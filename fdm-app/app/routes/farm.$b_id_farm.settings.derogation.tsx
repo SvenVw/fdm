@@ -94,8 +94,8 @@ export default function DerogationSettings() {
         .filter((year) => year >= 2006 && year <= 2025)
 
     return (
-        <div className="flex flex-col space-y-4 justify-self-center">
-            <Card className="w-[350px]">
+        <div className="flex justify-center p-4">
+            <Card className="w-full max-w-md">
                 <CardHeader>
                     <CardTitle>Derogatie</CardTitle>
                     <CardDescription>

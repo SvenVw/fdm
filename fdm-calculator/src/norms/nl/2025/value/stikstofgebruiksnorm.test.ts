@@ -34,10 +34,10 @@ describe("stikstofgebruiksnorm helpers", () => {
     })
 })
 
-describe("calculateNL2025StikstofGebruiksNorm", () => {
-    it("should return the correct norm for grasland", async () => {
+describe("getNL2025StikstofGebruiksNorm", () => {
+    it("should return the correct norm for grasland (beweiden)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: true },
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571],
@@ -54,12 +54,34 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
         const result = await calculateNL2025StikstofGebruiksNorm(mockInput)
         expect(result.normValue).toBe(345)
-        expect(result.normSource).toEqual("Grasland.")
+        expect(result.normSource).toEqual("Grasland (beweiden).")
+    })
+
+    it("should return the correct norm for grasland (volledig maaien)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571],
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_265",
+                    b_lu_start: new Date(2025, 0, 1), // Current year cultivation
+                    b_lu_end: new Date(2025, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(385)
+        expect(result.normSource).toEqual("Grasland (volledig maaien).")
     })
 
     it("should return the correct norm for potatoes", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571],
@@ -84,7 +106,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should apply 0 korting if winterteelt is present in zand_nwc region (hoofdteelt 2025)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: true },
             field: {
                 b_id: "1",
                 b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
@@ -104,13 +126,13 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
         // The base norm for Grasland in zand_nwc is 200 in nv-gebied. With winterteelt, korting should be 0.
         expect(result.normValue).toBe(200)
         expect(result.normSource).toEqual(
-            "Grasland. Geen korting: winterteelt aanwezig",
+            "Grasland (beweiden). Geen korting: winterteelt aanwezig",
         )
     })
 
     it("should apply 0 korting if vanggewas is present (sown <= Oct 1st)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
@@ -140,7 +162,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should apply 5 korting if vanggewas is present (sown Oct 2nd - Oct 14th)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
@@ -170,7 +192,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should apply 10 korting if vanggewas is present (sown Oct 15th - Oct 31st)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
@@ -200,7 +222,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should apply 20 korting if vanggewas is present (sown Nov 1st or later)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
@@ -230,7 +252,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should apply 20 korting if no winterteelt or vanggewas is present in zand_nwc region", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
@@ -260,7 +282,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should not apply korting if region is not sandy or loess, even without winterteelt/vanggewas", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.648307588666836, 51.96484772224782], // This centroid is in 'klei'
@@ -290,7 +312,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should return the correct norm for Gras voor industriële verwerking (eerste jaar)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571], // Klei region
@@ -314,7 +336,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should return the correct norm for Gras voor industriële verwerking (volgende jaren)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571], // Klei region
@@ -343,7 +365,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should return the correct norm for Graszaad, Engels raaigras (1e jaars)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571], // Klei region
@@ -367,7 +389,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should return the correct norm for Graszaad, Engels raaigras (overjarig)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571], // Klei region
@@ -396,7 +418,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should return the correct norm for Akkerbouwgewassen, Roodzwenkgras (1e jaars)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571], // Klei region
@@ -420,7 +442,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should return the correct norm for Akkerbouwgewassen, Roodzwenkgras (overjarig)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571], // Klei region
@@ -449,7 +471,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should return the correct norm for Winterui (1e jaars)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571], // Klei region
@@ -473,7 +495,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should return the correct norm for Winterui (2e jaars)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571], // Klei region
@@ -497,7 +519,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should return the correct norm for Bladgewassen, Spinazie (1e teelt)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571], // Klei region
@@ -519,7 +541,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should return the correct norm for Bladgewassen, Slasoorten (1e teelt)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571], // Klei region
@@ -543,7 +565,7 @@ describe("calculateNL2025StikstofGebruiksNorm", () => {
 
     it("should return the correct norm for Bladgewassen, Andijvie eerste teelt volgteelt (1e teelt)", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571], // Klei region

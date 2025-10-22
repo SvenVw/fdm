@@ -28,8 +28,8 @@ export function HeaderFertilizer({
         <>
             <BreadcrumbSeparator />
             <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href={`/farm/${b_id_farm}/fertilizer`}>
-                    Meststof
+                <BreadcrumbLink href={`/farm/${b_id_farm}/fertilizers`}>
+                    Meststoffen
                 </BreadcrumbLink>
             </BreadcrumbItem>
             {fertilizerOptions.length > 0 ? (

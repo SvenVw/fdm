@@ -1,7 +1,7 @@
-import { type Field, withCalculationCache } from "@svenvw/fdm-core"
+import type { Field } from "@svenvw/fdm-core"
+import { getGeoTiffValue } from "../../../../shared/geotiff"
+import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
 import pkg from "../../../package"
-import { getGeoTiffValue } from "../../../shared/geotiff"
-import { getFdmPublicDataUrl } from "../../../shared/public-data-url"
 import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
 import type {
     DierlijkeMestGebruiksnormResult,
