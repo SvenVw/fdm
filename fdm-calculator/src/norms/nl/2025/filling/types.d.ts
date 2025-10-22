@@ -1,4 +1,10 @@
-import type { fdmSchema } from "@svenvw/fdm-core"
+import type * as schema from "@svenvw/fdm-core"
+import type {
+    Cultivation,
+    Fertilizer,
+    FertilizerApplication,
+    Field,
+} from "@svenvw/fdm-core"
 import type { RegionKey } from "../value/types"
 
 export type NormFilling = {
@@ -11,7 +17,7 @@ export type NormFilling = {
 }
 
 export type Table11Mestcodes = {
-    p_type_rvo: fdmSchema.fertilizersCatalogueTypeSelect["p_type_rvo"]
+    p_type_rvo: schema.fertilizersCatalogueTypeSelect["p_type_rvo"]
     p_type_nitratesdirective: boolean
     p_n_rt?: number
     p_p_rt?: number
@@ -19,7 +25,7 @@ export type Table11Mestcodes = {
 
 export type Table9 = {
     description: string
-    p_type_rvo: fdmSchema.fertilizersCatalogueTypeSelect["p_type_rvo"][]
+    p_type_rvo: schema.fertilizersCatalogueTypeSelect["p_type_rvo"][]
     onFarmProduced?: boolean
     subTypes?: {
         description: string
@@ -39,7 +45,7 @@ export type WorkingCoefficientDetails = {
 }
 
 export type NL2025NormsFillingInput = {
-    cultivations: cultivations
+    cultivations: Cultivation
     applications: FertilizerApplication[]
     fertilizers: Fertilizer[]
     has_organic_certification: boolean
