@@ -129,10 +129,7 @@ export function FieldNorms({ fieldNorms, fieldOptions }: FieldNormsProps) {
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
                 {fieldNorms.map((field) => (
                     <NavLink key={field.b_id} to={`./${field.b_id}`}>
-                        <Card
-                            key={field.b_id}
-                            className="flex flex-col transition-shadow hover:shadow-lg"
-                        >
+                        <Card className="flex flex-col transition-shadow hover:shadow-lg">
                             <CardHeader>
                                 <CardTitle className="text-lg">
                                     {getFieldName(field.b_id)}
