@@ -45,7 +45,7 @@ export type WorkingCoefficientDetails = {
 }
 
 export type NL2025NormsFillingInput = {
-    cultivations: Cultivation
+    cultivations: Cultivation[]
     applications: FertilizerApplication[]
     fertilizers: Fertilizer[]
     has_organic_certification: boolean
