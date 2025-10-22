@@ -106,7 +106,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
                 has_organic_certification: false,
                 fosfaatgebruiksnorm,
                 cultivations: [],
-                has_grazining_intention: false,
+                has_grazing_intention: false,
                 b_centroid: [0, 0],
             } as NL2025NormsFillingInput)
 
@@ -129,7 +129,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
                 has_organic_certification: false,
                 fosfaatgebruiksnorm,
                 cultivations: [],
-                has_grazining_intention: false,
+                has_grazing_intention: false,
                 b_centroid: [0, 0],
             } as NL2025NormsFillingInput)
             // console.log(result) // Keep for debugging if needed
@@ -158,7 +158,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
                 has_organic_certification: false,
                 fosfaatgebruiksnorm,
                 cultivations: [],
-                has_grazining_intention: false,
+                has_grazing_intention: false,
                 b_centroid: [0, 0],
             } as NL2025NormsFillingInput)
             // console.log(result) // Keep for debugging if needed
@@ -182,7 +182,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
                 has_organic_certification: false,
                 fosfaatgebruiksnorm,
                 cultivations: [],
-                has_grazining_intention: false,
+                has_grazing_intention: false,
                 b_centroid: [0, 0],
             } as NL2025NormsFillingInput)
 
@@ -206,7 +206,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
                 has_organic_certification: false,
                 fosfaatgebruiksnorm,
                 cultivations: [],
-                has_grazining_intention: false,
+                has_grazing_intention: false,
                 b_centroid: [0, 0],
             } as NL2025NormsFillingInput)
 
@@ -230,7 +230,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
                 has_organic_certification: false,
                 fosfaatgebruiksnorm,
                 cultivations: [],
-                has_grazining_intention: false,
+                has_grazing_intention: false,
                 b_centroid: [0, 0],
             } as NL2025NormsFillingInput)
 
@@ -250,7 +250,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             has_organic_certification: false,
             fosfaatgebruiksnorm: 100,
             cultivations: [],
-            has_grazining_intention: false,
+            has_grazing_intention: false,
             b_centroid: [0, 0],
         } as NL2025NormsFillingInput)
         expect(result.normFilling).toBe(0)
@@ -269,7 +269,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             has_organic_certification: false,
             fosfaatgebruiksnorm,
             cultivations: [],
-            has_grazining_intention: false,
+            has_grazing_intention: false,
             b_centroid: [0, 0],
         } as NL2025NormsFillingInput)
         expect(result.normFilling).toBeCloseTo(35)
@@ -287,7 +287,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             has_organic_certification: false,
             fosfaatgebruiksnorm,
             cultivations: [],
-            has_grazining_intention: false,
+            has_grazing_intention: false,
             b_centroid: [0, 0],
         } as NL2025NormsFillingInput)
         expect(result.normFilling).toBeCloseTo(10) // 100% counted
@@ -307,7 +307,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             has_organic_certification: true,
             fosfaatgebruiksnorm,
             cultivations: [],
-            has_grazining_intention: false,
+            has_grazing_intention: false,
             b_centroid: [0, 0],
         } as NL2025NormsFillingInput)
         expect(result.normFilling).toBeCloseTo(22.5) // 30 * 0.75 = 22.5
@@ -327,7 +327,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             has_organic_certification: false,
             fosfaatgebruiksnorm,
             cultivations: [],
-            has_grazining_intention: false,
+            has_grazing_intention: false,
             b_centroid: [0, 0],
         } as NL2025NormsFillingInput)
         expect(result.normFilling).toBeCloseTo(30) // 100% counted
@@ -345,7 +345,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             has_organic_certification: false,
             fosfaatgebruiksnorm,
             cultivations: [],
-            has_grazining_intention: false,
+            has_grazing_intention: false,
             b_centroid: [0, 0],
         } as NL2025NormsFillingInput)
         expect(result.normFilling).toBeCloseTo(10 * 3.1) // 31
@@ -362,7 +362,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             has_organic_certification: false,
             fosfaatgebruiksnorm,
             cultivations: [],
-            has_grazining_intention: false,
+            has_grazing_intention: false,
             b_centroid: [0, 0],
         } as NL2025NormsFillingInput)
         expect(result.normFilling).toBe(0)
@@ -380,7 +380,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             has_organic_certification: false,
             fosfaatgebruiksnorm,
             cultivations: [],
-            has_grazining_intention: false,
+            has_grazing_intention: false,
             b_centroid: [0, 0],
         } as NL2025NormsFillingInput)
         // Standard: 10kg. Remaining norm: 20kg.
@@ -414,7 +414,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             has_organic_certification: false,
             fosfaatgebruiksnorm,
             cultivations: [],
-            has_grazining_intention: false,
+            has_grazing_intention: false,
             b_centroid: [0, 0],
         } as NL2025NormsFillingInput)
         // Standard: 10kg.

@@ -26,7 +26,7 @@ export async function calculateFertilizerApplicationFillingForNitrogen(
         applications,
         fertilizers,
         b_centroid,
-        has_grazining_intention,
+        has_grazing_intention,
         cultivations,
     } = input
 
@@ -82,7 +82,7 @@ export async function calculateFertilizerApplicationFillingForNitrogen(
         const workingCoefficientDetails = getWorkingCoefficient(
             fertilizer.p_type_rvo,
             soilType,
-            has_grazining_intention,
+            has_grazing_intention,
             isCurrentBouwland,
             p_app_date,
             fertilizerOnFarmProduced, // Pass the determined onFarmProduced status

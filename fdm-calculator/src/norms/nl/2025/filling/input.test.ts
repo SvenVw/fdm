@@ -120,7 +120,7 @@ describe("collectInputForFertilizerApplicationFilling", () => {
             applications: expectedApplications,
             fertilizers: expectedFertilizers,
             has_organic_certification: false,
-            has_grazining_intention: true,
+            has_grazing_intention: true,
             fosfaatgebruiksnorm: mockFosfaatgebruiksnorm,
             b_centroid: expectedB_centroid,
         } as NL2025NormsFillingInput)

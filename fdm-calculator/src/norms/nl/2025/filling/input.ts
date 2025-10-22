@@ -26,7 +26,7 @@ import {
 export async function collectInputForFertilizerApplicationFilling(
     fdm: FdmType,
     principal_id: string,
-    b_id: string, 
+    b_id: string,
     fosfaatgebruiksnorm: number,
 ): Promise<NL2025NormsFillingInput> {
     // Define the calendar year for the norms calculation.
@@ -40,7 +40,9 @@ export async function collectInputForFertilizerApplicationFilling(
     // This is crucial for obtaining the farm ID and the field's geographical centroid.
     const field = await getField(fdm, principal_id, b_id)
     if (!field) {
-        throw new Error(`Field with id ${b_id} not found for principal ${principal_id}`);
+        throw new Error(
+            `Field with id ${b_id} not found for principal ${principal_id}`,
+        )
     }
     const b_id_farm = field.b_id_farm
     const b_centroid = field.b_centroid
@@ -89,7 +91,7 @@ export async function collectInputForFertilizerApplicationFilling(
         applications: applications,
         fertilizers: fertilizers,
         has_organic_certification: has_organic_certification,
-        has_grazining_intention: has_grazing_intention,
+        has_grazing_intention: has_grazing_intention,
         fosfaatgebruiksnorm: fosfaatgebruiksnorm,
         b_centroid: b_centroid,
     }

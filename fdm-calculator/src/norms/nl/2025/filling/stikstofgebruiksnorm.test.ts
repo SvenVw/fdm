@@ -575,14 +575,14 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
             },
         ]
         const b_centroid: [number, number] = [0, 0]
-        const has_grazining_intention = false
+        const has_grazing_intention = false
         const cultivations: Cultivation[] = []
 
         const result = await calculateFertilizerApplicationFillingForNitrogen({
             applications,
             fertilizers,
             b_centroid,
-            has_grazining_intention,
+            has_grazing_intention,
             cultivations,
             has_organic_certification: false, // Default value for tests
             fosfaatgebruiksnorm: 0, // Default value for tests
@@ -626,14 +626,14 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
             },
         ]
         const b_centroid: [number, number] = [0, 0]
-        const has_grazining_intention = false
+        const has_grazing_intention = false
         const cultivations: Cultivation[] = []
 
         const result = await calculateFertilizerApplicationFillingForNitrogen({
             applications,
             fertilizers,
             b_centroid,
-            has_grazining_intention,
+            has_grazing_intention,
             cultivations,
             has_organic_certification: false, // Default value for tests
             fosfaatgebruiksnorm: 0, // Default value for tests
@@ -671,14 +671,14 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
             },
         ]
         const b_centroid: [number, number] = [0, 0]
-        const has_grazining_intention = true // Drijfmest graasdieren, met beweiding -> 0.45
+        const has_grazing_intention = true // Drijfmest graasdieren, met beweiding -> 0.45
         const cultivations: Cultivation[] = []
 
         const result = await calculateFertilizerApplicationFillingForNitrogen({
             applications,
             fertilizers,
             b_centroid,
-            has_grazining_intention,
+            has_grazing_intention,
             cultivations,
             has_organic_certification: false, // Default value for tests
             fosfaatgebruiksnorm: 0, // Default value for tests
@@ -704,7 +704,7 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
         ]
         const fertilizers: Fertilizer[] = [] // Empty fertilizers array
         const b_centroid: [number, number] = [0, 0]
-        const has_grazining_intention = false
+        const has_grazing_intention = false
         const cultivations: Cultivation[] = []
 
         await expect(() =>
@@ -712,7 +712,7 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
                 applications,
                 fertilizers,
                 b_centroid,
-                has_grazining_intention,
+                has_grazing_intention,
                 cultivations,
                 has_organic_certification: false, // Default value for tests
                 fosfaatgebruiksnorm: 0, // Default value for tests
@@ -741,7 +741,7 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
             },
         ]
         const b_centroid: [number, number] = [0, 0]
-        const has_grazining_intention = false
+        const has_grazing_intention = false
         const cultivations: Cultivation[] = [
             {
                 b_lu: "cult1",
@@ -755,7 +755,7 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
             applications,
             fertilizers,
             b_centroid,
-            has_grazining_intention,
+            has_grazing_intention,
             cultivations,
             has_organic_certification: false, // Default value for tests
             fosfaatgebruiksnorm: 0, // Default value for tests
