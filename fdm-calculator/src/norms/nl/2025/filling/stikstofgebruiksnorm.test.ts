@@ -707,7 +707,7 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
         const has_grazing_intention = false
         const cultivations: Cultivation[] = []
 
-        await expect(() =>
+        await expect(
             calculateFertilizerApplicationFillingForNitrogen({
                 applications,
                 fertilizers,
