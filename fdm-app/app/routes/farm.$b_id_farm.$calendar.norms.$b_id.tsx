@@ -501,15 +501,16 @@ function FieldNormsContent(loaderData: Awaited<ReturnType<typeof loader>>) {
                         perceel en hun bijdrage aan de gebruiksnormen.
                     </p>
                 </div>
-
                 <div className="grid gap-6 mt-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-                    {fertilizerApplications?.map((app) => (
-                        <FertilizerApplicationCard
-                            key={app.p_app_id}
-                            application={app}
-                            normsFilling={normsFilling}
-                        />
-                    ))}
+                    {fertilizerApplications &&
+                        normsFilling &&
+                        fertilizerApplications.map((app) => (
+                            <FertilizerApplicationCard
+                                key={app.p_app_id}
+                                application={app}
+                                normsFilling={normsFilling}
+                            />
+                        ))}
                 </div>
             </div>
         </div>
