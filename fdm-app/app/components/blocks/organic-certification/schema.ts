@@ -1,4 +1,4 @@
-import z from "zod"
+import { z } from "zod"
 
 /**
  * Regular expression for validating EU TRACES document numbers for Organic Operator Certificates.
@@ -41,9 +41,11 @@ export const formSchema = z
             required_error: "Startdatum is verplicht",
             invalid_type_error: "Ongeldige datum",
         }),
-        b_organic_expires: z.coerce.date({
-            invalid_type_error: "Ongeldige datum",
-        }).optional(),
+        b_organic_expires: z.coerce
+            .date({
+                invalid_type_error: "Ongeldige datum",
+            })
+            .optional(),
     })
     .refine(
         (data) => {
