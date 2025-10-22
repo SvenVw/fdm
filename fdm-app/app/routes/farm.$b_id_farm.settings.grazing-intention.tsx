@@ -1,7 +1,4 @@
-import {
-    getGrazingIntentions,
-    setGrazingIntention,
-} from "@svenvw/fdm-core"
+import { getGrazingIntentions, setGrazingIntention } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -32,7 +29,10 @@ import { fdm } from "~/lib/fdm.server"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
-        const b_id_farm = params.b_id_farm!
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw new Error("Invalid b_id_farm")
+        }
         const session = await getSession(request)
         const grazingIntentions = await getGrazingIntentions(
             fdm,
@@ -47,19 +47,31 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
-        const b_id_farm = params.b_id_farm!
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw new Error("Invalid b_id_farm")
+        }
         const session = await getSession(request)
         const formData = await request.formData()
         const year = Number(formData.get("year"))
-        const hasGrazingIntention = formData.get("hasGrazingIntention") === "true"
-        
-        await setGrazingIntention(fdm, session.principal_id, b_id_farm, year, !hasGrazingIntention)
+        const hasGrazingIntention =
+            formData.get("hasGrazingIntention") === "true"
+        if (Number.isNaN(year)) {
+            throw new Error("invalid: year")
+        }
+
+        await setGrazingIntention(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            year,
+            !hasGrazingIntention,
+        )
 
         if (hasGrazingIntention) {
             return dataWithSuccess({}, `Beweiding voor ${year} uitgeschakeld.`)
-        } else {
-            return dataWithSuccess({}, `Beweiding voor ${year} ingeschakeld.`)
         }
+        return dataWithSuccess({}, `Beweiding voor ${year} ingeschakeld.`)
     } catch (error) {
         throw handleActionError(error)
     }
@@ -79,7 +91,9 @@ export default function GrazingIntentionSettings() {
                 <CardHeader>
                     <CardTitle>Beweiding</CardTitle>
                     <CardDescription>
-                        Geef hier aan of je voor een bepaald jaar hebt beweid of van plan bent te gaan beweiden. Dit heeft invloed op de berekeningen.
+                        Geef hier aan of je voor een bepaald jaar hebt beweid of
+                        van plan bent te gaan beweiden. Dit heeft invloed op de
+                        berekeningen.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -92,16 +106,21 @@ export default function GrazingIntentionSettings() {
                         </TableHeader>
                         <TableBody>
                             {years.map((year) => {
-                                const hasGrazingIntention = grazingIntentions.some(
-                                    (g) => g.b_grazing_intention_year === year && g.b_grazing_intention,
-                                )
+                                const hasGrazingIntention =
+                                    grazingIntentions.some(
+                                        (g) =>
+                                            g.b_grazing_intention_year ===
+                                                year && g.b_grazing_intention,
+                                    )
                                 return (
                                     <TableRow key={year}>
                                         <TableCell>{year}</TableCell>
                                         <TableCell>
                                             <fetcher.Form method="post">
                                                 <Switch
-                                                    checked={hasGrazingIntention}
+                                                    checked={
+                                                        hasGrazingIntention
+                                                    }
                                                     onCheckedChange={() => {
                                                         fetcher.submit(
                                                             {
