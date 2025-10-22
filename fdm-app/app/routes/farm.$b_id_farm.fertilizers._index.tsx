@@ -78,9 +78,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the options for p_type_rvo
         const fertilizerParameterDescription =
             await getFertilizerParametersDescription("NL-nl")
-        const p_type_rvo_options = fertilizerParameterDescription.find(
-            (x) => x.parameter === "p_type_rvo",
-        )?.options
+        const p_type_rvo_options =
+            fertilizerParameterDescription.find(
+                (x: { parameter: string }) => x.parameter === "p_type_rvo",
+            )?.options ?? []
+        const rvoLabelByValue = new Map(
+            p_type_rvo_options.map((opt: { value: string; label: string }) => [
+                String(opt.value),
+                opt.label,
+            ]),
+        )
 
         // Get the available fertilizers and the label for p_type_rvo
         const fertilizers: Fertilizer[] = await getFertilizers(
@@ -88,16 +95,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session.principal_id,
             b_id_farm,
         ).then((fertilizers) =>
-            fertilizers.map((fertilizer) => {
-                const p_type_rvo = fertilizer.p_type_rvo
-                const rvoTypeName = p_type_rvo_options.find(
-                    (x) => x.value === p_type_rvo,
-                )?.label
-                return {
-                    ...fertilizer,
-                    p_type_rvo_label: rvoTypeName,
-                }
-            }),
+            fertilizers.map((fertilizer) => ({
+                ...fertilizer,
+                p_type_rvo_label:
+                    rvoLabelByValue.get(String(fertilizer.p_type_rvo)) ?? null,
+            })),
         )
 
         // Return user information from loader
