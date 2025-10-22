@@ -502,7 +502,7 @@ function FieldNormsContent(loaderData: Awaited<ReturnType<typeof loader>>) {
                     </p>
                 </div>
 
-                <div className="flex flex-cols gap-6 mt-6">
+                <div className="grid gap-6 mt-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                     {fertilizerApplications?.map((app) => (
                         <FertilizerApplicationCard
                             key={app.p_app_id}
