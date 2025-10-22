@@ -28,4 +28,6 @@ CREATE TABLE "fdm"."organic_certifications_holding" (
 ALTER TABLE "fdm"."fertilizers_catalogue" ADD COLUMN "p_type_rvo" "fdm"."p_type_rvo";--> statement-breakpoint
 ALTER TABLE "fdm"."intending_grazing" ADD CONSTRAINT "intending_grazing_b_id_farm_farms_b_id_farm_fk" FOREIGN KEY ("b_id_farm") REFERENCES "fdm"."farms"("b_id_farm") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."organic_certifications_holding" ADD CONSTRAINT "organic_certifications_holding_b_id_farm_farms_b_id_farm_fk" FOREIGN KEY ("b_id_farm") REFERENCES "fdm"."farms"("b_id_farm") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fdm"."organic_certifications_holding" ADD CONSTRAINT "organic_certifications_holding_b_id_organic_organic_certifications_b_id_organic_fk" FOREIGN KEY ("b_id_organic") REFERENCES "fdm"."organic_certifications"("b_id_organic") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "fdm"."organic_certifications_holding" ADD CONSTRAINT "organic_certifications_holding_b_id_organic_organic_certifications_b_id_organic_fk" FOREIGN KEY ("b_id_organic") REFERENCES "fdm"."organic_certifications"("b_id_organic") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+CREATE UNIQUE INDEX "organic_one_farm_per_cert" ON "fdm"."organic_certifications_holding" USING btree ("b_id_organic");--> statement-breakpoint
+CREATE UNIQUE INDEX "derogation_one_per_farm_per" ON "fdm"."derogation_applying" USING btree ("b_id_derogation");

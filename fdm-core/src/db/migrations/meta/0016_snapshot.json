@@ -1,5 +1,5 @@
 {
-  "id": "11582248-020a-482b-94e7-4cad07114e8c",
+  "id": "f52147c0-1fd4-4bde-9190-be18a24ccaf5",
   "prevId": "60e262a4-309d-4384-ae3d-130a6e208f05",
   "version": "7",
   "dialect": "postgresql",
@@ -546,7 +546,23 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "derogation_one_per_farm_per": {
+          "name": "derogation_one_per_farm_per",
+          "columns": [
+            {
+              "expression": "b_id_derogation",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "derogation_applying_b_id_farm_farms_b_id_farm_fk": {
           "name": "derogation_applying_b_id_farm_farms_b_id_farm_fk",
@@ -2001,7 +2017,23 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "organic_one_farm_per_cert": {
+          "name": "organic_one_farm_per_cert",
+          "columns": [
+            {
+              "expression": "b_id_organic",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "organic_certifications_holding_b_id_farm_farms_b_id_farm_fk": {
           "name": "organic_certifications_holding_b_id_farm_farms_b_id_farm_fk",

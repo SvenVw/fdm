@@ -799,6 +799,9 @@ export const derogationApplying = fdmSchema.table(
                     columns: [table.b_id_farm, table.b_id_derogation],
                 }),
             },
+            uniqueIndex("derogation_one_per_farm_per").on(
+                table.b_id_derogation,
+            ),
         ]
     },
 )
@@ -844,6 +847,7 @@ export const organicCertificationsHolding = fdmSchema.table(
                     columns: [table.b_id_farm, table.b_id_organic],
                 }),
             },
+            uniqueIndex("organic_one_farm_per_cert").on(table.b_id_organic),
         ]
     },
 )
