@@ -1,6 +1,6 @@
 import { withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
-import pkg from "../../../package"
+import pkg from "../../../../package"
 import { fosfaatNormsData } from "./fosfaatgebruiksnorm-data"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import type {
@@ -174,8 +174,18 @@ export async function calculateNL2025FosfaatGebruiksNorm(
     return { normValue, normSource }
 }
 
+/**
+ * Memoized version of {@link calculateNL2025FosfaatGebruiksNorm}.
+ *
+ * This function is wrapped with `withCalculationCache` to optimize performance by caching
+ * results based on the input and the current calculator version.
+ *
+ * @param {NL2025NormsInput} input - An object containing all necessary parameters for the calculation.
+ * @returns {Promise<FosfaatGebruiksnormResult>} An object of type `FosfaatGebruiksnormResult` containing the determined
+ *   phosphate usage standard (`normValue`) and the `fosfaatKlasse` (the phosphate
+ *   class determined from the soil analysis). Returns `null` if a norm cannot be determined.
+ */
 export const getNL2025FosfaatGebruiksNorm = withCalculationCache(
-    "calculateNL2025FosfaatGebruiksNorm",
-    pkg.calculatorVersion,
     calculateNL2025FosfaatGebruiksNorm,
+    pkg.calculatorVersion,
 )

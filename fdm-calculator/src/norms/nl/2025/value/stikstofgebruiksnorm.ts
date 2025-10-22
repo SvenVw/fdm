@@ -2,7 +2,7 @@ import { type Field, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import { getGeoTiffValue } from "../../../../shared/geotiff"
 import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
-import pkg from "../../../package"
+import pkg from "../../../../package"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {
@@ -644,8 +644,19 @@ export async function calculateNL2025StikstofGebruiksNorm(
     }
 }
 
+/**
+ * Memoized version of {@link calculateNL2025StikstofGebruiksNorm}.
+ *
+ * This function is wrapped with `withCalculationCache` to optimize performance by caching
+ * results based on the input and the current calculator version.
+ *
+ * @param {NL2025NormsInput} input - An object of type `NL2025NormsInput` containing all necessary data.
+ * @returns {Promise<GebruiksnormResult>} A promise that resolves to an object of type `GebruiksnormResult` containing:
+ *   - `normValue`: The determined nitrogen usage standard in kilograms per hectare (kg/ha).
+ *   - `normSource`: The descriptive name from RVO Table 2 used for the calculation.
+ *   - `kortingDescription`: A description of any korting (reduction) applied to the norm.
+ */
 export const getNL2025StikstofGebruiksNorm = withCalculationCache(
-    "calculateNL2025StikstofGebruiksNorm",
-    pkg.calculatorVersion,
     calculateNL2025StikstofGebruiksNorm,
+    pkg.calculatorVersion,
 )

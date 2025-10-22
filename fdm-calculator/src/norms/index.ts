@@ -2,14 +2,14 @@ import {
     aggregateNormsToFarmLevel,
     aggregateNormFillingsToFarmLevel,
 } from "./farm"
-import { calculateNL2025DierlijkeMestGebruiksNorm } from "./nl/2025/value/dierlijke-mest-gebruiksnorm"
-import { calculateNL2025FertilizerApplicationFillingForManure } from "./nl/2025/filling/dierlijke-mest-gebruiksnorm"
-import { calculateNL2025FertilizerApplicationFillingForPhosphate } from "./nl/2025/filling/fosfaatgebruiksnorm"
+import { getNL2025DierlijkeMestGebruiksNorm } from "./nl/2025/value/dierlijke-mest-gebruiksnorm"
+import { getNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm } from "./nl/2025/filling/dierlijke-mest-gebruiksnorm"
+import { getNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm } from "./nl/2025/filling/fosfaatgebruiksnorm"
 import { collectInputForFertilizerApplicationFilling } from "./nl/2025/filling/input"
-import { calculateNL2025FertilizerApplicationFillingForNitrogen } from "./nl/2025/filling/stikstofgebruiksnorm"
-import { calculateNL2025FosfaatGebruiksNorm } from "./nl/2025/value/fosfaatgebruiksnorm"
+import { getNL2025FertilizerApplicationFillingForStikstofGebruiksNorm } from "./nl/2025/filling/stikstofgebruiksnorm"
+import { getNL2025FosfaatGebruiksNorm } from "./nl/2025/value/fosfaatgebruiksnorm"
 import { collectNL2025InputForNorms } from "./nl/2025/value/input"
-import { calculateNL2025StikstofGebruiksNorm } from "./nl/2025/value/stikstofgebruiksnorm"
+import { getNL2025StikstofGebruiksNorm } from "./nl/2025/value/stikstofgebruiksnorm"
 import type { NormFilling } from "./nl/2025/filling/types"
 
 export function createFunctionsForNorms(b_region: "NL", year: "2025") {
@@ -17,9 +17,9 @@ export function createFunctionsForNorms(b_region: "NL", year: "2025") {
         if (year === "2025") {
             return {
                 collectInputForNorms: collectNL2025InputForNorms,
-                calculateNormForNitrogen: calculateNL2025StikstofGebruiksNorm,
-                calculateNormForManure: calculateNL2025DierlijkeMestGebruiksNorm,
-                calculateNormForPhosphate: calculateNL2025FosfaatGebruiksNorm,
+                calculateNormForNitrogen: getNL2025StikstofGebruiksNorm,
+                calculateNormForManure: getNL2025DierlijkeMestGebruiksNorm,
+                calculateNormForPhosphate: getNL2025FosfaatGebruiksNorm,
                 aggregateNormsToFarmLevel: aggregateNormsToFarmLevel,
             }
         }
@@ -38,11 +38,11 @@ export function createFunctionsForFertilizerApplicationFilling(
                 collectInputForFertilizerApplicationFilling:
                     collectInputForFertilizerApplicationFilling,
                 calculateFertilizerApplicationFillingForNitrogen:
-                    calculateNL2025FertilizerApplicationFillingForNitrogen,
+                    getNL2025FertilizerApplicationFillingForStikstofGebruiksNorm,
                 calculateFertilizerApplicationFillingForManure:
-                    calculateNL2025FertilizerApplicationFillingForManure,
+                    getNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm,
                 calculateFertilizerApplicationFillingForPhosphate:
-                    calculateNL2025FertilizerApplicationFillingForPhosphate,
+                    getNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm,
                 aggregateNormFillingsToFarmLevel:
                     aggregateNormFillingsToFarmLevel,
             }

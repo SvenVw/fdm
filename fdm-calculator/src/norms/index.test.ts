@@ -11,9 +11,9 @@ import { calculateNL2025DierlijkeMestGebruiksNorm } from "./nl/2025/value/dierli
 import { calculateNL2025FosfaatGebruiksNorm } from "./nl/2025/value/fosfaatgebruiksnorm"
 import { collectNL2025InputForNorms } from "./nl/2025/value/input"
 import { calculateNL2025StikstofGebruiksNorm } from "./nl/2025/value/stikstofgebruiksnorm"
-import { calculateNL2025FertilizerApplicationFillingForPhosphate } from "./nl/2025/filling/fosfaatgebruiksnorm"
-import { calculateNL2025FertilizerApplicationFillingForManure } from "./nl/2025/filling/dierlijke-mest-gebruiksnorm"
-import { calculateNL2025FertilizerApplicationFillingForNitrogen } from "./nl/2025/filling/stikstofgebruiksnorm"
+import { calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm } from "./nl/2025/filling/fosfaatgebruiksnorm"
+import { calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm } from "./nl/2025/filling/dierlijke-mest-gebruiksnorm"
+import { calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm } from "./nl/2025/filling/stikstofgebruiksnorm"
 import { collectInputForFertilizerApplicationFilling } from "./nl/2025/filling/input"
 
 describe("createFunctionsForNorms", () => {
@@ -57,14 +57,16 @@ describe("createFunctionsForFertilizerApplicationFilling", () => {
             collectInputForFertilizerApplicationFilling,
         )
         expect(functions.calculateFertilizerApplicationFillingForNitrogen).toBe(
-            calculateNL2025FertilizerApplicationFillingForNitrogen,
+            calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm,
         )
         expect(functions.calculateFertilizerApplicationFillingForManure).toBe(
-            calculateNL2025FertilizerApplicationFillingForManure,
+            calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm,
         )
         expect(
             functions.calculateFertilizerApplicationFillingForPhosphate,
-        ).toBe(calculateNL2025FertilizerApplicationFillingForPhosphate)
+        ).toBe(
+            calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm,
+        )
         expect(functions.aggregateNormFillingsToFarmLevel).toBe(
             aggregateNormFillingsToFarmLevel,
         )
