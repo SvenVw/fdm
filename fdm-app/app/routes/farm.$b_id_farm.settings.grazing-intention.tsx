@@ -31,7 +31,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         const b_id_farm = params.b_id_farm
         if (!b_id_farm) {
-            throw new Error("Invalid b_id_farm")
+            throw new Error("invalid: b_id_farm")
         }
         const session = await getSession(request)
         const grazingIntentions = await getGrazingIntentions(
@@ -49,7 +49,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     try {
         const b_id_farm = params.b_id_farm
         if (!b_id_farm) {
-            throw new Error("Invalid b_id_farm")
+            throw new Error("invalid: b_id_farm")
         }
         const session = await getSession(request)
         const formData = await request.formData()
