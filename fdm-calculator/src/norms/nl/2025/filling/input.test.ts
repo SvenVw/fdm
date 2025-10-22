@@ -110,13 +110,16 @@ describe("collectInputForFertilizerApplicationFilling", () => {
             mockFdm,
             mockPrincipalId,
             mockFieldId,
-            { start: new Date(2025, 0, 1), end: new Date(2025, 11, 31) },
+            {
+                start: new Date(2025, 0, 1),
+                end: new Date(2025, 11, 31, 23, 59, 59, 999),
+            },
         )
         expect(getFertilizerApplications).toHaveBeenCalledWith(
             mockFdm,
             mockPrincipalId,
             "field456",
-            { start: new Date(2025, 0, 1), end: new Date(2025, 11, 31) },
+            { start: new Date(2025, 0, 1), end: new Date(2025, 11, 31, 23, 59, 59, 999)},
         )
         expect(getFertilizers).toHaveBeenCalledWith(
             mockFdm,
