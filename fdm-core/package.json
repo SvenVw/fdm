@@ -71,8 +71,8 @@
         "better-auth": "catalog:",
         "drizzle-orm": "catalog:",
         "nanoid": "^5.1.6",
-        "object-hash": "^3.0.0",
         "postgres": "^3.4.7",
+        "safe-stable-stringify": "^2.5.0",
         "unique-username-generator": "^1.5.1"
     },
     "packageManager": "pnpm@10.18.3",

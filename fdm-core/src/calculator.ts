@@ -1,16 +1,34 @@
-import { and, eq } from "drizzle-orm"
-import hash from "object-hash"
+import { eq } from "drizzle-orm"
+import { createHash } from "node:crypto"
+import stableStringify from "safe-stable-stringify"
 import {
     calculationCache as calculationCacheTable,
     calculationErrors as calculationErrorsTable,
 } from "./db/schema-calculator"
 import type { FdmType } from "./fdm"
+import { createId } from "./id"
 
-export function getCalculationInputHash<T_Input>(
-    calculator_version: string,
-    inputs: T_Input,
-) {
-    return hash([calculator_version, inputs])
+/**
+ * Generates a reliable and quick hash for caching calculation results.
+ *
+ * @param functionName - The name of the calculation function.
+ * @param packageVersion - The version of the package/module containing the function.
+ * @param functionInput - The input object for the function.
+ * @returns A SHA-256 hash as a hex string.
+ */
+export function generateCalculationHash<T_Input extends object>(
+    functionName: string,
+    packageVersion: string,
+    functionInput: T_Input,
+): string {
+    // 1. Deterministically serialize the input object
+    const serializedInput = stableStringify(functionInput)
+
+    // 2. Combine all components into a single string with separators
+    const dataToHash = `${functionName}:${packageVersion}:${serializedInput}`
+
+    // 3. Compute the hash using SHA-256
+    return createHash("sha256").update(dataToHash).digest("hex")
 }
 
 /**
@@ -21,61 +39,52 @@ export function getCalculationInputHash<T_Input>(
  * @param input_hash
  * @returns
  */
-export async function getCachedCalculation<T_Input, T_Output>(
+export function getCachedCalculation<T_Output>(
     fdm: FdmType,
-    calculation_type: string,
-    calculator_version: string,
-    inputs: T_Input,
+    calculation_hash: string,
 ): Promise<T_Output | null> {
-    const result = await fdm
+    const result = fdm
         .select({
-            calculation_type: calculationCacheTable.calculation_type,
-            calculator_version: calculationCacheTable.calculator_version,
             result: calculationCacheTable.result,
-            created_at: calculationCacheTable.created_at,
         })
         .from(calculationCacheTable)
-        .where(
-            and(
-                eq(calculationCacheTable.calculation_type, calculation_type),
-                eq(
-                    calculationCacheTable.input_hash,
-                    getCalculationInputHash(calculator_version, inputs),
-                ),
-            ),
-        )
+        .where(eq(calculationCacheTable.calculation_hash, calculation_hash))
         .limit(1)
-    return result?.length ? (result[0].result as T_Output) : null
+    return result.then((rows: { result: T_Output }[]) =>
+        rows?.length ? (rows[0].result as T_Output) : null,
+    )
 }
 
-export async function setCachedCalculation<T_Input, T_Output>(
+export async function setCachedCalculation<T_Input extends object, T_Output>(
     fdm: FdmType,
-    calculation_type: string,
-    calculator_version: string,
-    inputs: T_Input,
+    calculationHash: string,
+    calculationFunctionName: string,
+    calculatorVersion: string,
+    input: T_Input,
     result: T_Output,
 ) {
     await fdm.insert(calculationCacheTable).values({
-        calculation_type: calculation_type,
-        calculator_version: calculator_version,
-        inputs: inputs,
-        input_hash: getCalculationInputHash(calculator_version, inputs),
+        calculation_hash: calculationHash,
+        calculation_function: calculationFunctionName,
+        calculator_version: calculatorVersion,
+        input: input,
         result: result,
     })
 }
 
-export async function setCalculationError<T_Input>(
+export async function setCalculationError<T_Input extends object>(
     fdm: FdmType,
-    calculation_type: string,
-    calculator_version: string,
-    inputs: T_Input,
+    calculationFunctionName: string,
+    calculatorVersion: string,
+    input: T_Input,
     error_message: string,
     stack_trace: string | undefined,
 ) {
     return fdm.insert(calculationErrorsTable).values({
-        calculation_type: calculation_type,
-        calculator_version: calculator_version,
-        inputs: inputs,
+        calculation_error_id: createId(),
+        calculation_function: calculationFunctionName,
+        calculator_version: calculatorVersion,
+        input: input,
         error_message: error_message,
         stack_trace: stack_trace ?? null,
     })
@@ -86,49 +95,78 @@ export async function setCalculationError<T_Input>(
  *
  * Make sure to provide calculation_type same as the name of `calculationFunction` if possible
  *
- * @param calculation_type key to use to indentify the type of calculation
- * @param calculator_version key tied to the version of the current calculation function
  * @param calculationFunction function to compute in case there is no cached result
+ * @param calculatorVersion key tied to the version of the current calculation function
  * @returns a new function that takes an fdm instance and inputs and tries to retrieve results from cache when available
  */
-export function withCalculationCache<T_Input, T_Output>(
-    calculation_type: string,
-    calculator_version: string,
+export function withCalculationCache<T_Input extends object, T_Output>(
     calculationFunction: (inputs: T_Input) => T_Output | Promise<T_Output>,
+    calculatorVersion: string,
 ) {
-    return async (fdm: FdmType, inputs: T_Input) => {
-        // Database entries are tagged with the calculationFunction version
-        // therefore one can be sure that the stored type matches T_Output
-        const cachedResult: T_Output | null = await getCachedCalculation(
-            fdm,
-            calculation_type,
-            calculator_version,
-            inputs,
+    return async (fdm: FdmType, input: T_Input) => {
+        const calculationFunctionName = calculationFunction.name
+        const calculationHash = generateCalculationHash(
+            calculationFunctionName,
+            calculatorVersion,
+            input,
         )
 
+        let cachedResult: T_Output | null = null
+        let cacheResultOfCalculation = true
+        try {
+            cachedResult = await getCachedCalculation(fdm, calculationHash)
+        } catch (e: unknown) {
+            cacheResultOfCalculation = false
+            const errorMessage = e instanceof Error ? e.message : String(e)
+            console.error(
+                `Failed to read from calculation cache for ${calculationFunctionName} (hash: ${calculationHash}): ${errorMessage}`,
+            )
+            // Treat as a cache miss and proceed with calculation, but do not set a new cache
+        }
+
         if (cachedResult) {
+            console.log(
+                `Cache HIT for ${calculationFunctionName} (hash: ${calculationHash})`,
+            )
             return cachedResult
         }
 
         try {
-            const result = await calculationFunction(inputs)
-            await setCachedCalculation(
-                fdm,
-                calculation_type,
-                calculator_version,
-                inputs,
-                result,
+            console.log(
+                `Cache MISS for ${calculationFunctionName} (hash: ${calculationHash}). Performing calculation...`,
             )
+            const result = await calculationFunction(input)
+
+            if (cacheResultOfCalculation) {
+                await setCachedCalculation(
+                    fdm,
+                    calculationHash,
+                    calculationFunctionName,
+                    calculatorVersion,
+                    input,
+                    result,
+                )
+                console.log(
+                    `Calculation for ${calculationFunctionName} (hash: ${calculationHash}) completed and cached.`,
+                )
+            } else {
+                console.log(
+                    `Calculation for ${calculationFunctionName} (hash: ${calculationHash}) completed and not cached.`,
+                )
+            }
 
             return result
-        } catch (e: any) {
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : String(e)
+            const stackTrace = e instanceof Error ? e.stack : undefined
+
             await setCalculationError(
                 fdm,
-                calculation_type,
-                calculator_version,
-                inputs,
-                e.message,
-                e.stack,
+                calculationFunctionName,
+                calculatorVersion,
+                input,
+                errorMessage,
+                stackTrace,
             )
 
             throw e
