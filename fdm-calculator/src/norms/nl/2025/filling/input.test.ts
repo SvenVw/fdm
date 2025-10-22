@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach} from "vitest"
+import { describe, it, expect, vi, beforeEach } from "vitest"
 import { collectInputForFertilizerApplicationFilling } from "./input"
 import type {
     FdmType,
@@ -49,8 +49,13 @@ describe("collectInputForFertilizerApplicationFilling", () => {
         vi.mocked(getGrazingIntention).mockResolvedValue(true)
         vi.mocked(isOrganicCertificationValid).mockResolvedValue(false)
         vi.mocked(getCultivations).mockResolvedValue([
-            { b_lu: "cult1", b_start: "2025-01-01", b_lu_catalogue: "nl_2014" },
-        ] as Cultivation[])
+            {
+                b_lu: "cult1",
+                b_lu_start: new Date(2025, 0, 1),
+                b_lu_end: new Date(2025, 5, 1),
+                b_lu_catalogue: "nl_2014",
+            },
+        ] as unknown as Cultivation[])
         vi.mocked(getFertilizerApplications).mockResolvedValue([
             { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 1000 },
         ] as FertilizerApplication[])
@@ -61,8 +66,13 @@ describe("collectInputForFertilizerApplicationFilling", () => {
 
     it("should successfully collect all input data for a valid scenario", async () => {
         const expectedB_centroid: [number, number] = [10, 20]
-        const expectedCultivations: Cultivation[] = [
-            { b_lu: "cult1", b_start: "2025-01-01", b_lu_catalogue: "nl_2014" },
+        const expectedCultivations = [
+            {
+                b_lu: "cult1",
+                b_lu_start: new Date(2025, 0, 1),
+                b_lu_end: new Date(2025, 5, 1),
+                b_lu_catalogue: "nl_2014",
+            },
         ]
         const expectedApplications: FertilizerApplication[] = [
             { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 1000 },
