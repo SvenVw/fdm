@@ -13,7 +13,7 @@ import type { NormFilling, NL2025NormsFillingInput } from "./types"
  * @returns {NormFilling} An object containing the total nitrogen usage (`normFilling`) and a detailed breakdown per application (`applicationFilling`).
  * @throws {Error} Throws an error if a fertilizer or its RVO type is not found, ensuring data integrity.
  */
-export function calculateFertilizerApplicationFillingForManure(
+export function calculateNL2025FertilizerApplicationFillingForManure(
 	input: NL2025NormsFillingInput,
 ): NormFilling {
     const { applications, fertilizers } = input;

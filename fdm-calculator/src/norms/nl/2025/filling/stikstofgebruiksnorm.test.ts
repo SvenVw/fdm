@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import {
-    calculateFertilizerApplicationFillingForNitrogen,
+    calculateNL2025FertilizerApplicationFillingForNitrogen,
     isBouwland,
     getWorkingCoefficient,
 } from "./stikstofgebruiksnorm"
@@ -547,7 +547,7 @@ describe("getWorkingCoefficient", () => {
     })
 })
 
-describe("calculateFertilizerApplicationFillingForNitrogen", () => {
+describe("calculateNL2025FertilizerApplicationFillingForNitrogen", () => {
     // Mock getRegion to return a consistent soil type for these tests
     beforeEach(() => {
         vi.mocked(getRegion).mockResolvedValue("zand_nwc")
@@ -578,7 +578,7 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
         const has_grazing_intention = false
         const cultivations: Cultivation[] = []
 
-        const result = await calculateFertilizerApplicationFillingForNitrogen({
+        const result = await calculateNL2025FertilizerApplicationFillingForNitrogen({
             applications,
             fertilizers,
             b_centroid,
@@ -629,7 +629,7 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
         const has_grazing_intention = false
         const cultivations: Cultivation[] = []
 
-        const result = await calculateFertilizerApplicationFillingForNitrogen({
+        const result = await calculateNL2025FertilizerApplicationFillingForNitrogen({
             applications,
             fertilizers,
             b_centroid,
@@ -674,7 +674,7 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
         const has_grazing_intention = true // Drijfmest graasdieren, met beweiding -> 0.45
         const cultivations: Cultivation[] = []
 
-        const result = await calculateFertilizerApplicationFillingForNitrogen({
+        const result = await calculateNL2025FertilizerApplicationFillingForNitrogen({
             applications,
             fertilizers,
             b_centroid,
@@ -708,7 +708,7 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
         const cultivations: Cultivation[] = []
 
         await expect(
-            calculateFertilizerApplicationFillingForNitrogen({
+            calculateNL2025FertilizerApplicationFillingForNitrogen({
                 applications,
                 fertilizers,
                 b_centroid,
@@ -751,7 +751,7 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
             },
         ]
 
-        const result = await calculateFertilizerApplicationFillingForNitrogen({
+        const result = await calculateNL2025FertilizerApplicationFillingForNitrogen({
             applications,
             fertilizers,
             b_centroid,

@@ -529,7 +529,7 @@ function calculateKorting(
  * @see {@link https://www.rvo.nl/sites/default/files/2024-12/Tabel-2-Stikstof-landbouwgrond-2025_0.pdf | RVO Tabel 2 Stikstof landbouwgrond 2025} - Official document for nitrogen norms.
  * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/stikstof-en-fosfaat/gebruiksnormen-stikstof | RVO Gebruiksnormen stikstof (official page)} - General information on nitrogen and phosphate norms.
  */
-export async function getNL2025StikstofGebruiksNorm(
+export async function calculateNL2025StikstofGebruiksNorm(
     input: NL2025NormsInput,
 ): Promise<GebruiksnormResult> {
     const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf

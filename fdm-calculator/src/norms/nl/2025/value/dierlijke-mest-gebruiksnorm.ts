@@ -146,7 +146,7 @@ export async function isFieldInDerogatieVrijeZone(
  * @see {@link https://www.rvo.nl/onderwerpen/mest/derogatie | RVO Derogatie (official page)}
  * @see {@link https://www.rvo.nl/onderwerpen/mest/met-nutrienten-verontreinigde-gebieden-nv-gebieden | RVO Met nutriënten verontreinigde gebieden (NV-gebieden) (official page)}
  */
-export async function getNL2025DierlijkeMestGebruiksNorm(
+export async function calculateNL2025DierlijkeMestGebruiksNorm(
     input: NL2025NormsInput,
 ): Promise<DierlijkeMestGebruiksnormResult> {
     const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf || false
