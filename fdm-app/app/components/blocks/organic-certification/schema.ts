@@ -29,11 +29,15 @@ export const formSchema = z
     .object({
         b_organic_traces: z
             .string()
+            .trim()
+            .optional()
             .refine((val) => !val || isValidTracesNumber(val), {
                 message: "Ongeldig TRACES-nummer",
             }),
         b_organic_skal: z
             .string()
+            .trim()
+            .optional()
             .refine((val) => !val || isValidSkalNumber(val), {
                 message: "Ongeldig SKAL-nummer",
             }),
@@ -62,12 +66,7 @@ export const formSchema = z
             path: ["b_organic_issued"],
         },
     )
-    .refine(
-        (data) => {
-            return data.b_organic_traces || data.b_organic_skal
-        },
-        {
-            message: "Vul een TRACES- of SKAL-nummer in",
-            path: ["b_organic_traces"],
-        },
-    )
+    .refine((data) => !!(data.b_organic_traces || data.b_organic_skal), {
+        message: "Vul een TRACES- of SKAL-nummer in",
+        path: ["b_organic_traces"],
+    })
