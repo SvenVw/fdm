@@ -310,13 +310,13 @@ const FertilizerApplicationCard = ({
     normsFilling,
 }: FertilizerApplicationCardProps) => {
     const applicationFilling = {
-        nitrogen: normsFilling.nitrogen.applicationFilling.find(
+        nitrogen: normsFilling.nitrogen.applicationFilling?.find(
             (d: { p_app_id: string }) => d.p_app_id === application.p_app_id,
         ),
-        phosphate: normsFilling.phosphate.applicationFilling.find(
+        phosphate: normsFilling.phosphate.applicationFilling?.find(
             (d: { p_app_id: string }) => d.p_app_id === application.p_app_id,
         ),
-        manure: normsFilling.manure.applicationFilling.find(
+        manure: normsFilling.manure.applicationFilling?.find(
             (d: { p_app_id: string }) => d.p_app_id === application.p_app_id,
         ),
     }
