@@ -6,12 +6,11 @@ import {
     useLoaderData,
     useNavigation,
 } from "react-router"
-import { useEffect, useId, useState } from "react"
+import { useId } from "react"
 import { clientConfig } from "~/lib/config"
 import { getSession } from "~/lib/auth.server"
 import {
     addOrganicCertification,
-    deleteOrganicCertification,
     listOrganicCertifications,
     removeOrganicCertification,
 } from "@svenvw/fdm-core"
@@ -53,7 +52,7 @@ import { DatePicker } from "~/components/custom/date-picker"
 import { dataWithSuccess } from "remix-toast"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { formSchema } from "~/components/blocks/organic-certification/schema"
-import { LoadingSpinner } from "../components/custom/loadingspinner"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
     Card,
     CardContent,
