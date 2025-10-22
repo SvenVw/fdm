@@ -31,7 +31,7 @@ const rvoMestcodesOrganicRich75PercentOrganic = ["40"] // Varkens - Vaste mest (
  * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
  * @returns {NormFilling} An object containing the total norm filling and a breakdown per application.
  */
-export function calculateFertilizerApplicationFillingForPhosphate(
+export function calculateNL2025FertilizerApplicationFillingForPhosphate(
     input: NL2025NormsFillingInput,
 ): NormFilling {
     const { applications, fertilizers, has_organic_certification, fosfaatgebruiksnorm } = input;

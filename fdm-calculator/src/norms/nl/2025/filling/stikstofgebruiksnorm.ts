@@ -19,7 +19,7 @@ import Decimal from "decimal.js"
  * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
  * @returns {Promise<NormFilling>} An object containing the total norm filling and details for each application.
  */
-export async function calculateFertilizerApplicationFillingForNitrogen(
+export async function calculateNL2025FertilizerApplicationFillingForNitrogen(
     input: NL2025NormsFillingInput,
 ): Promise<NormFilling> {
     const {

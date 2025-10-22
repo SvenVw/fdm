@@ -34,7 +34,7 @@ describe("stikstofgebruiksnorm helpers", () => {
     })
 })
 
-describe("getNL2025StikstofGebruiksNorm", () => {
+describe(" calculateNL2025StikstofGebruiksNorm", () => {
     it("should return the correct norm for grasland (beweiden)", async () => {
         const mockInput: NL2025NormsInput = {
             farm: { is_derogatie_bedrijf: false, has_grazing_intention: true },
@@ -74,7 +74,7 @@ describe("getNL2025StikstofGebruiksNorm", () => {
             soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
         }
 
-        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        const result = await  calculateNL2025StikstofGebruiksNorm(mockInput)
         expect(result.normValue).toBe(385)
         expect(result.normSource).toEqual("Grasland (volledig maaien).")
     })
