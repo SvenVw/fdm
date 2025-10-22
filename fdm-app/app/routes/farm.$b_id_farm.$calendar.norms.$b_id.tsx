@@ -82,10 +82,10 @@ type FertilizerApplication = Awaited<
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Gebruiksruimte | Perceel } ${clientConfig.name}` },
+        { title: `Gebruiksruimte - Perceel | ${clientConfig.name}` },
         {
             name: "description",
-            content: "Bekijk de gebruiksruimte en opvulling voor dit  perceel.",
+            content: "Bekijk de gebruiksruimte en opvulling voor dit perceel.",
         },
     ]
 }

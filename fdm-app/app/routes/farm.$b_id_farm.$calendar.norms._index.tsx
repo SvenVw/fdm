@@ -59,10 +59,11 @@ interface FieldNorm {
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Gebruiksnormen ${clientConfig.name}` },
+        { title: `Gebruiksruimte - Bedrijf | ${clientConfig.name}` },
         {
             name: "description",
-            content: "Bekijk de Gebruiksnormen voor je bedrijf.",
+            content:
+                "Bekijk de gebruiksruimte en opvulling voor je bedrijf en percelen.",
         },
     ]
 }
@@ -315,9 +316,9 @@ export default function FarmNormsBlock() {
             </Header>
             <main>
                 <FarmTitle
-                    title={"Gebruiksnormen"}
+                    title={"Gebruiksruimte"}
                     description={
-                        "Bekijk de gebruiksnormen voor je bedrijf en percelen."
+                        "Bekijk de gebruiksruimte en opvulling voor je bedrijf en percelen."
                     }
                 />
                 <Suspense

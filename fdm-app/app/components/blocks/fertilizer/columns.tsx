@@ -74,13 +74,13 @@ export const columns: ColumnDef<Fertilizer>[] = [
                 return null
             }
             const p_type = fertilizer.p_type
-            const rvoTypeName = fertilizer.p_type_rvo_label
-            const maxLength = "Rundvee - Drijfmest behalve van vleeskalveren"
-                .length
-            const isTruncated = rvoTypeName && rvoTypeName.length > maxLength
-            const truncatedRvoTypeName = isTruncated
-                ? `${rvoTypeName.substring(0, maxLength)}...`
-                : rvoTypeName
+            const rawLabel = fertilizer.p_type_rvo_label?.trim() ?? ""
+            const displayLabel = rawLabel || fertilizer.p_type_rvo || "Onbekend"
+            const MAX_LABEL_LEN = 48
+            const isTruncated = displayLabel.length > MAX_LABEL_LEN
+            const truncatedLabel = isTruncated
+                ? `${displayLabel.substring(0, MAX_LABEL_LEN)}...`
+                : displayLabel
 
             const badge = (
                 <Badge
@@ -95,7 +95,7 @@ export const columns: ColumnDef<Fertilizer>[] = [
                     }
                     variant="outline"
                 >
-                    <p>{truncatedRvoTypeName}</p>
+                    <p>{truncatedLabel}</p>
                 </Badge>
             )
 
@@ -106,7 +106,7 @@ export const columns: ColumnDef<Fertilizer>[] = [
                             <Tooltip>
                                 <TooltipTrigger asChild>{badge}</TooltipTrigger>
                                 <TooltipContent>
-                                    <p>{rvoTypeName}</p>
+                                    <p>{displayLabel}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
@@ -114,33 +114,6 @@ export const columns: ColumnDef<Fertilizer>[] = [
                         badge
                     )}
                 </span>
-
-                // <span className="flex items-center gap-2">
-                //     {fertilizer.p_type_manure ? (
-                //         <Badge
-                //             className="bg-amber-600 text-white hover:bg-amber-700"
-                //             variant="default"
-                //         >
-                //             Mest
-                //         </Badge>
-                //     ) : null}
-                //     {fertilizer.p_type_compost ? (
-                //         <Badge
-                //             className="bg-green-600 text-white hover:bg-green-700"
-                //             variant="default"
-                //         >
-                //             Compost
-                //         </Badge>
-                //     ) : null}
-                //     {fertilizer.p_type_mineral ? (
-                //         <Badge
-                //             className="bg-blue-600 text-white hover:bg-blue-700"
-                //             variant="default"
-                //         >
-                //             Kunstmest
-                //         </Badge>
-                //     ) : null}
-                // </span>
             )
         },
     },
