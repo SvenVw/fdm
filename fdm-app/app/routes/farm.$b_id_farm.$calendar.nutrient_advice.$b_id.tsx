@@ -109,45 +109,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     throw handleLoaderError("missing: cultivations")
                 }
 
-                const inputs = await Promise.all([
+                const [
+                    resolvedCurrentSoilData,
+                    resolvedFertilizerApplications,
+                    resolvedFertilizers,
+                ] = await Promise.all([
                     currentSoilData,
                     fertilizerApplications,
                     fertilizers,
                 ])
 
-                const [_, resolvedFertilizerApplications, resolvedFertilizers] =
-                    inputs
+                // For now take the first cultivation
+                const b_lu_catalogue = cultivations[0].b_lu_catalogue
 
-                const getCalculation = withCalculationCache(
-                    "fieldNutrientAdviceAsyncData",
-                    fdmCalculator.calculatorVersion,
-                    async ([
-                        resolvedCurrentSoilData,
-                        resolvedFertilizerApplications,
-                        resolvedFertilizers,
-                    ]: typeof inputs) => {
-                        // For now take the first cultivation
-                        const b_lu_catalogue = cultivations[0].b_lu_catalogue
+                const doses = calculateDose({
+                    applications: resolvedFertilizerApplications,
+                    fertilizers: resolvedFertilizers,
+                })
 
-                        const doses = calculateDose({
-                            applications: resolvedFertilizerApplications,
-                            fertilizers: resolvedFertilizers,
-                        })
-
-                        // Request nutrient advice
-                        const nutrientAdvice = await getNutrientAdvice(
-                            b_lu_catalogue,
-                            field.b_centroid,
-                            resolvedCurrentSoilData,
-                        )
-
-                        return [doses, nutrientAdvice]
-                    },
-                )
-
-                const [doses, nutrientAdvice] = await getCalculation(
-                    fdm,
-                    inputs,
+                // Request nutrient advice
+                const nutrientAdvice = await getNutrientAdvice(
+                    b_lu_catalogue,
+                    field.b_centroid,
+                    resolvedCurrentSoilData,
                 )
 
                 return {
