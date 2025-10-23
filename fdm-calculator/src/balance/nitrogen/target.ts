@@ -28,7 +28,7 @@ export function calculateTargetForNitrogenBalance(
 ): Decimal {
     // Determine whether field is grassland or arable
     let cultivationType = "arable"
-    cultivations.map((cultivation) => {
+    cultivations.forEach((cultivation) => {
         const cultivationDetail = cultivationDetailsMap.get(
             cultivation.b_lu_catalogue,
         )
