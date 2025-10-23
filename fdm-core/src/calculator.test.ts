@@ -99,6 +99,7 @@ describe("withCalculationCache", () => {
         const input = { a: "my value" }
         const getCalculation = withCalculationCache(
             calculate,
+            "calculate",
             calculatorVersion,
         )
 
@@ -109,7 +110,7 @@ describe("withCalculationCache", () => {
         expect(calculate).toHaveBeenCalledTimes(1)
 
         const expectedHash = generateCalculationHash(
-            calculate.name,
+            "calculate",
             calculatorVersion,
             input,
         )
@@ -129,19 +130,20 @@ describe("withCalculationCache", () => {
         const input = { a: "same value" }
         const getCalculation = withCalculationCache(
             calculate,
+            "calculate",
             calculatorVersion,
         )
 
         // Manually set a cached result
         const expectedHash = generateCalculationHash(
-            calculate.name,
+            "calculate",
             calculatorVersion,
             input,
         )
         await setCachedCalculation(
             fdm,
             expectedHash,
-            calculate.name,
+            "calculate",
             calculatorVersion,
             input,
             "pre-cached result",
@@ -162,6 +164,7 @@ describe("withCalculationCache", () => {
         const input = { data: 123 }
         const getCalculation = withCalculationCache(
             calculate,
+            "calculate",
             calculatorVersion,
         )
 
@@ -171,7 +174,7 @@ describe("withCalculationCache", () => {
         expect(calculate).toHaveBeenCalledTimes(1)
 
         const expectedHash = generateCalculationHash(
-            calculate.name,
+            "calculate",
             calculatorVersion,
             input,
         )
@@ -186,7 +189,7 @@ describe("withCalculationCache", () => {
             .from(calculationErrors)
             .where(
                 and(
-                    eq(calculationErrors.calculation_function, calculate.name),
+                    eq(calculationErrors.calculation_function, "calculate"),
                     eq(
                         calculationErrors.error_message,
                         "calculation error occurred",
@@ -205,6 +208,7 @@ describe("withCalculationCache", () => {
         const input = { data: 456 }
         const getCalculation = withCalculationCache(
             calculate,
+            "calculate",
             calculatorVersion,
         )
 
@@ -214,7 +218,7 @@ describe("withCalculationCache", () => {
         expect(calculate).toHaveBeenCalledTimes(1)
 
         const expectedHash = generateCalculationHash(
-            calculate.name,
+            "calculate",
             calculatorVersion,
             input,
         )
@@ -229,7 +233,7 @@ describe("withCalculationCache", () => {
             .from(calculationErrors)
             .where(
                 and(
-                    eq(calculationErrors.calculation_function, calculate.name),
+                    eq(calculationErrors.calculation_function, "calculate"),
                     eq(
                         calculationErrors.error_message,
                         "a simple string error",
@@ -248,6 +252,7 @@ describe("withCalculationCache", () => {
         const input = { val: 5 }
         const getCalculation = withCalculationCache(
             calculate,
+            "calculate",
             calculatorVersion,
         )
 
@@ -260,7 +265,7 @@ describe("withCalculationCache", () => {
         expect(calculate).toHaveBeenCalledTimes(1) // Original calculation should still run
 
         const expectedHash = generateCalculationHash(
-            calculate.name,
+            "calculate",
             calculatorVersion,
             input,
         )
