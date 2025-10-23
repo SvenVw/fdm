@@ -135,6 +135,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
             return {
                 fieldResult: fieldResult,
+                fieldInput: input,
             }
         })
 
@@ -177,7 +178,7 @@ function NitrogenBalance({
     field,
     nitrogenBalanceResult,
 }: Awaited<ReturnType<typeof loader>>) {
-    const { fieldResult } = use(nitrogenBalanceResult)
+    const { fieldResult, fieldInput } = use(nitrogenBalanceResult)
 
     const location = useLocation()
     const page = location.pathname
@@ -387,8 +388,8 @@ function NitrogenBalance({
                     <CardContent>
                         <div className="space-y-8">
                             <NitrogenBalanceDetails
-                                balanceData={result}
-                                fieldInput={fieldResult.balance}
+                                balanceData={fieldResult.balance}
+                                fieldInput={fieldInput.fields[0]}
                             />
                         </div>
                     </CardContent>
