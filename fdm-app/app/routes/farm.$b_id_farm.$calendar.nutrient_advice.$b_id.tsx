@@ -29,7 +29,6 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { fdmCalculator } from "@svenvw/fdm-calculator"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -128,11 +127,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 })
 
                 // Request nutrient advice
-                const nutrientAdvice = await getNutrientAdvice(
+                const nutrientAdvice = await getNutrientAdvice({
                     b_lu_catalogue,
-                    field.b_centroid,
-                    resolvedCurrentSoilData,
-                )
+                    b_centroid: field.b_centroid,
+                    currentSoilData: resolvedCurrentSoilData,
+                    nmiApiKey: clientConfig.nmiApiKey,
+                })
 
                 return {
                     nutrientAdvice: nutrientAdvice,
