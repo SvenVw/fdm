@@ -268,5 +268,6 @@ export function getWorkingCoefficient(
 export const getNL2025FertilizerApplicationFillingForStikstofGebruiksNorm =
     withCalculationCache(
         calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm,
+        "calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm",
         pkg.calculatorVersion,
     )

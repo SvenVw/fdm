@@ -187,5 +187,6 @@ export async function calculateNL2025FosfaatGebruiksNorm(
  */
 export const getNL2025FosfaatGebruiksNorm = withCalculationCache(
     calculateNL2025FosfaatGebruiksNorm,
+    "calculateNL2025FosfaatGebruiksNorm",
     pkg.calculatorVersion,
 )

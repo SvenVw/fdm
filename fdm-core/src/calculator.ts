@@ -136,6 +136,7 @@ export async function setCalculationError<T_Input extends object>(
  * @template T_Input - The type of the input object for the calculation function.
  * @template T_Output - The expected type of the calculation result.
  * @param {(inputs: T_Input) => T_Output | Promise<T_Output>} calculationFunction - The original function to compute the result.
+ * @param {string} calculationFunctionName - The name of the calculation function, used for caching.
  * @param {string} calculatorVersion - A version string tied to the current calculation function.
  *                                     Changing this version will invalidate old cache entries.
  * @returns {(fdm: FdmType, input: T_Input) => Promise<T_Output>} A new function that wraps the original
@@ -151,7 +152,7 @@ export async function setCalculationError<T_Input extends object>(
  * }
  *
  * // Decorate it with caching
- * const cachedCalculation = withCalculationCache(myExpensiveCalculation, 'v1.0.0');
+ * const cachedCalculation = withCalculationCache(myExpensiveCalculation, 'myExpensiveCalculation', 'v1.0.0');
  *
  * // Use the decorated function
  * // Assuming 'fdm' is an initialized FdmType instance
@@ -161,10 +162,22 @@ export async function setCalculationError<T_Input extends object>(
  */
 export function withCalculationCache<T_Input extends object, T_Output>(
     calculationFunction: (inputs: T_Input) => T_Output | Promise<T_Output>,
+    calculationFunctionName: string,
     calculatorVersion: string,
 ) {
     return async (fdm: FdmType, input: T_Input) => {
-        const calculationFunctionName = calculationFunction.name
+        if (!calculationFunctionName) {
+            throw new Error(
+                "Calculation function name not provided for caching. Please provide a valid function name.",
+            )
+        }
+
+        if (!calculatorVersion) {
+            throw new Error(
+                "Calculator version not provided for caching. Please provide a valid version string.",
+            )
+        }
+
         // Generate a unique hash for the current calculation based on function name, version, and input.
         const calculationHash = generateCalculationHash(
             calculationFunctionName,

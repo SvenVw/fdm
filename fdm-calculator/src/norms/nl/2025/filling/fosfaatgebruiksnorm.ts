@@ -298,5 +298,6 @@ function determineCondition1StimuleringOrganischeStofrijkeMeststoffen(
 export const getNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm =
     withCalculationCache(
         calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm,
+        "calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm",
         pkg.calculatorVersion,
     )

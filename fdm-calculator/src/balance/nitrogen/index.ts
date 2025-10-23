@@ -132,6 +132,7 @@ export async function calculateNitrogenBalance(
  */
 export const getNitrogenBalance = withCalculationCache(
     calculateNitrogenBalance,
+    "calculateNitrogenBalance",
     pkg.calculatorVersion,
 )
 

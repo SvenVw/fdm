@@ -658,5 +658,6 @@ export async function calculateNL2025StikstofGebruiksNorm(
  */
 export const getNL2025StikstofGebruiksNorm = withCalculationCache(
     calculateNL2025StikstofGebruiksNorm,
+    "calculateNL2025StikstofGebruiksNorm",
     pkg.calculatorVersion,
 )

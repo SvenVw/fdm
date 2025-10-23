@@ -205,5 +205,6 @@ export async function calculateNL2025DierlijkeMestGebruiksNorm(
  */
 export const getNL2025DierlijkeMestGebruiksNorm = withCalculationCache(
    calculateNL2025DierlijkeMestGebruiksNorm,
+    "calculateNL2025DierlijkeMestGebruiksNorm",
     pkg.calculatorVersion,
 )

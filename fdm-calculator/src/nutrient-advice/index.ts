@@ -92,5 +92,6 @@ export async function requestNutrientAdvice({
  */
 export const getNutrientAdvice = withCalculationCache(
     requestNutrientAdvice,
+    "requestNutrientAdvice",
     pkg.calculatorVersion,
 )

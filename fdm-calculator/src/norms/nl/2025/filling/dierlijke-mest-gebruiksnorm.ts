@@ -110,5 +110,6 @@ export function calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebru
 export const getNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm =
     withCalculationCache(
         calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm,
+        "calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm",
         pkg.calculatorVersion,
     )
