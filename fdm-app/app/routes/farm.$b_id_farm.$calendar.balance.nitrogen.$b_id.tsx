@@ -132,9 +132,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     errorId: errorId,
                 }
             }
+            const inputForField = input.fields.find(
+                (field: { field: { b_id: string } }) =>
+                    field.field.b_id === b_id,
+            )
 
             return {
                 fieldResult: fieldResult,
+                fieldInput: inputForField,
             }
         })
 
@@ -177,7 +182,7 @@ function NitrogenBalance({
     field,
     nitrogenBalanceResult,
 }: Awaited<ReturnType<typeof loader>>) {
-    const { fieldResult } = use(nitrogenBalanceResult)
+    const { fieldResult, fieldInput } = use(nitrogenBalanceResult)
 
     const location = useLocation()
     const page = location.pathname
@@ -387,8 +392,8 @@ function NitrogenBalance({
                     <CardContent>
                         <div className="space-y-8">
                             <NitrogenBalanceDetails
-                                balanceData={result}
-                                fieldInput={fieldResult.balance}
+                                balanceData={fieldResult.balance}
+                                fieldInput={fieldInput}
                             />
                         </div>
                     </CardContent>
