@@ -207,18 +207,18 @@ export function withCalculationCache<T_Input extends object, T_Output>(
 
         // If a cached result was successfully retrieved, return it immediately.
         if (cachedResult) {
-            console.log(
-                `Cache HIT for ${calculationFunctionName} (hash: ${calculationHash})`,
-            )
+            // console.log(
+            //     `Cache HIT for ${calculationFunctionName} (hash: ${calculationHash})`,
+            // )
             return cachedResult
         }
 
         // If no cached result was found (either genuinely a miss or cache read failed),
         // perform the actual calculation.
         try {
-            console.log(
-                `Cache MISS for ${calculationFunctionName} (hash: ${calculationHash}). Performing calculation...`,
-            )
+            // console.log(
+            //     `Cache MISS for ${calculationFunctionName} (hash: ${calculationHash}). Performing calculation...`,
+            // )
             const result = await calculationFunction(input)
 
             // If the initial cache read was successful (meaning the cache is healthy),
@@ -232,14 +232,14 @@ export function withCalculationCache<T_Input extends object, T_Output>(
                     input,
                     result,
                 )
-                console.log(
-                    `Calculation for ${calculationFunctionName} (hash: ${calculationHash}) completed and cached.`,
-                )
+                // console.log(
+                //     `Calculation for ${calculationFunctionName} (hash: ${calculationHash}) completed and cached.`,
+                // )
             } else {
                 // If cache read failed, log that the result is not being cached.
-                console.log(
-                    `Calculation for ${calculationFunctionName} (hash: ${calculationHash}) completed and not cached due to prior cache read failure.`,
-                )
+                // console.log(
+                //     `Calculation for ${calculationFunctionName} (hash: ${calculationHash}) completed and not cached due to prior cache read failure.`,
+                // )
             }
 
             return result
