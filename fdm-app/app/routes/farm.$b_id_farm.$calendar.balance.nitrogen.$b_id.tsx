@@ -132,10 +132,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     errorId: errorId,
                 }
             }
+            const inputForField = input.fields.find(
+                (field: { field: { b_id: string } }) =>
+                    field.field.b_id === b_id,
+            )
 
             return {
                 fieldResult: fieldResult,
-                fieldInput: input,
+                fieldInput: inputForField,
             }
         })
 
@@ -389,7 +393,7 @@ function NitrogenBalance({
                         <div className="space-y-8">
                             <NitrogenBalanceDetails
                                 balanceData={fieldResult.balance}
-                                fieldInput={fieldInput.fields[0]}
+                                fieldInput={fieldInput}
                             />
                         </div>
                     </CardContent>
