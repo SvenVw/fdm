@@ -119,10 +119,20 @@ export async function calculateNitrogenBalance(
     return convertNitrogenBalanceToNumeric(farmWithBalanceDecimal)
 }
 
+/**
+ * A cached version of the `calculateNitrogenBalance` function.
+ *
+ * This function provides the same functionality as `calculateNitrogenBalance` but
+ * includes a caching mechanism to improve performance for repeated calls with the
+ * same input. The cache is managed by `withCalculationCache` and uses the
+ * `pkg.calculatorVersion` as part of its cache key.
+ *
+ * @param nitrogenBalanceInput - The input data for the nitrogen balance calculation.
+ * @returns A promise that resolves with the calculated nitrogen balance, with numeric values as numbers.
+ */
 export const getNitrogenBalance = withCalculationCache(
-    "calculateNitrogenBalance",
-    pkg.calculatorVersion,
     calculateNitrogenBalance,
+    pkg.calculatorVersion,
 )
 
 /**
