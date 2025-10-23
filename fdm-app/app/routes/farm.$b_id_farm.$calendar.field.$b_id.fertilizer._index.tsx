@@ -130,6 +130,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             field: field,
             fertilizerOptions: fertilizerOptions,
             fertilizerApplications: fertilizerApplications,
+            fertilizers: fertilizers,
             dose: dose.dose,
             applicationMethodOptions: applicationMethods.options,
         }
@@ -155,6 +156,7 @@ export default function FarmFieldsOverviewBlock() {
             <FertilizerApplicationCard
                 fertilizerApplications={loaderData.fertilizerApplications}
                 applicationMethodOptions={loaderData.applicationMethodOptions}
+                fertilizers={loaderData.fertilizers}
                 fertilizerOptions={loaderData.fertilizerOptions}
                 dose={loaderData.dose}
             />

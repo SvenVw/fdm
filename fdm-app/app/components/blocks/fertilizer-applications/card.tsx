@@ -29,6 +29,7 @@ import type {
     FertilizerApplicationsCardProps,
     FertilizerOption,
 } from "./types.d"
+import { FertilizerApplicationsList } from "./list"
 
 function FertilizerApplicationsDetailCard({
     title,
@@ -139,16 +140,20 @@ function constructCards(dose: Dose) {
 export function FertilizerApplicationCard({
     fertilizerApplications,
     applicationMethodOptions,
+    fertilizers,
     fertilizerOptions,
     dose,
+    className,
 }: {
     fertilizerApplications: FertilizerApplication[]
     applicationMethodOptions: {
         value: ApplicationMethods
         label: string
     }[]
+    fertilizers: Fertilizer[]
     fertilizerOptions: FertilizerOption[]
     dose: Dose
+    className?: string
 }) {
     const fetcher = useFetcher()
     const location = useLocation()
@@ -201,7 +206,12 @@ export function FertilizerApplicationCard({
     }
 
     return (
-        <Card className="col-span-2 space-y-4">
+        <Card
+            className={cn(
+                "col-span-2 space-y-4 transition-transform duration-200 hover:scale-[1.02]",
+                className,
+            )}
+        >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle>
                     <p className="text-lg font-medium">Bemesting</p>
@@ -239,101 +249,13 @@ export function FertilizerApplicationCard({
                     </DialogContent>
                 </Dialog>
             </CardHeader>
-            <CardContent className="grid 2xl:grid-cols-3 gap-8">
-                <div className="space-y-4 2xl:col-span-2 items-start">
-                    {fertilizerApplications.length > 0 ? (
-                        fertilizerApplications.map((application) => (
-                            <div
-                                className="grid grid-cols-5 gap-x-3 items-center"
-                                key={application.p_app_id}
-                            >
-                                <div className="col-span-2">
-                                    <p className="text-sm font-medium leading-none">
-                                        {application.p_name_nl}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {application.p_app_method
-                                            ? applicationMethodOptions.find(
-                                                  (x) =>
-                                                      x.value ===
-                                                      application.p_app_method,
-                                              )?.label
-                                            : "Toedieningsmethode niet bekend"}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-muted-foreground leading-none">
-                                        {application.p_app_amount} kg / ha
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-sm text-muted-foreground leading-none">
-                                        {format(
-                                            application.p_app_date,
-                                            "yyyy-MM-dd",
-                                        )}
-                                    </p>
-                                </div>
-                                <div className="justify-self-end">
-                                    <Button
-                                        variant="destructive"
-                                        disabled={
-                                            fetcher.state === "submitting"
-                                        }
-                                        onClick={() => {
-                                            if (application.p_app_ids) {
-                                                handleDelete(
-                                                    application.p_app_ids,
-                                                )
-                                            } else {
-                                                handleDelete([
-                                                    application.p_app_id,
-                                                ])
-                                            }
-                                        }}
-                                    >
-                                        {fetcher.state === "submitting" ? (
-                                            <div className="flex items-center space-x-2">
-                                                <LoadingSpinner />
-                                                <span>Verwijderen...</span>
-                                            </div>
-                                        ) : (
-                                            "Verwijder"
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6">
-                            <div className="flex flex-col space-y-2 text-center">
-                                <h1 className="text-2xl font-semibold tracking-tight">
-                                    Je hebt nog geen bemesting ingevuld...
-                                </h1>
-                                <p className="text-sm text-muted-foreground">
-                                    Voeg een bemesting toe om gegevens zoals,
-                                    meststof, hoeveelheid en datum bij te
-                                    houden.
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                </div>
-                <div className="grid gap-4 sm:grid-cols-4 2xl:grid-cols-2">
-                    {detailCards.map(
-                        (card: FertilizerApplicationsCardProps) => (
-                            <FertilizerApplicationsDetailCard
-                                key={card.title}
-                                title={card.title}
-                                shortname={card.shortname}
-                                value={card.value}
-                                unit={card.unit}
-                                limit={card.limit}
-                                advice={card.advice}
-                            />
-                        ),
-                    )}
-                </div>
+            <CardContent>
+                <FertilizerApplicationsList
+                    fertilizerApplications={fertilizerApplications}
+                    applicationMethodOptions={applicationMethodOptions}
+                    fertilizers={fertilizers}
+                    handleDelete={handleDelete}
+                />
             </CardContent>
         </Card>
     )
