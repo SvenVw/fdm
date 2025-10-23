@@ -23,6 +23,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { FertilizerApplicationMetricsCard } from "../components/blocks/fertilizer-applications/metrics"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -160,6 +161,7 @@ export default function FarmFieldsOverviewBlock() {
                 fertilizerOptions={loaderData.fertilizerOptions}
                 dose={loaderData.dose}
             />
+            <FertilizerApplicationMetricsCard />
         </div>
     )
 }

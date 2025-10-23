@@ -87,10 +87,10 @@ export function FertilizerApplicationCard({
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>
                     <p className="text-lg font-medium">Bemesting</p>
-                    <p className="text-sm font-medium text-muted-foreground">
+                    {/* <p className="text-sm text-muted-foreground">
                         Voeg bemestingen toe, verwijder ze en bekijk de totale
                         gift per hectare voor verschillende nutriënten
-                    </p>
+                    </p> */}
                 </CardTitle>
                 <Dialog
                     open={isDialogOpen}
