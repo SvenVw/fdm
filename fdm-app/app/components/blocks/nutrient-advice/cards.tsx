@@ -95,13 +95,14 @@ export function NutrientCard({
                         </div>
                         <Progress
                             value={percentage}
-                            className={cn(
+                            colorBar={
                                 percentage > 100 && description.symbol === "EOC"
-                                    ? "[&>div]:bg-green-500 h-3"
+                                    ? "green-500"
                                     : percentage > 100
-                                      ? "[&>div]:bg-orange-500  h-3"
-                                      : "h-3",
-                            )}
+                                      ? "orange-500"
+                                      : undefined
+                            }
+                            className="h-3"
                         />
                     </div>
                 )}
