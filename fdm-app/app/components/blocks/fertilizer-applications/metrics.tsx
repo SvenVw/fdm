@@ -1,3 +1,4 @@
+import { NavLink } from "react-router"
 import {
     Card,
     CardContent,
@@ -68,7 +69,9 @@ export function FertilizerApplicationMetricsCard() {
                         <ItemSeparator />
                         <Item>
                             <ItemContent>
-                                <ItemTitle>Gebruiksnormen</ItemTitle>
+                                <ItemTitle className="hover:underline">
+                                    <NavLink to="#">Gebruiksnormen</NavLink>
+                                </ItemTitle>
                             </ItemContent>
                             <ItemDescription>
                                 <div className="flex flex-col space-y-2">
@@ -139,7 +142,9 @@ export function FertilizerApplicationMetricsCard() {
                         <ItemSeparator />
                         <Item>
                             <ItemContent>
-                                <ItemTitle>Stikstofbalans</ItemTitle>
+                                <ItemTitle className="hover:underline">
+                                    <NavLink to="#">Stikstofbalans</NavLink>
+                                </ItemTitle>
                             </ItemContent>
                             <ItemDescription>
                                 <div className="flex flex-col space-y-2">
@@ -204,7 +209,9 @@ export function FertilizerApplicationMetricsCard() {
                         <ItemSeparator />
                         <Item>
                             <ItemContent>
-                                <ItemTitle>Bemestingsadvies</ItemTitle>
+                                <ItemTitle className="hover:underline">
+                                    <NavLink to="#">Bemestingsadvies</NavLink>
+                                </ItemTitle>
                             </ItemContent>
                             <ItemDescription>
                                 <div className="flex flex-col space-y-2">
