@@ -4,7 +4,7 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-} from "../../ui/card"
+} from "~/components/ui/card"
 import {
     Item,
     ItemContent,
@@ -12,102 +12,302 @@ import {
     ItemGroup,
     ItemSeparator,
     ItemTitle,
-} from "../../ui/item"
+} from "~/components/ui/item"
+import { Progress } from "~/components/ui/progress"
 
 export function FertilizerApplicationMetricsCard() {
+    // Mock data for demonstration
+    const mockNorms = {
+        nitrogen: { current: 200, total: 230 },
+        phosphate: { current: 40, total: 230 },
+        animalManure: { current: 120, total: 170 },
+    }
+
+    const mockNitrogenBalance = {
+        supply: 200,
+        removal: 40,
+        emission: 10,
+        balance: 150,
+        target: 125,
+        task: -25,
+    }
+
+    const mockFertilizationAdvice = {
+        nitrogen: { current: 200, total: 230 },
+        phosphate: { current: 40, total: 230 },
+        potassium: { current: 120, total: 170 },
+    }
+
+    const getNormsProgressColor = (current: number, total: number) => {
+        const percentage = (current / total) * 100
+        if (percentage > 100) return "red-500"
+        return "green-500"
+    }
+
+    const getAdviceProgressColor = (current: number, total: number) => {
+        const percentage = (current / total) * 100
+        if (percentage < 80) return "orange-500"
+        if (percentage >= 80 && percentage <= 105) return "green-500"
+        if (percentage > 105) return "orange-500"
+        return "gray-500" // Default or error color
+    }
+
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Bemestingsplanner</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                    Bemestingsplanner
+                </CardTitle>
                 <CardDescription>
                     Bekijk de impact van uw bemestingen.
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <ItemGroup className="">
-                    <ItemSeparator />
-                    <Item>
-                        <ItemContent>
-                            <ItemTitle>Gebruiksnormen</ItemTitle>
+                <div className="flex flex-col gap-4 2xl:grid 2xl:grid-cols-3">
+                    <ItemGroup>
+                        <ItemSeparator />
+                        <Item>
+                            <ItemContent>
+                                <ItemTitle>Gebruiksnormen</ItemTitle>
+                            </ItemContent>
                             <ItemDescription>
-                                <div className="">
+                                <div className="flex flex-col space-y-2">
                                     <div className="flex flex-row justify-between">
                                         <p>Stikstof</p>
-                                        <span>200 / 230 kg N</span>
+                                        <span>
+                                            {mockNorms.nitrogen.current} /{" "}
+                                            {mockNorms.nitrogen.total} kg N
+                                        </span>
                                     </div>
+                                    <Progress
+                                        value={
+                                            (mockNorms.nitrogen.current /
+                                                mockNorms.nitrogen.total) *
+                                            100
+                                        }
+                                        colorBar={getNormsProgressColor(
+                                            mockNorms.nitrogen.current,
+                                            mockNorms.nitrogen.total,
+                                        )}
+                                        className="h-2"
+                                    />
+
                                     <div className="flex flex-row justify-between">
                                         <p>Fosfaat</p>
-                                        <span>40 / 230 kg P₂O₅</span>
+                                        <span>
+                                            {mockNorms.phosphate.current} /{" "}
+                                            {mockNorms.phosphate.total} kg P₂O₅
+                                        </span>
                                     </div>
+                                    <Progress
+                                        value={
+                                            (mockNorms.phosphate.current /
+                                                mockNorms.phosphate.total) *
+                                            100
+                                        }
+                                        colorBar={getNormsProgressColor(
+                                            mockNorms.phosphate.current,
+                                            mockNorms.phosphate.total,
+                                        )}
+                                        className="h-2"
+                                    />
+
                                     <div className="flex flex-row justify-between">
                                         <p>Dierlijke mest</p>
-                                        <span>120 / 170 kg N</span>
+                                        <span>
+                                            {mockNorms.animalManure.current} /{" "}
+                                            {mockNorms.animalManure.total} kg N
+                                        </span>
                                     </div>
+                                    <Progress
+                                        value={
+                                            (mockNorms.animalManure.current /
+                                                mockNorms.animalManure.total) *
+                                            100
+                                        }
+                                        colorBar={getNormsProgressColor(
+                                            mockNorms.animalManure.current,
+                                            mockNorms.animalManure.total,
+                                        )}
+                                        className="h-2"
+                                    />
                                 </div>
                             </ItemDescription>
-                        </ItemContent>
-                        <div className="text-lg font-semibold">
-                            {/* {dose.nitrogen.total.toFixed(0)} kg */}
-                        </div>
-                    </Item>
-                    <ItemSeparator />
-                    <Item>
-                        <ItemContent>
-                            <ItemTitle>Stikstofbalans</ItemTitle>
+                        </Item>
+                    </ItemGroup>
+                    <ItemGroup>
+                        <ItemSeparator />
+                        <Item>
+                            <ItemContent>
+                                <ItemTitle>Stikstofbalans</ItemTitle>
+                            </ItemContent>
                             <ItemDescription>
-                                <div className="flex flex-col">
-                                    <div className="flex flex-row justify-between">
-                                        <p>Aanvoer</p>
-                                        <span>200 kg N</span>
+                                <div className="flex flex-col space-y-2">
+                                    {/* Simplified Flow (Top Section) */}
+                                    <div className="flex flex-col gap-1">
+                                        <div className="flex items-center justify-between">
+                                            <p className="flex items-center gap-1">
+                                                Aanvoer
+                                            </p>
+                                            <span className="font-semibold">
+                                                {mockNitrogenBalance.supply} kg
+                                                N
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <p className="flex items-center gap-1">
+                                                Afvoer
+                                            </p>
+                                            <span className="font-semibold">
+                                                - {mockNitrogenBalance.removal}{" "}
+                                                kg N
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <p className="flex items-center gap-1">
+                                                Emissie
+                                            </p>
+                                            <span className="font-semibold">
+                                                - {mockNitrogenBalance.emission}{" "}
+                                                kg N
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="flex flex-row justify-between">
-                                        <p>Afvoer</p>
-                                        <span>- 40 kg N</span>
-                                    </div>
-                                    <div className="flex flex-row justify-between">
-                                        <p>Emissie</p>
-                                        <span>- 10 kg N</span>
-                                    </div>
-                                    <div className="flex flex-row justify-between space-y-4 font-bold">
+                                    <ItemSeparator />{" "}
+                                    {/* Separator for clarity */}
+                                    {/* Prominent Result (Bottom Section) */}
+                                    <div className="flex flex-row justify-between items-center font-bold text-lg">
                                         <p>Balans</p>
-                                        <span>150 kg N</span>
+                                        <span>
+                                            {mockNitrogenBalance.balance} kg N
+                                        </span>
                                     </div>
-                                    <div className="flex flex-row justify-between">
+                                    <div className="flex flex-row justify-between items-center text-sm text-gray-500 space-x-1">
                                         <p>Streefwaarde</p>
-                                        <span>125 kg N</span>
+                                        <span>
+                                            {mockNitrogenBalance.target} kg N
+                                        </span>
                                     </div>
-
-                                    <div className="flex flex-row justify-between font-bold text-red-400">
+                                    <div
+                                        className={`flex flex-row justify-between items-center font-bold text-lg ${mockNitrogenBalance.task < 0 ? "text-red-500" : "text-green-500"}`}
+                                    >
                                         <p>Opgave</p>
-                                        <span>-25 kg N</span>
+                                        <span>
+                                            {mockNitrogenBalance.task} kg N
+                                        </span>
                                     </div>
                                 </div>
                             </ItemDescription>
-                        </ItemContent>
-                    </Item>
-                    <ItemSeparator />
-                    <Item>
-                        <ItemContent>
-                            <ItemTitle>Bemestingsadvies</ItemTitle>
+                        </Item>
+                    </ItemGroup>
+                    <ItemGroup>
+                        <ItemSeparator />
+                        <Item>
+                            <ItemContent>
+                                <ItemTitle>Bemestingsadvies</ItemTitle>
+                            </ItemContent>
                             <ItemDescription>
-                                <div className="flex flex-col">
+                                <div className="flex flex-col space-y-2">
                                     <div className="flex flex-row justify-between">
                                         <p>Stikstof</p>
-                                        <span>200 / 230 kg N</span>
+                                        <span>
+                                            {
+                                                mockFertilizationAdvice.nitrogen
+                                                    .current
+                                            }{" "}
+                                            /{" "}
+                                            {
+                                                mockFertilizationAdvice.nitrogen
+                                                    .total
+                                            }{" "}
+                                            kg N
+                                        </span>
                                     </div>
+                                    <Progress
+                                        value={
+                                            (mockFertilizationAdvice.nitrogen
+                                                .current /
+                                                mockFertilizationAdvice.nitrogen
+                                                    .total) *
+                                            100
+                                        }
+                                        colorBar={getAdviceProgressColor(
+                                            mockFertilizationAdvice.nitrogen
+                                                .current,
+                                            mockFertilizationAdvice.nitrogen
+                                                .total,
+                                        )}
+                                        className="h-2"
+                                    />
+
                                     <div className="flex flex-row justify-between">
                                         <p>Fosfaat</p>
-                                        <span>40 / 230 kg P₂O₅</span>
+                                        <span>
+                                            {
+                                                mockFertilizationAdvice
+                                                    .phosphate.current
+                                            }{" "}
+                                            /{" "}
+                                            {
+                                                mockFertilizationAdvice
+                                                    .phosphate.total
+                                            }{" "}
+                                            kg P₂O₅
+                                        </span>
                                     </div>
+                                    <Progress
+                                        value={
+                                            (mockFertilizationAdvice.phosphate
+                                                .current /
+                                                mockFertilizationAdvice
+                                                    .phosphate.total) *
+                                            100
+                                        }
+                                        colorBar={getAdviceProgressColor(
+                                            mockFertilizationAdvice.phosphate
+                                                .current,
+                                            mockFertilizationAdvice.phosphate
+                                                .total,
+                                        )}
+                                        className="h-2"
+                                    />
+
                                     <div className="flex flex-row justify-between">
                                         <p>Kalium</p>
-                                        <span>120 / 170 kg K₂O</span>
+                                        <span>
+                                            {
+                                                mockFertilizationAdvice
+                                                    .potassium.current
+                                            }{" "}
+                                            /{" "}
+                                            {
+                                                mockFertilizationAdvice
+                                                    .potassium.total
+                                            }{" "}
+                                            kg K₂O
+                                        </span>
                                     </div>
+                                    <Progress
+                                        value={
+                                            (mockFertilizationAdvice.potassium
+                                                .current /
+                                                mockFertilizationAdvice
+                                                    .potassium.total) *
+                                            100
+                                        }
+                                        colorBar={getAdviceProgressColor(
+                                            mockFertilizationAdvice.potassium
+                                                .current,
+                                            mockFertilizationAdvice.potassium
+                                                .total,
+                                        )}
+                                        className="h-2"
+                                    />
                                 </div>
                             </ItemDescription>
-                        </ItemContent>
-                    </Item>
-                </ItemGroup>
+                        </Item>
+                    </ItemGroup>
+                </div>
             </CardContent>
         </Card>
     )
