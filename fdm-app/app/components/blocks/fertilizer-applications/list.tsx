@@ -34,6 +34,7 @@ export function FertilizerApplicationsList({
     fertilizerApplications,
     applicationMethodOptions,
     fertilizers,
+    handleDelete,
 }: {
     fertilizerApplications: FertilizerApplication[]
     applicationMethodOptions: {
@@ -41,13 +42,9 @@ export function FertilizerApplicationsList({
         label: string
     }[]
     fertilizers: Fertilizer[]
+    handleDelete: (p_app_id: string | string[]) => void
 }) {
     const fetcher = useFetcher()
-    const handleDelete = (p_app_id: string | string[]) => {
-        if (fetcher.state === "submitting") return
-
-        fetcher.submit({ p_app_id }, { method: "DELETE" })
-    }
 
     return (
         <div className="space-y-4">
@@ -66,7 +63,7 @@ export function FertilizerApplicationsList({
                                 <ItemSeparator />
                                 <Item size="sm" variant="default">      
                                     <ItemContent>
-                                        <ItemTitle className="flex flex-row items-center space-x-1">
+                                        <ItemTitle className="flex flex-row flex-wrap items-center gap-x-1">
                                             <span>
                                                 {fertilizer.p_type ===
                                                 "manure" ? (

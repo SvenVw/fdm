@@ -153,16 +153,24 @@ export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
-        <div className="grid xl:grid-cols-3 gap-8">
-            <FertilizerApplicationCard
-                fertilizerApplications={loaderData.fertilizerApplications}
-                applicationMethodOptions={loaderData.applicationMethodOptions}
-                fertilizers={loaderData.fertilizers}
-                fertilizerOptions={loaderData.fertilizerOptions}
-                dose={loaderData.dose}
-            />
-            <div className="xl:col-span-2">
-                <FertilizerApplicationMetricsCard />
+        <div className="container mx-auto py-8 px-4">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                <div className="md:col-span-1 lg:col-span-1">
+                    <FertilizerApplicationCard
+                        fertilizerApplications={
+                            loaderData.fertilizerApplications
+                        }
+                        applicationMethodOptions={
+                            loaderData.applicationMethodOptions
+                        }
+                        fertilizers={loaderData.fertilizers}
+                        fertilizerOptions={loaderData.fertilizerOptions}
+                        dose={loaderData.dose}
+                    />
+                </div>
+                <div className="md:col-span-1 lg:col-span-2">
+                    <FertilizerApplicationMetricsCard />
+                </div>
             </div>
         </div>
     )

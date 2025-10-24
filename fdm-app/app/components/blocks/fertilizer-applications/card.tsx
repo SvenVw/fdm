@@ -17,6 +17,7 @@ import { FertilizerApplicationForm } from "./form"
 import type { FertilizerApplication, FertilizerOption } from "./types.d"
 import { FertilizerApplicationsList } from "./list"
 import type { Fertilizer } from "@svenvw/fdm-core"
+import { Plus } from "lucide-react"
 
 export function FertilizerApplicationCard({
     fertilizerApplications,
@@ -84,7 +85,7 @@ export function FertilizerApplicationCard({
 
     return (
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-col space-y-4 xl:flex-row xl:items-center xl:justify-between xl:space-y-0">
                 <CardTitle>
                     <p className="text-lg font-medium">Bemesting</p>
                     {/* <p className="text-sm text-muted-foreground">
@@ -97,7 +98,10 @@ export function FertilizerApplicationCard({
                     onOpenChange={handleDialogOpenChange}
                 >
                     <DialogTrigger asChild>
-                        <Button>Bemesting toevoegen</Button>
+                        <Button>
+                            <Plus className="size-4" />
+                            Toevoegen
+                        </Button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[800px]">
                         <DialogHeader>

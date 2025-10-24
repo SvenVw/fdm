@@ -63,7 +63,7 @@ export function FertilizerApplicationMetricsCard() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="flex flex-col gap-4 2xl:grid 2xl:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                     <ItemGroup>
                         <ItemSeparator />
                         <Item>
