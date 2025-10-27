@@ -64,20 +64,7 @@ export async function calculateNL2025FertilizerApplicationFillingForNitrogen(
 
         // Determine the onFarmProduced status of the *actual fertilizer* based on temporary logic.
         // TODO: Implement proper determination of onFarmProduced based on actual farm data.
-        const isDrijfmest = [
-            "14",
-            "18",
-            "19",
-            "60",
-            "46",
-            "50",
-            "30",
-            "76",
-            "81",
-            "91",
-            "92",
-        ].includes(fertilizer.p_type_rvo ?? "")
-        const fertilizerOnFarmProduced = isDrijfmest // Assume drijfmest is on-farm, vaste mest is not for now.
+        const onFarmProduced = has_grazing_intention // Assume that if farm performs grazing, drijfmest and vaste mest are from the farm itself, otherwise supplied.
 
         const workingCoefficientDetails = getWorkingCoefficient(
             fertilizer.p_type_rvo,
@@ -85,7 +72,7 @@ export async function calculateNL2025FertilizerApplicationFillingForNitrogen(
             has_grazing_intention,
             isCurrentBouwland,
             p_app_date,
-            fertilizerOnFarmProduced, // Pass the determined onFarmProduced status
+            onFarmProduced,
         )
 
         // Calculate norm filling: amount * nitrogen content * (working coefficient / 100) / 1000
