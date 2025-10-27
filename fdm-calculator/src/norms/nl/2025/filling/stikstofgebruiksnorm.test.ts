@@ -729,7 +729,7 @@ describe("calculateNL2025FertilizerApplicationFillingForNitrogen", () => {
             {
                 p_id_catalogue: "fert1",
                 p_n_rt: 10, // 10 kg N per ton
-                p_type_rvo: "10", // Vaste mest rundvee (onFarmProduced: true in table9, but our temp logic makes it false)
+                p_type_rvo: "10", 
             },
         ]
         const b_centroid: [number, number] = [0, 0]
@@ -755,8 +755,6 @@ describe("calculateNL2025FertilizerApplicationFillingForNitrogen", () => {
 
         // For p_type_rvo "10" (Vaste mest rundvee), onFarmProduced: true in table9.
         // Since has_grazing_intention is false, onFarmProduced will be false in the main function.
-        // This will then fall through to the "Vaste mest van graasdieren aangevoerd" entry,
-        // which has onFarmProduced: false.
         // For "bouwland op klei en veen, van 1 september t/m 31 januari", p_n_wcl is 0.3.
         // Expected: 1000 * 10 * 0.3 / 1000 = 3
         expect(result.normFilling).toBeCloseTo(3)
