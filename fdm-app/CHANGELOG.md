@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.23.2
+
+### Patch Changes
+
+- 2ba569e: The atlas no longer redirects the users to an invalid route when they don't have any farms.
+
 ## 0.23.1
 
 ### Patch Changes

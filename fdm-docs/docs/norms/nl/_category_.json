@@ -1,8 +1,4 @@
 {
     "label": "The Netherlands",
-    "position": 1,
-    "link": {
-        "type": "generated-index",
-        "description": "Guides to understand calculations of Dutch legal norms for fertilizer application per year."
-    }
+    "position": 1
 }

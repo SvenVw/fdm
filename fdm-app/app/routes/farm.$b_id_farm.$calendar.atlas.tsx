@@ -1,9 +1,8 @@
-import { getFarms } from "@svenvw/fdm-core"
+import { getFarm, getFarms } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
-    redirect,
     useLoaderData,
     useLocation,
 } from "react-router"
@@ -51,13 +50,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the calendar
         const calendar = getCalendar(params)
 
+        // Check if the b_id_farm is valid and accessible by the user
+        if (b_id_farm && b_id_farm !== "undefined") {
+            await getFarm(fdm, session.principal_id, b_id_farm)
+        }
+
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
-
-        // Redirect to farms overview if user has no farm
-        if (farms.length === 0) {
-            return redirect("./farm")
-        }
 
         const farmOptions = farms.map((farm) => {
             return {

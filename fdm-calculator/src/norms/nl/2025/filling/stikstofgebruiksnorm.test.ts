@@ -97,56 +97,6 @@ describe("isBouwland", () => {
 })
 
 describe("getWorkingCoefficient", () => {
-    // Helper to determine onFarmProduced for tests
-    const isDrijfmest = (p_type_rvo: string) =>
-        [
-            "14",
-            "18",
-            "19",
-            "60",
-            "46",
-            "50",
-            "30",
-            "76",
-            "81",
-            "91",
-            "92",
-        ].includes(p_type_rvo)
-    const isVasteMest = (p_type_rvo: string) =>
-        [
-            "10",
-            "56",
-            "61",
-            "25",
-            "26",
-            "27",
-            "95",
-            "96",
-            "23",
-            "31",
-            "32",
-            "33",
-            "35",
-            "39",
-            "40",
-            "43",
-            "75",
-            "80",
-            "90",
-            "97",
-            "98",
-            "99",
-            "100",
-            "101",
-            "102",
-            "103",
-            "104",
-            "105",
-            "106",
-            "11",
-            "13",
-        ].includes(p_type_rvo)
-
     it("should return default details if p_type_rvo is null or undefined", () => {
         const result = getWorkingCoefficient(
             null,
@@ -180,7 +130,7 @@ describe("getWorkingCoefficient", () => {
         const p_type_rvo = "14" // Drijfmest rundvee
         const soilType: RegionKey = "zand_nwc"
         const isBouwland = false // Grasland
-        const fertilizerOnFarmProduced = isDrijfmest(p_type_rvo)
+        const fertilizerOnFarmProduced = true // Explicitly true for on-farm produced
 
         it("should return 0.45 for on-farm produced drijfmest with grazing intention", () => {
             const b_grazing_intention = true
@@ -248,7 +198,7 @@ describe("getWorkingCoefficient", () => {
         const b_grazing_intention = false
         const isBouwland = true
         const applicationDate = new Date("2025-06-15")
-        const fertilizerOnFarmProduced = isDrijfmest(p_type_rvo)
+        const fertilizerOnFarmProduced = false // Explicitly false for aangevoerd
 
         it("should return 0.60 for klei en veen soil", () => {
             const soilType: RegionKey = "klei"
@@ -288,7 +238,7 @@ describe("getWorkingCoefficient", () => {
         const b_grazing_intention = false
         const isBouwland = true
         const applicationDate = new Date("2025-06-15")
-        const fertilizerOnFarmProduced = isDrijfmest(p_type_rvo)
+        const fertilizerOnFarmProduced = false // Explicitly false for aangevoerd
         const result = getWorkingCoefficient(
             p_type_rvo,
             soilType,
@@ -400,7 +350,7 @@ describe("getWorkingCoefficient", () => {
         const b_grazing_intention = false
         const isBouwland = true
         const applicationDate = new Date("2025-06-15")
-        const fertilizerOnFarmProduced = isVasteMest(p_type_rvo)
+        const fertilizerOnFarmProduced = false // Explicitly false for aangevoerd
         const result = getWorkingCoefficient(
             p_type_rvo,
             soilType,
@@ -422,7 +372,7 @@ describe("getWorkingCoefficient", () => {
         const soilType: RegionKey = "klei"
         const b_grazing_intention = false
         const isBouwland = true
-        const fertilizerOnFarmProduced = isVasteMest(p_type_rvo)
+        const fertilizerOnFarmProduced = false // Explicitly false for aangevoerd
 
         it("should return 0.30 for bouwland on klei/veen from Sep 1 to Jan 31", () => {
             const applicationDate = new Date("2025-11-01") // November
@@ -547,12 +497,8 @@ describe("getWorkingCoefficient", () => {
     })
 })
 
-describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", () => {
-    // Mock getRegion to return a consistent soil type for these tests
-    beforeEach(() => {
-        vi.mocked(getRegion).mockResolvedValue("zand_nwc")
-    })
 
+describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", () => {
     afterEach(() => {
         vi.clearAllMocks()
     })
@@ -722,6 +668,49 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
         )
     })
 
+    it("should treat onFarmProduced as false when has_grazing_intention is false for drijfmest", async () => {
+        vi.mocked(getRegion).mockResolvedValue("zand_nwc")
+        const applications: FertilizerApplication[] = [
+            {
+                p_app_id: "app1",
+                b_id: "field1",
+                p_app_date: "2025-05-01",
+                p_app_amount: 1000,
+                p_id_catalogue: "fert1",
+            },
+        ]
+        const fertilizers: Fertilizer[] = [
+            {
+                p_id_catalogue: "fert1",
+                p_n_rt: 0, // Nitrogen content not directly known
+                p_type_rvo: "14", // Drijfmest rundvee (Table 11: 4.0 kg N/ton)
+            },
+        ]
+        const b_centroid: [number, number] = [0, 0]
+        const has_grazing_intention = false // No grazing intention, so onFarmProduced should be false
+        const cultivations: Cultivation[] = []
+
+        const result =
+            await calculateNL2025FertilizerApplicationFillingForNitrogen({
+                applications,
+                fertilizers,
+                b_centroid,
+                has_grazing_intention,
+                cultivations,
+                has_organic_certification: false,
+                fosfaatgebruiksnorm: 0,
+            } as NL2025NormsFillingInput)
+
+        // For p_type_rvo "14" (Drijfmest rundvee), if onFarmProduced is false,
+        // it falls into "Drijfmest van graasdieren aangevoerd" which has p_n_wcl of 0.60.
+        // Expected: 1000 * 4.0 (from Table 11) * 0.60 (from Table 9) / 1000 = 2.4
+        expect(result.normFilling).toBeCloseTo(2.4)
+        expect(result.applicationFilling[0].normFilling).toBeCloseTo(2.4)
+        expect(result.applicationFilling[0].normFillingDetails).toBe(
+            "Werkingscoëfficiënt: 60% - Drijfmest van graasdieren aangevoerd",
+        )
+    })
+
     it("should correctly apply bouwland logic for working coefficient", async () => {
         vi.mocked(getRegion).mockResolvedValue("klei") // Soil type for bouwland rule
         const applications: FertilizerApplication[] = [
@@ -737,7 +726,7 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
             {
                 p_id_catalogue: "fert1",
                 p_n_rt: 10, // 10 kg N per ton
-                p_type_rvo: "10", // Vaste mest rundvee (onFarmProduced: true in table9, but our temp logic makes it false)
+                p_type_rvo: "10",
             },
         ]
         const b_centroid: [number, number] = [0, 0]
@@ -762,9 +751,7 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
         } as NL2025NormsFillingInput)
 
         // For p_type_rvo "10" (Vaste mest rundvee), onFarmProduced: true in table9.
-        // Our temporary logic `onFarmProduced = isDrijfmest` makes it `false`.
-        // It will then fall through to the "Vaste mest van graasdieren aangevoerd" entry,
-        // which has onFarmProduced: false.
+        // Since has_grazing_intention is false, onFarmProduced will be false in the main function.
         // For "bouwland op klei en veen, van 1 september t/m 31 januari", p_n_wcl is 0.3.
         // Expected: 1000 * 10 * 0.3 / 1000 = 3
         expect(result.normFilling).toBeCloseTo(3)
