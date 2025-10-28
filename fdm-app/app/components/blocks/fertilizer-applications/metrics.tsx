@@ -75,9 +75,9 @@ export function FertilizerApplicationMetricsCard() {
                             </ItemContent>
                             <ItemDescription>
                                 <div className="flex flex-col space-y-2">
-                                    <div className="flex flex-row justify-between">
-                                        <p>Stikstof</p>
-                                        <span>
+                                    <div className="grid grid-cols-[1fr_auto] items-center">
+                                        <p className="whitespace-nowrap px-2">Stikstof</p>
+                                        <span className="text-right whitespace-nowrap px-2">
                                             {mockNorms.nitrogen.current} /{" "}
                                             {mockNorms.nitrogen.total} kg N
                                         </span>
@@ -95,9 +95,9 @@ export function FertilizerApplicationMetricsCard() {
                                         className="h-2"
                                     />
 
-                                    <div className="flex flex-row justify-between">
-                                        <p>Fosfaat</p>
-                                        <span>
+                                    <div className="grid grid-cols-[1fr_auto] items-center">
+                                        <p className="whitespace-nowrap px-2">Fosfaat</p>
+                                        <span className="text-right whitespace-nowrap px-2">
                                             {mockNorms.phosphate.current} /{" "}
                                             {mockNorms.phosphate.total} kg P₂O₅
                                         </span>
@@ -115,9 +115,9 @@ export function FertilizerApplicationMetricsCard() {
                                         className="h-2"
                                     />
 
-                                    <div className="flex flex-row justify-between">
-                                        <p>Dierlijke mest</p>
-                                        <span>
+                                    <div className="grid grid-cols-[1fr_auto] items-center">
+                                        <p className="whitespace-nowrap px-2">Dierlijke mest</p>
+                                        <span className="text-right whitespace-nowrap px-2">
                                             {mockNorms.animalManure.current} /{" "}
                                             {mockNorms.animalManure.total} kg N
                                         </span>
@@ -147,44 +147,62 @@ export function FertilizerApplicationMetricsCard() {
                                 </ItemTitle>
                             </ItemContent>
                             <ItemDescription>
-                                <div className="grid grid-cols-2 items-start justify-between space-y-2">
+                                <div className="flex flex-col space-y-2">
                                     {/* Simplified Flow (Top Section) */}
-                                    <p className="">Aanvoer</p>
-                                    <span className="font-semibold text-right">
-                                        {mockNitrogenBalance.supply} kg N
-                                    </span>
-                                    <p className="">Afvoer</p>
-                                    <span className="font-semibold text-right">
-                                        - {mockNitrogenBalance.removal} kg N
-                                    </span>
-                                    <p className="flex items-center gap-1">
-                                        Emissie
-                                    </p>
-                                    <span className="font-semibold text-right">
-                                        - {mockNitrogenBalance.emission} kg N
-                                    </span>
+                                    <div className="grid grid-cols-[1fr_auto] items-center">
+                                        <p className="whitespace-nowrap px-2">Aanvoer</p>
+                                        <span className="font-semibold text-right whitespace-nowrap px-2">
+                                            {mockNitrogenBalance.supply} kg N
+                                        </span>
+                                    </div>
+                                    <div className="grid grid-cols-[1fr_auto] items-center">
+                                        <p className="whitespace-nowrap px-2">Afvoer</p>
+                                        <span className="font-semibold text-right whitespace-nowrap px-2">
+                                            - {mockNitrogenBalance.removal} kg N
+                                        </span>
+                                    </div>
+                                    <div className="grid grid-cols-[1fr_auto] items-center">
+                                        <p className="whitespace-nowrap px-2">Emissie</p>
+                                        <span className="font-semibold text-right whitespace-nowrap px-2">
+                                            - {mockNitrogenBalance.emission} kg N
+                                        </span>
+                                    </div>
                                     <ItemSeparator className="col-span-2" />{" "}
                                     {/* Separator for clarity */}
                                     {/* Prominent Result (Bottom Section) */}
-                                    <p className="text-xl font-bold">Balans</p>
-                                    <span className="text-xl font-bold text-right">
-                                        {mockNitrogenBalance.balance} kg N
-                                    </span>
-                                    <p>Streefwaarde</p>
-                                    <span className="font-semibold text-right">
-                                        {mockNitrogenBalance.target} kg N
-                                    </span>
+                                    <div className="grid grid-cols-[1fr_auto] items-center">
+                                        <p className="text-xl font-bold whitespace-nowrap px-2">
+                                            Balans
+                                        </p>
+                                        <span className="text-xl font-bold text-right whitespace-nowrap px-2">
+                                            {mockNitrogenBalance.balance} kg N
+                                        </span>
+                                    </div>
+                                    <div className="grid grid-cols-[1fr_auto] items-center">
+                                        <p className="whitespace-nowrap px-2">
+                                            Streefwaarde
+                                        </p>
+                                        <span className="font-semibold text-right whitespace-nowrap px-2">
+                                            {mockNitrogenBalance.target} kg N
+                                        </span>
+                                    </div>
                                     <ItemSeparator className="col-span-2" />{" "}
-                                    <p className="text-xl font-bold">
-                                        {mockNitrogenBalance.task < 0
-                                            ? "Opgave"
-                                            : "Ruimte"}
-                                    </p>
-                                    <span
-                                        className={`text-xl font-bold text-right ${mockNitrogenBalance.task < 0 ? "text-red-500" : "text-green-500"}`}
-                                    >
-                                        {mockNitrogenBalance.task} kg N
-                                    </span>
+                                    <div className="grid grid-cols-[1fr_auto] items-center">
+                                        <p className="text-xl font-bold whitespace-nowrap px-2">
+                                            {mockNitrogenBalance.task < 0
+                                                ? "Opgave"
+                                                : "Ruimte"}
+                                        </p>
+                                        <span
+                                            className={`text-xl font-bold text-right whitespace-nowrap px-2 ${
+                                                mockNitrogenBalance.task < 0
+                                                    ? "text-red-500"
+                                                    : "text-green-500"
+                                            }`}
+                                        >
+                                            {mockNitrogenBalance.task} kg N
+                                        </span>
+                                    </div>
                                 </div>
                             </ItemDescription>
                         </Item>
@@ -199,9 +217,9 @@ export function FertilizerApplicationMetricsCard() {
                             </ItemContent>
                             <ItemDescription>
                                 <div className="flex flex-col space-y-2">
-                                    <div className="flex flex-row justify-between">
-                                        <p>Stikstof</p>
-                                        <span>
+                                    <div className="grid grid-cols-[1fr_auto] items-center">
+                                        <p className="whitespace-nowrap px-2">Stikstof</p>
+                                        <span className="text-right whitespace-nowrap px-2">
                                             {
                                                 mockFertilizationAdvice.nitrogen
                                                     .current
@@ -231,17 +249,17 @@ export function FertilizerApplicationMetricsCard() {
                                         className="h-2"
                                     />
 
-                                    <div className="flex flex-row justify-between">
-                                        <p>Fosfaat</p>
-                                        <span>
+                                    <div className="grid grid-cols-[1fr_auto] items-center">
+                                        <p className="whitespace-nowrap px-2">Fosfaat</p>
+                                        <span className="text-right whitespace-nowrap px-2">
                                             {
-                                                mockFertilizationAdvice
-                                                    .phosphate.current
+                                                mockFertilizationAdvice.phosphate
+                                                    .current
                                             }{" "}
                                             /{" "}
                                             {
-                                                mockFertilizationAdvice
-                                                    .phosphate.total
+                                                mockFertilizationAdvice.phosphate
+                                                    .total
                                             }{" "}
                                             kg P₂O₅
                                         </span>
@@ -250,8 +268,8 @@ export function FertilizerApplicationMetricsCard() {
                                         value={
                                             (mockFertilizationAdvice.phosphate
                                                 .current /
-                                                mockFertilizationAdvice
-                                                    .phosphate.total) *
+                                                mockFertilizationAdvice.phosphate
+                                                    .total) *
                                             100
                                         }
                                         colorBar={getAdviceProgressColor(
@@ -263,17 +281,17 @@ export function FertilizerApplicationMetricsCard() {
                                         className="h-2"
                                     />
 
-                                    <div className="flex flex-row justify-between">
-                                        <p>Kalium</p>
-                                        <span>
+                                    <div className="grid grid-cols-[1fr_auto] items-center">
+                                        <p className="whitespace-nowrap px-2">Kalium</p>
+                                        <span className="text-right whitespace-nowrap px-2">
                                             {
-                                                mockFertilizationAdvice
-                                                    .potassium.current
+                                                mockFertilizationAdvice.potassium
+                                                    .current
                                             }{" "}
                                             /{" "}
                                             {
-                                                mockFertilizationAdvice
-                                                    .potassium.total
+                                                mockFertilizationAdvice.potassium
+                                                    .total
                                             }{" "}
                                             kg K₂O
                                         </span>
@@ -282,8 +300,8 @@ export function FertilizerApplicationMetricsCard() {
                                         value={
                                             (mockFertilizationAdvice.potassium
                                                 .current /
-                                                mockFertilizationAdvice
-                                                    .potassium.total) *
+                                                mockFertilizationAdvice.potassium
+                                                    .total) *
                                             100
                                         }
                                         colorBar={getAdviceProgressColor(
