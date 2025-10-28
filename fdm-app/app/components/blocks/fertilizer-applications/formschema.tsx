@@ -31,3 +31,7 @@ export const PatchFormSchema = FormSchema.extend({
         invalid_type_error: "Bemesting id is ongeldig",
     }),
 })
+
+export type FieldFertilizerFormValues = z.infer<typeof FormSchema> & {
+    p_app_id?: string | undefined
+}

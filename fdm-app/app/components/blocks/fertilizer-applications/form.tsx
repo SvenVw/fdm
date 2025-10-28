@@ -6,7 +6,6 @@ import { useEffect } from "react"
 import type { Navigation } from "react-router"
 import { Form, useNavigate, useSearchParams } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import type { z } from "zod"
 import { useFieldFertilizerFormStore } from "@/app/store/field-fertilizer-form"
 import { Combobox } from "~/components/custom/combobox"
 import { DatePicker } from "~/components/custom/date-picker"
@@ -33,7 +32,11 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
-import { FormSchema, PatchFormSchema } from "./formschema"
+import {
+    type FieldFertilizerFormValues,
+    FormSchema,
+    PatchFormSchema,
+} from "./formschema"
 import type { FertilizerOption } from "./types.d"
 
 export function FertilizerApplicationForm({
@@ -54,12 +57,10 @@ export function FertilizerApplicationForm({
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
 
-    const form = useRemixForm<z.infer<typeof PatchFormSchema>>({
+    const form = useRemixForm<FieldFertilizerFormValues>({
         mode: "onTouched",
         resolver: zodResolver(
-            fertilizerApplication
-                ? PatchFormSchema
-                : (FormSchema as typeof PatchFormSchema),
+            fertilizerApplication ? PatchFormSchema : FormSchema,
         ),
         defaultValues: {
             p_app_id: fertilizerApplication?.p_app_id,

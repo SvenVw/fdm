@@ -200,12 +200,22 @@ export function FertilizerApplicationCard({
               (app) => app.p_app_id === savedFormValues.p_app_id,
           )
         : null
-    if (applicationToEdit && !editedFertilizerApplication) {
-        setEditedFertilizerApplication(applicationToEdit)
-    }
-    if (savedFormValues?.p_app_id && !applicationToEdit && params.b_id) {
-        fieldFertilizerFormStore.delete(params.b_id_farm || "", params.b_id)
-    }
+    useEffect(() => {
+        if (applicationToEdit && !editedFertilizerApplication) {
+            setEditedFertilizerApplication(applicationToEdit)
+        }
+        if (savedFormValues?.p_app_id && !applicationToEdit && params.b_id) {
+            fieldFertilizerFormStore.delete(params.b_id_farm || "", params.b_id)
+        }
+    }, [
+        applicationToEdit,
+        params.b_id_farm,
+        params.b_id,
+        savedFormValues,
+        fertilizerApplications,
+        editedFertilizerApplication,
+        fieldFertilizerFormStore.delete,
+    ])
 
     useEffect(() => {
         if (savedFormValues && !isDialogOpen) {
