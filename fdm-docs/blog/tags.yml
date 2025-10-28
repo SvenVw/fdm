@@ -23,6 +23,11 @@ fdm-docs:
   description: Posts related to the FDM documentation website (@svenvw/fdm-docs).
   permalink: /fdm-docs
 
+fdm-app:
+  label: fdm-app
+  description: Posts related to the React web application to interact with FDM (@svenvw/fdm-app).
+  permalink: /fdm-app
+
 update:
   label: Update
   description: General updates and improvements to the FDM ecosystem.
