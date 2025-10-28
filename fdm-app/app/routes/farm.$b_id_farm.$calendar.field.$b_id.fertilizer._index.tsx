@@ -1,4 +1,12 @@
-import { calculateDose } from "@svenvw/fdm-calculator"
+import {
+    calculateDose,
+    createFunctionsForNorms,
+    getNitrogenBalance,
+    getNutrientAdvice,
+    createFunctionsForFertilizerApplicationFilling,
+    collectInputForNitrogenBalance,
+    NitrogenBalanceNumeric,
+} from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
     getFertilizerApplications,
@@ -6,6 +14,10 @@ import {
     getFertilizers,
     getField,
     removeFertilizerApplication,
+    getCurrentSoilData,
+    getCultivations,
+    Timeframe,
+    FdmType,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
@@ -18,12 +30,15 @@ import { dataWithError, dataWithSuccess } from "remix-toast"
 import { FertilizerApplicationCard } from "~/components/blocks/fertilizer-applications/card"
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getTimeframe, getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { FertilizerApplicationMetricsCard } from "../components/blocks/fertilizer-applications/metrics"
+import { getNmiApiKey } from "../integrations/nmi"
+import { underlineSquare } from "@lucide/lab"
+import { getNitrogenBalanceforField } from "../integrations/calculator"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -71,9 +86,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get the session
         const session = await getSession(request)
+        const principal_id = session.principal_id
 
         // Get timeframe from calendar store
         const timeframe = getTimeframe(params)
+        const calendar = getCalendar(params)
 
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)
@@ -93,15 +110,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fertilizerParameterDescription =
             getFertilizerParametersDescription()
         const applicationMethods = fertilizerParameterDescription.find(
-            (x) => x.parameter === "p_app_method_options",
+            (x: any) => x.parameter === "p_app_method_options",
         )
         if (!applicationMethods) throw new Error("Parameter metadata missing")
         // Map fertilizers to options for the combobox
         const fertilizerOptions = fertilizers.map((fertilizer) => {
             const applicationMethodOptions = fertilizer.p_app_method_options
-                .map((opt) => {
+                .map((opt: any) => {
                     const meta = applicationMethods.options.find(
-                        (x) => x.value === opt,
+                        (x: any) => x.value === opt,
                     )
                     return meta ? { value: opt, label: meta.label } : undefined
                 })
@@ -126,7 +143,140 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fertilizers,
         })
 
-        // Return user information from loader
+        const FertilizerApplicationMetricsData = {
+            norms: undefined,
+            normsFilling: undefined,
+            nitrogenBalance: getNitrogenBalanceforField({
+                fdm,
+                principal_id,
+                b_id_farm,
+                b_id,
+                timeframe,
+        }),
+            nutrientAdvice: undefined,
+            dose: dose.dose,
+        }
+
+        // const asyncData = (async () => {
+        //     try {
+        //         const currentSoilData = await getCurrentSoilData(
+        //             fdm,
+        //             session.principal_id,
+        //             b_id,
+        //         )
+
+        //         const cultivations = await getCultivations(
+        //             fdm,
+        //             session.principal_id,
+        //             b_id,
+        //             timeframe,
+        //         )
+
+        //         if (!cultivations.length) {
+        //             throw new Error("missing: cultivations")
+        //         }
+
+        //         // For now take the first cultivation
+        //         const b_lu_catalogue = cultivations[0].b_lu_catalogue
+
+        //         const nmiApiKey = getNmiApiKey()
+
+        //         const functionsForNorms = createFunctionsForNorms("NL", "2025")
+        //         const functionsForFilling =
+        //             createFunctionsForFertilizerApplicationFilling("NL", "2025")
+
+        //         const normsInput = await functionsForNorms.collectInputForNorms(
+        //             fdm,
+        //             session.principal_id,
+        //             field.b_id,
+        //         )
+
+        //         const [normManure, normPhosphate, normNitrogen] =
+        //             await Promise.all([
+        //                 functionsForNorms.calculateNormForManure(
+        //                     fdm,
+        //                     normsInput,
+        //                 ),
+        //                 functionsForNorms.calculateNormForPhosphate(
+        //                     fdm,
+        //                     normsInput,
+        //                 ),
+        //                 functionsForNorms.calculateNormForNitrogen(
+        //                     fdm,
+        //                     normsInput,
+        //                 ),
+        //             ])
+
+        //         const fillingInput =
+        //             await functionsForFilling.collectInputForFertilizerApplicationFilling(
+        //                 fdm,
+        //                 session.principal_id,
+        //                 field.b_id,
+        //                 normPhosphate.normValue,
+        //             )
+
+        //         const [fillingManure, fillingPhosphate, fillingNitrogen] =
+        //             await Promise.all([
+        //                 functionsForFilling.calculateFertilizerApplicationFillingForManure(
+        //                     fdm,
+        //                     fillingInput,
+        //                 ),
+        //                 functionsForFilling.calculateFertilizerApplicationFillingForPhosphate(
+        //                     fdm,
+        //                     fillingInput,
+        //                 ),
+        //                 functionsForFilling.calculateFertilizerApplicationFillingForNitrogen(
+        //                     fdm,
+        //                     fillingInput,
+        //                 ),
+        //             ])
+
+        //         const nitrogenBalanceInput =
+        //             await collectInputForNitrogenBalance(
+        //                 fdm,
+        //                 session.principal_id,
+        //                 b_id_farm,
+        //                 timeframe,
+        //                 b_id,
+        //             )
+
+        //         const nitrogenBalanceResult = await getNitrogenBalance(
+        //             fdm,
+        //             nitrogenBalanceInput,
+        //         )
+        //         const nitrogenBalance = nitrogenBalanceResult.fields.find(
+        //             (field: { b_id: string }) => field.b_id === b_id,
+        //         )
+
+        //         const nutrientAdvice = await getNutrientAdvice(fdm, {
+        //             b_lu_catalogue,
+        //             b_centroid: field.b_centroid,
+        //             currentSoilData: currentSoilData,
+        //             nmiApiKey: nmiApiKey,
+        //         })
+
+        //         return {
+        //             norms: {
+        //                 manure: normManure,
+        //                 phosphate: normPhosphate,
+        //                 nitrogen: normNitrogen,
+        //             },
+        //             normsFilling: {
+        //                 manure: fillingManure,
+        //                 phosphate: fillingPhosphate,
+        //                 nitrogen: fillingNitrogen,
+        //             },
+        //             nitrogenBalance,
+        //             nutrientAdvice,
+        //             dose,
+        //             errorMessage: undefined,
+        //         }
+        //     } catch (error) {
+        //         return { errorMessage: String(error).replace("Error: ", "") }
+        //     }
+        // })()
+
+        // Return user information from loader, including the promises
         return {
             field: field,
             fertilizerOptions: fertilizerOptions,
@@ -134,6 +284,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fertilizers: fertilizers,
             dose: dose.dose,
             applicationMethodOptions: applicationMethods.options,
+            FertilizerApplicationMetricsData: FertilizerApplicationMetricsData,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -152,6 +303,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
+    if (!loaderData) {
+        return <div>Loading...</div> // Or a more sophisticated loading state
+    }
+
     return (
         <div className="container mx-auto py-8 px-4">
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -169,7 +324,13 @@ export default function FarmFieldsOverviewBlock() {
                     />
                 </div>
                 <div className="md:col-span-1 lg:col-span-2">
-                    <FertilizerApplicationMetricsCard />
+                    <FertilizerApplicationMetricsCard
+                        dose={loaderData.FertilizerApplicationMetricsData.dose}
+                        nitrogenBalance={
+                            loaderData.FertilizerApplicationMetricsData
+                                .nitrogenBalance
+                        }
+                    />
                 </div>
             </div>
         </div>
@@ -248,3 +409,4 @@ export async function action({ request, params }: ActionFunctionArgs) {
         throw handleActionError(error)
     }
 }
+
