@@ -1,4 +1,4 @@
-import type { FdmType, Timeframe } from "@svenvw/fdm-core"
+import type { FdmType, PrincipalId, Timeframe } from "@svenvw/fdm-core"
 import type { NL2025NormsFillingInput } from "./types"
 import {
     getCultivations,
@@ -25,7 +25,7 @@ import {
  */
 export async function collectInputForFertilizerApplicationFilling(
     fdm: FdmType,
-    principal_id: string,
+    principal_id: PrincipalId,
     b_id: string,
     fosfaatgebruiksnorm: number,
 ): Promise<NL2025NormsFillingInput> {
@@ -33,7 +33,7 @@ export async function collectInputForFertilizerApplicationFilling(
     const year = 2025
     // Define the timeframe for data collection for the current year.
     const startOfYear = new Date(year, 0, 1) // January 1st of the specified year
-    const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999) // December 31st of the specified year, including December 31st 
+    const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999) // December 31st of the specified year, including December 31st
     const timeframe2025: Timeframe = { start: startOfYear, end: endOfYear }
 
     // 1. Retrieve field details using the field ID.

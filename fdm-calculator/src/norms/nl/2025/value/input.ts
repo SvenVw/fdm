@@ -24,7 +24,7 @@ import type { NL2025NormsInput } from "./types.d"
  */
 export async function collectNL2025InputForNorms(
     fdm: FdmType,
-    principal_id: string,
+    principal_id: PrincipalId,
     b_id: string,
 ): Promise<NL2025NormsInput> {
     // Create timeframe for 2025
