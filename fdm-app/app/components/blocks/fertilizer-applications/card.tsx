@@ -155,6 +155,8 @@ export function FertilizerApplicationCard({
     const params = useParams()
     const navigation = useNavigation()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [editedFertilizerApplication, setEditedFertilizerApplication] =
+        useState<FertilizerApplication>()
     const previousNavigationState = useRef(navigation.state)
 
     const b_id_or_b_lu_catalogue = params.b_lu_catalogue || params.b_id
@@ -165,12 +167,17 @@ export function FertilizerApplicationCard({
         fetcher.submit({ p_app_id }, { method: "DELETE" })
     }
 
+    const handleEdit = (fertilizerApplication: FertilizerApplication) => () => {
+        setEditedFertilizerApplication(fertilizerApplication)
+        setIsDialogOpen(true)
+    }
     useEffect(() => {
         const wasNotIdle = previousNavigationState.current !== "idle"
         const isIdle = navigation.state === "idle"
 
         if (wasNotIdle && isIdle) {
             setIsDialogOpen(false)
+            setEditedFertilizerApplication(undefined)
         }
 
         previousNavigationState.current = navigation.state
@@ -197,6 +204,10 @@ export function FertilizerApplicationCard({
             )
         }
 
+        if (!state) {
+            setEditedFertilizerApplication(undefined)
+        }
+
         setIsDialogOpen(state)
     }
 
@@ -206,8 +217,8 @@ export function FertilizerApplicationCard({
                 <CardTitle>
                     <p className="text-lg font-medium">Bemesting</p>
                     <p className="text-sm font-medium text-muted-foreground">
-                        Voeg bemestingen toe, verwijder ze en bekijk de totale
-                        gift per hectare voor verschillende nutriënten
+                        Voeg bemestingen toe, wijzig of verwijder ze en bekijk
+                        de totale gift per hectare voor verschillende nutriënten
                     </p>
                 </CardTitle>
                 <Dialog
@@ -220,11 +231,14 @@ export function FertilizerApplicationCard({
                     <DialogContent className="sm:max-w-[800px]">
                         <DialogHeader>
                             <DialogTitle className="flex flex-row items-center justify-between mr-4">
-                                Bemesting toevoegen
+                                {editedFertilizerApplication
+                                    ? "Bemesting wijzigen"
+                                    : "Bemesting toevoegen"}
                             </DialogTitle>
                             <DialogDescription>
-                                Voeg een nieuwe bemestingstoepassing toe aan het
-                                perceel.
+                                {editedFertilizerApplication
+                                    ? "Wijzig een bemestingtoepassing aan het percel."
+                                    : "Voeg een nieuwe bemestingstoepassing toe aan het perceel."}
                             </DialogDescription>
                         </DialogHeader>
                         <FertilizerApplicationForm
@@ -235,6 +249,7 @@ export function FertilizerApplicationCard({
                             b_id_or_b_lu_catalogue={
                                 b_id_or_b_lu_catalogue || ""
                             }
+                            fertilizerApplication={editedFertilizerApplication}
                         />
                     </DialogContent>
                 </Dialog>
@@ -244,7 +259,7 @@ export function FertilizerApplicationCard({
                     {fertilizerApplications.length > 0 ? (
                         fertilizerApplications.map((application) => (
                             <div
-                                className="grid grid-cols-5 gap-x-3 items-center"
+                                className="grid grid-cols-6 gap-x-3 items-center"
                                 key={application.p_app_id}
                             >
                                 <div className="col-span-2">
@@ -273,6 +288,17 @@ export function FertilizerApplicationCard({
                                             "yyyy-MM-dd",
                                         )}
                                     </p>
+                                </div>
+                                <div className="justify-self-end">
+                                    <Button
+                                        variant="secondary"
+                                        disabled={
+                                            fetcher.state === "submitting"
+                                        }
+                                        onClick={handleEdit(application)}
+                                    >
+                                        Wijzig
+                                    </Button>
                                 </div>
                                 <div className="justify-self-end">
                                     <Button

@@ -6,6 +6,7 @@ import {
     getFertilizers,
     getField,
     removeFertilizerApplication,
+    updateFertilizerApplication,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
@@ -16,7 +17,10 @@ import {
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 import { FertilizerApplicationCard } from "~/components/blocks/fertilizer-applications/card"
-import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
+import {
+    FormSchema,
+    PatchFormSchema,
+} from "~/components/blocks/fertilizer-applications/formschema"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -207,6 +211,37 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 { result: "Data saved successfully" },
                 { message: "Bemesting is toegevoegd! 🎉" },
             )
+        }
+
+        if (request.method === "PATCH") {
+            // Collect form entry
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                PatchFormSchema,
+            )
+            const { p_app_id, p_id, p_app_amount, p_app_date, p_app_method } =
+                formValues
+
+            if (!p_app_id || typeof p_app_id !== "string") {
+                return dataWithError(
+                    "Invalid or missing p_app_id value",
+                    "Oops! Something went wrong. Please try again later.",
+                )
+            }
+
+            await updateFertilizerApplication(
+                fdm,
+                session.principal_id,
+                p_app_id,
+                p_id,
+                p_app_amount,
+                p_app_method,
+                p_app_date,
+            )
+
+            return dataWithSuccess("Date edited successfully", {
+                message: "Bemesting is gewijzigd",
+            })
         }
 
         if (request.method === "DELETE") {

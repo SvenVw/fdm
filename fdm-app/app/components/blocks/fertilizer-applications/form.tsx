@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import type { FertilizerApplication } from "@svenvw/fdm-core"
 import { Plus } from "lucide-react"
 import type { MouseEvent } from "react"
 import { useEffect } from "react"
@@ -32,7 +33,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
-import { FormSchema } from "./formschema"
+import { FormSchema, PatchFormSchema } from "./formschema"
 import type { FertilizerOption } from "./types.d"
 
 export function FertilizerApplicationForm({
@@ -41,24 +42,34 @@ export function FertilizerApplicationForm({
     navigation,
     b_id_farm,
     b_id_or_b_lu_catalogue,
+    fertilizerApplication,
 }: {
     options: FertilizerOption[]
     action: string
     navigation: Navigation
     b_id_farm: string
     b_id_or_b_lu_catalogue: string
+    fertilizerApplication: FertilizerApplication
 }) {
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
 
-    const form = useRemixForm<z.infer<typeof FormSchema>>({
+    const form = useRemixForm<z.infer<typeof PatchFormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(FormSchema),
+        resolver: zodResolver(
+            fertilizerApplication
+                ? PatchFormSchema
+                : (FormSchema as typeof PatchFormSchema),
+        ),
         defaultValues: {
-            p_id: undefined,
-            p_app_method: undefined,
-            p_app_amount: undefined,
-            p_app_date: new Date(),
+            p_app_id: fertilizerApplication?.p_app_id,
+            p_id: fertilizerApplication?.p_id,
+            p_app_method: fertilizerApplication?.p_app_method,
+            p_app_amount: fertilizerApplication?.p_app_amount,
+            p_app_date: fertilizerApplication?.p_app_date ?? new Date(),
+        },
+        submitConfig: {
+            method: fertilizerApplication ? "PUT" : "POST",
         },
     })
     const p_id = form.watch("p_id")
@@ -66,10 +77,13 @@ export function FertilizerApplicationForm({
     const isSubmitting = navigation.state === "submitting"
 
     useEffect(() => {
-        if (p_id) {
+        if (
+            p_id &&
+            (!fertilizerApplication || fertilizerApplication.p_id !== p_id)
+        ) {
             form.setValue("p_app_method", "")
         }
-    }, [p_id, form.setValue])
+    }, [p_id, fertilizerApplication, form.setValue])
 
     const fieldFertilizerFormStore = useFieldFertilizerFormStore()
 
@@ -139,6 +153,13 @@ export function FertilizerApplicationForm({
                 onSubmit={form.handleSubmit}
                 method="post"
             >
+                {fertilizerApplication && (
+                    <input
+                        name="p_app_id"
+                        type="hidden"
+                        value={fertilizerApplication?.p_app_id}
+                    />
+                )}
                 <fieldset disabled={isSubmitting}>
                     <div className="grid md:grid-cols-2 items-end gap-x-8 gap-y-4 justify-between">
                         {/* <Label htmlFor="b_name_farm">Meststof</Label> */}
@@ -270,6 +291,8 @@ export function FertilizerApplicationForm({
                                         <LoadingSpinner />
                                         <span>Opslaan...</span>
                                     </div>
+                                ) : fertilizerApplication ? (
+                                    "Opslaan"
                                 ) : (
                                     "Voeg toe"
                                 )}
