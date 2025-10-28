@@ -147,7 +147,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fertilizers,
         })
 
-        const FertilizerApplicationMetricsData = {
+        const fertilizerApplicationMetricsData = {
             norms: undefined,
             normsFilling: undefined,
             nitrogenBalance: getNitrogenBalanceforField({
@@ -294,7 +294,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fertilizers: fertilizers,
             dose: dose.dose,
             applicationMethodOptions: applicationMethods.options,
-            FertilizerApplicationMetricsData: FertilizerApplicationMetricsData,
+            fertilizerApplicationMetricsData: fertilizerApplicationMetricsData,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -336,14 +336,14 @@ export default function FarmFieldsOverviewBlock() {
                 <div className="md:col-span-1 lg:col-span-2">
                     <FertilizerApplicationMetricsCard
                         nitrogenBalance={
-                            loaderData.FertilizerApplicationMetricsData
+                            loaderData.fertilizerApplicationMetricsData
                                 .nitrogenBalance
                         }
                         nutrientAdvice={
-                            loaderData.FertilizerApplicationMetricsData
+                            loaderData.fertilizerApplicationMetricsData
                                 .nutrientAdvice
                         }
-                        dose={loaderData.FertilizerApplicationMetricsData.dose}
+                        dose={loaderData.fertilizerApplicationMetricsData.dose}
                     />
                 </div>
             </div>

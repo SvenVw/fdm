@@ -26,7 +26,7 @@ import type {
     Dose,
 } from "@svenvw/fdm-calculator"
 
-interface FertilizerApplicationMetricsCardProps {
+interface FertilizerApplicationMetricsData {
     norms: {
         manure: GebruiksnormResult
         phosphate: GebruiksnormResult
@@ -143,7 +143,7 @@ const NutrientAdviceSkeleton = () => (
 )
 
 export function FertilizerApplicationMetricsCard(
-    asyncData: FertilizerApplicationMetricsCardProps,
+    fertilizerApplicationMetricsData: FertilizerApplicationMetricsData,
 ) {
     const getNormsProgressColor = (current: number, total: number) => {
         const percentage = (current / total) * 100
@@ -159,7 +159,7 @@ export function FertilizerApplicationMetricsCard(
         return "gray-500" // Default or error color
     }
 
-    const dose = asyncData.dose
+    const dose = fertilizerApplicationMetricsData.dose
 
     return (
         <Card>
@@ -281,7 +281,11 @@ export function FertilizerApplicationMetricsCard(
                                 <Suspense
                                     fallback={<NitrogenBalanceSkeleton />}
                                 >
-                                    <Await resolve={asyncData.nitrogenBalance}>
+                                    <Await
+                                        resolve={
+                                            fertilizerApplicationMetricsData.nitrogenBalance
+                                        }
+                                    >
                                         {(nitrogenBalance) => {
                                             const task =
                                                 nitrogenBalance.balance.target -
@@ -385,7 +389,11 @@ export function FertilizerApplicationMetricsCard(
                             </ItemContent>
                             <ItemDescription>
                                 <Suspense fallback={<NutrientAdviceSkeleton />}>
-                                    <Await resolve={asyncData.nutrientAdvice}>
+                                    <Await
+                                        resolve={
+                                            fertilizerApplicationMetricsData.nutrientAdvice
+                                        }
+                                    >
                                         {(nutrientAdvice) => (
                                             <div className="flex flex-col space-y-2">
                                                 <div className="grid grid-cols-[1fr_auto] items-center">
