@@ -5,6 +5,7 @@ import {
     getFertilizerParametersDescription,
     getFertilizers,
     removeFertilizerApplication,
+    updateFertilizerApplication,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
@@ -15,7 +16,10 @@ import {
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
 import { FertilizerApplicationCard } from "~/components/blocks/fertilizer-applications/card"
-import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
+import {
+    FormSchema,
+    PatchFormSchema,
+} from "~/components/blocks/fertilizer-applications/formschema"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -67,6 +71,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         session.principal_id,
         b_id_farm,
     )
+
+    // Map fertilizer catalogue ids to their farm fertilizer acquiring ids
+    const fertilizerAcquiringIds: Record<string, string> = {}
+    for (const fertilizer of fertilizers) {
+        if (fertilizer.p_id_catalogue) {
+            fertilizerAcquiringIds[fertilizer.p_id_catalogue] = fertilizer.p_id
+        }
+    }
+
     const fertilizerParameterDescription = getFertilizerParametersDescription()
     const applicationMethods = fertilizerParameterDescription.find(
         (x: { parameter: string }) => x.parameter === "p_app_method_options",
@@ -126,7 +139,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     existingApplication.p_app_ids.push(app.p_app_id)
                 } else {
                     // If it's a new application, add it to the accumulator with a new p_app_ids array.
-                    accumulator.push({ ...app, p_app_ids: [app.p_app_id] })
+                    accumulator.push({
+                        ...app,
+                        p_id:
+                            fertilizerAcquiringIds[app.p_id_catalogue] ??
+                            app.p_id_catalogue,
+                        p_app_ids: [app.p_app_id],
+                    })
                 }
             })
 
@@ -228,6 +247,39 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 { result: "Data saved successfully" },
                 { message: "Bemesting is toegevoegd! 🎉" },
             )
+        }
+        if (request.method === "PUT") {
+            console.log("PUT request")
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                PatchFormSchema,
+            )
+            console.log(formValues)
+            const rawAppIds = formValues.p_app_id
+
+            if (!rawAppIds || typeof rawAppIds !== "string") {
+                throw new Error("invalid: p_app_id")
+            }
+
+            const p_app_ids = rawAppIds.split(",")
+
+            const { p_id, p_app_amount, p_app_date, p_app_method } = formValues
+
+            await Promise.all(
+                p_app_ids.map((p_app_id: string) =>
+                    updateFertilizerApplication(
+                        fdm,
+                        session.principal_id,
+                        p_app_id,
+                        p_id,
+                        p_app_amount,
+                        p_app_method,
+                        p_app_date,
+                    ),
+                ),
+            )
+
+            return dataWithSuccess({}, { message: "Bemesting is gewijzigd" })
         }
         if (request.method === "DELETE") {
             const formData = await request.formData()

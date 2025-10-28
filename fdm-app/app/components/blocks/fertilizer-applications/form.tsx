@@ -56,17 +56,18 @@ export function FertilizerApplicationForm({
 }) {
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
-
     const form = useRemixForm<FieldFertilizerFormValues>({
         mode: "onTouched",
         resolver: zodResolver(
             fertilizerApplication ? PatchFormSchema : FormSchema,
         ),
         defaultValues: {
-            p_app_id: fertilizerApplication?.p_app_id,
+            p_app_id: fertilizerApplication?.p_app_ids
+                ? fertilizerApplication.p_app_ids.join(",")
+                : fertilizerApplication?.p_app_id,
             p_id: fertilizerApplication?.p_id,
             p_app_method: fertilizerApplication?.p_app_method,
-            p_app_amount: fertilizerApplication?.p_app_amount,
+            p_app_amount: undefined, // Handled through an effect due to blank behavior
             p_app_date: fertilizerApplication?.p_app_date ?? new Date(),
         },
         submitConfig: {
@@ -112,6 +113,12 @@ export function FertilizerApplicationForm({
         fieldFertilizerFormStore.load,
     ])
 
+    useEffect(() => {
+        if (fertilizerApplication) {
+            form.setValue("p_app_amount", fertilizerApplication.p_app_amount)
+        }
+    }, [fertilizerApplication, form.setValue])
+
     // Change fertilizer selection if the user has added a new fertilizer
     const new_p_id = searchParams.get("p_id")
     useEffect(() => {
@@ -154,13 +161,6 @@ export function FertilizerApplicationForm({
                 onSubmit={form.handleSubmit}
                 method="post"
             >
-                {fertilizerApplication && (
-                    <input
-                        name="p_app_id"
-                        type="hidden"
-                        value={fertilizerApplication?.p_app_id}
-                    />
-                )}
                 <fieldset disabled={isSubmitting}>
                     <div className="grid md:grid-cols-2 items-end gap-x-8 gap-y-4 justify-between">
                         {/* <Label htmlFor="b_name_farm">Meststof</Label> */}

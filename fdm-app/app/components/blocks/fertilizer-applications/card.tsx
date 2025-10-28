@@ -204,8 +204,11 @@ export function FertilizerApplicationCard({
         if (applicationToEdit && !editedFertilizerApplication) {
             setEditedFertilizerApplication(applicationToEdit)
         }
-        if (savedFormValues?.p_app_id && !applicationToEdit && params.b_id) {
-            fieldFertilizerFormStore.delete(params.b_id_farm || "", params.b_id)
+        if (savedFormValues?.p_app_id && !applicationToEdit) {
+            fieldFertilizerFormStore.delete(
+                params.b_id_farm || "",
+                b_id_or_b_lu_catalogue || "",
+            )
         }
     }, [
         applicationToEdit,
