@@ -30,16 +30,15 @@ import { dataWithError, dataWithSuccess } from "remix-toast"
 import { FertilizerApplicationCard } from "~/components/blocks/fertilizer-applications/card"
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe, getCalendar } from "~/lib/calendar"
+import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { FertilizerApplicationMetricsCard } from "../components/blocks/fertilizer-applications/metrics"
-import { getNmiApiKey } from "../integrations/nmi"
-import { underlineSquare } from "@lucide/lab"
+import { FertilizerApplicationMetricsCard } from "~/components/blocks/fertilizer-applications/metrics"
 import {
     getNitrogenBalanceforField,
+    getNorms,
     getNutrientAdviceForField,
 } from "../integrations/calculator"
 
@@ -93,7 +92,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get timeframe from calendar store
         const timeframe = getTimeframe(params)
-        const calendar = getCalendar(params)
 
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)
@@ -148,8 +146,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
 
         const fertilizerApplicationMetricsData = {
-            norms: undefined,
-            normsFilling: undefined,
+            norms: getNorms({
+                fdm,
+                principal_id,
+                b_id,
+            }),
             nitrogenBalance: getNitrogenBalanceforField({
                 fdm,
                 principal_id,
@@ -166,125 +167,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }),
             dose: dose.dose,
         }
-
-        // const asyncData = (async () => {
-        //     try {
-        //         const currentSoilData = await getCurrentSoilData(
-        //             fdm,
-        //             session.principal_id,
-        //             b_id,
-        //         )
-
-        //         const cultivations = await getCultivations(
-        //             fdm,
-        //             session.principal_id,
-        //             b_id,
-        //             timeframe,
-        //         )
-
-        //         if (!cultivations.length) {
-        //             throw new Error("missing: cultivations")
-        //         }
-
-        //         // For now take the first cultivation
-        //         const b_lu_catalogue = cultivations[0].b_lu_catalogue
-
-        //         const nmiApiKey = getNmiApiKey()
-
-        //         const functionsForNorms = createFunctionsForNorms("NL", "2025")
-        //         const functionsForFilling =
-        //             createFunctionsForFertilizerApplicationFilling("NL", "2025")
-
-        //         const normsInput = await functionsForNorms.collectInputForNorms(
-        //             fdm,
-        //             session.principal_id,
-        //             field.b_id,
-        //         )
-
-        //         const [normManure, normPhosphate, normNitrogen] =
-        //             await Promise.all([
-        //                 functionsForNorms.calculateNormForManure(
-        //                     fdm,
-        //                     normsInput,
-        //                 ),
-        //                 functionsForNorms.calculateNormForPhosphate(
-        //                     fdm,
-        //                     normsInput,
-        //                 ),
-        //                 functionsForNorms.calculateNormForNitrogen(
-        //                     fdm,
-        //                     normsInput,
-        //                 ),
-        //             ])
-
-        //         const fillingInput =
-        //             await functionsForFilling.collectInputForFertilizerApplicationFilling(
-        //                 fdm,
-        //                 session.principal_id,
-        //                 field.b_id,
-        //                 normPhosphate.normValue,
-        //             )
-
-        //         const [fillingManure, fillingPhosphate, fillingNitrogen] =
-        //             await Promise.all([
-        //                 functionsForFilling.calculateFertilizerApplicationFillingForManure(
-        //                     fdm,
-        //                     fillingInput,
-        //                 ),
-        //                 functionsForFilling.calculateFertilizerApplicationFillingForPhosphate(
-        //                     fdm,
-        //                     fillingInput,
-        //                 ),
-        //                 functionsForFilling.calculateFertilizerApplicationFillingForNitrogen(
-        //                     fdm,
-        //                     fillingInput,
-        //                 ),
-        //             ])
-
-        //         const nitrogenBalanceInput =
-        //             await collectInputForNitrogenBalance(
-        //                 fdm,
-        //                 session.principal_id,
-        //                 b_id_farm,
-        //                 timeframe,
-        //                 b_id,
-        //             )
-
-        //         const nitrogenBalanceResult = await getNitrogenBalance(
-        //             fdm,
-        //             nitrogenBalanceInput,
-        //         )
-        //         const nitrogenBalance = nitrogenBalanceResult.fields.find(
-        //             (field: { b_id: string }) => field.b_id === b_id,
-        //         )
-
-        //         const nutrientAdvice = await getNutrientAdvice(fdm, {
-        //             b_lu_catalogue,
-        //             b_centroid: field.b_centroid,
-        //             currentSoilData: currentSoilData,
-        //             nmiApiKey: nmiApiKey,
-        //         })
-
-        //         return {
-        //             norms: {
-        //                 manure: normManure,
-        //                 phosphate: normPhosphate,
-        //                 nitrogen: normNitrogen,
-        //             },
-        //             normsFilling: {
-        //                 manure: fillingManure,
-        //                 phosphate: fillingPhosphate,
-        //                 nitrogen: fillingNitrogen,
-        //             },
-        //             nitrogenBalance,
-        //             nutrientAdvice,
-        //             dose,
-        //             errorMessage: undefined,
-        //         }
-        //     } catch (error) {
-        //         return { errorMessage: String(error).replace("Error: ", "") }
-        //     }
-        // })()
 
         // Return user information from loader, including the promises
         return {
@@ -313,10 +195,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
-    if (!loaderData) {
-        return <div>Loading...</div> // Or a more sophisticated loading state
-    }
-
     return (
         <div className="container mx-auto py-8 px-4">
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -335,6 +213,9 @@ export default function FarmFieldsOverviewBlock() {
                 </div>
                 <div className="md:col-span-1 lg:col-span-2">
                     <FertilizerApplicationMetricsCard
+                        norms={
+                            loaderData.fertilizerApplicationMetricsData.norms
+                        }
                         nitrogenBalance={
                             loaderData.fertilizerApplicationMetricsData
                                 .nitrogenBalance

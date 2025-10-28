@@ -28,119 +28,22 @@ import type {
 
 interface FertilizerApplicationMetricsData {
     norms: {
-        manure: GebruiksnormResult
-        phosphate: GebruiksnormResult
-        nitrogen: GebruiksnormResult
-    }
-    normsFilling: {
-        manure: NormFilling
-        phosphate: NormFilling
-        nitrogen: NormFilling
+        value: {
+            manure: GebruiksnormResult
+            phosphate: GebruiksnormResult
+            nitrogen: GebruiksnormResult
+        }
+        filling: {
+            manure: NormFilling
+            phosphate: NormFilling
+            nitrogen: NormFilling
+        }
     }
     nitrogenBalance: Promise<NitrogenBalanceNumeric> | undefined
     nutrientAdvice: NutrientAdvice
     dose: Dose
     errorMessage: string | undefined
 }
-
-const MetricsSkeleton = () => (
-    <div className="flex flex-col space-y-2">
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-16" />
-        </div>
-        <Skeleton className="h-2 w-full" />
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-16" />
-        </div>
-        <Skeleton className="h-2 w-full" />
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-4 w-16" />
-        </div>
-        <Skeleton className="h-2 w-full" />
-        <div className="flex justify-center pt-2">
-            <Spinner />
-        </div>
-    </div>
-)
-const NitrogenBalanceSkeleton = () => (
-    <div className="flex flex-col space-y-2">
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Aanvoer</p>
-            <span className="font-semibold text-right whitespace-nowrap px-2">
-                <Spinner />
-            </span>
-        </div>
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Afvoer</p>
-            <span className="font-semibold text-right whitespace-nowrap px-2">
-                <Spinner />
-            </span>
-        </div>
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Emissie</p>
-            <span className="font-semibold text-right whitespace-nowrap px-2">
-                <Spinner />
-            </span>
-        </div>
-        <ItemSeparator className="col-span-2" />
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="text-xl font-bold whitespace-nowrap px-2">Balans</p>
-            <span className="text-xl font-bold text-right whitespace-nowrap px-2">
-                <Spinner />
-            </span>
-        </div>
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Streefwaarde</p>
-            <span className="font-semibold text-right whitespace-nowrap px-2">
-                <Spinner />
-            </span>
-        </div>
-        <ItemSeparator className="col-span-2" />{" "}
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="text-xl font-bold whitespace-nowrap px-2 invisible">
-                Opgave
-            </p>
-            <span
-                className={
-                    "text-xl font-bold text-right whitespace-nowrap px-2"
-                }
-            >
-                <Spinner />
-            </span>
-        </div>
-    </div>
-)
-
-const NutrientAdviceSkeleton = () => (
-    <div className="flex flex-col space-y-2">
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Stikstof</p>
-            <span className="text-right  px-2">
-                {<Spinner className="h-3" />} kg N
-            </span>
-        </div>
-        <Skeleton className="h-2 w-full" />
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Fosfaat</p>
-            <span className="text-right px-2">
-                {<Spinner className="h-4" />} kg P₂O₅
-            </span>
-        </div>
-        <Skeleton className="h-2 w-full" />
-
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Kalium</p>
-            <span className="text-right px-2">
-                {<Spinner className="h-4" />}
-                kg K₂O
-            </span>
-        </div>
-        <Skeleton className="h-2 w-full" />
-    </div>
-)
 
 export function FertilizerApplicationMetricsCard(
     fertilizerApplicationMetricsData: FertilizerApplicationMetricsData,
@@ -173,7 +76,7 @@ export function FertilizerApplicationMetricsCard(
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                    {/* <ItemGroup>
+                    <ItemGroup>
                         <ItemSeparator />
                         <Item>
                             <ItemContent>
@@ -182,93 +85,110 @@ export function FertilizerApplicationMetricsCard(
                                 </ItemTitle>
                             </ItemContent>
                             <ItemDescription>
-                                <div className="flex flex-col space-y-2">
-                                    <div className="grid grid-cols-[1fr_auto] items-center">
-                                        <p className="whitespace-nowrap px-2">
-                                            Stikstof
-                                        </p>
-                                        <span className="text-right whitespace-nowrap px-2">
-                                            {normsFilling.nitrogen.normFilling?.toFixed(
-                                                0,
-                                            )}{" "}
-                                            /{" "}
-                                            {norms.nitrogen.normValue.toFixed(
-                                                0,
-                                            )}{" "}
-                                            kg N
-                                        </span>
-                                    </div>
-                                    <Progress
-                                        value={
-                                            (normsFilling.nitrogen.normFilling /
-                                                norms.nitrogen.normValue) *
-                                            100
+                                <Suspense fallback={<NormsSkeleton />}>
+                                    <Await
+                                        resolve={
+                                            fertilizerApplicationMetricsData.norms
                                         }
-                                        colorBar={getNormsProgressColor(
-                                            normsFilling.nitrogen.normFilling,
-                                            norms.nitrogen.normValue,
-                                        )}
-                                        className="h-2"
-                                    />
+                                    >
+                                        {(norms) => (
+                                            <div className="flex flex-col space-y-2">
+                                                <div className="grid grid-cols-[1fr_auto] items-center">
+                                                    <p className="whitespace-nowrap px-2">
+                                                        Stikstof
+                                                    </p>
+                                                    <span className="text-right whitespace-nowrap px-2">
+                                                        {norms.filling.nitrogen.toFixed(
+                                                            0,
+                                                        )}{" "}
+                                                        /{" "}
+                                                        {norms.value.nitrogen.toFixed(
+                                                            0,
+                                                        )}{" "}
+                                                        kg N
+                                                    </span>
+                                                </div>
+                                                <Progress
+                                                    value={
+                                                        (norms.filling
+                                                            .nitrogen /
+                                                            norms.value
+                                                                .nitrogen) *
+                                                        100
+                                                    }
+                                                    colorBar={getNormsProgressColor(
+                                                        norms.filling.nitrogen,
+                                                        norms.value.nitrogen,
+                                                    )}
+                                                    className="h-2"
+                                                />
 
-                                    <div className="grid grid-cols-[1fr_auto] items-center">
-                                        <p className="whitespace-nowrap px-2">
-                                            Fosfaat
-                                        </p>
-                                        <span className="text-right whitespace-nowrap px-2">
-                                            {normsFilling.phosphate.normFilling?.toFixed(
-                                                0,
-                                            )}{" "}
-                                            /{" "}
-                                            {norms.phosphate.normValue.toFixed(
-                                                0,
-                                            )}{" "}
-                                            kg P₂O₅
-                                        </span>
-                                    </div>
-                                    <Progress
-                                        value={
-                                            (normsFilling.phosphate
-                                                .normFilling /
-                                                norms.phosphate.normValue) *
-                                            100
-                                        }
-                                        colorBar={getNormsProgressColor(
-                                            normsFilling.phosphate.normFilling,
-                                            norms.phosphate.normValue,
-                                        )}
-                                        className="h-2"
-                                    />
+                                                <div className="grid grid-cols-[1fr_auto] items-center">
+                                                    <p className="whitespace-nowrap px-2">
+                                                        Fosfaat
+                                                    </p>
+                                                    <span className="text-right whitespace-nowrap px-2">
+                                                        {norms.filling.phosphate.toFixed(
+                                                            0,
+                                                        )}{" "}
+                                                        /{" "}
+                                                        {norms.value.phosphate.toFixed(
+                                                            0,
+                                                        )}{" "}
+                                                        kg P₂O₅
+                                                    </span>
+                                                </div>
+                                                <Progress
+                                                    value={
+                                                        (norms.filling
+                                                            .phosphate /
+                                                            norms.value
+                                                                .phosphate) *
+                                                        100
+                                                    }
+                                                    colorBar={getNormsProgressColor(
+                                                        norms.filling.phosphate,
+                                                        norms.value.phosphate,
+                                                    )}
+                                                    className="h-2"
+                                                />
 
-                                    <div className="grid grid-cols-[1fr_auto] items-center">
-                                        <p className="whitespace-nowrap px-2">
-                                            Dierlijke mest
-                                        </p>
-                                        <span className="text-right whitespace-nowrap px-2">
-                                            {normsFilling.manure.normFilling?.toFixed(
-                                                0,
-                                            )}{" "}
-                                            /{" "}
-                                            {norms.manure.normValue.toFixed(0)}{" "}
-                                            kg N
-                                        </span>
-                                    </div>
-                                    <Progress
-                                        value={
-                                            (normsFilling.manure.normFilling /
-                                                norms.manure.normValue) *
-                                            100
-                                        }
-                                        colorBar={getNormsProgressColor(
-                                            normsFilling.manure.normFilling,
-                                            norms.manure.normValue,
+                                                <div className="grid grid-cols-[1fr_auto] items-center">
+                                                    <p className="whitespace-nowrap px-2">
+                                                        Dierlijke mest
+                                                    </p>
+                                                    <span className="text-right whitespace-nowrap px-2">
+                                                        {norms.filling.manure.toFixed(
+                                                            0,
+                                                        )}{" "}
+                                                        /{" "}
+                                                        {norms.value.manure.toFixed(
+                                                            0,
+                                                        )}{" "}
+                                                        kg N
+                                                    </span>
+                                                </div>
+                                                <Progress
+                                                    value={
+                                                        (norms.filling.manure /
+                                                            norms.value
+                                                                .manure) *
+                                                        100
+                                                    }
+                                                    colorBar={getNormsProgressColor(
+                                                        norms.filling.manure
+                                                            .normFilling,
+                                                        norms.value.manure,
+                                                    )}
+                                                    className="h-2"
+                                                />
+                                            </div>
                                         )}
-                                        className="h-2"
-                                    />
-                                </div>
+                                    </Await>
+                                </Suspense>
                             </ItemDescription>
                         </Item>
-                    </ItemGroup> */}
+                    </ItemGroup>
                     <ItemGroup>
                         <ItemSeparator />
                         <Item>
@@ -491,3 +411,107 @@ export function FertilizerApplicationMetricsCard(
         </Card>
     )
 }
+
+const NormsSkeleton = () => (
+    <div className="flex flex-col space-y-2">
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="whitespace-nowrap px-2">Stikstof</p>
+            <span className="text-right whitespace-nowrap px-2">
+                {<Spinner className="h-3" />} kg N
+            </span>
+        </div>
+        <Skeleton className="h-2 w-full" />
+
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="whitespace-nowrap px-2">Fosfaat</p>
+            <span className="text-right whitespace-nowrap px-2">
+                {<Spinner className="h-3" />} kg P₂O₅
+            </span>
+        </div>
+        <Skeleton className="h-2 w-full" />
+
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="whitespace-nowrap px-2">Dierlijke mest</p>
+            <span className="text-right whitespace-nowrap px-2">
+                {<Spinner className="h-3" />} kg N
+            </span>
+        </div>
+        <Skeleton className="h-2 w-full" />
+    </div>
+)
+const NitrogenBalanceSkeleton = () => (
+    <div className="flex flex-col space-y-2">
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="whitespace-nowrap px-2">Aanvoer</p>
+            <span className="font-semibold text-right whitespace-nowrap px-2">
+                <Spinner />
+            </span>
+        </div>
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="whitespace-nowrap px-2">Afvoer</p>
+            <span className="font-semibold text-right whitespace-nowrap px-2">
+                <Spinner />
+            </span>
+        </div>
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="whitespace-nowrap px-2">Emissie</p>
+            <span className="font-semibold text-right whitespace-nowrap px-2">
+                <Spinner />
+            </span>
+        </div>
+        <ItemSeparator className="col-span-2" />
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="text-xl font-bold whitespace-nowrap px-2">Balans</p>
+            <span className="text-xl font-bold text-right whitespace-nowrap px-2">
+                <Spinner />
+            </span>
+        </div>
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="whitespace-nowrap px-2">Streefwaarde</p>
+            <span className="font-semibold text-right whitespace-nowrap px-2">
+                <Spinner />
+            </span>
+        </div>
+        <ItemSeparator className="col-span-2" />{" "}
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="text-xl font-bold whitespace-nowrap px-2 invisible">
+                Opgave
+            </p>
+            <span
+                className={
+                    "text-xl font-bold text-right whitespace-nowrap px-2"
+                }
+            >
+                <Spinner />
+            </span>
+        </div>
+    </div>
+)
+
+const NutrientAdviceSkeleton = () => (
+    <div className="flex flex-col space-y-2">
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="whitespace-nowrap px-2">Stikstof</p>
+            <span className="text-right  px-2">
+                {<Spinner className="h-3" />} kg N
+            </span>
+        </div>
+        <Skeleton className="h-2 w-full" />
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="whitespace-nowrap px-2">Fosfaat</p>
+            <span className="text-right px-2">
+                {<Spinner className="h-4" />} kg P₂O₅
+            </span>
+        </div>
+        <Skeleton className="h-2 w-full" />
+
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="whitespace-nowrap px-2">Kalium</p>
+            <span className="text-right px-2">
+                {<Spinner className="h-4" />}
+                kg K₂O
+            </span>
+        </div>
+        <Skeleton className="h-2 w-full" />
+    </div>
+)

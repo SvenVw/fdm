@@ -1,5 +1,7 @@
 import {
     collectInputForNitrogenBalance,
+    createFunctionsForFertilizerApplicationFilling,
+    createFunctionsForNorms,
     getNitrogenBalance,
     getNutrientAdvice,
     type NitrogenBalanceNumeric,
@@ -9,6 +11,7 @@ import {
     Field,
     getCultivations,
     getCurrentSoilData,
+    type PrincipalId,
     type fdmSchema,
     type FdmType,
     type Timeframe,
@@ -24,7 +27,7 @@ export async function getNitrogenBalanceforField({
     timeframe,
 }: {
     fdm: FdmType
-    principal_id: string | string[]
+    principal_id: PrincipalId
     b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"]
     b_id: Field.b_id
     timeframe: Timeframe
@@ -56,7 +59,7 @@ export async function getNutrientAdviceForField({
     timeframe,
 }: {
     fdm: FdmType
-    principal_id: string | string[]
+    principal_id: PrincipalId
     b_id: Field.b_id
     b_centroid: Field.b_centroid
     timeframe: Timeframe
@@ -89,4 +92,71 @@ export async function getNutrientAdviceForField({
     })
 
     return nutrientAdvice
+}
+
+export async function getNorms({
+    fdm,
+    principal_id,
+    b_id,
+}: {
+    fdm: FdmType
+    principal_id: PrincipalId
+    b_id: Field.b_id
+}) {
+    const functionsForNorms = createFunctionsForNorms("NL", "2025")
+    const functionsForFilling = createFunctionsForFertilizerApplicationFilling(
+        "NL",
+        "2025",
+    )
+
+    const normsInput = await functionsForNorms.collectInputForNorms(
+        fdm,
+        principal_id,
+        b_id,
+    )
+
+    const [normManure, normPhosphate, normNitrogen] = await Promise.all([
+        functionsForNorms.calculateNormForManure(fdm, normsInput),
+        functionsForNorms.calculateNormForPhosphate(fdm, normsInput),
+        functionsForNorms.calculateNormForNitrogen(fdm, normsInput),
+    ])
+
+    const fillingInput =
+        await functionsForFilling.collectInputForFertilizerApplicationFilling(
+            fdm,
+            principal_id,
+            b_id,
+            normPhosphate.normValue,
+        )
+
+    const [fillingManure, fillingPhosphate, fillingNitrogen] =
+        await Promise.all([
+            functionsForFilling.calculateFertilizerApplicationFillingForManure(
+                fdm,
+                fillingInput,
+            ),
+            functionsForFilling.calculateFertilizerApplicationFillingForPhosphate(
+                fdm,
+                fillingInput,
+            ),
+            functionsForFilling.calculateFertilizerApplicationFillingForNitrogen(
+                fdm,
+                fillingInput,
+            ),
+        ])
+
+    const norms = {
+        value: {
+            manure: normManure.normValue,
+            phosphate: normPhosphate.normValue,
+            nitrogen: normNitrogen.normValue,
+        },
+        filling: {
+            manure: fillingManure.normFilling,
+            phosphate: fillingPhosphate.normFilling,
+            nitrogen: fillingNitrogen.normFilling,
+        },
+    }
+
+    return norms
 }
