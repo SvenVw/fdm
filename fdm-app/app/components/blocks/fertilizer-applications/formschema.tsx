@@ -27,7 +27,7 @@ export const FormSchema = z.object({
 export const PatchFormSchema = FormSchema.extend({
     p_app_id: z.string({
         // TODO: Validate against the options that are available
-        required_error: "Perceel id is verplicht",
-        invalid_type_error: "Perceel niet gevonden",
+        required_error: "Bemesting id is verplicht",
+        invalid_type_error: "Bemesting id is ongeldig",
     }),
 })
