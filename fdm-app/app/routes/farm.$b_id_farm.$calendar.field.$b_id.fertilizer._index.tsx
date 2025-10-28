@@ -213,7 +213,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
 
-        if (request.method === "PATCH") {
+        if (request.method === "PUT") {
             // Collect form entry
             const formValues = await extractFormValuesFromRequest(
                 request,
