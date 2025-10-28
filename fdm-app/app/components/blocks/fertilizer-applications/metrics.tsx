@@ -147,60 +147,44 @@ export function FertilizerApplicationMetricsCard() {
                                 </ItemTitle>
                             </ItemContent>
                             <ItemDescription>
-                                <div className="flex flex-col space-y-2">
+                                <div className="grid grid-cols-2 items-start justify-between space-y-2">
                                     {/* Simplified Flow (Top Section) */}
-                                    <div className="flex flex-col gap-1">
-                                        <div className="flex items-center justify-between">
-                                            <p className="flex items-center gap-1">
-                                                Aanvoer
-                                            </p>
-                                            <span className="font-semibold">
-                                                {mockNitrogenBalance.supply} kg
-                                                N
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center justify-between">
-                                            <p className="flex items-center gap-1">
-                                                Afvoer
-                                            </p>
-                                            <span className="font-semibold">
-                                                - {mockNitrogenBalance.removal}{" "}
-                                                kg N
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center justify-between">
-                                            <p className="flex items-center gap-1">
-                                                Emissie
-                                            </p>
-                                            <span className="font-semibold">
-                                                - {mockNitrogenBalance.emission}{" "}
-                                                kg N
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <ItemSeparator />{" "}
+                                    <p className="">Aanvoer</p>
+                                    <span className="font-semibold text-right">
+                                        {mockNitrogenBalance.supply} kg N
+                                    </span>
+                                    <p className="">Afvoer</p>
+                                    <span className="font-semibold text-right">
+                                        - {mockNitrogenBalance.removal} kg N
+                                    </span>
+                                    <p className="flex items-center gap-1">
+                                        Emissie
+                                    </p>
+                                    <span className="font-semibold text-right">
+                                        - {mockNitrogenBalance.emission} kg N
+                                    </span>
+                                    <ItemSeparator className="col-span-2" />{" "}
                                     {/* Separator for clarity */}
                                     {/* Prominent Result (Bottom Section) */}
-                                    <div className="flex flex-row justify-between items-center font-bold text-lg">
-                                        <p>Balans</p>
-                                        <span>
-                                            {mockNitrogenBalance.balance} kg N
-                                        </span>
-                                    </div>
-                                    <div className="flex flex-row justify-between items-center text-sm text-gray-500 space-x-1">
-                                        <p>Streefwaarde</p>
-                                        <span>
-                                            {mockNitrogenBalance.target} kg N
-                                        </span>
-                                    </div>
-                                    <div
-                                        className={`flex flex-row justify-between items-center font-bold text-lg ${mockNitrogenBalance.task < 0 ? "text-red-500" : "text-green-500"}`}
+                                    <p className="text-xl font-bold">Balans</p>
+                                    <span className="text-xl font-bold text-right">
+                                        {mockNitrogenBalance.balance} kg N
+                                    </span>
+                                    <p>Streefwaarde</p>
+                                    <span className="font-semibold text-right">
+                                        {mockNitrogenBalance.target} kg N
+                                    </span>
+                                    <ItemSeparator className="col-span-2" />{" "}
+                                    <p className="text-xl font-bold">
+                                        {mockNitrogenBalance.task < 0
+                                            ? "Opgave"
+                                            : "Ruimte"}
+                                    </p>
+                                    <span
+                                        className={`text-xl font-bold text-right ${mockNitrogenBalance.task < 0 ? "text-red-500" : "text-green-500"}`}
                                     >
-                                        <p>Opgave</p>
-                                        <span>
-                                            {mockNitrogenBalance.task} kg N
-                                        </span>
-                                    </div>
+                                        {mockNitrogenBalance.task} kg N
+                                    </span>
                                 </div>
                             </ItemDescription>
                         </Item>
