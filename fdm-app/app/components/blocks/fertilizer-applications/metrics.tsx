@@ -1,4 +1,4 @@
-import { Suspense, use } from "react"
+import { Suspense } from "react"
 import { Await, NavLink } from "react-router-dom"
 import {
     Card,
@@ -39,10 +39,7 @@ interface FertilizerApplicationMetricsCardProps {
     }
     nitrogenBalance: Promise<NitrogenBalanceNumeric> | undefined
     nutrientAdvice: NutrientAdvice
-    dose: {
-        dose: Dose
-        applications: Dose[]
-    }
+    dose: Dose
     errorMessage: string | undefined
 }
 
@@ -88,7 +85,7 @@ const NitrogenBalanceSkeleton = () => (
                 <Spinner />
             </span>
         </div>
-        <ItemSeparator className="col-span-2" /> 
+        <ItemSeparator className="col-span-2" />
         <div className="grid grid-cols-[1fr_auto] items-center">
             <p className="text-xl font-bold whitespace-nowrap px-2">Balans</p>
             <span className="text-xl font-bold text-right whitespace-nowrap px-2">
@@ -117,6 +114,34 @@ const NitrogenBalanceSkeleton = () => (
     </div>
 )
 
+const NutrientAdviceSkeleton = () => (
+    <div className="flex flex-col space-y-2">
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="whitespace-nowrap px-2">Stikstof</p>
+            <span className="text-right  px-2">
+                {<Spinner className="h-3" />} kg N
+            </span>
+        </div>
+        <Skeleton className="h-2 w-full" />
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="whitespace-nowrap px-2">Fosfaat</p>
+            <span className="text-right px-2">
+                {<Spinner className="h-4" />} kg P₂O₅
+            </span>
+        </div>
+        <Skeleton className="h-2 w-full" />
+
+        <div className="grid grid-cols-[1fr_auto] items-center">
+            <p className="whitespace-nowrap px-2">Kalium</p>
+            <span className="text-right px-2">
+                {<Spinner className="h-4" />}
+                kg K₂O
+            </span>
+        </div>
+        <Skeleton className="h-2 w-full" />
+    </div>
+)
+
 export function FertilizerApplicationMetricsCard(
     asyncData: FertilizerApplicationMetricsCardProps,
 ) {
@@ -134,7 +159,7 @@ export function FertilizerApplicationMetricsCard(
         return "gray-500" // Default or error color
     }
 
-    // const { norms, normsFilling, nitrogenBalance, nutrientAdvice, dose } = data
+    const dose = asyncData.dose
 
     return (
         <Card>
@@ -350,7 +375,7 @@ export function FertilizerApplicationMetricsCard(
                             </ItemDescription>
                         </Item>
                     </ItemGroup>
-                    {/* <ItemGroup>
+                    <ItemGroup>
                         <ItemSeparator />
                         <Item>
                             <ItemContent>
@@ -359,87 +384,100 @@ export function FertilizerApplicationMetricsCard(
                                 </ItemTitle>
                             </ItemContent>
                             <ItemDescription>
-                                <div className="flex flex-col space-y-2">
-                                    <div className="grid grid-cols-[1fr_auto] items-center">
-                                        <p className="whitespace-nowrap px-2">
-                                            Stikstof
-                                        </p>
-                                        <span className="text-right whitespace-nowrap px-2">
-                                            {dose.dose.n.toFixed(0)} /{" "}
-                                            {nutrientAdvice.nitrogen.total.toFixed(
-                                                0,
-                                            )}{" "}
-                                            kg N
-                                        </span>
-                                    </div>
-                                    <Progress
-                                        value={
-                                            (dose.dose.n /
-                                                nutrientAdvice.nitrogen.total) *
-                                            100
-                                        }
-                                        colorBar={getAdviceProgressColor(
-                                            dose.dose.n,
-                                            nutrientAdvice.nitrogen.total,
-                                        )}
-                                        className="h-2"
-                                    />
+                                <Suspense fallback={<NutrientAdviceSkeleton />}>
+                                    <Await resolve={asyncData.nutrientAdvice}>
+                                        {(nutrientAdvice) => (
+                                            <div className="flex flex-col space-y-2">
+                                                <div className="grid grid-cols-[1fr_auto] items-center">
+                                                    <p className="whitespace-nowrap px-2">
+                                                        Stikstof
+                                                    </p>
+                                                    <span className="text-right whitespace-nowrap px-2">
+                                                        {dose.p_dose_n.toFixed(
+                                                            0,
+                                                        )}{" "}
+                                                        /{" "}
+                                                        {nutrientAdvice.d_n_req.toFixed(
+                                                            0,
+                                                        )}{" "}
+                                                        kg N
+                                                    </span>
+                                                </div>
+                                                <Progress
+                                                    value={
+                                                        (dose.p_dose_n /
+                                                            nutrientAdvice.d_n_req) *
+                                                        100
+                                                    }
+                                                    colorBar={getAdviceProgressColor(
+                                                        dose.p_dose_n,
+                                                        nutrientAdvice.d_n_req,
+                                                    )}
+                                                    className="h-2"
+                                                />
 
-                                    <div className="grid grid-cols-[1fr_auto] items-center">
-                                        <p className="whitespace-nowrap px-2">
-                                            Fosfaat
-                                        </p>
-                                        <span className="text-right whitespace-nowrap px-2">
-                                            {dose.dose.p2o5.toFixed(0)} /{" "}
-                                            {nutrientAdvice.phosphate.total.toFixed(
-                                                0,
-                                            )}{" "}
-                                            kg P₂O₅
-                                        </span>
-                                    </div>
-                                    <Progress
-                                        value={
-                                            (dose.dose.p2o5 /
-                                                nutrientAdvice.phosphate
-                                                    .total) *
-                                            100
-                                        }
-                                        colorBar={getAdviceProgressColor(
-                                            dose.dose.p2o5,
-                                            nutrientAdvice.phosphate.total,
-                                        )}
-                                        className="h-2"
-                                    />
+                                                <div className="grid grid-cols-[1fr_auto] items-center">
+                                                    <p className="whitespace-nowrap px-2">
+                                                        Fosfaat
+                                                    </p>
+                                                    <span className="text-right whitespace-nowrap px-2">
+                                                        {dose.p_dose_p.toFixed(
+                                                            0,
+                                                        )}{" "}
+                                                        /{" "}
+                                                        {nutrientAdvice.d_p_req.toFixed(
+                                                            0,
+                                                        )}{" "}
+                                                        kg P₂O₅
+                                                    </span>
+                                                </div>
+                                                <Progress
+                                                    value={
+                                                        (dose.p_dose_p /
+                                                            nutrientAdvice.d_p_req) *
+                                                        100
+                                                    }
+                                                    colorBar={getAdviceProgressColor(
+                                                        dose.p_dose_p,
+                                                        nutrientAdvice.d_p_req,
+                                                    )}
+                                                    className="h-2"
+                                                />
 
-                                    <div className="grid grid-cols-[1fr_auto] items-center">
-                                        <p className="whitespace-nowrap px-2">
-                                            Kalium
-                                        </p>
-                                        <span className="text-right whitespace-nowrap px-2">
-                                            {dose.dose.k2o.toFixed(0)} /{" "}
-                                            {nutrientAdvice.potassium.total.toFixed(
-                                                0,
-                                            )}{" "}
-                                            kg K₂O
-                                        </span>
-                                    </div>
-                                    <Progress
-                                        value={
-                                            (dose.dose.k2o /
-                                                nutrientAdvice.potassium
-                                                    .total) *
-                                            100
-                                        }
-                                        colorBar={getAdviceProgressColor(
-                                            dose.dose.k2o,
-                                            nutrientAdvice.potassium.total,
+                                                <div className="grid grid-cols-[1fr_auto] items-center">
+                                                    <p className="whitespace-nowrap px-2">
+                                                        Kalium
+                                                    </p>
+                                                    <span className="text-right whitespace-nowrap px-2">
+                                                        {dose.p_dose_k.toFixed(
+                                                            0,
+                                                        )}{" "}
+                                                        /{" "}
+                                                        {nutrientAdvice.d_k_req.toFixed(
+                                                            0,
+                                                        )}{" "}
+                                                        kg K₂O
+                                                    </span>
+                                                </div>
+                                                <Progress
+                                                    value={
+                                                        (dose.p_dose_k /
+                                                            nutrientAdvice.d_k_req) *
+                                                        100
+                                                    }
+                                                    colorBar={getAdviceProgressColor(
+                                                        dose.p_dose_k,
+                                                        nutrientAdvice.d_k_req,
+                                                    )}
+                                                    className="h-2"
+                                                />
+                                            </div>
                                         )}
-                                        className="h-2"
-                                    />
-                                </div>
+                                    </Await>
+                                </Suspense>
                             </ItemDescription>
                         </Item>
-                    </ItemGroup> */}
+                    </ItemGroup>
                 </div>
             </CardContent>
         </Card>

@@ -38,7 +38,10 @@ import { extractFormValuesFromRequest } from "~/lib/form"
 import { FertilizerApplicationMetricsCard } from "../components/blocks/fertilizer-applications/metrics"
 import { getNmiApiKey } from "../integrations/nmi"
 import { underlineSquare } from "@lucide/lab"
-import { getNitrogenBalanceforField } from "../integrations/calculator"
+import {
+    getNitrogenBalanceforField,
+    getNutrientAdviceForField,
+} from "../integrations/calculator"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -100,6 +103,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 statusText: "Field is not found",
             })
         }
+        const b_centroid = field.b_centroid
 
         // Get available fertilizers for the farm
         const fertilizers = await getFertilizers(
@@ -152,8 +156,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 b_id_farm,
                 b_id,
                 timeframe,
-        }),
-            nutrientAdvice: undefined,
+            }),
+            nutrientAdvice: getNutrientAdviceForField({
+                fdm,
+                principal_id,
+                b_id,
+                b_centroid,
+                timeframe,
+            }),
             dose: dose.dose,
         }
 
@@ -325,11 +335,15 @@ export default function FarmFieldsOverviewBlock() {
                 </div>
                 <div className="md:col-span-1 lg:col-span-2">
                     <FertilizerApplicationMetricsCard
-                        dose={loaderData.FertilizerApplicationMetricsData.dose}
                         nitrogenBalance={
                             loaderData.FertilizerApplicationMetricsData
                                 .nitrogenBalance
                         }
+                        nutrientAdvice={
+                            loaderData.FertilizerApplicationMetricsData
+                                .nutrientAdvice
+                        }
+                        dose={loaderData.FertilizerApplicationMetricsData.dose}
                     />
                 </div>
             </div>
@@ -409,4 +423,3 @@ export async function action({ request, params }: ActionFunctionArgs) {
         throw handleActionError(error)
     }
 }
-
