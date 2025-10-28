@@ -171,6 +171,7 @@ export function FertilizerApplicationCard({
         setEditedFertilizerApplication(fertilizerApplication)
         setIsDialogOpen(true)
     }
+
     useEffect(() => {
         const wasNotIdle = previousNavigationState.current !== "idle"
         const isIdle = navigation.state === "idle"
@@ -185,14 +186,39 @@ export function FertilizerApplicationCard({
 
     const fieldFertilizerFormStore = useFieldFertilizerFormStore()
     const savedFormValues =
-        params.b_id_farm &&
-        b_id_or_b_lu_catalogue &&
-        fieldFertilizerFormStore.load(params.b_id_farm, b_id_or_b_lu_catalogue)
+        params.b_id_farm && b_id_or_b_lu_catalogue
+            ? fieldFertilizerFormStore.load(
+                  params.b_id_farm,
+                  b_id_or_b_lu_catalogue,
+              )
+            : null
+
+    // See if the saved form was for updating an existing application.
+    // If so, verify that the user can still edit the application and update the state.
+    const applicationToEdit = savedFormValues?.p_app_id
+        ? fertilizerApplications.find(
+              (app) => app.p_app_id === savedFormValues.p_app_id,
+          )
+        : null
+    if (applicationToEdit && !editedFertilizerApplication) {
+        setEditedFertilizerApplication(applicationToEdit)
+    }
+    if (savedFormValues?.p_app_id && !applicationToEdit && params.b_id) {
+        fieldFertilizerFormStore.delete(params.b_id_farm || "", params.b_id)
+    }
+
     useEffect(() => {
-        if (!isDialogOpen && savedFormValues) {
-            setIsDialogOpen(true)
+        if (savedFormValues && !isDialogOpen) {
+            if (savedFormValues.p_app_id) {
+                // Do not open the form if there is a risk it will create a new application
+                if (applicationToEdit) {
+                    setIsDialogOpen(true)
+                }
+            } else {
+                setIsDialogOpen(true)
+            }
         }
-    }, [isDialogOpen, savedFormValues])
+    }, [savedFormValues, applicationToEdit, isDialogOpen])
 
     const detailCards = constructCards(dose)
 
