@@ -87,6 +87,12 @@ export function FertilizerApplicationMetricsCard(
                             <ItemDescription>
                                 <Suspense fallback={<NormsSkeleton />}>
                                     <Await
+                                        errorElement={
+                                            <div>
+                                                Helaas, er is wat misgegaan met
+                                                de berekening
+                                            </div>
+                                        }
                                         resolve={
                                             fertilizerApplicationMetricsData.norms
                                         }
@@ -202,6 +208,12 @@ export function FertilizerApplicationMetricsCard(
                                     fallback={<NitrogenBalanceSkeleton />}
                                 >
                                     <Await
+                                        errorElement={
+                                            <div>
+                                                Helaas, er is wat misgegaan met
+                                                de berekening
+                                            </div>
+                                        }
                                         resolve={
                                             fertilizerApplicationMetricsData.nitrogenBalance
                                         }
@@ -310,6 +322,12 @@ export function FertilizerApplicationMetricsCard(
                             <ItemDescription>
                                 <Suspense fallback={<NutrientAdviceSkeleton />}>
                                     <Await
+                                        errorElement={
+                                            <div>
+                                                Helaas, er is wat misgegaan met
+                                                de berekening
+                                            </div>
+                                        }
                                         resolve={
                                             fertilizerApplicationMetricsData.nutrientAdvice
                                         }
