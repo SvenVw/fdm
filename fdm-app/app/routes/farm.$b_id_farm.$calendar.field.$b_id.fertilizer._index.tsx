@@ -25,6 +25,7 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
+    useNavigation,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 import { FertilizerApplicationCard } from "~/components/blocks/fertilizer-applications/card"
@@ -166,6 +167,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 timeframe,
             }),
             dose: dose.dose,
+            b_id: b_id,
+            b_id_farm: b_id_farm,
+            calendar: getCalendar(params),
         }
 
         // Return user information from loader, including the promises
@@ -195,6 +199,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
+    const navigation = useNavigation()
+    const isSubmitting = navigation.state === "submitting"
 
     return (
         <div className="container mx-auto py-8 px-4">
@@ -214,21 +220,10 @@ export default function FarmFieldsOverviewBlock() {
                 </div>
                 <div className="md:col-span-1 lg:col-span-2">
                     <FertilizerApplicationMetricsCard
-                        norms={
-                            loaderData.fertilizerApplicationMetricsData.norms
-                        }
-                        nitrogenBalance={
+                        fertilizerApplicationMetricsData={
                             loaderData.fertilizerApplicationMetricsData
-                                .nitrogenBalance
                         }
-                        nutrientAdvice={
-                            loaderData.fertilizerApplicationMetricsData
-                                .nutrientAdvice
-                        }
-                        dose={loaderData.fertilizerApplicationMetricsData.dose}
-                        b_id={loaderData.field.b_id}
-                        b_id_farm={loaderData.field.b_id_farm}
-                        calendar={loaderData.calendar}
+                        isSubmitting={isSubmitting}
                     />
                 </div>
             </div>
