@@ -249,12 +249,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
         if (request.method === "PUT") {
-            console.log("PUT request")
             const formValues = await extractFormValuesFromRequest(
                 request,
                 PatchFormSchema,
             )
-            console.log(formValues)
             const rawAppIds = formValues.p_app_id
 
             if (!rawAppIds || typeof rawAppIds !== "string") {

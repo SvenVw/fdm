@@ -213,9 +213,8 @@ export function FertilizerApplicationCard({
     }, [
         applicationToEdit,
         params.b_id_farm,
-        params.b_id,
+        b_id_or_b_lu_catalogue,
         savedFormValues,
-        fertilizerApplications,
         editedFertilizerApplication,
         fieldFertilizerFormStore.delete,
     ])
