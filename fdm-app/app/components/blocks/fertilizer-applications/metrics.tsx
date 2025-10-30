@@ -128,13 +128,9 @@ export function FertilizerApplicationMetricsCard(
                                                         </TooltipContent>
                                                     </Tooltip>
                                                     <span className="text-right whitespace-nowrap px-2">
-                                                        {norms.filling.nitrogen.toFixed(
-                                                            0,
-                                                        )}{" "}
+                                                        {Math.round(norms.filling.nitrogen)}{" "}
                                                         /{" "}
-                                                        {norms.value.nitrogen.toFixed(
-                                                            0,
-                                                        )}{" "}
+                                                        {Math.round(norms.value.nitrogen)}{" "}
                                                         kg N
                                                     </span>
                                                 </div>
@@ -169,13 +165,9 @@ export function FertilizerApplicationMetricsCard(
                                                         </TooltipContent>
                                                     </Tooltip>
                                                     <span className="text-right whitespace-nowrap px-2">
-                                                        {norms.filling.phosphate.toFixed(
-                                                            0,
-                                                        )}{" "}
+                                                        {Math.round(norms.filling.phosphate)}{" "}
                                                         /{" "}
-                                                        {norms.value.phosphate.toFixed(
-                                                            0,
-                                                        )}{" "}
+                                                        {Math.round(norms.value.phosphate)}{" "}
                                                         kg P₂O₅
                                                     </span>
                                                 </div>
@@ -210,13 +202,9 @@ export function FertilizerApplicationMetricsCard(
                                                         </TooltipContent>
                                                     </Tooltip>
                                                     <span className="text-right whitespace-nowrap px-2">
-                                                        {norms.filling.manure.toFixed(
-                                                            0,
-                                                        )}{" "}
+                                                        {Math.round(norms.filling.manure)}{" "}
                                                         /{" "}
-                                                        {norms.value.manure.toFixed(
-                                                            0,
-                                                        )}{" "}
+                                                        {Math.round(norms.value.manure)}{" "}
                                                         kg N
                                                     </span>
                                                 </div>
@@ -297,9 +285,7 @@ export function FertilizerApplicationMetricsCard(
                                                         </Tooltip>
 
                                                         <span className="font-semibold text-right whitespace-nowrap px-2">
-                                                            {nitrogenBalance.balance.supply.total.toFixed(
-                                                                0,
-                                                            )}{" "}
+                                                            {Math.round(nitrogenBalance.balance.supply.total)}{" "}
                                                             kg N
                                                         </span>
                                                     </div>
@@ -322,9 +308,7 @@ export function FertilizerApplicationMetricsCard(
                                                             </TooltipContent>
                                                         </Tooltip>
                                                         <span className="font-semibold text-right whitespace-nowrap px-2">
-                                                            {nitrogenBalance.balance.removal.total.toFixed(
-                                                                0,
-                                                            )}{" "}
+                                                            {Math.round(nitrogenBalance.balance.removal.total)}{" "}
                                                             kg N
                                                         </span>
                                                     </div>
@@ -348,9 +332,7 @@ export function FertilizerApplicationMetricsCard(
                                                             </TooltipContent>
                                                         </Tooltip>
                                                         <span className="font-semibold text-right whitespace-nowrap px-2">
-                                                            {nitrogenBalance.balance.emission.total.toFixed(
-                                                                0,
-                                                            )}{" "}
+                                                            {Math.round(nitrogenBalance.balance.emission.total)}{" "}
                                                             kg N
                                                         </span>
                                                     </div>
@@ -362,9 +344,7 @@ export function FertilizerApplicationMetricsCard(
                                                             Balans
                                                         </p>
                                                         <span className="text-xl font-bold text-right whitespace-nowrap px-2">
-                                                            {nitrogenBalance.balance.balance.toFixed(
-                                                                0,
-                                                            )}{" "}
+                                                            {Math.round(nitrogenBalance.balance.balance)}{" "}
                                                             kg N
                                                         </span>
                                                     </div>
@@ -373,9 +353,7 @@ export function FertilizerApplicationMetricsCard(
                                                             Streefwaarde
                                                         </p>
                                                         <span className="font-semibold text-right whitespace-nowrap px-2">
-                                                            {nitrogenBalance.balance.target.toFixed(
-                                                                0,
-                                                            )}{" "}
+                                                            {Math.round(nitrogenBalance.balance.target)}{" "}
                                                             kg N
                                                         </span>
                                                     </div>
@@ -412,7 +390,7 @@ export function FertilizerApplicationMetricsCard(
                                                                     : "text-green-500"
                                                             }`}
                                                         >
-                                                            {task.toFixed(0)} kg
+                                                            {Math.round(task)} kg
                                                             N
                                                         </span>
                                                     </div>
@@ -466,13 +444,9 @@ export function FertilizerApplicationMetricsCard(
                                                         </TooltipContent>
                                                     </Tooltip>
                                                     <span className="text-right whitespace-nowrap px-2">
-                                                        {dose.p_dose_n.toFixed(
-                                                            0,
-                                                        )}{" "}
+                                                        {Math.round(dose.p_dose_n)}{" "}
                                                         /{" "}
-                                                        {nutrientAdvice.d_n_req.toFixed(
-                                                            0,
-                                                        )}{" "}
+                                                        {Math.round(nutrientAdvice.d_n_req)}{" "}
                                                         kg N
                                                     </span>
                                                 </div>
@@ -494,13 +468,9 @@ export function FertilizerApplicationMetricsCard(
                                                         Fosfaat
                                                     </p>
                                                     <span className="text-right whitespace-nowrap px-2">
-                                                        {dose.p_dose_p.toFixed(
-                                                            0,
-                                                        )}{" "}
+                                                        {Math.round(dose.p_dose_p)}{" "}
                                                         /{" "}
-                                                        {nutrientAdvice.d_p_req.toFixed(
-                                                            0,
-                                                        )}{" "}
+                                                        {Math.round(nutrientAdvice.d_p_req)}{" "}
                                                         kg P₂O₅
                                                     </span>
                                                 </div>
@@ -522,13 +492,9 @@ export function FertilizerApplicationMetricsCard(
                                                         Kalium
                                                     </p>
                                                     <span className="text-right whitespace-nowrap px-2">
-                                                        {dose.p_dose_k.toFixed(
-                                                            0,
-                                                        )}{" "}
+                                                        {Math.round(dose.p_dose_k)}{" "}
                                                         /{" "}
-                                                        {nutrientAdvice.d_k_req.toFixed(
-                                                            0,
-                                                        )}{" "}
+                                                        {Math.round(nutrientAdvice.d_k_req)}{" "}
                                                         kg K₂O
                                                     </span>
                                                 </div>
