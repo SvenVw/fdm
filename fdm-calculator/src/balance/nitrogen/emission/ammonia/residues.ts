@@ -111,9 +111,11 @@ export function calculateNitrogenEmissionViaAmmoniaByResidues(
         )
 
         // Calculate the Emission Factor
-        let emissionFactor = new Decimal(0.41).times(b_lu_n_residue).minus(5.42)
+        let emissionFactor = new Decimal(0.41).times(b_lu_n_residue).minus(5.42).dividedBy(100)
         if (emissionFactor.lt(0)) {
             emissionFactor = new Decimal(0)
+        } else if (emissionFactor.gt(1)) {
+            emissionFactor = new Decimal(1)
         }
 
         // Calculate the amount of Nitrogen volatilized by crop residues of this cultivation

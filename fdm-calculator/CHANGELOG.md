@@ -1,5 +1,11 @@
 # fdm-calculator
 
+## 0.7.2
+
+### Patch Changes
+
+- 9b9dc68: Fixes ammonia emission factor for residues to be converted from percentage to factor
+
 ## 0.7.1
 
 ### Patch Changes
