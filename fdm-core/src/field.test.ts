@@ -9,6 +9,7 @@ import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import {
     addField,
+    determineIfFieldIsProductive,
     getField,
     getFields,
     listAvailableAcquiringMethods,
@@ -764,6 +765,8 @@ describe("Farm Data Model", () => {
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false, // Changed to boolean
                 b_lu_variety_options: [], // Added missing property
+                b_lu_start_default: "03-15",
+                b_date_harvest_default: "10-15",
             })
         })
 
@@ -946,6 +949,50 @@ describe("Farm Data Model", () => {
                 .from(schema.harvestables)
                 .where(eq(schema.harvestables.b_id_harvestable, harvestId))
             expect(remainingHarvests.length).toBe(0)
+        })
+    })
+
+    describe("determineIfFieldIsProductive", () => {
+        it("should determine if a field is productive by checking name", async () => {
+            const b_isproductive = determineIfFieldIsProductive(
+                1.0,
+                100.0,
+                "Bufferstrip",
+            )
+            expect(b_isproductive).toBe(false)
+        })
+        it("should determine if a field is productive by checking shape", async () => {
+            const b_isproductive = determineIfFieldIsProductive(
+                1.0,
+                10000.0,
+                "Field",
+            )
+            expect(b_isproductive).toBe(false)
+        })
+
+        it("should determine if a field is productive by checking shape (area is large enough)", async () => {
+            const b_isproductive = determineIfFieldIsProductive(
+                2.5,
+                10000.0,
+                "Field",
+            )
+            expect(b_isproductive).toBe(true)
+        })
+        it("should determine if a field is productive by checking shape and name", async () => {
+            const b_isproductive = determineIfFieldIsProductive(
+                1.0,
+                1000.0,
+                "Bufferstrip",
+            )
+            expect(b_isproductive).toBe(false)
+        })
+        it("should determine if a field is productive by checking shape and name (productive)", async () => {
+            const b_isproductive = determineIfFieldIsProductive(
+                10.0,
+                100.0,
+                "Field",
+            )
+            expect(b_isproductive).toBe(true)
         })
     })
 

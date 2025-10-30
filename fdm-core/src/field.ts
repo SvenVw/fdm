@@ -187,9 +187,10 @@ export async function getField(
         field[0].b_centroid = [field[0].b_centroid_x, field[0].b_centroid_y]
         field[0].b_centroid_x = undefined
         field[0].b_centroid_y = undefined
-        field[0].b_isproductive = determineIfFieldIsProductiveByShape(
+        field[0].b_isproductive = determineIfFieldIsProductive(
             field[0].b_area,
             field[0].b_perimeter,
+            field[0].b_name,
         )
 
         return field[0]
@@ -300,9 +301,10 @@ export async function getFields(
             field.b_centroid = [field.b_centroid_x, field.b_centroid_y]
             field.b_centroid_x = undefined
             field.b_centroid_y = undefined
-            field.b_isproductive = determineIfFieldIsProductiveByShape(
+            field.b_isproductive = determineIfFieldIsProductive(
                 field.b_area,
                 field.b_perimeter,
+                field.b_name,
             )
         }
 
@@ -640,26 +642,34 @@ export function listAvailableAcquiringMethods(): {
 }
 
 /**
- * Determines if a field is considered productive based on its area and perimeter.
+ * Determines if a field is considered productive based on its area, perimeter, and name.
  *
- * This function uses a heuristic to differentiate between productive fields and non-productive areas like buffer strips.
- * A field is classified as non-productive if its area is less than 2.5 hectares and the ratio of its perimeter
- * to the square root of its area (in square meters) is greater than or equal to a predefined constant (20).
+ * This function uses two heuristics to differentiate between productive fields and non-productive areas like buffer strips:
+ * 1. Shape-based: A field is classified as non-productive if its area is less than 2.5 hectares and the ratio of its perimeter
+ *    to the square root of its area (in square meters) is greater than or equal to a predefined constant (20).
+ * 2. Name-based: A field is classified as non-productive if its name contains "buffer" (case-insensitive).
+ *
+ * A field is considered productive only if both checks pass.
  *
  * @param b_area The area of the field in hectares.
  * @param b_perimeter The perimeter of the field in meters.
+ * @param b_name The name of the field.
  * @returns `true` if the field is determined to be productive, `false` otherwise.
  * @alpha
  */
-export function determineIfFieldIsProductiveByShape(
+export function determineIfFieldIsProductive(
     b_area: number,
     b_perimeter: number,
+    b_name: schema.fieldsTypeSelect["b_name"],
 ) {
     // Sven found that a ratio for a field with Perimeter (m) / SQRT(Area (m^2)) usually differentiates buffferstrips from "normal"  fields when the ratio is larger than 20 and area smaller than 2.5 ha
     const BUFFERSTROKEN_CONSTANT = 20
-
-    return (
+    const productiveAssumedByShape =
         b_perimeter / Math.sqrt(b_area * 10000) < BUFFERSTROKEN_CONSTANT ||
         b_area >= 2.5
-    )
+
+    // Check if name contains 'buffer'
+    const productiveAssumedByName = !b_name.toLowerCase().includes("buffer")
+
+    return productiveAssumedByShape && productiveAssumedByName
 }
