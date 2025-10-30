@@ -5,7 +5,6 @@ import { nl } from "date-fns/locale"
 import { ChevronDown, ChevronUp, TriangleAlert } from "lucide-react"
 import { useState } from "react"
 import { NavLink } from "react-router"
-import { cn } from "@/app/lib/utils"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -59,7 +58,7 @@ export function NutrientCard({
     const [isExpanded, setIsExpanded] = useState(false)
     const doseTotal =
         (doses.dose[description.doseParameter] as number | undefined) ?? 0
-    const percentage = advice > 0 ? (doseTotal / advice) * 100 : 0
+    const percentage = advice > 0 ? (doseTotal / advice) * 100 : 100
     const numberOfApplicationsForNutrient = doses.applications.filter(
         (x) => (x[description.doseParameter as keyof Dose] as number) > 0,
     ).length
@@ -81,31 +80,36 @@ export function NutrientCard({
             <CardContent className="space-y-4">
                 <div className="text-center space-y-1">
                     <div className="text-4xl font-bold">
-                        {advice.toLocaleString()}
+                        {advice > 1
+                            ? Math.round(advice).toLocaleString()
+                            : advice > 0
+                              ? advice.toPrecision(2).toLocaleString()
+                              : 0}
                     </div>
                     <div className="text-sm text-muted-foreground">
                         {description.unit}
                     </div>
                 </div>
-                {advice > 0 && (
-                    <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                            <span>Bemestingsniveau</span>
-                            <span>{percentage.toFixed(0)}%</span>
-                        </div>
-                        <Progress
-                            value={percentage}
-                            colorBar={
-                                percentage > 100 && description.symbol === "EOC"
-                                    ? "green-500"
-                                    : percentage > 100
-                                      ? "orange-500"
-                                      : undefined
-                            }
-                            className="h-3"
-                        />
+
+                <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                        <span>Bemestingsniveau</span>
+                        <span>
+                            {advice > 0 ? `${Math.round(percentage)}%` : null}
+                        </span>
                     </div>
-                )}
+                    <Progress
+                        value={percentage}
+                        colorBar={
+                            (percentage > 100 || advice === 0) && description.symbol === "EOC"
+                                ? "green-500"
+                                : percentage > 100
+                                  ? "orange-500"
+                                  : undefined
+                        }
+                        className="h-3"
+                    />
+                </div>
 
                 {fertilizerApplications.length > 0 &&
                 numberOfApplicationsForNutrient > 0 ? (
@@ -172,7 +176,15 @@ export function NutrientCard({
                                             </div>
                                             <div className="text-right">
                                                 <p className="text-sm font-bold">
-                                                    {dose.toFixed(0)}{" "}
+                                                    {dose > 1
+                                                        ? Math.round(
+                                                              dose,
+                                                          ).toLocaleString()
+                                                        : dose > 0
+                                                          ? dose
+                                                                .toPrecision(2)
+                                                                .toLocaleString()
+                                                          : 0}{" "}
                                                     {description.unit}
                                                 </p>
                                                 <p className="text-xs text-muted-foreground">
