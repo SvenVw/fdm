@@ -25,6 +25,11 @@ import type {
     NormFilling,
     Dose,
 } from "@svenvw/fdm-calculator"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "~/components/ui/tooltip"
 
 interface FertilizerApplicationMetricsData {
     norms: {
@@ -107,9 +112,21 @@ export function FertilizerApplicationMetricsCard(
                                         {(norms) => (
                                             <div className="flex flex-col space-y-2">
                                                 <div className="grid grid-cols-[1fr_auto] items-center">
-                                                    <p className="whitespace-nowrap px-2">
-                                                        Stikstof
-                                                    </p>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <p className="whitespace-nowrap px-2">
+                                                                Stikstof
+                                                            </p>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>
+                                                                Werkzame
+                                                                stikstof volgens
+                                                                forfaitaire
+                                                                gehalten
+                                                            </p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                     <span className="text-right whitespace-nowrap px-2">
                                                         {norms.filling.nitrogen.toFixed(
                                                             0,
@@ -137,9 +154,20 @@ export function FertilizerApplicationMetricsCard(
                                                 />
 
                                                 <div className="grid grid-cols-[1fr_auto] items-center">
-                                                    <p className="whitespace-nowrap px-2">
-                                                        Fosfaat
-                                                    </p>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <p className="whitespace-nowrap px-2">
+                                                                Fosfaat
+                                                            </p>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>
+                                                                Fosfaataanvoer
+                                                                incl. mogelijke
+                                                                stimuleringsregeling
+                                                            </p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                     <span className="text-right whitespace-nowrap px-2">
                                                         {norms.filling.phosphate.toFixed(
                                                             0,
@@ -167,9 +195,20 @@ export function FertilizerApplicationMetricsCard(
                                                 />
 
                                                 <div className="grid grid-cols-[1fr_auto] items-center">
-                                                    <p className="whitespace-nowrap px-2">
-                                                        Dierlijke mest
-                                                    </p>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <p className="whitespace-nowrap px-2">
+                                                                Dierlijke mest
+                                                            </p>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>
+                                                                Totaal stikstof
+                                                                via dierlijke
+                                                                mest
+                                                            </p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                     <span className="text-right whitespace-nowrap px-2">
                                                         {norms.filling.manure.toFixed(
                                                             0,
@@ -237,9 +276,26 @@ export function FertilizerApplicationMetricsCard(
                                                 <div className="flex flex-col space-y-2">
                                                     {/* Simplified Flow (Top Section) */}
                                                     <div className="grid grid-cols-[1fr_auto] items-center">
-                                                        <p className="whitespace-nowrap px-2">
-                                                            Aanvoer
-                                                        </p>
+                                                        <Tooltip>
+                                                            <TooltipTrigger
+                                                                asChild
+                                                            >
+                                                                <p className="whitespace-nowrap px-2">
+                                                                    Aanvoer
+                                                                </p>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p>
+                                                                    Totaal
+                                                                    stikstof via
+                                                                    bemesting,
+                                                                    depositie,
+                                                                    mineralisatie
+                                                                    en fixatie
+                                                                </p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+
                                                         <span className="font-semibold text-right whitespace-nowrap px-2">
                                                             {nitrogenBalance.balance.supply.total.toFixed(
                                                                 0,
@@ -248,9 +304,23 @@ export function FertilizerApplicationMetricsCard(
                                                         </span>
                                                     </div>
                                                     <div className="grid grid-cols-[1fr_auto] items-center">
-                                                        <p className="whitespace-nowrap px-2">
-                                                            Afvoer
-                                                        </p>
+                                                        <Tooltip>
+                                                            <TooltipTrigger
+                                                                asChild
+                                                            >
+                                                                <p className="whitespace-nowrap px-2">
+                                                                    Afvoer
+                                                                </p>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p>
+                                                                    Totaal
+                                                                    stikstof via
+                                                                    oogst en
+                                                                    gewasresten
+                                                                </p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
                                                         <span className="font-semibold text-right whitespace-nowrap px-2">
                                                             {nitrogenBalance.balance.removal.total.toFixed(
                                                                 0,
@@ -259,9 +329,24 @@ export function FertilizerApplicationMetricsCard(
                                                         </span>
                                                     </div>
                                                     <div className="grid grid-cols-[1fr_auto] items-center">
-                                                        <p className="whitespace-nowrap px-2">
-                                                            Emissie
-                                                        </p>
+                                                        <Tooltip>
+                                                            <TooltipTrigger
+                                                                asChild
+                                                            >
+                                                                <p className="whitespace-nowrap px-2">
+                                                                    Emissie
+                                                                </p>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p>
+                                                                    Totaal
+                                                                    stikstof via
+                                                                    gasvormige
+                                                                    verliezen
+                                                                    (NH3)
+                                                                </p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
                                                         <span className="font-semibold text-right whitespace-nowrap px-2">
                                                             {nitrogenBalance.balance.emission.total.toFixed(
                                                                 0,
@@ -296,13 +381,30 @@ export function FertilizerApplicationMetricsCard(
                                                     </div>
                                                     <ItemSeparator className="col-span-2" />{" "}
                                                     <div className="grid grid-cols-[1fr_auto] items-center">
-                                                        <p className="text-xl font-bold whitespace-nowrap px-2">
-                                                            {nitrogenBalance
-                                                                .balance.task <
-                                                            0
-                                                                ? "Opgave"
-                                                                : "Ruimte"}
-                                                        </p>
+                                                        <Tooltip>
+                                                            <TooltipTrigger
+                                                                asChild
+                                                            >
+                                                                <p className="text-xl font-bold whitespace-nowrap px-2">
+                                                                    {nitrogenBalance
+                                                                        .balance
+                                                                        .task <
+                                                                    0
+                                                                        ? "Opgave"
+                                                                        : "Ruimte"}
+                                                                </p>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p>
+                                                                    {nitrogenBalance
+                                                                        .balance
+                                                                        .task <
+                                                                    0
+                                                                        ? "Hoeveelheid totaal stikstof die verminderd moet worden om het doel te halen"
+                                                                        : "Hoeveelheid totaal stikstof die nog over waarbij het doel gehaald kan worden"}
+                                                                </p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
                                                         <span
                                                             className={`text-xl font-bold text-right whitespace-nowrap px-2 ${
                                                                 task < 0
@@ -350,9 +452,19 @@ export function FertilizerApplicationMetricsCard(
                                         {(nutrientAdvice) => (
                                             <div className="flex flex-col space-y-2">
                                                 <div className="grid grid-cols-[1fr_auto] items-center">
-                                                    <p className="whitespace-nowrap px-2">
-                                                        Stikstof
-                                                    </p>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <p className="whitespace-nowrap px-2">
+                                                                Stikstof
+                                                            </p>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>
+                                                                Werkzame
+                                                                stikstof
+                                                            </p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
                                                     <span className="text-right whitespace-nowrap px-2">
                                                         {dose.p_dose_n.toFixed(
                                                             0,
