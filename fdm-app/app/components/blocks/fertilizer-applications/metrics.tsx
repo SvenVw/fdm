@@ -42,6 +42,9 @@ interface FertilizerApplicationMetricsData {
     nitrogenBalance: Promise<NitrogenBalanceNumeric> | undefined
     nutrientAdvice: NutrientAdvice
     dose: Dose
+    b_id: string
+    b_id_farm: string
+    calendar: string
     errorMessage: string | undefined
 }
 
@@ -81,7 +84,11 @@ export function FertilizerApplicationMetricsCard(
                         <Item>
                             <ItemContent>
                                 <ItemTitle className="hover:underline">
-                                    <NavLink to="#">Gebruiksnormen</NavLink>
+                                    <NavLink
+                                        to={`/farm/${fertilizerApplicationMetricsData.b_id_farm}/${fertilizerApplicationMetricsData.calendar}/norms/${fertilizerApplicationMetricsData.b_id}`}
+                                    >
+                                        Gebruiksnormen
+                                    </NavLink>
                                 </ItemTitle>
                             </ItemContent>
                             <ItemDescription>
@@ -200,7 +207,11 @@ export function FertilizerApplicationMetricsCard(
                         <Item>
                             <ItemContent>
                                 <ItemTitle className="hover:underline">
-                                    <NavLink to="#">Stikstofbalans</NavLink>
+                                    <NavLink
+                                        to={`/farm/${fertilizerApplicationMetricsData.b_id_farm}/${fertilizerApplicationMetricsData.calendar}/balance/nitrogen/${fertilizerApplicationMetricsData.b_id}`}
+                                    >
+                                        Stikstofbalans
+                                    </NavLink>
                                 </ItemTitle>
                             </ItemContent>
                             <ItemDescription>
@@ -316,7 +327,11 @@ export function FertilizerApplicationMetricsCard(
                         <Item>
                             <ItemContent>
                                 <ItemTitle className="hover:underline">
-                                    <NavLink to="#">Bemestingsadvies</NavLink>
+                                    <NavLink
+                                        to={`/farm/${fertilizerApplicationMetricsData.b_id_farm}/${fertilizerApplicationMetricsData.calendar}/nutrient_advice/${fertilizerApplicationMetricsData.b_id}`}
+                                    >
+                                        Bemestingsadvies
+                                    </NavLink>
                                 </ItemTitle>
                             </ItemContent>
                             <ItemDescription>

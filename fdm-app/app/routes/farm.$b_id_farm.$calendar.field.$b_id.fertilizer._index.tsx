@@ -30,7 +30,7 @@ import { dataWithError, dataWithSuccess } from "remix-toast"
 import { FertilizerApplicationCard } from "~/components/blocks/fertilizer-applications/card"
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -177,6 +177,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             dose: dose.dose,
             applicationMethodOptions: applicationMethods.options,
             fertilizerApplicationMetricsData: fertilizerApplicationMetricsData,
+            calendar: getCalendar(params),
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -225,6 +226,9 @@ export default function FarmFieldsOverviewBlock() {
                                 .nutrientAdvice
                         }
                         dose={loaderData.fertilizerApplicationMetricsData.dose}
+                        b_id={loaderData.field.b_id}
+                        b_id_farm={loaderData.field.b_id_farm}
+                        calendar={loaderData.calendar}
                     />
                 </div>
             </div>
