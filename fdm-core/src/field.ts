@@ -642,11 +642,14 @@ export function listAvailableAcquiringMethods(): {
 }
 
 /**
- * Determines if a field is considered productive based on its area and perimeter.
+ * Determines if a field is considered productive based on its area, perimeter, and name.
  *
- * This function uses a heuristic to differentiate between productive fields and non-productive areas like buffer strips.
- * A field is classified as non-productive if its area is less than 2.5 hectares and the ratio of its perimeter
- * to the square root of its area (in square meters) is greater than or equal to a predefined constant (20).
+ * This function uses two heuristics to differentiate between productive fields and non-productive areas like buffer strips:
+ * 1. Shape-based: A field is classified as non-productive if its area is less than 2.5 hectares and the ratio of its perimeter
+ *    to the square root of its area (in square meters) is greater than or equal to a predefined constant (20).
+ * 2. Name-based: A field is classified as non-productive if its name contains "buffer" (case-insensitive).
+ *
+ * A field is considered productive only if both checks pass.
  *
  * @param b_area The area of the field in hectares.
  * @param b_perimeter The perimeter of the field in meters.
