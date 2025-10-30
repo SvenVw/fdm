@@ -76,17 +76,24 @@ export function FertilizerApplicationMetricsCard({
         return "gray-500" // Default or error color
     }
 
-    const { norms, nitrogenBalance, nutrientAdvice, dose, b_id, b_id_farm, calendar } =
-        fertilizerApplicationMetricsData
+    const {
+        norms,
+        nitrogenBalance,
+        nutrientAdvice,
+        dose,
+        b_id,
+        b_id_farm,
+        calendar,
+    } = fertilizerApplicationMetricsData
 
     return (
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    Bemestingsplanner
+                    Bemestingsdashboard
                 </CardTitle>
                 <CardDescription>
-                    Bekijk de impact van uw bemestingen.
+                    Krijg inzicht in de effecten van de bemesting.
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -104,13 +111,15 @@ export function FertilizerApplicationMetricsCard({
                                 </ItemTitle>
                             </ItemContent>
                             <ItemDescription>
-                                {isSubmitting ? <NormsSkeleton /> : (
+                                {isSubmitting ? (
+                                    <NormsSkeleton />
+                                ) : (
                                     <Suspense fallback={<NormsSkeleton />}>
                                         <Await
                                             errorElement={
                                                 <div>
-                                                    Helaas, er is wat misgegaan met
-                                                    de berekening
+                                                    Helaas, er is wat misgegaan
+                                                    met de berekening
                                                 </div>
                                             }
                                             resolve={norms}
@@ -119,7 +128,9 @@ export function FertilizerApplicationMetricsCard({
                                                 <div className="flex flex-col space-y-2">
                                                     <div className="grid grid-cols-[1fr_auto] items-center">
                                                         <Tooltip>
-                                                            <TooltipTrigger asChild>
+                                                            <TooltipTrigger
+                                                                asChild
+                                                            >
                                                                 <p className="whitespace-nowrap px-2">
                                                                     Stikstof
                                                                 </p>
@@ -127,37 +138,53 @@ export function FertilizerApplicationMetricsCard({
                                                             <TooltipContent>
                                                                 <p>
                                                                     Werkzame
-                                                                    stikstof volgens
+                                                                    stikstof
+                                                                    volgens
                                                                     forfaitaire
                                                                     gehalten
                                                                 </p>
                                                             </TooltipContent>
                                                         </Tooltip>
                                                         <span className="text-right whitespace-nowrap px-2">
-                                                            {Math.round(resolvedNorms.filling.nitrogen)}{" "}
+                                                            {Math.round(
+                                                                resolvedNorms
+                                                                    .filling
+                                                                    .nitrogen,
+                                                            )}{" "}
                                                             /{" "}
-                                                            {Math.round(resolvedNorms.value.nitrogen)}{" "}
+                                                            {Math.round(
+                                                                resolvedNorms
+                                                                    .value
+                                                                    .nitrogen,
+                                                            )}{" "}
                                                             kg N
                                                         </span>
                                                     </div>
                                                     <Progress
                                                         value={
-                                                            (resolvedNorms.filling
+                                                            (resolvedNorms
+                                                                .filling
                                                                 .nitrogen /
-                                                                resolvedNorms.value
+                                                                resolvedNorms
+                                                                    .value
                                                                     .nitrogen) *
                                                             100
                                                         }
                                                         colorBar={getNormsProgressColor(
-                                                            resolvedNorms.filling.nitrogen,
-                                                            resolvedNorms.value.nitrogen,
+                                                            resolvedNorms
+                                                                .filling
+                                                                .nitrogen,
+                                                            resolvedNorms.value
+                                                                .nitrogen,
                                                         )}
                                                         className="h-2"
                                                     />
 
                                                     <div className="grid grid-cols-[1fr_auto] items-center">
                                                         <Tooltip>
-                                                            <TooltipTrigger asChild>
+                                                            <TooltipTrigger
+                                                                asChild
+                                                            >
                                                                 <p className="whitespace-nowrap px-2">
                                                                     Fosfaat
                                                                 </p>
@@ -165,66 +192,97 @@ export function FertilizerApplicationMetricsCard({
                                                             <TooltipContent>
                                                                 <p>
                                                                     Fosfaataanvoer
-                                                                    incl. mogelijke
+                                                                    incl.
+                                                                    mogelijke
                                                                     stimuleringsregeling
                                                                 </p>
                                                             </TooltipContent>
                                                         </Tooltip>
                                                         <span className="text-right whitespace-nowrap px-2">
-                                                            {Math.round(resolvedNorms.filling.phosphate)}{" "}
+                                                            {Math.round(
+                                                                resolvedNorms
+                                                                    .filling
+                                                                    .phosphate,
+                                                            )}{" "}
                                                             /{" "}
-                                                            {Math.round(resolvedNorms.value.phosphate)}{" "}
+                                                            {Math.round(
+                                                                resolvedNorms
+                                                                    .value
+                                                                    .phosphate,
+                                                            )}{" "}
                                                             kg P₂O₅
                                                         </span>
                                                     </div>
                                                     <Progress
                                                         value={
-                                                            (resolvedNorms.filling
+                                                            (resolvedNorms
+                                                                .filling
                                                                 .phosphate /
-                                                                resolvedNorms.value
+                                                                resolvedNorms
+                                                                    .value
                                                                     .phosphate) *
                                                             100
                                                         }
                                                         colorBar={getNormsProgressColor(
-                                                            resolvedNorms.filling.phosphate,
-                                                            resolvedNorms.value.phosphate,
+                                                            resolvedNorms
+                                                                .filling
+                                                                .phosphate,
+                                                            resolvedNorms.value
+                                                                .phosphate,
                                                         )}
                                                         className="h-2"
                                                     />
 
                                                     <div className="grid grid-cols-[1fr_auto] items-center">
                                                         <Tooltip>
-                                                            <TooltipTrigger asChild>
+                                                            <TooltipTrigger
+                                                                asChild
+                                                            >
                                                                 <p className="whitespace-nowrap px-2">
-                                                                    Dierlijke mest
+                                                                    Dierlijke
+                                                                    mest
                                                                 </p>
                                                             </TooltipTrigger>
                                                             <TooltipContent>
                                                                 <p>
-                                                                    Totaal stikstof
-                                                                    via dierlijke
+                                                                    Totaal
+                                                                    stikstof via
+                                                                    dierlijke
                                                                     mest
                                                                 </p>
                                                             </TooltipContent>
                                                         </Tooltip>
                                                         <span className="text-right whitespace-nowrap px-2">
-                                                            {Math.round(resolvedNorms.filling.manure)}{" "}
+                                                            {Math.round(
+                                                                resolvedNorms
+                                                                    .filling
+                                                                    .manure,
+                                                            )}{" "}
                                                             /{" "}
-                                                            {Math.round(resolvedNorms.value.manure)}{" "}
+                                                            {Math.round(
+                                                                resolvedNorms
+                                                                    .value
+                                                                    .manure,
+                                                            )}{" "}
                                                             kg N
                                                         </span>
                                                     </div>
                                                     <Progress
                                                         value={
-                                                            (resolvedNorms.filling.manure /
-                                                                resolvedNorms.value
+                                                            (resolvedNorms
+                                                                .filling
+                                                                .manure /
+                                                                resolvedNorms
+                                                                    .value
                                                                     .manure) *
                                                             100
                                                         }
                                                         colorBar={getNormsProgressColor(
-                                                            resolvedNorms.filling.manure
+                                                            resolvedNorms
+                                                                .filling.manure
                                                                 .normFilling,
-                                                            resolvedNorms.value.manure,
+                                                            resolvedNorms.value
+                                                                .manure,
                                                         )}
                                                         className="h-2"
                                                     />
@@ -249,23 +307,27 @@ export function FertilizerApplicationMetricsCard({
                                 </ItemTitle>
                             </ItemContent>
                             <ItemDescription>
-                                {isSubmitting ? <NitrogenBalanceSkeleton /> : (
+                                {isSubmitting ? (
+                                    <NitrogenBalanceSkeleton />
+                                ) : (
                                     <Suspense
                                         fallback={<NitrogenBalanceSkeleton />}
                                     >
                                         <Await
                                             errorElement={
                                                 <div>
-                                                    Helaas, er is wat misgegaan met
-                                                    de berekening
+                                                    Helaas, er is wat misgegaan
+                                                    met de berekening
                                                 </div>
                                             }
                                             resolve={nitrogenBalance}
                                         >
                                             {(resolvedNitrogenBalance) => {
                                                 const task =
-                                                    resolvedNitrogenBalance.balance.target -
-                                                    resolvedNitrogenBalance.balance.balance
+                                                    resolvedNitrogenBalance
+                                                        .balance.target -
+                                                    resolvedNitrogenBalance
+                                                        .balance.balance
                                                 return (
                                                     <div className="flex flex-col space-y-2">
                                                         {/* Simplified Flow (Top Section) */}
@@ -281,17 +343,24 @@ export function FertilizerApplicationMetricsCard({
                                                                 <TooltipContent>
                                                                     <p>
                                                                         Totaal
-                                                                        stikstof via
+                                                                        stikstof
+                                                                        via
                                                                         bemesting,
                                                                         depositie,
                                                                         mineralisatie
-                                                                        en fixatie
+                                                                        en
+                                                                        fixatie
                                                                     </p>
                                                                 </TooltipContent>
                                                             </Tooltip>
 
                                                             <span className="font-semibold text-right whitespace-nowrap px-2">
-                                                                {Math.round(resolvedNitrogenBalance.balance.supply.total)}{" "}
+                                                                {Math.round(
+                                                                    resolvedNitrogenBalance
+                                                                        .balance
+                                                                        .supply
+                                                                        .total,
+                                                                )}{" "}
                                                                 kg N
                                                             </span>
                                                         </div>
@@ -307,14 +376,20 @@ export function FertilizerApplicationMetricsCard({
                                                                 <TooltipContent>
                                                                     <p>
                                                                         Totaal
-                                                                        stikstof via
+                                                                        stikstof
+                                                                        via
                                                                         oogst en
                                                                         gewasresten
                                                                     </p>
                                                                 </TooltipContent>
                                                             </Tooltip>
                                                             <span className="font-semibold text-right whitespace-nowrap px-2">
-                                                                {Math.round(resolvedNitrogenBalance.balance.removal.total)}{" "}
+                                                                {Math.round(
+                                                                    resolvedNitrogenBalance
+                                                                        .balance
+                                                                        .removal
+                                                                        .total,
+                                                                )}{" "}
                                                                 kg N
                                                             </span>
                                                         </div>
@@ -330,7 +405,8 @@ export function FertilizerApplicationMetricsCard({
                                                                 <TooltipContent>
                                                                     <p>
                                                                         Totaal
-                                                                        stikstof via
+                                                                        stikstof
+                                                                        via
                                                                         gasvormige
                                                                         verliezen
                                                                         (NH3)
@@ -338,7 +414,12 @@ export function FertilizerApplicationMetricsCard({
                                                                 </TooltipContent>
                                                             </Tooltip>
                                                             <span className="font-semibold text-right whitespace-nowrap px-2">
-                                                                {Math.round(resolvedNitrogenBalance.balance.emission.total)}{" "}
+                                                                {Math.round(
+                                                                    resolvedNitrogenBalance
+                                                                        .balance
+                                                                        .emission
+                                                                        .total,
+                                                                )}{" "}
                                                                 kg N
                                                             </span>
                                                         </div>
@@ -350,7 +431,11 @@ export function FertilizerApplicationMetricsCard({
                                                                 Balans
                                                             </p>
                                                             <span className="text-xl font-bold text-right whitespace-nowrap px-2">
-                                                                {Math.round(resolvedNitrogenBalance.balance.balance)}{" "}
+                                                                {Math.round(
+                                                                    resolvedNitrogenBalance
+                                                                        .balance
+                                                                        .balance,
+                                                                )}{" "}
                                                                 kg N
                                                             </span>
                                                         </div>
@@ -359,7 +444,11 @@ export function FertilizerApplicationMetricsCard({
                                                                 Streefwaarde
                                                             </p>
                                                             <span className="font-semibold text-right whitespace-nowrap px-2">
-                                                                {Math.round(resolvedNitrogenBalance.balance.target)}{" "}
+                                                                {Math.round(
+                                                                    resolvedNitrogenBalance
+                                                                        .balance
+                                                                        .target,
+                                                                )}{" "}
                                                                 kg N
                                                             </span>
                                                         </div>
@@ -396,8 +485,10 @@ export function FertilizerApplicationMetricsCard({
                                                                         : "text-green-500"
                                                                 }`}
                                                             >
-                                                                {Math.round(task)} kg
-                                                                N
+                                                                {Math.round(
+                                                                    task,
+                                                                )}{" "}
+                                                                kg N
                                                             </span>
                                                         </div>
                                                     </div>
@@ -422,13 +513,17 @@ export function FertilizerApplicationMetricsCard({
                                 </ItemTitle>
                             </ItemContent>
                             <ItemDescription>
-                                {isSubmitting ? <NutrientAdviceSkeleton /> : (
-                                    <Suspense fallback={<NutrientAdviceSkeleton />}>
+                                {isSubmitting ? (
+                                    <NutrientAdviceSkeleton />
+                                ) : (
+                                    <Suspense
+                                        fallback={<NutrientAdviceSkeleton />}
+                                    >
                                         <Await
                                             errorElement={
                                                 <div>
-                                                    Helaas, er is wat misgegaan met
-                                                    de berekening
+                                                    Helaas, er is wat misgegaan
+                                                    met de berekening
                                                 </div>
                                             }
                                             resolve={nutrientAdvice}
@@ -437,7 +532,9 @@ export function FertilizerApplicationMetricsCard({
                                                 <div className="flex flex-col space-y-2">
                                                     <div className="grid grid-cols-[1fr_auto] items-center">
                                                         <Tooltip>
-                                                            <TooltipTrigger asChild>
+                                                            <TooltipTrigger
+                                                                asChild
+                                                            >
                                                                 <p className="whitespace-nowrap px-2">
                                                                     Stikstof
                                                                 </p>
@@ -450,9 +547,13 @@ export function FertilizerApplicationMetricsCard({
                                                             </TooltipContent>
                                                         </Tooltip>
                                                         <span className="text-right whitespace-nowrap px-2">
-                                                            {Math.round(dose.p_dose_n)}{" "}
+                                                            {Math.round(
+                                                                dose.p_dose_n,
+                                                            )}{" "}
                                                             /{" "}
-                                                            {Math.round(resolvedNutrientAdvice.d_n_req)}{" "}
+                                                            {Math.round(
+                                                                resolvedNutrientAdvice.d_n_req,
+                                                            )}{" "}
                                                             kg N
                                                         </span>
                                                     </div>
@@ -475,9 +576,13 @@ export function FertilizerApplicationMetricsCard({
                                                             Fosfaat
                                                         </p>
                                                         <span className="text-right whitespace-nowrap px-2">
-                                                            {Math.round(dose.p_dose_p)}{" "}
+                                                            {Math.round(
+                                                                dose.p_dose_p,
+                                                            )}{" "}
                                                             /{" "}
-                                                            {Math.round(resolvedNutrientAdvice.d_p_req)}{" "}
+                                                            {Math.round(
+                                                                resolvedNutrientAdvice.d_p_req,
+                                                            )}{" "}
                                                             kg P₂O₅
                                                         </span>
                                                     </div>
@@ -500,9 +605,13 @@ export function FertilizerApplicationMetricsCard({
                                                             Kalium
                                                         </p>
                                                         <span className="text-right whitespace-nowrap px-2">
-                                                            {Math.round(dose.p_dose_k)}{" "}
+                                                            {Math.round(
+                                                                dose.p_dose_k,
+                                                            )}{" "}
                                                             /{" "}
-                                                            {Math.round(resolvedNutrientAdvice.d_k_req)}{" "}
+                                                            {Math.round(
+                                                                resolvedNutrientAdvice.d_k_req,
+                                                            )}{" "}
                                                             kg K₂O
                                                         </span>
                                                     </div>
