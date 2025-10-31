@@ -1,146 +1,184 @@
 import { describe, expect, it } from "vitest"
-import { aggregateNormsToFarmLevel } from "./farm"
-import type { GebruiksnormResult } from "./nl/2025/types"
+import {
+    aggregateNormsToFarmLevel,
+    aggregateNormFillingsToFarmLevel,
+} from "./farm"
+import type {
+    InputAggregateNormsToFarmLevel,
+    InputAggregateNormFillingsToFarmLevel,
+} from "./farm"
 
 describe("aggregateNormsToFarmLevel", () => {
-    it("should correctly aggregate norms from multiple fields", () => {
-        const fieldData = [
+    it("should correctly aggregate norm values to farm level", () => {
+        const fieldData: InputAggregateNormsToFarmLevel = [
             {
                 b_id: "field1",
-                b_area: 10,
+                b_area: 10, // hectares
                 norms: {
-                    manure: {
-                        normValue: 100,
-                        normSource: "Source A",
-                    } as GebruiksnormResult,
-                    nitrogen: {
-                        normValue: 150,
-                        normSource: "Source B",
-                    } as GebruiksnormResult,
-                    phosphate: {
-                        normValue: 50,
-                        normSource: "Source C",
-                    } as GebruiksnormResult,
+                    manure: { normValue: 100, normSource: "Source A" }, // kg N/ha
+                    nitrogen: { normValue: 150, normSource: "Source B" }, // kg N/ha
+                    phosphate: { normValue: 50, normSource: "Source C" }, // kg P2O5/ha
                 },
             },
             {
                 b_id: "field2",
-                b_area: 5,
+                b_area: 5, // hectares
                 norms: {
-                    manure: {
-                        normValue: 90,
-                        normSource: "Source A",
-                    } as GebruiksnormResult,
-                    nitrogen: {
-                        normValue: 140,
-                        normSource: "Source B",
-                    } as GebruiksnormResult,
-                    phosphate: {
-                        normValue: 45,
-                        normSource: "Source C",
-                    } as GebruiksnormResult,
+                    manure: { normValue: 90, normSource: "Source A" }, // kg N/ha
+                    nitrogen: { normValue: 140, normSource: "Source B" }, // kg N/ha
+                    phosphate: { normValue: 45, normSource: "Source C" }, // kg P2O5/ha
                 },
             },
         ]
 
-        const result = aggregateNormsToFarmLevel(fieldData)
+        const aggregatedNorms = aggregateNormsToFarmLevel(fieldData)
 
-        expect(result.manure).toBe(1450)
-        expect(result.nitrogen).toBe(2200)
-        expect(result.phosphate).toBe(725)
+        expect(aggregatedNorms).toEqual({
+            manure: 1450, // (100 * 10) + (90 * 5)
+            nitrogen: 2200, // (150 * 10) + (140 * 5)
+            phosphate: 725, // (50 * 10) + (45 * 5)
+        })
     })
 
-    it("should handle an empty array of fields", () => {
-        const result = aggregateNormsToFarmLevel([])
-        expect(result.manure).toBe(0)
-        expect(result.nitrogen).toBe(0)
-        expect(result.phosphate).toBe(0)
+    it("should handle empty input array", () => {
+        const fieldData: InputAggregateNormsToFarmLevel = []
+        const aggregatedNorms = aggregateNormsToFarmLevel(fieldData)
+        expect(aggregatedNorms).toEqual({
+            manure: 0,
+            nitrogen: 0,
+            phosphate: 0,
+        })
     })
 
     it("should handle fields with zero area", () => {
-        const fieldData = [
+        const fieldData: InputAggregateNormsToFarmLevel = [
             {
                 b_id: "field1",
-                b_area: 0,
+                b_area: 0, // hectares
                 norms: {
+                    manure: { normValue: 100, normSource: "Source A" },
+                    nitrogen: { normValue: 150, normSource: "Source B" },
+                    phosphate: { normValue: 50, normSource: "Source C" },
+                },
+            },
+        ]
+        const aggregatedNorms = aggregateNormsToFarmLevel(fieldData)
+        expect(aggregatedNorms).toEqual({
+            manure: 0,
+            nitrogen: 0,
+            phosphate: 0,
+        })
+    })
+})
+
+describe("aggregateNormFillingsToFarmLevel", () => {
+    it("should correctly aggregate norm filling values to farm level", () => {
+        const fieldData: InputAggregateNormFillingsToFarmLevel = [
+            {
+                b_id: "field1",
+                b_area: 10, // hectares
+                normsFilling: {
                     manure: {
-                        normValue: 100,
-                        normSource: "Source A",
-                    } as GebruiksnormResult,
+                        normFilling: 10,
+                        applicationFilling: [
+                            { p_app_id: "app1", normFilling: 5 },
+                            { p_app_id: "app2", normFilling: 5 },
+                        ],
+                    },
                     nitrogen: {
-                        normValue: 150,
-                        normSource: "Source B",
-                    } as GebruiksnormResult,
+                        normFilling: 20,
+                        applicationFilling: [
+                            { p_app_id: "app1", normFilling: 10 },
+                            { p_app_id: "app2", normFilling: 10 },
+                        ],
+                    },
                     phosphate: {
-                        normValue: 50,
-                        normSource: "Source C",
-                    } as GebruiksnormResult,
+                        normFilling: 5,
+                        applicationFilling: [
+                            { p_app_id: "app1", normFilling: 2 },
+                            { p_app_id: "app2", normFilling: 3 },
+                        ],
+                    },
+                },
+            },
+            {
+                b_id: "field2",
+                b_area: 5, // hectares
+                normsFilling: {
+                    manure: {
+                        normFilling: 8,
+                        applicationFilling: [
+                            { p_app_id: "app3", normFilling: 4 },
+                            { p_app_id: "app4", normFilling: 4 },
+                        ],
+                    },
+                    nitrogen: {
+                        normFilling: 15,
+                        applicationFilling: [
+                            { p_app_id: "app3", normFilling: 7 },
+                            { p_app_id: "app4", normFilling: 8 },
+                        ],
+                    },
+                    phosphate: {
+                        normFilling: 3,
+                        applicationFilling: [
+                            { p_app_id: "app3", normFilling: 1 },
+                            { p_app_id: "app4", normFilling: 2 },
+                        ],
+                    },
                 },
             },
         ]
 
-        const result = aggregateNormsToFarmLevel(fieldData)
+        const aggregatedFillings = aggregateNormFillingsToFarmLevel(fieldData)
 
-        expect(result.manure).toBe(0)
-        expect(result.nitrogen).toBe(0)
-        expect(result.phosphate).toBe(0)
+        expect(aggregatedFillings.manure).toBe(140) // (10 * 10) + (8 * 5)
+        expect(aggregatedFillings.nitrogen).toBe(275) // (20 * 10) + (15 * 5)
+        expect(aggregatedFillings.phosphate).toBe(65) // (5 * 10) + (3 * 5)
     })
 
-    it("should handle fields with zero norm values", () => {
-        const fieldData = [
-            {
-                b_id: "field1",
-                b_area: 10,
-                norms: {
-                    manure: {
-                        normValue: 0,
-                        normSource: "Source A",
-                    } as GebruiksnormResult,
-                    nitrogen: {
-                        normValue: 0,
-                        normSource: "Source B",
-                    } as GebruiksnormResult,
-                    phosphate: {
-                        normValue: 0,
-                        normSource: "Source C",
-                    } as GebruiksnormResult,
-                },
-            },
-        ]
-
-        const result = aggregateNormsToFarmLevel(fieldData)
-
-        expect(result.manure).toBe(0)
-        expect(result.nitrogen).toBe(0)
-        expect(result.phosphate).toBe(0)
+    it("should handle empty input array for norm fillings", () => {
+        const fieldData: InputAggregateNormFillingsToFarmLevel = []
+        const aggregatedFillings = aggregateNormFillingsToFarmLevel(fieldData)
+        expect(aggregatedFillings).toEqual({
+            manure: 0,
+            nitrogen: 0,
+            phosphate: 0,
+        })
     })
 
-    it("should handle floating point numbers for area and norm values", () => {
-        const fieldData = [
+    it("should handle fields with zero area for norm fillings", () => {
+        const fieldData: InputAggregateNormFillingsToFarmLevel = [
             {
                 b_id: "field1",
-                b_area: 10.5,
-                norms: {
+                b_area: 0, // hectares
+                normsFilling: {
                     manure: {
-                        normValue: 100.5,
-                        normSource: "Source A",
-                    } as GebruiksnormResult,
+                        normFilling: 10,
+                        applicationFilling: [
+                            { p_app_id: "app1", normFilling: 5 },
+                        ],
+                    },
                     nitrogen: {
-                        normValue: 150.5,
-                        normSource: "Source B",
-                    } as GebruiksnormResult,
+                        normFilling: 20,
+                        applicationFilling: [
+                            { p_app_id: "app1", normFilling: 10 },
+                        ],
+                    },
                     phosphate: {
-                        normValue: 50.5,
-                        normSource: "Source C",
-                    } as GebruiksnormResult,
+                        normFilling: 5,
+                        applicationFilling: [
+                            { p_app_id: "app1", normFilling: 2 },
+                        ],
+                    },
                 },
             },
         ]
-
-        const result = aggregateNormsToFarmLevel(fieldData)
-
-        expect(result.manure).toBe(1055) // 10.5 * 100.5 = 1055.25
-        expect(result.nitrogen).toBe(1580) // 10.5 * 150.5 = 1580.25
-        expect(result.phosphate).toBe(530) // 10.5 * 50.5 = 530.25
+        const aggregatedFillings = aggregateNormFillingsToFarmLevel(fieldData)
+        expect(aggregatedFillings).toEqual({
+            manure: 0,
+            nitrogen: 0,
+            phosphate: 0,
+        })
     })
 })

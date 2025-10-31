@@ -1,9 +1,17 @@
+import type {
+    AggregatedNormFillingsToFarmLevel,
+    AggregatedNormsToFarmLevel,
+    GebruiksnormResult,
+    InputAggregateNormFillingsToFarmLevel,
+    InputAggregateNormsToFarmLevel,
+    NormFilling,
+} from "@svenvw/fdm-calculator"
 import {
-    type AggregatedNormsToFarmLevel,
+    createFunctionsForFertilizerApplicationFilling,
     createFunctionsForNorms,
-    type GebruiksnormResult,
 } from "@svenvw/fdm-calculator"
 import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
+import { AlertTriangle } from "lucide-react"
 import { Suspense, use } from "react"
 import {
     data,
@@ -20,7 +28,7 @@ import { HeaderNorms } from "~/components/blocks/header/norms"
 import { FarmNorms } from "~/components/blocks/norms/farm-norms"
 import { FieldNorms } from "~/components/blocks/norms/field-norms"
 import { NormsFallback } from "~/components/blocks/norms/skeletons"
-import { Alert, AlertDescription } from "~/components/ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
@@ -40,16 +48,22 @@ interface FieldNorm {
         phosphate: GebruiksnormResult
         nitrogen: GebruiksnormResult
     }
+    normsFilling?: {
+        manure: NormFilling
+        phosphate: NormFilling
+        nitrogen: NormFilling
+    }
     errorMessage?: string
 }
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Gebruiksnormen ${clientConfig.name}` },
+        { title: `Gebruiksruimte - Bedrijf | ${clientConfig.name}` },
         {
             name: "description",
-            content: "Bekijk de Gebruiksnormen voor je bedrijf.",
+            content:
+                "Bekijk de gebruiksruimte en opvulling voor je bedrijf en percelen.",
         },
     ]
 }
@@ -116,29 +130,71 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
             let fieldNorms = undefined as FieldNorm[] | undefined
             let farmNorms = undefined as AggregatedNormsToFarmLevel | undefined
+            let farmFillings = undefined as
+                | AggregatedNormFillingsToFarmLevel
+                | undefined
             let errorMessage = null as string | null
             let hasFieldNormErrors = false
             const fieldErrorMessages: string[] = []
             try {
                 // Calculate norms per field
-                const functionsForms = createFunctionsForNorms("NL", calendar)
+                const functionsForNorms = createFunctionsForNorms(
+                    "NL",
+                    calendar,
+                )
+                const functionsForFilling =
+                    createFunctionsForFertilizerApplicationFilling(
+                        "NL",
+                        calendar,
+                    )
 
                 const fieldNormPromises = fields.map(async (field) => {
                     try {
-                        // Collect the input
-                        const input = await functionsForms.collectInputForNorms(
-                            fdm,
-                            session.principal_id,
-                            field.b_id,
-                        )
+                        // Collect the input for norms
+                        const input =
+                            await functionsForNorms.collectInputForNorms(
+                                fdm,
+                                session.principal_id,
+                                field.b_id,
+                            )
 
-                        // Calculate the norms
+                        // Calculate the norms first
                         const [normManure, normPhosphate, normNitrogen] =
                             await Promise.all([
-                                functionsForms.calculateNormForManure(input),
-                                functionsForms.calculateNormForPhosphate(input),
-                                functionsForms.calculateNormForNitrogen(input),
+                                functionsForNorms.calculateNormForManure(input),
+                                functionsForNorms.calculateNormForPhosphate(
+                                    input,
+                                ),
+                                functionsForNorms.calculateNormForNitrogen(
+                                    input,
+                                ),
                             ])
+
+                        // Collect the input for fillings, using the calculated phosphate norm
+                        const fillingInput =
+                            await functionsForFilling.collectInputForFertilizerApplicationFilling(
+                                fdm,
+                                session.principal_id,
+                                field.b_id,
+                                normPhosphate.normValue, // Pass the calculated fosfaatgebruiksnorm
+                            )
+
+                        // Calculate the fillings
+                        const [
+                            fillingManure,
+                            fillingPhosphate,
+                            fillingNitrogen,
+                        ] = await Promise.all([
+                            functionsForFilling.calculateFertilizerApplicationFillingForManure(
+                                fillingInput,
+                            ),
+                            functionsForFilling.calculateFertilizerApplicationFillingForPhosphate(
+                                fillingInput,
+                            ),
+                            functionsForFilling.calculateFertilizerApplicationFillingForNitrogen(
+                                fillingInput,
+                            ),
+                        ])
 
                         return {
                             b_id: field.b_id,
@@ -147,6 +203,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                                 manure: normManure,
                                 phosphate: normPhosphate,
                                 nitrogen: normNitrogen,
+                            },
+                            normsFilling: {
+                                manure: fillingManure,
+                                phosphate: fillingPhosphate,
+                                nitrogen: fillingNitrogen,
                             },
                         }
                     } catch (error) {
@@ -200,18 +261,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 // Aggregate the norms to farm level
                 const validFieldNorms = (fieldNorms || []).filter(
                     (field) => field.norms !== undefined,
-                ) as {
-                    b_id: string
-                    b_area: number
-                    norms: {
-                        manure: GebruiksnormResult
-                        phosphate: GebruiksnormResult
-                        nitrogen: GebruiksnormResult
-                    }
-                }[]
+                ) as InputAggregateNormsToFarmLevel
                 farmNorms =
-                    await functionsForms.aggregateNormsToFarmLevel(
-                        validFieldNorms,
+                    functionsForNorms.aggregateNormsToFarmLevel(validFieldNorms)
+
+                // Aggregate the fillings to farm level
+                const validFieldFillings = (fieldNorms || []).filter(
+                    (field) => field.normsFilling !== undefined,
+                ) as InputAggregateNormFillingsToFarmLevel
+                farmFillings =
+                    functionsForFilling.aggregateNormFillingsToFarmLevel(
+                        validFieldFillings,
                     )
             } catch (error) {
                 errorMessage = String(error).replace("Error: ", "")
@@ -222,6 +282,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 errorMessage: errorMessage,
                 fieldNorms: fieldNorms,
                 farmNorms: farmNorms,
+                farmFillings: farmFillings,
                 hasFieldNormErrors: hasFieldNormErrors,
                 fieldErrorMessages: fieldErrorMessages,
             }
@@ -255,9 +316,9 @@ export default function FarmNormsBlock() {
             </Header>
             <main>
                 <FarmTitle
-                    title={"Gebruiksnormen"}
+                    title={"Gebruiksruimte"}
                     description={
-                        "Bekijk de gebruiksnormen voor je bedrijf en percelen."
+                        "Bekijk de gebruiksruimte en opvulling voor je bedrijf en percelen."
                     }
                 />
                 <Suspense
@@ -283,6 +344,7 @@ export default function FarmNormsBlock() {
 function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
     const {
         farmNorms,
+        farmFillings,
         fieldNorms,
         errorMessage,
         hasFieldNormErrors,
@@ -343,19 +405,25 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
         })
 
         return (
-            <div className="space-y-6 px-10 pb-16">
-                <Alert className="mb-8  border-amber-200 bg-amber-50">
-                    <AlertDescription className="text-amber-800">
-                        <strong>Disclaimer:</strong> Deze getallen zijn
-                        uitsluitend bedoeld voor informatieve doeleinden. De
-                        getoonde gebruiksnormen zijn indicatief en dienen te
-                        worden geverifieerd voor juridische naleving. Raadpleeg
-                        altijd de officiële RVO-publicaties en uw adviseur voor
-                        definitieve normen.
+            <div className="space-y-6 px-4 pb-16 sm:px-6 lg:px-8">
+                <Alert
+                    className="mb-8 border-amber-200 bg-amber-50 text-amber-800"
+                    variant="default"
+                >
+                    <AlertTriangle className="h-4 w-4 !text-amber-800" />
+                    <AlertTitle>Disclaimer</AlertTitle>
+                    <AlertDescription>
+                        Deze getallen zijn uitsluitend bedoeld voor informatieve
+                        doeleinden. De getoonde gebruiksnormen zijn indicatief
+                        en dienen te worden geverifieerd voor juridische
+                        naleving. Raadpleeg altijd de officiële RVO-publicaties
+                        en uw adviseur voor definitieve normen.
                     </AlertDescription>
                 </Alert>
+
                 <FarmNorms
                     farmNorms={farmNorms}
+                    farmFillings={farmFillings}
                     hasFieldNormErrors={hasFieldNormErrors}
                     fieldErrorMessages={fieldErrorMessages}
                 />
@@ -369,7 +437,7 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
     }
     // This block is now an independent return, not an else clause
     return (
-        <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6">
+        <div className="mx-auto flex h-full w-full flex-col items-center justify-center space-y-6">
             <div className="flex flex-col space-y-2 text-center">
                 <h1 className="text-2xl font-semibold tracking-tight">
                     Helaas, nog geen gebruiksnormen beschikbaar voor{" "}
