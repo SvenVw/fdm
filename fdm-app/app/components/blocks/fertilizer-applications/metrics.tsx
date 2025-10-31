@@ -279,7 +279,7 @@ export function FertilizerApplicationMetricsCard({
                                                         }
                                                         colorBar={getNormsProgressColor(
                                                             resolvedNorms
-                                                                .filling.manure,                                                              
+                                                                .filling.manure,
                                                             resolvedNorms.value
                                                                 .manure,
                                                         )}
@@ -458,9 +458,7 @@ export function FertilizerApplicationMetricsCard({
                                                                     asChild
                                                                 >
                                                                     <p className="text-xl font-bold whitespace-nowrap px-2">
-                                                                        {resolvedNitrogenBalance
-                                                                            .balance
-                                                                            .task <
+                                                                        {task <
                                                                         0
                                                                             ? "Opgave"
                                                                             : "Ruimte"}
@@ -468,9 +466,7 @@ export function FertilizerApplicationMetricsCard({
                                                                 </TooltipTrigger>
                                                                 <TooltipContent>
                                                                     <p>
-                                                                        {resolvedNitrogenBalance
-                                                                            .balance
-                                                                            .task <
+                                                                        {task <
                                                                         0
                                                                             ? "Hoeveelheid totaal stikstof die verminderd moet worden om het doel te halen"
                                                                             : "Hoeveelheid totaal stikstof die nog over waarbij het doel gehaald kan worden"}
@@ -721,7 +717,7 @@ const NutrientAdviceSkeleton = () => (
     <div className="flex flex-col space-y-2">
         <div className="grid grid-cols-[1fr_auto] items-center">
             <p className="whitespace-nowrap px-2">Stikstof</p>
-            <span className="text-right  px-2">
+            <span className="text-right px-2">
                 {<Spinner className="h-3" />} kg N
             </span>
         </div>

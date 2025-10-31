@@ -117,7 +117,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fertilizerParameterDescription =
             getFertilizerParametersDescription()
         const applicationMethods = fertilizerParameterDescription.find(
-            (x: any) => x.parameter === "p_app_method_options",
+            (x: { parameter: string }) => x.parameter === "p_app_method_options",
         )
         if (!applicationMethods) throw new Error("Parameter metadata missing")
         // Map fertilizers to options for the combobox

@@ -51,7 +51,7 @@ export async function collectNL2025InputForNorms(
     // 3. Get the grazing intention for the farm
     const has_grazing_intention = await getGrazingIntention(
         fdm,
-        principal_id as PrincipalId,
+        principal_id,
         field.b_id_farm,
         2025,
     )
