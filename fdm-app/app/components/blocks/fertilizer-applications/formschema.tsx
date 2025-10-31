@@ -24,7 +24,7 @@ export const FormSchema = z.object({
     }),
 })
 
-export const PatchFormSchema = FormSchema.extend({
+export const FormSchemaModify = FormSchema.extend({
     p_app_id: z.string({
         // TODO: Validate against the options that are available
         required_error: "Bemesting id is verplicht",

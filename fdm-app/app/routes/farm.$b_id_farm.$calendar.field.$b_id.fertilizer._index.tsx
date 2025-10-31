@@ -19,7 +19,7 @@ import { dataWithError, dataWithSuccess } from "remix-toast"
 import { FertilizerApplicationCard } from "~/components/blocks/fertilizer-applications/card"
 import {
     FormSchema,
-    PatchFormSchema,
+    FormSchemaModify,
 } from "~/components/blocks/fertilizer-applications/formschema"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
@@ -217,7 +217,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             // Collect form entry
             const formValues = await extractFormValuesFromRequest(
                 request,
-                PatchFormSchema,
+                FormSchemaModify,
             )
             const { p_app_id, p_id, p_app_amount, p_app_date, p_app_method } =
                 formValues

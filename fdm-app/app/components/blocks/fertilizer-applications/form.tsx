@@ -35,7 +35,7 @@ import {
 import {
     type FieldFertilizerFormValues,
     FormSchema,
-    PatchFormSchema,
+    FormSchemaModify,
 } from "./formschema"
 import type { FertilizerOption } from "./types.d"
 
@@ -59,7 +59,7 @@ export function FertilizerApplicationForm({
     const form = useRemixForm<FieldFertilizerFormValues>({
         mode: "onTouched",
         resolver: zodResolver(
-            fertilizerApplication ? PatchFormSchema : FormSchema,
+            fertilizerApplication ? FormSchemaModify : FormSchema,
         ),
         defaultValues: {
             p_app_id: fertilizerApplication?.p_app_ids
