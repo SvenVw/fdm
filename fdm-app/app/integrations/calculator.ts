@@ -47,6 +47,9 @@ export async function getNitrogenBalanceforField({
     const nitrogenBalance = nitrogenBalanceResult.fields.find(
         (field: { b_id: string }) => field.b_id === b_id,
     )
+    if (!nitrogenBalance) {
+        throw new Error(`Nitrogen balance not found for field ${b_id}`)
+    }
 
     return nitrogenBalance
 }
