@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import type { FertilizerApplication } from "@svenvw/fdm-core"
 import { Plus } from "lucide-react"
 import type { MouseEvent } from "react"
-import { useEffect } from "react"
+import { useEffect, useId } from "react"
 import type { Navigation } from "react-router"
 import { Form, useNavigate, useSearchParams } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
@@ -156,7 +156,7 @@ export function FertilizerApplicationForm({
     return (
         <RemixFormProvider {...form}>
             <Form
-                id="formAddFertilizerApplication"
+                id={useId()}
                 action={action}
                 onSubmit={form.handleSubmit}
                 method="post"
