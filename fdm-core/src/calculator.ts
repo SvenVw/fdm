@@ -224,14 +224,23 @@ export function withCalculationCache<T_Input extends object, T_Output>(
             // If the initial cache read was successful (meaning the cache is healthy),
             // then attempt to store the new calculation result in the cache.
             if (cacheResultOfCalculation) {
-                await setCachedCalculation(
-                    fdm,
-                    calculationHash,
-                    calculationFunctionName,
-                    calculatorVersion,
-                    input,
-                    result,
-                )
+                try {
+                    await setCachedCalculation(
+                        fdm,
+                        calculationHash,
+                        calculationFunctionName,
+                        calculatorVersion,
+                        input,
+                        result,
+                    )
+                } catch (e: unknown) {
+                    const errorMessage =
+                        e instanceof Error ? e.message : String(e)
+                    console.error(
+                        `Failed to write to calculation cache for ${calculationFunctionName} (hash: ${calculationHash}): ${errorMessage}`,
+                    )
+                    // Continue execution - the calculation succeeded, only caching failed
+                }
                 // console.log(
                 //     `Calculation for ${calculationFunctionName} (hash: ${calculationHash}) completed and cached.`,
                 // )
@@ -249,16 +258,27 @@ export function withCalculationCache<T_Input extends object, T_Output>(
             const errorMessage = e instanceof Error ? e.message : String(e)
             const stackTrace = e instanceof Error ? e.stack : undefined
 
-            await setCalculationError(
-                fdm,
-                calculationFunctionName,
-                calculatorVersion,
-                input,
-                errorMessage,
-                stackTrace,
-            )
+            try {
+                await setCalculationError(
+                    fdm,
+                    calculationFunctionName,
+                    calculatorVersion,
+                    input,
+                    errorMessage,
+                    stackTrace,
+                )
+            } catch (loggingError: unknown) {
+                const loggingErrorMessage =
+                    loggingError instanceof Error
+                        ? loggingError.message
+                        : String(loggingError)
+                console.error(
+                    `Failed to log calculation error for ${calculationFunctionName}: ${loggingErrorMessage}`,
+                )
+                // Continue to re-throw the original calculation error
+            }
 
-            throw e
-        }
-    }
+           throw e
+       }
+   }
 }
