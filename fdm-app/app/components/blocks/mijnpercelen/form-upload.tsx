@@ -231,9 +231,17 @@ export function MijnPercelenUploadForm({
             )
 
             form.setValue("shapefile", updatedFiles, { shouldValidate: true })
-            const container = new DataTransfer()
-            updatedFiles.forEach((f) => container.items.add(f))
-            document.getElementById("file-upload").files = container.files
+
+            const fileInput = document.getElementById(
+                "file-upload",
+            ) as HTMLInputElement | null
+            if (fileInput) {
+                const container = new DataTransfer()
+                updatedFiles.forEach((f) => {
+                    container.items.add(f)
+                })
+                fileInput.files = container.files
+            }
             await handleFilesSet(updatedFiles)
             e.dataTransfer.clearData()
         }
@@ -389,6 +397,8 @@ export function MijnPercelenUploadForm({
                                                             id="file-upload"
                                                         />
                                                         <label
+                                                            tabIndex={0}
+                                                            role="button"
                                                             className="relative block"
                                                             htmlFor="file-upload"
                                                             aria-label="Upload shapefile files by clicking or dragging and dropping"
