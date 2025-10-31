@@ -231,6 +231,9 @@ export function MijnPercelenUploadForm({
             )
 
             form.setValue("shapefile", updatedFiles, { shouldValidate: true })
+            const container = new DataTransfer()
+            updatedFiles.forEach((f) => container.items.add(f))
+            document.getElementById("file-upload").files = container.files
             await handleFilesSet(updatedFiles)
             e.dataTransfer.clearData()
         }
