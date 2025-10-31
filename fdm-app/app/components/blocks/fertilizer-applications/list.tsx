@@ -21,12 +21,10 @@ import {
     Empty,
     EmptyDescription,
     EmptyHeader,
-    EmptyMedia,
     EmptyTitle,
 } from "~/components/ui/empty"
 import { LoadingSpinner } from "../../custom/loadingspinner"
 import { Circle, Diamond, Square, Trash, Triangle } from "lucide-react"
-import { Lightbulb } from "lucide-react"
 import { nl } from "date-fns/locale"
 import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
 
@@ -167,9 +165,6 @@ export function FertilizerApplicationsList({
             ) : (
                 <Empty className="col-span-full">
                     <EmptyHeader>
-                        <EmptyMedia>
-                            <Lightbulb className="size-6" />
-                        </EmptyMedia>
                         <EmptyTitle>
                             Je hebt nog geen bemesting ingevuld...
                         </EmptyTitle>
