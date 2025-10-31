@@ -117,8 +117,6 @@ export function FertilizerApplicationCard({
         }
     }, [savedFormValues, applicationToEdit, isDialogOpen])
 
-    const detailCards = constructCards(dose)
-
     function handleDialogOpenChange(state: boolean) {
         if (!state && params.b_id_farm && b_id_or_b_lu_catalogue) {
             fieldFertilizerFormStore.delete(
@@ -139,10 +137,6 @@ export function FertilizerApplicationCard({
             <CardHeader className="flex flex-col space-y-4 xl:flex-row xl:items-center xl:justify-between xl:space-y-0">
                 <CardTitle>
                     <p className="text-lg font-medium">Bemesting</p>
-                    <p className="text-sm font-medium text-muted-foreground">
-                        Voeg bemestingen toe, wijzig of verwijder ze en bekijk
-                        de totale gift per hectare voor verschillende nutriënten
-                    </p>
                 </CardTitle>
                 <Dialog
                     open={isDialogOpen}
@@ -186,6 +180,7 @@ export function FertilizerApplicationCard({
                     applicationMethodOptions={applicationMethodOptions}
                     fertilizers={fertilizers}
                     handleDelete={handleDelete}
+                    handleEdit={handleEdit}
                 />
             </CardContent>
         </Card>

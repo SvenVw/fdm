@@ -35,6 +35,7 @@ export function FertilizerApplicationsList({
     applicationMethodOptions,
     fertilizers,
     handleDelete,
+    handleEdit,
 }: {
     fertilizerApplications: FertilizerApplication[]
     applicationMethodOptions: {
@@ -43,6 +44,7 @@ export function FertilizerApplicationsList({
     }[]
     fertilizers: Fertilizer[]
     handleDelete: (p_app_id: string | string[]) => void
+    handleEdit: (fertilizerApplication: FertilizerApplication) => () => void
 }) {
     const fetcher = useFetcher()
 
@@ -61,9 +63,9 @@ export function FertilizerApplicationsList({
                         return (
                             <div key={application.p_app_id}>
                                 <ItemSeparator />
-                                <Item size="sm" variant="default">      
+                                <Item size="sm" variant="default">
                                     <ItemContent>
-                                        <ItemTitle className="flex flex-row flex-wrap items-center gap-x-1">
+                                        <ItemTitle className="flex flex-row flex-wrap items-center gap-x-2">
                                             <span>
                                                 {fertilizer.p_type ===
                                                 "manure" ? (
@@ -78,7 +80,19 @@ export function FertilizerApplicationsList({
                                                     <Diamond className="size-3 text-gray-600 fill-gray-600" />
                                                 )}
                                             </span>
-                                            <span>{application.p_name_nl}</span>
+                                            <Button
+                                                variant="link"
+                                                className="p-0 mt-0"
+                                                disabled={
+                                                    fetcher.state ===
+                                                    "submitting"
+                                                }
+                                                onClick={handleEdit(
+                                                    application,
+                                                )}
+                                            >
+                                                {application.p_name_nl}
+                                            </Button>
                                             <span className="text-muted-foreground">
                                                 {format(
                                                     application.p_app_date,

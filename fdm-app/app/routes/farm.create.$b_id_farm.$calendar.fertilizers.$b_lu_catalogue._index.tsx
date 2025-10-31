@@ -164,6 +164,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         b_id_farm: b_id_farm,
         fertilizerOptions: fertilizerOptions,
         fertilizerApplications: fertilizerApplications,
+        fertilizers: fertilizers,
         dose: dose.dose,
         applicationMethodOptions: applicationMethods.options,
     }
@@ -179,6 +180,7 @@ export default function Index() {
             <FertilizerApplicationCard
                 fertilizerApplications={loaderData.fertilizerApplications}
                 applicationMethodOptions={loaderData.applicationMethodOptions}
+                fertilizers={loaderData.fertilizers}
                 fertilizerOptions={loaderData.fertilizerOptions}
                 dose={loaderData.dose}
             />
