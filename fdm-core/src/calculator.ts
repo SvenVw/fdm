@@ -224,14 +224,23 @@ export function withCalculationCache<T_Input extends object, T_Output>(
             // If the initial cache read was successful (meaning the cache is healthy),
             // then attempt to store the new calculation result in the cache.
             if (cacheResultOfCalculation) {
-                await setCachedCalculation(
-                    fdm,
-                    calculationHash,
-                    calculationFunctionName,
-                    calculatorVersion,
-                    input,
-                    result,
-                )
+                try {
+                    await setCachedCalculation(
+                        fdm,
+                        calculationHash,
+                        calculationFunctionName,
+                        calculatorVersion,
+                        input,
+                        result,
+                    )
+                } catch (e: unknown) {
+                    const errorMessage =
+                        e instanceof Error ? e.message : String(e)
+                    console.error(
+                        `Failed to write to calculation cache for ${calculationFunctionName} (hash: ${calculationHash}): ${errorMessage}`,
+                    )
+                    // Continue execution - the calculation succeeded, only caching failed
+                }
                 // console.log(
                 //     `Calculation for ${calculationFunctionName} (hash: ${calculationHash}) completed and cached.`,
                 // )
