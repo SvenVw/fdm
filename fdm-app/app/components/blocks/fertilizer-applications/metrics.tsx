@@ -279,8 +279,7 @@ export function FertilizerApplicationMetricsCard({
                                                         }
                                                         colorBar={getNormsProgressColor(
                                                             resolvedNorms
-                                                                .filling.manure
-                                                                .normFilling,
+                                                                .filling.manure,                                                              
                                                             resolvedNorms.value
                                                                 .manure,
                                                         )}
