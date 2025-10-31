@@ -361,13 +361,54 @@ export function MijnPercelenUploadForm({
                                                         name,
                                                         onBlur,
                                                         onChange,
-                                                        disabled,
                                                         ref,
                                                     },
                                                 }) => (
                                                     <FormItem>
                                                         <div>Shapefile</div>
-                                                        <div className="relative">
+                                                        <Input
+                                                            name={name}
+                                                            onBlur={onBlur}
+                                                            onChange={async (
+                                                                event,
+                                                            ) => {
+                                                                await handleFileChange(
+                                                                    event,
+                                                                    onChange,
+                                                                )
+                                                            }}
+                                                            ref={ref}
+                                                            type="file"
+                                                            placeholder=""
+                                                            className="hidden"
+                                                            multiple
+                                                            required
+                                                            id="file-upload"
+                                                        />
+                                                        <label
+                                                            className="relative block"
+                                                            htmlFor="file-upload"
+                                                            aria-label="Upload shapefile files by clicking or dragging and dropping"
+                                                            onKeyDown={(e) => {
+                                                                if (
+                                                                    e.key ===
+                                                                        "Enter" ||
+                                                                    e.key ===
+                                                                        " "
+                                                                ) {
+                                                                    e.preventDefault()
+                                                                    document
+                                                                        .getElementById(
+                                                                            "file-upload",
+                                                                        )
+                                                                        ?.click()
+                                                                }
+                                                            }}
+                                                            onDragOver={
+                                                                handleDragOver
+                                                            }
+                                                            onDrop={handleDrop}
+                                                        >
                                                             {fileNames.length >
                                                                 0 && (
                                                                 <Button
@@ -403,58 +444,7 @@ export function MijnPercelenUploadForm({
                                                                         "border-green-500 bg-green-50",
                                                                 )}
                                                             >
-                                                                <Input
-                                                                    name={name}
-                                                                    onBlur={
-                                                                        onBlur
-                                                                    }
-                                                                    onChange={async (
-                                                                        event,
-                                                                    ) => {
-                                                                        await handleFileChange(
-                                                                            event,
-                                                                            onChange,
-                                                                        )
-                                                                    }}
-                                                                    ref={ref}
-                                                                    type="file"
-                                                                    placeholder=""
-                                                                    className="hidden"
-                                                                    multiple
-                                                                    required
-                                                                    disabled={
-                                                                        disabled
-                                                                    }
-                                                                    id="file-upload"
-                                                                />
-                                                                <label
-                                                                    htmlFor="file-upload"
-                                                                    className="flex flex-col items-center justify-center w-full h-full cursor-pointer"
-                                                                    aria-label="Upload shapefile files by clicking or dragging and dropping"
-                                                                    onKeyDown={(
-                                                                        e,
-                                                                    ) => {
-                                                                        if (
-                                                                            e.key ===
-                                                                                "Enter" ||
-                                                                            e.key ===
-                                                                                " "
-                                                                        ) {
-                                                                            e.preventDefault()
-                                                                            document
-                                                                                .getElementById(
-                                                                                    "file-upload",
-                                                                                )
-                                                                                ?.click()
-                                                                        }
-                                                                    }}
-                                                                    onDragOver={
-                                                                        handleDragOver
-                                                                    }
-                                                                    onDrop={
-                                                                        handleDrop
-                                                                    }
-                                                                >
+                                                                <div className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
                                                                     {uploadState ===
                                                                         "idle" && (
                                                                         <>
@@ -509,9 +499,9 @@ export function MijnPercelenUploadForm({
                                                                             </div>
                                                                         </>
                                                                     )}
-                                                                </label>
+                                                                </div>
                                                             </div>
-                                                        </div>
+                                                        </label>
                                                         <FormDescription />
                                                         <FormMessage />
                                                     </FormItem>
