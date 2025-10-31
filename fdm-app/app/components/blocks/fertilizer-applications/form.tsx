@@ -56,6 +56,7 @@ export function FertilizerApplicationForm({
 }) {
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
+    const formId = useId()
     const form = useRemixForm<FieldFertilizerFormValues>({
         mode: "onTouched",
         resolver: zodResolver(
@@ -156,7 +157,7 @@ export function FertilizerApplicationForm({
     return (
         <RemixFormProvider {...form}>
             <Form
-                id={useId()}
+                id={formId}
                 action={action}
                 onSubmit={form.handleSubmit}
                 method="post"
