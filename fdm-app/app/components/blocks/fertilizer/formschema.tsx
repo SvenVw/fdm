@@ -10,8 +10,9 @@ export const FormSchema = z
             .min(1, { message: "Geef een naam op voor deze meststof" }),
         p_name_en: z.string().optional(),
         p_description: z.string().optional(),
-        p_type: z.enum(["manure", "mineral", "compost"], {
-            required_error: "Kies het type meststof",
+        p_type_rvo: z.string({
+            required_error: "RVO mestcode is verplicht",
+            invalid_type_error: "Ongeldige waarde",
         }),
         p_dm: z.preprocess(
             (val) => (val === "" || val === null ? undefined : val),

@@ -1,4 +1,5 @@
 import type { ApplicationMethods } from "@svenvw/fdm-data"
+import type * as schema from "./db/schema"
 
 export interface Fertilizer {
     p_id: string
@@ -41,6 +42,7 @@ export interface Fertilizer {
     p_cl_rt: number | null
     p_ef_nh3: number | null
     p_type: FertilizerType | null
+    p_type_rvo: schema.fertilizersCatalogueTypeSelect["p_type_rvo"]
 }
 type FertilizerType = "manure" | "mineral" | "compost"
 
@@ -105,6 +107,7 @@ export type FertilizerParameters =
     | "p_cl_rt"
     | "p_ef_nh3"
     | "p_type"
+    | "p_type_rvo"
 
 export interface FertilizerParameterDescriptionItem {
     parameter: FertilizerParameters
@@ -121,7 +124,13 @@ export interface FertilizerParameterDescriptionItem {
         | "physical"
     min?: number
     max?: number
-    options?: { value: FertilizerType | ApplicationMethods; label: string }[]
+    options?: {
+        value:
+            | FertilizerType
+            | ApplicationMethods
+            | schema.fertilizersCatalogueTypeSelect["p_type_rvo"]
+        label: string
+    }[]
 }
 
 export type FertilizerParameterDescription =

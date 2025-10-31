@@ -4,7 +4,7 @@ export type {
     FieldInput,
     NitrogenBalanceInput,
     NitrogenBalanceNumeric,
-    NitrogenBalanceFieldNumeric, 
+    NitrogenBalanceFieldNumeric,
     NitrogenBalanceFieldResultNumeric,
     NitrogenEmissionAmmoniaFertilizersNumeric,
     NitrogenEmissionAmmoniaNumeric,
@@ -24,16 +24,22 @@ export {
     createFunctionsForFertilizerApplicationFilling,
     createFunctionsForNorms,
 } from "./norms"
-export type { AggregatedNormsToFarmLevel } from "./norms/farm"
+export type {
+    InputAggregateNormsToFarmLevel,
+    InputAggregateNormFillingsToFarmLevel,
+    AggregatedNormsToFarmLevel,
+    AggregatedNormFillingsToFarmLevel,
+} from "./norms/farm"
+export type { NormFilling } from "./norms/nl/2025/filling/types"
 export {
     isFieldInGWGBGebied,
     isFieldInNatura2000Gebied,
-} from "./norms/nl/2025/dierlijke-mest-gebruiksnorm"
+} from "./norms/nl/2025/value/dierlijke-mest-gebruiksnorm"
 export {
     getRegion,
     isFieldInNVGebied,
-} from "./norms/nl/2025/stikstofgebruiksnorm"
+} from "./norms/nl/2025/value/stikstofgebruiksnorm"
 export type {
     GebruiksnormResult,
     NL2025NormsInput,
-} from "./norms/nl/2025/types.d"
+} from "./norms/nl/2025/value/types"

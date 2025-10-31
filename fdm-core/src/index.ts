@@ -151,3 +151,19 @@ export type {
     SoilParameters,
 } from "./soil.d"
 export type { Timeframe } from "./timeframe.d"
+export {
+    addOrganicCertification,
+    isOrganicCertificationValid,
+    listOrganicCertifications,
+    getOrganicCertification,
+    removeOrganicCertification,
+    isValidSkalNumber,
+    isValidTracesNumber,
+} from "./organic"
+export type { OrganicCertification } from "./organic.d"
+export {
+    setGrazingIntention,
+    removeGrazingIntention,
+    getGrazingIntention,
+    getGrazingIntentions,
+} from "./grazing_intention"

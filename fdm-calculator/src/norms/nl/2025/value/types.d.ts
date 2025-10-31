@@ -15,6 +15,7 @@ export type NL2025NormsInput = {
     /** Farm-level properties, such as derogation status. */
     farm: {
         is_derogatie_bedrijf: boolean
+        has_grazing_intention: boolean
     }
     /** The field record from fdm-core, including its ID and centroid for location-based checks. */
     field: Pick<Field, "b_id" | "b_centroid">

@@ -135,7 +135,7 @@ function getFosfaatKlasse(
  * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond | RVO Fosfaat landbouwgrond (official page)}
  * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond/differentiatie | RVO Fosfaatdifferentiatie (official page, including tables for 2025)}
  */
-export async function getNL2025FosfaatGebruiksNorm(
+export async function calculateNL2025FosfaatGebruiksNorm(
     input: NL2025NormsInput,
 ): Promise<FosfaatGebruiksnormResult> {
     const cultivations = input.cultivations

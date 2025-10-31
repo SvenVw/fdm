@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest"
-import { getNL2025FosfaatGebruiksNorm } from "./fosfaatgebruiksnorm"
+import { calculateNL2025FosfaatGebruiksNorm } from "./fosfaatgebruiksnorm"
 import type { NL2025NormsInput, NL2025NormsInputForCultivation } from "./types"
 
-describe("getNL2025FosfaatGebruiksNorm", () => {
+describe("calculateNL2025FosfaatGebruiksNorm", () => {
     it("should return the correct norm for grasland", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: true},
             field: {
                 b_id: "1",
                 b_centroid: { type: "Point", coordinates: [5.0, 52.0] },
@@ -17,14 +17,14 @@ describe("getNL2025FosfaatGebruiksNorm", () => {
             ] as NL2025NormsInputForCultivation[],
             soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
         }
-        const result = await getNL2025FosfaatGebruiksNorm(mockInput)
+        const result = await calculateNL2025FosfaatGebruiksNorm(mockInput)
         expect(result.normValue).toBe(120)
         expect(result.normSource).toContain("Grasland")
     })
 
     it("should return the correct norm for bouwland", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: true},
             field: {
                 b_id: "1",
                 b_centroid: { type: "Point", coordinates: [5.0, 52.0] },
@@ -36,7 +36,7 @@ describe("getNL2025FosfaatGebruiksNorm", () => {
             ] as NL2025NormsInputForCultivation[],
             soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
         }
-        const result = await getNL2025FosfaatGebruiksNorm(mockInput)
+        const result = await calculateNL2025FosfaatGebruiksNorm(mockInput)
         expect(result.normValue).toBe(120)
         expect(result.normSource).toContain("Bouwland")
     })
