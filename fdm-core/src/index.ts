@@ -24,6 +24,12 @@ export {
 export type { FdmAuth } from "./authentication.d"
 export type { PrincipalId } from "./authorization.d"
 export {
+    getCachedCalculation,
+    setCachedCalculation,
+    setCalculationError,
+    withCalculationCache,
+} from "./calculator"
+export {
     disableCultivationCatalogue,
     disableFertilizerCatalogue,
     enableCultivationCatalogue,

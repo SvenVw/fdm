@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
-import { calculateNL2025FertilizerApplicationFillingForPhosphate } from "./fosfaatgebruiksnorm"
+import { calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm } from "./fosfaatgebruiksnorm"
 import type { NL2025NormsFillingInput } from "./types"
 
 // Mock data for fertilizers
@@ -77,7 +77,7 @@ const mockFertilizers: Fertilizer[] = [
     },
 ]
 
-describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
+describe("calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm", () => {
     // Helper to create a FertilizerApplication
     const createApplication = (
         fertilizerId: string,
@@ -100,7 +100,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
                 createApplication("f2", 53333.33, "app2"), // Strorijke vaste mest: 40kg P (53333.33 kg fertilizer * 0.75 P_RT / 1000)
             ]
             const fosfaatgebruiksnorm = 60
-            const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+            const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
                 applications,
                 fertilizers: mockFertilizers,
                 has_organic_certification: false,
@@ -123,7 +123,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
                 createApplication("f3", 9000, "app2"), // Groencompost: 90kg P (9000 kg fertilizer * 10 P_RT / 1000)
             ]
             const fosfaatgebruiksnorm = 120
-            const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+            const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
                 applications,
                 fertilizers: mockFertilizers,
                 has_organic_certification: false,
@@ -152,7 +152,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
                 createApplication("f3", 9000, "app2"), // Groencompost: 90kg P
             ]
             const fosfaatgebruiksnorm = 120
-            const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+            const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
                 applications,
                 fertilizers: mockFertilizers,
                 has_organic_certification: false,
@@ -176,7 +176,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
                 createApplication("f3", 10500, "app2"), // Groencompost: 105kg P
             ]
             const fosfaatgebruiksnorm = 105
-            const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+            const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
                 applications,
                 fertilizers: mockFertilizers,
                 has_organic_certification: false,
@@ -200,7 +200,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
                 createApplication("f6", 17733.33, "app3"), // Strorijke mest paarden: 13.3kg P
             ]
             const fosfaatgebruiksnorm = 60
-            const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+            const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
                 applications,
                 fertilizers: mockFertilizers,
                 has_organic_certification: false,
@@ -224,7 +224,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
                 createApplication("f4", 40000, "app2"), // Drijfmest: 40kg P
             ]
             const fosfaatgebruiksnorm = 120
-        const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+        const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
                 applications,
                 fertilizers: mockFertilizers,
                 has_organic_certification: false,
@@ -244,7 +244,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
     // Additional Test Cases for coverage
 
     it("should return 0 for no applications", () => {
-        const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+        const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
             applications: [],
             fertilizers: mockFertilizers,
             has_organic_certification: false,
@@ -263,7 +263,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
             createApplication("f4", 20000, "app2"), // Drijfmest: 20 * 1.0 = 20kg P
         ]
         const fosfaatgebruiksnorm = 100
-        const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+        const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
             applications,
             fertilizers: mockFertilizers,
             has_organic_certification: false,
@@ -281,7 +281,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
             createApplication("f3", 1000, "app1"), // Groencompost: 10kg P (below 20kg threshold)
         ]
         const fosfaatgebruiksnorm = 100
-        const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+        const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
             applications,
             fertilizers: mockFertilizers,
             has_organic_certification: false,
@@ -301,7 +301,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
             createApplication("f7", 40000, "app1"), // Vaste mest varkens (biologisch): 30kg P (75% discounted)
         ]
         const fosfaatgebruiksnorm = 100
-        const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+        const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
             applications,
             fertilizers: mockFertilizers,
             has_organic_certification: true,
@@ -321,7 +321,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
             createApplication("f7", 40000, "app1"), // Vaste mest varkens (biologisch): 30kg P (100% counted)
         ]
         const fosfaatgebruiksnorm = 100
-        const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+        const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
             applications,
             fertilizers: mockFertilizers,
             has_organic_certification: false,
@@ -339,7 +339,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
             createApplication("f10", 10000, "app1"), // Fertilizer with p_p_rt in table11Mestcodes (3.1)
         ]
         const fosfaatgebruiksnorm = 100
-        const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+        const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
             applications,
             fertilizers: mockFertilizers,
             has_organic_certification: false,
@@ -356,7 +356,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
             createApplication("f9", 10000, "app1"), // Fertilizer with no p_p_rt
         ]
         const fosfaatgebruiksnorm = 100
-        const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+        const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
             applications,
             fertilizers: mockFertilizers,
             has_organic_certification: false,
@@ -374,7 +374,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
             createApplication("f3", 20000, "app2"), // Groencompost: 200 * 0.25 = 50kg P (25% discounted)
         ]
         const fosfaatgebruiksnorm = 30 // Small norm
-        const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+        const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
             applications,
             fertilizers: mockFertilizers,
             has_organic_certification: false,
@@ -408,7 +408,7 @@ describe("calculateNL2025FertilizerApplicationFillingForPhosphate", () => {
             createApplication("f2", 20000, "app3"), // Strorijke vaste mest: 20kg actual P (75% discounted)
         ]
         const fosfaatgebruiksnorm = 30
-        const result = calculateNL2025FertilizerApplicationFillingForPhosphate({
+        const result = calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm({
             applications,
             fertilizers: mockFertilizers,
             has_organic_certification: false,

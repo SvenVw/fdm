@@ -1,4 +1,4 @@
-import type { fdmSchema } from "@svenvw/fdm-core"
+import { type fdmSchema, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import {
     calculateBulkDensity,
@@ -6,6 +6,7 @@ import {
     calculateOrganicCarbon,
     calculateOrganicMatter,
 } from "../../conversions/soil"
+import pkg from "../../package"
 import { getFdmPublicDataUrl } from "../../shared/public-data-url"
 import { calculateNitrogenEmission } from "./emission"
 import { calculateNitrogenRemoval } from "./removal"
@@ -18,8 +19,8 @@ import type {
     FieldInput,
     NitrogenBalance,
     NitrogenBalanceField,
-    NitrogenBalanceFieldResult,
     NitrogenBalanceFieldNumeric,
+    NitrogenBalanceFieldResult,
     NitrogenBalanceInput,
     NitrogenBalanceNumeric,
     SoilAnalysisPicked,
@@ -117,6 +118,23 @@ export async function calculateNitrogenBalance(
     // Convert the final result to use numbers instead of Decimals
     return convertNitrogenBalanceToNumeric(farmWithBalanceDecimal)
 }
+
+/**
+ * A cached version of the `calculateNitrogenBalance` function.
+ *
+ * This function provides the same functionality as `calculateNitrogenBalance` but
+ * includes a caching mechanism to improve performance for repeated calls with the
+ * same input. The cache is managed by `withCalculationCache` and uses the
+ * `pkg.calculatorVersion` as part of its cache key.
+ *
+ * @param nitrogenBalanceInput - The input data for the nitrogen balance calculation.
+ * @returns A promise that resolves with the calculated nitrogen balance, with numeric values as numbers.
+ */
+export const getNitrogenBalance = withCalculationCache(
+    calculateNitrogenBalance,
+    "calculateNitrogenBalance",
+    pkg.calculatorVersion,
+)
 
 /**
  * Calculates the nitrogen balance for a single field, considering nitrogen supply, removal, and emission.

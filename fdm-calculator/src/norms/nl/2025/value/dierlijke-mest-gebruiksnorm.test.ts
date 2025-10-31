@@ -8,7 +8,22 @@ import type { NL2025NormsInput } from "./types"
 describe("calculateNL2025DierlijkeMestGebruiksNorm", () => {
     it("should return the default norm value", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: true, has_grazing_intention: false },
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.641351453912945, 51.97755938887036],
+            },
+            cultivations: [],
+            soilAnalysis: { a_p_cc: 0, a_p_al: 0 },
+        }
+        const result = await calculateNL2025DierlijkeMestGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(170)
+        expect(result.normSource).toBe("Standaard - geen derogatie")
+    })
+
+    it("should return the default norm value with derogation", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: true, has_grazing_intention: false},
             field: {
                 b_id: "1",
                 b_centroid: [5.641351453912945, 51.97755938887036],

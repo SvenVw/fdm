@@ -1,4 +1,4 @@
-import type { Cultivation } from "@svenvw/fdm-core"
+import { withCalculationCache, type Cultivation } from "@svenvw/fdm-core"
 import type {
     NormFilling,
     WorkingCoefficientDetails,
@@ -9,6 +9,7 @@ import { table9 } from "./table-9"
 import { getRegion } from "../value/stikstofgebruiksnorm"
 import type { RegionKey } from "../value/types"
 import Decimal from "decimal.js"
+import pkg from "../../../../package"
 
 /**
  * Calculates the nitrogen utilization norm filling for a set of fertilizer applications.
@@ -19,7 +20,7 @@ import Decimal from "decimal.js"
  * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
  * @returns {Promise<NormFilling>} An object containing the total norm filling and details for each application.
  */
-export async function calculateNL2025FertilizerApplicationFillingForNitrogen(
+export async function calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm(
     input: NL2025NormsFillingInput,
 ): Promise<NormFilling> {
     const {
@@ -241,3 +242,19 @@ export function getWorkingCoefficient(
 
     return defaultDetails // If no specific rule is found, return the default 100% (1.0)
 }
+
+/**
+ * Memoized version of {@link calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm}.
+ *
+ * This function is wrapped with `withCalculationCache` to optimize performance by caching
+ * results based on the input and the current calculator version.
+ *
+ * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
+ * @returns {Promise<NormFilling>} An object containing the total norm filling and details for each application.
+ */
+export const getNL2025FertilizerApplicationFillingForStikstofGebruiksNorm =
+    withCalculationCache(
+        calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm,
+        "calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm",
+        pkg.calculatorVersion,
+    )

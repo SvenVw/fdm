@@ -7,6 +7,7 @@ export default defineConfig({
         "./src/db/schema.ts",
         "./src/db/schema-authn.ts",
         "./src/db/schema-authz.ts",
+        "./src/db/schema-calculator.ts",
     ],
     out: "./src/db/migrations",
     migrations: {
