@@ -225,7 +225,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!p_app_id || typeof p_app_id !== "string") {
                 return dataWithError(
                     "Invalid or missing p_app_id value",
-                    "Helaas, er is wat misggegaan. Probeer het later opnieuw of neem contact op met ondersteuning.",
+                    "Helaas, er is wat misgegaan. Probeer het later opnieuw of neem contact op met ondersteuning.",
                 )
             }
 
@@ -251,7 +251,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!p_app_id || typeof p_app_id !== "string") {
                 return dataWithError(
                     "Invalid or missing p_app_id value",
-                    "Oops! Something went wrong. Please try again later.",
+                    "Helaas, er is wat misgegaan. Probeer het later opnieuw of neem contact op met ondersteuning.",
                 )
             }
 
