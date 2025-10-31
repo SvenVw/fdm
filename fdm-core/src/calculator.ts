@@ -258,16 +258,27 @@ export function withCalculationCache<T_Input extends object, T_Output>(
             const errorMessage = e instanceof Error ? e.message : String(e)
             const stackTrace = e instanceof Error ? e.stack : undefined
 
-            await setCalculationError(
-                fdm,
-                calculationFunctionName,
-                calculatorVersion,
-                input,
-                errorMessage,
-                stackTrace,
-            )
+            try {
+                await setCalculationError(
+                    fdm,
+                    calculationFunctionName,
+                    calculatorVersion,
+                    input,
+                    errorMessage,
+                    stackTrace,
+                )
+            } catch (loggingError: unknown) {
+                const loggingErrorMessage =
+                    loggingError instanceof Error
+                        ? loggingError.message
+                        : String(loggingError)
+                console.error(
+                    `Failed to log calculation error for ${calculationFunctionName}: ${loggingErrorMessage}`,
+                )
+                // Continue to re-throw the original calculation error
+            }
 
-            throw e
-        }
-    }
-}
+           throw e
+       }
+   }
+
