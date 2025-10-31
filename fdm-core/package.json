@@ -71,6 +71,7 @@
         "drizzle-orm": "catalog:",
         "nanoid": "^5.1.6",
         "postgres": "^3.4.7",
+        "safe-stable-stringify": "^2.5.0",
         "unique-username-generator": "^1.5.1"
     },
     "packageManager": "pnpm@10.18.3",

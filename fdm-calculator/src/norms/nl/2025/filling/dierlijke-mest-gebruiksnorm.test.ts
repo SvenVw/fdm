@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest"
 import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
-import { calculateNL2025FertilizerApplicationFillingForManure } from "./dierlijke-mest-gebruiksnorm"
+import { calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm } from "./dierlijke-mest-gebruiksnorm"
 import type { NL2025NormsFillingInput } from "./types"
 
-describe("calculateNL2025FertilizerApplicationFillingForManure", () => {
+describe("calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm", () => {
 	const mockFertilizers: Fertilizer[] = [
 		{
 			p_id_catalogue: "1",
@@ -42,7 +42,7 @@ describe("calculateNL2025FertilizerApplicationFillingForManure", () => {
 	]
 
 	it("should calculate the norm filling for a single application", () => {
-        const result = calculateNL2025FertilizerApplicationFillingForManure({
+        const result = calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm({
 			applications: [mockApplications[0]],
 			fertilizers: mockFertilizers,
             cultivations: [],
@@ -62,7 +62,7 @@ describe("calculateNL2025FertilizerApplicationFillingForManure", () => {
 	})
 
 	it("should calculate the norm filling for multiple applications", () => {
-		const result = calculateNL2025FertilizerApplicationFillingForManure({
+		const result = calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm({
 			applications: mockApplications,
 			fertilizers: mockFertilizers,
             cultivations: [],
@@ -86,7 +86,7 @@ describe("calculateNL2025FertilizerApplicationFillingForManure", () => {
 	})
 
 	it("should return zero filling for fertilizers not relevant to the nitrates directive", () => {
-		const result = calculateNL2025FertilizerApplicationFillingForManure({
+		const result = calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm({
 			applications: [
 				{
 					p_app_id: "app3",
@@ -113,7 +113,7 @@ describe("calculateNL2025FertilizerApplicationFillingForManure", () => {
 
 	it("should throw an error if a fertilizer is not found", () => {
 		expect(() =>
-			calculateNL2025FertilizerApplicationFillingForManure({
+			calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm({
 				applications: [
 					{
 						p_app_id: "app4",
@@ -133,7 +133,7 @@ describe("calculateNL2025FertilizerApplicationFillingForManure", () => {
 
 	it("should throw an error if a fertilizer has no p_type_rvo", () => {
 		expect(() =>
-			calculateNL2025FertilizerApplicationFillingForManure({
+			calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm({
 				applications: [
 					{
 						p_app_id: "app5",
@@ -153,7 +153,7 @@ describe("calculateNL2025FertilizerApplicationFillingForManure", () => {
 
 	it("should throw an error if a fertilizer has an unknown p_type_rvo", () => {
 		expect(() =>
-			calculateNL2025FertilizerApplicationFillingForManure({
+			calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm({
 				applications: [
 					{
 						p_app_id: "app6",
@@ -172,7 +172,7 @@ describe("calculateNL2025FertilizerApplicationFillingForManure", () => {
 	})
 
 	it("should return zero filling when no applications are provided", () => {
-		const result = calculateNL2025FertilizerApplicationFillingForManure({
+		const result = calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm({
 			applications: [],
 			fertilizers: mockFertilizers,
             cultivations: [],

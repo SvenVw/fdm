@@ -1,4 +1,9 @@
-export { calculateNitrogenBalance } from "./balance/nitrogen/index"
+import pkg from "./package"
+export const fdmCalculator = pkg
+export {
+    calculateNitrogenBalance,
+    getNitrogenBalance,
+} from "./balance/nitrogen/index"
 export { collectInputForNitrogenBalance } from "./balance/nitrogen/input"
 export type {
     FieldInput,
@@ -43,3 +48,12 @@ export type {
     GebruiksnormResult,
     NL2025NormsInput,
 } from "./norms/nl/2025/value/types"
+export {
+    getNutrientAdvice,
+    requestNutrientAdvice,
+} from "./nutrient-advice"
+export type {
+    NutrientAdvice,
+    NutrientAdviceInputs,
+    NutrientAdviceResponse,
+} from "./nutrient-advice/types"

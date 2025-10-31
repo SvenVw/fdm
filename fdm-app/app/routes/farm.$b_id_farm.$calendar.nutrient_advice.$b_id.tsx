@@ -1,4 +1,4 @@
-import { calculateDose } from "@svenvw/fdm-calculator"
+import { calculateDose, getNutrientAdvice } from "@svenvw/fdm-calculator"
 import {
     getCultivations,
     getCurrentSoilData,
@@ -22,12 +22,13 @@ import {
 import { FieldNutrientAdviceSkeleton } from "~/components/blocks/nutrient-advice/skeletons"
 import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
 import { ErrorBlock } from "~/components/custom/error"
-import { getNutrientAdvice } from "~/integrations/nmi"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { serverConfig } from "../lib/config.server"
+import { getNmiApiKey } from "../integrations/nmi"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -126,11 +127,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 })
 
                 // Request nutrient advice
-                const nutrientAdvice = await getNutrientAdvice(
+                const nmiApiKey = getNmiApiKey()
+                const nutrientAdvice = await getNutrientAdvice(fdm, {
                     b_lu_catalogue,
-                    field.b_centroid,
-                    resolvedCurrentSoilData,
-                )
+                    b_centroid: field.b_centroid,
+                    currentSoilData: resolvedCurrentSoilData,
+                    nmiApiKey: nmiApiKey,
+                })
 
                 return {
                     nutrientAdvice: nutrientAdvice,

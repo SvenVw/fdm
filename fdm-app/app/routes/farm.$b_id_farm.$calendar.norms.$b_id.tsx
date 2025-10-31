@@ -194,9 +194,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
                 const [normManure, normPhosphate, normNitrogen] =
                     await Promise.all([
-                        functionsForNorms.calculateNormForManure(input),
-                        functionsForNorms.calculateNormForPhosphate(input),
-                        functionsForNorms.calculateNormForNitrogen(input),
+                        functionsForNorms.calculateNormForManure(fdm, input),
+                        functionsForNorms.calculateNormForPhosphate(fdm, input),
+                        functionsForNorms.calculateNormForNitrogen(fdm, input),
                     ])
 
                 const fillingInput =
@@ -210,12 +210,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 const [fillingManure, fillingPhosphate, fillingNitrogen] =
                     await Promise.all([
                         functionsForFilling.calculateFertilizerApplicationFillingForManure(
+                            fdm,
                             fillingInput,
                         ),
                         functionsForFilling.calculateFertilizerApplicationFillingForPhosphate(
+                            fdm,
                             fillingInput,
                         ),
                         functionsForFilling.calculateFertilizerApplicationFillingForNitrogen(
+                            fdm,
                             fillingInput,
                         ),
                     ])

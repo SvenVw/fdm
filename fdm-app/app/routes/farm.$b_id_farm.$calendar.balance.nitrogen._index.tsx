@@ -1,6 +1,6 @@
 import {
-    calculateNitrogenBalance,
     collectInputForNitrogenBalance,
+    getNitrogenBalance,
     type NitrogenBalanceFieldResultNumeric,
 } from "@svenvw/fdm-calculator"
 import { getFarm, getFields } from "@svenvw/fdm-core"
@@ -94,8 +94,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 timeframe,
             )
 
-            const nitrogenBalanceResult =
-                await calculateNitrogenBalance(nitrogenBalanceInput)
+            const nitrogenBalanceResult = await getNitrogenBalance(
+                fdm,
+                nitrogenBalanceInput,
+            )
 
             if (nitrogenBalanceResult.hasErrors) {
                 reportError(

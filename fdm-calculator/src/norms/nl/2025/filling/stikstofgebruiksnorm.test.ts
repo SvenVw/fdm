@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import {
-    calculateNL2025FertilizerApplicationFillingForNitrogen,
+    calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm,
     isBouwland,
     getWorkingCoefficient,
 } from "./stikstofgebruiksnorm"
@@ -497,7 +497,8 @@ describe("getWorkingCoefficient", () => {
     })
 })
 
-describe("calculateNL2025FertilizerApplicationFillingForNitrogen", () => {
+
+describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", () => {
     afterEach(() => {
         vi.clearAllMocks()
     })
@@ -523,16 +524,15 @@ describe("calculateNL2025FertilizerApplicationFillingForNitrogen", () => {
         const has_grazing_intention = false
         const cultivations: Cultivation[] = []
 
-        const result =
-            await calculateNL2025FertilizerApplicationFillingForNitrogen({
-                applications,
-                fertilizers,
-                b_centroid,
-                has_grazing_intention,
-                cultivations,
-                has_organic_certification: false, // Default value for tests
-                fosfaatgebruiksnorm: 0, // Default value for tests
-            } as NL2025NormsFillingInput)
+        const result = await calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm({
+            applications,
+            fertilizers,
+            b_centroid,
+            has_grazing_intention,
+            cultivations,
+            has_organic_certification: false, // Default value for tests
+            fosfaatgebruiksnorm: 0, // Default value for tests
+        } as NL2025NormsFillingInput)
 
         // Expected: 1000 kg * 5 kg/ton * 1.0 (100%) / 1000 = 5
         expect(result.normFilling).toBeCloseTo(5)
@@ -575,16 +575,15 @@ describe("calculateNL2025FertilizerApplicationFillingForNitrogen", () => {
         const has_grazing_intention = false
         const cultivations: Cultivation[] = []
 
-        const result =
-            await calculateNL2025FertilizerApplicationFillingForNitrogen({
-                applications,
-                fertilizers,
-                b_centroid,
-                has_grazing_intention,
-                cultivations,
-                has_organic_certification: false, // Default value for tests
-                fosfaatgebruiksnorm: 0, // Default value for tests
-            } as NL2025NormsFillingInput)
+        const result = await calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm({
+            applications,
+            fertilizers,
+            b_centroid,
+            has_grazing_intention,
+            cultivations,
+            has_organic_certification: false, // Default value for tests
+            fosfaatgebruiksnorm: 0, // Default value for tests
+        } as NL2025NormsFillingInput)
 
         // App1: 1000 * 5 * 1.0 / 1000 = 5
         // App2: 500 * 10 * 0.1 / 1000 = 0.5
@@ -621,16 +620,15 @@ describe("calculateNL2025FertilizerApplicationFillingForNitrogen", () => {
         const has_grazing_intention = true // Drijfmest graasdieren, met beweiding -> 0.45
         const cultivations: Cultivation[] = []
 
-        const result =
-            await calculateNL2025FertilizerApplicationFillingForNitrogen({
-                applications,
-                fertilizers,
-                b_centroid,
-                has_grazing_intention,
-                cultivations,
-                has_organic_certification: false, // Default value for tests
-                fosfaatgebruiksnorm: 0, // Default value for tests
-            } as NL2025NormsFillingInput)
+        const result = await calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm({
+            applications,
+            fertilizers,
+            b_centroid,
+            has_grazing_intention,
+            cultivations,
+            has_organic_certification: false, // Default value for tests
+            fosfaatgebruiksnorm: 0, // Default value for tests
+        } as NL2025NormsFillingInput)
 
         // Expected: 1000 * 4.0 (from Table 11) * 0.45 (from Table 9) / 1000 = 1.8
         expect(result.normFilling).toBeCloseTo(1.8)
@@ -656,7 +654,7 @@ describe("calculateNL2025FertilizerApplicationFillingForNitrogen", () => {
         const cultivations: Cultivation[] = []
 
         await expect(
-            calculateNL2025FertilizerApplicationFillingForNitrogen({
+            calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm({
                 applications,
                 fertilizers,
                 b_centroid,
@@ -693,7 +691,7 @@ describe("calculateNL2025FertilizerApplicationFillingForNitrogen", () => {
         const cultivations: Cultivation[] = []
 
         const result =
-            await calculateNL2025FertilizerApplicationFillingForNitrogen({
+            await calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm({
                 applications,
                 fertilizers,
                 b_centroid,
@@ -742,16 +740,15 @@ describe("calculateNL2025FertilizerApplicationFillingForNitrogen", () => {
             },
         ]
 
-        const result =
-            await calculateNL2025FertilizerApplicationFillingForNitrogen({
-                applications,
-                fertilizers,
-                b_centroid,
-                has_grazing_intention,
-                cultivations,
-                has_organic_certification: false, // Default value for tests
-                fosfaatgebruiksnorm: 0, // Default value for tests
-            } as NL2025NormsFillingInput)
+        const result = await calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm({
+            applications,
+            fertilizers,
+            b_centroid,
+            has_grazing_intention,
+            cultivations,
+            has_organic_certification: false, // Default value for tests
+            fosfaatgebruiksnorm: 0, // Default value for tests
+        } as NL2025NormsFillingInput)
 
         // For p_type_rvo "10" (Vaste mest rundvee), onFarmProduced: true in table9.
         // Since has_grazing_intention is false, onFarmProduced will be false in the main function.
