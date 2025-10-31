@@ -1,5 +1,5 @@
 {
-  "id": "f36bf366-029a-4851-b0e3-807fe445812c",
+  "id": "a869127f-3bc4-48ac-aeaa-90e78bd04932",
   "prevId": "f52147c0-1fd4-4bde-9190-be18a24ccaf5",
   "version": "7",
   "dialect": "postgresql",
@@ -3241,13 +3241,13 @@
           "name": "input",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "result": {
           "name": "result",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",

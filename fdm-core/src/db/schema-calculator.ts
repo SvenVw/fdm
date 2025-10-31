@@ -7,8 +7,8 @@ export const calculationCache = fdmCalculatorSchema.table("calculation_cache", {
     calculation_hash: text().notNull().primaryKey(),
     calculation_function: text().notNull(),
     calculator_version: text(),
-    input: jsonb(),
-    result: jsonb(),
+    input: jsonb().notNull(),
+    result: jsonb().notNull(),
     created_at: timestamp({ withTimezone: true }).notNull().defaultNow(),
 })
 
