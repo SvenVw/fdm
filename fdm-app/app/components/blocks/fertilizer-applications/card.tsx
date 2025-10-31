@@ -40,6 +40,8 @@ export function FertilizerApplicationCard({
     const params = useParams()
     const navigation = useNavigation()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [editedFertilizerApplication, setEditedFertilizerApplication] =
+        useState<FertilizerApplication>()
     const previousNavigationState = useRef(navigation.state)
 
     const b_id_or_b_lu_catalogue = params.b_lu_catalogue || params.b_id
@@ -50,12 +52,18 @@ export function FertilizerApplicationCard({
         fetcher.submit({ p_app_id }, { method: "DELETE" })
     }
 
+    const handleEdit = (fertilizerApplication: FertilizerApplication) => () => {
+        setEditedFertilizerApplication(fertilizerApplication)
+        setIsDialogOpen(true)
+    }
+
     useEffect(() => {
         const wasNotIdle = previousNavigationState.current !== "idle"
         const isIdle = navigation.state === "idle"
 
         if (wasNotIdle && isIdle) {
             setIsDialogOpen(false)
+            setEditedFertilizerApplication(undefined)
         }
 
         previousNavigationState.current = navigation.state
@@ -63,14 +71,53 @@ export function FertilizerApplicationCard({
 
     const fieldFertilizerFormStore = useFieldFertilizerFormStore()
     const savedFormValues =
-        params.b_id_farm &&
-        b_id_or_b_lu_catalogue &&
-        fieldFertilizerFormStore.load(params.b_id_farm, b_id_or_b_lu_catalogue)
+        params.b_id_farm && b_id_or_b_lu_catalogue
+            ? fieldFertilizerFormStore.load(
+                  params.b_id_farm,
+                  b_id_or_b_lu_catalogue,
+              )
+            : null
+
+    // See if the saved form was for updating an existing application.
+    // If so, verify that the user can still edit the application and update the state.
+    const applicationToEdit = savedFormValues?.p_app_id
+        ? fertilizerApplications.find(
+              (app) => app.p_app_id === savedFormValues.p_app_id,
+          )
+        : null
     useEffect(() => {
-        if (!isDialogOpen && savedFormValues) {
-            setIsDialogOpen(true)
+        if (applicationToEdit && !editedFertilizerApplication) {
+            setEditedFertilizerApplication(applicationToEdit)
         }
-    }, [isDialogOpen, savedFormValues])
+        if (savedFormValues?.p_app_id && !applicationToEdit) {
+            fieldFertilizerFormStore.delete(
+                params.b_id_farm || "",
+                b_id_or_b_lu_catalogue || "",
+            )
+        }
+    }, [
+        applicationToEdit,
+        params.b_id_farm,
+        b_id_or_b_lu_catalogue,
+        savedFormValues,
+        editedFertilizerApplication,
+        fieldFertilizerFormStore.delete,
+    ])
+
+    useEffect(() => {
+        if (savedFormValues && !isDialogOpen) {
+            if (savedFormValues.p_app_id) {
+                // Do not open the form if there is a risk it will create a new application
+                if (applicationToEdit) {
+                    setIsDialogOpen(true)
+                }
+            } else {
+                setIsDialogOpen(true)
+            }
+        }
+    }, [savedFormValues, applicationToEdit, isDialogOpen])
+
+    const detailCards = constructCards(dose)
 
     function handleDialogOpenChange(state: boolean) {
         if (!state && params.b_id_farm && b_id_or_b_lu_catalogue) {
@@ -78,6 +125,10 @@ export function FertilizerApplicationCard({
                 params.b_id_farm,
                 b_id_or_b_lu_catalogue,
             )
+        }
+
+        if (!state) {
+            setEditedFertilizerApplication(undefined)
         }
 
         setIsDialogOpen(state)
@@ -88,10 +139,10 @@ export function FertilizerApplicationCard({
             <CardHeader className="flex flex-col space-y-4 xl:flex-row xl:items-center xl:justify-between xl:space-y-0">
                 <CardTitle>
                     <p className="text-lg font-medium">Bemesting</p>
-                    {/* <p className="text-sm text-muted-foreground">
-                        Voeg bemestingen toe, verwijder ze en bekijk de totale
-                        gift per hectare voor verschillende nutriënten
-                    </p> */}
+                    <p className="text-sm font-medium text-muted-foreground">
+                        Voeg bemestingen toe, wijzig of verwijder ze en bekijk
+                        de totale gift per hectare voor verschillende nutriënten
+                    </p>
                 </CardTitle>
                 <Dialog
                     open={isDialogOpen}
@@ -106,11 +157,14 @@ export function FertilizerApplicationCard({
                     <DialogContent className="sm:max-w-[800px]">
                         <DialogHeader>
                             <DialogTitle className="flex flex-row items-center justify-between mr-4">
-                                Bemesting toevoegen
+                                {editedFertilizerApplication
+                                    ? "Bemesting wijzigen"
+                                    : "Bemesting toevoegen"}
                             </DialogTitle>
                             <DialogDescription>
-                                Voeg een nieuwe bemestingstoepassing toe aan het
-                                perceel.
+                                {editedFertilizerApplication
+                                    ? "Wijzig een bemestingtoepassing aan het percel."
+                                    : "Voeg een nieuwe bemestingstoepassing toe aan het perceel."}
                             </DialogDescription>
                         </DialogHeader>
                         <FertilizerApplicationForm
@@ -121,6 +175,7 @@ export function FertilizerApplicationCard({
                             b_id_or_b_lu_catalogue={
                                 b_id_or_b_lu_catalogue || ""
                             }
+                            fertilizerApplication={editedFertilizerApplication}
                         />
                     </DialogContent>
                 </Dialog>

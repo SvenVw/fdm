@@ -23,3 +23,15 @@ export const FormSchema = z.object({
         invalid_type_error: "Meststof is ongeldig",
     }),
 })
+
+export const FormSchemaModify = FormSchema.extend({
+    p_app_id: z.string({
+        // TODO: Validate against the options that are available
+        required_error: "Bemesting id is verplicht",
+        invalid_type_error: "Bemesting id is ongeldig",
+    }),
+})
+
+export type FieldFertilizerFormValues = z.infer<typeof FormSchema> & {
+    p_app_id?: string | undefined
+}

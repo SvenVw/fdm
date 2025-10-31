@@ -1,11 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import type { FertilizerApplication } from "@svenvw/fdm-core"
 import { Plus } from "lucide-react"
 import type { MouseEvent } from "react"
-import { useEffect } from "react"
+import { useEffect, useId } from "react"
 import type { Navigation } from "react-router"
 import { Form, useNavigate, useSearchParams } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import type { z } from "zod"
 import { useFieldFertilizerFormStore } from "@/app/store/field-fertilizer-form"
 import { Combobox } from "~/components/custom/combobox"
 import { DatePicker } from "~/components/custom/date-picker"
@@ -32,7 +32,11 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
-import { FormSchema } from "./formschema"
+import {
+    type FieldFertilizerFormValues,
+    FormSchema,
+    FormSchemaModify,
+} from "./formschema"
 import type { FertilizerOption } from "./types.d"
 
 export function FertilizerApplicationForm({
@@ -41,24 +45,34 @@ export function FertilizerApplicationForm({
     navigation,
     b_id_farm,
     b_id_or_b_lu_catalogue,
+    fertilizerApplication,
 }: {
     options: FertilizerOption[]
     action: string
     navigation: Navigation
     b_id_farm: string
     b_id_or_b_lu_catalogue: string
+    fertilizerApplication: FertilizerApplication
 }) {
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
-
-    const form = useRemixForm<z.infer<typeof FormSchema>>({
+    const formId = useId()
+    const form = useRemixForm<FieldFertilizerFormValues>({
         mode: "onTouched",
-        resolver: zodResolver(FormSchema),
+        resolver: zodResolver(
+            fertilizerApplication ? FormSchemaModify : FormSchema,
+        ),
         defaultValues: {
-            p_id: undefined,
-            p_app_method: undefined,
-            p_app_amount: undefined,
-            p_app_date: new Date(),
+            p_app_id: fertilizerApplication?.p_app_ids
+                ? fertilizerApplication.p_app_ids.join(",")
+                : fertilizerApplication?.p_app_id,
+            p_id: fertilizerApplication?.p_id,
+            p_app_method: fertilizerApplication?.p_app_method,
+            p_app_amount: undefined, // Handled through an effect due to blank behavior
+            p_app_date: fertilizerApplication?.p_app_date ?? new Date(),
+        },
+        submitConfig: {
+            method: fertilizerApplication ? "PUT" : "POST",
         },
     })
     const p_id = form.watch("p_id")
@@ -66,10 +80,13 @@ export function FertilizerApplicationForm({
     const isSubmitting = navigation.state === "submitting"
 
     useEffect(() => {
-        if (p_id) {
+        if (
+            p_id &&
+            (!fertilizerApplication || fertilizerApplication.p_id !== p_id)
+        ) {
             form.setValue("p_app_method", "")
         }
-    }, [p_id, form.setValue])
+    }, [p_id, fertilizerApplication, form.setValue])
 
     const fieldFertilizerFormStore = useFieldFertilizerFormStore()
 
@@ -96,6 +113,12 @@ export function FertilizerApplicationForm({
         form.setValue,
         fieldFertilizerFormStore.load,
     ])
+
+    useEffect(() => {
+        if (fertilizerApplication) {
+            form.setValue("p_app_amount", fertilizerApplication.p_app_amount)
+        }
+    }, [fertilizerApplication, form.setValue])
 
     // Change fertilizer selection if the user has added a new fertilizer
     const new_p_id = searchParams.get("p_id")
@@ -134,7 +157,7 @@ export function FertilizerApplicationForm({
     return (
         <RemixFormProvider {...form}>
             <Form
-                id="formAddFertilizerApplication"
+                id={formId}
                 action={action}
                 onSubmit={form.handleSubmit}
                 method="post"
@@ -270,6 +293,8 @@ export function FertilizerApplicationForm({
                                         <LoadingSpinner />
                                         <span>Opslaan...</span>
                                     </div>
+                                ) : fertilizerApplication ? (
+                                    "Opslaan"
                                 ) : (
                                     "Voeg toe"
                                 )}

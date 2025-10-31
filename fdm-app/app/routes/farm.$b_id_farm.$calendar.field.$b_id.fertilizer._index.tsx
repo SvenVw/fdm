@@ -18,6 +18,7 @@ import {
     getCultivations,
     Timeframe,
     FdmType,
+    updateFertilizerApplication,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
@@ -29,7 +30,10 @@ import {
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 import { FertilizerApplicationCard } from "~/components/blocks/fertilizer-applications/card"
-import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
+import {
+    FormSchema,
+    FormSchemaModify,
+} from "~/components/blocks/fertilizer-applications/formschema"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -278,6 +282,37 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
 
+        if (request.method === "PUT") {
+            // Collect form entry
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                FormSchemaModify,
+            )
+            const { p_app_id, p_id, p_app_amount, p_app_date, p_app_method } =
+                formValues
+
+            if (!p_app_id || typeof p_app_id !== "string") {
+                return dataWithError(
+                    "Invalid or missing p_app_id value",
+                    "Helaas, er is wat misgegaan. Probeer het later opnieuw of neem contact op met ondersteuning.",
+                )
+            }
+
+            await updateFertilizerApplication(
+                fdm,
+                session.principal_id,
+                p_app_id,
+                p_id,
+                p_app_amount,
+                p_app_method,
+                p_app_date,
+            )
+
+            return dataWithSuccess("Date edited successfully", {
+                message: "Bemesting is gewijzigd",
+            })
+        }
+
         if (request.method === "DELETE") {
             const formData = await request.formData()
             const p_app_id = formData.get("p_app_id")
@@ -285,7 +320,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!p_app_id || typeof p_app_id !== "string") {
                 return dataWithError(
                     "Invalid or missing p_app_id value",
-                    "Oops! Something went wrong. Please try again later.",
+                    "Helaas, er is wat misgegaan. Probeer het later opnieuw of neem contact op met ondersteuning.",
                 )
             }
 
