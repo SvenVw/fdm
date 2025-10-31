@@ -329,7 +329,7 @@ export function FertilizerApplicationMetricsCard({
                                                     resolvedNitrogenBalance
                                                         .balance.balance
                                                 return (
-                                                    <div className="flex flex-col space-y-2">
+                                                    <div className="flex flex-col space-y-1">
                                                         {/* Simplified Flow (Top Section) */}
                                                         <div className="grid grid-cols-[1fr_auto] items-center">
                                                             <Tooltip>
