@@ -691,7 +691,7 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const cultivations: Cultivation[] = []
 
         const result =
-            await calculateNL2025FertilizerApplicationFillingForNitrogen({
+            await calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm({
                 applications,
                 fertilizers,
                 b_centroid,
