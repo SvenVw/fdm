@@ -23,7 +23,7 @@ import type {
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import { determineIfFieldIsProductiveByShape } from "./field"
+import { determineIfFieldIsProductive } from "./field"
 import {
     addHarvest,
     getHarvestableTypeOfCultivation,
@@ -916,9 +916,10 @@ export async function getCultivationPlan(
                         b_id: curr.b_id,
                         b_area: curr.b_area,
                         b_name: curr.b_name,
-                        b_isproductive: determineIfFieldIsProductiveByShape(
+                        b_isproductive: determineIfFieldIsProductive(
                             curr.b_area,
                             curr.b_perimeter,
+                            curr.b_name,
                         ),
                         fertilizer_applications: [],
                         harvests: [],
