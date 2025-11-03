@@ -24,7 +24,7 @@ import type { NL2025NormsInput } from "./types.d"
  */
 export async function collectNL2025InputForNorms(
     fdm: FdmType,
-    principal_id: string,
+    principal_id: PrincipalId,
     b_id: string,
 ): Promise<NL2025NormsInput> {
     // Create timeframe for 2025
@@ -51,7 +51,7 @@ export async function collectNL2025InputForNorms(
     // 3. Get the grazing intention for the farm
     const has_grazing_intention = await getGrazingIntention(
         fdm,
-        principal_id as PrincipalId,
+        principal_id,
         field.b_id_farm,
         2025,
     )
