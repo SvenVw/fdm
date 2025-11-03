@@ -1,0 +1,41 @@
+name: Release PR Comment
+
+on:
+  pull_request:
+    types: [opened, reopened]
+    branches:
+      - main # Only trigger for PRs targeting main
+
+jobs:
+  add-comment:
+    runs-on: ubuntu-latest
+    if: startsWith(github.head_ref, 'release/') || startsWith(github.head_ref, 'hotfix/')
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Add PR Comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const isHotfix = context.payload.pull_request.head.ref.startsWith('hotfix/');
+            const branchType = isHotfix ? 'Hotfix' : 'Release';
+            const workflowName = 'Release'; // The name of your workflow file
+
+            const commentBody = `
+            👋 **${branchType} Branch PR Detected!**
+
+            Before merging this Pull Request into \`main\`, please ensure you have finalized the ${branchType.toLowerCase()} by **manually running the '${workflowName}' workflow** on this \`${context.payload.pull_request.head.ref}\` branch.
+
+            This will:
+            1.  Bump package versions.
+            2.  Generate changelogs.
+            3.  Create Git tags.
+
+            You can trigger the workflow from the 'Actions' tab, selecting the '${workflowName}' workflow, and choosing this \`${context.payload.pull_request.head.ref}\` branch.
+            `;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
