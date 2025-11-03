@@ -35,7 +35,7 @@ Create a new `release/*` branch from the `development` branch.
 ```bash
 git checkout development
 git pull origin development
-git checkout -b release/v1.2.3 # Use the upcoming version number
+git checkout -b release/[YYYY-MM]
 ```
 
 ### Step 2: Perform Release Chores
@@ -56,19 +56,30 @@ When you are **100% certain** the release branch is complete and ready, you must
 1.  Go to the **Actions** tab in the GitHub repository.
 2.  Select the **Release** workflow from the list on the left.
 3.  Click the **Run workflow** dropdown.
-4.  Select your `release/v1.2.3` branch from the "Branch" dropdown.
+4.  Select your `release/[YYYY-MM]` branch from the "Branch" dropdown.
 5.  Click the green **Run workflow** button.
 
 This will trigger the `Version Packages` job, which adds a final commit to your branch containing all the version bumps, changelog updates, and Git tags.
 
 ### Step 4: Merge to Main
 
-1.  Open a pull request from your `release/v1.2.3` branch to the `main` branch.
+1.  Open a pull request from your `release/[YYYY-MM]` branch to the `main` branch.
 2.  The PR will have a **`Verify Versioning`** status check. This check must pass before you can merge. It fails if the versioning commit from the previous step is not present.
 3.  A bot will also add a comment to the PR reminding you of the process.
 4.  Once all checks pass, **merge the pull request**.
 
 Merging into `main` will trigger the final step of the automation, which publishes the stable packages and creates the GitHub Releases.
+
+### Step 5: Merge Main Back to Development
+
+**This is a critical final step.** To ensure the `development` branch receives the latest version bumps and changelogs from the release, you must merge `main` back into `development`.
+
+```bash
+git checkout development
+git pull origin development
+git merge --no-ff main
+git push origin development
+```
 
 ## For Release Managers: Creating a Hotfix
 
@@ -88,11 +99,11 @@ A hotfix is used to patch a critical bug in production. The process is similar t
 
 4.  **Merge to Main**: Open a pull request from your `hotfix/*` branch to `main`. The same status checks and comments will apply. Merging this will publish the patched version.
 
-5.  **Merge back to Development**: **This is a critical step.** To ensure the fix is not lost, you must also merge your `hotfix/*` branch back into the `development` branch.
+5.  **Merge back to Development**: **This is a critical step.** To ensure the fix is not lost, you must also merge the `main` branch back into the `development` branch.
 
     ```bash
     git checkout development
     git pull origin development
-    git merge --no-ff hotfix/fix-critical-bug
+    git merge --no-ff main
     git push origin development
     ```
