@@ -1,5 +1,11 @@
 # fdm-docs
 
+## 0.8.0
+
+### Minor Changes
+
+- 6ee8422: Update and extend the documentation for 2025 Dutch Fertilizer Application Norms, e.g. explaining how filling is calculated
+
 ## 0.7.0
 
 ### Minor Changes
