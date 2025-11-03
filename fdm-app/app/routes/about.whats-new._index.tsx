@@ -24,6 +24,25 @@ export const meta: MetaFunction = () => {
 
 export const changelogEntries: ChangelogEntry[] = [
     {
+        version: "v0.24.0",
+        date: "3 november 2025",
+        title: "Inzicht in bemesting, invulling van gebruiksruimte en meer",
+        description:
+            "Deze update introduceert een nieuw overzicht van gebruiksruimte, stikstofbalans en bemetingsadvies op de bemestingspagina, voegt de mogelijkheid toe om biologische certificering en beweidingsintentie vast te leggen, en verbetert de weergave van meststoffen.",
+        items: [
+            "Overzicht van Gebruiksruimte, Stikstofbalans en Bemestingsadvies: Op de pagina met toegediende mestgiften voor een perceel wordt nu een uitgebreid overzicht getoond van de gebruiksruimte, de stikstofbalans en het bemestingsadvies. Dit geeft u in één oogopslag inzicht in de actuele stand van zaken voor uw perceel.",
+            "Opvulling van Gebruiksruimte: Naast het berekenen van de gebruiksruimte voor stikstof, fosfaat en dierlijke mest, wordt nu ook de opvulling via bemesting berekend. Hierbij kunt u nu ook op perceelsniveau voor elke bemesting zien hoeveel deze bijdraagt per norm.",
+            "Biologische bedrijven: U kunt nu vastleggen of een bedrijf een biologisch (Skal) certificaat heeft. Dit heeft namelijk invloed op de invulling van de gebruiksruimte en wordt nu meegenomen in de berekening.",
+            "Beweidingsintentie: Geef per jaar aan of u van plan bent om uw dieren te weiden. Deze informatie wordt gebruikt om de stikstofgebruiksnormen voor grasland correct te berekenen.",
+            "Bewerken van Toegediende Mestgiften: Het is nu mogelijk om eerder ingevoerde mestgiften te bewerken. Hierdoor hoeft u niet eerst een bemesting te verwijderen en daarna toe te voegen, maar kan het eenvoudig worden bijgewerkt.",
+            "Verbeterd Ontwerp van Mestgiften: De weergave van toegediende meststoffen is overzichtelijker gemaakt door het gebruik van iconen voor het type meststof en een betere uitlijning van de gegevens.",
+            "Mestcode (RVO) als Kenmerk van Meststof: Bij het toevoegen van een meststof wordt nu de officiële RVO-mestcode gebruikt in plaats van het algemene 'Meststoftype'. Dit zorgt voor een betere aansluiting bij de regelgeving.",
+            "Verbeterde Weergave van Mestcodes: In de lijst met toegediende meststoffen wordt de RVO-mestcode nu gekleurd weergegeven op basis van het type meststof, wat de leesbaarheid ten goede komt.",
+            "Verbeterde Foutafhandeling Stikstofbalans: Als de berekening van de stikstofbalans voor een specifiek perceel mislukt, worden de resultaten voor de andere percelen en het bedrijfsniveau nog steeds weergegeven.",
+            "Prestatieverbeteringen: De berekeningen voor de gebruiksnormen en de stikstofbalans zijn aanzienlijk versneld door het gebruik van caching. Dit zorgt voor een snellere en soepelere gebruikerservaring.",
+        ],
+    },
+    {
         version: "v0.23.0",
         date: "29 September 2025",
         title: "Nieuw perceelsoverzicht, bedrijf verwijderen en meer",
