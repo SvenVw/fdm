@@ -82,17 +82,26 @@ export function SoilAnalysisUploadForm() {
         }
     }
 
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault() // Prevent default to allow drop
     }
 
-    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault() // Prevent default file opening in browser
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             const file = e.dataTransfer.files[0]
             form.setValue("soilAnalysisFile", file, { shouldValidate: true })
             setFileName(file.name)
             setUploadStatus("idle") // Reset status when a new file is dropped
+
+            const fileInput = document.getElementById(
+                "file-upload",
+            ) as HTMLInputElement | null
+            if (fileInput) {
+                const container = new DataTransfer()
+                container.items.add(file)
+                fileInput.files = container.files
+            }
             e.dataTransfer.clearData()
         }
     }
@@ -131,117 +140,107 @@ export function SoilAnalysisUploadForm() {
                                             }) => (
                                                 <FormItem>
                                                     <div>Bodemanalyse</div>
-                                                    <div>
-                                                        <div
-                                                            className={cn(
-                                                                "flex flex-col items-center justify-center w-full h-32 rounded-md border border-dashed border-muted-foreground/25 px-6 py-4 text-center transition-colors hover:bg-muted/25",
-                                                                uploadStatus ===
-                                                                    "success" &&
-                                                                    "border-green-500 bg-green-50",
-                                                                uploadStatus ===
-                                                                    "error" &&
-                                                                    "border-red-500 bg-red-50",
+                                                    <Input
+                                                        name={name}
+                                                        onBlur={onBlur}
+                                                        onChange={(event) => {
+                                                            onChange(
+                                                                event.target
+                                                                    .files?.[0],
+                                                            )
+                                                            handleFileChange(
+                                                                event,
+                                                            )
+                                                        }}
+                                                        ref={ref}
+                                                        type="file"
+                                                        placeholder=""
+                                                        className="hidden"
+                                                        accept=".pdf"
+                                                        multiple={false}
+                                                        required={true}
+                                                        disabled={disabled}
+                                                        id="file-upload"
+                                                    />
+                                                    <label
+                                                        htmlFor="file-upload"
+                                                        className={cn(
+                                                            "flex flex-col items-center justify-center w-full h-32 rounded-md border border-dashed border-muted-foreground/25 px-6 py-4 text-center transition-colors hover:bg-muted/25",
+                                                            uploadStatus ===
+                                                                "success" &&
+                                                                "border-green-500 bg-green-50",
+                                                            uploadStatus ===
+                                                                "error" &&
+                                                                "border-red-500 bg-red-50",
+                                                        )}
+                                                        onDragOver={
+                                                            handleDragOver
+                                                        }
+                                                        onDrop={handleDrop}
+                                                    >
+                                                        <div className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
+                                                            {uploadStatus ===
+                                                                "idle" && (
+                                                                <>
+                                                                    <FileUp className="w-8 h-8 mb-2 text-muted-foreground" />
+                                                                    <div className="text-sm text-muted-foreground">
+                                                                        {fileName
+                                                                            ? fileName
+                                                                            : "Klik om te uploaden of sleep een PDF bestand naar hier"}
+                                                                    </div>
+                                                                    <div className="text-xs text-muted-foreground mt-1">
+                                                                        PDF tot
+                                                                        5MB
+                                                                    </div>
+                                                                </>
                                                             )}
-                                                            onDragOver={
-                                                                handleDragOver
-                                                            }
-                                                            onDrop={handleDrop}
-                                                        >
-                                                            <Input
-                                                                name={name}
-                                                                onBlur={onBlur}
-                                                                onChange={(
-                                                                    event,
-                                                                ) => {
-                                                                    onChange(
-                                                                        event
-                                                                            .target
-                                                                            .files?.[0],
-                                                                    )
-                                                                    handleFileChange(
-                                                                        event,
-                                                                    )
-                                                                }}
-                                                                ref={ref}
-                                                                type="file"
-                                                                placeholder=""
-                                                                className="hidden"
-                                                                accept=".pdf"
-                                                                multiple={false}
-                                                                required={true}
-                                                                disabled={
-                                                                    disabled
-                                                                }
-                                                                id="file-upload"
-                                                            />
-                                                            <label
-                                                                htmlFor="file-upload"
-                                                                className="flex flex-col items-center justify-center w-full h-full cursor-pointer"
-                                                            >
-                                                                {uploadStatus ===
-                                                                    "idle" && (
-                                                                    <>
-                                                                        <FileUp className="w-8 h-8 mb-2 text-muted-foreground" />
-                                                                        <div className="text-sm text-muted-foreground">
-                                                                            {fileName
-                                                                                ? fileName
-                                                                                : "Klik om te uploaden of sleep een PDF bestand naar hier"}
-                                                                        </div>
-                                                                        <div className="text-xs text-muted-foreground mt-1">
-                                                                            PDF
-                                                                            tot
-                                                                            5MB
-                                                                        </div>
-                                                                    </>
-                                                                )}
 
-                                                                {uploadStatus ===
-                                                                    "uploading" && (
-                                                                    <>
-                                                                        <Upload className="w-8 h-8 mb-2 text-primary animate-pulse" />
-                                                                        <div className="text-sm">
-                                                                            Uploading{" "}
-                                                                            {
-                                                                                fileName
-                                                                            }
-                                                                            ...
-                                                                        </div>
-                                                                        <Progress
-                                                                            value={
-                                                                                uploadProgress
-                                                                            }
-                                                                            className="w-full mt-2 h-2"
-                                                                        />
-                                                                    </>
-                                                                )}
+                                                            {uploadStatus ===
+                                                                "uploading" && (
+                                                                <>
+                                                                    <Upload className="w-8 h-8 mb-2 text-primary animate-pulse" />
+                                                                    <div className="text-sm">
+                                                                        Uploading{" "}
+                                                                        {
+                                                                            fileName
+                                                                        }
+                                                                        ...
+                                                                    </div>
+                                                                    <Progress
+                                                                        value={
+                                                                            uploadProgress
+                                                                        }
+                                                                        className="w-full mt-2 h-2"
+                                                                    />
+                                                                </>
+                                                            )}
 
-                                                                {uploadStatus ===
-                                                                    "success" && (
-                                                                    <>
-                                                                        <CheckCircle className="w-8 h-8 mb-2 text-green-500" />
-                                                                        <div className="text-sm text-green-600">
-                                                                            Uploaden
-                                                                            succesvol!
-                                                                        </div>
-                                                                    </>
-                                                                )}
+                                                            {uploadStatus ===
+                                                                "success" && (
+                                                                <>
+                                                                    <CheckCircle className="w-8 h-8 mb-2 text-green-500" />
+                                                                    <div className="text-sm text-green-600">
+                                                                        Uploaden
+                                                                        succesvol!
+                                                                    </div>
+                                                                </>
+                                                            )}
 
-                                                                {uploadStatus ===
-                                                                    "error" && (
-                                                                    <>
-                                                                        <AlertCircle className="w-8 h-8 mb-2 text-red-500" />
-                                                                        <div className="text-sm text-red-600">
-                                                                            Uploaden
-                                                                            mislukt.
-                                                                            Probeer
-                                                                            het
-                                                                            opnieuw.
-                                                                        </div>
-                                                                    </>
-                                                                )}
-                                                            </label>
+                                                            {uploadStatus ===
+                                                                "error" && (
+                                                                <>
+                                                                    <AlertCircle className="w-8 h-8 mb-2 text-red-500" />
+                                                                    <div className="text-sm text-red-600">
+                                                                        Uploaden
+                                                                        mislukt.
+                                                                        Probeer
+                                                                        het
+                                                                        opnieuw.
+                                                                    </div>
+                                                                </>
+                                                            )}
                                                         </div>
-                                                    </div>
+                                                    </label>
                                                     <FormDescription />
                                                     <FormMessage />
                                                 </FormItem>
