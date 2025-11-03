@@ -397,6 +397,7 @@ export function MijnPercelenUploadForm({
                                                             id="file-upload"
                                                         />
                                                         <label
+                                                            // biome-ignore lint/a11y/noNoninteractiveTabindex: The label is interactive and should be focusable
                                                             tabIndex={0}
                                                             className="relative block"
                                                             htmlFor="file-upload"
