@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Users can now drop files onto the shapefile drop area in the creation wizard, and it will work.
+Fixes that user can drop files as well for Mijn Percelen shapefile upload and Soil Analysis pdf upload.
