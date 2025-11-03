@@ -398,7 +398,6 @@ export function MijnPercelenUploadForm({
                                                         />
                                                         <label
                                                             tabIndex={0}
-                                                            role="button"
                                                             className="relative block"
                                                             htmlFor="file-upload"
                                                             aria-label="Upload shapefile files by clicking or dragging and dropping"
