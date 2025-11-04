@@ -101,7 +101,7 @@ export function FertilizerApplicationCard({
         b_id_or_b_lu_catalogue,
         savedFormValues,
         editedFertilizerApplication,
-        fieldFertilizerFormStore.delete,
+        fieldFertilizerFormStore,
     ])
 
     useEffect(() => {
