@@ -28,7 +28,7 @@ export const changelogEntries: ChangelogEntry[] = [
         date: "3 november 2025",
         title: "Inzicht in bemesting, invulling van gebruiksruimte en meer",
         description:
-            "Deze update introduceert een nieuw overzicht van gebruiksruimte, stikstofbalans en bemetingsadvies op de bemestingspagina, voegt de mogelijkheid toe om biologische certificering en beweidingsintentie vast te leggen, en verbetert de weergave van meststoffen.",
+            "Deze update introduceert een nieuw overzicht van gebruiksruimte, stikstofbalans en bemestingsadvies op de bemestingspagina, voegt de mogelijkheid toe om biologische certificering en beweidingsintentie vast te leggen, en verbetert de weergave van meststoffen.",
         items: [
             "Overzicht van Gebruiksruimte, Stikstofbalans en Bemestingsadvies: Op de pagina met toegediende mestgiften voor een perceel wordt nu een uitgebreid overzicht getoond van de gebruiksruimte, de stikstofbalans en het bemestingsadvies. Dit geeft u in één oogopslag inzicht in de actuele stand van zaken voor uw perceel.",
             "Opvulling van Gebruiksruimte: Naast het berekenen van de gebruiksruimte voor stikstof, fosfaat en dierlijke mest, wordt nu ook de opvulling via bemesting berekend. Hierbij kunt u nu ook op perceelsniveau voor elke bemesting zien hoeveel deze bijdraagt per norm.",
