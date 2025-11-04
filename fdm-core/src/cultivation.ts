@@ -220,6 +220,10 @@ export async function getDefaultDatesOfCultivation(
                 eq(schema.cultivationCatalogueSelecting.b_id_farm, b_id_farm),
             )
 
+        if (enabledCatalogues.length === 0) {
+            throw new Error("Cultivation not found in catalogue")
+        }
+
         // Fetch the specified cultivation's default date information from the enabled catalogues.
         const cultivationsCatalogue = await fdm
             .select({
