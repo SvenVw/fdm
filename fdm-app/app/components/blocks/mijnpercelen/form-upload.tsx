@@ -288,6 +288,7 @@ export function MijnPercelenUploadForm({
                                                             accept={
                                                                 requiredExtensions
                                                             }
+                                                            multiple
                                                             onBlur={onBlur}
                                                             onFilesChange={
                                                                 handleFilesSet
@@ -305,13 +306,13 @@ export function MijnPercelenUploadForm({
                                                             mergeFiles={(
                                                                 oldFiles,
                                                                 newFiles,
-                                                            ) => [
+                                                            ) =>
                                                                 mergeShapefileParts(
                                                                     oldFiles,
                                                                     newFiles,
                                                                     requiredExtensions,
-                                                                ),
-                                                            ]}
+                                                                )
+                                                            }
                                                         >
                                                             <FileUp className="w-8 h-8 mb-2 text-muted-foreground" />
                                                             <div className="text-sm text-muted-foreground">

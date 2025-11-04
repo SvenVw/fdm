@@ -2,21 +2,13 @@
 
 import { X } from "lucide-react"
 import type { InputHTMLAttributes, ReactNode } from "react"
-import {
-    createContext,
-    useContext,
-    useEffect,
-    useId,
-    useRef,
-    useState,
-} from "react"
+import { createContext, useContext, useEffect, useId, useRef } from "react"
 import { toast as notify } from "sonner"
 import { Button } from "~/components/ui/button"
 import { cn } from "~/lib/utils"
 
 type DropzoneContextType = {
     files?: File[]
-    error?: string
     accept?: string[]
     maxSize?: number | undefined
     minSize?: number | undefined
@@ -50,7 +42,7 @@ export type DropzoneProps = {
     mergeFiles?: (
         oldFiles: File[],
         newFiles: File[],
-    ) => Promise<[File[] | null, string?]> | [File[] | null, string?]
+    ) => Promise<File[] | null> | File[] | null
     children?: ReactNode
 }
 
@@ -65,34 +57,26 @@ export const Dropzone = ({
     className,
     children,
     allowReset = true,
-    value: propFiles,
-    error: propError,
+    value,
     ref,
     onBlur,
-    onFilesChange: propSetFiles,
+    onFilesChange,
     mergeFiles = (oldFiles, newFiles) => [
-        [
-            ...newFiles.reduce((combined, newFile) => {
-                combined.add(newFile)
-                return combined
-            }, new Set<File>(oldFiles)),
-        ],
+        ...newFiles.reduce((combined, newFile) => {
+            combined.add(newFile)
+            return combined
+        }, new Set<File>(oldFiles)),
     ],
 }: DropzoneProps) => {
     const inputRef = useRef<HTMLInputElement>(null)
-    const [internalFiles, setInternalFiles] = useState<File[]>([])
-    const [error, setError] = useState<string>()
+    const files =
+        value ??
+        (inputRef.current?.files ? Array.from(inputRef.current.files) : [])
     const labelId = useId()
     const acceptedFileExtensions =
         typeof accept === "string" ? accept.split(",") : accept
 
-    const files = propFiles ?? internalFiles
-    const setFiles = propSetFiles ?? setInternalFiles
     const fileNames = files.map((f) => f.name)
-
-    useEffect(() => {
-        setError(propError)
-    }, [propError])
 
     useEffect(() => {
         if (files.length === 0 && inputRef.current) {
@@ -101,16 +85,16 @@ export const Dropzone = ({
     }, [files])
 
     const handleFilesSet = async (oldFiles: File[], newFiles: File[]) => {
-        const [finalFiles, error] = await mergeFiles(oldFiles, newFiles)
-        if (finalFiles) {
-            setFiles(finalFiles)
+        const finalFiles = await mergeFiles(oldFiles, newFiles)
+        if (finalFiles && onFilesChange) {
+            onFilesChange(finalFiles)
         }
-        setError(error)
         return finalFiles ?? files
     }
 
     const handleFilesClear = async () => {
-        setFiles([])
+        if (onFilesChange) onFilesChange([])
+        else if (inputRef.current) inputRef.current.value = null
     }
 
     const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
@@ -139,7 +123,22 @@ export const Dropzone = ({
 
             if (validNewFiles.length === 0) return
 
-            await handleFilesSet(files, validNewFiles)
+            const finalFiles = await handleFilesSet(files, validNewFiles)
+
+            if (inputRef.current?.files) {
+                const oldFiles = Array.from(inputRef.current.files)
+                const newlyAddedFiles = finalFiles.filter(
+                    (f) => !oldFiles.includes(f),
+                )
+
+                if (newlyAddedFiles.length > 0) {
+                    const container = new DataTransfer()
+                    finalFiles.forEach((f) => {
+                        container.items.add(f)
+                    })
+                    inputRef.current.files = container.files
+                }
+            }
         }
     }
 
@@ -170,7 +169,6 @@ export const Dropzone = ({
             value={{
                 files,
                 accept: acceptedFileExtensions,
-                error,
                 maxSize,
                 minSize,
                 multiple,
