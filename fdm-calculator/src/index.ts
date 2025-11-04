@@ -7,10 +7,10 @@ export {
 export { collectInputForNitrogenBalance } from "./balance/nitrogen/input"
 export type {
     FieldInput,
-    NitrogenBalanceInput,
-    NitrogenBalanceNumeric,
     NitrogenBalanceFieldNumeric,
     NitrogenBalanceFieldResultNumeric,
+    NitrogenBalanceInput,
+    NitrogenBalanceNumeric,
     NitrogenEmissionAmmoniaFertilizersNumeric,
     NitrogenEmissionAmmoniaNumeric,
     NitrogenEmissionAmmoniaResiduesNumeric,
@@ -30,10 +30,10 @@ export {
     createFunctionsForNorms,
 } from "./norms"
 export type {
-    InputAggregateNormsToFarmLevel,
-    InputAggregateNormFillingsToFarmLevel,
-    AggregatedNormsToFarmLevel,
     AggregatedNormFillingsToFarmLevel,
+    AggregatedNormsToFarmLevel,
+    InputAggregateNormFillingsToFarmLevel,
+    InputAggregateNormsToFarmLevel,
 } from "./norms/farm"
 export type { NormFilling } from "./norms/nl/2025/filling/types"
 export {

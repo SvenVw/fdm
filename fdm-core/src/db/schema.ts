@@ -1,4 +1,5 @@
 import type { ApplicationMethods } from "@svenvw/fdm-data"
+import { sql } from "drizzle-orm"
 import {
     boolean,
     check,
@@ -11,7 +12,6 @@ import {
     uniqueIndex,
 } from "drizzle-orm/pg-core"
 import { geometry, numericCasted } from "./schema-custom-types"
-import { sql } from "drizzle-orm"
 
 // Define postgres schema
 export const fdmSchema = pgSchema("fdm")

@@ -1,7 +1,7 @@
-import { withCalculationCache, type Field } from "@svenvw/fdm-core"
+import { type Field, withCalculationCache } from "@svenvw/fdm-core"
+import pkg from "../../../../package"
 import { getGeoTiffValue } from "../../../../shared/geotiff"
 import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
-import pkg from "../../../../package"
 import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
 import type {
     DierlijkeMestGebruiksnormResult,
@@ -204,7 +204,7 @@ export async function calculateNL2025DierlijkeMestGebruiksNorm(
  *   nitrogen usage standard (`normValue`) and a `normSource` string explaining the rule applied.
  */
 export const getNL2025DierlijkeMestGebruiksNorm = withCalculationCache(
-   calculateNL2025DierlijkeMestGebruiksNorm,
+    calculateNL2025DierlijkeMestGebruiksNorm,
     "calculateNL2025DierlijkeMestGebruiksNorm",
     pkg.calculatorVersion,
 )

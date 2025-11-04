@@ -1,8 +1,8 @@
 import { type Field, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
+import pkg from "../../../../package"
 import { getGeoTiffValue } from "../../../../shared/geotiff"
 import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
-import pkg from "../../../../package"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {

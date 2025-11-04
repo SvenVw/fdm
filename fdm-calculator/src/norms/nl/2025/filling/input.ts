@@ -1,13 +1,13 @@
 import type { FdmType, PrincipalId, Timeframe } from "@svenvw/fdm-core"
-import type { NL2025NormsFillingInput } from "./types"
 import {
     getCultivations,
     getFertilizerApplications,
     getFertilizers,
-    isOrganicCertificationValid,
     getField,
     getGrazingIntention,
+    isOrganicCertificationValid,
 } from "@svenvw/fdm-core"
+import type { NL2025NormsFillingInput } from "./types"
 
 /**
  * Collects all necessary input data from fdm-core functions for the NL 2025 norms filling calculations.

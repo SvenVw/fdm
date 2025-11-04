@@ -27,7 +27,6 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { serverConfig } from "../lib/config.server"
 import { getNmiApiKey } from "../integrations/nmi"
 
 // Meta

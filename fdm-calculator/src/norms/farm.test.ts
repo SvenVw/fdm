@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest"
-import {
-    aggregateNormsToFarmLevel,
-    aggregateNormFillingsToFarmLevel,
-} from "./farm"
 import type {
-    InputAggregateNormsToFarmLevel,
     InputAggregateNormFillingsToFarmLevel,
+    InputAggregateNormsToFarmLevel,
+} from "./farm"
+import {
+    aggregateNormFillingsToFarmLevel,
+    aggregateNormsToFarmLevel,
 } from "./farm"
 
 describe("aggregateNormsToFarmLevel", () => {

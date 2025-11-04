@@ -1,10 +1,10 @@
 import { withCalculationCache } from "@svenvw/fdm-core"
+import pkg from "../package"
 import type {
     NutrientAdvice,
-    NutrientAdviceResponse,
     NutrientAdviceInputs,
+    NutrientAdviceResponse,
 } from "./types"
-import pkg from "../package"
 
 /**
  * Requests nutrient advice from the NMI API based on provided field and soil data.

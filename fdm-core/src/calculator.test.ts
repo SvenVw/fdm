@@ -6,8 +6,8 @@ import {
     withCalculationCache,
 } from "./calculator"
 import { calculationCache, calculationErrors } from "./db/schema-calculator"
-import { createFdmServer } from "./fdm-server"
 import type { FdmType } from "./fdm"
+import { createFdmServer } from "./fdm-server"
 
 describe("generateCalculationHash", () => {
     it("should produce the same hash for identical inputs regardless of object key order", () => {

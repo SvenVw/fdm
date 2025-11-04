@@ -800,7 +800,6 @@ describe("Fertilizer Data Model", () => {
             // 4. Get the fertilizer and assert that p_type is "compost".
             fertilizer = await getFertilizer(fdm, p_id)
             expect(fertilizer.p_type).toBe("compost")
-
         })
     })
 

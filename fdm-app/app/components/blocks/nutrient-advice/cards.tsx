@@ -101,7 +101,8 @@ export function NutrientCard({
                     <Progress
                         value={percentage}
                         colorBar={
-                            (percentage > 100 || advice === 0) && description.symbol === "EOC"
+                            (percentage > 100 || advice === 0) &&
+                            description.symbol === "EOC"
                                 ? "green-500"
                                 : percentage > 100
                                   ? "orange-500"

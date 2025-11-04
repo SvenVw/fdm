@@ -74,7 +74,7 @@ describe(" calculateNL2025StikstofGebruiksNorm", () => {
             soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
         }
 
-        const result = await  calculateNL2025StikstofGebruiksNorm(mockInput)
+        const result = await calculateNL2025StikstofGebruiksNorm(mockInput)
         expect(result.normValue).toBe(385)
         expect(result.normSource).toEqual("Grasland (volledig maaien).")
     })

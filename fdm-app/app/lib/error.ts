@@ -1,7 +1,7 @@
+import * as Sentry from "@sentry/react-router"
+import { customAlphabet } from "nanoid"
 import { data, redirect } from "react-router"
 import { dataWithError, dataWithWarning } from "remix-toast"
-import { customAlphabet } from "nanoid"
-import * as Sentry from "@sentry/react-router"
 import { clientConfig } from "~/lib/config"
 
 const customErrorAlphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ" // No lookalikes (0, 1, I, O, S, Z)

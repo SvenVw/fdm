@@ -1,5 +1,7 @@
 import type { Dose } from "@svenvw/fdm-calculator"
+import type { Fertilizer } from "@svenvw/fdm-core"
 import type { ApplicationMethods } from "@svenvw/fdm-data"
+import { Plus } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { useFetcher, useLocation, useNavigation, useParams } from "react-router"
 import { useFieldFertilizerFormStore } from "@/app/store/field-fertilizer-form"
@@ -14,10 +16,8 @@ import {
     DialogTrigger,
 } from "~/components/ui/dialog"
 import { FertilizerApplicationForm } from "./form"
-import type { FertilizerApplication, FertilizerOption } from "./types.d"
 import { FertilizerApplicationsList } from "./list"
-import type { Fertilizer } from "@svenvw/fdm-core"
-import { Plus } from "lucide-react"
+import type { FertilizerApplication, FertilizerOption } from "./types.d"
 
 export function FertilizerApplicationCard({
     fertilizerApplications,

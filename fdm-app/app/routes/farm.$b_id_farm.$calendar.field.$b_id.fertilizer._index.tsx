@@ -1,12 +1,4 @@
-import {
-    calculateDose,
-    createFunctionsForNorms,
-    getNitrogenBalance,
-    getNutrientAdvice,
-    createFunctionsForFertilizerApplicationFilling,
-    collectInputForNitrogenBalance,
-    NitrogenBalanceNumeric,
-} from "@svenvw/fdm-calculator"
+import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
     getFertilizerApplications,
@@ -14,10 +6,6 @@ import {
     getFertilizers,
     getField,
     removeFertilizerApplication,
-    getCurrentSoilData,
-    getCultivations,
-    Timeframe,
-    FdmType,
     updateFertilizerApplication,
 } from "@svenvw/fdm-core"
 import {
@@ -34,13 +22,13 @@ import {
     FormSchema,
     FormSchemaModify,
 } from "~/components/blocks/fertilizer-applications/formschema"
+import { FertilizerApplicationMetricsCard } from "~/components/blocks/fertilizer-applications/metrics"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { FertilizerApplicationMetricsCard } from "~/components/blocks/fertilizer-applications/metrics"
 import {
     getNitrogenBalanceforField,
     getNorms,
@@ -117,7 +105,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fertilizerParameterDescription =
             getFertilizerParametersDescription()
         const applicationMethods = fertilizerParameterDescription.find(
-            (x: { parameter: string }) => x.parameter === "p_app_method_options",
+            (x: { parameter: string }) =>
+                x.parameter === "p_app_method_options",
         )
         if (!applicationMethods) throw new Error("Parameter metadata missing")
         // Map fertilizers to options for the combobox
