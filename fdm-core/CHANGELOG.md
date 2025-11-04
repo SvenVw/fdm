@@ -1,5 +1,26 @@
 # Changelog fdm-core
 
+## 0.26.0
+
+### Minor Changes
+
+- a226f7e: Adds `b_lu_start_default` and `b_date_harvest_default` to cultivations catalogue as the default start and harvest dates of a cultivation
+- a00a331: Add the functions `setGrazingIntention`, `removeGrazingIntention`, `getGrazingIntention` and `getGrazingIntentions` to manage if a farm is planning to do grazing
+- 8f9d4ff: Improve check for `b_isproductive` by checking if name contains 'buffer'
+- 2f7b281: Adds getDefaultDatesOfCultivation as helper function to determine default dates for cultivations
+- c939de9: Add the table `intending_grazing` to store if the farm is planning to perform grazing
+- b58cd07: Add the functions `addOrganicCertification`, `isOrganicCertificationValid`, `listOrganicCertifications`, `getOrganicCertification`, and `removeOrganicCertification` to manage organic certifications of a farm.
+- b58cd07: Add tables `organic_certifications` and `organic_certifications_holding`to store information of farm if they have organic certificates
+- ac5d94f: Add `p_type_rvo` as new parameter to fertilizersCatalogue. It describes the 'Mestcode' according to RVO (Dutch government)
+- 91d4103: Add new db schema `fdm-calculator` to cache calculation results and store calculation errors. The decorator function `withCalculationCache` enables adds the functionality to add caching to calculator functions
+
+### Patch Changes
+
+- 6bcb528: Add the missing options for b_acquiring_method: "In gebruik van een terreinbeherende organisatie" (nl_03), "Tijdelijk gebruik in het kader van landinrichting" (nl_04), "Pacht van geringe oppervlakten" (nl_10) and "Natuurpacht" (nl_11)
+- Updated dependencies [97083dd]
+- Updated dependencies [d6b8900]
+  - @svenvw/fdm-data@0.18.0
+
 ## 0.25.1
 
 ### Patch Changes

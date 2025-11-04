@@ -1,15 +1,24 @@
+import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
 import type { ApplicationMethods } from "@svenvw/fdm-data"
 import { format } from "date-fns"
+import { nl } from "date-fns/locale"
+import { Circle, Diamond, Square, Trash, Triangle } from "lucide-react"
 import { useFetcher } from "react-router"
 import { Button } from "~/components/ui/button"
+import {
+    Empty,
+    EmptyDescription,
+    EmptyHeader,
+    EmptyTitle,
+} from "~/components/ui/empty"
 import {
     Item,
     ItemActions,
     ItemContent,
-    ItemGroup,
     ItemDescription,
-    ItemTitle,
+    ItemGroup,
     ItemSeparator,
+    ItemTitle,
 } from "~/components/ui/item"
 import {
     Tooltip,
@@ -17,16 +26,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
-import {
-    Empty,
-    EmptyDescription,
-    EmptyHeader,
-    EmptyTitle,
-} from "~/components/ui/empty"
 import { LoadingSpinner } from "../../custom/loadingspinner"
-import { Circle, Diamond, Square, Trash, Triangle } from "lucide-react"
-import { nl } from "date-fns/locale"
-import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
 
 export function FertilizerApplicationsList({
     fertilizerApplications,

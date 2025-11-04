@@ -1,3 +1,4 @@
+import { cowHead } from "@lucide/lab"
 import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
 import {
     ArrowRightLeft,
@@ -14,7 +15,6 @@ import {
     Trash2,
     UserRoundCheck,
 } from "lucide-react"
-import { cowHead } from "@lucide/lab"
 import {
     data,
     type LoaderFunctionArgs,

@@ -7,13 +7,13 @@ import {
     type NitrogenBalanceNumeric,
 } from "@svenvw/fdm-calculator"
 import {
-    Cultivation,
-    Field,
+    type Cultivation,
+    type FdmType,
+    type Field,
+    type fdmSchema,
     getCultivations,
     getCurrentSoilData,
     type PrincipalId,
-    type fdmSchema,
-    type FdmType,
     type Timeframe,
 } from "@svenvw/fdm-core"
 import { getNmiApiKey } from "./nmi"

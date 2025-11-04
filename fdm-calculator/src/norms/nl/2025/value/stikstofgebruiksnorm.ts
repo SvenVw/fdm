@@ -1,8 +1,8 @@
 import { type Field, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
+import pkg from "../../../../package"
 import { getGeoTiffValue } from "../../../../shared/geotiff"
 import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
-import pkg from "../../../../package"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {
@@ -406,6 +406,7 @@ function calculateKorting(
     const vanggewassenCompleted2024 = vanggewassen2024.filter(
         (prevCultivation) => {
             return (
+                prevCultivation.b_lu_end === null ||
                 prevCultivation.b_lu_end.getTime() >= new Date(currentYear, 1) // Month 1 is February
             )
         },
@@ -628,18 +629,23 @@ export async function calculateNL2025StikstofGebruiksNorm(
         )
     }
 
-    let normValue = is_nv_area
-        ? normsForRegion.nv_area
-        : normsForRegion.standard
+    let normValue = new Decimal(
+        is_nv_area ? normsForRegion.nv_area : normsForRegion.standard,
+    )
 
     // Apply korting
     const { amount: kortingAmount, description: kortingDescription } =
         calculateKorting(cultivations, region)
-    normValue = new Decimal(normValue).minus(kortingAmount).toNumber()
+    normValue = new Decimal(normValue).minus(kortingAmount)
+
+    // If normvalue is negative, e.g. Geen plaatsingsruimte plus korting, set it to 0
+    if (normValue.isNegative()) {
+        normValue = new Decimal(0)
+    }
 
     const subTypeText = subTypeOmschrijving ? ` (${subTypeOmschrijving})` : ""
     return {
-        normValue: normValue,
+        normValue: normValue.toNumber(),
         normSource: `${selectedStandard.cultivation_rvo_table2}${subTypeText}${kortingDescription}`,
     }
 }

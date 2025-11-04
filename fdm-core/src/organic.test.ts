@@ -1,8 +1,10 @@
 import { eq } from "drizzle-orm"
 import { beforeEach, describe, expect, inject, it } from "vitest"
-import { createFdmServer } from "./fdm-server"
 import * as schema from "./db/schema"
 import { addFarm } from "./farm"
+import { createFdmServer } from "./fdm-server"
+import type { FdmServerType } from "./fdm-server.d"
+import { createId } from "./id"
 import {
     addOrganicCertification,
     getOrganicCertification,
@@ -10,8 +12,6 @@ import {
     listOrganicCertifications,
     removeOrganicCertification,
 } from "./organic"
-import type { FdmServerType } from "./fdm-server.d"
-import { createId } from "./id"
 
 describe("Organic Certifications", () => {
     let fdm: FdmServerType

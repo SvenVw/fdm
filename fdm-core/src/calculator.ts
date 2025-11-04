@@ -1,5 +1,5 @@
-import { eq } from "drizzle-orm"
 import { createHash } from "node:crypto"
+import { eq } from "drizzle-orm"
 import stableStringify from "safe-stable-stringify"
 import {
     calculationCache as calculationCacheTable,
@@ -278,7 +278,7 @@ export function withCalculationCache<T_Input extends object, T_Output>(
                 // Continue to re-throw the original calculation error
             }
 
-           throw e
-       }
-   }
+            throw e
+        }
+    }
 }

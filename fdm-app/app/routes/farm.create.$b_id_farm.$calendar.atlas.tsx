@@ -430,7 +430,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     const b_lu_catalogue = field.properties.b_lu_catalogue
                     const b_geometry = field.geometry
 
-                    const currentYear = Number(calendar)
+                    const parsedYear = Number.parseInt(
+                        String(calendar ?? ""),
+                        10,
+                    )
+                    const currentYear =
+                        Number.isInteger(parsedYear) &&
+                        parsedYear >= 1970 &&
+                        parsedYear < 2100
+                            ? parsedYear
+                            : timeframe.start.getFullYear()
                     const cultivationDefaultDates =
                         await getDefaultDatesOfCultivation(
                             fdm,
@@ -439,7 +448,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
                             b_lu_catalogue,
                             currentYear,
                         )
-
                     const b_start = new Date(`${currentYear}-01-01`)
                     const b_lu_start = cultivationDefaultDates.b_lu_start
                     const b_lu_end = cultivationDefaultDates.b_lu_end

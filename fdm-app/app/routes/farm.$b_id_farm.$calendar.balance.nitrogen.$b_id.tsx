@@ -35,9 +35,9 @@ import {
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
+import { handleLoaderError, reportError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
-import { handleLoaderError, reportError } from "~/lib/error"
 
 // Meta
 export const meta: MetaFunction = () => {

@@ -43,11 +43,11 @@ export {
 export {
     addCultivation,
     addCultivationToCatalogue,
-    getDefaultDatesOfCultivation,
     getCultivation,
     getCultivationPlan,
     getCultivations,
     getCultivationsFromCatalogue,
+    getDefaultDatesOfCultivation,
     removeCultivation,
     updateCultivation,
 } from "./cultivation"
@@ -110,6 +110,12 @@ export {
 } from "./field"
 export type { Field } from "./field.d"
 export {
+    getGrazingIntention,
+    getGrazingIntentions,
+    removeGrazingIntention,
+    setGrazingIntention,
+} from "./grazing_intention"
+export {
     addHarvest,
     getHarvest,
     getHarvests,
@@ -122,6 +128,16 @@ export type {
     HarvestableAnalysis,
 } from "./harvest.d"
 export { runMigration } from "./migrate"
+export {
+    addOrganicCertification,
+    getOrganicCertification,
+    isOrganicCertificationValid,
+    isValidSkalNumber,
+    isValidTracesNumber,
+    listOrganicCertifications,
+    removeOrganicCertification,
+} from "./organic"
+export type { OrganicCertification } from "./organic.d"
 export {
     acceptInvitation,
     cancelPendingInvitation,
@@ -157,19 +173,3 @@ export type {
     SoilParameters,
 } from "./soil.d"
 export type { Timeframe } from "./timeframe.d"
-export {
-    addOrganicCertification,
-    isOrganicCertificationValid,
-    listOrganicCertifications,
-    getOrganicCertification,
-    removeOrganicCertification,
-    isValidSkalNumber,
-    isValidTracesNumber,
-} from "./organic"
-export type { OrganicCertification } from "./organic.d"
-export {
-    setGrazingIntention,
-    removeGrazingIntention,
-    getGrazingIntention,
-    getGrazingIntentions,
-} from "./grazing_intention"

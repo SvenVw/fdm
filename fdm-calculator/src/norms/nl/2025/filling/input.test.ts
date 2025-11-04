@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { collectInputForFertilizerApplicationFilling } from "./input"
 import type {
-    FdmType,
-    Field,
     Cultivation,
-    FertilizerApplication,
+    FdmType,
     Fertilizer,
+    FertilizerApplication,
+    Field,
 } from "@svenvw/fdm-core"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { collectInputForFertilizerApplicationFilling } from "./input"
 import type { NL2025NormsFillingInput } from "./types"
 
 // Mock the entire @svenvw/fdm-core module
@@ -21,12 +21,12 @@ vi.mock("@svenvw/fdm-core", () => ({
 
 // Import the mocked functions
 import {
-    getField,
-    getGrazingIntention,
-    isOrganicCertificationValid,
     getCultivations,
     getFertilizerApplications,
     getFertilizers,
+    getField,
+    getGrazingIntention,
+    isOrganicCertificationValid,
 } from "@svenvw/fdm-core"
 
 describe("collectInputForFertilizerApplicationFilling", () => {
@@ -119,7 +119,10 @@ describe("collectInputForFertilizerApplicationFilling", () => {
             mockFdm,
             mockPrincipalId,
             "field456",
-            { start: new Date(2025, 0, 1), end: new Date(2025, 11, 31, 23, 59, 59, 999)},
+            {
+                start: new Date(2025, 0, 1),
+                end: new Date(2025, 11, 31, 23, 59, 59, 999),
+            },
         )
         expect(getFertilizers).toHaveBeenCalledWith(
             mockFdm,

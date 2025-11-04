@@ -1,6 +1,12 @@
+import type {
+    Dose,
+    GebruiksnormResult,
+    NitrogenBalanceNumeric,
+    NormFilling,
+    NutrientAdvice,
+} from "@svenvw/fdm-calculator"
 import { Suspense } from "react"
 import { Await, NavLink } from "react-router-dom"
-import { cn } from "~/lib/utils"
 import {
     Card,
     CardContent,
@@ -19,13 +25,6 @@ import {
 import { Progress } from "~/components/ui/progress"
 import { Skeleton } from "~/components/ui/skeleton"
 import { Spinner } from "~/components/ui/spinner"
-import type {
-    GebruiksnormResult,
-    NitrogenBalanceNumeric,
-    NutrientAdvice,
-    NormFilling,
-    Dose,
-} from "@svenvw/fdm-calculator"
 import {
     Tooltip,
     TooltipContent,

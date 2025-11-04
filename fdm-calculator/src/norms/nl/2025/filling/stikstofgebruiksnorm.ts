@@ -1,15 +1,15 @@
-import { withCalculationCache, type Cultivation } from "@svenvw/fdm-core"
-import type {
-    NormFilling,
-    WorkingCoefficientDetails,
-    NL2025NormsFillingInput,
-} from "./types"
-import { table11Mestcodes } from "./table-11-mestcodes"
-import { table9 } from "./table-9"
-import { getRegion } from "../value/stikstofgebruiksnorm"
-import type { RegionKey } from "../value/types"
+import { type Cultivation, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
+import { getRegion } from "../value/stikstofgebruiksnorm"
+import type { RegionKey } from "../value/types"
+import { table9 } from "./table-9"
+import { table11Mestcodes } from "./table-11-mestcodes"
+import type {
+    NL2025NormsFillingInput,
+    NormFilling,
+    WorkingCoefficientDetails,
+} from "./types"
 
 /**
  * Calculates the nitrogen utilization norm filling for a set of fertilizer applications.

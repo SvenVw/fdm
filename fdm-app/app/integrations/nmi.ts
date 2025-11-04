@@ -204,7 +204,14 @@ export async function extractSoilAnalysis(formData: FormData) {
 
     // Process the other parameters
     if (field.b_date) {
-        soilAnalysis.b_sampling_date = new Date(field.b_date)
+        // As b_date is in format dd-mm-yyyy
+        const dateParts = field.b_date.split("-")
+        if (dateParts.length === 3) {
+            const day = Number.parseInt(dateParts[0], 10)
+            const month = Number.parseInt(dateParts[1], 10) - 1 // Month is 0-indexed
+            const year = Number.parseInt(dateParts[2], 10)
+            soilAnalysis.b_sampling_date = new Date(year, month, day)
+        }
     }
     if (field.b_soiltype_agr) {
         soilAnalysis.b_soil_type = field.b_soiltype_agr
