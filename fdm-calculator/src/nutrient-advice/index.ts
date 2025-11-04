@@ -54,7 +54,7 @@ export async function requestNutrientAdvice({
         const body = {
             a_lon: b_centroid[0],
             a_lat: b_centroid[1],
-            b_lu_brp: brpCode,
+            b_lu_brp: [brpCode],
             a_nmin_cc_d30: a_nmin_cc_d30,
             a_nmin_cc_d60: a_nmin_cc_d60,
             ...soilData, // Include all other soil data parameters
