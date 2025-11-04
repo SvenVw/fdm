@@ -628,18 +628,23 @@ export async function calculateNL2025StikstofGebruiksNorm(
         )
     }
 
-    let normValue = is_nv_area
-        ? normsForRegion.nv_area
-        : normsForRegion.standard
+    let normValue = new Decimal(
+        is_nv_area ? normsForRegion.nv_area : normsForRegion.standard,
+    )
 
     // Apply korting
     const { amount: kortingAmount, description: kortingDescription } =
         calculateKorting(cultivations, region)
-    normValue = new Decimal(normValue).minus(kortingAmount).toNumber()
+    normValue = new Decimal(normValue).minus(kortingAmount)
+
+    // If normvalue is negative, e.g. Geen plaatsingsruimte plus korting, set it to 0
+    if (normValue.isNegative()) {
+        normValue = new Decimal(0)
+    }
 
     const subTypeText = subTypeOmschrijving ? ` (${subTypeOmschrijving})` : ""
     return {
-        normValue: normValue,
+        normValue: normValue.toNumber(),
         normSource: `${selectedStandard.cultivation_rvo_table2}${subTypeText}${kortingDescription}`,
     }
 }
