@@ -406,6 +406,7 @@ function calculateKorting(
     const vanggewassenCompleted2024 = vanggewassen2024.filter(
         (prevCultivation) => {
             return (
+                prevCultivation.b_lu_end === null ||
                 prevCultivation.b_lu_end.getTime() >= new Date(currentYear, 1) // Month 1 is February
             )
         },
