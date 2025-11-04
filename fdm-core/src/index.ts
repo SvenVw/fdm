@@ -24,6 +24,12 @@ export {
 export type { FdmAuth } from "./authentication.d"
 export type { PrincipalId } from "./authorization.d"
 export {
+    getCachedCalculation,
+    setCachedCalculation,
+    setCalculationError,
+    withCalculationCache,
+} from "./calculator"
+export {
     disableCultivationCatalogue,
     disableFertilizerCatalogue,
     enableCultivationCatalogue,
@@ -41,6 +47,7 @@ export {
     getCultivationPlan,
     getCultivations,
     getCultivationsFromCatalogue,
+    getDefaultDatesOfCultivation,
     removeCultivation,
     updateCultivation,
 } from "./cultivation"
@@ -103,6 +110,12 @@ export {
 } from "./field"
 export type { Field } from "./field.d"
 export {
+    getGrazingIntention,
+    getGrazingIntentions,
+    removeGrazingIntention,
+    setGrazingIntention,
+} from "./grazing_intention"
+export {
     addHarvest,
     getHarvest,
     getHarvests,
@@ -115,6 +128,16 @@ export type {
     HarvestableAnalysis,
 } from "./harvest.d"
 export { runMigration } from "./migrate"
+export {
+    addOrganicCertification,
+    getOrganicCertification,
+    isOrganicCertificationValid,
+    isValidSkalNumber,
+    isValidTracesNumber,
+    listOrganicCertifications,
+    removeOrganicCertification,
+} from "./organic"
+export type { OrganicCertification } from "./organic.d"
 export {
     acceptInvitation,
     cancelPendingInvitation,

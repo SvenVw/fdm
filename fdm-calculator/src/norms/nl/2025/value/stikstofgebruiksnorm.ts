@@ -1,7 +1,8 @@
-import type { Field } from "@svenvw/fdm-core"
+import { type Field, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
-import { getGeoTiffValue } from "../../../shared/geotiff"
-import { getFdmPublicDataUrl } from "../../../shared/public-data-url"
+import pkg from "../../../../package"
+import { getGeoTiffValue } from "../../../../shared/geotiff"
+import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {
@@ -147,7 +148,7 @@ export async function getRegion(
 function getNormsForCultivation(
     selectedStandard: NitrogenStandard,
     b_lu_end: Date,
-    subTypeOmschrijving?: string, // New parameter
+    subTypeOmschrijving?: string,
 ): NormsByRegion | undefined {
     if (selectedStandard.sub_types) {
         type SubType = NonNullable<NitrogenStandard["sub_types"]>[number]
@@ -207,7 +208,13 @@ function determineSubTypeOmschrijving(
     standard: NitrogenStandard,
     is_derogatie_bedrijf: boolean | undefined,
     cultivations: NL2025NormsInputForCultivation[],
+    has_grazing_intention: boolean | undefined,
 ): string | undefined {
+    // Grasland logic based on grazing intention
+    if (standard.type === "grasland") {
+        return has_grazing_intention ? "beweiden" : "volledig maaien"
+    }
+
     // Potato logic based on variety
     if (standard.type === "aardappel") {
         if (cultivation.b_lu_variety) {
@@ -399,6 +406,7 @@ function calculateKorting(
     const vanggewassenCompleted2024 = vanggewassen2024.filter(
         (prevCultivation) => {
             return (
+                prevCultivation.b_lu_end === null ||
                 prevCultivation.b_lu_end.getTime() >= new Date(currentYear, 1) // Month 1 is February
             )
         },
@@ -523,10 +531,11 @@ function calculateKorting(
  * @see {@link https://www.rvo.nl/sites/default/files/2024-12/Tabel-2-Stikstof-landbouwgrond-2025_0.pdf | RVO Tabel 2 Stikstof landbouwgrond 2025} - Official document for nitrogen norms.
  * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/stikstof-en-fosfaat/gebruiksnormen-stikstof | RVO Gebruiksnormen stikstof (official page)} - General information on nitrogen and phosphate norms.
  */
-export async function getNL2025StikstofGebruiksNorm(
+export async function calculateNL2025StikstofGebruiksNorm(
     input: NL2025NormsInput,
 ): Promise<GebruiksnormResult> {
     const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf
+    const has_grazing_intention = input.farm.has_grazing_intention
     const field = input.field
     const cultivations = input.cultivations
 
@@ -596,12 +605,13 @@ export async function getNL2025StikstofGebruiksNorm(
         selectedStandard,
         is_derogatie_bedrijf,
         cultivations,
+        has_grazing_intention,
     )
 
     const applicableNorms = getNormsForCultivation(
         selectedStandard,
         cultivation.b_lu_end,
-        subTypeOmschrijving, // Pass the determined subTypeOmschrijving
+        subTypeOmschrijving,
     )
 
     if (!applicableNorms) {
@@ -619,18 +629,41 @@ export async function getNL2025StikstofGebruiksNorm(
         )
     }
 
-    let normValue = is_nv_area
-        ? normsForRegion.nv_area
-        : normsForRegion.standard
+    let normValue = new Decimal(
+        is_nv_area ? normsForRegion.nv_area : normsForRegion.standard,
+    )
 
     // Apply korting
     const { amount: kortingAmount, description: kortingDescription } =
         calculateKorting(cultivations, region)
-    normValue = new Decimal(normValue).minus(kortingAmount).toNumber()
+    normValue = new Decimal(normValue).minus(kortingAmount)
+
+    // If normvalue is negative, e.g. Geen plaatsingsruimte plus korting, set it to 0
+    if (normValue.isNegative()) {
+        normValue = new Decimal(0)
+    }
 
     const subTypeText = subTypeOmschrijving ? ` (${subTypeOmschrijving})` : ""
     return {
-        normValue: normValue,
+        normValue: normValue.toNumber(),
         normSource: `${selectedStandard.cultivation_rvo_table2}${subTypeText}${kortingDescription}`,
     }
 }
+
+/**
+ * Memoized version of {@link calculateNL2025StikstofGebruiksNorm}.
+ *
+ * This function is wrapped with `withCalculationCache` to optimize performance by caching
+ * results based on the input and the current calculator version.
+ *
+ * @param {NL2025NormsInput} input - An object of type `NL2025NormsInput` containing all necessary data.
+ * @returns {Promise<GebruiksnormResult>} A promise that resolves to an object of type `GebruiksnormResult` containing:
+ *   - `normValue`: The determined nitrogen usage standard in kilograms per hectare (kg/ha).
+ *   - `normSource`: The descriptive name from RVO Table 2 used for the calculation.
+ *   - `kortingDescription`: A description of any korting (reduction) applied to the norm.
+ */
+export const getNL2025StikstofGebruiksNorm = withCalculationCache(
+    calculateNL2025StikstofGebruiksNorm,
+    "calculateNL2025StikstofGebruiksNorm",
+    pkg.calculatorVersion,
+)

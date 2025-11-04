@@ -142,7 +142,7 @@ export default function FarmFertilizerBlock() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             p_name_nl: fertilizer.p_name_nl,
-            p_type: fertilizer.p_type,
+            p_type_rvo: fertilizer.p_type_rvo,
             p_dm: fertilizer.p_dm,
             p_density: fertilizer.p_density,
             p_om: fertilizer.p_om,

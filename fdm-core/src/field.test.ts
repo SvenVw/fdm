@@ -9,6 +9,7 @@ import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import {
     addField,
+    determineIfFieldIsProductive,
     getField,
     getFields,
     listAvailableAcquiringMethods,
@@ -36,12 +37,25 @@ describe("Farm Data Model", () => {
     })
 
     describe("Field CRUD", () => {
-        it("should add a new field", async () => {
+        let fdm: FdmType
+        let principal_id: string
+        let b_id_farm: string
+
+        beforeEach(async () => {
+            const host = inject("host")
+            const port = inject("port")
+            const user = inject("user")
+            const password = inject("password")
+            const database = inject("database")
+            fdm = createFdmServer(host, port, user, password, database)
+            principal_id = "test_principal"
+
+            // Create a test farm
             const farmName = "Test Farm"
             const farmBusinessId = "123456"
             const farmAddress = "123 Farm Lane"
             const farmPostalCode = "12345"
-            const b_id_farm = await addFarm(
+            b_id_farm = await addFarm(
                 fdm,
                 principal_id,
                 farmName,
@@ -49,7 +63,9 @@ describe("Farm Data Model", () => {
                 farmAddress,
                 farmPostalCode,
             )
+        })
 
+        it("should add a new field", async () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry: Polygon = {
@@ -93,6 +109,41 @@ describe("Farm Data Model", () => {
             expect(field.b_isproductive).toBe(true)
             expect(field.b_start).toEqual(AcquireDate)
             expect(field.b_end).toEqual(discardingDate)
+            expect(field.b_acquiring_method).toBe(AcquiringMethod)
+        })
+
+        it("should add a new field with a later added option for b_acquiring_method", async () => {
+            const fieldName = "Test Field"
+            const fieldIDSource = "test-field-id"
+            const fieldGeometry: Polygon = {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [0, 0],
+                        [0, 1],
+                        [1, 1],
+                        [1, 0],
+                        [0, 0],
+                    ],
+                ],
+            }
+            const AcquireDate = new Date("2023-01-01")
+            const discardingDate = new Date("2023-12-31")
+            const AcquiringMethod = "nl_11"
+            const b_id = await addField(
+                fdm,
+                principal_id,
+                b_id_farm,
+                fieldName,
+                fieldIDSource,
+                fieldGeometry,
+                AcquireDate,
+                AcquiringMethod,
+                discardingDate,
+            )
+            expect(b_id).toBeDefined()
+
+            const field = await getField(fdm, principal_id, b_id)
             expect(field.b_acquiring_method).toBe(AcquiringMethod)
         })
 
@@ -714,6 +765,8 @@ describe("Farm Data Model", () => {
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false, // Changed to boolean
                 b_lu_variety_options: [], // Added missing property
+                b_lu_start_default: "03-15",
+                b_date_harvest_default: "10-15",
             })
         })
 
@@ -896,6 +949,50 @@ describe("Farm Data Model", () => {
                 .from(schema.harvestables)
                 .where(eq(schema.harvestables.b_id_harvestable, harvestId))
             expect(remainingHarvests.length).toBe(0)
+        })
+    })
+
+    describe("determineIfFieldIsProductive", () => {
+        it("should determine if a field is productive by checking name", async () => {
+            const b_isproductive = determineIfFieldIsProductive(
+                1.0,
+                100.0,
+                "Bufferstrip",
+            )
+            expect(b_isproductive).toBe(false)
+        })
+        it("should determine if a field is productive by checking shape", async () => {
+            const b_isproductive = determineIfFieldIsProductive(
+                1.0,
+                10000.0,
+                "Field",
+            )
+            expect(b_isproductive).toBe(false)
+        })
+
+        it("should determine if a field is productive by checking shape (area is large enough)", async () => {
+            const b_isproductive = determineIfFieldIsProductive(
+                2.5,
+                10000.0,
+                "Field",
+            )
+            expect(b_isproductive).toBe(true)
+        })
+        it("should determine if a field is productive by checking shape and name", async () => {
+            const b_isproductive = determineIfFieldIsProductive(
+                1.0,
+                1000.0,
+                "Bufferstrip",
+            )
+            expect(b_isproductive).toBe(false)
+        })
+        it("should determine if a field is productive by checking shape and name (productive)", async () => {
+            const b_isproductive = determineIfFieldIsProductive(
+                10.0,
+                100.0,
+                "Field",
+            )
+            expect(b_isproductive).toBe(true)
         })
     })
 

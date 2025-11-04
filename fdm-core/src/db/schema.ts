@@ -1,6 +1,8 @@
 import type { ApplicationMethods } from "@svenvw/fdm-data"
+import { sql } from "drizzle-orm"
 import {
     boolean,
+    check,
     index,
     integer,
     pgSchema,
@@ -37,22 +39,25 @@ export type farmsTypeInsert = typeof farms.$inferInsert
 export const acquiringMethodOptions = [
     { value: "nl_01", label: "Eigendom" },
     { value: "nl_02", label: "Reguliere pacht" },
+    {
+        value: "nl_03",
+        label: "In gebruik van een terreinbeherende organisatie",
+    },
+    {
+        value: "nl_04",
+        label: "Tijdelijk gebruik in het kader van landinrichting",
+    },
     { value: "nl_07", label: "Overige exploitatievormen" },
     { value: "nl_09", label: "Erfpacht" },
+    { value: "nl_10", label: "Pacht van geringe oppervlakten" },
+    { value: "nl_11", label: "Natuurpacht" },
     { value: "nl_12", label: "Geliberaliseerde pacht, langer dan 6 jaar" },
     { value: "nl_13", label: "Geliberaliseerde pacht, 6 jaar of korter" },
     { value: "nl_61", label: "Reguliere pacht kortlopend" },
     { value: "nl_63", label: "Teeltpacht" },
-    // { value: "nl_xx", label: "Pacht van geringe oppervlakten" },
-    // { value: "nl_xx", label: "Natuurpacht" },
-    // { value: "nl_xx", label: "In gebuik van een terreinbeherende organisatie" },
-    // {
-    //     value: "nl_xx",
-    //     label: "Tijdelijk gebuik in het kader van landinrichting",
-    // },
     { value: "unknown", label: "Onbekend" },
 ]
-const acquiringMethodEnum = fdmSchema.enum(
+export const acquiringMethodEnum = fdmSchema.enum(
     "b_acquiring_method",
     acquiringMethodOptions.map((x) => x.value) as [string, ...string[]],
 )
@@ -201,6 +206,84 @@ export type fertilizerApplicationTypeSelect =
 export type fertilizerApplicationTypeInsert =
     typeof fertilizerApplication.$inferInsert
 
+// Define farm_managing table
+export const typeRvoOptions = [
+    { value: "10", label: "Rundvee - Vaste mest" },
+    { value: "11", label: "Rundvee - Filtraat na mestscheiding" },
+    { value: "12", label: "Rundvee - Gier" },
+    { value: "13", label: "Rundvee - Koek na mestscheiding" },
+    { value: "14", label: "Rundvee - Drijfmest behalve van vleeskalveren" },
+    { value: "17", label: "Rundvee - Bewerkte kalvergier" },
+    { value: "18", label: "Rundvee - Vleeskalveren, witvlees" },
+    { value: "19", label: "Rundvee - Vleeskalveren, rosevlees" },
+    { value: "23", label: "Kalkoenen - Mest, alle systemen" },
+    { value: "30", label: "Kippen - Drijfmest" },
+    { value: "31", label: "Kippen - Deeppitstal, kanalenstal" },
+    { value: "32", label: "Kippen - Mestband" },
+    { value: "33", label: "Kippen - Mestband + nadroog" },
+    {
+        value: "35",
+        label: "Kippen - Geheel of gedeeltelijk strooiselstal (incl. volièrestal/scharrelstal)",
+    },
+    {
+        value: "39",
+        label: "Vleeskuikens en parelhoenders - Mest, alle systemen",
+    },
+    { value: "40", label: "Varkens - Vaste mest" },
+    { value: "41", label: "Varkens - Filtraat na mestscheiding" },
+    { value: "42", label: "Varkens - Gier" },
+    { value: "43", label: "Varkens - Koek na mestscheiding" },
+    {
+        value: "46",
+        label: "Varkens - Drijfmest fokzeugen, incl. biggen, opfokzeugen/-beren, dekberen",
+    },
+    { value: "50", label: "Varkens - Drijfmest vleesvarkens" },
+    { value: "56", label: "Schapen - Mest, alle systemen" },
+    { value: "60", label: "Geiten - Drijfmest" },
+    { value: "61", label: "Geiten - Vaste mest" },
+    { value: "75", label: "Nertsen - Vaste mest" },
+    { value: "76", label: "Nertsen - Drijfmest" },
+    { value: "80", label: "Eenden - Vaste mest" },
+    { value: "81", label: "Eenden - Drijfmest" },
+    { value: "90", label: "Konijnen - Vaste mest" },
+    {
+        value: "91",
+        label: "Konijnen - Drijfmest met percentage droge stof < 2,5%",
+    },
+    { value: "92", label: "Konijnen - Drijfmest" },
+    { value: "25", label: "Paarden - Vaste mest" },
+    { value: "26", label: "Ezels - Vaste mest" },
+    { value: "27", label: "Pony’s - Vaste mest" },
+    { value: "95", label: "Herten - Vaste mest" },
+    { value: "96", label: "Waterbuffels - Mest, alle systemen" },
+    { value: "97", label: "Knobbelgans - Vaste mest" },
+    { value: "98", label: "Grauwe gans - Vaste mest" },
+    { value: "99", label: "Fazanten en patrijzen - Vaste mest" },
+    { value: "100", label: "Struisvogels, emoes en nandoes - Vaste mest" },
+    { value: "101", label: "Vleesduif - Vaste mest" },
+    { value: "102", label: "Bruine rat - Vaste mest" },
+    { value: "103", label: "Tamme muis - Vaste mest" },
+    { value: "104", label: "Cavia - Vaste mest" },
+    { value: "105", label: "Goudhamster - Vaste mest" },
+    { value: "106", label: "Gerbil - Vaste mest" },
+    { value: "107", label: "Fase 1 substraat" },
+    { value: "108", label: "Fase 2 substraat" },
+    { value: "109", label: "Fase 3 substraat" },
+    { value: "110", label: "Champost" },
+    { value: "111", label: "Compost" },
+    { value: "112", label: "Zeer schone compost" },
+    { value: "113", label: "Zuiveringsslib vloeibaar" },
+    { value: "114", label: "Zuiveringsslib steekvast" },
+    { value: "115", label: "Kunstmest" },
+    { value: "116", label: "Overige mestsoorten" },
+    { value: "117", label: "Gescheiden champost" },
+    { value: "120", label: "Mineralenconcentraat" },
+]
+export const typeRvoEnum = fdmSchema.enum(
+    "p_type_rvo",
+    typeRvoOptions.map((x) => x.value) as [string, ...string[]],
+)
+
 // Define fertilizers_catalogue table
 export const fertilizersCatalogue = fdmSchema.table(
     "fertilizers_catalogue",
@@ -257,6 +340,7 @@ export const fertilizersCatalogue = fdmSchema.table(
         p_type_manure: boolean(),
         p_type_mineral: boolean(),
         p_type_compost: boolean(),
+        p_type_rvo: typeRvoEnum(),
         hash: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
@@ -371,11 +455,23 @@ export const cultivationsCatalogue = fdmSchema.table(
         b_n_fixation: numericCasted(),
         b_lu_rest_oravib: boolean(),
         b_lu_variety_options: text().array(),
+        b_lu_start_default: text(), // MM-dd
+        b_date_harvest_default: text(), // MM-dd
         hash: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
-    (table) => [uniqueIndex("b_lu_catalogue_idx").on(table.b_lu_catalogue)],
+    (table) => [
+        uniqueIndex("b_lu_catalogue_idx").on(table.b_lu_catalogue),
+        check(
+            "b_lu_start_default_format",
+            sql`b_lu_start_default IS NULL OR b_lu_start_default ~ '^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'`,
+        ),
+        check(
+            "b_date_harvest_default_format",
+            sql`b_date_harvest_default IS NULL OR b_date_harvest_default ~ '^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'`,
+        ),
+    ],
 )
 
 export type cultivationsCatalogueTypeSelect =
@@ -703,6 +799,9 @@ export const derogationApplying = fdmSchema.table(
                     columns: [table.b_id_farm, table.b_id_derogation],
                 }),
             },
+            uniqueIndex("derogation_one_per_farm_per").on(
+                table.b_id_derogation,
+            ),
         ]
     },
 )
@@ -711,6 +810,74 @@ export type derogationApplyingTypeSelect =
     typeof derogationApplying.$inferSelect
 export type derogationApplyingTypeInsert =
     typeof derogationApplying.$inferInsert
+
+// Define organics table
+export const organicCertifications = fdmSchema.table("organic_certifications", {
+    b_id_organic: text().primaryKey(),
+    b_organic_traces: text(),
+    b_organic_skal: text(),
+    b_organic_issued: timestamp({ withTimezone: true }),
+    b_organic_expires: timestamp({ withTimezone: true }),
+    created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updated: timestamp({ withTimezone: true }),
+})
+
+export type organicCertificationsTypeSelect =
+    typeof organicCertifications.$inferSelect
+export type organicCertificationsTypeInsert =
+    typeof organicCertifications.$inferInsert
+
+// Define organic_certifications_holding table
+export const organicCertificationsHolding = fdmSchema.table(
+    "organic_certifications_holding",
+    {
+        b_id_farm: text()
+            .notNull()
+            .references(() => farms.b_id_farm),
+        b_id_organic: text()
+            .notNull()
+            .references(() => organicCertifications.b_id_organic),
+        created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+        updated: timestamp({ withTimezone: true }),
+    },
+    (table) => {
+        return [
+            {
+                pk: primaryKey({
+                    columns: [table.b_id_farm, table.b_id_organic],
+                }),
+            },
+            uniqueIndex("organic_one_farm_per_cert").on(table.b_id_organic),
+        ]
+    },
+)
+
+export type organicCertificationsHoldingTypeSelect =
+    typeof organicCertificationsHolding.$inferSelect
+export type organicCertificationsHoldingTypeInsert =
+    typeof organicCertificationsHolding.$inferInsert
+
+// Define intending_grazing table
+export const intendingGrazing = fdmSchema.table(
+    "intending_grazing",
+    {
+        b_id_farm: text()
+            .notNull()
+            .references(() => farms.b_id_farm),
+        b_grazing_intention: boolean(),
+        b_grazing_intention_year: integer().notNull(),
+        created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+        updated: timestamp({ withTimezone: true }),
+    },
+    (table) => ({
+        pk: primaryKey({
+            columns: [table.b_id_farm, table.b_grazing_intention_year],
+        }),
+    }),
+)
+
+export type intendingGrazingTypeSelect = typeof intendingGrazing.$inferSelect
+export type intendingGrazingTypeInsert = typeof intendingGrazing.$inferInsert
 
 // Define fertilizer_catalogue_enabling table
 export const fertilizerCatalogueEnabling = fdmSchema.table(

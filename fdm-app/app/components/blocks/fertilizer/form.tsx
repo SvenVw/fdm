@@ -120,7 +120,7 @@ export function FertilizerForm({
                                 >
                                     <FormControl>
                                         <SelectTrigger>
-                                            <SelectValue placeholder="Selecteer een type" />
+                                            <SelectValue placeholder="Selecteer een optie" />
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
@@ -130,7 +130,7 @@ export function FertilizerForm({
                                                     key={option.value}
                                                     value={option.value}
                                                 >
-                                                    {option.label}
+                                                    {`${option.label} (${option.value})`}
                                                 </SelectItem>
                                             )
                                         })}

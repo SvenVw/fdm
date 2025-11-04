@@ -1,7 +1,7 @@
 import {
-    calculateNitrogenBalance,
     collectInputForNitrogenBalance,
-    type NitrogenBalanceNumeric,
+    getNitrogenBalance,
+    type NitrogenBalanceFieldResultNumeric,
 } from "@svenvw/fdm-calculator"
 import { getFarm, getFields } from "@svenvw/fdm-core"
 import {
@@ -11,6 +11,7 @@ import {
     ArrowUpFromLine,
     CircleAlert,
     CircleCheck,
+    CircleX,
 } from "lucide-react"
 import { Suspense, use } from "react"
 import {
@@ -19,7 +20,6 @@ import {
     type MetaFunction,
     NavLink,
     useLoaderData,
-    useLocation,
 } from "react-router"
 import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons"
@@ -31,9 +31,15 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "~/components/ui/tooltip"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
+import { handleLoaderError, reportError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useFieldFilterStore } from "~/store/field-filter"
 
@@ -51,61 +57,75 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("invalid: b_id_farm", {
-            status: 400,
-            statusText: "invalid: b_id_farm",
-        })
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
-    // Get timeframe from calendar store
-    const timeframe = getTimeframe(params)
-
-    // Get details of farm
-    const farm = await getFarm(fdm, session.principal_id, b_id_farm)
-    if (!farm) {
-        throw data("not found: b_id_farm", {
-            status: 404,
-            statusText: "not found: b_id_farm",
-        })
-    }
-
-    // Get details of fields
-    const fields = await getFields(fdm, session.principal_id, b_id_farm)
-
-    const asyncData = (async () => {
-        // Collect input data for nutrient balance calculation
-        const nitrogenBalanceInput = await collectInputForNitrogenBalance(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            timeframe,
-        )
-
-        let nitrogenBalanceResult = null as NitrogenBalanceNumeric | null
-        let errorMessage = null as string | null
-        try {
-            nitrogenBalanceResult =
-                await calculateNitrogenBalance(nitrogenBalanceInput)
-        } catch (error) {
-            errorMessage = String(error).replace("Error: ", "")
+    try {
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("invalid: b_id_farm", {
+                status: 400,
+                statusText: "invalid: b_id_farm",
+            })
         }
+
+        // Get the session
+        const session = await getSession(request)
+
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
+
+        // Get details of farm
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
+        if (!farm) {
+            throw data("not found: b_id_farm", {
+                status: 404,
+                statusText: "not found: b_id_farm",
+            })
+        }
+
+        // Get details of fields
+        const fields = await getFields(fdm, session.principal_id, b_id_farm)
+
+        const asyncData = (async () => {
+            // Collect input data for nutrient balance calculation
+            const nitrogenBalanceInput = await collectInputForNitrogenBalance(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+                timeframe,
+            )
+
+            const nitrogenBalanceResult = await getNitrogenBalance(
+                fdm,
+                nitrogenBalanceInput,
+            )
+
+            if (nitrogenBalanceResult.hasErrors) {
+                reportError(
+                    nitrogenBalanceResult.fieldErrorMessages.join(",\n"),
+                    {
+                        page: "farm/{b_id_farm}/{calendar}/balance/nitrogen/_index",
+                        scope: "loader",
+                    },
+                    {
+                        b_id_farm,
+                        timeframe,
+                        userId: session.principal_id,
+                    },
+                )
+            }
+
+            return {
+                nitrogenBalanceResult: nitrogenBalanceResult,
+            }
+        })()
 
         return {
-            nitrogenBalanceResult: nitrogenBalanceResult,
-            errorMessage: errorMessage,
+            farm: farm,
+            fields: fields,
+            asyncData: asyncData,
         }
-    })()
-
-    return {
-        farm: farm,
-        fields: fields,
-        asyncData: asyncData,
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
@@ -138,13 +158,12 @@ function FarmBalanceNitrogenOverview({
     fields,
     asyncData,
 }: Awaited<ReturnType<typeof loader>>) {
-    const location = useLocation()
-    const page = location.pathname
-    const { nitrogenBalanceResult, errorMessage } = use(asyncData)
+    const { nitrogenBalanceResult } = use(asyncData)
     const { showProductiveOnly } = useFieldFilterStore()
 
     const resolvedNitrogenBalanceResult = nitrogenBalanceResult
-    if (errorMessage) {
+
+    if (resolvedNitrogenBalanceResult.errorMessage) {
         return (
             <div className="flex items-center justify-center">
                 <Card className="w-[350px]">
@@ -155,68 +174,39 @@ function FarmBalanceNitrogenOverview({
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {!errorMessage ? (
-                            <div className="text-muted-foreground">
-                                <p>
-                                    Er is een onbekende fout opgetreden. Probeer
-                                    opnieuw of neem contact op met
-                                    Ondersteuning.
-                                </p>
+                        <div className="text-muted-foreground">
+                            <p>
+                                Er is helaas wat misgegaan. Probeer opnieuw of
+                                neem contact op met Ondersteuning en deel de
+                                volgende foutmelding:
+                            </p>
+                            <div className="mt-8 w-full max-w-2xl">
+                                <pre className="bg-gray-200 dark:bg-gray-800 p-4 rounded-md overflow-x-auto text-sm text-gray-800 dark:text-gray-200">
+                                    {JSON.stringify(
+                                        {
+                                            message:
+                                                resolvedNitrogenBalanceResult.errorMessage,
+                                            timestamp: new Date(),
+                                        },
+                                        null,
+                                        2,
+                                    )}
+                                </pre>
                             </div>
-                        ) : errorMessage.match(
-                              /Missing required soil parameters/,
-                          ) ? (
-                            <div className="text-muted-foreground">
-                                <p>
-                                    Voor niet alle percelen zijn de benodigde
-                                    bodemparameters bekend:
-                                </p>
-                                <br />
-                                <ul className="list-disc list-inside">
-                                    {errorMessage.match(/a_n_rt/) ? (
-                                        <li>Totaal stikstofgehalte</li>
-                                    ) : null}
-                                    {errorMessage.match(/b_soiltype_agr/) ? (
-                                        <li>Agrarisch bodemtype</li>
-                                    ) : null}
-                                    {errorMessage.match(/a_c_of|a_som_loi/) ? (
-                                        <li>Organische stofgehalte</li>
-                                    ) : null}
-                                </ul>
-                            </div>
-                        ) : (
-                            <div className="text-muted-foreground">
-                                <p>
-                                    Er is helaas wat misgegaan. Probeer opnieuw
-                                    of neem contact op met Ondersteuning en deel
-                                    de volgende foutmelding:
-                                </p>
-                                <div className="mt-8 w-full max-w-2xl">
-                                    <pre className="bg-gray-200 dark:bg-gray-800 p-4 rounded-md overflow-x-auto text-sm text-gray-800 dark:text-gray-200">
-                                        {JSON.stringify(
-                                            {
-                                                message: errorMessage,
-                                                page: page,
-                                                timestamp: new Date(),
-                                            },
-                                            null,
-                                            2,
-                                        )}
-                                    </pre>
-                                </div>
-                            </div>
-                        )}
+                        </div>
                     </CardContent>
                 </Card>
             </div>
         )
     }
 
+    const { hasErrors } = resolvedNitrogenBalanceResult
+
     const fieldsMap = new Map(fields.map((f) => [f.b_id, f]))
     const filteredFields = resolvedNitrogenBalanceResult.fields.filter(
-        (field) => {
+        (fieldResult: NitrogenBalanceFieldResultNumeric) => {
             if (!showProductiveOnly) return true
-            const fieldData = fieldsMap.get(field.b_id)
+            const fieldData = fieldsMap.get(fieldResult.b_id)
             return fieldData ? fieldData.b_isproductive === true : false
         },
     )
@@ -237,11 +227,21 @@ function FarmBalanceNitrogenOverview({
                                 <p>
                                     {`${resolvedNitrogenBalanceResult.balance} / ${resolvedNitrogenBalanceResult.target}`}
                                 </p>
-                                {resolvedNitrogenBalanceResult.balance <=
-                                resolvedNitrogenBalanceResult.target ? (
+                                {hasErrors ? (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <CircleAlert className="text-orange-500 bg-orange-100 rounded-full" />
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            Niet alle percelen konden worden
+                                            berekend
+                                        </TooltipContent>
+                                    </Tooltip>
+                                ) : resolvedNitrogenBalanceResult.balance <=
+                                  resolvedNitrogenBalanceResult.target ? (
                                     <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full " />
                                 ) : (
-                                    <CircleAlert className="text-red-500 bg-red-100 rounded-full " />
+                                    <CircleX className="text-red-500 bg-red-100 rounded-full " />
                                 )}
                             </div>
                         </div>
@@ -332,22 +332,31 @@ function FarmBalanceNitrogenOverview({
                         <div className="space-y-8">
                             {filteredFields.map(
                                 (
-                                    field: NitrogenBalanceNumeric["fields"][number],
+                                    fieldResult: NitrogenBalanceFieldResultNumeric,
                                 ) => {
-                                    const fieldData = fieldsMap.get(field.b_id)
+                                    const fieldData = fieldsMap.get(
+                                        fieldResult.b_id,
+                                    )
                                     return (
                                         <div
                                             className="flex items-center"
-                                            key={field.b_id}
+                                            key={fieldResult.b_id}
                                         >
-                                            {field.balance <= field.target ? (
-                                                <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full w-6 h-6" />
+                                            {fieldResult.balance ? (
+                                                fieldResult.balance.balance <=
+                                                fieldResult.balance.target ? (
+                                                    <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full w-6 h-6" />
+                                                ) : (
+                                                    <CircleX className="text-red-500 bg-red-100 p-0 rounded-full w-6 h-6" />
+                                                )
                                             ) : (
-                                                <CircleAlert className="text-red-500 bg-red-100 p-0 rounded-full w-6 h-6" />
+                                                <CircleAlert className="text-orange-500 bg-orange-100 p-0 rounded-full w-6 h-6" />
                                             )}
 
                                             <div className="ml-4 space-y-1">
-                                                <NavLink to={`./${field.b_id}`}>
+                                                <NavLink
+                                                    to={`./${fieldResult.b_id}`}
+                                                >
                                                     <p className="text-sm font-medium leading-none hover:underline">
                                                         {fieldData?.b_name}
                                                     </p>
@@ -357,7 +366,19 @@ function FarmBalanceNitrogenOverview({
                                                 </p>
                                             </div>
                                             <div className="ml-auto font-medium">
-                                                {field.balance} / {field.target}
+                                                {fieldResult.balance ? (
+                                                    `${fieldResult.balance.balance} / ${fieldResult.balance.target}`
+                                                ) : (
+                                                    <NavLink
+                                                        to={`./${fieldResult.b_id}`}
+                                                    >
+                                                        <p className="text-sm text-end text-orange-500 hover:underline">
+                                                            {
+                                                                "Bekijk foutmelding"
+                                                            }
+                                                        </p>
+                                                    </NavLink>
+                                                )}
                                             </div>
                                         </div>
                                     )

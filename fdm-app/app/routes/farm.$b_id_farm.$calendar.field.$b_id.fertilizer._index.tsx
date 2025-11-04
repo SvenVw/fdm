@@ -6,6 +6,7 @@ import {
     getFertilizers,
     getField,
     removeFertilizerApplication,
+    updateFertilizerApplication,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
@@ -13,16 +14,26 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
+    useNavigation,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 import { FertilizerApplicationCard } from "~/components/blocks/fertilizer-applications/card"
-import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
+import {
+    FormSchema,
+    FormSchemaModify,
+} from "~/components/blocks/fertilizer-applications/formschema"
+import { FertilizerApplicationMetricsCard } from "~/components/blocks/fertilizer-applications/metrics"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import {
+    getNitrogenBalanceforField,
+    getNorms,
+    getNutrientAdviceForField,
+} from "../integrations/calculator"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -70,6 +81,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get the session
         const session = await getSession(request)
+        const principal_id = session.principal_id
 
         // Get timeframe from calendar store
         const timeframe = getTimeframe(params)
@@ -82,6 +94,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 statusText: "Field is not found",
             })
         }
+        const b_centroid = field.b_centroid
 
         // Get available fertilizers for the farm
         const fertilizers = await getFertilizers(
@@ -92,15 +105,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fertilizerParameterDescription =
             getFertilizerParametersDescription()
         const applicationMethods = fertilizerParameterDescription.find(
-            (x) => x.parameter === "p_app_method_options",
+            (x: { parameter: string }) =>
+                x.parameter === "p_app_method_options",
         )
         if (!applicationMethods) throw new Error("Parameter metadata missing")
         // Map fertilizers to options for the combobox
         const fertilizerOptions = fertilizers.map((fertilizer) => {
             const applicationMethodOptions = fertilizer.p_app_method_options
-                .map((opt) => {
+                .map((opt: any) => {
                     const meta = applicationMethods.options.find(
-                        (x) => x.value === opt,
+                        (x: any) => x.value === opt,
                     )
                     return meta ? { value: opt, label: meta.label } : undefined
                 })
@@ -125,13 +139,42 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fertilizers,
         })
 
-        // Return user information from loader
+        const fertilizerApplicationMetricsData = {
+            norms: getNorms({
+                fdm,
+                principal_id,
+                b_id,
+            }),
+            nitrogenBalance: getNitrogenBalanceforField({
+                fdm,
+                principal_id,
+                b_id_farm,
+                b_id,
+                timeframe,
+            }),
+            nutrientAdvice: getNutrientAdviceForField({
+                fdm,
+                principal_id,
+                b_id,
+                b_centroid,
+                timeframe,
+            }),
+            dose: dose.dose,
+            b_id: b_id,
+            b_id_farm: b_id_farm,
+            calendar: getCalendar(params),
+        }
+
+        // Return user information from loader, including the promises
         return {
             field: field,
             fertilizerOptions: fertilizerOptions,
             fertilizerApplications: fertilizerApplications,
+            fertilizers: fertilizers,
             dose: dose.dose,
             applicationMethodOptions: applicationMethods.options,
+            fertilizerApplicationMetricsData: fertilizerApplicationMetricsData,
+            calendar: getCalendar(params),
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -149,15 +192,34 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
+    const navigation = useNavigation()
+    const isSubmitting = navigation.state === "submitting"
 
     return (
-        <div className="space-y-6">
-            <FertilizerApplicationCard
-                fertilizerApplications={loaderData.fertilizerApplications}
-                applicationMethodOptions={loaderData.applicationMethodOptions}
-                fertilizerOptions={loaderData.fertilizerOptions}
-                dose={loaderData.dose}
-            />
+        <div className="container mx-auto py-8 px-4">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                <div className="md:col-span-1 lg:col-span-1">
+                    <FertilizerApplicationCard
+                        fertilizerApplications={
+                            loaderData.fertilizerApplications
+                        }
+                        applicationMethodOptions={
+                            loaderData.applicationMethodOptions
+                        }
+                        fertilizers={loaderData.fertilizers}
+                        fertilizerOptions={loaderData.fertilizerOptions}
+                        dose={loaderData.dose}
+                    />
+                </div>
+                <div className="md:col-span-1 lg:col-span-2">
+                    <FertilizerApplicationMetricsCard
+                        fertilizerApplicationMetricsData={
+                            loaderData.fertilizerApplicationMetricsData
+                        }
+                        isSubmitting={isSubmitting}
+                    />
+                </div>
+            </div>
         </div>
     )
 }
@@ -209,6 +271,37 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
 
+        if (request.method === "PUT") {
+            // Collect form entry
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                FormSchemaModify,
+            )
+            const { p_app_id, p_id, p_app_amount, p_app_date, p_app_method } =
+                formValues
+
+            if (!p_app_id || typeof p_app_id !== "string") {
+                return dataWithError(
+                    "Invalid or missing p_app_id value",
+                    "Helaas, er is wat misgegaan. Probeer het later opnieuw of neem contact op met ondersteuning.",
+                )
+            }
+
+            await updateFertilizerApplication(
+                fdm,
+                session.principal_id,
+                p_app_id,
+                p_id,
+                p_app_amount,
+                p_app_method,
+                p_app_date,
+            )
+
+            return dataWithSuccess("Date edited successfully", {
+                message: "Bemesting is gewijzigd",
+            })
+        }
+
         if (request.method === "DELETE") {
             const formData = await request.formData()
             const p_app_id = formData.get("p_app_id")
@@ -216,7 +309,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!p_app_id || typeof p_app_id !== "string") {
                 return dataWithError(
                     "Invalid or missing p_app_id value",
-                    "Oops! Something went wrong. Please try again later.",
+                    "Helaas, er is wat misgegaan. Probeer het later opnieuw of neem contact op met ondersteuning.",
                 )
             }
 

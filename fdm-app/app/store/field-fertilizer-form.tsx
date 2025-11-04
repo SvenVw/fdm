@@ -1,9 +1,7 @@
-import type { z } from "zod"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
-import type { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
+import type { FieldFertilizerFormValues } from "~/components/blocks/fertilizer-applications/formschema"
 
-type FieldFertilizerFormValues = z.infer<typeof FormSchema>
 interface FieldFertilizerFormStore {
     db: Record<string, Partial<FieldFertilizerFormValues>>
     save(

@@ -1,5 +1,30 @@
 # fdm-calculator
 
+## 0.8.0
+
+### Minor Changes
+
+- a74a6e8: Add `getNutrientAdvice` and `requestNutrientAdvice` to fetch nutrient advices from the NMI API
+- 77c309d: The nitrogen balance can now be calculated per field instead of only per farm.
+- 77c309d: The nitrogen balance calculation now gracefully handles errors for individual fields. Instead of failing the entire farm calculation, it will now return partial results for successfully calculated fields and provide specific error messages for fields that encountered issues.
+- 91d4103: Add cached versions of main calculator functions for `balance` and `norms` to enable caching
+- 8b2bf8c: Add functions to calculate the norm filling by fertilizer application for NL 2025
+
+### Patch Changes
+
+- 726ae00: Fixes to differentiate stikstofgebruiksnorm for grassland based on "beweiden" or "volledig maaien"
+- Updated dependencies [a226f7e]
+- Updated dependencies [a00a331]
+- Updated dependencies [8f9d4ff]
+- Updated dependencies [2f7b281]
+- Updated dependencies [c939de9]
+- Updated dependencies [b58cd07]
+- Updated dependencies [b58cd07]
+- Updated dependencies [ac5d94f]
+- Updated dependencies [6bcb528]
+- Updated dependencies [91d4103]
+  - @svenvw/fdm-core@0.26.0
+
 ## 0.7.2
 
 ### Patch Changes

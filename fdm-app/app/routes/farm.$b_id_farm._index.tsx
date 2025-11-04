@@ -1,12 +1,15 @@
+import { cowHead } from "@lucide/lab"
 import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
 import {
     ArrowRightLeft,
     BookOpenText,
     ChevronUp,
     Home,
+    Icon,
     Landmark,
     MapIcon,
     Plus,
+    ScrollText,
     Shapes,
     Square,
     Trash2,
@@ -418,6 +421,29 @@ export default function FarmDashboardIndex() {
                                                 <NavLink to="settings/derogation">
                                                     <ChevronUp className="mr-2 h-4 w-4" />
                                                     Derogatie
+                                                </NavLink>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-start"
+                                                asChild
+                                            >
+                                                <NavLink to="settings/organic-certification">
+                                                    <ScrollText className="mr-2 h-4 w-4" />
+                                                    Bio-certificaat
+                                                </NavLink>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-start"
+                                                asChild
+                                            >
+                                                <NavLink to="settings/grazing-intention">
+                                                    <Icon
+                                                        iconNode={cowHead}
+                                                        className="mr-2 h-4 w-4"
+                                                    />
+                                                    Beweiding
                                                 </NavLink>
                                             </Button>
                                             <Button

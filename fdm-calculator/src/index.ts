@@ -1,7 +1,14 @@
-export { calculateNitrogenBalance } from "./balance/nitrogen/index"
+import pkg from "./package"
+export const fdmCalculator = pkg
+export {
+    calculateNitrogenBalance,
+    getNitrogenBalance,
+} from "./balance/nitrogen/index"
 export { collectInputForNitrogenBalance } from "./balance/nitrogen/input"
 export type {
     FieldInput,
+    NitrogenBalanceFieldNumeric,
+    NitrogenBalanceFieldResultNumeric,
     NitrogenBalanceInput,
     NitrogenBalanceNumeric,
     NitrogenEmissionAmmoniaFertilizersNumeric,
@@ -14,7 +21,6 @@ export type {
     NitrogenSupplyFixationNumeric,
     NitrogenSupplyMineralizationNumeric,
     NitrogenSupplyNumeric,
-    NitrogenVolatilizationNumeric,
 } from "./balance/nitrogen/types"
 export { calculateDose } from "./doses/calculate-dose"
 export type { Dose } from "./doses/d"
@@ -23,16 +29,31 @@ export {
     createFunctionsForFertilizerApplicationFilling,
     createFunctionsForNorms,
 } from "./norms"
-export type { AggregatedNormsToFarmLevel } from "./norms/farm"
+export type {
+    AggregatedNormFillingsToFarmLevel,
+    AggregatedNormsToFarmLevel,
+    InputAggregateNormFillingsToFarmLevel,
+    InputAggregateNormsToFarmLevel,
+} from "./norms/farm"
+export type { NormFilling } from "./norms/nl/2025/filling/types"
 export {
     isFieldInGWGBGebied,
     isFieldInNatura2000Gebied,
-} from "./norms/nl/2025/dierlijke-mest-gebruiksnorm"
+} from "./norms/nl/2025/value/dierlijke-mest-gebruiksnorm"
 export {
     getRegion,
     isFieldInNVGebied,
-} from "./norms/nl/2025/stikstofgebruiksnorm"
+} from "./norms/nl/2025/value/stikstofgebruiksnorm"
 export type {
     GebruiksnormResult,
     NL2025NormsInput,
-} from "./norms/nl/2025/types.d"
+} from "./norms/nl/2025/value/types"
+export {
+    getNutrientAdvice,
+    requestNutrientAdvice,
+} from "./nutrient-advice"
+export type {
+    NutrientAdvice,
+    NutrientAdviceInputs,
+    NutrientAdviceResponse,
+} from "./nutrient-advice/types"

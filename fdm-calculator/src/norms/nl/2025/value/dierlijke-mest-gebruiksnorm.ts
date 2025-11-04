@@ -1,6 +1,7 @@
-import type { Field } from "@svenvw/fdm-core"
-import { getGeoTiffValue } from "../../../shared/geotiff"
-import { getFdmPublicDataUrl } from "../../../shared/public-data-url"
+import { type Field, withCalculationCache } from "@svenvw/fdm-core"
+import pkg from "../../../../package"
+import { getGeoTiffValue } from "../../../../shared/geotiff"
+import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
 import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
 import type {
     DierlijkeMestGebruiksnormResult,
@@ -146,7 +147,7 @@ export async function isFieldInDerogatieVrijeZone(
  * @see {@link https://www.rvo.nl/onderwerpen/mest/derogatie | RVO Derogatie (official page)}
  * @see {@link https://www.rvo.nl/onderwerpen/mest/met-nutrienten-verontreinigde-gebieden-nv-gebieden | RVO Met nutriënten verontreinigde gebieden (NV-gebieden) (official page)}
  */
-export async function getNL2025DierlijkeMestGebruiksNorm(
+export async function calculateNL2025DierlijkeMestGebruiksNorm(
     input: NL2025NormsInput,
 ): Promise<DierlijkeMestGebruiksnormResult> {
     const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf || false
@@ -191,3 +192,19 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
 
     return { normValue, normSource }
 }
+
+/**
+ * Memoized version of {@link calculateNL2025DierlijkeMestGebruiksNorm}.
+ *
+ * This function is wrapped with `withCalculationCache` to optimize performance by caching
+ * results based on the input and the current calculator version.
+ *
+ * @param {NL2025NormsInput} input - An object containing all necessary parameters for the calculation.
+ * @returns {Promise<DierlijkeMestGebruiksnormResult>} An object of type `DierlijkeMestGebruiksnormResult` containing the determined
+ *   nitrogen usage standard (`normValue`) and a `normSource` string explaining the rule applied.
+ */
+export const getNL2025DierlijkeMestGebruiksNorm = withCalculationCache(
+    calculateNL2025DierlijkeMestGebruiksNorm,
+    "calculateNL2025DierlijkeMestGebruiksNorm",
+    pkg.calculatorVersion,
+)

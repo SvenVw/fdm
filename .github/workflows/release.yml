@@ -1,61 +1,107 @@
-name: Prerelease
+name: Release
 
 on:
   push:
-    paths:
-      - 'fdm-core/**'
-      - 'fdm-data/**'
     branches:
       - main
+      - development
+  workflow_dispatch: # This enables the manual trigger
+  pull_request:
+    branches:
+      - main # Trigger for pull requests targeting main
 
-concurrency: 
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  Release:
+  release:
     name: Release
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [22]
     permissions:
-      contents: read
+      contents: write
       packages: write
+      pull-requests: write # Required for the status check
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Cache turbo build setup
-        uses: actions/cache@v4
-        with: 
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-
-
-      - name: Setup pnpm 10
+      - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.17.0
+          version: 10.18.3
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          registry-url: 'https://npm.pkg.github.com'
+          node-version: 22
           cache: 'pnpm'
 
       - name: Install Dependencies
-        run: pnpm i
+        run: pnpm install --frozen-lockfile
 
-      - name: Bump snapshot
-        run: pnpm changeset version
-
-      - name: Build packages
-        run: pnpm build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data --filter=@svenvw/fdm-calculator
-      
-      - name: Publish snapshot
-        run: pnpm changeset publish
+      # Runs for the 'development' branch on push
+      - name: Publish Snapshot
+        if: github.ref == 'refs/heads/development'
+        run: |
+          pnpm changeset version --snapshot
+          pnpm changeset publish --tag development
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Runs MANUALLY on a 'release/*' or 'hotfix/*' branch
+      - name: Version Packages
+        if: github.event_name == 'workflow_dispatch' && (startsWith(github.ref, 'refs/heads/release/') || startsWith(github.ref, 'refs/heads/hotfix/'))
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          pnpm changeset version
+          pnpm changeset tag
+          git add .
+          git commit -m "chore: bump version of packages for release"
+          git push --follow-tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Runs for the 'main' branch on push
+      - name: Publish Packages and Create Releases
+        if: github.ref == 'refs/heads/main'
+        run: |
+          pnpm build --filter="!@svenvw/fdm-app"
+          pnpm changeset publish --no-git-tag
+          
+          git tag --points-at HEAD | while read -r tag; do
+            gh release create "$tag" --generate-notes
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  verify-versioning:
+    name: Verify Versioning
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && (startsWith(github.head_ref, 'release/') || startsWith(github.head_ref, 'hotfix/'))
+    permissions:
+      pull-requests: write # Required to update PR status
+      contents: read # Required to checkout code
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+
+      - name: Check for Versioning Commit
+        id: check_commit
+        run: |
+          if git log --format="%s" -n 1 | grep -q "chore: bump version of packages for release"; then
+            echo "::notice::Versioning commit found. All good!"
+            echo "versioning_commit_found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::Versioning commit 'chore: bump version of packages for release' not found. Please run the 'Release' workflow manually on this branch."
+            echo "versioning_commit_found=false" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+        shell: bash

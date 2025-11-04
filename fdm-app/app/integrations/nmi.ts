@@ -1,4 +1,3 @@
-import type { CurrentSoilData } from "@svenvw/fdm-core"
 import centroid from "@turf/centroid"
 import type { Feature, Geometry, Polygon } from "geojson"
 import { z } from "zod"
@@ -205,7 +204,14 @@ export async function extractSoilAnalysis(formData: FormData) {
 
     // Process the other parameters
     if (field.b_date) {
-        soilAnalysis.b_sampling_date = new Date(field.b_date)
+        // As b_date is in format dd-mm-yyyy
+        const dateParts = field.b_date.split("-")
+        if (dateParts.length === 3) {
+            const day = Number.parseInt(dateParts[0], 10)
+            const month = Number.parseInt(dateParts[1], 10) - 1 // Month is 0-indexed
+            const year = Number.parseInt(dateParts[2], 10)
+            soilAnalysis.b_sampling_date = new Date(year, month, day)
+        }
     }
     if (field.b_soiltype_agr) {
         soilAnalysis.b_soil_type = field.b_soiltype_agr
@@ -226,62 +232,4 @@ export async function extractSoilAnalysis(formData: FormData) {
         }
     }
     return soilAnalysis
-}
-
-export async function getNutrientAdvice(
-    b_lu_catalogue: string,
-    b_centroid: [number, number],
-    currentSoilData: CurrentSoilData,
-) {
-    const nmiApiKey = getNmiApiKey()
-
-    if (!nmiApiKey) {
-        throw new Error("NMI API key not configured")
-    }
-
-    let a_nmin_cc_d30: number | undefined
-    let a_nmin_cc_d60: number | undefined
-    const soilData: Record<string, number | string> = {}
-    for (const item of currentSoilData) {
-        if (item.parameter === "a_nmin_cc") {
-            if (item.a_depth_lower <= 30) {
-                a_nmin_cc_d30 = item.value
-            } else if (item.a_depth_lower <= 60) {
-                a_nmin_cc_d60 = item.value
-            }
-        }
-        soilData[item.parameter] = item.value
-    }
-
-    // Create request body
-    const body = {
-        a_lon: b_centroid[0],
-        a_lat: b_centroid[1],
-        b_lu_brp: [b_lu_catalogue.split("_")[1]],
-        a_nmin_cc_d30: a_nmin_cc_d30,
-        a_nmin_cc_d60: a_nmin_cc_d60,
-        ...soilData,
-    }
-
-    // Send request to NMI API
-    const responseApi = await fetch(
-        "https://api.nmi-agro.nl/bemestingsplan/nutrients",
-        {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${nmiApiKey}`,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(body),
-        },
-    )
-
-    if (!responseApi.ok) {
-        throw new Error("Request to NMI API failed")
-    }
-
-    const result = await responseApi.json()
-    const response = result.data.year
-
-    return response
 }
