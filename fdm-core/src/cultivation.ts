@@ -264,26 +264,24 @@ export async function getDefaultDatesOfCultivation(
         // Construct the default start date using the provided year.
         const cultivationDefaultDates: CultivationDefaultDates = {
             b_lu_start: new Date(`${year}-${defaultStart}`),
-            b_lu_end: undefined,
+            b_lu_end: new Date(`${year}-${defaultEnd}`),
         }
 
-        // For single-harvest crops, set the default end date based on the default harvest date.
+        // If the calculated end date is earlier than the start date, it implies the sowing
+        // occurred in the previous year, so we use the previous year for the start date.
         if (
-            cultivationsCatalogue[0].b_lu_harvestable === "once" &&
-            defaultEnd
-        ) {
-            cultivationDefaultDates.b_lu_end = new Date(`${year}-${defaultEnd}`)
-
-            // If the calculated end date is earlier than the start date, it implies the sowing
-            // occurred in the previous year, so we use the previous year for the start date.
-            if (
-                cultivationDefaultDates.b_lu_end.getTime() <=
+            cultivationDefaultDates.b_lu_end &&
+            cultivationDefaultDates.b_lu_end.getTime() <=
                 cultivationDefaultDates.b_lu_start.getTime()
-            ) {
-                cultivationDefaultDates.b_lu_start = new Date(
-                    `${year - 1}-${defaultStart}`,
-                )
-            }
+        ) {
+            cultivationDefaultDates.b_lu_start = new Date(
+                `${year - 1}-${defaultStart}`,
+            )
+        }
+
+        // For cultivations that can be harvested multiple times or not at all, set b_lu_end to undefined
+        if (cultivationsCatalogue[0].b_lu_harvestable !== "once") {
+            cultivationDefaultDates.b_lu_end = undefined
         }
 
         return cultivationDefaultDates
