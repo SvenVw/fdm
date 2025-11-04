@@ -105,7 +105,7 @@ export default function AppIndex() {
                             title={`Welkom, ${loaderData.username}! 👋`}
                             description="Kies een van de onderstaande opties om verder te gaan."
                         />
-                        <div className="grid flex-1 grid-cols-1 gap-6 p-10 lg:grid-cols-2">
+                        <div className="grid grow grid-cols-1 gap-6 p-10 lg:grid-cols-2">
                             <Card className="flex flex-col">
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
@@ -119,14 +119,14 @@ export default function AppIndex() {
                                         voeg je percelen toe.
                                     </CardDescription>
                                 </CardHeader>
-                                <CardContent className="flex-grow space-y-4 text-muted-foreground">
+                                <CardContent className="grow space-y-4 text-muted-foreground">
                                     <p>
                                         Een bedrijf vormt de basis voor al je
                                         analyses en adviezen. Krijg toegang tot:
                                     </p>
                                     <ul className="space-y-2">
                                         <li className="flex items-start gap-2">
-                                            <CheckIcon className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
+                                            <CheckIcon className="mt-1 h-5 w-5 shrink-0 text-primary" />
                                             <span>
                                                 Toegang tot de{" "}
                                                 <b>Stikstofbalans</b>,{" "}
@@ -135,14 +135,14 @@ export default function AppIndex() {
                                             </span>
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <CheckIcon className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
+                                            <CheckIcon className="mt-1 h-5 w-5 shrink-0 text-primary" />
                                             <span>
                                                 Beheer van meerdere jaren voor
                                                 een compleet overzicht.
                                             </span>
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <CheckIcon className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
+                                            <CheckIcon className="mt-1 h-5 w-5 shrink-0 text-primary" />
                                             <span>
                                                 Een uitgebreide lijst van
                                                 meststoffen die je zelf kunt
@@ -150,7 +150,7 @@ export default function AppIndex() {
                                             </span>
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <CheckIcon className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
+                                            <CheckIcon className="mt-1 h-5 w-5 shrink-0 text-primary" />
                                             <span>
                                                 De mogelijkheid om je adviseur
                                                 toegang te geven tot je
@@ -180,7 +180,7 @@ export default function AppIndex() {
                                         gedetailleerde informatie.
                                     </CardDescription>
                                 </CardHeader>
-                                <CardContent className="flex-grow space-y-4 text-muted-foreground">
+                                <CardContent className="grow space-y-4 text-muted-foreground">
                                     <p>
                                         De Atlas is een handige tool om percelen
                                         te analyseren, zelfs zonder een eigen
@@ -188,14 +188,14 @@ export default function AppIndex() {
                                     </p>
                                     <ul className="space-y-2">
                                         <li className="flex items-start gap-2">
-                                            <CheckIcon className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
+                                            <CheckIcon className="mt-1 h-5 w-5 shrink-0 text-primary" />
                                             <span>
                                                 De volledige teelthistorie van
                                                 percelen tot 2009.
                                             </span>
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <CheckIcon className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
+                                            <CheckIcon className="mt-1 h-5 w-5 shrink-0 text-primary" />
                                             <span>
                                                 Of een perceel in een gebied met
                                                 beperkingen voor de
@@ -203,7 +203,7 @@ export default function AppIndex() {
                                             </span>
                                         </li>
                                         <li className="flex items-start gap-2">
-                                            <CheckIcon className="mt-1 h-5 w-5 flex-shrink-0 text-primary" />
+                                            <CheckIcon className="mt-1 h-5 w-5 shrink-0 text-primary" />
                                             <span>
                                                 Een inschatting van de
                                                 bodemtextuur en het
@@ -279,7 +279,7 @@ export default function AppIndex() {
                                                 </CardTitle>
                                                 <CardDescription />
                                             </CardHeader>
-                                            <CardContent className="flex-grow">
+                                            <CardContent className="grow">
                                                 <div className="grid gap-2">
                                                     <div className="flex items-center text-sm text-muted-foreground">
                                                         <p>Adres:</p>
@@ -349,7 +349,7 @@ export default function AppIndex() {
                                             </CardTitle>
                                             <CardDescription />
                                         </CardHeader>
-                                        <CardContent className="flex-grow text-sm text-muted-foreground">
+                                        <CardContent className="grow text-sm text-muted-foreground">
                                             <p>
                                                 Maak een nieuw bedrijf aan en
                                                 beheer je percelen, gewassen en
@@ -386,7 +386,7 @@ export default function AppIndex() {
                                             </CardTitle>
                                             <CardDescription />
                                         </CardHeader>
-                                        <CardContent className="flex-grow">
+                                        <CardContent className="grow">
                                             <p className="text-sm text-muted-foreground">
                                                 Bekijk alle percelen op de kaart
                                                 en selecteer een perceel voor

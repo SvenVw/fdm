@@ -15,7 +15,7 @@ export function ChangelogNotification() {
         <div className="flex items-center justify-between gap-2 rounded-md border border-muted-foreground/20 bg-background p-2 text-sm shadow-sm transition-colors hover:border-primary">
             <NavLink
                 to="/about/whats-new"
-                className="flex flex-grow items-center gap-2"
+                className="flex grow items-center gap-2"
             >
                 <Circle className="h-4 w-4 text-blue-400 fill-blue-400" />
                 <span className="font-medium text-shadow-muted-foregroundforeground">
