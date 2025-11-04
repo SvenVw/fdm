@@ -38,7 +38,7 @@ export function CultivationHistoryCard({
                             key={cultivation.year}
                             className="flex items-start space-x-4 pb-6"
                         >
-                            <div className="relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full">
+                            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
                                 <span
                                     className="absolute h-full w-full rounded-full"
                                     style={{
