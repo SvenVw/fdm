@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.24.1
+
+### Patch Changes
+
+- f50e3aa: Server-side upload limit is increased to 5MB for shapefiles and soil analyses, in order to match the value used for form validation.
+
 ## 0.24.0
 
 ### Minor Changes
