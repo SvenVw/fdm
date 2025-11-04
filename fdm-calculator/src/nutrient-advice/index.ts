@@ -46,10 +46,15 @@ export async function requestNutrientAdvice({
         }
 
         // Create request body for the NMI API
+        const brpSegments = b_lu_catalogue.split("_")
+        const brpCode = brpSegments[brpSegments.length - 1]
+        if (!brpCode) {
+            throw new Error("Invalid b_lu_catalogue provided")
+        }
         const body = {
             a_lon: b_centroid[0],
             a_lat: b_centroid[1],
-            b_lu_brp: [b_lu_catalogue.split("_")[1]], // Extract the BRP code from the b_lu_catalogue string
+            b_lu_brp: brpCode,
             a_nmin_cc_d30: a_nmin_cc_d30,
             a_nmin_cc_d60: a_nmin_cc_d60,
             ...soilData, // Include all other soil data parameters
