@@ -1,6 +1,6 @@
 "use client"
 
-import { UploadIcon, X } from "lucide-react"
+import { X } from "lucide-react"
 import type { InputHTMLAttributes, ReactNode } from "react"
 import {
     createContext,
@@ -10,9 +10,9 @@ import {
     useRef,
     useState,
 } from "react"
+import { toast as notify } from "sonner"
 import { Button } from "~/components/ui/button"
 import { cn } from "~/lib/utils"
-import { toast as notify } from "sonner"
 
 type DropzoneContextType = {
     files?: File[]
@@ -21,19 +21,6 @@ type DropzoneContextType = {
     maxSize?: number | undefined
     minSize?: number | undefined
     multiple?: boolean
-}
-
-const renderBytes = (bytes: number) => {
-    const units = ["B", "KB", "MB", "GB", "TB", "PB"]
-    let size = bytes
-    let unitIndex = 0
-
-    while (size >= 1024 && unitIndex < units.length - 1) {
-        size /= 1024
-        unitIndex++
-    }
-
-    return `${size.toFixed(2)}${units[unitIndex]}`
 }
 
 const DropzoneContext = createContext<DropzoneContextType | undefined>(
@@ -111,7 +98,7 @@ export const Dropzone = ({
         if (files.length === 0 && inputRef.current) {
             inputRef.current.value = null
         }
-    }, [files, inputRef.current])
+    }, [files])
 
     const handleFilesSet = async (oldFiles: File[], newFiles: File[]) => {
         const [finalFiles, error] = await mergeFiles(oldFiles, newFiles)
@@ -119,6 +106,7 @@ export const Dropzone = ({
             setFiles(finalFiles)
         }
         setError(error)
+        return finalFiles ?? files
     }
 
     const handleFilesClear = async () => {
@@ -163,11 +151,11 @@ export const Dropzone = ({
 
             if (validNewFiles.length === 0) return
 
-            await handleFilesSet(files, validNewFiles)
+            const finalFiles = await handleFilesSet(files, validNewFiles)
 
             if (inputRef.current) {
                 const container = new DataTransfer()
-                validNewFiles.forEach((f) => {
+                finalFiles.forEach((f) => {
                     container.items.add(f)
                 })
                 inputRef.current.files = container.files
@@ -210,10 +198,9 @@ export const Dropzone = ({
                 <label
                     tabIndex={0}
                     className={cn(
-                        "flex flex-col items-center justify-center w-full h-32 rounded-md border border-dashed border-muted-foreground/25 px-6 py-4 text-center transition-colors hover:bg-muted/25",
-                        disabled && "hidden",
+                        "flex-col items-center justify-center w-full h-32 rounded-md border border-dashed border-muted-foreground/25 px-6 py-4 text-center transition-colors hover:bg-muted/25",
+                        disabled ? "hidden" : "flex",
                         className,
-                        !disabled && "block",
                     )}
                     ref={ref}
                     htmlFor={labelId}
@@ -245,7 +232,7 @@ export const Dropzone = ({
     )
 }
 
-const useDropzoneContext = () => {
+export const useDropzoneContext = () => {
     const context = useContext(DropzoneContext)
 
     if (!context) {
@@ -253,107 +240,4 @@ const useDropzoneContext = () => {
     }
 
     return context
-}
-
-export type DropzoneContentProps = {
-    children?: ReactNode
-    className?: string
-}
-
-const maxLabelItems = 3
-
-export const DropzoneContent = ({
-    children,
-    className,
-}: DropzoneContentProps) => {
-    const { files } = useDropzoneContext()
-
-    if (!files) {
-        return null
-    }
-
-    if (children) {
-        return children
-    }
-
-    return (
-        <>
-            <div className="flex size-8 items-center justify-center rounded-md bg-muted text-muted-foreground">
-                <UploadIcon size={16} />
-            </div>
-            <p className="my-2 w-full truncate font-medium text-sm">
-                {files.length > maxLabelItems
-                    ? `${new Intl.ListFormat("en").format(
-                          files
-                              .slice(0, maxLabelItems)
-                              .map((file) => file.name),
-                      )} and ${files.length - maxLabelItems} more`
-                    : new Intl.ListFormat("en").format(
-                          files.map((file) => file.name),
-                      )}
-            </p>
-            <p className="w-full text-wrap text-muted-foreground text-xs">
-                Drag and drop or click to replace
-            </p>
-        </>
-    )
-}
-
-export type DropzoneEmptyStateProps = {
-    children?: ReactNode
-    className?: string
-}
-
-export const DropzoneEmptyState = ({
-    children,
-    className,
-}: DropzoneEmptyStateProps) => {
-    const { files, accept, maxSize, minSize, multiple } = useDropzoneContext()
-
-    if (files) {
-        return null
-    }
-
-    if (children) {
-        return children
-    }
-
-    let caption = ""
-
-    if (accept) {
-        caption += "Accepts "
-        caption += new Intl.ListFormat("en").format(accept)
-    }
-
-    if (minSize && maxSize) {
-        caption += ` between ${renderBytes(minSize)} and ${renderBytes(maxSize)}`
-    } else if (minSize) {
-        caption += ` at least ${renderBytes(minSize)}`
-    } else if (maxSize) {
-        caption += ` less than ${renderBytes(maxSize)}`
-    }
-
-    return (
-        <div
-            className={cn(
-                "flex flex-col items-center justify-center",
-                className,
-            )}
-        >
-            <div className="flex size-8 items-center justify-center rounded-md bg-muted text-muted-foreground">
-                <UploadIcon size={16} />
-            </div>
-            <p className="my-2 w-full truncate text-wrap font-medium text-sm">
-                Upload {multiple ? "files" : "file"}
-            </p>
-            <p className="w-full truncate text-wrap text-muted-foreground text-xs">
-                Drag and drop or click to upload
-            </p>
-            {caption && (
-                <p className="text-wrap text-muted-foreground text-xs">
-                    {caption}.
-                </p>
-            )}
-        </div>
-    )
 }
