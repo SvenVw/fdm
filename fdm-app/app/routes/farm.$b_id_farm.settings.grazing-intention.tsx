@@ -5,7 +5,7 @@ import {
     useFetcher,
     useLoaderData,
 } from "react-router"
-import { dataWithError, dataWithSuccess } from "remix-toast"
+import { dataWithSuccess } from "remix-toast"
 import {
     Card,
     CardContent,
@@ -81,9 +81,10 @@ export default function GrazingIntentionSettings() {
     const { grazingIntentions } = useLoaderData<typeof loader>()
     const fetcher = useFetcher<typeof action>()
 
+    const currentYear = new Date().getFullYear()
     const years = getCalendarSelection()
-        .map((year) => Number(year))
-        .filter((year) => year >= 2006 && year <= 2025)
+        .map(Number)
+        .filter((year) => year >= 2006 && year <= currentYear + 1)
 
     return (
         <div className="flex justify-center p-4">
