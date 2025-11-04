@@ -127,7 +127,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
             return fileStorage.get(storageKey)
         }
 
-        const formData = await parseFormData(request, uploadHandler)
+        const formData = await parseFormData(
+            request,
+            { maxFileSize: 5 * 1024 * 1024 },
+            uploadHandler,
+        )
         const files = formData.getAll("shapefile") as File[]
 
         const shp_file = files.find((f) => f.name.endsWith(".shp"))
