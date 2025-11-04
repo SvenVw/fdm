@@ -61,12 +61,7 @@ export const Dropzone = ({
     ref,
     onBlur,
     onFilesChange,
-    mergeFiles = (oldFiles, newFiles) => [
-        ...newFiles.reduce((combined, newFile) => {
-            combined.add(newFile)
-            return combined
-        }, new Set<File>(oldFiles)),
-    ],
+    mergeFiles,
 }: DropzoneProps) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const files =
@@ -77,6 +72,16 @@ export const Dropzone = ({
         typeof accept === "string" ? accept.split(",") : accept
 
     const fileNames = files.map((f) => f.name)
+    const myMergeFiles =
+        mergeFiles ??
+        (multiple
+            ? (oldFiles, newFiles) => [
+                  ...newFiles.reduce((combined, newFile) => {
+                      combined.add(newFile)
+                      return combined
+                  }, new Set<File>(oldFiles)),
+              ]
+            : (_, newFiles) => newFiles.slice(0, 1))
 
     useEffect(() => {
         if (files.length === 0 && inputRef.current) {
@@ -85,7 +90,7 @@ export const Dropzone = ({
     }, [files])
 
     const handleFilesSet = async (oldFiles: File[], newFiles: File[]) => {
-        const finalFiles = await mergeFiles(oldFiles, newFiles)
+        const finalFiles = await myMergeFiles(oldFiles, newFiles)
         if (finalFiles && onFilesChange) {
             onFilesChange(finalFiles)
         }
@@ -125,19 +130,13 @@ export const Dropzone = ({
 
             const finalFiles = await handleFilesSet(files, validNewFiles)
 
+            // In order to include the previous files too
             if (inputRef.current?.files) {
-                const oldFiles = Array.from(inputRef.current.files)
-                const newlyAddedFiles = finalFiles.filter(
-                    (f) => !oldFiles.includes(f),
-                )
-
-                if (newlyAddedFiles.length > 0) {
-                    const container = new DataTransfer()
-                    finalFiles.forEach((f) => {
-                        container.items.add(f)
-                    })
-                    inputRef.current.files = container.files
-                }
+                const container = new DataTransfer()
+                finalFiles.forEach((f) => {
+                    container.items.add(f)
+                })
+                inputRef.current.files = container.files
             }
         }
     }
