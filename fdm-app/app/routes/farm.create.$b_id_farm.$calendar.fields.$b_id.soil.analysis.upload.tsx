@@ -146,7 +146,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
             throw new Error("Invalid file type (mime check)")
         }
 
-        const formData = await parseFormData(request, uploadHandler)
+        const formData = await parseFormData(
+            request,
+            { maxFileSize: 5 * 1024 * 1024 },
+            uploadHandler,
+        )
         const file = formData.get("soilAnalysisFile") as File | undefined
 
         // Server-side validation using Zod schema
