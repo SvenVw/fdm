@@ -8,11 +8,12 @@ This document provides a comprehensive overview of the Farm Data Model (FDM) dat
 
 ## Schema Overview
 
-The FDM database is organized into three distinct PostgreSQL schemas:
+The FDM database is organized into four distinct PostgreSQL schemas:
 
 1.  **`fdm`**: Contains the core tables related to farm management, fields, cultivations, fertilizers, soil data, etc.
 2.  **`fdm-authn`**: Handles authentication, storing user accounts, sessions, organizations, and related information.
 3.  **`fdm-authz`**: Manages authorization, defining roles, permissions, and maintaining an audit trail.
+4.  **`fdm-calculator`**: Caches calculation results and stores calculation errors to improve performance and provide better debugging capabilities.
 
 ---
 
@@ -55,14 +56,14 @@ This schema holds the primary data related to farm operations.
 *   GIST index on `b_geometry` for spatial queries.
 
 #### **`fieldAcquiring`**
-**Purpose**: Tracks the relationship between a farm and a field it manages, including the method and timeframe of acquisition. Replaces the old `farmManaging` concept.
+**Purpose**: Tracks the relationship between a farm and a field it manages, including the method and timeframe of acquisition.
 
 | Column                | Type                        | Constraints                                  | Description                                                              |
 |-----------------------|-----------------------------|----------------------------------------------|--------------------------------------------------------------------------|
 | **b_id**              | `text`                      | Not Null, Foreign Key (references `fields.b_id`) | Identifier of the field being acquired.                                  |
 | **b_id_farm**         | `text`                      | Not Null, Foreign Key (references `farms.b_id_farm`) | Identifier of the farm acquiring the field.                              |
 | **b_start**           | `timestamp with time zone`  |                                              | Timestamp indicating the start of the farm's management/acquisition.     |
-| **b_acquiring_method**| `acquiringMethodEnum`       | Not Null (default: 'unknown')                | Method by which the farm acquired the field (e.g., 'nl_01', 'nl_02'). |
+| **b_acquiring_method**| `acquiringMethodEnum`       | Not Null (default: 'unknown')                | Method by which the farm acquired the field. |
 | **created**           | `timestamp with time zone`  | Not Null                                     | Timestamp when this record was created (default: now()).                 |
 | **updated**           | `timestamp with time zone`  |                                              | Timestamp when this record was last updated.                             |
 
@@ -71,7 +72,7 @@ This schema holds the primary data related to farm operations.
 
 ##### `acquiringMethodEnum`
 *   **Name**: `b_acquiring_method`
-*   **Possible values**: `nl_01`, `nl_02`, `nl_07`, `nl_09`, `nl_12`, `nl_13`, `nl_61`, `nl_63`, `unknown`
+*   **Possible values**: `nl_01`, `nl_02`, `nl_03`, `nl_04`, `nl_07`, `nl_09`, `nl_10`, `nl_11`, `nl_12`, `nl_13`, `nl_61`, `nl_63`, `unknown`
 
 #### **`fieldDiscarding`**
 **Purpose**: Marks when a field is no longer actively managed or used within the system.
@@ -105,6 +106,10 @@ This schema holds the primary data related to farm operations.
 | **b_lu_n_harvestable**| `numeric` (custom)       |             | Nitrogen content in the harvested portion.                                         |
 | **b_lu_n_residue**  | `numeric` (custom)         |             | Nitrogen content in the crop residue.                                              |
 | **b_n_fixation**    | `numeric` (custom)         |             | Nitrogen fixation rate (for legumes).                                              |
+| **b_lu_rest_oravib**| `boolean`                   |             | Is the cultivation a 'rustgewas' with regards to Dutch manure legislation                                                                         |
+| **b_lu_variety_options**| `text[]`                |             | A set of varieties (cultivars) that a cultivation may be	                                                                                |
+| **b_lu_start_default**| `text`                    |             | Default start date of the cultivation (MM-DD).                                     |
+| **b_date_harvest_default**| `text`                |             | Default harvest date of the cultivation (MM-DD).                                   |
 | **hash**            | `text`                      |             | A hash value representing the content of the catalogue entry, for change tracking. |
 | **created**         | `timestamp with time zone`  | Not Null    | Timestamp when this record was created (default: now()).                           |
 | **updated**         | `timestamp with time zone`  |             | Timestamp when this record was last updated.                                       |
@@ -127,6 +132,7 @@ This schema holds the primary data related to farm operations.
 |--------------------|-----------------------------|--------------------------------------------------------------|--------------------------------------------------------------------------|
 | **b_lu**           | `text`                      | Primary Key                                                  | Unique identifier for this specific cultivation instance.                |
 | **b_lu_catalogue** | `text`                      | Not Null, Foreign Key (references `cultivationsCatalogue.b_lu_catalogue`) | Links to the type of cultivation in the catalogue.                       |
+| **b_lu_variety**   | `text`                      |                                                              | Variety of the cultivation.                                              |
 | **created**        | `timestamp with time zone`  | Not Null                                                     | Timestamp when this record was created (default: now()).                 |
 | **updated**        | `timestamp with time zone`  |                                                              | Timestamp when this record was last updated.                             |
 
@@ -134,7 +140,7 @@ This schema holds the primary data related to farm operations.
 *   Unique index on `b_lu`.
 
 #### **`cultivationStarting`**
-**Purpose**: Records the event of starting a specific cultivation instance on a particular field. Replaces `fieldSowing`.
+**Purpose**: Records the event of starting a specific cultivation instance on a particular field.
 
 | Column            | Type                        | Constraints                                  | Description                                                        |
 |-------------------|-----------------------------|----------------------------------------------|--------------------------------------------------------------------|
@@ -248,6 +254,7 @@ This schema holds the primary data related to farm operations.
 | **p_name_nl**      | `text`                      | Not Null    | Name of the fertilizer (often in Dutch).                                       |
 | **p_name_en**      | `text`                      |             | English name of the fertilizer.                                                |
 | **p_description**  | `text`                      |             | Additional descriptive text about the fertilizer.                              |
+| **p_app_method_options** | `applicationMethodEnum[]` |           | Allowed application methods for the fertilizer.                                |
 | **p_dm**           | `numeric` (custom)         |             | Dry Matter content (%).                                                        |
 | **p_density**      | `numeric` (custom)         |             | Density (e.g., kg/m³).                                                         |
 | **p_om**           | `numeric` (custom)         |             | Organic Matter content (%).                                                    |
@@ -264,6 +271,8 @@ This schema holds the primary data related to farm operations.
 | **p_n_if**         | `numeric` (custom)         |             | Inorganic Nitrogen content (%).                                                |
 | **p_n_of**         | `numeric` (custom)         |             | Organic Nitrogen content (%).                                                  |
 | **p_n_wc**         | `numeric` (custom)         |             | Water-soluble Nitrogen content (%).                                            |
+| **p_no3_rt**       | `numeric` (custom)         |             | Total Nitrate content (%).                                                     |
+| **p_nh4_rt**       | `numeric` (custom)         |             | Total Ammonium content (%).                                                    |
 | **p_p_rt**         | `numeric` (custom)         |             | Total Phosphorus content (%).                                                  |
 | **p_k_rt**         | `numeric` (custom)         |             | Total Potassium content (%).                                                   |
 | **p_mg_rt**        | `numeric` (custom)         |             | Total Magnesium content (%).                                                   |
@@ -288,9 +297,11 @@ This schema holds the primary data related to farm operations.
 | **p_pb_rt**        | `numeric` (custom)         |             | Total Lead content (%).                                                        |
 | **p_hg_rt**        | `numeric` (custom)         |             | Total Mercury content (%).                                                     |
 | **p_cl_rt**        | `numeric` (custom)         |             | Total Chlorine content (%).                                                    |
+| **p_ef_nh3**       | `numeric` (custom)         |             | Ammonia emission factor.                                                       |
 | **p_type_manure**  | `boolean`                   |             | Flag indicating if it's a manure type fertilizer.                              |
 | **p_type_mineral** | `boolean`                   |             | Flag indicating if it's a mineral type fertilizer.                             |
 | **p_type_compost** | `boolean`                   |             | Flag indicating if it's a compost type fertilizer.                             |
+| **p_type_rvo**     | `typeRvoEnum`               |             | RVO manure type code.                                                          |
 | **hash**           | `text`                      |             | A hash value representing the content of the catalogue entry, for change tracking. |
 | **created**        | `timestamp with time zone`  | Not Null    | Timestamp when this record was created (default: now()).                       |
 | **updated**        | `timestamp with time zone`  |             | Timestamp when this record was last updated.                                   |
@@ -333,7 +344,7 @@ This schema holds the primary data related to farm operations.
 | **created**        | `timestamp with time zone`  | Not Null                                                     | Timestamp when this record was created (default: now()).                 |
 | **updated**        | `timestamp with time zone`  |                                                              | Timestamp when this record was last updated.                             |
 
-#### **`fertilizerApplying`** (formerly `fertilizerApplication`)
+#### **`fertilizer_applying`**
 **Purpose**: Logs the event of applying a specific fertilizer instance to a field.
 
 | Column         | Type                        | Constraints                                  | Description                                                              |
@@ -342,7 +353,7 @@ This schema holds the primary data related to farm operations.
 | **b_id**       | `text`                      | Not Null, Foreign Key (references `fields.b_id`) | Identifier of the field where the fertilizer was applied.                |
 | **p_id**       | `text`                      | Not Null, Foreign Key (references `fertilizers.p_id`) | Identifier of the fertilizer instance applied.                           |
 | **p_app_amount**| `numeric` (custom)         |                                              | Amount of fertilizer applied (typically kg/ha).                          |
-| **p_app_method**| `applicationMethodEnum`     |                                              | Method used for application (e.g., 'injection', 'spraying').           |
+| **p_app_method**| `applicationMethodEnum`     |                                              | Method used for application.           |
 | **p_app_date** | `timestamp with time zone`  |                                              | Timestamp when the application occurred.                                 |
 | **created**    | `timestamp with time zone`  | Not Null                                     | Timestamp when this record was created (default: now()).                 |
 | **updated**    | `timestamp with time zone`  |                                              | Timestamp when this record was last updated.                             |
@@ -352,7 +363,7 @@ This schema holds the primary data related to farm operations.
 
 ##### `applicationMethodEnum`
 *   **Name**: `p_app_method`
-*   **Possible values**: `slotted coulter`, `incorporation`, `injection`, `spraying`, `broadcasting`, `spoke wheel`, `pocket placement`
+*   **Possible values**: `slotted coulter`, `incorporation`, `incorporation 2 tracks`, `injection`, `shallow injection`, `spraying`, `broadcasting`, `spoke wheel`, `pocket placement`, `narrowband`
 
 #### **`fertilizerCatalogueEnabling`**
 **Purpose**: Indicates which fertilizer catalogue sources are actively enabled or used by a specific farm.
@@ -425,7 +436,7 @@ This schema holds the primary data related to farm operations.
 
 ##### `gwlClassEnum`
 *   **Name**: `b_gwl_class`
-*   **Possible values**: `II`, `IV`, `IIIb`, `V`, `VI`, `VII`, `Vb`, `-`, `Va`, `III`, `VIII`, `sVI`, `I`, `IIb`, `sVII`, `IVu`, `bVII`, `sV`, `sVb`, `bVI`, `IIIa`
+*   **Possible values**: `I`, `Ia`, `Ic`, `II`, `IIa`, `IIb`, `IIc`, `III`, `IIIa`, `IIIb`, `IV`, `IVu`, `IVc`, `V`, `Va`, `Vao`, `Vad`, `Vb`, `Vbo`, `Vbd`, `sV`, `sVb`, `VI`, `VIo`, `VId`, `VII`, `VIIo`, `VIId`, `VIII`, `VIIIo`, `VIIId`
 
 ##### `soilAnalysisSourceEnum`
 *   **Name**: `a_source`
@@ -448,7 +459,7 @@ This schema holds the primary data related to farm operations.
 
 ---
 
-### Derogations
+### Derogations & Certifications
 
 #### **`derogations`**
 **Purpose**: Stores information about derogations, which is special permissions by year related to legal norms for fertilizer application.
@@ -475,6 +486,46 @@ This schema holds the primary data related to farm operations.
 
 **Constraints:**
 *   Primary Key on (`b_id_farm`, `b_id_derogation`).
+
+#### **`organicCertifications`**
+**Purpose**: Stores information about organic certifications for a farm.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| **b_id_organic** | `text` | Primary Key | Unique identifier for the organic certification. |
+| **b_organic_traces** | `text` | | TRACES number of the organic certification. |
+| **b_organic_skal** | `text` | | Skal number of the organic certification. |
+| **b_organic_issued** | `timestamp with time zone` | | Timestamp when the certification was issued. |
+| **b_organic_expires** | `timestamp with time zone` | | Timestamp when the certification expires. |
+| **created** | `timestamp with time zone` | Not Null | Timestamp when this record was created (default: now()). |
+| **updated** | `timestamp with time zone` | | Timestamp when this record was last updated. |
+
+#### **`organicCertificationsHolding`**
+**Purpose**: Links a farm to a specific organic certification.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| **b_id_farm** | `text` | Not Null, Foreign Key (references `farms.b_id_farm`) | Identifier of the farm holding the certification. |
+| **b_id_organic** | `text` | Not Null, Foreign Key (references `organicCertifications.b_id_organic`) | Identifier of the organic certification. |
+| **created** | `timestamp with time zone` | Not Null | Timestamp when this record was created (default: now()). |
+| **updated** | `timestamp with time zone` | | Timestamp when this record was last updated. |
+
+**Constraints:**
+*   Primary Key on (`b_id_farm`, `b_id_organic`).
+
+#### **`intendingGrazing`**
+**Purpose**: Stores the grazing intention for a farm for a specific year.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| **b_id_farm** | `text` | Not Null, Foreign Key (references `farms.b_id_farm`) | Identifier of the farm. |
+| **b_grazing_intention** | `boolean` | | Whether the farm intends to graze animals. |
+| **b_grazing_intention_year** | `integer` | Not Null | The year of the grazing intention. |
+| **created** | `timestamp with time zone` | Not Null | Timestamp when this record was created (default: now()). |
+| **updated** | `timestamp with time zone` | | Timestamp when this record was last updated. |
+
+**Constraints:**
+*   Primary Key on (`b_id_farm`, `b_grazing_intention_year`).
 
 ---
 
@@ -633,6 +684,37 @@ This schema manages roles, permissions, and auditing for authorization purposes.
 | **action**             | `text`                      | Not Null    | The action being attempted (e.g., 'read', 'update', 'delete').              |
 | **allowed**            | `boolean`                   | Not Null    | Whether the action was allowed based on authorization rules.                |
 | **duration**           | `integer`                   | Not Null    | Duration of the authorization check in milliseconds.                        |
+
+---
+
+## `fdm-calculator` Schema (Calculator)
+
+This schema is used to cache calculation results and store errors that occur during calculations.
+
+#### **`calculationCache`**
+**Purpose**: Caches the results of calculations to improve performance.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| **calculation_hash** | `text` | Primary Key | A unique hash representing the calculation function and its input. |
+| **calculation_function** | `text` | Not Null | The name of the calculation function that was executed. |
+| **calculator_version** | `text` | | The version of the calculator that was used. |
+| **input** | `jsonb` | Not Null | The input parameters for the calculation. |
+| **result** | `jsonb` | Not Null | The result of the calculation. |
+| **created_at** | `timestamp with time zone` | Not Null | Timestamp when the calculation was cached (default: now()). |
+
+#### **`calculationErrors`**
+**Purpose**: Logs errors that occur during calculations.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| **calculation_error_id** | `text` | Primary Key | Unique identifier for the calculation error. |
+| **calculation_function** | `text` | | The name of the calculation function that failed. |
+| **calculator_version** | `text` | | The version of the calculator that was used. |
+| **input** | `jsonb` | | The input parameters for the calculation. |
+| **error_message** | `text` | | The error message. |
+| **stack_trace** | `text` | | The stack trace of the error. |
+| **created_at** | `timestamp with time zone` | Not Null | Timestamp when the error occurred (default: now()). |
 
 ---
 

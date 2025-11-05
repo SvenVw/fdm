@@ -23,7 +23,7 @@ describe("calculateNL2025DierlijkeMestGebruiksNorm", () => {
 
     it("should return the default norm value with derogation", async () => {
         const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: true, has_grazing_intention: false},
+            farm: { is_derogatie_bedrijf: true, has_grazing_intention: false },
             field: {
                 b_id: "1",
                 b_centroid: [5.641351453912945, 51.97755938887036],

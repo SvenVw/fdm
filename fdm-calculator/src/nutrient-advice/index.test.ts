@@ -1,15 +1,15 @@
+import type { CurrentSoilData } from "@svenvw/fdm-core"
 import {
-    describe,
-    it,
-    expect,
-    vi,
-    beforeAll,
-    afterEach,
     afterAll,
+    afterEach,
+    beforeAll,
+    describe,
+    expect,
+    it,
+    vi,
 } from "vitest"
 import { requestNutrientAdvice } from "./index"
 import type { NutrientAdviceInputs, NutrientAdviceResponse } from "./types"
-import type { CurrentSoilData } from "@svenvw/fdm-core"
 
 // Mock data for CurrentSoilData
 const mockCurrentSoilData: CurrentSoilData = [

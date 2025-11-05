@@ -1,5 +1,61 @@
 # Changelog fdm-app
 
+## 0.24.1
+
+### Patch Changes
+
+- f50e3aa: Server-side upload limit is increased to 5MB for shapefiles and soil analyses, in order to match the value used for form validation.
+
+## 0.24.0
+
+### Minor Changes
+
+- 9dfde4c: Replace Meststoftype with Mestcode (RVO) at fertilizer forms
+- 5e711d7: Improve the design of the list of fertilizer applications by adding an icon for the type of fertilizer and better usage of spacing and aligning
+- bf8b0ff: In the fertilizer table show the RVO mestcode (p_type_rvo) colored by p_type instead of only p_type
+- 2c9aafa: Add new page at farm details to add whether the farm has an organic certification
+- 06314a5: Fixes that user can drop files as well for Mijn Percelen shapefile upload and Soil Analysis pdf upload.
+- b71bf41: Users can now edit previously created fertilizer applications, both for individual fields or a given cultivation type.
+- 77c309d: In case a field has an error at the nitrogen balance calculation, the balance at farm level and other fields are still shown, but an error message for the specific field is shown
+- c1ebe6d: Add new page at farm details to state whether the farmer has done grazing or intends it for a year
+- d756cf4: The users can now drop files onto the entire shapefile upload area during farm creation, not just on top of the text and icons.
+- d279d08: For cultivations default dates based on the cultivation catalogue date are used for b_lu_start and b_lu_end if available when adding a field with a cultivation
+- 276f35a: Show to the farm norms page the filling of the norms as well
+- 3eb4ec2: At the fertilizer applications page for a field show the metrics for norms, nitrogen balance and nutrient advice as well
+- 73be0f3: Add page to show on field level the norm values and fillings. It shows also the contribution of each fertilizer application to the various norms
+
+### Patch Changes
+
+- 1a89d67: Submit "other" errors for loaders and actions to Sentry
+- 8f8cc9f: At Nutrient Advice show progress bar for nutrients that have advice of 0
+- beef80c: Submit calculation errors at nitrogen balance calculation to Sentry
+- 8b854af: Move `getNutrientAdvice` to fdm-calculator and use the cached version of the function
+- 8f8cc9f: At Nutrient Advice show doses with precision of 2 if dose is between 0 and 1 kg / ha instead of showing 0
+- a2f8419: Fix parsing of `b_date` in the response for th soil analysis extraction
+- da64906: Fix link in header of fertilizers
+- 91d4103: Switch to use the cached version of the calculator functions for `norms` and `balance`
+- Updated dependencies [97083dd]
+- Updated dependencies [a74a6e8]
+- Updated dependencies [a226f7e]
+- Updated dependencies [77c309d]
+- Updated dependencies [a00a331]
+- Updated dependencies [726ae00]
+- Updated dependencies [8f9d4ff]
+- Updated dependencies [2f7b281]
+- Updated dependencies [c939de9]
+- Updated dependencies [b58cd07]
+- Updated dependencies [77c309d]
+- Updated dependencies [d6b8900]
+- Updated dependencies [b58cd07]
+- Updated dependencies [ac5d94f]
+- Updated dependencies [91d4103]
+- Updated dependencies [8b2bf8c]
+- Updated dependencies [6bcb528]
+- Updated dependencies [91d4103]
+  - @svenvw/fdm-data@0.18.0
+  - @svenvw/fdm-calculator@0.8.0
+  - @svenvw/fdm-core@0.26.0
+
 ## 0.23.2
 
 ### Patch Changes

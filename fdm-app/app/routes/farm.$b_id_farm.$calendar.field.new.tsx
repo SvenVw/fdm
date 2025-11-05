@@ -418,8 +418,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const b_geometry = JSON.parse(
             JSON.parse(String(formValues.b_geometry)),
         ) as Polygon
-        const currentYear = Number(calendar)
+        const parsedYear = Number.parseInt(String(calendar ?? ""), 10)
 
+        const currentYear =
+            Number.isInteger(parsedYear) &&
+            parsedYear >= 1970 &&
+            parsedYear < 2100
+                ? parsedYear
+                : timeframe.start.getFullYear()
         const cultivationDefaultDates = await getDefaultDatesOfCultivation(
             fdm,
             session.principal_id,

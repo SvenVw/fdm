@@ -24,6 +24,7 @@ import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { HeaderNorms } from "~/components/blocks/header/norms"
+import { NormCard } from "~/components/blocks/norms/norm-card"
 import { NormsFallback } from "~/components/blocks/norms/skeletons"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import {
@@ -53,7 +54,6 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { NormCard } from "~/components/blocks/norms/norm-card"
 
 interface FieldNormData {
     b_id: string

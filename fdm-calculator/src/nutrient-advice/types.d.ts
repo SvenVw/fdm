@@ -1,3 +1,5 @@
+import type { CurrentSoilData } from "@svenvw/fdm-core"
+
 /**
  * Represents the nutrient advice for a given year, as returned by the NMI API.
  * Each property corresponds to a specific nutrient requirement or norm.

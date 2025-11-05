@@ -665,7 +665,9 @@ export async function removeFarm(
 
             // Get all derogation IDs associated with this farm
             const derogationIdsToDelete = await tx
-                .select({ b_id_derogation: schema.derogationApplying.b_id_derogation })
+                .select({
+                    b_id_derogation: schema.derogationApplying.b_id_derogation,
+                })
                 .from(schema.derogationApplying)
                 .where(eq(schema.derogationApplying.b_id_farm, b_id_farm))
 
@@ -677,8 +679,9 @@ export async function removeFarm(
             // Delete derogations that were associated with this farm
             if (derogationIdsToDelete.length > 0) {
                 const bIdsDerogation = derogationIdsToDelete.map(
-                    (d: { b_id_derogation: schema.derogationsTypeSelect["b_id_derogation"] }) =>
-                        d.b_id_derogation,
+                    (d: {
+                        b_id_derogation: schema.derogationsTypeSelect["b_id_derogation"]
+                    }) => d.b_id_derogation,
                 )
                 await tx
                     .delete(schema.derogations)
@@ -692,20 +695,34 @@ export async function removeFarm(
 
             // Get all organic certification IDs associated with this farm
             const organicCertificationIdsToDelete = await tx
-                .select({ b_id_organic: schema.organicCertificationsHolding.b_id_organic })
+                .select({
+                    b_id_organic:
+                        schema.organicCertificationsHolding.b_id_organic,
+                })
                 .from(schema.organicCertificationsHolding)
-                .where(eq(schema.organicCertificationsHolding.b_id_farm, b_id_farm))
+                .where(
+                    eq(
+                        schema.organicCertificationsHolding.b_id_farm,
+                        b_id_farm,
+                    ),
+                )
 
             // Delete organic certifications holding records
             await tx
                 .delete(schema.organicCertificationsHolding)
-                .where(eq(schema.organicCertificationsHolding.b_id_farm, b_id_farm))
+                .where(
+                    eq(
+                        schema.organicCertificationsHolding.b_id_farm,
+                        b_id_farm,
+                    ),
+                )
 
             // Delete organic certifications that were associated with this farm
             if (organicCertificationIdsToDelete.length > 0) {
                 const bIdsOrganic = organicCertificationIdsToDelete.map(
-                    (o: { b_id_organic: schema.organicCertificationsTypeSelect["b_id_organic"] }) =>
-                        o.b_id_organic,
+                    (o: {
+                        b_id_organic: schema.organicCertificationsTypeSelect["b_id_organic"]
+                    }) => o.b_id_organic,
                 )
                 await tx
                     .delete(schema.organicCertifications)

@@ -3,10 +3,10 @@ import {
     getCultivations,
     getCurrentSoilData,
     getField,
-    isDerogationGrantedForYear,
-    type Timeframe,
     getGrazingIntention,
+    isDerogationGrantedForYear,
     type PrincipalId,
+    type Timeframe,
 } from "@svenvw/fdm-core"
 import type { NL2025NormsInput } from "./types.d"
 

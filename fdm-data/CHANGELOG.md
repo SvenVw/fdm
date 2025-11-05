@@ -1,5 +1,12 @@
 # fdm-data
 
+## 0.18.0
+
+### Minor Changes
+
+- 97083dd: Adds `b_lu_start_default` and `b_date_harvest_default` to brp catalogue
+- d6b8900: Add `p_type_rvo` to `baat` catalogue
+
 ## 0.17.1
 
 ### Patch Changes

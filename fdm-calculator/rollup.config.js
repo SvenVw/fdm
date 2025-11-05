@@ -35,16 +35,28 @@ export default defineConfig({
                 const replacement = `"fdm-calculator:${packageJson.version}"`
 
                 const placeholder = `"fdm-calculator:{FDM_CALCULATOR_VERSION}"`
-                const occurrences = code.match(new RegExp(placeholder.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&'), "g")) || []
+                const occurrences =
+                    code.match(
+                        new RegExp(
+                            placeholder.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&"),
+                            "g",
+                        ),
+                    ) || []
 
                 if (occurrences.length === 0) {
-                    console.warn(`⚠️ Version placeholder "${placeholder}" not found in bundle`)
+                    console.warn(
+                        `⚠️ Version placeholder "${placeholder}" not found in bundle`,
+                    )
                 } else if (occurrences.length > 1) {
-                    console.warn(`⚠️ Version placeholder "${placeholder}" appears ${occurrences.length} times`)
+                    console.warn(
+                        `⚠️ Version placeholder "${placeholder}" appears ${occurrences.length} times`,
+                    )
                 }
 
                 if (replacement.length > placeholder.length) {
-                    console.warn("⚠️ Replacement fdm-calculator version string ended up longer than the placeholder in package.ts. Source map will be broken.")
+                    console.warn(
+                        "⚠️ Replacement fdm-calculator version string ended up longer than the placeholder in package.ts. Source map will be broken.",
+                    )
                 }
 
                 return {
