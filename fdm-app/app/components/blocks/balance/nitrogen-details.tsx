@@ -401,6 +401,21 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
         )
     }
 
+    const renderNitrateEmissions = (
+        nitrate: NitrogenEmissionNumeric["nitrate"],
+    ) => {
+        const sectionKey = "nitraat"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <p className="flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all text-left">
+                    Nitraat: {nitrate.total} kg N / ha
+                </p>
+                <AccordionContent />
+            </AccordionItem>
+        )
+    }
+
     const renderFertilizersEmission = (
         fertilizers: NitrogenEmissionNumeric["ammonia"]["fertilizers"],
         fieldInput: FieldInput,
@@ -568,6 +583,9 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <Accordion type="multiple" className="ml-4">
                         {renderAmmoniaEmissions(emission.ammonia, fieldInput)}
+                    </Accordion>
+                    <Accordion type="multiple" className="ml-4">
+                        {renderNitrateEmissions(emission.nitrate)}
                     </Accordion>
                 </AccordionContent>
             </AccordionItem>
