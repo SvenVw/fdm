@@ -3,6 +3,7 @@ import {
     getCurrentSoilData,
     getFarms,
     getFertilizerApplications,
+    getFertilizers,
     getFields,
 } from "@svenvw/fdm-core"
 import {
@@ -111,6 +112,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
+        const fertilizers = await getFertilizers(fdm, session.principal_id, b_id_farm)
+
         const fieldsExtended = await Promise.all(
             fields.map(async (field) => {
                 const cultivations = await getCultivations(
@@ -126,6 +129,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     field.b_id,
                     timeframe,
                 )
+
+                const fertilizersFiltered = fertilizers.filter((fertilizer) => {
+                    return fertilizerApplications.some((application) => {
+                        return application.p_id === fertilizer.p_id
+                    })
+                })
 
                 const currentSoilData = await getCurrentSoilData(
                     fdm,
@@ -145,7 +154,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     b_id: field.b_id,
                     b_name: field.b_name,
                     cultivations: cultivations,
-                    fertilizerApplications: fertilizerApplications,
+                    fertilizers: fertilizersFiltered,
                     a_som_loi: a_som_loi,
                     b_soiltype_agr: b_soiltype_agr,
                     b_area: Math.round(field.b_area * 10) / 10,
