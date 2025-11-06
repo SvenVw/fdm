@@ -1,3 +1,4 @@
+import Decimal from "decimal.js"
 import type {
     CultivationDetail,
     FertilizerDetail,
@@ -33,13 +34,12 @@ export function calculateNitrogenEmission(
         fertilizerDetailsMap,
     )
 
-    /** Calculate the total amount of Nitrogen volatilized as Ammonia by crop residues */
-    const nitrate = calculateNitrogenEmissionViaNitrate()
-
     const emission = {
-        total: ammonia.total.add(nitrate.total),
+        total: ammonia.total,
         ammonia: ammonia,
-        nitrate: nitrate,
+        nitrate: {
+            total: new Decimal(0), // Nitrate emission is calculated as factor of nitrogen surplus this will be calculated after surplus is known
+        },
     }
 
     return emission

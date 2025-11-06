@@ -25,6 +25,7 @@ import type {
     NitrogenBalanceNumeric,
     SoilAnalysisPicked,
 } from "./types"
+import { calculateNitrogenEmissionViaNitrate } from "./emission/nitrate"
 
 /**
  * Calculates the nitrogen balance for a set of fields, considering nitrogen supply, removal, and emission.
@@ -224,6 +225,20 @@ export function calculateNitrogenBalanceField(
             fertilizerDetailsMap,
         )
 
+        // Calculate the balance
+        const balance = supply.total
+            .add(removal.total)
+            .add(emission.ammonia.total)
+
+        // Calculate the Nitrogen Emssion via Nitrate as the surplus of nitrogen balance that is leached out
+        const nitrateEmission = calculateNitrogenEmissionViaNitrate(
+            balance,
+            cultivations,
+            soilAnalysis,
+            cultivationDetailsMap,
+        )
+        emission.nitrate = nitrateEmission
+
         // Calculate the target for the Nitrogen balance
         const target = calculateTargetForNitrogenBalance(
             cultivations,
@@ -237,9 +252,7 @@ export function calculateNitrogenBalanceField(
             b_area: fieldDetails.b_area ?? 0,
             balance: {
                 b_id: fieldDetails.b_id,
-                balance: supply.total
-                    .add(removal.total)
-                    .add(emission.ammonia.total),
+                balance: balance,
                 supply: supply,
                 removal: removal,
                 emission: emission,
