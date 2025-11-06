@@ -17,8 +17,8 @@ import {
 } from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { columns } from "~/components/blocks/fields/columns"
-import { DataTable } from "~/components/blocks/fields/table"
+import { columns, RotationExtended } from "~/components/blocks/rotation/columns"
+import { DataTable } from "~/components/blocks/rotation/table"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
@@ -128,6 +128,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     timeframe,
                 )
 
+                const harvests = await Promise.all(
+                    cultivations.map(async (cultivation) => {
+                        return await getHarvests(
+                            fdm,
+                            session.principal_id,
+                            cultivation.b_lu,
+                            timeframe,
+                        )
+                    }),
+                )
+
                 const fertilizerApplications = await getFertilizerApplications(
                     fdm,
                     session.principal_id,
@@ -159,6 +170,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     b_id: field.b_id,
                     b_name: field.b_name,
                     cultivations: cultivations,
+                    harvests: harvests,
+                    fertilizerApplications: fertilizerApplications,
                     fertilizers: fertilizersFiltered,
                     a_som_loi: a_som_loi,
                     b_soiltype_agr: b_soiltype_agr,
@@ -168,12 +181,103 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }),
         )
 
+        // Transform fieldsExtended to rotationExtended
+        const cultivationsInRotation: string[] = [
+            ...new Set(
+                fieldsExtended.flatMap((field) => {
+                    return field.cultivations.flatMap((cultivation) => {
+                        return cultivation.b_lu_catalogue
+                    })
+                }),
+            ),
+        ]
+
+        const rotationExtended: RotationExtended[] = cultivationsInRotation.map(
+            (b_lu_catalogue) => {
+                const cultivationsForCatalogue = fieldsExtended.flatMap(
+                    (field) =>
+                        field.cultivations.filter(
+                            (cultivation) =>
+                                cultivation.b_lu_catalogue === b_lu_catalogue,
+                        ),
+                )
+
+                const fieldsWithThisCultivation = fieldsExtended.filter(
+                    (field) =>
+                        field.cultivations.some(
+                            (cultivation) =>
+                                cultivation.b_lu_catalogue === b_lu_catalogue,
+                        ),
+                )
+
+                // Get all unique b_lu_start of cultivation
+                const b_lu_start = [
+                    ...new Set(
+                        cultivationsForCatalogue.map((cultivation) =>
+                            cultivation.b_lu_start.getTime(),
+                        ),
+                    ),
+                ].map((b_lu_start) => new Date(b_lu_start))
+
+                const b_lu_end = [
+                    ...new Set(
+                        cultivationsForCatalogue.map((cultivation) =>
+                            cultivation.b_lu_start.getTime(),
+                        ),
+                    ),
+                ].map((b_lu_end) => new Date(b_lu_end))
+
+                // Get all harvests for this cultivation
+                const harvestsFiltered = fieldsWithThisCultivation.flatMap(
+                    (field) =>
+                        field.harvests.filter((harvest) =>
+                            cultivationsForCatalogue.some(
+                                (cultivation) =>
+                                    cultivation.b_lu === harvest.b_lu,
+                            ),
+                        ),
+                )
+
+                return {
+                    b_lu_catalogue: b_lu_catalogue,
+                    b_lu: cultivationsForCatalogue.map(
+                        (cultivation) => cultivation.b_lu,
+                    ),
+                    b_lu_name: cultivationsForCatalogue[0]?.b_lu_name ?? "",
+                    b_lu_croprotation:
+                        cultivationsForCatalogue[0]?.b_lu_croprotation ?? "",
+                    b_lu_start: b_lu_start,
+                    b_lu_end: b_lu_end,
+                    fields: fieldsWithThisCultivation.map((field) => ({
+                        b_id: field.b_id,
+                        b_name: field.b_name,
+                        b_area: field.b_area,
+                        b_isproductive: field.b_isproductive,
+                        a_som_loi: field.a_som_loi ?? 0,
+                        b_soiltype_agr: field.b_soiltype_agr ?? "",
+                        harvests: harvestsFiltered,
+                        fertilizerApplications:
+                            field.fertilizerApplications.map((app) => ({
+                                p_name_nl: app.p_name_nl,
+                                p_id: app.p_id,
+                                p_type: app.p_type,
+                            })),
+                        fertilizers: field.fertilizers.map((app) => ({
+                            p_name_nl: app.p_name_nl,
+                            p_id: app.p_id,
+                            p_type: app.p_type,
+                        })),
+                    })),
+                }
+            },
+        )
+
         // Return user information from loader
         return {
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
             fieldOptions: fieldOptions,
-            fieldsExtended: fieldsExtended,
+            rotationExtended: rotationExtended,
             userName: session.userName,
         }
     } catch (error) {
@@ -192,15 +296,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * @example
  * <FarmFieldIndex />
  */
-export default function FarmFieldIndex() {
+export default function FarmRotationIndex() {
     const loaderData = useLoaderData<typeof loader>()
     const { showProductiveOnly } = useFieldFilterStore()
 
-    const filteredFields = loaderData.fieldsExtended.filter((field) => {
+    const filteredRotations = loaderData.rotationExtended.filter((rotation) => {
         if (!showProductiveOnly) {
             return true
         }
-        return field.b_isproductive === true
+        return rotation.fields.some((field) => field.b_isproductive)
     })
 
     const currentFarmName =
@@ -224,45 +328,43 @@ export default function FarmFieldIndex() {
 
                 <BreadcrumbSeparator />
                 <BreadcrumbItem className="hidden md:block">
-                    Percelen
+                    Bouwplan
                 </BreadcrumbItem>
             </Header>
             <main>
                 {loaderData.fieldOptions.length === 0 ? (
                     <>
                         <FarmTitle
-                            title={`Percelen van ${currentFarmName}`}
-                            description="Dit bedrijf heeft nog geen percelen"
+                            title={`Bouwplan van ${currentFarmName}`}
+                            description="Dit bedrijf heeft nog geen bouwplan"
                         />
                         <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
                             <div className="flex flex-col space-y-2 text-center">
                                 <h1 className="text-2xl font-semibold tracking-tight">
-                                    Het lijkt erop dat je nog geen perceel hebt
+                                    Het lijkt erop dat je nog geen bouwplan hebt
                                     :(
                                 </h1>
                             </div>
                             <div className="flex flex-col items-center relative">
-                                <NavLink to="./new">
+                                <NavLink to="../field/new">
                                     <Button>Maak een perceel</Button>
                                 </NavLink>
                             </div>
-                            {/* <p className="px-8 text-center text-sm text-muted-foreground">
-                            </p> */}
                         </div>
                     </>
                 ) : (
                     <>
                         <div className="flex items-center justify-between">
                             <FarmTitle
-                                title={`Percelen van ${currentFarmName}`}
-                                description="Selecteer een perceel voor details of voeg een nieuw perceel toe."
+                                title={`Bouwplan van ${currentFarmName}`}
+                                description="Bekijk het bouwplan en voeg gegevens toe."
                             />
                         </div>
                         <FarmContent>
                             <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
                                 <DataTable
                                     columns={columns}
-                                    data={filteredFields}
+                                    data={filteredRotations}
                                 />
                             </div>
                         </FarmContent>
