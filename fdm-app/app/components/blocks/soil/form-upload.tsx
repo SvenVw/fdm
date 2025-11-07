@@ -5,6 +5,7 @@ import { Form, useActionData, useNavigation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { z } from "zod"
 import { cn } from "@/app/lib/utils"
+import { Dropzone } from "~/components/custom/dropzone"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
@@ -22,7 +23,6 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Progress } from "~/components/ui/progress"
-import { Dropzone } from "~/components/ui/dropzone"
 
 type UploadStatus = "idle" | "uploading" | "success" | "error"
 

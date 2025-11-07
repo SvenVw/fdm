@@ -13,6 +13,7 @@ import { parseDbf } from "shpjs"
 import { toast as notify } from "sonner"
 import { z } from "zod"
 import { cn } from "@/app/lib/utils"
+import { Dropzone } from "~/components/custom/dropzone"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
     Accordion,
@@ -29,7 +30,6 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { Dropzone } from "~/components/ui/dropzone"
 import {
     FormDescription,
     FormField,
