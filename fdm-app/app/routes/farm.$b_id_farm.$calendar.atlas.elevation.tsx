@@ -19,12 +19,6 @@ import { interpolateTurbo } from 'd3-scale-chromatic';
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { LegendElevation } from "~/components/blocks/atlas/atlas-legend-elevation"
-import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
-import {
-    FieldsSourceAvailable,
-    FieldsSourceNotClickable,
-} from "~/components/blocks/atlas/atlas-sources"
-import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { getSession } from "~/lib/auth.server"
@@ -148,13 +142,7 @@ export default function FarmAtlasElevationBlock() {
         return Promise.resolve("");
     }
 
-    const id = "fieldsSaved"
-    const fields = loaderData.savedFields
-    const fieldsSavedStyle = getFieldsStyle(id)
-    const fieldsAvailableId = "fieldsAvailable"
-    const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
-    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
-    const initialViewState = getViewState(fields)
+    const initialViewState = getViewState(loaderData.savedFields)
 
     const [viewState, setViewState] = useState<ViewState>(() => {
         if (typeof window !== "undefined") {
@@ -199,7 +187,8 @@ export default function FarmAtlasElevationBlock() {
             interactive={true}
             mapStyle={loaderData.mapboxStyle}
             mapboxAccessToken={loaderData.mapboxToken}
-            interactiveLayerIds={[id, fieldsAvailableId]}
+            interactiveLayerIds={[]}
+            onLoad={(e) => updateMapData(e.target.getBounds())}
             onMove={onViewportChange}
             onMouseMove={(e) => {
                 if (!elevationData.pixelData || !mapRef.current) return;
@@ -265,34 +254,6 @@ export default function FarmAtlasElevationBlock() {
                     }))
                 }
             />
-
-            <FieldsSourceAvailable
-                id={fieldsAvailableId}
-                calendar={loaderData.calendar}
-                zoomLevelFields={ZOOM_LEVEL_FIELDS}
-                redirectToDetailsPage={true}
-            >
-                <Layer {...fieldsAvailableStyle} />
-            </FieldsSourceAvailable>
-
-            {fields ? (
-                <FieldsSourceNotClickable id={id} fieldsData={fields}>
-                    <Layer {...fieldsSavedStyle} />
-                    <Layer {...fieldsSavedOutlineStyle} />
-                </FieldsSourceNotClickable>
-            ) : null}
-            <div className="fields-panel grid gap-4 w-[350px]">
-                <FieldsPanelHover
-                    zoomLevelFields={ZOOM_LEVEL_FIELDS}
-                    layer={fieldsAvailableId}
-                    layerExclude={id}
-                    clickRedirectsToDetailsPage={true}
-                />
-                <FieldsPanelHover
-                    zoomLevelFields={ZOOM_LEVEL_FIELDS}
-                    layer={id}
-                />
-            </div>
         </MapGL>
     )
 }
