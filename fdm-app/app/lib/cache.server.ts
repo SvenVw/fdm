@@ -138,7 +138,7 @@ export function addSecurityHeaders(headers: Headers): Headers {
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.posthog.com;
         font-src 'self' https://fonts.gstatic.com https://*.posthog.com data:;
         img-src 'self' data: blob: https://*.mapbox.com https://*.public.blob.vercel-storage.com https://images.unsplash.com https://lh3.googleusercontent.com https://graph.microsoft.com https://*.posthog.com;
-        connect-src 'self' https://*.mapbox.com https://sentry.io https://*.sentry.io https://*.nmi-agro.nl https://storage.googleapis.com/fdm-public-data/ https://*.posthog.com https://service.pdok.nl/rws/ahn/atom/downloads/dtm_05m/kaartbladindex.json ws://localhost:* http://localhost:*;
+        connect-src 'self' https://*.mapbox.com https://sentry.io https://*.sentry.io https://*.nmi-agro.nl https://storage.googleapis.com/fdm-public-data/ https://*.posthog.com ws://localhost:* http://localhost:*;
         frame-src 'self';
         media-src 'self' https://*.posthog.com;
         object-src 'none';

@@ -170,6 +170,7 @@ export default function FarmAtlasElevationBlock() {
     }, [elevationData.imageData]);
 
     const isFirstRender = useRef(true)
+    const initialLoadDone = useRef(false);
 
     useEffect(() => {
         if (isFirstRender.current) {
@@ -178,6 +179,13 @@ export default function FarmAtlasElevationBlock() {
         }
         sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
     }, [viewState])
+
+    useEffect(() => {
+        if (mapRef.current && cogIndex.length > 0 && !initialLoadDone.current) {
+            initialLoadDone.current = true;
+            updateMapData(mapRef.current.getBounds());
+        }
+    }, [cogIndex, updateMapData]);
 
     return (
         <MapGL
@@ -188,7 +196,6 @@ export default function FarmAtlasElevationBlock() {
             mapStyle={loaderData.mapboxStyle}
             mapboxAccessToken={loaderData.mapboxToken}
             interactiveLayerIds={[]}
-            onLoad={(e) => updateMapData(e.target.getBounds())}
             onMove={onViewportChange}
             onMouseMove={(e) => {
                 if (!elevationData.pixelData || !mapRef.current) return;
