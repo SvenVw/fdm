@@ -77,7 +77,10 @@ export function getCacheControlHeaders(
         headers.set("Cache-Control", generateCacheControl({ noStore: true }))
     } else if (url.pathname.startsWith("/farm")) {
         if (request.method !== "GET") {
-            headers.set("Cache-Control", generateCacheControl({ noStore: true }))
+            headers.set(
+                "Cache-Control",
+                generateCacheControl({ noStore: true }),
+            )
         } else {
             headers.set(
                 "Cache-Control",

@@ -148,7 +148,8 @@ export function Banner() {
                         <p className="text-sm font-normal text-start">
                             {`Wij gebruiken cookies enkel om ${clientConfig.name} te verbeteren, zodat we weten wat er goed en fout gaat.`}
                             <br />
-                            Geen zorgen, we gebruiken ze niet voor advertenties en ook niet om je online te volgen.
+                            Geen zorgen, we gebruiken ze niet voor advertenties
+                            en ook niet om je online te volgen.
                             <br />
                             <br />
                             <span className="text-xs">

@@ -239,7 +239,7 @@ export function AutoComplete<T extends string>({
                                 <CommandGroup>
                                     {items.map((option) => {
                                         const IconComponent = option.icon
-                                            ? iconMap[option.icon] ?? Check
+                                            ? (iconMap[option.icon] ?? Check)
                                             : Check
                                         return (
                                             <CommandItem

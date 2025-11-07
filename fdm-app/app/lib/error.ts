@@ -88,7 +88,8 @@ export function handleLoaderError(error: unknown) {
             case 401:
                 return redirect("/signin")
             case 403:
-                userMessage = "U heeft geen rechten om deze actie uit te voeren."
+                userMessage =
+                    "U heeft geen rechten om deze actie uit te voeren."
                 break
             case 404:
                 userMessage = "De gevraagde data kon niet worden gevonden."
@@ -98,7 +99,10 @@ export function handleLoaderError(error: unknown) {
                     "Er is een onverwachte fout opgetreden. Probeer het later opnieuw."
                 break
         }
-        return data({ warning: error }, { status: error.status, statusText: userMessage })
+        return data(
+            { warning: error },
+            { status: error.status, statusText: userMessage },
+        )
     }
 
     // Handle specific error messages.
@@ -108,18 +112,30 @@ export function handleLoaderError(error: unknown) {
             "Principal does not have permission to perform this action"
         ) {
             console.warn("Permission denied: ", error)
-            return data({ warning: error.message }, { status: 403, statusText: "U heeft helaas geen rechten om dit te doen." })
+            return data(
+                { warning: error.message },
+                {
+                    status: 403,
+                    statusText: "U heeft helaas geen rechten om dit te doen.",
+                },
+            )
         }
         if (
             error.message.startsWith("missing: ") ||
             error.message.startsWith("invalid: ")
         ) {
             console.warn(error.message)
-            return data({ warning: error }, { status: 400, statusText: "Ongeldige waarde" })
+            return data(
+                { warning: error },
+                { status: 400, statusText: "Ongeldige waarde" },
+            )
         }
         if (error.message.startsWith("not found")) {
             console.warn(error.message)
-            return data({ warning: error }, { status: 404, statusText: "Pagina is niet gevonden" })
+            return data(
+                { warning: error },
+                { status: 404, statusText: "Pagina is niet gevonden" },
+            )
         }
     }
 
@@ -166,7 +182,8 @@ export function handleActionError(error: unknown) {
             case 401:
                 return redirect("/signin")
             case 403:
-                userMessage = "U heeft geen rechten om deze actie uit te voeren."
+                userMessage =
+                    "U heeft geen rechten om deze actie uit te voeren."
                 isWarning = true
                 break
             case 404:
@@ -189,7 +206,10 @@ export function handleActionError(error: unknown) {
             "Principal does not have permission to perform this action"
         ) {
             console.warn("Permission denied: ", error)
-            return dataWithWarning({ error }, "U heeft helaas geen rechten om dit te doen.")
+            return dataWithWarning(
+                { error },
+                "U heeft helaas geen rechten om dit te doen.",
+            )
         }
         if (
             error.message.startsWith("missing: ") ||

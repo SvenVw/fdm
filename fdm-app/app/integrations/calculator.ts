@@ -17,7 +17,6 @@ import {
     type NitrogenBalanceNumeric,
 } from "@svenvw/fdm-calculator"
 import {
-    type Cultivation,
     type FdmType,
     type Field,
     type fdmSchema,

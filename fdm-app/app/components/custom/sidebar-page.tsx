@@ -52,7 +52,9 @@ export function SidebarPage({
                 <NavLink
                     key={item.to}
                     to={item.to}
-                    aria-current={pathname.startsWith(item.to) ? "page" : undefined}
+                    aria-current={
+                        pathname.startsWith(item.to) ? "page" : undefined
+                    }
                     aria-label={item.title}
                     className={cn(
                         buttonVariants({ variant: "ghost" }),

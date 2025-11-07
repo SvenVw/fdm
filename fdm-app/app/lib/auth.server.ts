@@ -110,7 +110,8 @@ export async function getSession(request: Request): Promise<FdmSession> {
     }
 
     const displayUserName =
-        user.displayUsername || createDisplayUsername(user.firstname, user.surname)
+        user.displayUsername ||
+        createDisplayUsername(user.firstname, user.surname)
 
     return {
         ...session,
