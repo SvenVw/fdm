@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNull } from "drizzle-orm"
+import { and, eq, inArray, isNull, or } from "drizzle-orm"
 import type {
     Action,
     Permission,
@@ -10,6 +10,7 @@ import type {
     Role,
 } from "./authorization.d"
 import * as schema from "./db/schema"
+import * as authNSchema from "./db/schema-authn"
 import * as authZSchema from "./db/schema-authz"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
@@ -182,13 +183,26 @@ export async function checkPermission(
                         resource_id: authZSchema.role.resource_id,
                     })
                     .from(authZSchema.role)
+                    .leftJoin(
+                        authNSchema.member,
+                        eq(
+                            authZSchema.role.principal_id,
+                            authNSchema.member.organizationId,
+                        ),
+                    )
                     .where(
                         and(
                             eq(authZSchema.role.resource, bead.resource),
                             eq(authZSchema.role.resource_id, bead.resource_id),
-                            inArray(
-                                authZSchema.role.principal_id,
-                                principal_ids,
+                            or(
+                                inArray(
+                                    authZSchema.role.principal_id,
+                                    principal_ids,
+                                ),
+                                inArray(
+                                    authNSchema.member.userId,
+                                    principal_ids,
+                                ),
                             ),
                             inArray(authZSchema.role.role, roles),
                             isNull(authZSchema.role.deleted),
@@ -277,11 +291,24 @@ export async function getRolesOfPrincipalForResource(
                     role: authZSchema.role.role,
                 })
                 .from(authZSchema.role)
+                .leftJoin(
+                    authNSchema.member,
+                    eq(
+                        authZSchema.role.principal_id,
+                        authNSchema.member.organizationId,
+                    ),
+                )
                 .where(
                     and(
                         eq(authZSchema.role.resource, resource),
                         eq(authZSchema.role.resource_id, resource_id),
-                        inArray(authZSchema.role.principal_id, principal_ids),
+                        or(
+                            inArray(
+                                authZSchema.role.principal_id,
+                                principal_ids,
+                            ),
+                            inArray(authNSchema.member.userId, principal_ids),
+                        ),
                         isNull(authZSchema.role.deleted),
                     ),
                 )
@@ -538,10 +565,23 @@ export async function listResources(
                     resource_id: authZSchema.role.resource_id,
                 })
                 .from(authZSchema.role)
+                .leftJoin(
+                    authNSchema.member,
+                    eq(
+                        authZSchema.role.principal_id,
+                        authNSchema.member.organizationId,
+                    ),
+                )
                 .where(
                     and(
                         eq(authZSchema.role.resource, resource),
-                        inArray(authZSchema.role.principal_id, principal_ids),
+                        or(
+                            inArray(
+                                authZSchema.role.principal_id,
+                                principal_ids,
+                            ),
+                            inArray(authNSchema.member.userId, principal_ids),
+                        ),
                         inArray(authZSchema.role.role, roles),
                         isNull(authZSchema.role.deleted),
                     ),
