@@ -1,20 +1,38 @@
 import { getFields } from "@svenvw/fdm-core"
+import type { FeatureCollection } from "geojson"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
-    data,
-    type LoaderFunctionArgs,
-    type MetaFunction,
-    NavLink,
-    useLoaderData,
-} from "react-router"
-import { Button } from "~/components/ui/button"
-import { getMapboxToken } from "~/integrations/mapbox"
+    Layer,
+    Map as MapGL,
+    Source,
+    type MapRef,
+    type ViewState,
+    type ViewStateChangeEvent,
+} from "react-map-gl/mapbox"
+import type { MetaFunction } from "react-router"
+import { type LoaderFunctionArgs, useLoaderData } from "react-router"
+import { fromUrl } from 'geotiff';
+import proj4 from 'proj4';
+import throttle from 'lodash.throttle';
+import { scaleSequential } from 'd3-scale';
+import { interpolateTurbo } from 'd3-scale-chromatic';
+import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { Controls } from "~/components/blocks/atlas/atlas-controls"
+import { LegendElevation } from "~/components/blocks/atlas/atlas-legend-elevation"
+import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
+import {
+    FieldsSourceAvailable,
+    FieldsSourceNotClickable,
+} from "~/components/blocks/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
+import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
+import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 
-// Meta
 export const meta: MetaFunction = () => {
     return [
         { title: `Hoogte - Kaart | ${clientConfig.name}` },
@@ -25,92 +43,255 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-/**
- * Loads farm field data and a Mapbox token for the elevation feature.
- *
- * This asynchronous function checks for the presence of a farm ID in the route parameters. It retrieves the user session, fetches the fields associated with the specified farm, and maps them to a GeoJSON FeatureCollection. A Mapbox token is also obtained to enable map rendering on the client side. Errors during these processes, such as a missing farm ID or data retrieval issues, are caught and rethrown.
- *
- * @throws {Error} If the farm ID is not provided (HTTP 400) or if an internal error occurs during data fetching.
- *
- * @returns An object containing the Mapbox token and the GeoJSON FeatureCollection of farm fields.
- */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
-        // Get the farm id
         const b_id_farm = params.b_id_farm
-        if (!b_id_farm) {
-            throw data("Farm ID is required", {
-                status: 400,
-                statusText: "Farm ID is required",
-            })
-        }
-
-        // Get the session
         const session = await getSession(request)
-
-        // Get timeframe from calendar store
+        const calendar = getCalendar(params)
         const timeframe = getTimeframe(params)
 
-        // Get the fields of the farm
-        const fields = await getFields(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            timeframe,
-        )
-        const features = fields.map((field) => {
-            const feature = {
-                type: "Feature",
+        let featureCollection: FeatureCollection | undefined
+        if (b_id_farm && b_id_farm !== "undefined") {
+            const fields = await getFields(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+                timeframe,
+            )
+            const features = fields.map((field) => ({
+                type: "Feature" as const,
                 properties: {
                     b_id: field.b_id,
                     b_name: field.b_name,
                     b_area: Math.round(field.b_area * 10) / 10,
+                    b_lu_name: field.b_lu_name,
+                    b_id_source: field.b_id_source,
                 },
                 geometry: field.b_geometry,
-            }
-            return feature
-        })
+            }))
 
-        const featureCollection = {
-            type: "FeatureCollection",
-            features: features,
+            featureCollection = {
+                type: "FeatureCollection",
+                features: features,
+            }
         }
 
-        // Get the Mapbox token
         const mapboxToken = getMapboxToken()
+        const mapboxStyle = getMapboxStyle()
 
-        // Return user information from loader
         return {
+            calendar: calendar,
+            savedFields: featureCollection,
             mapboxToken: mapboxToken,
-            fields: featureCollection,
+            mapboxStyle: mapboxStyle,
         }
     } catch (error) {
         throw handleLoaderError(error)
     }
 }
 
-/**
- * Renders a placeholder UI for the farm elevation feature.
- *
- * This component displays a message informing the user that the elevation map is not yet available and provides a button that navigates to the field map.
- */
 export default function FarmAtlasElevationBlock() {
-    const _loaderData = useLoaderData<typeof loader>()
+    const loaderData = useLoaderData<typeof loader>()
+    const [cogIndex, setCogIndex] = useState([])
+    const [elevationData, setElevationData] = useState<{
+        imageData: ImageData | null,
+        min: number,
+        max: number,
+        palette: any,
+        pixelData: { data: Float32Array, width: number, height: number } | null,
+    }>({ imageData: null, min: 0, max: 0, palette: [], pixelData: null });
+    const [hoverValue, setHoverValue] = useState<number | undefined>(undefined);
+    const [loading, setLoading] = useState(false);
+    const workerRef = useRef<Worker | null>(null);
+    const mapRef = useRef<MapRef | null>(null);
+
+    useEffect(() => {
+        workerRef.current = new Worker(new URL('../elevation.worker.ts', import.meta.url));
+        workerRef.current.onmessage = (event) => {
+            if (event.data.error) {
+                // Handle error
+                setLoading(false);
+                return;
+            }
+            const { imageData, min, max, paletteDomain, paletteInterpolator, pixelData } = event.data;
+            const palette = scaleSequential(interpolateTurbo).domain(paletteDomain);
+            setElevationData({ imageData, min, max, palette, pixelData });
+            setLoading(false);
+        };
+        return () => {
+            workerRef.current?.terminate();
+        };
+    }, []);
+
+    useEffect(() => {
+        fetch("https://service.pdok.nl/rws/ahn/atom/downloads/dtm_05m/kaartbladindex.json")
+            .then(res => res.json())
+            .then(index => setCogIndex(index.features));
+    }, []);
+
+    const updateMapData = useCallback(throttle((bounds) => {
+        if (!cogIndex.length || !workerRef.current) return;
+        setLoading(true);
+        workerRef.current.postMessage({ bounds: bounds.toArray().flat(), cogIndex });
+    }, 300), [cogIndex]);
+
+    const id = "fieldsSaved"
+    const fields = loaderData.savedFields
+    const fieldsSavedStyle = getFieldsStyle(id)
+    const fieldsAvailableId = "fieldsAvailable"
+    const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
+    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
+    const initialViewState = getViewState(fields)
+
+    const [viewState, setViewState] = useState<ViewState>(() => {
+        if (typeof window !== "undefined") {
+            const savedViewState = sessionStorage.getItem("mapViewState")
+            if (savedViewState) {
+                try {
+                    return JSON.parse(savedViewState)
+                } catch {
+                    sessionStorage.removeItem("mapViewState")
+                }
+            }
+        }
+        return initialViewState as ViewState
+    })
+
+    const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
+        setViewState(event.viewState);
+        updateMapData(event.target.getBounds());
+    }, [updateMapData]);
+
+    useEffect(() => {
+        if (elevationData.imageData) {
+            const canvas = document.getElementById('elevation-canvas') as HTMLCanvasElement;
+            if (canvas) {
+                canvas.width = elevationData.imageData.width;
+                canvas.height = elevationData.imageData.height;
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.putImageData(elevationData.imageData, 0, 0);
+                    const source = mapRef.current?.getSource('elevation');
+                    if (source && source.type === 'canvas') {
+                        source.setCoordinates([
+                            mapRef.current.getBounds().getNorthWest().toArray(),
+                            mapRef.current.getBounds().getNorthEast().toArray(),
+                            mapRef.current.getBounds().getSouthEast().toArray(),
+                            mapRef.current.getBounds().getSouthWest().toArray(),
+                        ]);
+                    }
+                }
+            }
+        }
+    }, [elevationData.imageData]);
+
+    const isFirstRender = useRef(true)
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false
+            return
+        }
+        sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
+    }, [viewState])
 
     return (
-        <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
-            <div className="flex flex-col space-y-2 text-center">
-                <h1 className="text-2xl font-semibold tracking-tight">
-                    Helaas, de hoogtekaart is nog niet beschikbaar :(
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                    We proberen de hoogtekaart binnenkort toe te voegen. Hou de
-                    website in de gaten.
-                </p>
+        <MapGL
+            ref={mapRef}
+            {...viewState}
+            style={{ height: "calc(100vh - 64px)", width: "100%" }}
+            interactive={true}
+            mapStyle={loaderData.mapboxStyle}
+            mapboxAccessToken={loaderData.mapboxToken}
+            interactiveLayerIds={[id, fieldsAvailableId]}
+            onMove={onViewportChange}
+            onMouseMove={(e) => {
+                if (!elevationData.pixelData || !mapRef.current) return;
+                const { lng, lat } = e.lngLat;
+                const rdProjection = proj4("EPSG:4326", "EPSG:28992");
+                const [x, y] = rdProjection.forward([lng, lat]);
+                const { data, width, height } = elevationData.pixelData;
+                const bounds = mapRef.current.getBounds();
+                const [minLon, minLat, maxLon, maxLat] = bounds.toArray().flat();
+                const minRD = rdProjection.forward([minLon, minLat]);
+                const maxRD = rdProjection.forward([maxLon, maxLat]);
+                const rdWidth = maxRD[0] - minRD[0];
+                const rdHeight = maxRD[1] - minRD[1];
+                const xPct = (x - minRD[0]) / rdWidth;
+                const yPct = (y - minRD[1]) / rdHeight;
+                const xPx = Math.floor(width * xPct);
+                const yPx = Math.floor(height * (1 - yPct));
+                const index = (yPx * width + xPx);
+                const value = data[index];
+                setHoverValue(value);
+            }}
+        >
+            {loading && (
+                <div className="absolute top-4 left-4 bg-white p-2 rounded-md shadow-md">
+                    Laden...
+                </div>
+            )}
+            {!loading && !elevationData.imageData && (
+                <div className="absolute top-4 left-4 bg-white p-2 rounded-md shadow-md">
+                    De AHN service is momenteel niet beschikbaar.
+                </div>
+            )}
+            <LegendElevation
+                min={elevationData.min}
+                max={elevationData.max}
+                palette={elevationData.palette}
+                hoverValue={hoverValue}
+            />
+            {elevationData.imageData && (
+                <Source
+                    id="elevation"
+                    type="canvas"
+                    canvas="elevation-canvas"
+                >
+                    <Layer id="elevation" type="raster" />
+                </Source>
+            )}
+            <canvas id="elevation-canvas" style={{ display: 'none' }} />
+            <Controls
+                onViewportChange={({ longitude, latitude, zoom }) =>
+                    setViewState((currentViewState) => ({
+                        ...currentViewState,
+                        longitude,
+                        latitude,
+                        zoom,
+                        pitch: currentViewState.pitch,
+                        bearing: currentViewState.bearing,
+                    }))
+                }
+            />
+
+            <FieldsSourceAvailable
+                id={fieldsAvailableId}
+                calendar={loaderData.calendar}
+                zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                redirectToDetailsPage={true}
+            >
+                <Layer {...fieldsAvailableStyle} />
+            </FieldsSourceAvailable>
+
+            {fields ? (
+                <FieldsSourceNotClickable id={id} fieldsData={fields}>
+                    <Layer {...fieldsSavedStyle} />
+                    <Layer {...fieldsSavedOutlineStyle} />
+                </FieldsSourceNotClickable>
+            ) : null}
+            <div className="fields-panel grid gap-4 w-[350px]">
+                <FieldsPanelHover
+                    zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                    layer={fieldsAvailableId}
+                    layerExclude={id}
+                    clickRedirectsToDetailsPage={true}
+                />
+                <FieldsPanelHover
+                    zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                    layer={id}
+                />
             </div>
-            <Button asChild>
-                <NavLink to="../fields">Naar perceelkaart</NavLink>
-            </Button>
-        </div>
+        </MapGL>
     )
 }
