@@ -338,9 +338,7 @@ export function MijnPercelenUploadForm({
                                                             </div>
                                                             <RequiredFilesStatus
                                                                 files={
-                                                                    form.getValues(
-                                                                        "shapefile",
-                                                                    ) || []
+                                                                    selectedFiles
                                                                 }
                                                                 requiredExtensions={
                                                                     requiredExtensions
