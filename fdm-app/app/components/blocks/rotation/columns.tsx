@@ -26,6 +26,7 @@ export type RotationExtended = {
     b_lu: string[]
     b_lu_name: string
     b_lu_croprotation: string
+    b_lu_harvestable: "once" | "multiple" | "nonde"
     b_lu_start: Date[]
     b_lu_end: Date[]
     fields: {
@@ -35,7 +36,7 @@ export type RotationExtended = {
         b_isproductive: boolean
         a_som_loi: number
         b_soiltype_agr: string
-        harvests: any
+        b_lu_harvest_date: Date[]
         fertilizerApplications: {
             p_name_nl: string
             p_id: string
@@ -117,8 +118,11 @@ export const columns: ColumnDef<RotationExtended>[] = [
                     </p>
                 )
             }
-            const firstDate = b_lu_start[0]
-            const lastDate = b_lu_start[b_lu_start.length - 1]
+            const b_lu_start_sorted = b_lu_start.sort(
+                (a, b) => a.getTime() - b.getTime(),
+            )
+            const firstDate = b_lu_start_sorted[0]
+            const lastDate = b_lu_start_sorted[b_lu_start_sorted.length - 1]
             return (
                 <p className="text-muted-foreground">
                     {`${format(firstDate, "PP", { locale: nl })} - ${format(lastDate, "PP", { locale: nl })}`}
@@ -137,22 +141,91 @@ export const columns: ColumnDef<RotationExtended>[] = [
         cell: ({ row }) => {
             const cultivation = row.original
 
-            const b_lu_start = cultivation.field.harvests
-
-            if (b_lu_start.length === 1) {
+            const b_lu_harvest_date = cultivation.fields.flatMap(
+                (field) => field.b_lu_harvest_date,
+            )
+            if (b_lu_harvest_date.length === 1) {
                 return (
                     <p className="text-muted-foreground">
-                        {format(b_lu_start[0], "PP", { locale: nl })}
+                        {format(b_lu_harvest_date[0], "PP", { locale: nl })}
                     </p>
                 )
             }
-            const firstDate = b_lu_start[0]
-            const lastDate = b_lu_start[b_lu_start.length - 1]
-            return (
-                <p className="text-muted-foreground">
-                    {`${format(firstDate, "PP", { locale: nl })} - ${format(lastDate, "PP", { locale: nl })}`}
-                </p>
-            )
+
+            if (
+                b_lu_harvest_date.length > 1 &&
+                cultivation.b_lu_harvestable === "once"
+            ) {
+                const b_lu_harvest_date_sorted = b_lu_harvest_date.sort(
+                    (a, b) => a.getTime() - b.getTime(),
+                )
+                const firstDate = b_lu_harvest_date_sorted[0]
+                const lastDate =
+                    b_lu_harvest_date_sorted[
+                        b_lu_harvest_date_sorted.length - 1
+                    ]
+
+                return (
+                    <p className="text-muted-foreground">
+                        {`${format(firstDate, "PP", { locale: nl })} - ${format(lastDate, "PP", { locale: nl })}`}
+                    </p>
+                )
+            }
+            if (
+                b_lu_harvest_date.length > 1 &&
+                cultivation.b_lu_harvestable === "multiple"
+            ) {
+                const b_lu_harvest_date_per_field = cultivation.fields.map(
+                    (field) => field.b_lu_harvest_date,
+                )
+
+                const harvestsByOrder: Date[][] = []
+                for (const harvestDates of b_lu_harvest_date_per_field) {
+                    const harvestDatesSorted = [...harvestDates].sort(
+                        (a, b) => a.getTime() - b.getTime(),
+                    )
+                    for (let i = 0; i < harvestDatesSorted.length; i++) {
+                        if (!harvestsByOrder[i]) {
+                            harvestsByOrder[i] = []
+                        }
+                        harvestsByOrder[i].push(harvestDatesSorted[i])
+                    }
+                }
+
+                return (
+                    <div className="flex items-start flex-col space-y-2">
+                        {harvestsByOrder.map((harvestDates, idx) => {
+                            const harvestDatesSorted = [...harvestDates].sort(
+                                (a, b) => a.getTime() - b.getTime(),
+                            )
+                            if (harvestDatesSorted.length === 1) {
+                                return (
+                                    <p
+                                        key={idx}
+                                        className="text-muted-foreground"
+                                    >
+                                        {`${idx + 1}e ${cultivation.b_lu_croprotation === "grass" ? "snede" : "oogst"}: ${format(
+                                            harvestDatesSorted[0],
+                                            "PP",
+                                            { locale: nl },
+                                        )}`}
+                                    </p>
+                                )
+                            }
+                            const firstDate = harvestDatesSorted[0]
+                            const lastDate =
+                                harvestDatesSorted[
+                                    harvestDatesSorted.length - 1
+                                ]
+                            return (
+                                <p key={idx} className="text-muted-foreground">
+                                    {`${idx + 1}e ${cultivation.b_lu_croprotation === "grass" ? "snede" : "oogst"}: ${format(firstDate, "PP", { locale: nl })} - ${format(lastDate, "PP", { locale: nl })}`}
+                                </p>
+                            )
+                        })}
+                    </div>
+                )
+            }
         },
     },
     {
@@ -303,112 +376,4 @@ export const columns: ColumnDef<RotationExtended>[] = [
             )
         },
     },
-
-    // {
-    //     accessorKey: "a_som_loi",
-    //     enableSorting: true,
-    //     sortingFn: "alphanumeric",
-    //     header: ({ column }) => {
-    //         return <DataTableColumnHeader column={column} title="OS" />
-    //     },
-    //     enableHiding: true, // Enable hiding for mobile
-    //     cell: ({ row }) => {
-    //         const field = row.original
-    //         return (
-    //             <p className="text-muted-foreground">
-    //                 {`${field.a_som_loi.toFixed(2)} %`}
-    //             </p>
-    //         )
-    //     },
-    // },
-    // {
-    //     accessorKey: "b_soiltype_agr",
-    //     enableSorting: true,
-    //     sortingFn: "alphanumeric",
-    //     header: ({ column }) => {
-    //         return <DataTableColumnHeader column={column} title="Bodemtype" />
-    //     },
-    //     enableHiding: true, // Enable hiding for mobile
-    //     cell: ({ row }) => {
-    //         const field = row.original
-    //         return (
-    //             <p className="text-muted-foreground">{field.b_soiltype_agr}</p>
-    //         )
-    //     },
-    // },
-    // {
-    //     accessorKey: "b_area",
-    //     enableSorting: true,
-    //     sortingFn: "alphanumeric",
-    //     header: ({ column }) => {
-    //         return <DataTableColumnHeader column={column} title="Oppervlakte" />
-    //     },
-    //     enableHiding: true, // Enable hiding for mobile
-    //     cell: ({ row }) => {
-    //         const field = row.original
-    //         return (
-    //             <p className="text-muted-foreground">
-    //                 {field.b_area < 0.1
-    //                     ? "< 0.1 ha"
-    //                     : `${field.b_area.toFixed(1)} ha`}
-    //             </p>
-    //         )
-    //     },
-    // },
-    // {
-    //     id: "actions",
-    //     enableHiding: false,
-    //     cell: ({ row }) => {
-    //         const field = row.original
-
-    //         return (
-    //             <DropdownMenu>
-    //                 <DropdownMenuTrigger asChild>
-    //                     <Button variant="ghost" className="h-8 w-8 p-0">
-    //                         <span className="sr-only">Open menu</span>
-    //                         <MoreHorizontal />
-    //                     </Button>
-    //                 </DropdownMenuTrigger>
-    //                 <DropdownMenuContent align="end">
-    //                     {/* <DropdownMenuLabel>Acties</DropdownMenuLabel>
-    //                     <DropdownMenuItem
-    //                         onClick={() =>
-    //                             navigator.clipboard.writeText(field.b_id)
-    //                         }
-    //                     >
-    //                         Kopieer perceel id
-    //                     </DropdownMenuItem>
-    //                     <DropdownMenuSeparator /> */}
-    //                     <DropdownMenuLabel>Gegevens</DropdownMenuLabel>
-    //                     <DropdownMenuItem>
-    //                         <NavLink to={`./${field.b_id}`}>Overzicht</NavLink>
-    //                     </DropdownMenuItem>
-    //                     <DropdownMenuItem>
-    //                         <NavLink to={`./${field.b_id}/cultivation`}>
-    //                             Gewassen
-    //                         </NavLink>
-    //                     </DropdownMenuItem>
-    //                     <DropdownMenuItem>
-    //                         <NavLink to={`./${field.b_id}/fertilizer`}>
-    //                             Bemesting
-    //                         </NavLink>
-    //                     </DropdownMenuItem>
-    //                     <DropdownMenuItem>
-    //                         <NavLink to={`./${field.b_id}/soil`}>Bodem</NavLink>
-    //                     </DropdownMenuItem>
-    //                     <DropdownMenuItem>
-    //                         <NavLink to={`./${field.b_id}/atlas`}>
-    //                             Kaart
-    //                         </NavLink>
-    //                     </DropdownMenuItem>
-    //                     <DropdownMenuItem>
-    //                         <NavLink to={`./${field.b_id}/delete`}>
-    //                             Verwijderen
-    //                         </NavLink>
-    //                     </DropdownMenuItem>
-    //                 </DropdownMenuContent>
-    //             </DropdownMenu>
-    //         )
-    //     },
-    // },
 ]

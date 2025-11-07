@@ -1,5 +1,6 @@
 import {
     getCultivations,
+    getCultivationsFromCatalogue,
     getCurrentSoilData,
     getFarms,
     getFertilizerApplications,
@@ -17,7 +18,10 @@ import {
 } from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { columns, RotationExtended } from "~/components/blocks/rotation/columns"
+import {
+    columns,
+    type RotationExtended,
+} from "~/components/blocks/rotation/columns"
 import { DataTable } from "~/components/blocks/rotation/table"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
@@ -30,6 +34,7 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useFieldFilterStore } from "~/store/field-filter"
+import { getCultivationCatalogue } from "@svenvw/fdm-data"
 
 export const meta: MetaFunction = () => {
     return [
@@ -119,6 +124,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm,
         )
 
+        const cultivationCatalogue = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+
         const fieldsExtended = await Promise.all(
             fields.map(async (field) => {
                 const cultivations = await getCultivations(
@@ -129,13 +140,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 )
 
                 const harvests = await Promise.all(
-                    cultivations.map(async (cultivation) => {
-                        return await getHarvests(
+                    cultivations.flatMap(async (cultivation) => {
+                        const harvests = await getHarvests(
                             fdm,
                             session.principal_id,
                             cultivation.b_lu,
                             timeframe,
                         )
+
+                        return {
+                            b_lu: cultivation.b_lu,
+                            b_lu_harvest_date: harvests.map(
+                                (harvest) => harvest.b_lu_harvest_date,
+                            ),
+                        }
                     }),
                 )
 
@@ -227,25 +245,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     ),
                 ].map((b_lu_end) => new Date(b_lu_end))
 
-                // Get all harvests for this cultivation
-                const harvestsFiltered = fieldsWithThisCultivation.flatMap(
-                    (field) =>
-                        field.harvests.filter((harvest) =>
-                            cultivationsForCatalogue.some(
-                                (cultivation) =>
-                                    cultivation.b_lu === harvest.b_lu,
-                            ),
-                        ),
+                const b_lu = cultivationsForCatalogue.map(
+                    (cultivation) => cultivation.b_lu,
                 )
 
                 return {
                     b_lu_catalogue: b_lu_catalogue,
-                    b_lu: cultivationsForCatalogue.map(
-                        (cultivation) => cultivation.b_lu,
-                    ),
+                    b_lu: b_lu,
                     b_lu_name: cultivationsForCatalogue[0]?.b_lu_name ?? "",
                     b_lu_croprotation:
                         cultivationsForCatalogue[0]?.b_lu_croprotation ?? "",
+                    b_lu_harvestable:
+                        cultivationCatalogue.find(
+                            (x) => x.b_lu_catalogue === b_lu_catalogue,
+                        )?.b_lu_harvestable ?? "once",
                     b_lu_start: b_lu_start,
                     b_lu_end: b_lu_end,
                     fields: fieldsWithThisCultivation.map((field) => ({
@@ -255,7 +268,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         b_isproductive: field.b_isproductive,
                         a_som_loi: field.a_som_loi ?? 0,
                         b_soiltype_agr: field.b_soiltype_agr ?? "",
-                        harvests: harvestsFiltered,
+                        b_lu_harvest_date: field.harvests.flatMap(
+                            (harvest) => harvest.b_lu_harvest_date,
+                        ),
                         fertilizerApplications:
                             field.fertilizerApplications.map((app) => ({
                                 p_name_nl: app.p_name_nl,
