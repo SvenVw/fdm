@@ -1,4 +1,5 @@
 import {
+    CultivationCatalogue,
     getCultivations,
     getCultivationsFromCatalogue,
     getCurrentSoilData,
@@ -69,9 +70,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the active farm
         const b_id_farm = params.b_id_farm
         if (!b_id_farm) {
-            throw data("missing: b_id_farm", {
-                status: 400,
-                statusText: "missing: b_id_farm",
+            throw new Response("Not Found", {
+                status: 404,
+                statusText: "Not Found",
             })
         }
 
@@ -164,11 +165,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     timeframe,
                 )
 
-                const fertilizersFiltered = fertilizers.filter((fertilizer) => {
-                    return fertilizerApplications.some((application) => {
-                        return application.p_id === fertilizer.p_id
-                    })
-                })
+                const fertilizerApplicationIds = new Set(
+                    fertilizerApplications.map((app) => app.p_id),
+                )
+
+                const fertilizersFiltered = fertilizers.filter((fertilizer) =>
+                    fertilizerApplicationIds.has(fertilizer.p_id),
+                )
 
                 const currentSoilData = await getCurrentSoilData(
                     fdm,
@@ -177,11 +180,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     timeframe,
                 )
                 const a_som_loi =
-                    currentSoilData.find((x) => x.parameter === "a_som_loi")
-                        ?.value ?? null
+                    currentSoilData.find(
+                        (item: { parameter: string }) => item.parameter === "a_som_loi",
+                    )?.value ?? null
                 const b_soiltype_agr =
                     currentSoilData.find(
-                        (x) => x.parameter === "b_soiltype_agr",
+                        (item: { parameter: string }) => item.parameter === "b_soiltype_agr",
                     )?.value ?? null
 
                 return {
@@ -199,23 +203,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }),
         )
 
-        // Transform fieldsExtended to rotationExtended
-        const cultivationsInRotation: string[] = [
-            ...new Set(
-                fieldsExtended.flatMap((field) => {
-                    return field.cultivations.flatMap((cultivation) => {
-                        return cultivation.b_lu_catalogue
-                    })
-                }),
-            ),
-        ]
+        const transformFieldsToRotationExtended = (
+            fieldsExtended: any[], // TODO: Define a proper type for fieldsExtended
+            cultivationCatalogue: CultivationCatalogue,
+        ): RotationExtended[] => {
+            const cultivationsInRotation: string[] = [
+                ...new Set(
+                    fieldsExtended.flatMap((field: { cultivations: { b_lu_catalogue: string }[] }) => {
+                        return field.cultivations.flatMap((cultivation) => {
+                            return cultivation.b_lu_catalogue
+                        })
+                    }),
+                ),
+            ]
 
-        const rotationExtended: RotationExtended[] = cultivationsInRotation.map(
-            (b_lu_catalogue) => {
+            return cultivationsInRotation.map((b_lu_catalogue) => {
                 const cultivationsForCatalogue = fieldsExtended.flatMap(
                     (field) =>
                         field.cultivations.filter(
-                            (cultivation) =>
+                            (cultivation: { b_lu_catalogue: string }) =>
                                 cultivation.b_lu_catalogue === b_lu_catalogue,
                         ),
                 )
@@ -223,7 +229,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 const fieldsWithThisCultivation = fieldsExtended.filter(
                     (field) =>
                         field.cultivations.some(
-                            (cultivation) =>
+                            (cultivation: { b_lu_catalogue: string }) =>
                                 cultivation.b_lu_catalogue === b_lu_catalogue,
                         ),
                 )
@@ -231,22 +237,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 // Get all unique b_lu_start of cultivation
                 const b_lu_start = [
                     ...new Set(
-                        cultivationsForCatalogue.map((cultivation) =>
+                        cultivationsForCatalogue.map((cultivation: { b_lu_start: Date }) =>
                             cultivation.b_lu_start.getTime(),
                         ),
                     ),
-                ].map((b_lu_start) => new Date(b_lu_start))
+                ].map((timestamp) => new Date(timestamp))
 
                 const b_lu_end = [
                     ...new Set(
-                        cultivationsForCatalogue.map((cultivation) =>
-                            cultivation.b_lu_start.getTime(),
-                        ),
+                        cultivationsForCatalogue
+                            .filter((cultivation: { b_lu_end: Date | null }) => cultivation.b_lu_end)
+                            .map((cultivation: { b_lu_end: Date }) => cultivation.b_lu_end.getTime()),
                     ),
-                ].map((b_lu_end) => new Date(b_lu_end))
+                ].map((timestamp) => new Date(timestamp))
 
                 const b_lu = cultivationsForCatalogue.map(
-                    (cultivation) => cultivation.b_lu,
+                    (cultivation: { b_lu: string }) => cultivation.b_lu,
                 )
 
                 return {
@@ -257,11 +263,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         cultivationsForCatalogue[0]?.b_lu_croprotation ?? "",
                     b_lu_harvestable:
                         cultivationCatalogue.find(
-                            (x) => x.b_lu_catalogue === b_lu_catalogue,
+                            (item: { b_lu_catalogue: string }) => item.b_lu_catalogue === b_lu_catalogue,
                         )?.b_lu_harvestable ?? "once",
                     b_lu_start: b_lu_start,
                     b_lu_end: b_lu_end,
-                    fields: fieldsWithThisCultivation.map((field) => ({
+                    fields: fieldsWithThisCultivation.map((field: any) => ({ // TODO: Define a proper type for field
                         b_id: field.b_id,
                         b_name: field.b_name,
                         b_area: field.b_area,
@@ -269,30 +275,44 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         a_som_loi: field.a_som_loi ?? 0,
                         b_soiltype_agr: field.b_soiltype_agr ?? "",
                         b_lu_harvest_date: field.harvests.flatMap(
-                            (harvest) => harvest.b_lu_harvest_date,
+                            (harvest: { b_lu_harvest_date: Date[] }) => harvest.b_lu_harvest_date,
                         ),
                         fertilizerApplications:
-                            field.fertilizerApplications.map((app) => ({
+                            field.fertilizerApplications.map((app: { p_name_nl: string; p_id: string; p_type: string }) => ({
                                 p_name_nl: app.p_name_nl,
                                 p_id: app.p_id,
                                 p_type: app.p_type,
                             })),
-                        fertilizers: field.fertilizers.map((app) => ({
+                        fertilizers: field.fertilizers.map((app: { p_name_nl: string; p_id: string; p_type: string }) => ({
                             p_name_nl: app.p_name_nl,
                             p_id: app.p_id,
                             p_type: app.p_type,
                         })),
                     })),
                 }
-            },
+            })
+        }
+
+        const rotationExtended: RotationExtended[] = transformFieldsToRotationExtended(
+            fieldsExtended,
+            cultivationCatalogue,        
         )
+
+        const { showProductiveOnly } = useFieldFilterStore.getState() // Get state directly in loader
+
+        const filteredRotations = rotationExtended.filter((rotation) => {
+            if (!showProductiveOnly) {
+                return true
+            }
+            return rotation.fields.some((field) => field.b_isproductive)
+        })
 
         // Return user information from loader
         return {
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
             fieldOptions: fieldOptions,
-            rotationExtended: rotationExtended,
+            rotationExtended: filteredRotations, // Return filtered data
             userName: session.userName,
         }
     } catch (error) {
@@ -313,14 +333,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmRotationIndex() {
     const loaderData = useLoaderData<typeof loader>()
-    const { showProductiveOnly } = useFieldFilterStore()
-
-    const filteredRotations = loaderData.rotationExtended.filter((rotation) => {
-        if (!showProductiveOnly) {
-            return true
-        }
-        return rotation.fields.some((field) => field.b_isproductive)
-    })
 
     const currentFarmName =
         loaderData.farmOptions.find(
@@ -379,7 +391,7 @@ export default function FarmRotationIndex() {
                             <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
                                 <DataTable
                                     columns={columns}
-                                    data={filteredRotations}
+                                    data={loaderData.rotationExtended}
                                 />
                             </div>
                         </FarmContent>
