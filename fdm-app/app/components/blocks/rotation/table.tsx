@@ -6,6 +6,7 @@ import {
     getCoreRowModel,
     getFilteredRowModel,
     getSortedRowModel,
+    getFacetedRowModel,
     type Row,
     type RowSelectionState,
     type SortingState,
@@ -121,14 +122,27 @@ export function DataTable<TData extends RotationExtended, TValue>({
             ...item,
             searchTarget: `${item.b_lu_name} ${[
                 ...new Set(
-                    item.b_lu_start.map((date) =>
-                        format(date, "dd MMMM yyy", { locale: nl }),
+                    item.b_lu_start.map((date: Date) =>
+                        format(date, "d MMMM yyy", { locale: nl }),
+                    ),
+                ),
+            ].join(" ")} ${[
+                ...new Set(
+                    item.fields.flatMap((field) =>
+                        field.b_lu_harvest_date.map((date: Date) =>
+                            format(date, "d MMMM yyy", { locale: nl }),
+                        ),
+                    ),
+                ),
+            ].join(" ")} ${[
+                ...new Set(
+                    item.fields.flatMap((field) =>
+                        field.fertilizers.map((fertilizer) => fertilizer.p_name_nl),
                     ),
                 ),
             ].join(" ")}`,
         }))
     }, [data])
-    // console.log(memoizedData.searchTarget)
 
     const fuzzyFilter: FilterFn<TData> = (row, _columnId, filterValue) => {
         const result = fuzzysort.go(filterValue, [
@@ -145,6 +159,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
         getSortedRowModel: getSortedRowModel(),
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
+        getFacetedRowModel: getFacetedRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
         onGlobalFilterChange: setGlobalFilter,
         onRowSelectionChange: setRowSelection,
@@ -183,7 +198,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
         <div className="w-full flex flex-col h-full">
             <div className="sticky top-0 z-10 bg-background py-4 flex flex-col sm:flex-row gap-2 items-center">
                 <Input
-                    placeholder="Zoek op naam, gewas of meststof"
+                    placeholder="Zoek op gewas, meststof of datum"
                     value={globalFilter ?? ""}
                     onChange={(event) => setGlobalFilter(event.target.value)}
                     className="w-full sm:w-auto sm:grow"
