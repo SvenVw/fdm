@@ -37,7 +37,12 @@ import {
     FormSchema,
     FormSchemaModify,
 } from "./formschema"
-import type { FertilizerOption } from "./types.d"
+
+export type FertilizerOption = {
+    value: string
+    label: string
+    applicationMethodOptions?: { value: string; label: string }[]
+}
 
 export function FertilizerApplicationForm({
     options,
@@ -150,12 +155,12 @@ export function FertilizerApplicationForm({
         navigate(
             searchParams.has("fieldIds")
                 ? `./manage/new?fieldIds=${searchParams.get("fieldIds")}`
-                : "./manage/new",
+                : `./manage/new?cultivationIds=${searchParams.get("cultivationIds")}`,
         )
     }
 
     return (
-        <RemixFormProvider {...form}>
+        <RemixFormProvider {...(form as any)}>
             <Form
                 id={formId}
                 action={action}
