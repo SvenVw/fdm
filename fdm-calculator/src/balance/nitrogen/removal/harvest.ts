@@ -1,3 +1,12 @@
+/**
+ * @file This module calculates the amount of nitrogen removed from a field through the
+ * harvesting of crops.
+ *
+ * The primary function, `calculateNitrogenRemovalByHarvests`, processes all harvest
+ * events to determine the total nitrogen exported in the harvested biomass.
+ *
+ * @packageDocumentation
+ */
 import type { HarvestableAnalysis } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import type {
@@ -7,11 +16,23 @@ import type {
 } from "../types"
 
 /**
- * Calculates the amount of Nitrogen removed from the field through harvests.
- * @param cultivations - The cultivations on the field.
- * @param harvests - The harvests from the field.
- * @param cultivationDetailsMap - The map of cultivation details.
- * @returns The NitrogenRemovalHarvests object containing the total amount of Nitrogen removed and the individual harvest values.
+ * Calculates the total nitrogen removed from a field via crop harvests.
+ *
+ * This function iterates through each harvest event and calculates the amount of nitrogen
+ * contained within the harvested product. The calculation for each harvest is based on:
+ * - The yield of the harvested crop (`b_lu_yield`).
+ * - The nitrogen concentration of the harvested material (`b_lu_n_harvestable`).
+ *
+ * It uses harvest-specific analysis data when available, falling back to default values
+ * from the cultivation catalogue if necessary. The function then aggregates the nitrogen
+ * removal from all harvests to provide a total.
+ *
+ * @param cultivations - An array of all cultivations on the field, used to link harvests to cultivation data.
+ * @param harvests - An array of all harvest events to be analyzed.
+ * @param cultivationDetailsMap - A map providing detailed data for each cultivation type, including
+ *   default yield and nitrogen content.
+ * @returns An object detailing total and per-harvest nitrogen removal.
+ * @throws {Error} If a harvest event cannot be linked to a valid cultivation or if cultivation details are missing.
  */
 export function calculateNitrogenRemovalByHarvests(
     cultivations: FieldInput["cultivations"],

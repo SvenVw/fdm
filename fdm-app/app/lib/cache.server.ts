@@ -1,3 +1,12 @@
+/**
+ * @file This module provides server-side utilities for managing HTTP caching and security headers.
+ *
+ * It contains functions to generate `Cache-Control` headers tailored to different types of
+ * resources and to apply a strict Content Security Policy (CSP) and other security-related
+ * headers to outgoing responses.
+ *
+ * @packageDocumentation
+ */
 import type { EntryContext } from "react-router"
 import { clientConfig } from "~/lib/config"
 
@@ -10,7 +19,8 @@ type CacheControl = {
 }
 
 /**
- * Generate Cache-Control header value based on provided options
+ * Generates a `Cache-Control` header string based on the provided options.
+ * @internal
  */
 function generateCacheControl({
     maxAge,
@@ -19,28 +29,34 @@ function generateCacheControl({
     mustRevalidate = false,
     noStore = false,
 }: CacheControl): string {
-    const directives: string[] = []
-
     if (noStore) {
         return "no-store, no-cache, must-revalidate"
     }
-
-    directives.push(isPublic ? "public" : "private")
-    directives.push(`max-age=${maxAge}`)
-
+    const directives: string[] = [
+        isPublic ? "public" : "private",
+        `max-age=${maxAge}`,
+    ]
     if (staleWhileRevalidate) {
         directives.push(`stale-while-revalidate=${staleWhileRevalidate}`)
     }
-
     if (mustRevalidate) {
         directives.push("must-revalidate")
     }
-
     return directives.join(", ")
 }
 
 /**
- * Get cache control headers based on the request path and context
+ * Determines the appropriate `Cache-Control` headers for a given request.
+ *
+ * This function applies different caching strategies based on the request URL path:
+ * - **Static Assets**: Long cache duration (1 year).
+ * - **API Routes & Health Checks**: No caching.
+ * - **Dynamic Farm Data**: No caching for mutations; short revalidation for GET requests.
+ * - **Other Routes**: Short cache duration with longer stale-while-revalidate.
+ *
+ * @param request - The incoming `Request` object.
+ * @param _context - The Remix `EntryContext`.
+ * @returns A `Headers` object with the appropriate `Cache-Control` directive set.
  */
 export function getCacheControlHeaders(
     request: Request,
@@ -49,7 +65,6 @@ export function getCacheControlHeaders(
     const url = new URL(request.url)
     const headers = new Headers()
 
-    // Static assets (JS, CSS, images)
     if (url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff2?)$/)) {
         headers.set(
             "Cache-Control",
@@ -58,80 +73,50 @@ export function getCacheControlHeaders(
                 staleWhileRevalidate: 86400, // 1 day
             }),
         )
-        return headers
-    }
-
-    // API endpoints
-    if (url.pathname.startsWith("/api")) {
-        headers.set(
-            "Cache-Control",
-            generateCacheControl({
-                maxAge: 0,
-                noStore: true,
-            }),
-        )
-        return headers
-    }
-
-    // Health check endpoint
-    if (url.pathname === "/health") {
-        headers.set(
-            "Cache-Control",
-            generateCacheControl({
-                maxAge: 0,
-                noStore: true,
-            }),
-        )
-        return headers
-    }
-
-    // Dynamic routes (farm data, etc.)
-    if (url.pathname.startsWith("/farm")) {
-        // Check if it's a data mutation (POST, PUT, DELETE) or viewing data
+    } else if (url.pathname.startsWith("/api") || url.pathname === "/health") {
+        headers.set("Cache-Control", generateCacheControl({ noStore: true }))
+    } else if (url.pathname.startsWith("/farm")) {
         if (request.method !== "GET") {
-            headers.set(
-                "Cache-Control",
-                generateCacheControl({
-                    maxAge: 0,
-                    noStore: true,
-                }),
-            )
+            headers.set("Cache-Control", generateCacheControl({ noStore: true }))
         } else {
             headers.set(
                 "Cache-Control",
                 generateCacheControl({
-                    maxAge: 0, // No caching for farm data views
-                    staleWhileRevalidate: 5, // Very short stale time
+                    maxAge: 0,
+                    staleWhileRevalidate: 5,
                     mustRevalidate: true,
                 }),
             )
         }
-        return headers
+    } else {
+        headers.set(
+            "Cache-Control",
+            generateCacheControl({
+                maxAge: 300, // 5 minutes
+                staleWhileRevalidate: 3600, // 1 hour
+            }),
+        )
     }
-
-    // Default for other routes
-    headers.set(
-        "Cache-Control",
-        generateCacheControl({
-            maxAge: 300, // 5 minutes
-            staleWhileRevalidate: 3600, // 1 hour
-        }),
-    )
     return headers
 }
 
 /**
- * Add security headers to the response
+ * Adds a set of standard security headers to a `Headers` object.
+ *
+ * This function configures a strict Content Security Policy (CSP) to mitigate XSS attacks,
+ * along with other important security headers like `X-Content-Type-Options`, `X-Frame-Options`,
+ * `Strict-Transport-Security`, etc. The CSP includes a `report-uri` for Sentry if configured.
+ *
+ * @param headers - The `Headers` object to which the security headers will be added.
+ * @returns The modified `Headers` object.
  */
 export function addSecurityHeaders(headers: Headers): Headers {
-    let reportUri = ""
-    if (clientConfig.analytics?.sentry) {
-        reportUri = encodeURIComponent(
-            clientConfig.analytics.sentry.security_report_uri.trim(),
-        )
-    }
+    const reportUri = clientConfig.analytics?.sentry?.security_report_uri
+        ? encodeURIComponent(
+              clientConfig.analytics.sentry.security_report_uri.trim(),
+          )
+        : ""
 
-    // Construct the Content-Security-Policy
     let csp = `default-src 'self';
         script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.mapbox.com https://*.posthog.com;
         worker-src 'self' blob:;
@@ -146,12 +131,11 @@ export function addSecurityHeaders(headers: Headers): Headers {
         form-action 'self';
         frame-ancestors 'none';`
 
-    // Add report-uri only if it exists
     if (reportUri) {
         csp += `report-uri ${reportUri};`
     }
 
-    headers.set("Content-Security-Policy", csp.replace(/\s+/g, " ").trim()) // Removing all double spaces
+    headers.set("Content-Security-Policy", csp.replace(/\s+/g, " ").trim())
     headers.set("X-Content-Type-Options", "nosniff")
     headers.set("X-Frame-Options", "DENY")
     headers.set("X-XSS-Protection", "1; mode=block")

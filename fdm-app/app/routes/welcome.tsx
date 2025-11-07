@@ -1,3 +1,8 @@
+/**
+ * @file This file provides the welcome page for new users to complete their profiles.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import { zodResolver } from "@hookform/resolvers/zod"
 import { updateUserProfile } from "@svenvw/fdm-core"
 import { Cookie } from "lucide-react"
@@ -62,20 +67,6 @@ const FormSchema = z.object({
         }),
 })
 
-/**
- * Checks for an existing user session and redirects authenticated users.
- *
- * This asynchronous loader function retrieves the user session from the request headers
- * via the authentication API. If a valid session exists, the function redirects the user
- * to the "/farm" route; otherwise, it returns an empty object. Any errors during session
- * retrieval are processed by {@link handleLoaderError} and thrown.
- *
- * @param request - The HTTP request object whose headers are used to retrieve the session.
- *
- * @returns A redirect response to "/farm" if a session exists, or an empty object otherwise.
- *
- * @throws {Error} If session retrieval fails, the error processed by {@link handleLoaderError} is thrown.
- */
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session
@@ -93,12 +84,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the welcome page for profile completion.
+ * Renders the welcome page for users to complete their profile.
  *
- * This component displays a form for users to complete their profile by entering their firstname and surname.
- * It shows the user's avatar if available and handles form submission with validation.
+ * This component displays a form where users can enter their first and last names.
+ * It's typically shown to new users after they sign in for the first time.
  *
- * @returns A React element representing the profile completion page.
+ * @returns The JSX for the welcome page.
  */
 export default function Welcome() {
     const loaderData = useLoaderData<typeof loader>()
@@ -274,6 +265,15 @@ export default function Welcome() {
     )
 }
 
+/**
+ * Handles the form submission for updating the user's profile.
+ *
+ * This function validates the submitted first name and last name, updates the user's
+ * profile information, and then redirects the user to the next page.
+ *
+ * @param request - The incoming request object containing the form data.
+ * @returns A redirect response upon successful profile update.
+ */
 export async function action({ request }: ActionFunctionArgs) {
     try {
         // Get the URL object to extract search params

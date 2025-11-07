@@ -1,3 +1,9 @@
+/**
+ * @file This file handles authentication requests for the application.
+ * It provides loader and action functions that delegate to the authentication handler.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,

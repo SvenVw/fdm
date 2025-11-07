@@ -1,6 +1,18 @@
+/**
+ * @file This file contains a function for hashing cultivation data.
+ */
 import { ensureInitialized, h32ToString } from "../hash"
 import type { CatalogueCultivationItem } from "./d"
 
+/**
+ * Generates a hash for a cultivation item.
+ *
+ * This function creates a hash based on the properties of a cultivation item, which can be used
+ * to uniquely identify it.
+ *
+ * @param cultivation The cultivation item to hash.
+ * @returns A promise that resolves to the hash string.
+ */
 export async function hashCultivation(cultivation: CatalogueCultivationItem) {
     await ensureInitialized()
     // Set hash to null for consistent hashing

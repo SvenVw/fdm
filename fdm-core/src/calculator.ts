@@ -1,3 +1,10 @@
+/**
+ * @file This file provides caching functionalities for calculations.
+ *
+ * It includes a higher-order function `withCalculationCache` that can be used to wrap any calculation
+ * function to add caching capabilities. The caching is based on a hash of the function name, version,
+ * and input, and the results are stored in a database.
+ */
 import { createHash } from "node:crypto"
 import { eq } from "drizzle-orm"
 import stableStringify from "safe-stable-stringify"
@@ -9,15 +16,16 @@ import type { FdmType } from "./fdm"
 import { createId } from "./id"
 
 /**
- * Generates a reliable and quick hash for caching calculation results.
- * This hash is used as a unique identifier for a given calculation function, its version, and its input.
- * It ensures that the same calculation with the same inputs always produces the same cache key.
+ * Generates a SHA-256 hash for a calculation, to be used as a cache key.
  *
- * @template T_Input - The type of the input object for the calculation function.
- * @param {string} functionName - The name of the calculation function.
- * @param {string} packageVersion - The version of the package/module containing the function.
- * @param {T_Input} functionInput - The input object for the function.
- * @returns {string} A SHA-256 hash as a hex string.
+ * The hash is created based on the function name, a version string, and the function's input.
+ * This ensures that the cache is properly invalidated when the function, its version, or its input changes.
+ *
+ * @template T_Input The type of the input object for the calculation.
+ * @param functionName The name of the calculation function.
+ * @param packageVersion The version of the package or calculator.
+ * @param functionInput The input object for the function.
+ * @returns A SHA-256 hash string.
  */
 export function generateCalculationHash<T_Input extends object>(
     functionName: string,
@@ -38,12 +46,12 @@ export function generateCalculationHash<T_Input extends object>(
 }
 
 /**
- * Retrieves a cached calculation result from the database.
+ * Retrieves a cached calculation result from the database using its hash.
  *
- * @template T_Output - The expected type of the calculation result.
- * @param {FdmType} fdm - The FDM instance, providing database access.
- * @param {string} calculation_hash - The unique hash identifying the cached calculation.
- * @returns {Promise<T_Output | null>} A promise that resolves to the cached result if found, otherwise `null`.
+ * @template T_Output The expected type of the cached result.
+ * @param fdm The FDM instance for database access.
+ * @param calculation_hash The hash of the calculation to retrieve.
+ * @returns A promise that resolves to the cached result, or `null` if it's not found.
  */
 export function getCachedCalculation<T_Output>(
     fdm: FdmType,
@@ -66,17 +74,19 @@ export function getCachedCalculation<T_Output>(
 }
 
 /**
- * Stores a calculation result in the cache.
+ * Caches the result of a calculation in the database.
  *
- * @template T_Input - The type of the input object for the calculation function.
- * @template T_Output - The type of the calculation result.
- * @param {FdmType} fdm - The FDM instance, providing database access.
- * @param {string} calculationHash - The unique hash of the calculation.
- * @param {string} calculationFunctionName - The name of the calculation function.
- * @param {string} calculatorVersion - The version of the calculator.
- * @param {T_Input} input - The input object used for the calculation.
- * @param {T_Output} result - The computed result of the calculation.
- * @returns {Promise<void>} A promise that resolves when the cache operation is complete.
+ * This function stores the result of a calculation, so it can be quickly retrieved later using `getCachedCalculation`.
+ *
+ * @template T_Input The type of the input object for the calculation.
+ * @template T_Output The type of the output of the calculation.
+ * @param fdm The FDM instance for database access.
+ * @param calculationHash The hash that uniquely identifies the calculation.
+ * @param calculationFunctionName The name of the function that was executed.
+ * @param calculatorVersion The version of the calculator.
+ * @param input The input object that was used for the calculation.
+ * @param result The result of the calculation.
+ * @returns A promise that resolves when the result has been cached.
  */
 export async function setCachedCalculation<T_Input extends object, T_Output>(
     fdm: FdmType,
@@ -98,16 +108,18 @@ export async function setCachedCalculation<T_Input extends object, T_Output>(
 }
 
 /**
- * Records an error that occurred during a calculation in the database.
+ * Logs an error that occurred during a calculation to the database.
  *
- * @template T_Input - The type of the input object that caused the error.
- * @param {FdmType} fdm - The FDM instance, providing database access.
- * @param {string} calculationFunctionName - The name of the calculation function where the error occurred.
- * @param {string} calculatorVersion - The version of the calculator.
- * @param {T_Input} input - The input object that was being processed when the error occurred.
- * @param {string} error_message - The error message.
- * @param {string | undefined} stack_trace - The stack trace of the error, if available.
- * @returns {Promise<void>} A promise that resolves when the error record is inserted.
+ * This function is used to persist calculation errors, which can be useful for debugging and monitoring.
+ *
+ * @template T_Input The type of the input object that caused the error.
+ * @param fdm The FDM instance for database access.
+ * @param calculationFunctionName The name of the function where the error occurred.
+ * @param calculatorVersion The version of the calculator.
+ * @param input The input that caused the error.
+ * @param error_message The error message.
+ * @param stack_trace The stack trace, if available.
+ * @returns A promise that resolves when the error has been logged.
  */
 export async function setCalculationError<T_Input extends object>(
     fdm: FdmType,
@@ -128,37 +140,18 @@ export async function setCalculationError<T_Input extends object>(
 }
 
 /**
- * A decorator function that adds caching capabilities to any asynchronous calculation function.
- * It first attempts to retrieve a result from the cache. If a cached result is found, it's returned immediately.
- * If not, the original calculation function is executed, its result is cached (if cache read was successful),
- * and then returned. Errors during calculation are logged and re-thrown.
+ * A higher-order function that wraps a calculation function with caching logic.
  *
- * @template T_Input - The type of the input object for the calculation function.
- * @template T_Output - The expected type of the calculation result.
- * @param {(inputs: T_Input) => T_Output | Promise<T_Output>} calculationFunction - The original function to compute the result.
- * @param {string} calculationFunctionName - The name of the calculation function, used for caching.
- * @param {string} calculatorVersion - A version string tied to the current calculation function.
- *                                     Changing this version will invalidate old cache entries.
- * @returns {(fdm: FdmType, input: T_Input) => Promise<T_Output>} A new function that wraps the original
- *          calculation with caching logic.
+ * This function handles the caching of calculation results to avoid re-computing them. It checks for a cached
+ * result, and if not found, it executes the original function, caches its result, and returns it. It also
+ * provides error handling by logging any calculation errors.
  *
- * @example
- * ```typescript
- * // Define a calculation function
- * async function myExpensiveCalculation(data: { value: number }): Promise<number> {
- *   // Simulate an expensive operation
- *   await new Promise(resolve => setTimeout(resolve, 1000));
- *   return data.value * 2;
- * }
- *
- * // Decorate it with caching
- * const cachedCalculation = withCalculationCache(myExpensiveCalculation, 'myExpensiveCalculation', 'v1.0.0');
- *
- * // Use the decorated function
- * // Assuming 'fdm' is an initialized FdmType instance
- * const result1 = await cachedCalculation(fdm, { value: 10 }); // Cache MISS, performs calculation
- * const result2 = await cachedCalculation(fdm, { value: 10 }); // Cache HIT, returns cached result instantly
- * ```
+ * @template T_Input The type of the input object for the calculation.
+ * @template T_Output The type of the output of the calculation.
+ * @param calculationFunction The original calculation function to be wrapped.
+ * @param calculationFunctionName The name of the calculation function, used as a part of the cache key.
+ * @param calculatorVersion The version of the calculator, used to invalidate the cache when the logic changes.
+ * @returns A new function that takes an `FdmType` instance and the input, and returns a promise resolving to the output.
  */
 export function withCalculationCache<T_Input extends object, T_Output>(
     calculationFunction: (inputs: T_Input) => T_Output | Promise<T_Output>,

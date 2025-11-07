@@ -1,3 +1,8 @@
+/**
+ * @file This file provides a page to inform the user that their magic link token is invalid or has expired.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import { Cookie } from "lucide-react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
 import { NavLink, redirect } from "react-router"
@@ -22,20 +27,6 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-/**
- * Checks for an existing user session and redirects authenticated users.
- *
- * This asynchronous loader function retrieves the user session from the request headers
- * via the authentication API. If a valid session exists, the function redirects the user
- * to the "/farm" route; otherwise, it returns an empty object. Any errors during session
- * retrieval are processed by {@link handleLoaderError} and thrown.
- *
- * @param request - The HTTP request object whose headers are used to retrieve the session.
- *
- * @returns A redirect response to "/farm" if a session exists, or an empty object otherwise.
- *
- * @throws {Error} If session retrieval fails, the error processed by {@link handleLoaderError} is thrown.
- */
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session
@@ -56,13 +47,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the invalid token page when a magic link has expired or is invalid.
+ * Renders a page informing the user that their sign-in token is invalid.
  *
- * This component displays a message informing the user that their sign-in link is no longer valid,
- * explaining the 5-minute validity and single-use nature of magic links. It provides a button to
- * navigate back to the main sign-in page.
+ * This component is displayed when a user tries to use an expired or invalid
+ * magic link. It explains why the link might not be valid and provides a
+ * button to return to the main sign-in page.
  *
- * @returns A React element representing the invalid token page.
+ * @returns The JSX for the invalid token page.
  */
 export default function SignIn() {
     const openCookieSettings = () => {

@@ -1,3 +1,14 @@
+/**
+ * @file This module serves as the central aggregator for calculating the total nitrogen supply
+ * to a field. It integrates various nitrogen input pathways to provide a comprehensive overview
+ * of nitrogen sources.
+ *
+ * The primary function, `calculateNitrogenSupply`, orchestrates calls to specialized
+ * calculators for fertilizers, biological fixation, and soil mineralization, and combines
+ * these with pre-calculated atmospheric deposition data.
+ *
+ * @packageDocumentation
+ */
 import type {
     CultivationDetail,
     FertilizerDetail,
@@ -11,20 +22,25 @@ import { calculateNitrogenFixation } from "./fixation"
 import { calculateNitrogenSupplyBySoilMineralization } from "./mineralization"
 
 /**
- * Calculates the total nitrogen supply for a field, considering various sources such as fertilizers,
- * biological fixation, atmospheric deposition, and soil mineralization.
+ * Calculates the total nitrogen supply for a single field from all relevant sources.
  *
- * @param field - The field for which to calculate the nitrogen supply.
- * @param cultivations - A list of cultivations on the field.
- * @param fertilizerApplications - A list of fertilizer applications on the field.
- * @param soilAnalysis - Combined soil analysis data for the field.
- * @param cultivationDetailsMap - A map containing details for each cultivation, including its nitrogen fixation value.
- * @param fertilizerDetailsMap - A map containing details for each fertilizer, including its type and nitrogen content.
+ * This function acts as an orchestrator, summing the nitrogen inputs from:
+ * 1.  **Fertilizers**: Nitrogen from applied mineral and organic fertilizers.
+ * 2.  **Biological Fixation**: Nitrogen fixed from the atmosphere by leguminous crops.
+ * 3.  **Atmospheric Deposition**: Nitrogen deposited on the field from the atmosphere (pre-calculated).
+ * 4.  **Soil Mineralization**: Nitrogen released from the decomposition of soil organic matter.
+ *
+ * It calls dedicated functions for each component and aggregates them into a `NitrogenSupply` object.
+ *
+ * @param cultivations - An array of the field's cultivations.
+ * @param fertilizerApplications - An array of fertilizer applications.
+ * @param soilAnalysis - The consolidated soil analysis data for the field.
+ * @param cultivationDetailsMap - A map providing detailed data for each cultivation type.
+ * @param fertilizerDetailsMap - A map providing detailed data for each fertilizer type.
  * @param depositionSupply - The pre-calculated nitrogen supply from atmospheric deposition.
- * @param timeFrame - The time frame for which to calculate the nitrogen supply.
- *
- * @returns An object containing the total nitrogen supply for the field,
- *  as well as a breakdown by source (fertilizers, fixation, deposition, and mineralization).
+ * @param timeFrame - The time period for which the supply is being calculated.
+ * @returns A `NitrogenSupply` object detailing the total and source-specific nitrogen inputs.
+ * @throws {Error} If any of the underlying supply calculations fail.
  */
 export function calculateNitrogenSupply(
     cultivations: FieldInput["cultivations"],

@@ -1,3 +1,26 @@
+/**
+ * @file This file contains the data from "Tabel 2 Stikstof landbouwgrond 2025" as specified
+ * by the RVO for the Dutch fertilizer regulations. This table is the cornerstone for
+ * determining the nitrogen usage norm for different cultivations.
+ *
+ * The data is structured to represent the complex rules of the regulation, including:
+ * - `cultivation_rvo_table2`: The descriptive name of the cultivation as it appears in the official table.
+ * - `b_lu_catalogue_match`: An array of `b_lu_catalogue` codes that map to this standard.
+ * - `type`: A general classification of the cultivation (e.g., "grasland", "aardappel").
+ * - `is_winterteelt` / `is_vanggewas`: Flags indicating if the crop qualifies as a winter or catch crop.
+ * - `sub_types`: An array for handling differentiations within a single cultivation type, such as
+ *   different norms for specific varieties, time periods, or farm statuses (e.g., derogation).
+ * - `norms`: The core norm values, differentiated by soil region and whether the field is in a
+ *   nutrient-polluted area (`nv_area`).
+ *
+ * @see https://www.rvo.nl/sites/default/files/2024-12/Tabel-2-Stikstof-landbouwgrond-2025_0.pdf
+ *
+ * @packageDocumentation
+ */
+
+/**
+ * Defines the nitrogen usage norms (in kg N/ha) for various cultivations for the year 2025.
+ */
 export const nitrogenStandardsData = [
     {
         cultivation_rvo_table2: "Grasland",

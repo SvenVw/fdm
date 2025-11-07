@@ -1,3 +1,11 @@
+/**
+ * @file This module provides a centralized function for collecting all the necessary data
+ * required for the norm filling calculations for the Dutch 2025 regulations. It acts as a
+ * data aggregation layer, fetching information from various `fdm-core` services and
+ * assembling it into a standardized input object.
+ *
+ * @packageDocumentation
+ */
 import type { FdmType, PrincipalId, Timeframe } from "@svenvw/fdm-core"
 import {
     getCultivations,
@@ -10,18 +18,26 @@ import {
 import type { NL2025NormsFillingInput } from "./types"
 
 /**
- * Collects all necessary input data from fdm-core functions for the NL 2025 norms filling calculations.
- * This function standardizes the data collection process, ensuring all calculation functions
- * receive a unified input object (NL2025NormsFillingInput).
+ * Gathers and standardizes all input data required for norm filling calculations.
  *
- * @param {FdmType} fdm - The FdmType instance for interacting with the Farm Data Model.
- * @param {string} principal_id - The ID of the principal (user or organization) performing the calculation.
- * @param {string} b_id - The ID of the field for which the norms are being calculated.
- * @param {number} fosfaatgebruiksnorm - The phosphate usage norm in kg/ha for the current calculation.
- * @returns {Promise<NL2025NormsFillingInput>} A promise that resolves to a standardized input object
- *   containing cultivations, fertilizer applications, fertilizers, organic certification status,
- *   grazing intention status, the phosphate usage norm, and the field's centroid.
- * @throws {Error} Throws an error if the specified field cannot be found.
+ * This function orchestrates the retrieval of various data points for a specific field
+ * within the 2025 calendar year, including:
+ * - Field details (to get the farm ID and centroid).
+ * - Grazing intentions and organic certification status for the farm.
+ * - Cultivation history for the field.
+ * - Fertilizer applications on the field.
+ * - Definitions of all fertilizers available on the farm.
+ *
+ * It then compiles this information, along with the provided phosphate usage norm, into a
+ * single, standardized input object (`NL2025NormsFillingInput`) that can be used by the
+ * various norm filling calculation functions.
+ *
+ * @param fdm - The FDM core data access object.
+ * @param principal_id - The identifier of the user or system making the request.
+ * @param b_id - The unique identifier of the field.
+ * @param fosfaatgebruiksnorm - The phosphate usage norm (in kg/ha) for the field.
+ * @returns A promise that resolves to the fully populated `NL2025NormsFillingInput` object.
+ * @throws {Error} If the specified field cannot be found.
  */
 export async function collectInputForFertilizerApplicationFilling(
     fdm: FdmType,

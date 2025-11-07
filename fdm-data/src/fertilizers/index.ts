@@ -1,26 +1,18 @@
+/**
+ * @file This file provides an entry point for accessing fertilizer catalogues.
+ *
+ * It exports a `getFertilizersCatalogue` function that retrieves a fertilizer catalogue by name.
+ */
 import { getCatalogueBaat } from "./catalogues/baat"
 import { getCatalogueSrm } from "./catalogues/srm"
 import type { CatalogueFertilizer, CatalogueFertilizerName } from "./d"
 
 /**
- * Retrieves a fertilizer catalogue based on the specified name.
+ * Retrieves a fertilizer catalogue by name.
  *
- * This function acts as a dispatcher, selecting and returning the appropriate
- * fertilizer catalogue based on the provided `catalogueName`.
- *
- * @param catalogueName - The name of the desired fertilizer catalogue.
- *                        Currently supported names are: "srm" and "baat".
- * @returns An array of `CatalogueFertilizerItem` objects representing the
- *          requested fertilizer catalogue.
- * @returns A Promise that resolves to an array of `CatalogueFertilizerItem` objects.
- * @throws {Error} Throws an error if the provided `catalogueName` is not
- *                 recognized or supported.
- *
- * @example
- * ```typescript
- * const srmCatalogue = await getFertilizersCatalogue("srm");
- * console.log(srmCatalogue);
- * ```
+ * @param catalogueName The name of the catalogue to retrieve.
+ * @returns A promise that resolves to the fertilizer catalogue.
+ * @throws An error if the catalogue name is not recognized.
  */
 export async function getFertilizersCatalogue(
     catalogueName: CatalogueFertilizerName,

@@ -1,3 +1,8 @@
+/**
+ * @file This file is responsible for displaying the user's account information.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -55,9 +60,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the user interface for the user page.
+ * Renders the user's account page.
  *
- * This component uses data from the loader to display the user's user details.
+ * This component displays the user's name, email, and avatar.
+ * It fetches the user's data via the `loader` function.
+ *
+ * @returns The JSX for the user account page.
  */
 export default function User() {
     const loaderData = useLoaderData<typeof loader>()

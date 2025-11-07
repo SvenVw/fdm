@@ -1,3 +1,9 @@
+/**
+ * @file This file handles the response to an organization invitation.
+ * It allows a user to accept or reject an invitation to join an organization.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import {
     acceptInvitation,
     getPendingInvitation,
@@ -30,6 +36,17 @@ import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import type { Route } from "../+types/root"
 
+/**
+ * Loads the data for the invitation response page.
+ *
+ * This function validates the invitation ID and fetches the details of the
+ * pending invitation. It ensures the user is authenticated before proceeding.
+ *
+ * @param request - The incoming request object.
+ * @param params - The route parameters, containing the invitation ID.
+ * @returns An object with the invitation details.
+ * @throws {Response} A 404 response if the invitation is not found, or a 500 response for a bad request.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     await getSession(request)
 
@@ -55,6 +72,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the page for responding to an organization invitation.
+ *
+ * This component handles the user interface for accepting or rejecting an invitation.
+ * It reads an `intent` from the URL search parameters to determine the initial action.
+ * If the intent is 'accept', it automatically submits a form to accept the invitation.
+ * If the intent is 'reject', it displays a confirmation dialog to the user.
+ *
+ * @returns The JSX for the invitation response page.
+ * @throws {Response} A bad request response if the intent is invalid.
+ */
 export default function Respond() {
     const {
         invitationId,
@@ -150,6 +178,18 @@ const FormSchema = z.object({
     organization_slug: z.string().optional(),
 })
 
+/**
+ * Handles the form submission for accepting or rejecting an invitation.
+ *
+ * This function processes the user's response to an invitation. It can accept,
+ * reject, or take no action based on the 'intent' value in the form data.
+ * On success, it redirects the user to the appropriate page with a toast message.
+ *
+ * @param request - The incoming request object containing the form data.
+ * @returns A redirect response.
+ * @throws {Response} A 404 response if the invitation is not found.
+ * @throws {Error} If the intent is invalid.
+ */
 export async function action({ request }: ActionFunctionArgs) {
     const formValues = await extractFormValuesFromRequest(request, FormSchema)
 
@@ -195,6 +235,17 @@ export async function action({ request }: ActionFunctionArgs) {
     throw new Error("invalid intent")
 }
 
+/**
+ * Renders a user-friendly error boundary for this route.
+ *
+ * This component catches errors thrown during rendering, loading, or actions
+ * on this route. It provides a specific message for 404 errors, indicating
+ * that the invitation is not available.
+ *
+ * @param props - The props object containing the error and route parameters.
+ * @returns The JSX for the error boundary.
+ * @throws The original error if it's not a 404 response.
+ */
 export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
     const error = props.error
     if (isRouteErrorResponse(error)) {

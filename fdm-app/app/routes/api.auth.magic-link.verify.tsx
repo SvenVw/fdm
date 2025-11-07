@@ -1,7 +1,24 @@
+/**
+ * @file This file handles the verification of magic links for authentication.
+ * It validates the token and redirects the user to the appropriate page.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import { redirect } from "react-router"
 import { auth } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
 
+/**
+ * Handles the magic link verification process.
+ *
+ * This function is triggered when a user clicks a magic link. It verifies the token,
+ * handles invalid or expired tokens, and redirects the user to their intended
+ * destination upon successful authentication.
+ *
+ * @param request - The incoming request object, containing the magic link URL.
+ * @returns A redirect response to the callback URL on success, or to an error page on failure.
+ * @throws {Error} If an unexpected error occurs during the process.
+ */
 export async function loader({ request }: { request: Request }) {
     const url = new URL(request.url)
     const callbackUrlParam = url.searchParams.get("callbackUrl") || "/farm"

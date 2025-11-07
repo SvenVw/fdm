@@ -1,3 +1,13 @@
+/**
+ * @file This file defines a reusable `Combobox` component.
+ *
+ * The `Combobox` is a form input that combines a text input with a popover list,
+ * allowing users to either type to filter a list or select an option from the dropdown.
+ * It is designed to integrate seamlessly with `remix-hook-form` and is built using
+ * `shadcn/ui` components.
+ *
+ * @packageDocumentation
+ */
 import { Check, ChevronsUpDown } from "lucide-react"
 import { type ReactNode, useMemo, useState } from "react"
 import { Button } from "~/components/ui/button"
@@ -24,20 +34,34 @@ import {
 } from "~/components/ui/popover"
 import { cn } from "~/lib/utils"
 
-type optionType = {
+type OptionType = {
     value: string
     label: string
 }
 
 interface ComboboxProps {
-    options: { value: string; label: string }[]
+    /** An array of options to display in the dropdown. */
+    options: OptionType[]
+    /** The name of the form field. */
     name: string
+    /** The label to display for the form field. */
     label: ReactNode
-    form: any // TODO: Replace 'any' with a more specific type from react-hook-form if available
-    defaultValue?: optionType["value"]
+    /** The form instance from `remix-hook-form`. */
+    // biome-ignore lint/suspicious/noExplicitAny: Using 'any' for compatibility with react-hook-form.
+    form: any
+    /** The default value for the combobox. */
+    defaultValue?: OptionType["value"]
+    /** A flag to disable the combobox. */
     disabled?: boolean
 }
 
+/**
+ * A searchable dropdown component designed for use within a `remix-hook-form`.
+ *
+ * This component renders a button that, when clicked, opens a popover containing a
+ * searchable list of options. It's wrapped in a `FormField` to automatically handle
+ * form state, validation, and error messages.
+ */
 export function Combobox({
     options,
     name,
@@ -48,19 +72,11 @@ export function Combobox({
 }: ComboboxProps) {
     const [open, setOpen] = useState(false)
 
-    /** Map of option values to their labels for efficient lookup */
     const optionsMap = useMemo(
-        () =>
-            new Map(
-                options.map((option: { value: string; label: string }) => [
-                    option.value,
-                    option.label,
-                ]),
-            ),
+        () => new Map(options.map((option) => [option.value, option.label])),
         [options],
     )
 
-    /** Computed label for the default value if provided */
     const defaultLabel = useMemo(
         () => (defaultValue ? optionsMap.get(defaultValue) : undefined),
         [defaultValue, optionsMap],
@@ -116,13 +132,12 @@ export function Combobox({
                                 <CommandList>
                                     <CommandEmpty>Niks gevonden</CommandEmpty>
                                     <CommandGroup>
-                                        {options.map((option: optionType) => (
+                                        {options.map((option: OptionType) => (
                                             <CommandItem
                                                 value={option.label}
                                                 key={option.value}
                                                 disabled={disabled}
-                                                onSelect={(value) => {
-                                                    console.log(value)
+                                                onSelect={() => {
                                                     form.setValue(
                                                         name,
                                                         option.value,

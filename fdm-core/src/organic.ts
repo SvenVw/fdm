@@ -1,3 +1,8 @@
+/**
+ * @file This file contains functions for managing organic certifications in the FDM.
+ *
+ * It provides functionalities to add, remove, list, and validate organic certifications for a farm.
+ */
 import { and, eq, gte, inArray, lte } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
@@ -20,39 +25,40 @@ const TRACES_REGEX = /^NL-BIO-\d{2}\.\d{3}-\d{7}\.\d{4}\.\d{3}$/
 const SKAL_REGEX = /^\d{6}$/
 
 /**
- * Validates an EU TRACES document number.
+ * Validates the format of an EU TRACES document number.
+ *
  * @param tracesNumber The TRACES document number to validate.
- * @returns True if the TRACES number is valid, false otherwise.
+ * @returns `true` if the format is valid, otherwise `false`.
  */
 export function isValidTracesNumber(tracesNumber: string): boolean {
     return TRACES_REGEX.test(tracesNumber)
 }
 
 /**
- * Validates a SKAL number.
+ * Validates the format of a SKAL number.
+ *
  * @param skalNumber The SKAL number to validate.
- * @returns True if the SKAL number is valid, false otherwise.
+ * @returns `true` if the format is valid, otherwise `false`.
  */
 export function isValidSkalNumber(skalNumber: string): boolean {
     return SKAL_REGEX.test(skalNumber)
 }
 
 /**
- * Adds a new organic certification for a specific farm.
+ * Adds an organic certification to a farm.
  *
- * This function checks if the principal has 'write' permission on the farm,
- * then creates a new organic certification and links it to the farm.
- * It also validates the TRACES and SKAL numbers, and the issue/expiry dates.
+ * This function records a new organic certification, including its TRACES and SKAL numbers,
+ * and its validity period.
  *
- * @param fdm The FDM instance providing the connection to the database.
- * @param principal_id The identifier of the principal creating the certification.
- * @param b_id_farm The identifier of the farm receiving the certification.
- * @param b_organic_traces The document number according to the EU Traces database.
- * @param b_organic_skal The SKAL number.
- * @param b_organic_issued The timestamp the certificate is valid from.
- * @param b_organic_expires The timestamp the certificate expires.
- * @returns The unique identifier for the new organic certification.
- * @throws {Error} If the principal does not have permission, validation fails, or the database transaction fails.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param b_organic_traces The TRACES number of the certification.
+ * @param b_organic_skal The SKAL number of the certification.
+ * @param b_organic_issued The issue date of the certification.
+ * @param b_organic_expires The expiry date of the certification.
+ * @returns A promise that resolves to the unique identifier of the new certification.
+ * @throws An error if the principal does not have permission, or if the provided data is invalid.
  */
 export async function addOrganicCertification(
     fdm: FdmType,
@@ -152,15 +158,13 @@ export async function addOrganicCertification(
 }
 
 /**
- * Removes an organic certification.
+ * Removes an organic certification from a farm.
  *
- * This function checks if the principal has 'write' permission on the associated farm,
- * then deletes the certification and its link to the farm.
- *
- * @param fdm The FDM instance providing the connection to the database.
- * @param principal_id The identifier of the principal removing the certification.
- * @param b_id_organic The identifier of the organic certification to remove.
- * @throws {Error} If the principal does not have permission, the certification does not exist, or the database transaction fails.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_organic The unique identifier of the organic certification to remove.
+ * @returns A promise that resolves when the certification has been successfully removed.
+ * @throws An error if the principal does not have permission or if the certification is not found.
  */
 export async function removeOrganicCertification(
     fdm: FdmType,
@@ -215,15 +219,13 @@ export async function removeOrganicCertification(
 }
 
 /**
- * Lists all organic certifications for a given farm.
+ * Lists all organic certifications for a farm.
  *
- * This function checks if the principal has 'read' permission on the farm before returning the list.
- *
- * @param fdm The FDM instance providing the connection to the database.
- * @param principal_id The identifier of the principal requesting the list.
- * @param b_id_farm The identifier of the farm.
- * @returns A Promise that resolves with a list of organic certifications for the specified farm.
- * @throws {Error} If the principal does not have permission to read the farm's certifications.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @returns A promise that resolves to an array of `OrganicCertification` objects.
+ * @throws An error if the principal does not have permission.
  */
 export async function listOrganicCertifications(
     fdm: FdmType,
@@ -280,16 +282,13 @@ export async function listOrganicCertifications(
 }
 
 /**
- * Retrieves the details of a single organic certification by its ID.
+ * Retrieves a single organic certification by its unique identifier.
  *
- * This function checks if the principal has 'read' permission on the associated farm
- * before returning the certification details.
- *
- * @param fdm The FDM instance providing the connection to the database.
- * @param principal_id The identifier of the principal requesting the certification.
- * @param b_id_organic The identifier of the organic certification to retrieve.
- * @returns A Promise that resolves with the organic certification details, or undefined if not found.
- * @throws {Error} If the principal does not have permission or the database transaction fails.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_organic The unique identifier of the organic certification.
+ * @returns A promise that resolves to an `OrganicCertification` object, or `undefined` if not found.
+ * @throws An error if the principal does not have permission.
  */
 export async function getOrganicCertification(
     fdm: FdmType,
@@ -342,17 +341,14 @@ export async function getOrganicCertification(
 }
 
 /**
- * Checks if a farm has a valid organic certification on a specific date.
+ * Checks if a farm has a valid organic certification on a given date.
  *
- * This function checks if the principal has 'read' permission on the farm.
- * A certification is considered valid if the given date falls within its issued and expires dates.
- *
- * @param fdm The FDM instance providing the connection to the database.
+ * @param fdm The FDM instance for database access.
  * @param principal_id The identifier of the principal making the request.
- * @param b_id_farm The identifier of the farm.
- * @param date The date to check for a valid certification.
- * @returns A Promise that resolves to true if a valid organic certification is found, false otherwise.
- * @throws {Error} If the principal does not have permission to read the farm's certifications.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param date The date to check.
+ * @returns A promise that resolves to `true` if a valid certification exists, otherwise `false`.
+ * @throws An error if the principal does not have permission.
  */
 export async function isOrganicCertificationValid(
     fdm: FdmType,

@@ -1,3 +1,9 @@
+/**
+ * @file This file provides the functionality for creating a new organization.
+ * It includes a form for users to enter organization details and handles the submission.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     checkOrganizationSlugForAvailability,
@@ -69,6 +75,18 @@ const FormSchema = z.object({
     description: z.string({}).optional(),
 })
 
+/**
+ * Loader function for the Add Organization page.
+ *
+ * Currently, this loader does not fetch any data but is required for the route to render.
+ * It's prepared to handle potential future data loading needs, such as fetching user-specific
+ * information or pre-filling form data. It includes error handling to manage any issues
+ * that may arise during data fetching.
+ *
+ * @param request - The incoming request object from the client.
+ * @returns An empty object, as no data is currently being loaded.
+ * @throws {Error} An error is thrown if any issues are encountered during execution, handled by `handleLoaderError`.
+ */
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         return {}
@@ -77,6 +95,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the page for adding a new organization.
+ *
+ * This component provides a form for users to create a new organization.
+ * It includes fields for the organization's name and description, and
+ * automatically generates a URL-friendly slug from the name.
+ *
+ * @returns The JSX for the add organization page.
+ */
 export default function AddOrganizationPage() {
     const form = useRemixForm({
         mode: "onTouched",
@@ -226,6 +253,17 @@ export default function AddOrganizationPage() {
     )
 }
 
+/**
+ * Handles the form submission for creating a new organization.
+ *
+ * This function validates the submitted form data, checks if the chosen
+ * organization slug is available, and then creates the new organization.
+ * Upon successful creation, it redirects the user to the new organization's page.
+ *
+ * @param request - The incoming request object containing the form data.
+ * @returns A redirect response on success, or an error response on failure.
+ * @throws {Error} If there is an issue creating the organization.
+ */
 export async function action({ request }: ActionFunctionArgs) {
     try {
         // Get the session

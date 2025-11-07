@@ -1,3 +1,8 @@
+/**
+ * @file This file contains functions for managing grazing intentions in the FDM.
+ *
+ * It provides functionalities to set, remove, and retrieve grazing intentions for a farm.
+ */
 import { and, eq } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
@@ -6,16 +11,18 @@ import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 
 /**
- * Sets a grazing intention for a farm for a specific year.
- * This will create a new record if one does not exist, or update the existing one.
+ * Sets or updates the grazing intention for a farm for a specific year.
  *
- * @param fdm The FDM instance providing the connection to the database.
- * @param principal_id The unique identifier of the principal performing the operation.
- * @param b_id_farm Identifier of the farm.
+ * This function creates a new grazing intention record if one doesn't exist for the given farm and year,
+ * or updates the existing one.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
  * @param b_grazing_intention_year The year of the grazing intention.
- * @param b_grazing_intention The grazing intention (true or false).
- * @returns A promise that resolves when the operation is complete.
- * @alpha
+ * @param b_grazing_intention The grazing intention value (true or false).
+ * @returns A promise that resolves when the grazing intention has been successfully set.
+ * @throws An error if the principal does not have permission.
  */
 export async function setGrazingIntention(
     fdm: FdmType,
@@ -61,14 +68,14 @@ export async function setGrazingIntention(
 }
 
 /**
- * Removes a grazing intention for a specific farm and year.
+ * Removes the grazing intention for a farm for a specific year.
  *
- * @param fdm The FDM instance providing the connection to the database.
- * @param principal_id The unique identifier of the principal performing the operation.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
  * @param b_id_farm The unique identifier of the farm.
  * @param b_grazing_intention_year The year of the grazing intention to remove.
  * @returns A promise that resolves when the grazing intention has been successfully removed.
- * @alpha
+ * @throws An error if the principal does not have permission.
  */
 export async function removeGrazingIntention(
     fdm: FdmType,
@@ -106,13 +113,13 @@ export async function removeGrazingIntention(
 }
 
 /**
- * Retrieves all grazing intentions for a specified farm.
+ * Retrieves all grazing intentions for a farm.
  *
- * @param fdm The FDM instance providing the connection to the database.
- * @param principal_id The ID of the principal making the request.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
  * @param b_id_farm The unique identifier of the farm.
- * @returns A Promise resolving to an array of grazing intention objects.
- * @alpha
+ * @returns A promise that resolves to an array of grazing intention objects.
+ * @throws An error if the principal does not have permission.
  */
 export async function getGrazingIntentions(
     fdm: FdmType,
@@ -141,14 +148,14 @@ export async function getGrazingIntentions(
 }
 
 /**
- * Retrieves the grazing intention for a specific farm and year.
+ * Retrieves the grazing intention for a farm for a specific year.
  *
- * @param fdm The FDM instance providing the connection to the database.
- * @param principal_id The ID of the principal making the request.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
  * @param b_id_farm The unique identifier of the farm.
- * @param b_grazing_intention_year The year to retrieve the grazing intention for.
- * @returns A Promise resolving to a boolean representing the grazing intention. Returns `false` if no intention is found.
- * @alpha
+ * @param b_grazing_intention_year The year of the grazing intention to retrieve.
+ * @returns A promise that resolves to a boolean indicating the grazing intention. Defaults to `false` if not set.
+ * @throws An error if the principal does not have permission.
  */
 export async function getGrazingIntention(
     fdm: FdmType,

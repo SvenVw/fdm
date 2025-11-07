@@ -1,3 +1,9 @@
+/**
+ * @file This file provides the sign-in functionality for the application.
+ * It includes options for social sign-in (Microsoft, Google) and magic link authentication.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Check, Cookie, Info } from "lucide-react"
 import { useEffect } from "react"
@@ -59,20 +65,6 @@ const FormSchema = z.object({
         }),
 })
 
-/**
- * Checks for an existing user session and redirects authenticated users.
- *
- * This asynchronous loader function retrieves the user session from the request headers
- * via the authentication API. If a valid session exists, the function redirects the user
- * to the "/farm" route; otherwise, it returns an empty object. Any errors during session
- * retrieval are processed by {@link handleLoaderError} and thrown.
- *
- * @param request - The HTTP request object whose headers are used to retrieve the session.
- *
- * @returns A redirect response to "/farm" if a session exists, or an empty object otherwise.
- *
- * @throws {Error} If session retrieval fails, the error processed by {@link handleLoaderError} is thrown.
- */
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session
@@ -93,13 +85,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the sign-in page with social authentication options.
+ * Renders the sign-in page, offering social and magic link authentication.
  *
- * This component displays a structured interface for user sign-in. It provides social sign-in buttons for Microsoft and Google,
- * along with information about service benefits and a link to the privacy policy. If a social sign-in attempt fails, a toast notification
- * is displayed and the error is logged to the console.
+ * This component provides a user interface for signing in, with options for
+ * Microsoft, Google, or email-based magic links. It also displays key
+ * features of the application to entice new users.
  *
- * @returns A React element representing the sign-in page.
+ * @returns The JSX for the sign-in page.
  */
 export default function SignIn() {
     const [searchParams] = useSearchParams() // Get search params
@@ -463,6 +455,16 @@ export default function SignIn() {
     )
 }
 
+/**
+ * Handles the magic link sign-in form submission.
+ *
+ * This function processes the email submitted by the user, validates it,
+ * and then triggers the `signInMagicLink` process. This sends a sign-in
+ * link to the user's email address.
+ *
+ * @param request - The incoming request object containing the form data.
+ * @returns A redirect to a page instructing the user to check their email.
+ */
 export async function action({ request }: ActionFunctionArgs) {
     // Get the URL object to extract search params
     const url = new URL(request.url)

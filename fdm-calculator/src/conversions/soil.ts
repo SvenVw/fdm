@@ -1,14 +1,25 @@
+/**
+ * @file This module provides a set of functions for converting between different soil
+ * properties. These conversions are based on standard pedological formulas and are
+ * essential for estimating soil parameters when direct measurements are unavailable.
+ *
+ * The functions handle conversions related to organic matter, organic carbon, C/N ratio,
+ * and bulk density.
+ *
+ * @packageDocumentation
+ */
 import type { fdmSchema } from "@svenvw/fdm-core"
 import { Decimal } from "decimal.js"
 
 /**
- * Calculates the organic carbon content of soil based on the loss on ignition (LOI) value,
- * which represents the percentage of organic matter in the soil.
+ * Estimates the soil organic carbon (SOC) content from the soil organic matter (SOM) content.
  *
- * The calculation applies a standard conversion factor to estimate the organic carbon content
- * from the organic matter content. The result is clamped within a reasonable range for soil
- * organic carbon content (0.1 to 600 g C / kg soil) to ensure realistic values.
- * @param a_som_loi - The soil organic matter content as a percentage (%).
+ * This function uses a standard conversion factor (the van Bemmelen factor) to estimate
+ * the amount of organic carbon based on the percentage of organic matter determined by
+ * loss on ignition (LOI). The result is clamped to a realistic range [0.1, 600].
+ *
+ * @param a_som_loi - The soil organic matter content (as a percentage) from LOI analysis.
+ * @returns The estimated organic carbon content (in g C / kg soil), or `null` if the input is null.
  */
 export function calculateOrganicCarbon(
     a_som_loi: fdmSchema.soilAnalysisTypeSelect["a_som_loi"],
@@ -30,12 +41,14 @@ export function calculateOrganicCarbon(
 }
 
 /**
- * Calculates the organic matter content of soil based on its organic carbon content.
+ * Estimates the soil organic matter (SOM) content from the soil organic carbon (SOC) content.
  *
- * This function converts organic carbon content to organic matter content using a conversion
- * factor. The result is constrained within a plausible range for soil organic matter content
- * (0.5 to 75 %) to maintain accuracy.
- * @param a_c_of - The organic carbon content of the soil (g C / kg soil).
+ * This is the inverse of the `calculateOrganicCarbon` function. It uses the same standard
+ * conversion factor to estimate the percentage of organic matter. The result is clamped
+ * to a realistic range [0.5, 75].
+ *
+ * @param a_c_of - The organic carbon content of the soil (in g C / kg soil).
+ * @returns The estimated soil organic matter content (as a percentage), or `null` if the input is null.
  */
 export function calculateOrganicMatter(
     a_c_of: fdmSchema.soilAnalysisTypeSelect["a_c_of"],
@@ -57,14 +70,15 @@ export function calculateOrganicMatter(
 }
 
 /**
- * Calculates the carbon-nitrogen ratio (C/N ratio) of soil based on its organic carbon content
- * and total nitrogen content.
+ * Calculates the Carbon-to-Nitrogen (C/N) ratio of the soil.
  *
- * The C/N ratio is an important indicator of soil health and decomposition rates. It is
- * calculated by dividing the organic carbon content by the total nitrogen content. The result
- * is clamped within a typical range for agricultural soils (5 to 40) to ensure realistic values.
- * @param a_c_of - The organic carbon content of the soil (g C / kg soil).
- * @param a_n_rt - The total nitrogen content of the soil (mg N / kg soil).
+ * The C/N ratio is a critical indicator of nutrient cycling and soil fertility. This function
+ * computes it by dividing the organic carbon content by the total nitrogen content.
+ * The result is clamped to a typical range for agricultural soils [5, 40].
+ *
+ * @param a_c_of - The organic carbon content of the soil (in g C / kg soil).
+ * @param a_n_rt - The total nitrogen content of the soil (in mg N / kg soil).
+ * @returns The calculated C/N ratio, or `null` if either input is null.
  */
 export function calculateCarbonNitrogenRatio(
     a_c_of: fdmSchema.soilAnalysisTypeSelect["a_c_of"],
@@ -89,15 +103,15 @@ export function calculateCarbonNitrogenRatio(
 }
 
 /**
- * Calculates the bulk density of soil based on its organic matter content and soil type.
+ * Estimates the bulk density of the soil.
  *
- * Bulk density is a measure of soil mass per unit volume and is influenced by both the
- * mineral and organic components of the soil. The calculation uses different formulas
- * depending on whether the soil is sandy (including loess) or not, reflecting the different
- * structural properties of these soil types. The result is clamped within a plausible range
- * for agricultural soils (0.5 to 3 kg / m³) to maintain accuracy.
- * @param a_som_loi - The soil organic matter content as a percentage (%).
- * @param b_soiltype_agr - The agricultural soil type classification.
+ * Bulk density is estimated based on the soil organic matter content and the broad soil type.
+ * The function applies different empirical formulas for sandy/loess soils versus other soil
+ * types (e.g., clay, peat). The result is clamped to a realistic range [0.5, 3.0] kg/m³.
+ *
+ * @param a_som_loi - The soil organic matter content (as a percentage).
+ * @param b_soiltype_agr - The agricultural soil type.
+ * @returns The estimated bulk density (in kg/m³), or `null` if either input is null.
  */
 export function calculateBulkDensity(
     a_som_loi: fdmSchema.soilAnalysisTypeSelect["a_som_loi"],

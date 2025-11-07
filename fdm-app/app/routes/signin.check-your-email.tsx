@@ -1,3 +1,9 @@
+/**
+ * @file This file provides a confirmation page for users who have signed in using a magic link.
+ * It informs them to check their email for the sign-in link.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import { Cookie } from "lucide-react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
 import { NavLink, redirect } from "react-router"
@@ -23,20 +29,6 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-/**
- * Checks for an existing user session and redirects authenticated users.
- *
- * This asynchronous loader function retrieves the user session from the request headers
- * via the authentication API. If a valid session exists, the function redirects the user
- * to the "/farm" route; otherwise, it returns an empty object. Any errors during session
- * retrieval are processed by {@link handleLoaderError} and thrown.
- *
- * @param request - The HTTP request object whose headers are used to retrieve the session.
- *
- * @returns A redirect response to "/farm" if a session exists, or an empty object otherwise.
- *
- * @throws {Error} If session retrieval fails, the error processed by {@link handleLoaderError} is thrown.
- */
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session
@@ -57,12 +49,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the sign-in page, informing the user to check their email.
+ * Renders a confirmation page instructing the user to check their email.
  *
- * This component displays a message to the user confirming that a temporary sign-in link has been sent to their email address.
- * It also provides a brief explanation about the link's validity and a button to navigate back to the main sign-in page.
+ * This component is displayed after a user requests a magic link. It informs
+ * them that the link has been sent and provides a button to return to the
+ * main sign-in page.
  *
- * @returns A React element representing the sign-in page.
+ * @returns The JSX for the "check your email" page.
  */
 export default function SignIn() {
     // Function to open cookie settings if available in the window object

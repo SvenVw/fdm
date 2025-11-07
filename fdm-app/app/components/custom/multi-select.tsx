@@ -1,5 +1,20 @@
-// https://github.com/sersavan/shadcn-multi-select-component
-
+/**
+ * @file This file defines a highly customizable `MultiSelect` component.
+ *
+ * This component provides a rich multi-select dropdown experience, allowing users to
+ * select multiple items from a list. It is built with `cva` for styling variants and
+ * uses `shadcn/ui` components like `Popover`, `Command`, and `Badge`.
+ *
+ * Features include:
+ * - Displaying selected items as dismissible badges.
+ * - Summarizing selections when they exceed a `maxCount`.
+ * - "Select All" and "Clear All" functionality.
+ * - Keyboard navigation and accessibility support.
+ * - Optional animations for a more engaging user experience.
+ *
+ * @see https://github.com/sersavan/shadcn-multi-select-component
+ * @packageDocumentation
+ */
 import { cva, type VariantProps } from "class-variance-authority"
 import {
     CheckIcon,
@@ -9,7 +24,6 @@ import {
     XIcon,
 } from "lucide-react"
 import * as React from "react"
-
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import {
@@ -30,8 +44,8 @@ import { Separator } from "~/components/ui/separator"
 import { cn } from "~/lib/utils"
 
 /**
- * Variants for the multi-select component to handle different styles.
- * Uses class-variance-authority (cva) to define different styles based on "variant" prop.
+ * Defines the visual variants for the multi-select component's badges.
+ * @internal
  */
 const multiSelectVariants = cva(
     "m-1 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300",
@@ -53,74 +67,47 @@ const multiSelectVariants = cva(
     },
 )
 
-/**
- * Props for MultiSelect component
- */
 interface MultiSelectProps
     extends React.ButtonHTMLAttributes<HTMLButtonElement>,
         VariantProps<typeof multiSelectVariants> {
-    /**
-     * An array of option objects to be displayed in the multi-select component.
-     * Each option object has a label, value, and an optional icon.
-     */
+    /** An array of options to be displayed in the dropdown. */
     options: {
-        /** The text to display for the option. */
         label: string
-        /** The unique value associated with the option. */
         value: string
-        /** Optional icon component to display alongside the option. */
         icon?: React.ComponentType<{ className?: string }>
     }[]
 
-    /**
-     * Callback function triggered when the selected values change.
-     * Receives an array of the new selected values.
-     */
+    /** Callback function invoked when the selected values change. */
     onValueChange: (value: string[]) => void
 
-    /** The default selected values when the component mounts. */
+    /** The default selected values. */
     defaultValue?: string[]
 
-    /**
-     * Placeholder text to be displayed when no values are selected.
-     * Optional, defaults to "Select options".
-     */
+    /** Placeholder text to display when no values are selected. */
     placeholder?: string
 
-    /**
-     * Animation duration in seconds for the visual effects (e.g., bouncing badges).
-     * Optional, defaults to 0 (no animation).
-     */
+    /** Animation duration in seconds for badge effects. */
     animation?: number
 
-    /**
-     * Maximum number of items to display. Extra selected items will be summarized.
-     * Optional, defaults to 3.
-     */
+    /** Maximum number of selected items to display before summarizing. */
     maxCount?: number
 
-    /**
-     * The modality of the popover. When set to true, interaction with outside elements
-     * will be disabled and only popover content will be visible to screen readers.
-     * Optional, defaults to false.
-     */
+    /** If true, the popover will be modal, disabling interaction with other elements. */
     modalPopover?: boolean
 
-    /**
-     * If true, renders the multi-select component as a child of another component.
-     * Optional, defaults to false.
-     */
-    asChild?: boolean
-
-    /**
-     * Additional class names to apply custom styles to the multi-select component.
-     * Optional, can be used to add custom styles.
-     */
+    /** Additional class names for custom styling. */
     className?: string
 
+    /** The name attribute for the button element. */
     name?: string
 }
 
+/**
+ * A versatile multi-select component with a rich user experience.
+ *
+ * This component allows users to select multiple items from a searchable list in a popover.
+ * Selected items are displayed as badges within the component's trigger button.
+ */
 export const MultiSelect = React.forwardRef<
     HTMLButtonElement,
     MultiSelectProps
@@ -135,7 +122,6 @@ export const MultiSelect = React.forwardRef<
             animation = 0,
             maxCount = 10,
             modalPopover = false,
-            //   asChild = false,
             className,
             name = "multi-select",
             ...props
@@ -227,9 +213,8 @@ export const MultiSelect = React.forwardRef<
                                                 <Badge
                                                     key={value}
                                                     className={cn(
-                                                        isAnimating
-                                                            ? "animate-bounce"
-                                                            : "",
+                                                        isAnimating &&
+                                                            "animate-bounce",
                                                         multiSelectVariants({
                                                             variant,
                                                         }),
@@ -256,9 +241,8 @@ export const MultiSelect = React.forwardRef<
                                         <Badge
                                             className={cn(
                                                 "bg-transparent text-foreground border-foreground/1 hover:bg-transparent",
-                                                isAnimating
-                                                    ? "animate-bounce"
-                                                    : "",
+                                                isAnimating &&
+                                                    "animate-bounce",
                                                 multiSelectVariants({
                                                     variant,
                                                 }),

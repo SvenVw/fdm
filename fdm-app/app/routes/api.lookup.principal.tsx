@@ -1,3 +1,9 @@
+/**
+ * @file This file provides an API endpoint for looking up principals (users and organizations).
+ * It's designed to be used by autocomplete components in the frontend.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import { lookupPrincipal } from "@svenvw/fdm-core"
 import type { LoaderFunctionArgs } from "react-router-dom"
 import { getSession } from "~/lib/auth.server"
@@ -18,6 +24,18 @@ type AutocompletePrincipal = {
     icon: "user" | "organization" // Icon identifier string
 }
 
+/**
+ * Handles GET requests to look up principals.
+ *
+ * This function retrieves the session, validates the user is authenticated,
+ * and then uses the `lookupPrincipal` function from fdm-core to find
+ * users and organizations matching the provided identifier. The results are
+ * formatted for use in an autocomplete component.
+ *
+ * @param request - The incoming request object, containing the search identifier.
+ * @returns An array of principals formatted for the autocomplete component.
+ * @throws {Response} A 401 Unauthorized response if the user is not authenticated.
+ */
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session

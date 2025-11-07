@@ -1,3 +1,9 @@
+/**
+ * @file This file serves as the layout component for all organization-related routes.
+ * It handles session validation, data loading for the sidebar and header, and renders the nested routes.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import { getOrganizationsForUser } from "@svenvw/fdm-core"
 import posthog from "posthog-js"
 import { useEffect } from "react"
@@ -22,15 +28,16 @@ import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 
 /**
- * Retrieves the session from the HTTP request and returns user information if available.
+ * Loads data for the organization layout.
  *
- * If the session does not contain a user, the function redirects to the "/signin" route.
- * Any errors encountered during session retrieval are processed by the designated error handler.
+ * This function ensures the user is authenticated, fetches the user's data,
+ * and retrieves the list of organizations they belong to. It also identifies
+ * the currently selected organization from the route parameters.
  *
- * @param request - The HTTP request used for obtaining session data.
- * @returns An object with a "user" property when a valid session is found.
- *
- * @throws {Error} If an error occurs during session retrieval, processed by handleLoaderError.
+ * @param request - The incoming request object.
+ * @param params - The route parameters.
+ * @returns An object containing user data, organization list, and selected organization slug.
+ * @throws {Response} A redirect response to the sign-in page if the user is not authenticated.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -70,9 +77,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the main application layout.
+ * Renders the layout for the organization section.
  *
- * This component retrieves user data from the loader using React Router's useLoaderData hook and passes it to the SidebarApp component within a SidebarProvider context. It also renders an Outlet to display nested routes.
+ * This component sets up the main structure with a sidebar and a content area.
+ * It initializes PostHog for analytics if configured and renders the nested
+ * route components through the Outlet.
+ *
+ * @returns The JSX for the organization layout.
  */
 export default function App() {
     const loaderData = useLoaderData<typeof loader>()

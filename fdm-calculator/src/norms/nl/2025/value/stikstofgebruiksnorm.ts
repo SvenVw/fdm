@@ -1,3 +1,13 @@
+/**
+ * @file This module calculates the usage norm for nitrogen (`stikstofgebruiksnorm`) for the
+ * Dutch regulations of 2025. It is a complex calculation that depends on the primary
+ * cultivation, soil type, geographical location (e.g., NV areas), and farm status (e.g., derogation).
+ *
+ * It also includes logic for applying a "korting" (reduction) to the norm based on the
+ * presence of catch crops in the previous year.
+ *
+ * @packageDocumentation
+ */
 import { type Field, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
@@ -15,15 +25,15 @@ import type {
 } from "./types"
 
 /**
- * Determines if a field is located within a met nutriënten verontreinigde gebied (NV-gebied) in the Netherlands.
- * This is achieved by querying a GeoTIFF file that delineates NV-gebieden.
- * The function checks the value at the field's centroid coordinates.
+ * Determines if a field is located within a nutrient-polluted area (`NV-gebied`).
  *
- * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
- *   This point is used to query the GeoTIFF data.
- * @returns A promise that resolves to `true` if the GeoTIFF value at the centroid is 1 (indicating it is within an NV-gebied),
- *   and `false` if the value is 0.
- * @throws {Error} If the GeoTIFF returns an unexpected value, or if there are issues fetching or processing the file.
+ * This function queries a specific GeoTIFF file using the field's centroid coordinates. A return
+ * value of `1` from the GeoTIFF indicates the field is within an NV area, which typically
+ * results in a stricter (lower) nitrogen norm.
+ *
+ * @param b_centroid - The longitude and latitude of the field's centroid.
+ * @returns A promise that resolves to `true` if the field is in an NV area, otherwise `false`.
+ * @throws {Error} If the GeoTIFF data returns an unexpected value.
  */
 export async function isFieldInNVGebied(
     b_centroid: Field["b_centroid"],
@@ -50,22 +60,15 @@ export async function isFieldInNVGebied(
 }
 
 /**
- * Determines the soil region for a given field based on its geographical coordinates.
+ * Determines the soil type region of a field based on its geographical coordinates.
  *
- * This function queries a GeoTIFF file representing the official "grondsoortenkaart"
- * from the Dutch Meststoffenwet (Manure Law). It identifies whether the field's centroid
- * falls within one of the predefined soil regions: "klei", "loess", "veen", "zand_nwc", or "zand_zuid".
+ * This function queries the official Dutch soil type map (`grondsoortenkaart`) to classify
+ * the field into one of five regulatory regions: "klei", "loess", "veen", "zand_nwc", or "zand_zuid".
+ * This classification is essential as nitrogen norms differ across these regions.
  *
- * The soil region is a critical factor in determining the applicable nitrogen usage norms,
- * as these standards vary significantly between different soil types.
- *
- * @param b_centroid - A tuple containing the longitude and latitude of the field's centroid.
- *   This coordinate is used to look up the corresponding value in the GeoTIFF file.
- * @returns A promise that resolves to a `RegionKey`, which is a string literal representing the soil region
- *   (e.g., "zand_nwc", "klei").
- * @throws {Error} If the GeoTIFF file cannot be fetched, if the coordinates fall outside the bounds of the map,
- *   or if the returned region code is unknown.
- *
+ * @param b_centroid - The longitude and latitude of the field's centroid.
+ * @returns A promise that resolves to the `RegionKey` representing the soil type.
+ * @throws {Error} If the GeoTIFF data returns an unknown region code.
  */
 export async function getRegion(
     b_centroid: Field["b_centroid"],
@@ -101,49 +104,19 @@ export async function getRegion(
 }
 
 /**
- * Retrieves the appropriate set of nitrogen norms (`NormsByRegion`) for a given cultivation.
- * This function applies a set of specific rules and conditions to select the most accurate
- * norm from the available `NitrogenStandard` data, considering factors like cultivation
- * sub-types, specific varieties, and farm derogation status.
+ * Selects the appropriate set of regional norms for a cultivation from a `NitrogenStandard` object.
  *
- * @param selectedStandard - The base `NitrogenStandard` object that broadly matches the cultivation.
- *   This object contains various norm categories (e.g., general, sub-type specific, variety-specific).
- * @param b_lu_variety - Optional. The specific variety of the cultivation (e.g., a potato variety).
- *   This is used to apply variety-specific norms where applicable.
- * @param is_derogatie_bedrijf - Optional. A boolean indicating if the farm operates under
- *   derogation. This is relevant for certain crops like maize, which have different norms
- *   for derogated vs. non-derogated farms.
- * @param b_lu_end - The termination date of the cultivation. This is crucial for determining
- *   applicable sub-type periods, especially for temporary grasslands where norms can vary
- *   based on the period of the year.
- * @returns A `NormsByRegion` object containing standard and NV-gebied norms for all regions
- *   (e.g., "zand_nwc", "zand_zuid", "klei", "veen", "loess") that apply to the specific cultivation and conditions.
- *   Returns `undefined` if no applicable norms can be found based on the provided criteria.
+ * This helper function applies a series of rules to find the correct `NormsByRegion` object
+ * within a given standard, accounting for differentiation by sub-type. It first checks for a
+ * direct match on the sub-type description and then falls back to time-based logic for
+ * temporary grasslands. If no sub-types match, it returns the default norms from the standard.
  *
- * @remarks
- * The function prioritizes norm selection based on the following hierarchy:
- * 1.  **Sub-Type Norms (e.g., Temporary Grasslands)**:
- *     If `selectedStandard` has `sub_types` defined (e.g., for temporary grasslands),
- *     it checks if the `b_lu_end` date falls within any of the specified `period_start_month`
- *     and `period_end_month` ranges. If a matching sub-type period is found, its associated
- *     norms are returned. This ensures that time-sensitive norms are correctly applied.
- * 2.  **Variety-Specific Norms (e.g., Potatoes)**:
- *     If the `selectedStandard` is for "aardappel" (potato) and `b_lu_variety` is provided,
- *     the function checks if the variety matches any in `varieties_hoge_norm` (high norms)
- *     or `varieties_lage_norm` (low norms). If a match is found, the corresponding norms
- *     (`norms_hoge_norm` or `norms_lage_norm`) are returned. If the variety doesn't match
- *     these specific lists, it falls back to `norms_overig` (other) potato norms if available.
- * 3.  **Derogation-Specific Norms (e.g., Maize)**:
- *     If the `selectedStandard` is for "akkerbouw" and specifically "Akkerbouwgewassen, mais",
- *     it checks the `is_derogatie_bedrijf` status. If the farm is derogated, `derogatie_norms`
- *     are returned; otherwise, `non_derogatie_norms` are returned. This ensures that norms
- *     are correctly applied based on the farm's legal status.
- * 4.  **Default Norms**:
- *     If none of the above specific conditions are met, the function defaults to returning
- *     the primary `norms` defined directly within the `selectedStandard` object.
- *
- * This structured approach ensures that the most specific and applicable nitrogen norm
- * is always retrieved for the given cultivation context.
+ * @param selectedStandard - The `NitrogenStandard` object for the primary cultivation.
+ * @param b_lu_end - The end date of the cultivation, used for time-based sub-type matching.
+ * @param subTypeOmschrijving - An optional string describing the specific sub-type,
+ *   determined by `determineSubTypeOmschrijving`.
+ * @returns The applicable `NormsByRegion` object, or `undefined` if no match is found.
+ * @internal
  */
 function getNormsForCultivation(
     selectedStandard: NitrogenStandard,
@@ -194,14 +167,20 @@ function getNormsForCultivation(
 }
 
 /**
- * Determines the specific sub-type 'omschrijving' for a cultivation that is part of a larger group.
- * This is necessary for standards that use sub_types to differentiate norms, e.g., for winter vs. summer varieties.
+ * Determines the specific sub-type description (`omschrijving`) for a cultivation.
  *
- * @param cultivation - The specific cultivation for which to determine the sub-type.
- * @param standard - The matched NitrogenStandard which may contain sub_types.
- * @param is_derogatie_bedrijf - Optional. A boolean indicating if the farm operates under derogation.
- * @param cultivations - An array of cultivation objects for the current and previous year.
- * @returns The 'omschrijving' of the matching sub-type as a string, or undefined if no specific sub-type applies.
+ * Many nitrogen standards are further differentiated into sub-types (e.g., winter vs. summer
+ * varieties, first-year vs. subsequent years). This function contains the logic to identify
+ * the correct sub-type based on context such as farm status, cultivation history, and
+ * specific crop varieties.
+ *
+ * @param cultivation - The specific cultivation being analyzed.
+ * @param standard - The general `NitrogenStandard` that matches the cultivation.
+ * @param is_derogatie_bedrijf - A flag for the farm's derogation status.
+ * @param cultivations - The full list of cultivations for the field, used for historical checks.
+ * @param has_grazing_intention - A flag for the farm's grazing intention.
+ * @returns The `omschrijving` of the matching sub-type, or `undefined` if none applies.
+ * @internal
  */
 function determineSubTypeOmschrijving(
     cultivation: NL2025NormsInputForCultivation,
@@ -338,12 +317,17 @@ function determineSubTypeOmschrijving(
 }
 
 /**
- * Calculates the "korting" (reduction) on the nitrogen usage norm based on the presence
- * of winter crops or catch crops in the previous year.
+ * Calculates the nitrogen norm reduction (`korting`) for fields in sandy or loess regions.
  *
- * @param cultivations - An array of cultivation objects for the current and previous year.
- * @param region - The soil region of the field (e.g., "zand_nwc", "zand_zuid", "loess").
- * @returns An object containing the reduction amount in kilograms of nitrogen per hectare (kg N/ha) and a description.
+ * This function implements the regulation that applies a reduction to the nitrogen norm if no
+ * catch crop or winter crop was present in the preceding autumn and winter. The amount of the
+ * reduction depends on the sowing date of the catch crop.
+ *
+ * @param cultivations - An array of cultivations for the current and previous years.
+ * @param region - The soil region of the field.
+ * @returns An object containing the `amount` of the reduction (in kg N/ha) and a `description`
+ *   explaining the reason for the reduction (or lack thereof).
+ * @internal
  */
 function calculateKorting(
     cultivations: NL2025NormsInputForCultivation[],
@@ -455,81 +439,21 @@ function calculateKorting(
 }
 
 /**
- * Determines the 'gebruiksnorm' (usage standard) for nitrogen for a given cultivation
- * based on its BRP code, geographical location, and other specific characteristics.
- * This function is the primary entry point for calculating the nitrogen usage norm
- * according to the Dutch RVO's "Tabel 2 Stikstof landbouwgrond 2025" and related annexes.
+ * Calculates the nitrogen usage norm for a specific field for the year 2025.
  *
- * @param input - An object of type `NL2025NormsInput` containing all necessary data:
- *   - `farm.is_derogatie_bedrijf`: A boolean indicating if the farm operates under derogation.
- *   - `field.b_centroid`: An object with the latitude and longitude of the field's centroid.
- *   - `cultivations`: An array of cultivation objects, from which the `hoofdteelt` (main crop)
- *     will be determined.
- * @returns A promise that resolves to an object of type `GebruiksnormResult` containing:
- *   - `normValue`: The determined nitrogen usage standard in kilograms per hectare (kg/ha).
- *   - `normSource`: The descriptive name from RVO Table 2 used for the calculation.
- *   - `kortingDescription`: A description of any korting (reduction) applied to the norm.
- * Returns `null` if no matching standard or applicable norm can be found for the given input.
- * @throws {Error} If the `hoofdteelt` cultivation cannot be found or if geographical data
- *   queries fail.
+ * This is the main function for determining the nitrogen norm. It orchestrates a multi-step
+ * process that includes:
+ * 1.  Identifying the primary cultivation (`hoofdteelt`).
+ * 2.  Determining the field's geographical context (soil type and NV area status).
+ * 3.  Finding the matching nitrogen standard from the regulations.
+ * 4.  Refining the standard based on specific sub-types (e.g., crop variety, farm status).
+ * 5.  Selecting the final norm value based on the region and NV status.
+ * 6.  Applying a `korting` (reduction) if applicable.
  *
- * @remarks
- * The function follows a comprehensive, multi-step process to accurately determine the
- * correct nitrogen norm:
- *
- * 1.  **Identify Main Crop (`hoofdteelt`)**:
- *     The `determineNL2025Hoofdteelt` function is called to identify the primary cultivation
- *     (`b_lu_catalogue`) for the field based on the provided `cultivations` array. This is
- *     the first step to narrow down the applicable nitrogen standards.
- *
- * 2.  **Determine Geographical Context**:
- *     -   `isFieldInNVGebied`: This asynchronous helper function is called to check if the
- *         field's centroid falls within a Nitraatkwetsbaar Gebied (NV-gebied). Fields in NV-gebieds
- *         often have stricter (lower) nitrogen norms.
- *     -   `getRegion`: This asynchronous helper function determines the specific soil region
- *         (e.g., "zand" for sandy soil, "klei" for clay soil) based on the field's coordinates.
- *         Nitrogen norms can vary significantly by soil type.
- *     Both functions use efficient spatial queries to retrieve this information.
- *
- * 3.  **Match Nitrogen Standard Data**:
- *     The `nitrogenStandardsData` (loaded from a JSON file) is filtered to find all entries
- *     (`NitrogenStandard` objects) whose `b_lu_catalogue_match` array includes the identified
- *     `b_lu_catalogue` of the `hoofdteelt`.
- *
- * 4.  **Refine by Variety (for Potatoes)**:
- *     If the `hoofdteelt` has a specific `b_lu_variety` (e.g., for potatoes), the matching
- *     standards are further filtered. Potatoes can have "high" (`varieties_hoge_norm`) or
- *     "low" (`varieties_lage_norm`) nitrogen norms based on their variety. If a specific
- *     variety match is not found, it falls back to "overig" (other) potato norms if available.
- *
- * 5.  **Select the Most Specific Standard**:
- *     If multiple `NitrogenStandard` entries still match after initial filtering and
- *     variety-specific refinement, the function attempts to select the most specific one.
- *     This prioritization ensures that detailed rules (e.g., those without `variety_type`
- *     or `sub_types` if a direct match is found) are applied correctly.
- *
- * 6.  **Retrieve Applicable Norms**:
- *     The `getNormsForCultivation` helper function is called with the `selectedStandard`
- *     and other relevant parameters (variety, derogation status, cultivation end date).
- *     This function applies a hierarchy of rules (sub-type periods, variety-specific,
- *     derogation-specific) to return the precise `NormsByRegion` object for the cultivation.
- *
- * 7.  **Calculate Final Norm Value**:
- *     From the `applicableNorms` object, the function retrieves the specific norms for the
- *     determined `region`. The final `normValue` is then selected: if the field is in an
- *     `is_nv_area`, the `nv_area` norm is used; otherwise, the `standard` norm is applied.
- *
- * 8.  **Apply "Korting" (Reduction)**:
- *     The `calculateKorting` function is called to determine if a reduction should be applied
- *     based on the previous year's cultivations and the field's region. The calculated
- *     `kortingAmount` is then subtracted from the `normValue`.
- *
- * This detailed process ensures that the calculated nitrogen usage norm is accurate and
- * compliant with RVO regulations, taking into account all relevant agricultural and
- * geographical factors.
- *
- * @see {@link https://www.rvo.nl/sites/default/files/2024-12/Tabel-2-Stikstof-landbouwgrond-2025_0.pdf | RVO Tabel 2 Stikstof landbouwgrond 2025} - Official document for nitrogen norms.
- * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/stikstof-en-fosfaat/gebruiksnormen-stikstof | RVO Gebruiksnormen stikstof (official page)} - General information on nitrogen and phosphate norms.
+ * @param input - A standardized object containing all necessary farm, field, and cultivation data.
+ * @returns A promise that resolves to an object containing the final `normValue` (in kg N/ha)
+ *   and a detailed `normSource` string explaining how the value was derived.
+ * @throws {Error} If any step in the process fails, such as not finding a matching norm.
  */
 export async function calculateNL2025StikstofGebruiksNorm(
     input: NL2025NormsInput,
@@ -651,16 +575,14 @@ export async function calculateNL2025StikstofGebruiksNorm(
 }
 
 /**
- * Memoized version of {@link calculateNL2025StikstofGebruiksNorm}.
+ * A cached version of the `calculateNL2025StikstofGebruiksNorm` function.
  *
- * This function is wrapped with `withCalculationCache` to optimize performance by caching
- * results based on the input and the current calculator version.
+ * This function enhances performance by caching the results of the norm calculation.
+ * The cache key is generated based on the function's input and the calculator's version,
+ * ensuring that the cache is invalidated when the underlying logic or data changes.
  *
- * @param {NL2025NormsInput} input - An object of type `NL2025NormsInput` containing all necessary data.
- * @returns {Promise<GebruiksnormResult>} A promise that resolves to an object of type `GebruiksnormResult` containing:
- *   - `normValue`: The determined nitrogen usage standard in kilograms per hectare (kg/ha).
- *   - `normSource`: The descriptive name from RVO Table 2 used for the calculation.
- *   - `kortingDescription`: A description of any korting (reduction) applied to the norm.
+ * @param input - A standardized object containing all necessary farm, field, and cultivation data.
+ * @returns A promise that resolves to an object containing the final `normValue` and `normSource`.
  */
 export const getNL2025StikstofGebruiksNorm = withCalculationCache(
     calculateNL2025StikstofGebruiksNorm,

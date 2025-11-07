@@ -1,3 +1,11 @@
+/**
+ * @file Calculates the "filling" of the phosphate usage norm (`fosfaatgebruiksnorm`) for the
+ * Dutch regulations of 2025. This calculation is complex due to the "Stimulating organic-rich
+ * fertilizers" regulation, which provides a discount on the phosphate contribution of certain
+ * fertilizer types.
+ *
+ * @packageDocumentation
+ */
 import {
     type Fertilizer,
     type FertilizerApplication,
@@ -13,28 +21,23 @@ const rvoMestcodesOrganicRich75Percent = ["110", "10", "61", "25", "56"] // Cham
 const rvoMestcodesOrganicRich75PercentOrganic = ["40"] // Varkens - Vaste mest (for organic certification)
 
 /**
- * Calculates the norm filling for phosphate application, taking into account the
- * "Stimuleren organische stofrijke meststoffen" (Stimulating organic-rich fertilizers) regulation.
+ * Calculates the norm filling for phosphate, applying the regulation for organic-rich fertilizers.
  *
- * This regulation, detailed in Staatscourant 2023, nr. 5152, aims to encourage the use of
- * organic-rich fertilizers by applying a differentiated percentage to their phosphate content
- * when calculating against the phosphate usage norm.
+ * This function implements the Dutch regulation that encourages the use of organic-rich
+ * fertilizers by discounting their phosphate contribution to the usage norm. The logic includes:
  *
- * Key aspects of the regulation implemented:
- * 1.  **Minimum Threshold (Condition 1):** A discount is only applied if at least 20 kg/ha of
- *     phosphate from organic-rich fertilizers is applied.
- * 2.  **Iterative Discounting:** The differentiated percentage (25% or 75% mee) is applied
- *     iteratively. The discount is only valid for the portion of organic-rich phosphate
- *     that, when summed with other discounted organic-rich phosphate, does not exceed
- *     the `fosfaatgebruiksnorm`. Any organic-rich phosphate applied beyond this limit
- *     is counted at 100% towards the norm.
- * 3.  **Prioritization:** To maximize the benefit for the farmer, fertilizers with a 25%
- *     contribution factor (e.g., compost) are prioritized for the discount over those
- *     with a 75% contribution factor (e.g., strorijke vaste mest).
- *     This has been acknowledged by RVO to be possible in personal communication with Sven.
+ * 1.  **Threshold Check**: Verifies if at least 20 kg/ha of P2O5 from organic-rich sources is applied.
+ *     If not, all fertilizers are counted at 100% of their phosphate value.
+ * 2.  **Prioritized Discounting**: If the threshold is met, it prioritizes fertilizers with a higher
+ *     discount (25% contribution) over those with a lower discount (75% contribution) to maximize
+ *     the farmer's benefit.
+ * 3.  **Iterative Application**: The discount is applied iteratively up to the phosphate usage norm limit.
+ *     Any phosphate applied from organic-rich sources that exceeds this limit is counted at 100%.
  *
- * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
- * @returns {NormFilling} An object containing the total norm filling and a breakdown per application.
+ * @param input - The standardized input object containing application data, fertilizer definitions,
+ *   and the phosphate usage norm for the field.
+ * @returns An object detailing the total `normFilling` for phosphate and a breakdown for each
+ *   individual `applicationFilling`, including details about any applied discounts.
  */
 export function calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm(
     input: NL2025NormsFillingInput,
@@ -231,13 +234,17 @@ export function calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNor
 }
 
 /**
- * Determines if at least 20 kg P2O5 / ha is applied with organic-rich fertilizers.
- * This is Condition 1 for the "Stimuleren organische stofrijke meststoffen" regulation.
+ * Checks if the threshold for applying the organic-rich fertilizer discount is met.
  *
- * @param {FertilizerApplication[]} applications - An array of fertilizer applications.
- * @param {Map<string, Fertilizer>} fertilizersMap - A map of fertilizers for efficient lookup.
- * @param {boolean} has_organic_certification - Indicates if the farm has organic certification.
- * @returns {boolean} True if the 20 kg/ha threshold is met, false otherwise.
+ * This function implements "Condition 1" of the regulation, which requires that a minimum
+ * of 20 kg/ha of P2O5 from qualifying organic-rich fertilizers is applied.
+ *
+ * @param applications - An array of all fertilizer applications.
+ * @param fertilizersMap - A map for quick lookup of fertilizer definitions.
+ * @param has_organic_certification - A flag indicating if the farm is organically certified,
+ *   which affects which fertilizers qualify.
+ * @returns `true` if the 20 kg/ha threshold is met, otherwise `false`.
+ * @internal
  */
 function determineCondition1StimuleringOrganischeStofrijkeMeststoffen(
     applications: FertilizerApplication[],
@@ -287,13 +294,16 @@ function determineCondition1StimuleringOrganischeStofrijkeMeststoffen(
 }
 
 /**
- * Memoized version of {@link calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm}.
+ * A cached version of the `calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm` function.
  *
- * This function is wrapped with `withCalculationCache` to optimize performance by caching
- * results based on the input and the current calculator version.
+ * This function enhances performance by caching the results of the norm filling calculation.
+ * The cache key is generated based on the function's input and the calculator's version,
+ * ensuring that the cache is invalidated when the underlying logic or data changes.
  *
- * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
- * @returns {NormFilling} An object containing the total norm filling and a breakdown per application.
+ * @param input - The standardized input object containing application data, fertilizer definitions,
+ *   and the phosphate usage norm for the field.
+ * @returns An object detailing the total `normFilling` for phosphate and a breakdown for each
+ *   individual `applicationFilling`.
  */
 export const getNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm =
     withCalculationCache(

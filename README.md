@@ -29,6 +29,7 @@ FDM comprises several interconnected packages, each serving a distinct purpose:
 * **`fdm-app`:** A React application offering a user-friendly interface for visualizing and managing farm data.  Utilizes `fdm-core` for database interaction and provides a practical demonstration of FDM's capabilities.
 
 * **`fdm-docs`:** Houses the comprehensive documentation for the entire FDM project.
+* **Docstrings:** All public functions, methods, and classes across the `fdm-core`, `fdm-data`, `fdm-calculator`, and `fdm-app` packages are fully documented with JSDoc comments. This provides in-depth information about the codebase directly within your editor.
 
 ## Running Locally with Docker
 

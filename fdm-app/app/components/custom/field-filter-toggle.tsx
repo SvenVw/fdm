@@ -1,3 +1,9 @@
+/**
+ * @file This file defines the `FieldFilterToggle` component, a UI control for
+ * toggling the visibility of non-productive fields (e.g., buffer strips).
+ *
+ * @packageDocumentation
+ */
 import { PanelsRightBottom, Square } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import {
@@ -8,6 +14,21 @@ import {
 } from "~/components/ui/tooltip"
 import { useFieldFilterStore } from "~/store/field-filter"
 
+/**
+ * A toggle button component for filtering fields.
+ *
+ * This component provides a user interface for toggling a filter that controls
+ * whether non-productive fields, such as buffer strips (`bufferstroken`), are
+ * visible. It integrates with the `useFieldFilterStore` (Zustand) to manage
+ * the global filter state.
+ *
+ * The button's icon and tooltip dynamically update to reflect the current
+ * filter state:
+ * - When `showProductiveOnly` is true, it displays a solid square, indicating
+ *   that some fields are hidden.
+ * - When `showProductiveOnly` is false, it displays a different icon, indicating
+ *   that all fields are shown.
+ */
 export function FieldFilterToggle() {
     const { showProductiveOnly, toggleShowProductiveOnly } =
         useFieldFilterStore()

@@ -50,7 +50,25 @@ The `fdm-app` is a React application providing a user-friendly interface for vis
     # Production build
     pnpm build
     pnpm start
-```    
+```
+
+## Project Structure
+
+The `fdm-app` is a [Remix](httpshttps://remix.run/) application. Here's a brief overview of the key directories:
+
+*   **`app/`**: This is the core of the Remix application.
+    *   **`components/`**: Contains reusable React components.
+        *   `blocks/`: Larger, more complex components that form sections of a page.
+        *   `custom/`: Application-specific, smaller components.
+        *   `import/`: Components imported from external sources or libraries.
+        *   `ui/`: Base UI components, often from a UI library like ShadCN.
+    *   **`hooks/`**: Custom React hooks for shared logic.
+    *   **`integrations/`**: Code for integrating with third-party services.
+    *   **`lib/`**: Library code, including utility functions, server-side logic, and configuration.
+    *   **`routes/`**: This is where the application's routes are defined. Each file in this directory corresponds to a URL path.
+    *   **`store/`**: State management stores (e.g., Zustand).
+    *   **`styles/`**: Global CSS styles.
+*   **`public/`**: Static assets like images and fonts.
 
 ## Key Functionalities
 * **Farm Management:** Create, view, update, and delete farm records, including adding and removing associated fields. Manage farm details and their associated data using the application.

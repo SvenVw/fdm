@@ -1,3 +1,13 @@
+/**
+ * @file This module calculates ammonia (`NH3`) emissions from various agricultural sources within a field.
+ * It serves as a central hub for aggregating ammonia volatilization from fertilizer applications and
+ * the decomposition of crop residues.
+ *
+ * The main function, `calculateNitrogenEmissionViaAmmonia`, integrates these sources to provide a
+ * comprehensive total of ammonia emissions.
+ *
+ * @packageDocumentation
+ */
 import type {
     CultivationDetail,
     FertilizerDetail,
@@ -8,14 +18,22 @@ import { calculateNitrogenEmissionViaAmmoniaByFertilizers } from "./fertilizers"
 import { calculateNitrogenEmissionViaAmmoniaByResidues } from "./residues"
 
 /**
- * Calculates the total nitrogen volatilization from a field, through ammonia emissions from fertilizer appplications and crop residues.
+ * Calculates the total ammonia (`NH3`) emission from a field.
  *
- * This function orchestrates the calculation of ammonia emission by calling separate functions for fertilizer applications and
- * residue volatilization, then aggregates the results.
- * @param cultivations - A list of cultivations on the field.
- * @param harvests - A list of harvests from the field.
- * @param cultivationDetailsMap - A map containing details for each cultivation, including its nitrogen content and residue management practices.
- * @returns The NitrogenEmmissionAmmonia object containing the total amount of Nitrogen volatilized and the individual ammonia values.
+ * This function quantifies ammonia volatilization by summing emissions from two primary sources:
+ * 1.  **Fertilizer Applications**: Calculates emissions based on the type, amount, and application
+ *     method of fertilizers.
+ * 2.  **Crop Residues**: Estimates emissions from the decomposition of leftover plant material after harvest.
+ *
+ * It orchestrates these calculations and aggregates the results into a single, detailed object.
+ * Note: Emissions from grazing are not yet implemented.
+ *
+ * @param cultivations - An array of cultivations on the field.
+ * @param harvests - An array of harvest events.
+ * @param fertilizerApplications - An array of fertilizer application events.
+ * @param cultivationDetailsMap - A map providing detailed data for each cultivation type.
+ * @param fertilizerDetailsMap - A map providing detailed data for each fertilizer type.
+ * @returns A `NitrogenEmissionAmmonia` object detailing total and source-specific ammonia emissions.
  */
 export function calculateNitrogenEmissionViaAmmonia(
     cultivations: FieldInput["cultivations"],

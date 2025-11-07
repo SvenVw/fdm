@@ -1,3 +1,13 @@
+/**
+ * @file This file defines a reusable `AutoComplete` component.
+ *
+ * The `AutoComplete` component provides a flexible, API-driven search input with
+ * features like debounced fetching, dynamic item rendering with icons, and seamless
+ * integration with `remix-hook-form`. It is built using `cmdk` for command menu
+ * functionality and `shadcn/ui` components for styling.
+ *
+ * @packageDocumentation
+ */
 import { Command as CommandPrimitive } from "cmdk"
 import { Check, User, Users } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -14,37 +24,63 @@ import { Popover, PopoverAnchor, PopoverContent } from "~/components/ui/popover"
 import { cn } from "~/lib/utils"
 import { LoadingSpinner } from "./loadingspinner"
 
-// Expected shape of items returned by the lookup API
+/**
+ * Represents the expected shape of an item returned by the lookup API.
+ */
 type LookupItem<T extends string> = {
+    /** The unique value of the item. */
     value: T
+    /** The human-readable label to display. */
     label: string
-    icon?: string // Icon identifier string (key for iconMap)
+    /** An optional string identifier for an icon to be displayed next to the item. */
+    icon?: string
 }
 
+/**
+ * A map of icon identifiers to their corresponding React components.
+ */
 type IconMap = Record<string, React.ComponentType<{ className?: string }>>
 
 type Props<T extends string> = {
+    /** The currently selected value. */
     selectedValue: T
+    /** Callback function invoked when the selected value changes. */
     onSelectedValueChange: (value: T) => void
-    lookupUrl: string // API endpoint for lookup
-    searchParamName?: string // Query parameter name for search term (default: 'identifier')
-    excludeValues?: T[] // Optional array of values to filter out
-    iconMap?: IconMap // Optional map of icon identifiers to components
+    /** The API endpoint URL to fetch lookup items from. */
+    lookupUrl: string
+    /** The name of the query parameter for the search term (defaults to 'identifier'). */
+    searchParamName?: string
+    /** An optional array of values to filter out from the results. */
+    excludeValues?: T[]
+    /** An optional map of icon identifiers to React components. */
+    iconMap?: IconMap
+    /** The message to display when no items are found. */
     emptyMessage?: string
+    /** The placeholder text for the input field. */
     placeholder?: string
-    // biome-ignore lint/suspicious/noExplicitAny: Using any temporarily due to potential type conflicts with remix-hook-form
+    /** The form instance from `remix-hook-form` for integration. */
+    // biome-ignore lint/suspicious/noExplicitAny: Using 'any' for compatibility with remix-hook-form.
     form?: any
-    name?: string // Name for remix-hook-form registration
+    /** The name to register the component with `remix-hook-form`. */
+    name?: string
+    /** Optional CSS class name for custom styling. */
     className?: string
 }
 
+/**
+ * A flexible, API-driven autocomplete component.
+ *
+ * This component provides a search input that fetches suggestions from a specified
+ * API endpoint as the user types. It features debouncing to limit API requests,
+ * support for custom icons, and integration with `remix-hook-form`.
+ */
 export function AutoComplete<T extends string>({
     selectedValue,
     onSelectedValueChange,
     lookupUrl,
-    searchParamName = "identifier", // Default search param name
+    searchParamName = "identifier",
     excludeValues = [],
-    iconMap = { user: User, organization: Users }, // Default icon map
+    iconMap = { user: User, organization: Users },
     emptyMessage = "No items.",
     placeholder = "Search...",
     form,
@@ -53,37 +89,33 @@ export function AutoComplete<T extends string>({
 }: Props<T>) {
     const fetcher = useFetcher<LookupItem<T>[]>()
     const [open, setOpen] = useState(false)
-    const [inputValue, setInputValue] = useState("") // Internal input state
+    const [inputValue, setInputValue] = useState("")
     const [items, setItems] = useState<LookupItem<T>[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
     const prevInputValue = useRef<string | null>(null)
-    const inputRef = useRef<HTMLInputElement>(null) // Ref for the input element
+    const inputRef = useRef<HTMLInputElement>(null)
 
-    // Derive display label for the currently selected value
     const selectedLabel = useMemo(() => {
-        // Find the label from fetched items or potentially passed initial state if needed
-        // For now, assume we fetch it or it's cleared if not found
         const selectedItem = items.find((item) => item.value === selectedValue)
         return selectedItem?.label ?? ""
     }, [selectedValue, items])
 
-    // Effect to fetch data when input value changes (debounced)
+    // Debounced effect to fetch data as the user types.
     useEffect(() => {
         if (debounceTimeout.current) {
             clearTimeout(debounceTimeout.current)
         }
 
-        // Only fetch if input has changed and is not empty
         if (inputValue.length >= 1 && prevInputValue.current !== inputValue) {
             debounceTimeout.current = setTimeout(() => {
                 prevInputValue.current = inputValue
                 setIsLoading(true)
                 const url = `${lookupUrl}?${searchParamName}=${encodeURIComponent(inputValue)}`
-                fetcher.load(url) // Use GET request via fetcher.load
+                fetcher.load(url)
             }, 300)
         } else if (inputValue.length < 1) {
-            setItems([]) // Clear items if input is empty
+            setItems([])
             setIsLoading(false)
         }
 
@@ -94,7 +126,7 @@ export function AutoComplete<T extends string>({
         }
     }, [inputValue, lookupUrl, searchParamName, fetcher])
 
-    // Effect to process fetched data
+    // Process fetched data from the API.
     useEffect(() => {
         if (fetcher.data) {
             const filteredItems = fetcher.data.filter(
@@ -102,11 +134,8 @@ export function AutoComplete<T extends string>({
             )
             setItems(filteredItems)
         }
-        // Stop loading regardless of data presence, but only if fetcher is idle
         if (fetcher.state === "idle") {
             setIsLoading(false)
-            // Refocus the input if it's still open after loading suggestions
-            // Use setTimeout to ensure focus happens after potential DOM updates
             if (open && inputRef.current) {
                 setTimeout(() => {
                     inputRef.current?.focus()
@@ -115,27 +144,21 @@ export function AutoComplete<T extends string>({
         }
     }, [fetcher.data, fetcher.state, excludeValues, open])
 
-    // Effect to sync input field when selectedValue changes externally
+    // Sync input field when selectedValue is changed externally (e.g., form reset).
     useEffect(() => {
-        // If a value is selected externally, update the input field to its label
-        // This handles cases where the form is reset or pre-populated
         if (selectedValue && selectedLabel) {
             setInputValue(selectedLabel)
         } else if (!selectedValue) {
-            // If selectedValue is cleared externally, clear the input
             setInputValue("")
         }
-        // We only want this effect to run when selectedValue changes externally,
-        // not when selectedLabel changes due to items loading.
     }, [selectedValue, selectedLabel])
 
     const handleInputChange = (value: string) => {
         setInputValue(value)
-        // If user types something different than the selected label, clear the selection
         if (selectedValue && value !== selectedLabel) {
-            onSelectedValueChange("" as T) // Clear parent state
+            onSelectedValueChange("" as T)
             if (form && name) {
-                form.setValue(name, "") // Clear form state if applicable
+                form.setValue(name, "")
             }
         }
     }
@@ -144,30 +167,24 @@ export function AutoComplete<T extends string>({
         const selectedItem = items.find((item) => item.value === itemValue)
         if (selectedItem) {
             onSelectedValueChange(selectedItem.value as T)
-            setInputValue(selectedItem.label) // Update input to reflect selection
+            setInputValue(selectedItem.label)
             if (form && name) {
-                form.setValue(name, selectedItem.value) // Update form state
+                form.setValue(name, selectedItem.value)
             }
         }
         setOpen(false)
     }
 
-    // Keep input if it matches a valid item, otherwise clear if no selection
     const handleInputBlur = () => {
-        // Timeout to allow click selection to register first
         setTimeout(() => {
             if (!open) {
-                // If input doesn't match the selected label, and no value is selected, clear input
                 if (inputValue !== selectedLabel && !selectedValue) {
                     setInputValue("")
-                }
-                // If input matches selected label, keep it.
-                // If input doesn't match, but a value IS selected, revert input to selected label
-                else if (inputValue !== selectedLabel && selectedValue) {
+                } else if (inputValue !== selectedLabel && selectedValue) {
                     setInputValue(selectedLabel)
                 }
             }
-        }, 100) // Small delay
+        }, 100)
     }
 
     return (
@@ -187,10 +204,10 @@ export function AutoComplete<T extends string>({
                             onBlur={handleInputBlur}
                         >
                             <Input
-                                ref={inputRef} // Assign ref to the input
+                                ref={inputRef}
                                 placeholder={placeholder}
                                 className="w-full"
-                                autoComplete="off" // Prevent browser autocomplete
+                                autoComplete="off"
                             />
                         </CommandPrimitive.Input>
                     </PopoverAnchor>
@@ -221,17 +238,16 @@ export function AutoComplete<T extends string>({
                             {items.length > 0 && !isLoading ? (
                                 <CommandGroup>
                                     {items.map((option) => {
-                                        // Use iconMap to get the component, default to Check
                                         const IconComponent = option.icon
-                                            ? (iconMap[option.icon] ?? Check)
+                                            ? iconMap[option.icon] ?? Check
                                             : Check
                                         return (
                                             <CommandItem
                                                 key={option.value}
-                                                value={option.value} // Use value for selection logic
+                                                value={option.value}
                                                 onMouseDown={(e) =>
                                                     e.preventDefault()
-                                                } // Prevent blur on click
+                                                }
                                                 onSelect={() =>
                                                     handleSelectItem(
                                                         option.value,
@@ -247,7 +263,7 @@ export function AutoComplete<T extends string>({
                                     })}
                                 </CommandGroup>
                             ) : null}
-                            {!isLoading && !items.length && inputValue ? ( // Show empty only if not loading and user typed something
+                            {!isLoading && !items.length && inputValue ? (
                                 <CommandEmpty>
                                     {emptyMessage ?? "No items."}
                                 </CommandEmpty>
@@ -256,7 +272,6 @@ export function AutoComplete<T extends string>({
                     </PopoverContent>
                 </Command>
             </Popover>
-            {/* Hidden input for react-hook-form integration */}
             {form && name && (
                 <input
                     type="hidden"

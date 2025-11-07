@@ -1,3 +1,12 @@
+/**
+ * @file This file defines the layout and data loading for the `/about` section of the application.
+ *
+ * It establishes a common layout that includes a sidebar for navigation within the "about"
+ * pages (like "What's New"). The loader ensures that only authenticated users can access
+ * this section and provides the necessary user data to the components.
+ *
+ * @packageDocumentation
+ */
 import posthog from "posthog-js"
 import { useEffect } from "react"
 import type { LoaderFunctionArgs } from "react-router"
@@ -18,54 +27,51 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 
 /**
- * Retrieves the session from the HTTP request and returns user information if available.
+ * The loader for the `/about` routes.
  *
- * If the session does not contain a user, the function redirects to the "/signin" route.
- * Any errors encountered during session retrieval are processed by the designated error handler.
+ * This function protects the route by ensuring a valid user session exists. It fetches
+ * the session data and performs a `checkSession` to handle unauthenticated users or
+ * users with incomplete profiles, redirecting them if necessary.
  *
- * @param request - The HTTP request used for obtaining session data.
- * @returns An object with a "user" property when a valid session is found.
- *
- * @throws {Error} If an error occurs during session retrieval, processed by handleLoaderError.
+ * @param request - The incoming `Request` object.
+ * @returns An object containing the user's data (`user`, `userName`, `initials`).
+ * @throws {Response} A redirect response if the user is not authenticated or if their
+ *   profile is incomplete. Throws other errors to be handled by the error boundary.
  */
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
-        // Get the session
         const session = await getSession(request)
         const sessionCheckResponse = await checkSession(session, request)
-        // If checkSession returns a Response, it means a redirect is needed
         if (sessionCheckResponse instanceof Response) {
             return sessionCheckResponse
         }
 
-        // Return user information from loader
         return {
             user: session.user,
             userName: session.userName,
             initials: session.initials,
         }
     } catch (error) {
-        // If getSession throws (e.g., invalid token), it might result in a 401
-        // We need to handle that case here as well, similar to the ErrorBoundary
         if (error instanceof Response && error.status === 401) {
             const currentPath = new URL(request.url).pathname
             const signInUrl = `/signin?redirectTo=${encodeURIComponent(currentPath)}`
             return redirect(signInUrl)
         }
-        // Re-throw other errors to be handled by the ErrorBoundary or default handling
         throw handleLoaderError(error)
     }
 }
 
 /**
- * Renders the main application layout.
+ * The layout component for the `/about` section.
  *
- * This component retrieves user data from the loader using React Router's useLoaderData hook and passes it to the SidebarApp component within a SidebarProvider context. It also renders an Outlet to display nested routes.
+ * It renders a consistent sidebar navigation and a main content area where
+ * nested routes are displayed via the `Outlet` component. It also handles
+ * identifying the user for PostHog analytics on the client-side.
  */
-export default function App() {
+export default function AboutLayout() {
     const loaderData = useLoaderData<typeof loader>()
 
-    // Identify user if PostHog is configured
+    // Identify the user in PostHog once the user data is available.
     useEffect(() => {
         if (clientConfig.analytics.posthog && loaderData.user) {
             posthog.identify(loaderData.user.id, {

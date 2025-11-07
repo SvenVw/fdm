@@ -1,22 +1,37 @@
+/**
+ * @file This module provides shared utility functions for fetching and processing GeoTIFF data.
+ * It includes an efficient caching mechanism to minimize redundant downloads and parsing
+ * of large GeoTIFF files.
+ *
+ * The primary functions are `getTiff` for retrieving a GeoTIFF object and `getGeoTiffValue`
+ * for extracting a specific value from it based on geographic coordinates.
+ *
+ * @packageDocumentation
+ */
 import { fromUrl, type GeoTIFF } from "geotiff"
 
 /**
- * In-memory cache for the GeoTIFF object.
- * This is a simple singleton pattern to ensure that for a given server instance,
- * the potentially large TIFF file is only downloaded and parsed once.
- * Subsequent calls will reuse the cached object, saving network and CPU resources.
+ * An in-memory cache for GeoTIFF objects to avoid re-fetching large files.
+ * @internal
  */
 const tiffCache = new Map<string, GeoTIFF>()
+
+/**
+ * An in-memory cache for promises of in-flight GeoTIFF fetches to prevent duplicate requests.
+ * @internal
+ */
 const tiffPromiseCache = new Map<string, Promise<GeoTIFF>>()
 
 /**
- * Fetches and caches the GeoTIFF object from a given URL.
- * It checks if the TIFF object is already in the cache. If not, it fetches it
- * from the provided URL and stores it in the cache for future use.
+ * Fetches a GeoTIFF object from a URL with in-memory caching.
+ *
+ * This function handles the retrieval and parsing of a GeoTIFF file. It implements a cache
+ * to store the parsed GeoTIFF object, preventing repeated downloads for the same URL. It also
+ * de-duplicates concurrent requests for the same URL, ensuring the file is fetched only once.
  *
  * @param url - The URL of the GeoTIFF file.
- * @returns A promise that resolves with the GeoTIFF object.
- * @throws Throws an error if the GeoTIFF file cannot be fetched or parsed.
+ * @returns A promise that resolves to the parsed `GeoTIFF` object.
+ * @throws {Error} If the GeoTIFF file cannot be fetched or parsed.
  */
 export async function getTiff(url: string): Promise<GeoTIFF> {
     // Return cached object if it exists
@@ -46,12 +61,21 @@ export async function getTiff(url: string): Promise<GeoTIFF> {
 }
 
 /**
- * Fetches a GeoTIFF value at a specific geographic coordinate.
+ * Extracts a pixel value from a GeoTIFF file at a specific geographic coordinate.
+ *
+ * This function performs the following steps:
+ * 1.  Retrieves the cached or newly fetched GeoTIFF object.
+ * 2.  Gets the image and its bounding box metadata.
+ * 3.  Converts the input longitude and latitude into pixel coordinates (x, y).
+ * 4.  Checks if the coordinates are within the image bounds.
+ * 5.  Reads the raster data for the single pixel at that location.
+ * 6.  Returns the value, ensuring it is not a "NoData" value.
  *
  * @param url - The URL of the GeoTIFF file.
- * @param longitude - The longitude of the location.
- * @param latitude - The latitude of the location.
- * @returns A promise that resolves with the GeoTIFF value at the specified location, or null if outside the TIFF bounds or no data.
+ * @param longitude - The longitude for the point of interest.
+ * @param latitude - The latitude for the point of interest.
+ * @returns A promise that resolves to the numeric value at the specified coordinate,
+ *   or `null` if the coordinate is out of bounds or corresponds to a "NoData" pixel.
  */
 export async function getGeoTiffValue(
     url: string,

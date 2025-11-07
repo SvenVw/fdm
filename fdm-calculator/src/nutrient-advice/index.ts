@@ -1,3 +1,12 @@
+/**
+ * @file This module provides functionality to request nutrient advice from the external
+ * NMI (Nutriënten Management Instituut) API. It formats the required input data and
+ * handles the API communication.
+ *
+ * A cached version of the main request function is also provided for performance optimization.
+ *
+ * @packageDocumentation
+ */
 import { withCalculationCache } from "@svenvw/fdm-core"
 import pkg from "../package"
 import type {
@@ -7,15 +16,19 @@ import type {
 } from "./types"
 
 /**
- * Requests nutrient advice from the NMI API based on provided field and soil data.
+ * Fetches a nutrient application recommendation from the NMI API.
  *
- * @param {NutrientAdviceInputs} inputs - An object containing all necessary inputs for the nutrient advice calculation.
- * @param {string} inputs.b_lu_catalogue - The BRP cultivation catalogue identifier (e.g., "nl_2014").
- * @param {[number, number]} inputs.b_centroid - The centroid coordinates of the field [longitude, latitude].
- * @param {CurrentSoilData} inputs.currentSoilData - Current soil data for the field, used to extract Nmin values and other soil parameters.
- * @param {string | undefined} inputs.nmiApiKey - The NMI API key for authentication.
- * @returns {Promise<NutrientAdvice>} A promise that resolves to an object containing the nutrient advice for the year.
- * @throws {Error} If the NMI API key is not provided or if the request to the NMI API fails.
+ * This function constructs a request body with cultivation, location, and detailed soil data,
+ * then sends it to the NMI's nutrient advice endpoint. It processes the response to extract
+ * the relevant yearly advice data.
+ *
+ * @param params - The input object for the nutrient advice request.
+ * @param params.b_lu_catalogue - The BRP code for the cultivation.
+ * @param params.b_centroid - The geographical coordinates of the field.
+ * @param params.currentSoilData - An array of the most recent soil analysis results.
+ * @param params.nmiApiKey - The API key required for authenticating with the NMI service.
+ * @returns A promise that resolves to the `NutrientAdvice` object returned by the API.
+ * @throws {Error} If the NMI API key is missing, if the `b_lu_catalogue` is invalid, or if the API request fails.
  */
 export async function requestNutrientAdvice({
     b_lu_catalogue,
@@ -90,10 +103,14 @@ export async function requestNutrientAdvice({
 }
 
 /**
- * Cached version of `requestNutrientAdvice`.
- * This function uses `withCalculationCache` to store and retrieve results,
- * improving performance for repeated calls with the same inputs.
- * The cache key is based on the inputs and the calculator version.
+ * A cached version of the `requestNutrientAdvice` function.
+ *
+ * This function enhances performance by caching the results of the API call. The cache
+ * key is generated based on the function's input and the calculator's version, ensuring
+ * that the cache is invalidated when the underlying logic or data changes.
+ *
+ * @param params - The input object for the nutrient advice request.
+ * @returns A promise that resolves to the `NutrientAdvice` object returned by the API.
  */
 export const getNutrientAdvice = withCalculationCache(
     requestNutrientAdvice,

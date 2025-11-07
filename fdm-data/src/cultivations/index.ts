@@ -1,25 +1,17 @@
+/**
+ * @file This file provides an entry point for accessing cultivation catalogues.
+ *
+ * It exports a `getCultivationCatalogue` function that retrieves a cultivation catalogue by name.
+ */
 import { getCatalogueBrp } from "./catalogues/brp"
 import type { CatalogueCultivation, CatalogueCultivationName } from "./d"
 
 /**
- * Retrieves a cultivation catalogue based on the specified name.
+ * Retrieves a cultivation catalogue by name.
  *
- * This function acts as a dispatcher, selecting and returning the appropriate
- * cultivation catalogue based on the provided `catalogueName`.
- *
- * @param catalogueName - The name of the desired cultivation catalogue.
- *                        Currently supported names are: "brp".
- * @returns An array of `CatalogueCultivationItem` objects representing the
- *          requested cultivation catalogue.
- * @returns A Promise that resolves to an array of `CatalogueCultivationItem` objects.
- * @throws {Error} Throws an error if the provided `catalogueName` is not
- *                 recognized or supported.
- *
- * @example
- * ```typescript
- * const brpCatalogue = await getCultivationCatalogue("brp");
- * console.log(brpCatalogue);
- * ```
+ * @param catalogueName The name of the catalogue to retrieve.
+ * @returns A promise that resolves to the cultivation catalogue.
+ * @throws An error if the catalogue name is not recognized.
  */
 export async function getCultivationCatalogue(
     catalogueName: CatalogueCultivationName,

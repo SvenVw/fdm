@@ -1,8 +1,21 @@
+/**
+ * @file This file implements a custom toast notification system, inspired by `react-hot-toast`.
+ *
+ * It provides a `useToast` hook and a `toast` function to create and manage toast notifications
+ * programmatically. The system is built using a React reducer and a global state listener pattern,
+ * allowing any component to display toasts without complex prop drilling.
+ *
+ * Key features include:
+ * - A central state management system for all toasts.
+ * - Functions to add, update, dismiss, and remove toasts.
+ * - A limit on the number of visible toasts.
+ * - A delayed removal queue to allow for exit animations.
+ *
+ * @packageDocumentation
+ */
 "use client"
 
-// Inspired by react-hot-toast library
 import * as React from "react"
-
 import type { ToastActionElement, ToastProps } from "~/components/ui/toast"
 
 const TOAST_LIMIT = 1
@@ -55,6 +68,10 @@ interface State {
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
+/**
+ * Adds a toast to a removal queue. After a delay, a "REMOVE_TOAST" action is dispatched.
+ * @internal
+ */
 const addToRemoveQueue = (toastId: string) => {
     if (toastTimeouts.has(toastId)) {
         clearTimeout(toastTimeouts.get(toastId))
@@ -73,6 +90,10 @@ const addToRemoveQueue = (toastId: string) => {
     toastTimeouts.set(toastId, timeout)
 }
 
+/**
+ * The reducer function for managing toast state.
+ * @internal
+ */
 export const reducer = (state: State, action: Action): State => {
     switch (action.type) {
         case "ADD_TOAST":
@@ -91,9 +112,6 @@ export const reducer = (state: State, action: Action): State => {
 
         case "DISMISS_TOAST": {
             const { toastId } = action
-
-            // ! Side effects ! - This could be extracted into a dismissToast() action,
-            // but I'll keep it here for simplicity
             if (toastId) {
                 addToRemoveQueue(toastId)
             } else {
@@ -106,10 +124,7 @@ export const reducer = (state: State, action: Action): State => {
                 ...state,
                 toasts: state.toasts.map((t) =>
                     t.id === toastId || toastId === undefined
-                        ? {
-                              ...t,
-                              open: false,
-                          }
+                        ? { ...t, open: false }
                         : t,
                 ),
             }
@@ -129,9 +144,12 @@ export const reducer = (state: State, action: Action): State => {
 }
 
 const listeners: Array<(state: State) => void> = []
-
 let memoryState: State = { toasts: [] }
 
+/**
+ * Dispatches an action to the reducer and notifies all subscribed listeners.
+ * @internal
+ */
 function dispatch(action: Action) {
     memoryState = reducer(memoryState, action)
     listeners.forEach((listener) => {
@@ -141,6 +159,11 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">
 
+/**
+ * Creates and displays a new toast notification.
+ * @param props - The properties of the toast to display.
+ * @returns An object with methods to `update` or `dismiss` the toast.
+ */
 function toast({ ...props }: Toast) {
     const id = genId()
 
@@ -170,6 +193,15 @@ function toast({ ...props }: Toast) {
     }
 }
 
+/**
+ * A custom hook for accessing the toast state and dispatcher functions.
+ *
+ * This hook subscribes a component to the global toast state. It returns the current
+ * list of toasts, along with the `toast` function to create new toasts and the
+ * `dismiss` function to remove them.
+ *
+ * @returns An object containing the current `toasts` array and the `toast` and `dismiss` functions.
+ */
 function useToast() {
     const [state, setState] = React.useState<State>(memoryState)
 

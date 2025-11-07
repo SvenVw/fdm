@@ -1,3 +1,9 @@
+/**
+ * @file This file contains functions for managing principals in the FDM.
+ *
+ * A principal can be either a user or an organization. This module provides functions for
+ * retrieving, identifying, and searching for principals.
+ */
 import { eq, ilike, or } from "drizzle-orm"
 import * as authNSchema from "./db/schema-authn"
 import { handleError } from "./error"
@@ -5,30 +11,11 @@ import type { FdmType } from "./fdm"
 import type { Principal } from "./principal.d"
 
 /**
- * Retrieves details of a principal (either a user or an organization) by ID.
+ * Retrieves the details of a principal (user or organization) by their ID.
  *
- * This function attempts to retrieve details first from the user table, and if not found,
- * then from the organization table.
- *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param principal_id - The unique identifier of the principal.
- * @returns A promise that resolves to an object containing the principal's details,
- *   or undefined if the principal is not found. The resolved object includes the name, image, type,
- *   and verification status of the principal.
- *
- * @throws {Error} - Throws an error if any database operation fails.
- *   The error includes a message and context information about the failed operation.
- *
- * @example
- * ```typescript
- * // Example usage:
- * const principalDetails = await getPrincipal(fdm, "user123");
- * if (principalDetails) {
- *   console.log("Principal Details:", principalDetails);
- * } else {
- *   console.log("Principal not found.");
- * }
- * ```
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The unique identifier of the principal.
+ * @returns A promise that resolves to a `Principal` object, or `undefined` if not found.
  */
 export async function getPrincipal(
     fdm: FdmType,
@@ -128,29 +115,11 @@ export async function getPrincipal(
 }
 
 /**
- * Identifies a principal (either a user or an organization) based on a username or email.
+ * Identifies a principal by a username, email, or organization slug.
  *
- * This function searches for a principal, first by checking the user table for a matching username or email,
- * and then, if not found, by checking the organization table for a matching slug. If a principal is found,
- * its details are retrieved and returned.
- *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param identifier - The username, email, or organization slug to search for.
- * @returns A promise that resolves to an array of LookupPrincipal objects. If a principal is found, the array contains a single object with the principal's details. If no principal is found, the array is empty.
- *
- * @throws {Error} - Throws an error if any database operation fails.
- *   The error includes a message and context information about the failed operation.
- *
- * @example
- * ```typescript
- * // Example usage:
- * const principalDetails = await identifyPrincipal(fdm, "john.doe@example.com");
- * if (principalDetails.length > 0) {
- *   console.log("Principal Details:", principalDetails[0]);
- * } else {
- *   console.log("Principal not found.");
- * }
- * ```
+ * @param fdm The FDM instance for database access.
+ * @param identifier The identifier to search for.
+ * @returns A promise that resolves to a `Principal` object with an added `id` property, or `undefined` if not found.
  */
 export async function identifyPrincipal(
     fdm: FdmType,
@@ -205,29 +174,13 @@ export async function identifyPrincipal(
 }
 
 /**
- * Looks up principals (users or organizations) based on a partial or complete identifier.
+ * Searches for principals (users or organizations) by a given identifier.
  *
- * This function searches for principals by matching the provided identifier against user emails,
- * and also performs a fuzzy search against organization names and slugs, as well as user usernames,
- * firstnames, surnames and names. It then returns a list of Principal objects representing the matching entities.
+ * This function performs a fuzzy search for principals.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param identifier - The string to search for within principal identifiers (email, username, name or slug). Should have at least 1 character
- * @returns A promise that resolves to an array of Principal objects that match the identifier.
- *
- * @throws {Error} - Throws an error if any database operation fails.
- *   The error includes a message and context information about the failed operation.
- *
- * @example
- * ```typescript
- * // Example usage:
- * const searchResults = await lookupPrincipal(fdm, "john");
- * if (searchResults.length > 0) {
- *   console.log("Found Principals:", searchResults);
- * } else {
- *   console.log("No principals found matching the identifier.");
- * }
- * ```
+ * @param fdm The FDM instance for database access.
+ * @param identifier The identifier to search for (must be at least 2 characters long).
+ * @returns A promise that resolves to an array of `Principal` objects.
  */
 export async function lookupPrincipal(
     fdm: FdmType,

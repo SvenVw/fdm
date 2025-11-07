@@ -1,16 +1,35 @@
-// Imported from https://www.shadcnblocks.com/block/changelog1
+/**
+ * @file This file defines a `Changelog1` component, which is a UI block for
+ * displaying a chronological list of updates or changes.
+ *
+ * This component is designed to render a series of changelog entries in a visually
+ * appealing timeline format. It was imported from `shadcnblocks`.
+ *
+ * @see https://www.shadcnblocks.com/block/changelog1
+ * @packageDocumentation
+ */
 import { ArrowUpRight } from "lucide-react"
 import { NavLink } from "react-router"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 
+/**
+ * Represents a single entry in the changelog.
+ */
 export type ChangelogEntry = {
+    /** The version number for the update (e.g., "v1.2.0"). */
     version: string
+    /** The date of the update (e.g., "March 2024"). */
     date: string
+    /** The main title of the changelog entry. */
     title: string
+    /** A detailed description of the changes. */
     description: string
+    /** An optional list of specific changes or bullet points. */
     items?: string[]
+    /** An optional URL to an image showcasing the update. */
     image?: string
+    /** An optional call-to-action button. */
     button?: {
         url: string
         text: string
@@ -18,14 +37,26 @@ export type ChangelogEntry = {
 }
 
 export interface Changelog1Props {
+    /** The main title of the changelog page. */
     title?: string
+    /** A subtitle or brief description for the changelog page. */
     description?: string
+    /** An array of changelog entries to display. */
     entries?: ChangelogEntry[]
+    /** Additional CSS classes for custom styling. */
     className?: string
 }
 
+/** An empty array to be used as a default for the `entries` prop. */
 export const defaultEntries: ChangelogEntry[] = []
 
+/**
+ * A component for displaying a changelog or a list of updates in a timeline format.
+ *
+ * It iterates over a list of `ChangelogEntry` objects and renders each one with its
+ * version, date, title, description, and optional details like a feature list,
+ * image, and a link button.
+ */
 const Changelog1 = ({
     title = "Changelog",
     description = "Get the latest updates and improvements to our platform.",

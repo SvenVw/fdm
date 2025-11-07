@@ -1,3 +1,13 @@
+/**
+ * @file This module calculates the usage norm for nitrogen from animal manure (`dierlijke mest gebruiksnorm`)
+ * for the Dutch regulations of 2025. It includes functions to determine if a field lies within
+ * specific geographically designated areas, which is a key factor in the norm calculation.
+ *
+ * The main function, `calculateNL2025DierlijkeMestGebruiksNorm`, integrates these geographical
+ * checks with the farm's derogation status to determine the final norm value.
+ *
+ * @packageDocumentation
+ */
 import { type Field, withCalculationCache } from "@svenvw/fdm-core"
 import pkg from "../../../../package"
 import { getGeoTiffValue } from "../../../../shared/geotiff"
@@ -9,15 +19,15 @@ import type {
 } from "./types.d"
 
 /**
- * Determines if a field is located within a grondwaterbeschermingsgebied (GWBG) in the Netherlands.
- * This is achieved by querying a GeoTIFF file that delineates GWBG areas.
- * The function checks the value at the field's centroid coordinates.
+ * Determines if a field is located within a groundwater protection area (`Grondwaterbeschermingsgebied`).
  *
- * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
- *   This point is used to query the GeoTIFF data.
- * @returns A promise that resolves to `true` if the GeoTIFF value at the centroid is 1 (indicating it is within a GWBG area),
- *   and `false` if the value is 0.
- * @throws {Error} If the GeoTIFF returns an unexpected value, or if there are issues fetching or processing the file.
+ * This function queries a specific GeoTIFF file using the field's centroid coordinates. A return
+ * value of `1` from the GeoTIFF indicates the field is within a protection area.
+ *
+ * @param b_centroid - The longitude and latitude of the field's centroid.
+ * @returns A promise that resolves to `true` if the field is in a groundwater protection area,
+ *   otherwise `false`.
+ * @throws {Error} If the GeoTIFF data returns an unexpected value.
  */
 export async function isFieldInGWGBGebied(
     b_centroid: Field["b_centroid"],
@@ -44,15 +54,14 @@ export async function isFieldInGWGBGebied(
 }
 
 /**
- * Determines if a field is located within a Natura 2000 area in the Netherlands.
- * This is achieved by querying a GeoTIFF file that delineates Natura 2000 areas.
- * The function checks the value at the field's centroid coordinates.
+ * Determines if a field is located within a Natura 2000 area.
  *
- * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
- *   This point is used to query the GeoTIFF data.
- * @returns A promise that resolves to `true` if the GeoTIFF value at the centroid is 1 (indicating it is within a Natura 2000 area),
- *   and `false` if the value is 0.
- * @throws {Error} If the GeoTIFF returns an unexpected value, or if there are issues fetching or processing the file.
+ * This function queries a specific GeoTIFF file using the field's centroid coordinates. A return
+ * value of `1` from the GeoTIFF indicates the field is within a Natura 2000 area.
+ *
+ * @param b_centroid - The longitude and latitude of the field's centroid.
+ * @returns A promise that resolves to `true` if the field is in a Natura 2000 area, otherwise `false`.
+ * @throws {Error} If the GeoTIFF data returns an unexpected value.
  */
 export async function isFieldInNatura2000Gebied(
     b_centroid: Field["b_centroid"],
@@ -79,15 +88,14 @@ export async function isFieldInNatura2000Gebied(
 }
 
 /**
- * Determines if a field is located within a "derogatie-vrije zone" (derogation-free zone) in the Netherlands.
- * This is achieved by querying a GeoTIFF file that delineates these zones.
- * The function checks the value at the field's centroid coordinates.
+ * Determines if a field is located within a derogation-free zone (`derogatie-vrije zone`).
  *
- * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
- *   This point is used to query the GeoTIFF data.
- * @returns A promise that resolves to `true` if the GeoTIFF value at the centroid is 1 (indicating it is within a derogatie-vrije zone),
- *   and `false` if the value is 0.
- * @throws {Error} If the GeoTIFF returns an unexpected value, or if there are issues fetching or processing the file.
+ * This function queries a specific GeoTIFF file using the field's centroid coordinates. A return
+ * value of `1` from the GeoTIFF indicates the field is within a derogation-free zone.
+ *
+ * @param b_centroid - The longitude and latitude of the field's centroid.
+ * @returns A promise that resolves to `true` if the field is in a derogation-free zone, otherwise `false`.
+ * @throws {Error} If the GeoTIFF data returns an unexpected value.
  */
 export async function isFieldInDerogatieVrijeZone(
     b_centroid: Field["b_centroid"],
@@ -118,34 +126,15 @@ export async function isFieldInDerogatieVrijeZone(
 }
 
 /**
- * Determines the 'gebruiksnorm' (usage standard) for nitrogen from animal manure
- * for a given farm and parcel in the Netherlands for the year 2025.
+ * Calculates the animal manure usage norm for a specific field for the year 2025.
  *
- * This function implements the rules and norms specified by the RVO for 2025,
- * taking into account derogation status and location within NV-gebieden.
+ * This function determines the maximum permissible amount of nitrogen from animal manure
+ * that can be applied to a field. The calculation follows a decision tree based on the
+ * farm's derogation status and the field's location relative to various protected zones.
  *
- * @param input - An object containing all necessary parameters for the calculation.
- *   See {@link DierlijkeMestGebruiksnormInput} for details.
- * @returns An object of type `DierlijkeMestGebruiksnormResult` containing the determined
- *   nitrogen usage standard (`normValue`) and a `normSource` string explaining the rule applied.
- *
- * @remarks
- * The rules for 2025 are as follows:
- * - **Standard Norm (No Derogation)**: If the farm does NOT have a derogation permit,
- *   the norm is 170 kg N/ha from animal manure.
- * - **Derogation Norm (With Derogation)**: If the farm HAS a derogation permit:
- *   - **Inside Natura2000-Gebied**: If the parcel is located in a Natura200-Gebied or within 100m of it,
- *     the norm is 170 kg N/ha from animal manure.
- *   - **Inside GWBG-Gebied**: If the parcel is located in a GWBG Gebied or within 100m of it,
- *     the norm is 170 kg N/ha from animal manure.
- *   - **Inside NV-Gebied**: If the parcel is located in a Nutriënt-Verontreinigd Gebied,
- *     the norm is 190 kg N/ha from animal manure.
- *   - **Outside NV-Gebied**: If the parcel is NOT located in a Nutriënt-Verontreinigd Gebied,
- *     the norm is 200 kg N/ha from animal manure.
- *
- * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/dierlijke-mest-landbouwgrond | RVO Hoeveel dierlijke mest landbouwgrond (official page)}
- * @see {@link https://www.rvo.nl/onderwerpen/mest/derogatie | RVO Derogatie (official page)}
- * @see {@link https://www.rvo.nl/onderwerpen/mest/met-nutrienten-verontreinigde-gebieden-nv-gebieden | RVO Met nutriënten verontreinigde gebieden (NV-gebieden) (official page)}
+ * @param input - A standardized object containing the farm and field data.
+ * @returns A promise that resolves to an object containing the calculated `normValue` (in kg N/ha)
+ *   and a `normSource` string explaining the basis for the norm.
  */
 export async function calculateNL2025DierlijkeMestGebruiksNorm(
     input: NL2025NormsInput,
@@ -194,14 +183,15 @@ export async function calculateNL2025DierlijkeMestGebruiksNorm(
 }
 
 /**
- * Memoized version of {@link calculateNL2025DierlijkeMestGebruiksNorm}.
+ * A cached version of the `calculateNL2025DierlijkeMestGebruiksNorm` function.
  *
- * This function is wrapped with `withCalculationCache` to optimize performance by caching
- * results based on the input and the current calculator version.
+ * This function enhances performance by caching the results of the norm calculation.
+ * The cache key is generated based on the function's input and the calculator's version,
+ * ensuring that the cache is invalidated when the underlying logic or data changes.
  *
- * @param {NL2025NormsInput} input - An object containing all necessary parameters for the calculation.
- * @returns {Promise<DierlijkeMestGebruiksnormResult>} An object of type `DierlijkeMestGebruiksnormResult` containing the determined
- *   nitrogen usage standard (`normValue`) and a `normSource` string explaining the rule applied.
+ * @param input - A standardized object containing the farm and field data.
+ * @returns A promise that resolves to an object containing the calculated `normValue` (in kg N/ha)
+ *   and a `normSource` string explaining the basis for the norm.
  */
 export const getNL2025DierlijkeMestGebruiksNorm = withCalculationCache(
     calculateNL2025DierlijkeMestGebruiksNorm,

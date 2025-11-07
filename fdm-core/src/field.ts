@@ -1,3 +1,9 @@
+/**
+ * @file This file contains functions for managing fields in the FDM.
+ *
+ * It provides a comprehensive set of CRUD operations for fields, as well as functions
+ * for listing available acquiring methods and determining if a field is productive.
+ */
 import {
     and,
     desc,
@@ -23,25 +29,20 @@ import type { Timeframe } from "./timeframe"
 /**
  * Adds a new field to a farm.
  *
- * This function verifies that the principal has write permission for the specified farm,
- * generates a unique field ID, records the field details, and creates an association between
- * the field and the farm. If a discarding date is provided, the function ensures that the acquiring
- * date is earlier than the discarding date, throwing an error otherwise.
+ * This function creates a new field and associates it with a farm. It performs validation to ensure
+ * that the acquiring date is before the discarding date, if provided.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The unique identifier of the principal performing the operation.
- * @param b_id_farm - Identifier of the farm to which the field belongs.
- * @param b_name - Name of the field.
- * @param b_id_source - Identifier for the field in the source dataset.
- * @param b_geometry - GeoJSON representation of the field geometry.
- * @param b_start - The start date for managing the field.
- * @param b_acquiring_method - Method used for acquiring the field.
- * @param b_end - (Optional) The end date for managing the field.
- * @returns A promise that resolves to the newly generated field ID.
- *
- * @throws {Error} If the acquiring date is not earlier than the discarding date.
- *
- * @alpha
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param b_name The name of the new field.
+ * @param b_id_source An external identifier for the field.
+ * @param b_geometry The geometry of the field in GeoJSON format.
+ * @param b_start The date when the field was acquired.
+ * @param b_acquiring_method The method of acquisition.
+ * @param b_end The date when the field was discarded (optional).
+ * @returns A promise that resolves to the unique identifier of the newly created field.
+ * @throws An error if the principal does not have permission or if the provided dates are invalid.
  */
 export async function addField(
     fdm: FdmType,
@@ -127,18 +128,16 @@ export async function addField(
 }
 
 /**
- * Retrieves detailed information for a specific field.
+ * Retrieves a single field by its unique identifier.
  *
- * This function verifies that the principal identified by `principal_id` has permission to read the field,
- * then fetches and returns the field's properties including its geometry, area, acquisition, and related timestamps.
+ * This function fetches detailed information about a field, including its geometry, area, and
+ * whether it is considered productive.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal making the request.
- * @param b_id - The unique identifier of the field to retrieve.
- *
- * @returns A promise that resolves with the field details.
- *
- * @alpha
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id The unique identifier of the field.
+ * @returns A promise that resolves to a `Field` object.
+ * @throws An error if the principal does not have permission or if the field is not found.
  */
 export async function getField(
     fdm: FdmType,
@@ -200,19 +199,17 @@ export async function getField(
 }
 
 /**
- * Retrieves all fields associated with a specified farm.
+ * Retrieves all fields for a farm, optionally filtered by a timeframe.
  *
- * This function first verifies that the requesting principal has read access to the farm, then
- * returns an array of field detail objects. Each object includes the field's identifier, name,
- * source, geometry, area, acquiring and discarding dates, as well as the creation and update timestamps.
+ * This function lists all fields associated with a farm. The results can be filtered to a specific
+ * time range to only include fields that were active during that time.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The ID of the principal making the request.
- * @param b_id_farm - The unique identifier of the farm.
- * @param timeframe - Optional timeframe to filter fields by start and end dates.
- * @returns A Promise resolving to an array of field detail objects.
- *
- * @alpha
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param timeframe An optional timeframe to filter the fields.
+ * @returns A promise that resolves to an array of `Field` objects.
+ * @throws An error if the principal does not have permission.
  */
 export async function getFields(
     fdm: FdmType,
@@ -315,24 +312,22 @@ export async function getFields(
 }
 
 /**
- * Updates the details of an existing field.
+ * Updates the properties of an existing field.
  *
- * This function applies updates to the field's basic information and its associated acquiring and discarding records.
- * It performs a permission check to ensure the principal has write access and validates that the acquiring date is earlier than the discarding date, when applicable.
+ * This function allows for the modification of a field's details. It performs validation to ensure
+ * that the acquiring date is before the discarding date.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal performing the update.
- * @param b_id - The unique identifier of the field to update.
- * @param b_name - (Optional) New name for the field.
- * @param b_id_source - (Optional) New source identifier for the field.
- * @param b_geometry - (Optional) Updated field geometry in GeoJSON format.
- * @param b_start - (Optional) Updated start date for managing the field.
- * @param b_acquiring_method - (Optional) Updated method for field management.
- * @param b_end - (Optional) Updated end date for managing the field.
- * @returns A Promise that resolves to the updated field details.
- *
- * @throws {Error} If the acquiring date is not before the discarding date.
- * @alpha
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id The unique identifier of the field to update.
+ * @param b_name The new name for the field (optional).
+ * @param b_id_source The new external identifier for the field (optional).
+ * @param b_geometry The new geometry for the field (optional).
+ * @param b_start The new acquiring date for the field (optional).
+ * @param b_acquiring_method The new acquiring method for the field (optional).
+ * @param b_end The new discarding date for the field (optional).
+ * @returns A promise that resolves to the updated `Field` object.
+ * @throws An error if the principal does not have permission or if the provided dates are invalid.
  */
 export async function updateField(
     fdm: FdmType,
@@ -453,20 +448,16 @@ export async function updateField(
 }
 
 /**
- * Removes a field and all its associated data.
+ * Deletes a field and all its associated data.
  *
- * This function checks if the principal has permission to delete the field, then proceeds to delete
- * the field and all cascading data, including acquiring and discarding information, cultivations,
+ * This function performs a cascaded delete of a field, including all its cultivations,
  * fertilizer applications, soil analyses, and harvests.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The unique identifier of the principal performing the operation.
- * @param b_id - The unique identifier of the field to be removed.
- * @returns A promise that resolves when the field has been successfully removed.
- *
- * @throws {Error} If the principal does not have permission to delete the field.
- *
- * @alpha
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id The unique identifier of the field to delete.
+ * @returns A promise that resolves when the field has been successfully deleted.
+ * @throws An error if the principal does not have permission.
  */
 export async function removeField(
     fdm: FdmType,
@@ -634,6 +625,11 @@ export async function removeField(
     }
 }
 
+/**
+ * Lists all available methods for acquiring a field.
+ *
+ * @returns An array of objects, each with a `value` and `label` property.
+ */
 export function listAvailableAcquiringMethods(): {
     value: schema.fieldAcquiringTypeSelect["b_acquiring_method"]
     label: string
@@ -642,20 +638,16 @@ export function listAvailableAcquiringMethods(): {
 }
 
 /**
- * Determines if a field is considered productive based on its area, perimeter, and name.
+ * Determines if a field is likely to be a productive agricultural field.
  *
- * This function uses two heuristics to differentiate between productive fields and non-productive areas like buffer strips:
- * 1. Shape-based: A field is classified as non-productive if its area is less than 2.5 hectares and the ratio of its perimeter
- *    to the square root of its area (in square meters) is greater than or equal to a predefined constant (20).
- * 2. Name-based: A field is classified as non-productive if its name contains "buffer" (case-insensitive).
- *
- * A field is considered productive only if both checks pass.
+ * This function uses a heuristic based on the field's shape and name to guess whether it is a
+ * productive field or a non-productive area like a buffer strip.
  *
  * @param b_area The area of the field in hectares.
  * @param b_perimeter The perimeter of the field in meters.
  * @param b_name The name of the field.
- * @returns `true` if the field is determined to be productive, `false` otherwise.
- * @alpha
+ * @returns `true` if the field is likely productive, otherwise `false`.
+ * @internal
  */
 export function determineIfFieldIsProductive(
     b_area: number,

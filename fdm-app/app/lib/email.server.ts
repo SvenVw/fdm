@@ -1,3 +1,12 @@
+/**
+ * @file This module handles all server-side email sending functionalities.
+ *
+ * It uses `@react-email/components` to render HTML for different types of emails
+ * (e.g., Welcome, Magic Link, Invitation) and the `postmark` library to dispatch them.
+ * The configuration for the email provider is sourced from the server-side config.
+ *
+ * @packageDocumentation
+ */
 import { TZDate } from "@date-fns/tz"
 import { render } from "@react-email/components"
 import type { User } from "better-auth"
@@ -12,6 +21,7 @@ import type { ExtendedUser } from "~/types/extended-user"
 
 const client = new postmark.ServerClient(String(process.env.POSTMARK_API_KEY))
 
+/** Represents the structure of an email to be sent via Postmark. */
 interface Email {
     From: string
     To: string
@@ -20,6 +30,12 @@ interface Email {
     Tag: string
 }
 
+/**
+ * Renders the welcome email template.
+ *
+ * @param user - The user object for whom the email is being sent.
+ * @returns An `Email` object ready to be sent.
+ */
 export async function renderWelcomeEmail(user: User): Promise<Email> {
     const emailHtml = await render(
         WelcomeEmail({
@@ -30,17 +46,24 @@ export async function renderWelcomeEmail(user: User): Promise<Email> {
         }),
     )
 
-    const email = {
+    return {
         From: `"${serverConfig.mail?.postmark.sender_name}" <${serverConfig.mail?.postmark.sender_address}>`,
         To: user.email,
         Subject: `Welkom bij ${serverConfig.name}! Krijg inzicht in je bedrijfsdata.`,
         HtmlBody: emailHtml,
         Tag: "welcome",
     }
-
-    return email
 }
 
+/**
+ * Renders the organization invitation email template.
+ *
+ * @param inviteeEmail - The email address of the person being invited.
+ * @param inviter - The user who is sending the invitation.
+ * @param organizationName - The name of the organization to which the user is invited.
+ * @param invitationId - The unique ID of the invitation.
+ * @returns An `Email` object ready to be sent.
+ */
 export async function renderInvitationEmail(
     inviteeEmail: string,
     inviter: ExtendedUser,
@@ -59,24 +82,27 @@ export async function renderInvitationEmail(
         { pretty: true },
     )
 
-    const email: Email = {
+    return {
         From: `"${serverConfig.mail?.postmark.sender_name}" <${serverConfig.mail?.postmark.sender_address}>`,
         To: inviteeEmail,
         Subject: `${inviter.firstname} ${inviter.surname} heeft je uitgenodigd om lid te worden van ${organizationName}!`,
         HtmlBody: emailHtml,
         Tag: "invitation-organization",
     }
-
-    return email
 }
 
+/**
+ * Renders the magic link sign-in email template.
+ *
+ * @param emailAddress - The recipient's email address.
+ * @param magicLinkUrl - The unique magic link URL for signing in.
+ * @returns An `Email` object ready to be sent.
+ */
 export async function renderMagicLinkEmail(
     emailAddress: string,
     magicLinkUrl: string,
 ): Promise<Email> {
     const timeZone = getTimeZoneFromUrl(magicLinkUrl)
-
-    // Show the local time only if available, otherwise show server time
     const emailTimestamp: string = format(
         timeZone ? TZDate.tz(timeZone) : new Date(),
         "Pp",
@@ -94,33 +120,26 @@ export async function renderMagicLinkEmail(
         { pretty: true },
     )
 
-    const email: Email = {
+    return {
         From: `"${serverConfig.mail?.postmark.sender_name}" <${serverConfig.mail?.postmark.sender_address}>`,
         To: emailAddress,
         Subject: `Aanmeldlink voor ${serverConfig.name} | ${emailTimestamp}`,
         HtmlBody: emailHtml,
         Tag: "magic-link",
     }
-
-    return email
 }
 
 /**
- * Extracts and validates a timezone from a given URL's callbackURL parameter.
- * @param url The URL to parse.
- * @returns The validated timezone string or undefined if not found or invalid.
+ * Extracts and validates a timezone from a magic link's callback URL.
+ * @internal
  */
 function getTimeZoneFromUrl(url: string): string | undefined {
     try {
         const parsedMagicLinkUrl = new URL(url)
         const callbackUrlCandidate =
             parsedMagicLinkUrl.searchParams.get("callbackURL")
+        if (!callbackUrlCandidate) return undefined
 
-        if (!callbackUrlCandidate) {
-            return undefined
-        }
-
-        // Use a dummy base URL for parsing if callbackUrlCandidate is relative
         const parsedCallbackUrl = new URL(
             callbackUrlCandidate,
             callbackUrlCandidate.startsWith("http")
@@ -130,7 +149,6 @@ function getTimeZoneFromUrl(url: string): string | undefined {
         const timeZoneCandidate = parsedCallbackUrl.searchParams.get("timeZone")
 
         if (timeZoneCandidate) {
-            // Validate the timezone
             Intl.DateTimeFormat(undefined, { timeZone: timeZoneCandidate })
             return timeZoneCandidate
         }
@@ -140,11 +158,22 @@ function getTimeZoneFromUrl(url: string): string | undefined {
     return undefined
 }
 
+/**
+ * Sends a pre-rendered email using the Postmark client.
+ *
+ * @param email - The `Email` object to be sent.
+ */
 export async function sendEmail(email: Email): Promise<void> {
     await client.sendEmail(email)
 }
 
-// Helper function to send magic link emails, to be passed to fdm-core
+/**
+ * A helper function passed to `fdm-core`'s authentication module to handle the
+ * sending of magic link emails.
+ *
+ * @param emailAddress - The recipient's email address.
+ * @param magicLinkUrl - The unique magic link URL for signing in.
+ */
 export async function sendMagicLinkEmailToUser(
     emailAddress: string,
     magicLinkUrl: string,

@@ -1,3 +1,23 @@
+/**
+ * @file This file defines the root component of the Remix application.
+ *
+ * It serves as the main layout or "shell" for the entire application, containing the `<html>`,
+ * `<head>`, and `<body>` tags. It is responsible for:
+ * 1.  **Global Styles**: Linking the main stylesheet (`tailwind.css`), Mapbox GL styles, and custom fonts.
+ * 2.  **Server-Side Data Loading**: The `loader` function fetches data required for the initial render,
+ *     such as toast messages from the session and environment variables that need to be exposed to the client.
+ * 3.  **Client-Side Environment**: It safely injects server-side environment variables into the client's
+ *     `window` object for use in browser-side code.
+ * 4.  **Root Layout (`Layout`)**: Renders the basic HTML structure, including `<Meta>`, `<Links>`, `<Scripts>`,
+ *     and the main `<Outlet>` where nested routes are rendered.
+ * 5.  **Client-Side Effects**: It includes `useEffect` hooks to handle toast notifications, initialize the
+ *     changelog store, and trigger PostHog pageviews on route changes.
+ * 6.  **Global Error Handling**: The `ErrorBoundary` component serves as a catch-all for unhandled
+ *     errors that occur during rendering, providing a graceful user experience and reporting the
+ *     error to Sentry. It also handles specific HTTP status codes, like redirecting on 401 Unauthorized.
+ *
+ * @packageDocumentation
+ */
 import * as Sentry from "@sentry/react-router"
 import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
 import posthog from "posthog-js"
@@ -25,6 +45,9 @@ import { useChangelogStore } from "~/store/changelog"
 import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
 
+/**
+ * Defines the global links for the application, including stylesheets and font preconnects.
+ */
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: styles },
     { rel: "stylesheet", href: mapBoxStyle },
@@ -40,11 +63,16 @@ export const links: LinksFunction = () => [
     },
 ]
 
+/**
+ * The root loader function. It runs on the server before the page is rendered.
+ * Its primary roles are to handle session-based toast messages and to pass
+ * public environment variables from the server to the client.
+ */
 export const loader = async ({ request }: LoaderFunctionArgs) => {
     try {
         const { toast, headers } = await getToast(request)
 
-        // Prepare runtime environment variables for the client
+        // Expose public environment variables to the client-side.
         const runtimeEnv = {
             PUBLIC_FDM_URL: process.env.PUBLIC_FDM_URL,
             PUBLIC_FDM_NAME: process.env.PUBLIC_FDM_NAME,
@@ -71,48 +99,50 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
         return data({ toast, runtimeEnv }, { headers })
     } catch (error) {
         console.error("Failed to get toast or runtimeEnv:", error)
-        // Fallback for runtimeEnv if process.env access fails or is not desired here for some reason
-        const runtimeEnvFallback = {
-            // Provide fallbacks or leave undefined if config.ts handles undefined from window object
-        }
-        return data({ toast: null, runtimeEnv: runtimeEnvFallback }, {})
+        return data({ toast: null, runtimeEnv: {} }, {})
     }
 }
 
+/**
+ * The root layout component for the entire application.
+ * It sets up the main HTML structure and includes client-side logic for analytics and notifications.
+ */
 export function Layout() {
     const loaderData = useLoaderData<typeof loader>()
     const toast = loaderData?.toast
-    const runtimeEnv = loaderData?.runtimeEnv // Get runtimeEnv from loader data
+    const runtimeEnv = loaderData?.runtimeEnv
     const location = useLocation()
 
-    // Capture pageviews if PostHog is configured
-    // biome-ignore lint/correctness/useExhaustiveDependencies: This is a false positive: the useEffect should run whenever the location changes to capture new pageviews correctly
+    // biome-ignore lint/correctness/useExhaustiveDependencies: This effect should re-run on every location change to capture new pageviews.
     useEffect(() => {
+        // Track page views with PostHog on client-side navigation.
         if (clientConfig.analytics.posthog && typeof window !== "undefined") {
             posthog.capture("$pageview")
         }
     }, [location])
 
-    // Initialize changelog store
+    // Initialize the changelog state on initial client load.
     useEffect(() => {
         useChangelogStore.getState().initializeChangelog()
     }, [])
 
-    // Hook to show the toasts
+    // Display toast notifications passed from server-side actions/loaders.
     useEffect(() => {
-        if (toast && toast.type === "error") {
-            notify.error(toast.message, {
-                duration: 30000,
-            })
-        }
-        if (toast && toast.type === "warning") {
-            notify.warning(toast.message)
-        }
-        if (toast && toast.type === "success") {
-            notify.success(toast.message)
-        }
-        if (toast && toast.type === "info") {
-            notify.info(toast.message)
+        if (toast) {
+            switch (toast.type) {
+                case "error":
+                    notify.error(toast.message, { duration: 30000 })
+                    break
+                case "warning":
+                    notify.warning(toast.message)
+                    break
+                case "success":
+                    notify.success(toast.message)
+                    break
+                case "info":
+                    notify.info(toast.message)
+                    break
+            }
         }
     }, [toast])
 
@@ -132,17 +162,14 @@ export function Layout() {
                 <Banner />
                 <Toaster />
                 <ErrorBoundary error={null} params={{}} />
-                <ScrollRestoration
-                    getKey={(location) => {
-                        return location.pathname
-                    }}
-                />
-                {/* Inject runtime environment variables */}
+                <ScrollRestoration getKey={(location) => location.pathname} />
+
+                {/* Inject server-side environment variables into a script tag for client-side access. */}
                 {runtimeEnv && (
                     <script
                         id="runtime-config"
                         type="application/json"
-                        // biome-ignore lint/security/noDangerouslySetInnerHtml: This is safe because we are stringifying a JSON object
+                        // biome-ignore lint/security/noDangerouslySetInnerHtml: This is safe as we are stringifying a JSON object and escaping characters.
                         dangerouslySetInnerHTML={{
                             __html: JSON.stringify(runtimeEnv).replace(
                                 /</g,
@@ -151,8 +178,9 @@ export function Layout() {
                         }}
                     />
                 )}
+                {/* Script to parse the injected config and attach it to the window object. */}
                 <script
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: This is safe because we are stringifying a JSON object
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: This is a static, safe script.
                     dangerouslySetInnerHTML={{
                         __html: `
                             try {
@@ -171,23 +199,17 @@ export function Layout() {
     )
 }
 
+/**
+ * The main application component.
+ */
 export default function App() {
     return <Layout />
 }
 
 /**
- * Renders an error boundary that handles and displays error information based on the provided error.
- *
- * This component distinguishes between route error responses and generic errors:
- * - For route errors:
- *   - Redirects to the signin page if the error status is 401.
- *   - Renders a 404 error block for client errors with status 400, 403, or 404.
- *   - Logs other route errors to the error tracking service and renders an error block reflecting the specific status.
- * - For generic Error instances, it logs the error and renders a 500 error block with the error message and stack trace.
- * - If the error is null, no error UI is rendered.
- * - For any other cases, it logs the error and displays an error block with a 500 status and a generic message.
- *
- * @param error - The error encountered during route processing, either as a route error response or a generic Error.
+ * The root error boundary for the application.
+ * This component catches errors thrown during rendering, data loading, or actions
+ * and displays an appropriate error page. It also handles specific HTTP error statuses.
  */
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     const location = useLocation()
@@ -195,22 +217,21 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     const timestamp = new Date().toISOString()
 
     if (isRouteErrorResponse(error)) {
-        // Redirect to signin page if authentication is not provided
+        // If the user is not authenticated, redirect them to the sign-in page,
+        // preserving the URL they were trying to access.
         if (error.status === 401) {
-            // Get the current path the user tried to access
             const currentPath =
                 location.pathname + location.search + location.hash
-            // Construct the sign-in URL with the redirectTo parameter
             const signInUrl = `./signin?redirectTo=${encodeURIComponent(currentPath)}`
-            // Throw the redirect response to be caught by React Router
             throw redirect(signInUrl)
         }
 
+        // For common client errors (like Not Found), show a standard 404 page.
         const clientErrors = [400, 403, 404]
         if (clientErrors.includes(error.status)) {
             return (
                 <ErrorBlock
-                    status={404} // Show 404 in case user is not authorized to access page
+                    status={404}
                     message={error.statusText}
                     stacktrace={error.data}
                     page={page}
@@ -219,6 +240,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
             )
         }
 
+        // For all other server errors, report to Sentry and show a generic error page.
         Sentry.captureException(error)
         return (
             <ErrorBlock
@@ -230,6 +252,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
             />
         )
     }
+
+    // Handle standard JavaScript Error objects.
     if (error instanceof Error) {
         Sentry.captureException(error)
         return (
@@ -242,18 +266,21 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
             />
         )
     }
-    if (error === null) {
-        return null
+
+    // Fallback for any other type of thrown value.
+    if (error !== null) {
+        Sentry.captureException(error)
+        return (
+            <ErrorBlock
+                status={500}
+                message="Unknown Error"
+                stacktrace={null}
+                page={page}
+                timestamp={timestamp}
+            />
+        )
     }
 
-    Sentry.captureException(error)
-    return (
-        <ErrorBlock
-            status={500}
-            message="Unknown Error"
-            stacktrace={null}
-            page={page}
-            timestamp={timestamp}
-        />
-    )
+    // If error is null, render nothing.
+    return null
 }

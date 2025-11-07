@@ -1,3 +1,15 @@
+/**
+ * @file This file is responsible for all server-side authentication and session management.
+ *
+ * It initializes the `@svenvw/fdm-core` authentication system (`FdmAuth`), which is built
+ * on top of `better-auth`. It configures authentication providers (Google, Microsoft, Magic Link)
+ * and extends the default behavior, for instance, by sending a welcome email upon user sign-up.
+ *
+ * It also provides utility functions for retrieving and validating user sessions, which are
+ * used in Remix loaders to protect routes and ensure user profiles are complete.
+ *
+ * @packageDocumentation
+ */
 import {
     createDisplayUsername,
     createFdmAuth,
@@ -14,7 +26,9 @@ import {
     sendMagicLinkEmailToUser,
 } from "./email.server"
 
-// Initialize better-auth instance for FDM
+/**
+ * The singleton instance of the FDM authentication client, configured for server-side use.
+ */
 export const auth: FdmAuth = createFdmAuth(
     fdm,
     serverConfig.auth.google,
@@ -22,7 +36,7 @@ export const auth: FdmAuth = createFdmAuth(
     sendMagicLinkEmailToUser,
 )
 
-// Extend database hooks with sending a welcome email after sign up
+// Extend the `user.create.after` database hook to send a welcome email.
 if (serverConfig.mail) {
     const originalUserCreateAfter =
         auth.options.databaseHooks?.user?.create?.after
@@ -51,7 +65,30 @@ if (serverConfig.mail) {
     }
 }
 
-// Get the session
+/**
+ * Represents the enriched user session object used throughout the FDM application.
+ */
+interface FdmSession {
+    session: Session
+    user: ExtendedUser
+    /** The user's full name for display purposes. */
+    userName: string
+    /** The user's ID, used as the principal identifier. */
+    principal_id: string
+    /** The user's initials for use in avatars. */
+    initials: string
+}
+
+/**
+ * Retrieves the current user session from an incoming request.
+ *
+ * This function authenticates the request and enriches the session object with
+ * additional user details like `userName`, `principal_id`, and `initials`.
+ *
+ * @param request - The incoming `Request` object.
+ * @returns A promise that resolves to the enriched `FdmSession`.
+ * @throws {Response} Throws a 401 Unauthorized response if the session is invalid or missing.
+ */
 export async function getSession(request: Request): Promise<FdmSession> {
     const session = await auth.api.getSession({
         headers: request.headers,
@@ -61,10 +98,8 @@ export async function getSession(request: Request): Promise<FdmSession> {
         throw new Response("Unauthorized", { status: 401 })
     }
 
-    // Cast session.user to ExtendedUser for type safety
     const user = session.user as ExtendedUser
 
-    // Determine avatar initials
     let initials = user.email[0]
     if (user.firstname && user.surname) {
         initials = user.firstname[0] + user.surname[0]
@@ -74,51 +109,45 @@ export async function getSession(request: Request): Promise<FdmSession> {
         initials = user.name[0]
     }
 
-    // Determine userName
-    let displayUserName = user.displayUsername
-    if (!displayUserName) {
-        displayUserName = createDisplayUsername(user.firstname, user.surname)
-    }
+    const displayUserName =
+        user.displayUsername || createDisplayUsername(user.firstname, user.surname)
 
-    // Expand session
-    const sessionWithUserName = {
+    return {
         ...session,
         userName: displayUserName,
         principal_id: user.id,
         initials: initials,
     }
-
-    return sessionWithUserName
 }
 
-interface FdmSession {
-    session: Session
-    user: ExtendedUser
-    userName: string
-    principal_id: string
-    initials: string
-}
-
+/**
+ * Checks the validity of a session and ensures the user's profile is complete.
+ *
+ * This function is a route guard. It should be called at the beginning of loaders
+ * for protected routes.
+ *
+ * - If the user is not authenticated, it redirects to the `/signin` page.
+ * - If the user is authenticated but has not completed their profile (i.e., missing
+ *   firstname or surname), it redirects to the `/welcome` page.
+ *
+ * @param session - The `FdmSession` object to check.
+ * @param request - The incoming `Request` object, used to preserve the original URL upon redirect.
+ * @returns A `Response` object for redirection if the session is invalid or incomplete,
+ *   otherwise `undefined`.
+ */
 export async function checkSession(
     session: FdmSession,
     request: Request,
 ): Promise<undefined | Response> {
     if (!session?.user) {
-        // Get the original URL the user tried to access
         const currentPath = new URL(request.url).pathname
-        // Construct the sign-in URL with the redirectTo parameter
         const signInUrl = `/signin?redirectTo=${encodeURIComponent(currentPath)}`
-        // Perform the redirect
         return redirect(signInUrl)
     }
-    // Check if profile is complete, otherwise redirect to welcome page
+
     if (!session.user.firstname || !session.user.surname) {
-        // Get the original URL the user tried to access
         const currentPath = new URL(request.url).pathname
-        // Construct the welcome URL with the redirectTo parameter
         const welcomeUrl = `/welcome?redirectTo=${encodeURIComponent(currentPath)}`
-        console.log(`Redirecting to ${welcomeUrl}`)
-        // Perform the redirect
         return redirect(welcomeUrl)
     }
 }

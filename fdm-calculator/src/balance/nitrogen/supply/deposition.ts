@@ -1,19 +1,35 @@
+/**
+ * @file This module calculates the atmospheric nitrogen deposition on agricultural fields.
+ * It uses geospatial data in the GeoTIFF format to determine the amount of nitrogen
+ * deposited at specific field locations.
+ *
+ * The primary function, `calculateAllFieldsNitrogenSupplyByDeposition`, is optimized for
+ * performance by fetching the GeoTIFF data once and processing multiple fields concurrently.
+ *
+ * @packageDocumentation
+ */
 import { differenceInCalendarDays } from "date-fns"
 import Decimal from "decimal.js"
 import { getGeoTiffValue } from "../../../shared/geotiff"
 import type { FieldInput, NitrogenBalanceInput, NitrogenSupply } from "../types"
 
 /**
- * Calculates the nitrogen deposition for a batch of fields from a GeoTIFF file.
- * This function is the core of the performance optimization. It fetches the GeoTIFF
- * object once (using a cache) and then concurrently calculates the deposition for each field.
- * This avoids re-downloading the main file for every field.
+ * Calculates the nitrogen supply from atmospheric deposition for a batch of fields.
  *
- * @param fields - An array of FieldInput objects for which to calculate deposition.
- * @param timeFrame - The time frame for the calculation.
- * @param fdmPublicDataUrl - The base URL for FDM public data.
- * @returns A promise that resolves to a Map where keys are field IDs and values are
- *          the calculated nitrogen deposition supply for that field.
+ * This function efficiently computes nitrogen deposition by:
+ * 1.  Identifying the correct GeoTIFF file based on the year and region.
+ * 2.  Concurrently fetching the deposition value for each field's centroid from the GeoTIFF data.
+ * 3.  Adjusting the annual deposition value based on the number of days the field was active
+ *     within the specified time frame.
+ *
+ * This batch-processing approach is a key performance optimization, as it avoids redundant
+ * downloads of the large GeoTIFF file.
+ *
+ * @param fields - An array of field data, each including its centroid coordinates.
+ * @param timeFrame - The start and end dates for the calculation period.
+ * @param fdmPublicDataUrl - The base URL where the public FDM GeoTIFF data is hosted.
+ * @returns A promise that resolves to a `Map`, where each key is a field ID and the value
+ *   is the calculated nitrogen deposition for that field.
  */
 export async function calculateAllFieldsNitrogenSupplyByDeposition(
     fields: FieldInput[],

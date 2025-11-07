@@ -1,3 +1,9 @@
+/**
+ * @file This file contains functions for managing derogations in the FDM.
+ *
+ * It provides functionalities to add, remove, and list derogations for a farm, as well as to check
+ * if a derogation has been granted for a specific year.
+ */
 import { and, eq, inArray } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
@@ -7,17 +13,17 @@ import type { FdmType } from "./fdm"
 import { createId } from "./id"
 
 /**
- * Adds a new derogation for a specific farm and year.
+ * Adds a derogation for a farm for a specific year.
  *
- * This function checks if the principal has 'write' permission on the farm,
- * then creates a new derogation and links it to the farm.
+ * This function allows for the recording of a derogation, which is an exemption from certain agricultural
+ * regulations. It ensures that a derogation is not duplicated for the same farm and year.
  *
- * @param fdm The FDM instance providing the connection to the database.
- * @param principal_id The identifier of the principal creating the derogation.
- * @param b_id_farm The identifier of the farm receiving the derogation.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
  * @param b_derogation_year The year for which the derogation is granted.
- * @returns The unique identifier for the new derogation.
- * @throws {Error} If the principal does not have permission to add a derogation or if the database transaction fails.
+ * @returns A promise that resolves to the unique identifier of the newly created derogation.
+ * @throws An error if the principal does not have permission, the year is invalid, or a derogation already exists.
  */
 export async function addDerogation(
     fdm: FdmType,
@@ -88,15 +94,15 @@ export async function addDerogation(
 }
 
 /**
- * Removes a derogation.
+ * Removes a derogation from a farm.
  *
- * This function checks if the principal has 'write' permission on the associated farm,
- * then deletes the derogation and its link to the farm.
+ * This function deletes a derogation and its association with a farm. It is an atomic operation.
  *
- * @param fdm The FDM instance providing the connection to the database.
- * @param principal_id The identifier of the principal removing the derogation.
- * @param b_id_derogation The identifier of the derogation to remove.
- * @throws {Error} If the principal does not have permission, the derogation does not exist, or the database transaction fails.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_derogation The unique identifier of the derogation to remove.
+ * @returns A promise that resolves when the derogation has been successfully removed.
+ * @throws An error if the principal does not have permission or if the derogation does not exist.
  */
 export async function removeDerogation(
     fdm: FdmType,
@@ -149,15 +155,15 @@ export async function removeDerogation(
 }
 
 /**
- * Lists all derogations for a given farm.
+ * Lists all derogations for a farm.
  *
- * This function checks if the principal has 'read' permission on the farm before returning the list.
+ * This function retrieves all derogations that have been granted to a specific farm.
  *
- * @param fdm The FDM instance providing the connection to the database.
- * @param principal_id The identifier of the principal requesting the list.
- * @param b_id_farm The identifier of the farm.
- * @returns A Promise that resolves with a list of derogations for the specified farm.
- * @throws {Error} If the principal does not have permission to read the farm's derogations.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @returns A promise that resolves to an array of `derogationsTypeSelect` objects.
+ * @throws An error if the principal does not have permission to read the farm's data.
  */
 export async function listDerogations(
     fdm: FdmType,
@@ -203,16 +209,16 @@ export async function listDerogations(
 }
 
 /**
- * Checks if a derogation has been granted for a specific farm and year.
+ * Checks if a derogation is granted for a farm for a specific year.
  *
- * This function checks if the principal has 'read' permission on the farm.
+ * This function determines whether a farm has a derogation for a given year.
  *
- * @param fdm The FDM instance providing the connection to the database.
+ * @param fdm The FDM instance for database access.
  * @param principal_id The identifier of the principal making the request.
- * @param b_id_farm The identifier of the farm.
- * @param year The year to check for a derogation.
- * @returns A Promise that resolves to true if a derogation is granted for the specified year, false otherwise.
- * @throws {Error} If the principal does not have permission to read the farm's derogations.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param year The year to check.
+ * @returns A promise that resolves to `true` if a derogation is granted, otherwise `false`.
+ * @throws An error if the principal does not have permission to read the farm's data.
  */
 export async function isDerogationGrantedForYear(
     fdm: FdmType,

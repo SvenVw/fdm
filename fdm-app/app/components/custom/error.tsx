@@ -1,22 +1,41 @@
+/**
+ * @file This file defines the `ErrorBlock` component, which is used as a full-page
+ * display for handling and presenting application errors to the user.
+ *
+ * @packageDocumentation
+ */
 import { ArrowLeft, Copy, Home } from "lucide-react"
 import { useEffect, useState } from "react"
 import { NavLink } from "react-router"
 import { Button } from "~/components/ui/button"
 
 /**
- * Displays a full-screen error block with tailored messaging and navigation options.
+ * Props for the `ErrorBlock` component.
+ */
+interface ErrorBlockProps {
+    /** The HTTP status code of the error (e.g., 404, 500). */
+    status: number | null
+    /** A descriptive message for the error. */
+    message: string | null
+    /** An optional stack trace or additional error data. */
+    stacktrace: string | null | undefined
+    /** The URL of the page where the error occurred. */
+    page: string
+    /** The ISO timestamp of when the error was recorded. */
+    timestamp: string
+}
+
+/**
+ * A full-screen error component that provides user-friendly feedback and actions.
  *
- * Depending on the provided error status, this component renders:
- * - A specific message and navigation buttons for a 404 error, indicating that the page does not exist.
- * - A generic error message along with a button to copy the formatted error details (including status, message, stack trace, page, and timestamp) to the clipboard for other errors.
+ * This component adapts its content based on the error `status`.
+ * - For a `404` status, it displays a "Page Not Found" message with navigation
+ *   buttons to go back or to the homepage.
+ * - For all other statuses, it displays a generic error message and provides a button
+ *   to copy the detailed error information to the clipboard, which is useful for
+ *   support and debugging.
  *
- * If an error message is available, the component also displays the error details formatted as pretty-printed JSON. Otherwise, it shows a fallback message for non-404 errors.
- *
- * @param status - HTTP status code of the error or null.
- * @param message - Detailed error message, or null if not available.
- * @param stacktrace - Optional stack trace providing additional error context.
- * @param page - The page where the error occurred.
- * @param timestamp - The timestamp when the error was recorded.
+ * The detailed error information is displayed in a formatted `<pre>` block if available.
  */
 export function ErrorBlock({
     status,
@@ -24,13 +43,7 @@ export function ErrorBlock({
     stacktrace,
     page,
     timestamp,
-}: {
-    status: number | null
-    message: string | null
-    stacktrace: string | null | undefined
-    page: string
-    timestamp: string
-}) {
+}: ErrorBlockProps) {
     const [isCopied, setIsCopied] = useState(false)
 
     useEffect(() => {
@@ -41,20 +54,16 @@ export function ErrorBlock({
     }, [isCopied])
 
     const errorDetails = JSON.stringify(
-        {
-            status,
-            message,
-            stacktrace,
-            page,
-            timestamp,
-        },
+        { status, message, stacktrace, page, timestamp },
         null,
         2,
     )
+
     const copyStackTrace = () => {
         navigator.clipboard.writeText(errorDetails)
         setIsCopied(true)
     }
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 px-4">
             <div className="mb-8 overflow-hidden rounded-lg w-full max-w-md">
@@ -104,7 +113,7 @@ export function ErrorBlock({
                     </Button>
                 </div>
             )}
-            {message ? (
+            {message && (
                 <div className="mt-8 w-full max-w-2xl">
                     <h2 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">
                         Foutmelding:
@@ -113,7 +122,8 @@ export function ErrorBlock({
                         {errorDetails}
                     </pre>
                 </div>
-            ) : status === 404 ? null : (
+            )}
+            {status !== 404 && !message && (
                 <p className="mt-8 text-gray-600 dark:text-gray-400">
                     Er zijn helaas geen details over de fout beschikbaar.
                 </p>
