@@ -1,3 +1,4 @@
+import { getFarm } from "@svenvw/fdm-core"
 import posthog from "posthog-js"
 import { useEffect } from "react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
@@ -19,6 +20,7 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { useCalendarStore } from "~/store/calendar"
 import { useFarmStore } from "~/store/farm"
+import { fdm } from "../lib/fdm.server"
 
 export const meta: MetaFunction = () => {
     return [
@@ -42,7 +44,7 @@ export const meta: MetaFunction = () => {
  *
  * @throws {Error} If an error occurs during session retrieval, processed by handleLoaderError.
  */
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
     try {
         // Get the session
         const session = await getSession(request)
@@ -52,8 +54,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
             return sessionCheckResponse
         }
 
+        const farm = params.b_id_farm
+            ? await getFarm(fdm, session.principal_id, params.b_id_farm)
+            : undefined
+
         // Return user information from loader
         return {
+            farm: farm,
             user: session.user,
             userName: session.userName,
             initials: session.initials,
@@ -116,7 +123,7 @@ export default function App() {
             <Sidebar>
                 <SidebarTitle />
                 <SidebarContent>
-                    <SidebarFarm />
+                    <SidebarFarm farm={loaderData.farm} />
                     <SidebarApps />
                 </SidebarContent>
                 <SidebarSupport
