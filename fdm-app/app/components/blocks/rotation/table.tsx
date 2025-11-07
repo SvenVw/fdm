@@ -284,7 +284,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                             }
                                         >
                                             <Plus className="mr-2 h-4 w-4" />
-                                            Oogst
+                                            Oogst toevoegen
                                         </Button>
                                     ) : (
                                         <NavLink
@@ -292,7 +292,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                         >
                                             <Button>
                                                 <Plus className="mr-2 h-4 w-4" />
-                                                Oogst
+                                                Oogst toevoegen
                                             </Button>
                                         </NavLink>
                                     )}
