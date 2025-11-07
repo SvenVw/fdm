@@ -24,7 +24,10 @@ export function LegendElevation({
                 <div
                     className="w-full h-4 rounded-md"
                     style={{
-                        background: `linear-gradient(to right, ${palette.domain().map((d: number) => palette(d)).join(",")})`,
+                        background:
+                            palette && typeof palette.domain === "function"
+                                ? `linear-gradient(to right, ${Array.from({ length: 10 }, (_, i) => palette(palette.domain()[0] + (i / 9) * (palette.domain()[1] - palette.domain()[0]))).join(",")})`
+                                : "none",
                     }}
                 />
                 {hoverValue && (

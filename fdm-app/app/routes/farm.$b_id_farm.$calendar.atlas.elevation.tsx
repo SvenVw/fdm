@@ -102,6 +102,7 @@ export default function FarmAtlasElevationBlock() {
     }>({ imageData: null, min: 0, max: 0, palette: [], pixelData: null });
     const [hoverValue, setHoverValue] = useState<number | undefined>(undefined);
     const [loading, setLoading] = useState(false);
+    const [imageUrl, setImageUrl] = useState<string>("");
     const workerRef = useRef<Worker | null>(null);
     const mapRef = useRef<MapRef | null>(null);
 
@@ -135,6 +136,18 @@ export default function FarmAtlasElevationBlock() {
         workerRef.current.postMessage({ bounds: bounds.toArray().flat(), cogIndex });
     }, 300), [cogIndex]);
 
+    function createImageUrl(imageData: ImageData) {
+        const canvas = document.createElement("canvas");
+        canvas.width = imageData.width;
+        canvas.height = imageData.height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+            ctx.putImageData(imageData, 0, 0);
+            return new Promise(resolve => canvas.toBlob(blob => resolve(URL.createObjectURL(blob!))));
+        }
+        return Promise.resolve("");
+    }
+
     const id = "fieldsSaved"
     const fields = loaderData.savedFields
     const fieldsSavedStyle = getFieldsStyle(id)
@@ -164,24 +177,7 @@ export default function FarmAtlasElevationBlock() {
 
     useEffect(() => {
         if (elevationData.imageData) {
-            const canvas = document.getElementById('elevation-canvas') as HTMLCanvasElement;
-            if (canvas) {
-                canvas.width = elevationData.imageData.width;
-                canvas.height = elevationData.imageData.height;
-                const ctx = canvas.getContext('2d');
-                if (ctx) {
-                    ctx.putImageData(elevationData.imageData, 0, 0);
-                    const source = mapRef.current?.getSource('elevation');
-                    if (source && source.type === 'canvas') {
-                        source.setCoordinates([
-                            mapRef.current.getBounds().getNorthWest().toArray(),
-                            mapRef.current.getBounds().getNorthEast().toArray(),
-                            mapRef.current.getBounds().getSouthEast().toArray(),
-                            mapRef.current.getBounds().getSouthWest().toArray(),
-                        ]);
-                    }
-                }
-            }
+            createImageUrl(elevationData.imageData).then(url => setImageUrl(url as string));
         }
     }, [elevationData.imageData]);
 
@@ -242,16 +238,21 @@ export default function FarmAtlasElevationBlock() {
                 palette={elevationData.palette}
                 hoverValue={hoverValue}
             />
-            {elevationData.imageData && (
+            {imageUrl && (
                 <Source
                     id="elevation"
-                    type="canvas"
-                    canvas="elevation-canvas"
+                    type="image"
+                    url={imageUrl}
+                    coordinates={[
+                        mapRef.current.getBounds().getNorthWest().toArray(),
+                        mapRef.current.getBounds().getNorthEast().toArray(),
+                        mapRef.current.getBounds().getSouthEast().toArray(),
+                        mapRef.current.getBounds().getSouthWest().toArray(),
+                    ]}
                 >
                     <Layer id="elevation" type="raster" />
                 </Source>
             )}
-            <canvas id="elevation-canvas" style={{ display: 'none' }} />
             <Controls
                 onViewportChange={({ longitude, latitude, zoom }) =>
                     setViewState((currentViewState) => ({
