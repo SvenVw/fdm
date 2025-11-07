@@ -1,7 +1,9 @@
+import { getFarm } from "@svenvw/fdm-core"
 import { data, type LoaderFunctionArgs, type MetaFunction } from "react-router"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -39,9 +41,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
+
         // Return the farm ID and session info
         return {
             farmId: b_id_farm,
+            farm: farm,
             session,
         }
     } catch (error) {
