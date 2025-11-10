@@ -20,7 +20,8 @@ const DropzoneContext = createContext<DropzoneContextType | undefined>(
 )
 
 const getFileExtension = (filename: string): string => {
-    return filename.slice(filename.lastIndexOf(".")).toLowerCase()
+    const dotIndex = filename.lastIndexOf(".")
+    return dotIndex === -1 ? "" : filename.slice(dotIndex).toLowerCase()
 }
 
 export type DropzoneProps = {
