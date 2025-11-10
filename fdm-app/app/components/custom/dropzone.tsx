@@ -25,7 +25,7 @@ const getFileExtension = (filename: string): string => {
 }
 
 export type DropzoneProps = {
-    ref: (instance: any) => void
+    ref?: React.Ref<HTMLInputElement>
     value?: File[]
     accept?: string | string[]
     name: string
