@@ -79,12 +79,12 @@ export const Dropzone = ({
     const myMergeFiles =
         mergeFiles ??
         (multiple
-            ? (oldFiles, newFiles) => [
-                  ...newFiles.reduce((combined, newFile) => {
-                      combined.add(newFile)
-                      return combined
-                  }, new Set<File>(oldFiles)),
-              ]
+            ? (oldFiles, newFiles) => {
+                  const fileMap = new Map<string, File>()
+                  for (const f of oldFiles) fileMap.set(f.name, f)
+                  for (const f of newFiles) fileMap.set(f.name, f)
+                  return Array.from(fileMap.values())
+              }
             : (_, newFiles) => newFiles.slice(0, 1))
 
     useEffect(() => {
