@@ -68,8 +68,11 @@ export const Dropzone = ({
         value ??
         (inputRef.current?.files ? Array.from(inputRef.current.files) : [])
     const labelId = useId()
+    const normalizeAcceptToken = (token: string) => token.trim().toLowerCase()
     const acceptedFileExtensions =
-        typeof accept === "string" ? accept.split(",") : accept
+        typeof accept === "string"
+            ? accept.split(",").map(normalizeAcceptToken)
+            : accept?.map(normalizeAcceptToken)
 
     const fileNames = files.map((f) => f.name)
     const myMergeFiles =
