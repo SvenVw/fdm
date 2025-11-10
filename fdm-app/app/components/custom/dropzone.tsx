@@ -112,15 +112,35 @@ export const Dropzone = ({
 
     const checkNewFile = (file: File) => {
         const extension = getFileExtension(file.name)
-        const isValid =
+        const fileExtensionCheck =
             !acceptedFileExtensions ||
             acceptedFileExtensions.includes(extension)
-        if (!isValid) {
+        const minSizeCheck = !minSize || file.size >= minSize
+        const maxSizeCheck = !maxSize || file.size <= maxSize
+
+        if (!fileExtensionCheck) {
             notify.warning(`Bestandstype niet ondersteund: ${extension}`, {
                 id: `invalid-file-type-${file.name}`,
             })
         }
-        return isValid
+        if (!maxSizeCheck) {
+            notify.warning(
+                "Een of meerdere bestanden zijn ongeldig of te groot.",
+                {
+                    id: `invalid-file-type-${file.name}`,
+                },
+            )
+        }
+        if (!minSizeCheck) {
+            notify.warning(
+                "Een of meerdere bestanden zijn ongeldig of te klein.",
+                {
+                    id: `invalid-file-type-${file.name}`,
+                },
+            )
+        }
+
+        return fileExtensionCheck && minSizeCheck && maxSizeCheck
     }
 
     const handleFileChange = async (
@@ -130,14 +150,15 @@ export const Dropzone = ({
             const newFiles = Array.from(event.target.files)
             const validNewFiles = newFiles.filter(checkNewFile)
 
-            if (validNewFiles.length === 0) return
+            // In order to reset the input to the previous state if the files are invalid
+            let inputFiles = files
+            if (validNewFiles.length > 0) {
+                inputFiles = await handleFilesSet(files, validNewFiles)
+            }
 
-            const finalFiles = await handleFilesSet(files, validNewFiles)
-
-            // In order to include the previous files too
             if (inputRef.current?.files) {
                 const container = new DataTransfer()
-                finalFiles.forEach((f) => {
+                inputFiles.forEach((f) => {
                     container.items.add(f)
                 })
                 inputRef.current.files = container.files

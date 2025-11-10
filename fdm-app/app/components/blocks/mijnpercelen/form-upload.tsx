@@ -288,6 +288,9 @@ export function MijnPercelenUploadForm({
                                                             accept={
                                                                 requiredExtensions
                                                             }
+                                                            maxSize={
+                                                                fileSizeLimit
+                                                            }
                                                             multiple
                                                             onBlur={onBlur}
                                                             onFilesChange={

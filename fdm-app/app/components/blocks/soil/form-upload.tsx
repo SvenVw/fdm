@@ -115,6 +115,7 @@ export function SoilAnalysisUploadForm() {
                                                         name={name}
                                                         value={dropzoneValue}
                                                         accept=".pdf"
+                                                        maxSize={fileSizeLimit}
                                                         required
                                                         className={cn(
                                                             uploadStatus ===
