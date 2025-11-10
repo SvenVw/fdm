@@ -74,6 +74,9 @@
         "safe-stable-stringify": "^2.5.0",
         "unique-username-generator": "^1.5.1"
     },
+    "engines": {
+        "node": ">=24.0.0"
+    },
     "packageManager": "pnpm@10.20.0",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
