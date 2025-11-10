@@ -89,7 +89,7 @@ export const Dropzone = ({
 
     useEffect(() => {
         if (files.length === 0 && inputRef.current) {
-            inputRef.current.value = null
+            inputRef.current.value = ""
         }
     }, [files])
 
