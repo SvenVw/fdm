@@ -127,7 +127,7 @@ export const Dropzone = ({
             notify.warning(
                 "Een of meerdere bestanden zijn ongeldig of te groot.",
                 {
-                    id: `invalid-file-type-${file.name}`,
+                    id: "file-too-big",
                 },
             )
         }
@@ -135,7 +135,7 @@ export const Dropzone = ({
             notify.warning(
                 "Een of meerdere bestanden zijn ongeldig of te klein.",
                 {
-                    id: `invalid-file-type-${file.name}`,
+                    id: "file-too-small",
                 },
             )
         }
