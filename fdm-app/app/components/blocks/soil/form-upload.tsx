@@ -1,10 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AlertCircle, CheckCircle, FileUp, Upload } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Form, useActionData, useNavigation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { z } from "zod"
 import { cn } from "@/app/lib/utils"
+import { Dropzone } from "~/components/custom/dropzone"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
@@ -21,13 +22,11 @@ import {
     FormItem,
     FormMessage,
 } from "~/components/ui/form"
-import { Input } from "~/components/ui/input"
 import { Progress } from "~/components/ui/progress"
 
 type UploadStatus = "idle" | "uploading" | "success" | "error"
 
 export function SoilAnalysisUploadForm() {
-    const [fileName, setFileName] = useState<string | null>(null)
     const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle")
     const [uploadProgress, setUploadProgress] = useState(0)
 
@@ -38,6 +37,12 @@ export function SoilAnalysisUploadForm() {
             soilAnalysisFile: undefined,
         },
     })
+
+    const selectedFile = form.watch("soilAnalysisFile")
+    const dropzoneValue = useMemo(
+        () => (selectedFile ? [selectedFile] : []),
+        [selectedFile],
+    )
 
     const actionData = useActionData<{
         message?: string
@@ -72,38 +77,9 @@ export function SoilAnalysisUploadForm() {
         }
     }, [isSubmitting, actionData, form.reset])
 
-    // Handle file change to display the file name
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            setFileName(e.target.files[0].name)
-            setUploadStatus("idle")
-        } else {
-            setFileName(null)
-        }
-    }
-
-    const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
-        e.preventDefault() // Prevent default to allow drop
-    }
-
-    const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
-        e.preventDefault() // Prevent default file opening in browser
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            const file = e.dataTransfer.files[0]
-            form.setValue("soilAnalysisFile", file, { shouldValidate: true })
-            setFileName(file.name)
-            setUploadStatus("idle") // Reset status when a new file is dropped
-
-            const fileInput = document.getElementById(
-                "file-upload",
-            ) as HTMLInputElement | null
-            if (fileInput) {
-                const container = new DataTransfer()
-                container.items.add(file)
-                fileInput.files = container.files
-            }
-            e.dataTransfer.clearData()
-        }
+    const handleFilesChange = (files: File[]) => {
+        form.setValue("soilAnalysisFile", files[0])
+        setUploadStatus("idle")
     }
 
     return (
@@ -130,42 +106,18 @@ export function SoilAnalysisUploadForm() {
                                             control={form.control}
                                             name="soilAnalysisFile"
                                             render={({
-                                                field: {
-                                                    name,
-                                                    onBlur,
-                                                    onChange,
-                                                    disabled,
-                                                    ref,
-                                                },
+                                                field: { name, onBlur, ref },
                                             }) => (
                                                 <FormItem>
                                                     <div>Bodemanalyse</div>
-                                                    <Input
-                                                        name={name}
-                                                        onBlur={onBlur}
-                                                        onChange={(event) => {
-                                                            onChange(
-                                                                event.target
-                                                                    .files?.[0],
-                                                            )
-                                                            handleFileChange(
-                                                                event,
-                                                            )
-                                                        }}
+                                                    <Dropzone
                                                         ref={ref}
-                                                        type="file"
-                                                        placeholder=""
-                                                        className="hidden"
+                                                        name={name}
+                                                        value={dropzoneValue}
                                                         accept=".pdf"
-                                                        multiple={false}
-                                                        required={true}
-                                                        disabled={disabled}
-                                                        id="file-upload"
-                                                    />
-                                                    <label
-                                                        htmlFor="file-upload"
+                                                        maxSize={fileSizeLimit}
+                                                        required
                                                         className={cn(
-                                                            "flex flex-col items-center justify-center w-full h-32 rounded-md border border-dashed border-muted-foreground/25 px-6 py-4 text-center transition-colors hover:bg-muted/25",
                                                             uploadStatus ===
                                                                 "success" &&
                                                                 "border-green-500 bg-green-50",
@@ -173,10 +125,10 @@ export function SoilAnalysisUploadForm() {
                                                                 "error" &&
                                                                 "border-red-500 bg-red-50",
                                                         )}
-                                                        onDragOver={
-                                                            handleDragOver
+                                                        onBlur={onBlur}
+                                                        onFilesChange={
+                                                            handleFilesChange
                                                         }
-                                                        onDrop={handleDrop}
                                                     >
                                                         <div className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
                                                             {uploadStatus ===
@@ -184,8 +136,8 @@ export function SoilAnalysisUploadForm() {
                                                                 <>
                                                                     <FileUp className="w-8 h-8 mb-2 text-muted-foreground" />
                                                                     <div className="text-sm text-muted-foreground">
-                                                                        {fileName
-                                                                            ? fileName
+                                                                        {selectedFile
+                                                                            ? selectedFile.name
                                                                             : "Klik om te uploaden of sleep een PDF bestand naar hier"}
                                                                     </div>
                                                                     <div className="text-xs text-muted-foreground mt-1">
@@ -202,7 +154,7 @@ export function SoilAnalysisUploadForm() {
                                                                     <div className="text-sm">
                                                                         Uploading{" "}
                                                                         {
-                                                                            fileName
+                                                                            selectedFile?.name
                                                                         }
                                                                         ...
                                                                     </div>
@@ -240,7 +192,7 @@ export function SoilAnalysisUploadForm() {
                                                                 </>
                                                             )}
                                                         </div>
-                                                    </label>
+                                                    </Dropzone>
                                                     <FormDescription />
                                                     <FormMessage />
                                                 </FormItem>
