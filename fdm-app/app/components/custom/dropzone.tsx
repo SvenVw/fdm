@@ -102,7 +102,7 @@ export const Dropzone = ({
 
     const handleFilesClear = async () => {
         if (onFilesChange) onFilesChange([])
-        else if (inputRef.current) inputRef.current.value = null
+        else if (inputRef.current) inputRef.current.value = ""
     }
 
     const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
@@ -185,7 +185,10 @@ export const Dropzone = ({
                     onChange={(event) => {
                         handleFileChange(event)
                     }}
-                    ref={inputRef}
+                    ref={(node) => {
+                        inputRef.current = node
+                        ref?.(node)
+                    }}
                     placeholder=""
                     className="hidden"
                     accept={
