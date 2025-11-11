@@ -138,6 +138,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
             throw new Error("missing: p_id")
         }
 
+        const requestUrl = new URL(request.url)
+        const returnUrl =
+            requestUrl.searchParams.get("returnUrl") ??
+            `/farm/${b_id_farm}/fertilizers`
+
         const session = await getSession(request)
         const formValues = await extractFormValuesFromRequest(
             request,
@@ -201,7 +206,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             },
         )
 
-        await addFertilizer(
+        const p_new_id = await addFertilizer(
             fdm,
             session.principal_id,
             p_id_catalogue,
@@ -210,7 +215,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
             undefined,
         )
 
-        return redirectWithSuccess(`/farm/${b_id_farm}/fertilizers`, {
+        const parsedReturnUrl = new URL(
+            returnUrl.startsWith("/")
+                ? `http://localhost${returnUrl}`
+                : returnUrl,
+        )
+        parsedReturnUrl.searchParams.set("p_id", p_new_id)
+        const modifiedReturnUrl = `${returnUrl.startsWith("/") ? "" : parsedReturnUrl.origin}${parsedReturnUrl.pathname}${parsedReturnUrl.search}${parsedReturnUrl.hash}`
+
+        return redirectWithSuccess(modifiedReturnUrl, {
             message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
         })
     } catch (error) {

@@ -1,17 +1,15 @@
-import { getFarm, getFarms } from "@svenvw/fdm-core"
+import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
-    useLoaderData,
 } from "react-router"
+import { NewFertilizerPageHeader } from "@/app/components/blocks/fertilizer/new-fertilizer-page-header"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -67,11 +65,46 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
+        // Try to load more data if the requestUrl is found
+        const requestUrl = new URL(request.url)
+        const returnUrl =
+            requestUrl.searchParams.get("returnUrl") ??
+            `/farm/${b_id_farm}/fertilizers`
+
+        let fieldOptions: {
+            b_id: string
+            b_name: string
+            b_area: number
+        }[] = []
+        if (/farm\/[^/]*\/[^/]*\/field\/[^/]*\/fertilizer/.test(returnUrl)) {
+            const timeframe = getTimeframe(params)
+            const fields = await getFields(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+                timeframe,
+            )
+            fieldOptions = fields.map(
+                (field: Awaited<ReturnType<typeof getFields>>[number]) => {
+                    if (!field?.b_id || !field?.b_name) {
+                        throw new Error("Invalid field data structure")
+                    }
+                    return {
+                        b_id: field.b_id,
+                        b_name: field.b_name,
+                        b_area: Math.round(field.b_area * 10) / 10,
+                    }
+                },
+            )
+        }
+
         // Return user information from loader
         return {
             farm: farm,
             b_id_farm: b_id_farm,
+            b_name_farm: farm.b_name_farm,
             farmOptions: farmOptions,
+            fieldOptions: fieldOptions,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -85,27 +118,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
  */
 export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
-    const loaderData = useLoaderData<typeof loader>()
-
     return (
         <SidebarInset>
-            <Header
-                action={{
-                    to: `/farm/${params.b_id_farm}/fertilizers`,
-                    label: "Terug naar overzicht",
-                    disabled: false,
-                }}
-            >
-                <HeaderFarm
-                    b_id_farm={loaderData.b_id_farm}
-                    farmOptions={loaderData.farmOptions}
-                />
-                <HeaderFertilizer
-                    b_id_farm={loaderData.b_id_farm}
-                    p_id={undefined}
-                    fertilizerOptions={[]}
-                />
-            </Header>
+            <NewFertilizerPageHeader />
             <main className="mx-auto max-w-4xl">
                 <FarmTitle
                     title={"Meststof toevoegen"}
