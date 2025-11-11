@@ -110,6 +110,7 @@ export async function addCultivationToCatalogue(
         b_lu_name: schema.cultivationsCatalogueTypeInsert["b_lu_name"]
         b_lu_name_en: schema.cultivationsCatalogueTypeInsert["b_lu_name_en"]
         b_lu_harvestable: schema.cultivationsCatalogueTypeInsert["b_lu_harvestable"]
+        b_lu_harvestcat: schema.cultivationsCatalogueTypeInsert["b_lu_harvestcat"]
         b_lu_hcat3: schema.cultivationsCatalogueTypeInsert["b_lu_hcat3"]
         b_lu_hcat3_name: schema.cultivationsCatalogueTypeInsert["b_lu_hcat3_name"]
         b_lu_croprotation: schema.cultivationsCatalogueTypeInsert["b_lu_croprotation"]
@@ -534,6 +535,8 @@ export async function getCultivation(
                 b_lu_name_en: schema.cultivationsCatalogue.b_lu_name_en,
                 b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
+                b_lu_harvestcat: schema.cultivationsCatalogue.b_lu_harvestcat,
+                b_lu_harvestable: schema.cultivationsCatalogue.b_lu_harvestable,
                 b_lu_croprotation:
                     schema.cultivationsCatalogue.b_lu_croprotation,
                 b_lu_variety: schema.cultivations.b_lu_variety,
@@ -618,6 +621,8 @@ export async function getCultivations(
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
                 b_lu_croprotation:
                     schema.cultivationsCatalogue.b_lu_croprotation,
+                b_lu_harvestcat: schema.cultivationsCatalogue.b_lu_harvestcat,
+                b_lu_harvestable: schema.cultivationsCatalogue.b_lu_harvestable,
                 b_lu_variety: schema.cultivations.b_lu_variety,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
