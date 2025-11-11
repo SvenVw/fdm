@@ -2,7 +2,11 @@ import { z } from "zod"
 
 export const FormSchema = z
     .object({
-        b_lu_yield: z.coerce
+        b_lu_harvest_date: z.coerce.date({
+            required_error: "Oogstdatum is verplicht",
+            invalid_type_error: "Oogstdatum moet een datum zijn",
+        }),
+        b_lu_yield_fresh: z.coerce
             .number({
                 invalid_type_error: "Hoeveelheid moet een getal zijn",
             })
@@ -12,8 +16,25 @@ export const FormSchema = z
             .finite({
                 message: "Hoeveelheid moet een geheel getal zijn",
             })
-            .max(100000, {
-                message: "Hoeveelheid mag niet groter zijn dan 100000",
+            .max(250000, {
+                message: "Hoeveelheid mag niet groter zijn dan 250000",
+            })
+            .safe({
+                message: "Hoeveelheid moet een safe getal zijn",
+            })
+            .optional(),
+        b_lu_dm: z.coerce
+            .number({
+                invalid_type_error: "Hoeveelheid moet een getal zijn",
+            })
+            .positive({
+                message: "Hoeveelheid moet positief zijn",
+            })
+            .finite({
+                message: "Hoeveelheid moet een geheel getal zijn",
+            })
+            .max(1000, {
+                message: "Hoeveelheid mag niet groter zijn dan 1000",
             })
             .safe({
                 message: "Hoeveelheid moet een safe getal zijn",
@@ -36,6 +57,43 @@ export const FormSchema = z
                 })
                 .optional(),
         ),
+        // b_lu_yield_bruto: z.coerce
+        //     .number({
+        //         invalid_type_error: "Hoeveelheid moet een getal zijn",
+        //     })
+        //     .positive({
+        //         message: "Hoeveelheid moet positief zijn",
+        //     })
+        //     .finite({
+        //         message: "Hoeveelheid moet een geheel getal zijn",
+        //     })
+        //     .max(250000, {
+        //         message: "Hoeveelheid mag niet groter zijn dan 250000",
+        //     })
+        //     .safe({
+        //         message: "Hoeveelheid moet een safe getal zijn",
+        //     })
+        //     .optional(),
+        // b_lu_yield_uvw: z.coerce
+        //     .number({
+        //         invalid_type_error: "Hoeveelheid moet een getal zijn",
+        //     })
+        //     .positive({
+        //         message: "Hoeveelheid moet positief zijn",
+        //     })
+        //     .finite({
+        //         message: "Hoeveelheid moet een geheel getal zijn",
+        //     })
+        //     .max(100, {
+        //         message: "Hoeveelheid mag niet kleiner zijn dan 100",
+        //     })
+        //     .max(1000, {
+        //         message: "Hoeveelheid mag niet groter zijn dan 1000",
+        //     })
+        //     .safe({
+        //         message: "Hoeveelheid moet een safe getal zijn",
+        //     })
+        //     .optional(),
         b_lu_start: z.preprocess((value) => {
             if (typeof value === "string") {
                 if (value.toLowerCase() === "null") return null
@@ -48,10 +106,6 @@ export const FormSchema = z
             }
             return value
         }, z.coerce.date().optional().nullable()),
-        b_lu_harvest_date: z.coerce.date({
-            required_error: "Oogstdatum is verplicht",
-            invalid_type_error: "Oogstdatum moet een datum zijn",
-        }),
         b_lu_harvestable: z.enum(["once", "multiple", "none"]).optional(),
     })
     .superRefine((data, ctx) => {

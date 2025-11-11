@@ -10,23 +10,16 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
-    useNavigate,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
-import { HarvestForm } from "~/components/blocks/harvest/form"
+import { HarvestFormDialog } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "../components/ui/dialog"
-import { getCalendar } from "../lib/calendar"
+import { getCalendar } from "~/lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -135,30 +128,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const navigate = useNavigate()
 
     return (
-        <Dialog open={true} onOpenChange={() => navigate("..")}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Oogst bijwerken</DialogTitle>
-                </DialogHeader>
-                <HarvestForm
-                    b_lu_yield={
-                        loaderData.harvest?.harvestable
-                            ?.harvestable_analyses?.[0]?.b_lu_yield
-                    }
-                    b_lu_n_harvestable={
-                        loaderData.harvest?.harvestable
-                            ?.harvestable_analyses?.[0]?.b_lu_n_harvestable
-                    }
-                    b_lu_harvest_date={loaderData.harvest?.b_lu_harvest_date}
-                    b_lu_start={loaderData.cultivation.b_lu_start}
-                    b_lu_end={loaderData.cultivation.b_lu_end}
-                    b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
-                />
-            </DialogContent>
-        </Dialog>
+        <HarvestFormDialog
+            b_lu_harvest_date={loaderData.harvest.b_lu_harvest_date}
+            b_lu_yield_fresh={loaderData.harvest.b_lu_yield_fresh}
+            b_lu_dm={loaderData.harvest.b_lu_dm}
+            b_lu_n_harvestable={loaderData.harvest.b_lu_n_harvestable}
+            b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
+            b_lu_start={loaderData.cultivation.b_lu_start}
+            b_lu_end={loaderData.cultivation.b_lu_end}
+        />
     )
 }
 
