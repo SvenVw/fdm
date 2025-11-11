@@ -27,6 +27,7 @@ import {
     FieldSet,
 } from "~/components/ui/field"
 import { Controller } from "react-hook-form"
+import { useEffect, useState } from "react"
 
 type HarvestFormDialogProps = {
     b_lu_harvest_date: Date | undefined
@@ -49,6 +50,12 @@ export function HarvestFormDialog({
 }: HarvestFormDialogProps) {
     const navigate = useNavigate()
     const fetcher = useFetcher()
+    const [yieldDryMatter, setYieldDryMatter] = useState<number | undefined>(
+        undefined,
+    )
+    const [nitrogenUptake, setNitrogenUptake] = useState<number | undefined>(
+        undefined,
+    )
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -70,6 +77,29 @@ export function HarvestFormDialog({
     const handleDeleteHarvest = () => {
         return fetcher.submit(null, { method: "DELETE" })
     }
+
+    // Calculate dry matter yield
+    useEffect(() => {
+        if (form.getValues("b_lu_yield_fresh") && form.getValues("b_lu_dm")) {
+            const b_lu_yield_fresh = Number(form.getValues("b_lu_yield_fresh"))
+            const b_lu_dm = Number(form.getValues("b_lu_dm"))
+            const b_lu_yield = Math.round(b_lu_yield_fresh * (b_lu_dm / 1000))
+            setYieldDryMatter(b_lu_yield)
+        } else {
+            setYieldDryMatter(undefined)
+        }
+    }, [form.getValues("b_lu_yield_fresh"), form.getValues("b_lu_dm")])
+
+    // Calculate nitrogen uptake
+    useEffect(() => {
+        if (yieldDryMatter && form.getValues("b_lu_n_harvestable")) {
+            const b_lu_n_harvestable = Number(form.getValues("b_lu_n_harvestable"))
+            const nitrogenUptake = Math.round(yieldDryMatter * b_lu_n_harvestable  / 1000)
+            setNitrogenUptake(nitrogenUptake)
+        } else {
+            setNitrogenUptake(undefined)
+        }
+    }, [yieldDryMatter, form.getValues("b_lu_n_harvestable")])
 
     // Check if this is a new harvest or is has already values
     const isHarvestUpdate = b_lu_harvest_date !== undefined
@@ -203,13 +233,19 @@ export function HarvestFormDialog({
                                 <Field orientation="horizontal">
                                     <FieldLabel>Droge stofopbrengst</FieldLabel>
                                     <p className="text-muted-foreground text-sm">
-                                        4500 kg DS / ha
+                                        {yieldDryMatter
+                                            ? yieldDryMatter?.toLocaleString()
+                                            : "-"}{" "}
+                                        kg DS / ha
                                     </p>
                                 </Field>
                                 <Field orientation="horizontal">
                                     <FieldLabel>Stikstofafvoer</FieldLabel>
                                     <p className="text-muted-foreground text-sm">
-                                        150 kg N / ha
+                                        {nitrogenUptake
+                                            ? nitrogenUptake?.toLocaleString()
+                                            : "-"}{" "}
+                                        kg N / ha
                                     </p>
                                 </Field>
                             </FieldGroup>
