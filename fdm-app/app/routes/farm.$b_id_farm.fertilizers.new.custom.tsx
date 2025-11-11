@@ -19,6 +19,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { modifySearchParams } from "~/lib/url-utils"
 
 export const meta: MetaFunction = () => {
     return [
@@ -219,17 +220,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
             undefined,
         )
 
-        const parsedReturnUrl = new URL(
-            returnUrl.startsWith("/")
-                ? `http://localhost${returnUrl}`
-                : returnUrl,
+        return redirectWithSuccess(
+            modifySearchParams(returnUrl, (searchParams) =>
+                searchParams.set("p_id", p_id),
+            ),
+            {
+                message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
+            },
         )
-        parsedReturnUrl.searchParams.set("p_id", p_id)
-        const modifiedReturnUrl = `${returnUrl.startsWith("/") ? "" : parsedReturnUrl.origin}${parsedReturnUrl.pathname}${parsedReturnUrl.search}${parsedReturnUrl.hash}`
-
-        return redirectWithSuccess(modifiedReturnUrl, {
-            message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
-        })
     } catch (error) {
         throw handleActionError(error)
     }

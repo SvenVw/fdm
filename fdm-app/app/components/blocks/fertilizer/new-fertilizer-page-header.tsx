@@ -1,4 +1,5 @@
 import { useLoaderData, useParams, useSearchParams } from "react-router"
+import { getSearchParams } from "@/app/lib/url-utils"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { HeaderFarm } from "~/components/blocks/header/farm"
@@ -7,7 +8,7 @@ import { HeaderField } from "~/components/blocks/header/field"
 import { BreadcrumbLink, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 
 /**
- * Returns the appropriate new fertilizer page header based on the `returnUrl`\
+ * Returns the appropriate new fertilizer page header based on the `returnUrl`
  * search param.
  *
  * `b_id_farm` is assumed to be in the route params for the farm fertilizer
@@ -24,17 +25,11 @@ export function NewFertilizerPageHeader() {
     const [searchParams] = useSearchParams()
     const params = useParams()
     const { b_name_farm, farmOptions, fieldOptions } = useLoaderData()
-    const returnUrl = searchParams.get("returnUrl") ?? ""
-    const parsedReturnUrl = returnUrl
-        ? new URL(
-              returnUrl.startsWith("/")
-                  ? `http://localhost${returnUrl}`
-                  : returnUrl,
-          )
-        : null
+    const returnUrl = searchParams.get("returnUrl") || ""
+    const returnUrlSearchParams = getSearchParams(returnUrl)
 
     const singleFieldMatch = returnUrl.match(
-        /farm\/([^/]*)\/([^/]*)\/field\/([^/]*)\/fertilizer/,
+        /farm\/([^/]*)\/([^/]*)\/field\/([^/]*)\/fertilizer(?:\/|$|\?)/,
     )
     if (singleFieldMatch) {
         const [_, b_id_farm, calendar, b_id] = singleFieldMatch
@@ -55,6 +50,7 @@ export function NewFertilizerPageHeader() {
                     fieldOptions={fieldOptions}
                     b_id={b_id}
                 />
+                <BreadcrumbSeparator />
                 <BreadcrumbLink
                     href={`/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer/manage/new`}
                 >
@@ -65,7 +61,7 @@ export function NewFertilizerPageHeader() {
     }
 
     const multipleFieldsMatch = returnUrl.match(
-        /farm\/([^/]*)\/([^/]*)\/field\/fertilizer/,
+        /farm\/([^/]*)\/([^/]*)\/field\/fertilizer(?:\/|$|\?)/,
     )
     if (multipleFieldsMatch) {
         const [_, b_id_farm, calendar] = multipleFieldsMatch
@@ -89,7 +85,7 @@ export function NewFertilizerPageHeader() {
                 </BreadcrumbLink>
                 <BreadcrumbSeparator />
                 <BreadcrumbLink
-                    href={`/farm/${b_id_farm}/${calendar}/field/fertilizer/manage/new?fieldIds=${parsedReturnUrl?.searchParams.get("fieldIds")}`}
+                    href={`/farm/${b_id_farm}/${calendar}/field/fertilizer/manage/new?fieldIds=${encodeURIComponent(returnUrlSearchParams.get("fieldIds") || "")}`}
                 >
                     Nieuwe meststof
                 </BreadcrumbLink>
