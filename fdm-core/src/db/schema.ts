@@ -460,6 +460,7 @@ export const cultivationsCatalogue = fdmSchema.table(
         b_lu_hcat3_name: text(),
         b_lu_croprotation: rotationEnum(),
         b_lu_yield: numericCasted(),
+        b_lu_dm: numericCasted(),
         b_lu_hi: numericCasted(),
         b_lu_n_harvestable: numericCasted(),
         b_lu_n_residue: numericCasted(),
