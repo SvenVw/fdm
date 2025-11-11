@@ -22,6 +22,7 @@ export interface CatalogueCultivationItem {
         | "alfalfa"
         | "catchcrop"
     b_lu_yield: number
+    b_lu_dm: number
     b_lu_hi: number
     b_lu_n_harvestable: number
     b_lu_n_residue: number

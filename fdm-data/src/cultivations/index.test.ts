@@ -53,6 +53,7 @@ describe("getCatalogueBrp", () => {
             expect(item).toHaveProperty("b_lu_hcat3_name")
             expect(item).toHaveProperty("b_lu_croprotation")
             expect(item).toHaveProperty("b_lu_yield")
+            expect(item).toHaveProperty("b_lu_dm")
             expect(item).toHaveProperty("b_lu_hi")
             expect(item).toHaveProperty("b_lu_n_harvestable")
             expect(item).toHaveProperty("b_lu_n_residue")

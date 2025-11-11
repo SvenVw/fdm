@@ -57,6 +57,7 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
             b_lu_hcat3_name: cultivation.b_lu_hcat3_name,
             b_lu_croprotation: cultivation.b_lu_croprotation,
             b_lu_yield: cultivation.b_lu_yield,
+            b_lu_dm: cultivation.b_lu_dm,
             b_lu_hi: cultivation.b_lu_hi,
             b_lu_n_harvestable: cultivation.b_lu_n_harvestable,
             b_lu_n_residue: cultivation.b_lu_n_residue,
