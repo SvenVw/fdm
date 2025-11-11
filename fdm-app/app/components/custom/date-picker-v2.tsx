@@ -14,11 +14,16 @@ import {
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import { Field, FieldError, FieldLabel } from "~/components/ui/field"
-import type { ControllerFieldState, ControllerRenderProps, FieldValues } from "react-hook-form"
+import type {
+    ControllerFieldState,
+    ControllerRenderProps,
+    FieldValues,
+} from "react-hook-form"
+import { nl as calenderLocale } from "react-day-picker/locale"
 
 type DatePickerProps = {
     label: string
-    defaultValue?: string
+    defaultValue?: Date
     field: ControllerRenderProps<FieldValues, string>
     fieldState: ControllerFieldState
 }
@@ -31,7 +36,10 @@ export function DatePicker({
 }: DatePickerProps) {
     const [open, setOpen] = React.useState(false)
     const [inputValue, setInputValue] = React.useState(
-        field.value || defaultValue || "",
+        field.value
+            ? parseDateText(field.value)?.toDateString() ||
+                  defaultValue?.toDateString()
+            : "",
     )
     const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
         field.value ? parseDateText(field.value) || undefined : undefined,
@@ -40,8 +48,9 @@ export function DatePicker({
 
     React.useEffect(() => {
         if (field.value) {
-            setInputValue(field.value)
-            setSelectedDate(parseDateText(field.value) || undefined)
+            const date = parseDateText(field.value)
+            setSelectedDate(date || undefined)
+            setInputValue(date ? formatDate(date) : "")
         } else {
             setInputValue("")
             setSelectedDate(undefined)
@@ -114,6 +123,7 @@ export function DatePicker({
                             month={month}
                             onMonthChange={setMonth}
                             onSelect={handleDateSelect}
+                            locale={calenderLocale}
                         />
                     </PopoverContent>
                 </Popover>
@@ -133,7 +143,10 @@ function formatDate(date: Date | undefined) {
     return format(date, "PPP", { locale: nl })
 }
 
-function parseDateText(date: string | undefined): Date | undefined {
+function parseDateText(date: string | Date | undefined): Date | undefined {
+    if (date instanceof Date) {
+        return date
+    }
     if (!date || date === "") {
         return undefined
     }
