@@ -4,9 +4,14 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
+    useLoaderData,
+    useSearchParams,
 } from "react-router"
-import { NewFertilizerPageHeader } from "@/app/components/blocks/fertilizer/new-fertilizer-page-header"
+import { redirectWithError } from "remix-toast"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
@@ -15,7 +20,6 @@ import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { isOfOrigin } from "~/lib/url-utils"
 import type { Route } from "./+types/farm.$b_id_farm.fertilizers.new"
-import { redirectWithError } from "remix-toast"
 
 export const meta: MetaFunction = () => {
     return [
@@ -127,9 +131,44 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
  */
 export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
+    const [searchParams] = useSearchParams()
+    const loaderData = useLoaderData()
+
+    const returnUrl = searchParams.get("returnUrl")
+    const fieldsMatch =
+        returnUrl &&
+        /farm\/[^/]+\/?[^/]+\/field\/[^/]+\/fertilizer(?:\/|$|\?)/.test(
+            returnUrl,
+        )
+    const createMatch = returnUrl && /farm\/create/.test(returnUrl)
+
     return (
         <SidebarInset>
-            <NewFertilizerPageHeader />
+            <Header
+                action={
+                    fieldsMatch || createMatch
+                        ? {
+                              label: "Terug naar bemesting toevoegen",
+                              to: returnUrl,
+                              disabled: false,
+                          }
+                        : {
+                              to: `/farm/${params.b_id_farm}/fertilizers`,
+                              label: "Terug naar overzicht",
+                              disabled: false,
+                          }
+                }
+            >
+                <HeaderFarm
+                    b_id_farm={params.b_id_farm}
+                    farmOptions={loaderData.farmOptions}
+                />
+                <HeaderFertilizer
+                    b_id_farm={params.b_id_farm || ""}
+                    p_id={undefined}
+                    fertilizerOptions={[]}
+                />
+            </Header>
             <main className="mx-auto max-w-4xl">
                 <FarmTitle
                     title={"Meststof toevoegen"}
