@@ -13,7 +13,9 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { isOfOrigin } from "~/lib/url-utils"
 import type { Route } from "./+types/farm.$b_id_farm.fertilizers.new"
+import { redirectWithError } from "remix-toast"
 
 export const meta: MetaFunction = () => {
     return [
@@ -35,6 +37,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 status: 400,
                 statusText: "invalid: b_id_farm",
             })
+        }
+
+        const requestUrl = new URL(request.url)
+        const returnUrl =
+            requestUrl.searchParams.get("returnUrl") ??
+            `/farm/${b_id_farm}/fertilizers`
+
+        if (!isOfOrigin(returnUrl, requestUrl.origin)) {
+            return redirectWithError(
+                `/farm/${b_id_farm}/fertilizers`,
+                `Return URL ${returnUrl} is niet ondersteund.`,
+            )
         }
 
         // Get the session
@@ -66,11 +80,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
 
         // Try to load more data if the requestUrl is found
-        const requestUrl = new URL(request.url)
-        const returnUrl =
-            requestUrl.searchParams.get("returnUrl") ??
-            `/farm/${b_id_farm}/fertilizers`
-
         let fieldOptions: {
             b_id: string
             b_name: string
