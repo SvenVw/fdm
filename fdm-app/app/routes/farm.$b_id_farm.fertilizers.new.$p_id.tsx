@@ -22,7 +22,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { modifySearchParams } from "~/lib/url-utils"
+import { isOfOrigin, modifySearchParams } from "~/lib/url-utils"
 
 export const meta: MetaFunction = () => {
     return [
@@ -217,9 +217,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
         )
 
         return redirectWithSuccess(
-            modifySearchParams(returnUrl, (searchParams) =>
-                searchParams.set("p_id", p_new_id),
-            ),
+            isOfOrigin(returnUrl, requestUrl.origin)
+                ? modifySearchParams(returnUrl, (searchParams) =>
+                      searchParams.set("p_id", p_new_id),
+                  )
+                : `/farm/${b_id_farm}/fertilizers`,
             {
                 message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
             },

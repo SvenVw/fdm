@@ -53,3 +53,19 @@ export function getSearchParams(href: string) {
     }
     return searchParams ?? new URLSearchParams()
 }
+
+/**
+ * Checks if the given URL-like might be a full URL, and if so, if it is of the
+ * origin given. No checks are performed if no protocol in the URL is detected.
+ *
+ * @param href URL-like
+ * @param origin origin, like `example.com` to check if full URL is detected
+ * @returns the validation result for full URLs, true if no full URL is found
+ */
+export function isOfOrigin(href: string, origin: string) {
+    try {
+        return !href.includes("://") || new URL(href).origin === origin
+    } catch {
+        return false
+    }
+}
