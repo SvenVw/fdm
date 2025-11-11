@@ -26,7 +26,9 @@ export function SidebarApps() {
 
     // Check if page contains `farm/create` in url
     const location = useLocation()
-    const isCreateFarmWizard = location.pathname.includes("farm/create")
+    const isCreateFarmWizard =
+        location.pathname.includes("farm/create") ||
+        location.search.toLowerCase().includes("farm%2fcreate")
 
     let atlasLink: string | undefined
     if (isCreateFarmWizard) {
