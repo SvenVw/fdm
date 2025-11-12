@@ -909,7 +909,7 @@ async function getHarvestSimplified(
 }
 
 /**
- * Retrieves the required harvest parameters for a given harvest class.
+ * Retrieves the required harvest parameters for a given harvest category.
  *
  * This function returns an array of parameter names that are required for a specific
  * harvest category (`b_lu_harvestcat`). Each category corresponds to a different type of crop
@@ -918,7 +918,7 @@ async function getHarvestSimplified(
  * @param b_lu_harvestcat - The harvest category identifier from the cultivations catalogue.
  * @returns An array of strings, where each string is a required parameter name for the given harvest class. Returns an empty array if the class is not recognized.
  */
-export function getParametersForHarvestClass(
+export function getParametersForHarvestCat(
     b_lu_harvestcat: schema.cultivationsCatalogueTypeSelect["b_lu_harvestcat"],
 ) {
     switch (b_lu_harvestcat) {

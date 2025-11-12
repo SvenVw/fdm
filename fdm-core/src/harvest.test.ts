@@ -7,7 +7,7 @@ import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField } from "./field"
-import { addHarvest, getHarvest, getHarvests, updateHarvest } from "./harvest"
+import { addHarvest, getHarvest, getHarvests, updateHarvest, getParametersForHarvestCat } from "./harvest"
 import { createId } from "./id"
 
 describe("Harvest Data Model", () => {
@@ -409,5 +409,77 @@ describe("Harvest Data Model", () => {
                 {},
             ),
         ).rejects.toThrowError("Exception for updateHarvest")
+    })
+})
+
+describe("getParametersForHarvestCat", () => {
+    it('should return correct parameters for "HC010"', () => {
+        const params = getParametersForHarvestCat("HC010")
+        expect(params).toEqual(["b_lu_yield_fresh", "b_lu_dm", "b_lu_n_harvestable"])
+    })
+
+    it('should return correct parameters for "HC020"', () => {
+        const params = getParametersForHarvestCat("HC020")
+        expect(params).toEqual(["b_lu_yield", "b_lu_cp"])
+    })
+
+    it('should return correct parameters for "HC031"', () => {
+        const params = getParametersForHarvestCat("HC031")
+        expect(params).toEqual(["b_lu_yield", "b_lu_cp"])
+    })
+
+    it('should return correct parameters for "HC040"', () => {
+        const params = getParametersForHarvestCat("HC040")
+        expect(params).toEqual([
+            "b_lu_yield_bruto",
+            "b_lu_tarra",
+            "b_lu_dm",
+            "b_lu_n_harvestable",
+        ])
+    })
+
+    it('should return correct parameters for "HC041"', () => {
+        const params = getParametersForHarvestCat("HC041")
+        expect(params).toEqual([
+            "b_lu_yield_bruto",
+            "b_lu_tarra",
+            "b_lu_dm",
+            "b_lu_n_harvestable",
+        ])
+    })
+
+    it('should return correct parameters for "HC042"', () => {
+        const params = getParametersForHarvestCat("HC042")
+        expect(params).toEqual([
+            "b_lu_yield_bruto",
+            "b_lu_tarra",
+            "b_lu_uww",
+            "b_lu_n_harvestable",
+        ])
+    })
+
+    it('should return correct parameters for "HC050"', () => {
+        const params = getParametersForHarvestCat("HC050")
+        expect(params).toEqual(["b_lu_yield_fresh", "b_lu_moist", "b_lu_cp"])
+    })
+
+    it('should return correct parameters for "HC061"', () => {
+        const params = getParametersForHarvestCat("HC061")
+        expect(params).toEqual(["b_lu_yield_fresh", "b_lu_dm", "f_no3_td_asis"])
+    })
+
+    it("should return an empty array for an unrecognized harvest category", () => {
+        const params = getParametersForHarvestCat("UNKNOWN_CAT")
+        expect(params).toEqual([])
+    })
+
+    it("should return an empty array for null input", () => {
+        const params = getParametersForHarvestCat(null as any)
+        expect(params).toEqual([])
+    })
+
+    it("should return an empty array for undefined input", () => {
+        const params = getParametersForHarvestCat(undefined as any)
+        expect(params).toEqual([])
     })
 })
