@@ -472,18 +472,7 @@ export async function addCultivation(
 
                 if (harvestableType === "once") {
                     // If cultivation can only be harvested once, add harvest on terminate date
-                    await addHarvest(
-                        tx,
-                        principal_id,
-                        b_lu,
-                        b_lu_end,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                    )
+                    await addHarvest(tx, principal_id, b_lu, b_lu_end)
                 }
             }
             return b_lu
@@ -1278,18 +1267,7 @@ export async function updateCultivation(
                                 ),
                             )
                     } else {
-                        await addHarvest(
-                            tx,
-                            principal_id,
-                            b_lu,
-                            b_lu_end,
-                            undefined,
-                            undefined,
-                            undefined,
-                            undefined,
-                            undefined,
-                            undefined,
-                        )
+                        await addHarvest(tx, principal_id, b_lu, b_lu_end)
                     }
                 }
             }
