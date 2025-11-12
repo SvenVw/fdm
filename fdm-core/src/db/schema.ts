@@ -544,6 +544,13 @@ export const harvestableAnalyses = fdmSchema.table(
     {
         b_id_harvestable_analysis: text().primaryKey(),
         b_lu_yield: numericCasted(),
+        b_lu_yield_fresh: numericCasted(),
+        b_lu_yield_bruto: numericCasted(),
+        b_lu_tarra: numericCasted(),
+        b_lu_dm: numericCasted(),
+        b_lu_moist: numericCasted(),
+        b_lu_uww: numericCasted(),
+        b_lu_cp: numericCasted(),
         b_lu_n_harvestable: numericCasted(),
         b_lu_n_residue: numericCasted(),
         b_lu_p_harvestable: numericCasted(),

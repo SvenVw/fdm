@@ -40,23 +40,17 @@ export const FormSchema = z
                 message: "Hoeveelheid moet een safe getal zijn",
             })
             .optional(),
-        b_lu_n_harvestable: z.preprocess(
-            (val) => {
-                if (val === "" || val === null) return undefined
-                return val as number | undefined
-            },
-            z.coerce
-                .number({
-                    invalid_type_error: "Hoeveelheid moet een getal zijn",
-                })
-                .min(0, {
-                    message: "Hoeveelheid moet positief zijn",
-                })
-                .max(1000, {
-                    message: "Hoeveelheid mag niet groter zijn dan 1000",
-                })
-                .optional(),
-        ),
+        b_lu_n_harvestable: z.coerce
+            .number({
+                invalid_type_error: "Hoeveelheid moet een getal zijn",
+            })
+            .min(0, {
+                message: "Hoeveelheid moet positief zijn",
+            })
+            .max(1000, {
+                message: "Hoeveelheid mag niet groter zijn dan 1000",
+            })
+            .optional(),
         // b_lu_yield_bruto: z.coerce
         //     .number({
         //         invalid_type_error: "Hoeveelheid moet een getal zijn",
@@ -106,7 +100,7 @@ export const FormSchema = z
             }
             return value
         }, z.coerce.date().optional().nullable()),
-        b_lu_harvestable: z.enum(["once", "multiple", "none"]).optional(),
+        b_lu_harvestable: z.enum(["once", "multiple", "none"]),
     })
     .superRefine((data, ctx) => {
         if (

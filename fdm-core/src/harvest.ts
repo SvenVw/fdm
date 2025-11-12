@@ -45,7 +45,14 @@ export async function addHarvest(
     principal_id: PrincipalId,
     b_lu: schema.cultivationHarvestingTypeInsert["b_lu"],
     b_lu_harvest_date: schema.cultivationHarvestingTypeInsert["b_lu_harvest_date"],
-    b_lu_yield: schema.harvestableAnalysesTypeInsert["b_lu_yield"],
+    b_lu_yield?: schema.harvestableAnalysesTypeInsert["b_lu_yield"],
+    b_lu_yield_bruto?: schema.harvestableAnalysesTypeInsert["b_lu_yield_bruto"],
+    b_lu_yield_fresh?: schema.harvestableAnalysesTypeInsert["b_lu_yield_fresh"],
+    b_lu_tarra?: schema.harvestableAnalysesTypeInsert["b_lu_tarra"],
+    b_lu_dm?: schema.harvestableAnalysesTypeInsert["b_lu_dm"],
+    b_lu_moist?: schema.harvestableAnalysesTypeInsert["b_lu_moist"],
+    b_lu_uww?: schema.harvestableAnalysesTypeInsert["b_lu_uww"],
+    b_lu_cp?: schema.harvestableAnalysesTypeInsert["b_lu_cp"],
     b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
     b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"],
     b_lu_p_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_p_harvestable"],
@@ -108,6 +115,13 @@ export async function addHarvest(
             await tx.insert(schema.harvestableAnalyses).values({
                 b_id_harvestable_analysis: b_id_harvestable_analysis,
                 b_lu_yield: b_lu_yield,
+                b_lu_yield_bruto: b_lu_yield_bruto,
+                b_lu_yield_fresh: b_lu_yield_fresh,
+                b_lu_tarra: b_lu_tarra,
+                b_lu_dm: b_lu_dm,
+                b_lu_moist: b_lu_moist,
+                b_lu_uww: b_lu_uww,
+                b_lu_cp: b_lu_cp,
                 b_lu_n_harvestable: b_lu_n_harvestable,
                 b_lu_n_residue: b_lu_n_residue,
                 b_lu_p_harvestable: b_lu_p_harvestable,
@@ -130,6 +144,13 @@ export async function addHarvest(
             b_lu,
             b_lu_harvest_date,
             b_lu_yield,
+            b_lu_yield_bruto,
+            b_lu_yield_fresh,
+            b_lu_tarra,
+            b_lu_dm,
+            b_lu_moist,
+            b_lu_uww,
+            b_lu_cp,
             b_lu_n_harvestable,
             b_lu_n_residue,
             b_lu_p_harvestable,
@@ -514,7 +535,14 @@ export async function updateHarvest(
     principal_id: PrincipalId,
     b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"],
     b_lu_harvest_date: schema.cultivationHarvestingTypeInsert["b_lu_harvest_date"],
-    b_lu_yield: schema.harvestableAnalysesTypeInsert["b_lu_yield"],
+    b_lu_yield?: schema.harvestableAnalysesTypeInsert["b_lu_yield"],
+    b_lu_yield_bruto?: schema.harvestableAnalysesTypeInsert["b_lu_yield_bruto"],
+    b_lu_yield_fresh?: schema.harvestableAnalysesTypeInsert["b_lu_yield_fresh"],
+    b_lu_tarra?: schema.harvestableAnalysesTypeInsert["b_lu_tarra"],
+    b_lu_moist?: schema.harvestableAnalysesTypeInsert["b_lu_moist"],
+    b_lu_uww?: schema.harvestableAnalysesTypeInsert["b_lu_uww"],
+    b_lu_dm?: schema.harvestableAnalysesTypeInsert["b_lu_dm"],
+    b_lu_cp?: schema.harvestableAnalysesTypeInsert["b_lu_cp"],
     b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
     b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"],
     b_lu_p_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_p_harvestable"],
@@ -540,7 +568,7 @@ export async function updateHarvest(
 
             const b_lu = harvest.b_lu
 
-            // --- Validation logic ---
+            // Validation logic
             if (!b_lu_harvest_date) {
                 throw new Error("Argument b_lu_harvest_date is missing")
             }
@@ -588,7 +616,7 @@ export async function updateHarvest(
                     )
                 }
             }
-            // --- End of validation logic ---
+            // End of validation logic
 
             const b_id_harvestable_analysis =
                 harvest.harvestable.harvestable_analyses[0]
@@ -611,6 +639,13 @@ export async function updateHarvest(
                 .update(schema.harvestableAnalyses)
                 .set({
                     b_lu_yield: b_lu_yield,
+                    b_lu_yield_bruto: b_lu_yield_bruto,
+                    b_lu_yield_fresh: b_lu_yield_fresh,
+                    b_lu_tarra: b_lu_tarra,
+                    b_lu_moist: b_lu_moist,
+                    b_lu_uww: b_lu_uww,
+                    b_lu_dm: b_lu_dm,
+                    b_lu_cp: b_lu_cp,
                     b_lu_n_harvestable: b_lu_n_harvestable,
                     b_lu_n_residue: b_lu_n_residue,
                     b_lu_p_harvestable: b_lu_p_harvestable,
@@ -638,6 +673,13 @@ export async function updateHarvest(
             b_id_harvesting,
             b_lu_harvest_date,
             b_lu_yield,
+            b_lu_yield_bruto,
+            b_lu_yield_fresh,
+            b_lu_tarra,
+            b_lu_moist,
+            b_lu_uww,
+            b_lu_dm,
+            b_lu_cp,
             b_lu_n_harvestable,
             b_lu_n_residue,
             b_lu_p_harvestable,
@@ -718,6 +760,13 @@ async function getHarvestSimplified(
             b_id_harvestable_analysis:
                 schema.harvestableAnalyses.b_id_harvestable_analysis,
             b_lu_yield: schema.harvestableAnalyses.b_lu_yield,
+            b_lu_yield_fresh: schema.harvestableAnalyses.b_lu_yield_fresh,
+            b_lu_yield_bruto: schema.harvestableAnalyses.b_lu_yield_bruto,
+            b_lu_tarra: schema.harvestableAnalyses.b_lu_tarra,
+            b_lu_dm: schema.harvestableAnalyses.b_lu_dm,
+            b_lu_moist: schema.harvestableAnalyses.b_lu_moist,
+            b_lu_uww: schema.harvestableAnalyses.b_lu_uww,
+            b_lu_cp: schema.harvestableAnalyses.b_lu_cp,
             b_lu_n_harvestable: schema.harvestableAnalyses.b_lu_n_harvestable,
             b_lu_n_residue: schema.harvestableAnalyses.b_lu_n_residue,
             b_lu_p_harvestable: schema.harvestableAnalyses.b_lu_p_harvestable,
@@ -752,3 +801,5 @@ async function getHarvestSimplified(
 
     return harvest
 }
+
+export function getParametersForHarvestClass() {}
