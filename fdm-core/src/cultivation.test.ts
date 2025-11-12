@@ -395,7 +395,7 @@ describe("Cultivation Data Model", () => {
         it("should remove a cultivation and its associated harvests", async () => {
             // Add a harvest to the cultivation using the addHarvest function
             const harvestDate = new Date("2024-01-15")
-            await addHarvest(fdm, principal_id, b_lu, harvestDate, 1000) // Add a dummy yield value
+            await addHarvest(fdm, principal_id, b_lu, harvestDate)
 
             // Verify the harvest exists
             const harvestsBeforeDelete = await fdm
