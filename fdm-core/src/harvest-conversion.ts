@@ -1,6 +1,28 @@
 import type * as schema from "./db/schema"
 import { Decimal } from "decimal.js"
+import type { StandardHarvestParameters } from "./harvest-conversion.d"
 
+/**
+ * Converts harvest parameters from different harvest categories to a standardized format.
+ *
+ * This function takes various harvest parameters, which may vary depending on the
+ * harvest category (`b_lu_harvestcat`), and converts them into a standard set of
+ * parameters: `b_lu_yield` (dry matter yield) and `b_lu_n_harvestable` (nitrogen content).
+ *
+ * @param b_lu_harvestcat - The harvest category code, which determines the conversion logic.
+ * @param [b_lu_yield] - The yield in kg dry matter per hectare.
+ * @param [b_lu_yield_bruto] - The gross yield in kg per hectare.
+ * @param [b_lu_yield_fresh] - The fresh yield in kg per hectare.
+ * @param [b_lu_tarra] - The percentage of tare (non-usable material).
+ * @param [b_lu_moist] - The moisture content as a percentage.
+ * @param [b_lu_uww] - The underwater weight in grams per 5 kg.
+ * @param [b_lu_dm] - The dry matter content in g/kg.
+ * @param [b_lu_cp] - The crude protein content in g/kg dry matter.
+ * @param [f_no3_td_asis] - The nitrate content in fresh matter (g NO3/kg).
+ * @param [b_lu_n_harvestable] - The nitrogen content in g N per kg dry matter.
+ * @returns An object containing the standardized harvest parameters (`b_lu_yield` and `b_lu_n_harvestable`).
+ *          If the category is unknown, it returns zero for both values.
+ */
 export function convertHarvestParameters(
     b_lu_harvestcat: schema.cultivationsCatalogueTypeSelect["b_lu_harvestcat"],
     b_lu_yield?: schema.harvestableAnalysesTypeInsert["b_lu_yield"],
@@ -15,50 +37,51 @@ export function convertHarvestParameters(
     b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
 ): StandardHarvestParameters {
     switch (b_lu_harvestcat) {
-        case "HC010":
+        case "HC010": // Standard
             return convertHarvestParametersForClassHC010(
                 b_lu_yield_fresh,
                 b_lu_dm,
                 b_lu_n_harvestable,
             )
-        case "HC020":
+        case "HC020": // Grassland
             return convertHarvestParametersForClassHC020(b_lu_yield, b_lu_cp)
-        case "HC031":
+        case "HC031": // Maize
             return convertHarvestParametersForClassHC031(b_lu_yield, b_lu_cp)
-        case "HC040":
+        case "HC040": // Root crops
             return convertHarvestParametersForClassHC040(
                 b_lu_yield_bruto,
                 b_lu_tarra,
                 b_lu_dm,
                 b_lu_n_harvestable,
             )
-        case "HC041":
+        case "HC041": // Sugar beet
             return convertHarvestParametersForClassHC041(
                 b_lu_yield_bruto,
                 b_lu_tarra,
                 b_lu_dm,
                 b_lu_n_harvestable,
             )
-        case "HC042":
+        case "HC042": // Potatoes
             return convertHarvestParametersForClassHC042(
                 b_lu_yield_bruto,
                 b_lu_tarra,
                 b_lu_uww,
                 b_lu_n_harvestable,
             )
-        case "HC050":
+        case "HC050": // Cereals
             return convertHarvestParametersForClassHC050(
                 b_lu_yield_fresh,
                 b_lu_moist,
                 b_lu_cp,
             )
-        case "HC061":
+        case "HC061": // Spinach
             return convertHarvestParametersForClassHC061(
                 b_lu_yield_fresh,
                 b_lu_dm,
                 f_no3_td_asis,
             )
         default:
+            // Return zero values for unknown categories
             return {
                 b_lu_yield: 0,
                 b_lu_n_harvestable: 0,
@@ -66,6 +89,15 @@ export function convertHarvestParameters(
     }
 }
 
+/**
+ * Converts harvest parameters for harvest category HC010 (Standard).
+ *
+ * @param b_lu_yield_fresh - The fresh yield in kg per hectare.
+ * @param b_lu_dm - The dry matter content in g/kg.
+ * @param b_lu_n_harvestable - The nitrogen content in g N per kg dry matter.
+ * @returns Standardized harvest parameters.
+ * @throws If required parameters are missing.
+ */
 function convertHarvestParametersForClassHC010(
     b_lu_yield_fresh: schema.harvestableAnalysesTypeInsert["b_lu_yield_fresh"],
     b_lu_dm: schema.harvestableAnalysesTypeInsert["b_lu_dm"],
@@ -81,7 +113,7 @@ function convertHarvestParametersForClassHC010(
     // Calculate b_lu_yield (dry matter yield)
     const b_lu_yield_calculated = new Decimal(b_lu_yield_fresh)
         .times(Decimal(b_lu_dm))
-        .dividedBy(1000)
+        .dividedBy(1000) // Convert g/kg to kg/kg
         .toNumber()
 
     // Return the calculated values
@@ -91,6 +123,14 @@ function convertHarvestParametersForClassHC010(
     }
 }
 
+/**
+ * Converts harvest parameters for harvest category HC020 (Grassland).
+ *
+ * @param b_lu_yield - The yield in kg dry matter per hectare.
+ * @param b_lu_cp - The crude protein content in g/kg dry matter.
+ * @returns Standardized harvest parameters.
+ * @throws If required parameters are missing.
+ */
 function convertHarvestParametersForClassHC020(
     b_lu_yield: schema.harvestableAnalysesTypeInsert["b_lu_yield"],
     b_lu_cp: schema.harvestableAnalysesTypeInsert["b_lu_cp"],
@@ -115,6 +155,14 @@ function convertHarvestParametersForClassHC020(
     }
 }
 
+/**
+ * Converts harvest parameters for harvest category HC031 (LMaize).
+ *
+ * @param b_lu_yield - The yield in kg dry matter per hectare.
+ * @param b_lu_cp - The crude protein content in g/kg dry matter.
+ * @returns Standardized harvest parameters.
+ * @throws If required parameters are missing.
+ */
 function convertHarvestParametersForClassHC031(
     b_lu_yield: schema.harvestableAnalysesTypeInsert["b_lu_yield"],
     b_lu_cp: schema.harvestableAnalysesTypeInsert["b_lu_cp"],
@@ -139,6 +187,16 @@ function convertHarvestParametersForClassHC031(
     }
 }
 
+/**
+ * Converts harvest parameters for harvest category HC040 (Root crops).
+ *
+ * @param b_lu_yield_bruto - The gross yield in kg per hectare.
+ * @param b_lu_tarra - The percentage of tare.
+ * @param b_lu_dm - The dry matter content in g/kg.
+ * @param b_lu_n_harvestable - The nitrogen content in g N per kg dry matter.
+ * @returns Standardized harvest parameters.
+ * @throws If required parameters are missing.
+ */
 function convertHarvestParametersForClassHC040(
     b_lu_yield_bruto: schema.harvestableAnalysesTypeInsert["b_lu_yield_bruto"],
     b_lu_tarra: schema.harvestableAnalysesTypeInsert["b_lu_tarra"],
@@ -152,14 +210,15 @@ function convertHarvestParametersForClassHC040(
         )
     }
 
-    // Calculate b_lu_yield (dry matter yield)
+    // Calculate fresh yield from gross yield and tare
     const b_lu_yield_fresh = new Decimal(100)
         .minus(b_lu_tarra)
         .dividedBy(100)
         .times(b_lu_yield_bruto)
+    // Calculate dry matter yield
     const b_lu_yield = b_lu_yield_fresh
         .times(b_lu_dm)
-        .dividedBy(1000)
+        .dividedBy(1000) // Convert g/kg to kg/kg
         .toNumber()
 
     // Return the calculated values
@@ -169,6 +228,16 @@ function convertHarvestParametersForClassHC040(
     }
 }
 
+/**
+ * Converts harvest parameters for harvest category HC041 (Sugar beets).
+ *
+ * @param b_lu_yield_bruto - The gross yield in kg per hectare.
+ * @param b_lu_tarra - The percentage of tare.
+ * @param b_lu_dm - The dry matter content in g/kg.
+ * @param b_lu_n_harvestable - The nitrogen content in g N per kg dry matter.
+ * @returns Standardized harvest parameters.
+ * @throws If required parameters are missing.
+ */
 function convertHarvestParametersForClassHC041(
     b_lu_yield_bruto: schema.harvestableAnalysesTypeInsert["b_lu_yield_bruto"],
     b_lu_tarra: schema.harvestableAnalysesTypeInsert["b_lu_tarra"],
@@ -182,14 +251,15 @@ function convertHarvestParametersForClassHC041(
         )
     }
 
-    // Calculate b_lu_yield (dry matter yield)
+    // Calculate fresh yield from gross yield and tare
     const b_lu_yield_fresh = new Decimal(100)
         .minus(b_lu_tarra)
         .dividedBy(100)
         .times(b_lu_yield_bruto)
+    // Calculate dry matter yield
     const b_lu_yield = b_lu_yield_fresh
         .times(b_lu_dm)
-        .dividedBy(1000)
+        .dividedBy(1000) // Convert g/kg to kg/kg
         .toNumber()
 
     // Return the calculated values
@@ -199,6 +269,16 @@ function convertHarvestParametersForClassHC041(
     }
 }
 
+/**
+ * Converts harvest parameters for harvest category HC042 (Potatoes).
+ *
+ * @param b_lu_yield_bruto - The gross yield in kg per hectare.
+ * @param b_lu_tarra - The percentage of tare.
+ * @param b_lu_uww - The underwater weight in grams.
+ * @param b_lu_n_harvestable - The nitrogen content in g N per kg dry matter.
+ * @returns Standardized harvest parameters.
+ * @throws If required parameters are missing.
+ */
 function convertHarvestParametersForClassHC042(
     b_lu_yield_bruto: schema.harvestableAnalysesTypeInsert["b_lu_yield_bruto"],
     b_lu_tarra: schema.harvestableAnalysesTypeInsert["b_lu_tarra"],
@@ -212,17 +292,19 @@ function convertHarvestParametersForClassHC042(
         )
     }
 
-    // Calculate dry matter content according to Ludwig,1972 (https://edepot.wur.nl/368270 page 11)
+    // Calculate dry matter content (g/kg) from underwater weight (g)
+    // Formula from Ludwig, 1972 (https://edepot.wur.nl/368270 page 11)
     const b_lu_dm = new Decimal(b_lu_uww).times(0.049).add(2.0).times(10)
 
-    // Calculate b_lu_yield (dry matter yield)
+    // Calculate fresh yield from gross yield and tare
     const b_lu_yield_fresh = new Decimal(100)
         .minus(b_lu_tarra)
         .dividedBy(100)
         .times(b_lu_yield_bruto)
+    // Calculate dry matter yield
     const b_lu_yield = b_lu_yield_fresh
         .times(b_lu_dm)
-        .dividedBy(1000)
+        .dividedBy(1000) // Convert g/kg to kg/kg
         .toNumber()
 
     // Return the calculated values
@@ -232,6 +314,15 @@ function convertHarvestParametersForClassHC042(
     }
 }
 
+/**
+ * Converts harvest parameters for harvest category HC050 (Cereals).
+ *
+ * @param b_lu_yield_fresh - The fresh yield in kg per hectare.
+ * @param b_lu_moist - The moisture content as a percentage.
+ * @param b_lu_cp - The crude protein content in g/kg dry matter.
+ * @returns Standardized harvest parameters.
+ * @throws If required parameters are missing.
+ */
 function convertHarvestParametersForClassHC050(
     b_lu_yield_fresh: schema.harvestableAnalysesTypeInsert["b_lu_yield_fresh"],
     b_lu_moist: schema.harvestableAnalysesTypeInsert["b_lu_moist"],
@@ -244,17 +335,17 @@ function convertHarvestParametersForClassHC050(
         )
     }
 
-    // Calculate b_lu_dm (dry matter content)
+    // Calculate dry matter content (g/kg) from moisture percentage
     const b_lu_dm = new Decimal(100).minus(b_lu_moist).times(10)
 
-    // Calculate b_lu_yield (dry matter yield)
+    // Calculate dry matter yield
     const b_lu_yield_calculated = new Decimal(b_lu_yield_fresh)
         .times(b_lu_dm)
-        .dividedBy(1000)
+        .dividedBy(1000) // Convert g/kg to kg/kg
         .toNumber()
 
     // Calculate b_lu_n_harvestable (Nitrogen content in harvestable yield)
-    // Assuming CP (Crude Protein) is approximately N * 5.7
+    // Assuming CP (Crude Protein) is approximately N * 5.7 for cereals
     const b_lu_n_harvestable_calculated = new Decimal(b_lu_cp)
         .dividedBy(5.7)
         .toNumber()
@@ -266,6 +357,15 @@ function convertHarvestParametersForClassHC050(
     }
 }
 
+/**
+ * Converts harvest parameters for harvest category HC061 (spinach).
+ *
+ * @param b_lu_yield_fresh - The fresh yield in kg per hectare.
+ * @param b_lu_dm - The dry matter content in g/kg.
+ * @param f_no3_td_asis - The nitrate content in fresh matter (g NO3/kg).
+ * @returns Standardized harvest parameters.
+ * @throws If required parameters are missing.
+ */
 function convertHarvestParametersForClassHC061(
     b_lu_yield_fresh: schema.harvestableAnalysesTypeInsert["b_lu_yield_fresh"],
     b_lu_dm: schema.harvestableAnalysesTypeInsert["b_lu_dm"],
@@ -278,17 +378,17 @@ function convertHarvestParametersForClassHC061(
         )
     }
 
-    // Calculate b_lu_yield (dry matter yield)
+    // Calculate dry matter yield
     const b_lu_yield = new Decimal(b_lu_yield_fresh)
         .times(b_lu_dm)
-        .dividedBy(1000)
+        .dividedBy(1000) // Convert g/kg to kg/kg
         .toNumber()
 
-    // Calculate b_lu_n_harvestable (Nitrogen content in harvestable yield)
-    // Assuming f_no3_td_asis is the nitrate content in fresh matter (g NO3 /kg), convert to g N/kg DM
+    // Calculate nitrogen content from nitrate content
+    // Convert g NO3/kg fresh matter to g N/kg dry matter
     const b_lu_n_harvestable = new Decimal(f_no3_td_asis)
-        .times(0.226) // NO3 to N
-        .dividedBy(new Decimal(b_lu_dm).dividedBy(1000)) // per kg fresh to per kg dry
+        .times(0.226) // Conversion factor from NO3 to N (14.007 / 62.0049)
+        .dividedBy(new Decimal(b_lu_dm).dividedBy(1000)) // Convert from per kg fresh matter to per kg dry matter
         .toNumber()
 
     // Return the calculated values
@@ -296,9 +396,4 @@ function convertHarvestParametersForClassHC061(
         b_lu_yield: b_lu_yield,
         b_lu_n_harvestable: b_lu_n_harvestable,
     }
-}
-
-type StandardHarvestParameters = {
-    b_lu_yield: number
-    b_lu_n_harvestable: number
 }

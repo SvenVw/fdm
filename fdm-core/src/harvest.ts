@@ -12,6 +12,7 @@ import type { FdmType } from "./fdm"
 import type { Harvest } from "./harvest.d"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
+import { convertHarvestParameters } from "./harvest-conversion"
 
 /**
  * Adds a new harvest to a cultivation.
@@ -29,6 +30,14 @@ import type { Timeframe } from "./timeframe"
  * @param b_lu - The cultivation ID.
  * @param b_lu_harvest_date - The date of the harvest.
  * @param b_lu_yield - The dry-matter yield for the harvest, in kg/ha.
+ * @param b_lu_yield_bruto - The gross yield of the harvest, in kg/ha.
+ * @param b_lu_yield_fresh - The fresh-matter yield of the harvest, in kg/ha.
+ * @param b_lu_tarra - The tarra percentage of the harvest (e.g., soil).
+ * @param b_lu_dm - The dry matter content of the harvest, in g/kg.
+ * @param b_lu_moist - The moisture content of the harvest, in g/kg.
+ * @param b_lu_uww - The underwater weight of the harvest, in g/5kg.
+ * @param b_lu_cp - The crude protein content of the harvest, in g/kg.
+ * @param f_no3_td_asis - The nitrate content of the harvest, in mg/kg.
  * @param b_lu_n_harvestable - The total nitrogen content in the harvestable yield (g N/kg).
  * @param b_lu_n_residue - The total nitrogen content in the crop residue (g N/kg).
  * @param b_lu_p_harvestable - The total phosphorus content in the harvestable yield (g P2O5/kg).
@@ -408,6 +417,17 @@ export async function removeHarvest(
     }
 }
 
+/**
+ * Retrieves the harvestable type of a cultivation.
+ *
+ * This function queries the database to determine whether a cultivation can be harvested
+ * 'once', 'multiple' times, or 'none'. This is based on the cultivation's catalogue information.
+ *
+ * @param tx The FDM transaction instance.
+ * @param b_lu The identifier of the cultivation.
+ * @returns A promise that resolves with the harvestable type ('once', 'multiple', or 'none').
+ * @throws {Error} If the cultivation does not exist.
+ */
 export async function getHarvestableTypeOfCultivation(
     tx: FdmType,
     b_lu: schema.cultivationsTypeSelect["b_lu"],
@@ -546,6 +566,14 @@ export async function checkHarvestDateCompability(
  * @param b_id_harvesting The unique identifier of the harvest to be updated.
  * @param b_lu_harvest_date The new date of the harvest.
  * @param b_lu_yield The new dry-matter yield for the harvest, in kg/ha.
+ * @param b_lu_yield_bruto - The gross yield of the harvest, in kg/ha.
+ * @param b_lu_yield_fresh - The fresh-matter yield of the harvest, in kg/ha.
+ * @param b_lu_tarra - The tarra percentage of the harvest (e.g., soil).
+ * @param b_lu_dm - The dry matter content of the harvest, in g/kg.
+ * @param b_lu_moist - The moisture content of the harvest, in g/kg.
+ * @param b_lu_uww - The underwater weight of the harvest, in g/5kg.
+ * @param b_lu_cp - The crude protein content of the harvest, in g/kg.
+ * @param f_no3_td_asis - The nitrate content of the harvest, in mg/kg.
  * @param b_lu_n_harvestable The new total nitrogen content in the harvestable yield (g N/kg).
  * @param b_lu_n_residue The new total nitrogen content in the crop residue (g N/kg).
  * @param b_lu_p_harvestable The new total phosphorus content in the harvestable yield (g P2O5/kg).
@@ -874,6 +902,16 @@ async function getHarvestSimplified(
     return harvest
 }
 
+/**
+ * Retrieves the required harvest parameters for a given harvest class.
+ *
+ * This function returns an array of parameter names that are required for a specific
+ * harvest category (`b_lu_harvestcat`). Each category corresponds to a different type of crop
+ * or harvest measurement, and thus requires a different set of parameters.
+ *
+ * @param b_lu_harvestcat - The harvest category identifier from the cultivations catalogue.
+ * @returns An array of strings, where each string is a required parameter name for the given harvest class. Returns an empty array if the class is not recognized.
+ */
 export function getParametersForHarvestClass(
     b_lu_harvestcat: schema.cultivationsCatalogueTypeSelect["b_lu_harvestcat"],
 ) {

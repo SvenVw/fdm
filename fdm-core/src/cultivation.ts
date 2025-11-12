@@ -684,14 +684,18 @@ export async function getCultivations(
  * {
  *   b_lu_catalogue: string;   // Unique ID of the cultivation catalogue item
  *   b_lu_name: string;        // Name of the cultivation
- *   b_lu_start: Date;      // Sowing date for the cultivation (if available)
- *   b_lu_end: Date; // Termination date for the cultivation (if available)
- *   m_cropresidue: boolean // Whether crop residues are left on the field or not after termination of the cultivation
+ *   b_lu_variety: string;     // Variety of the cultivation
+ *   b_area: number;           // Total area of the cultivation
+ *   b_lu_start: Date;         // Sowing date for the cultivation (if available)
+ *   b_lu_end: Date;           // Termination date for the cultivation (if available)
+ *   m_cropresidue: boolean    // Whether crop residues are left on the field or not after termination of the cultivation
  *   fields: [
  *     {
  *       b_lu: string;        // Unique ID of the cultivation record
  *       b_id: string;        // Unique ID of the field
  *       b_name: string;      // Name of the field
+ *       b_area: number;      // Area of the field
+ *       b_isproductive: boolean; // Whether the field is productive
  *       fertilizer_applications: [
  *         {
  *           p_id_catalogue: string; // Fertilizer catalogue ID
@@ -1302,13 +1306,18 @@ export async function updateCultivation(
     }
 }
 
-// Helper function to build a robust date range condition for cultivations.
-// This function constructs a SQL clause to filter cultivations that overlap
-// with a given timeframe.
-// An overlap occurs if the cultivation's start is before the timeframe's end,
-// AND the cultivation's end is after the timeframe's start.
-// A cultivation with no end date is considered to extend indefinitely into the future,
-// which correctly includes it in the timeframe if it started before the timeframe ended.
+/**
+ * Builds a SQL condition for filtering cultivations based on a timeframe.
+ *
+ * This function constructs a SQL clause to filter cultivations that overlap
+ * with a given timeframe. An overlap occurs if the cultivation's start is before
+ * the timeframe's end, AND the cultivation's end is after the timeframe's start.
+ * A cultivation with no end date is considered to extend indefinitely into the future,
+ * which correctly includes it in the timeframe if it started before the timeframe ended.
+ *
+ * @param timeframe - An object with optional `start` and `end` Date properties.
+ * @returns A Drizzle-ORM SQL condition, or `undefined` if the timeframe is not provided.
+ */
 export const buildCultivationTimeframeCondition = (
     timeframe: Timeframe | undefined,
 ): SQL | undefined => {
