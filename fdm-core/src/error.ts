@@ -1,16 +1,21 @@
+/**
+ * @file This file provides custom error handling functionalities for the FDM.
+ *
+ * It includes a custom `BaseError` class that extends the built-in `Error` class,
+ * and a centralized `handleError` function to ensure that all thrown errors are of a consistent type.
+ */
 import type { Jsonable } from "./error.d"
 
 /**
- * Converts an unknown error into a structured BaseError, applying a custom message for permission denials.
+ * A centralized error handler that wraps unknown errors in a `BaseError`.
  *
- * The function first ensures the input is an Error instance using `ensureError`. If the error message exactly matches
- * "Principal does not have permission to perform this action", the message is explicitly set to that value. The resulting
- * BaseError includes the resolved error as its cause along with any additional context provided.
+ * This function is used throughout the application to ensure that all thrown errors are of a consistent type.
+ * It also provides a mechanism for adding context to errors, which is useful for debugging.
  *
- * @param err - The error value to convert into an Error instance.
- * @param base - The default error message, which may be overridden for specific permission denial cases.
- * @param context - Optional supplementary context to include with the error.
- * @returns A new BaseError instance encapsulating the error, its message, and any additional context.
+ * @param err The unknown error to handle.
+ * @param base A base error message to use if the error is not an instance of `Error`.
+ * @param context Additional context to attach to the error.
+ * @returns A new `BaseError` instance.
  */
 export function handleError(err: unknown, base: string, context?: Jsonable) {
     const error = ensureError(err)
@@ -30,6 +35,16 @@ export function handleError(err: unknown, base: string, context?: Jsonable) {
     })
 }
 
+/**
+ * Ensures that a value is an instance of `Error`.
+ *
+ * If the value is already an `Error`, it is returned as is. Otherwise, a new `Error` is created
+ * with a stringified representation of the value as its message.
+ *
+ * @param value The value to ensure is an `Error`.
+ * @returns An `Error` instance.
+ * @internal
+ */
 export function ensureError(value: unknown): Error {
     if (value instanceof Error) return value
 
@@ -44,6 +59,12 @@ export function ensureError(value: unknown): Error {
     return error
 }
 
+/**
+ * A custom error class that extends the built-in `Error` class.
+ *
+ * It adds support for a `context` property, which can be used to attach additional information
+ * to an error, and a `cause` property, which can be used to chain errors.
+ */
 export class BaseError extends Error {
     public readonly context?: Jsonable
 

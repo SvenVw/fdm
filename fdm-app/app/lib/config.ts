@@ -1,4 +1,16 @@
-import type { ClientConfig } from "~/types/config.d"
+/**
+ * @file This module is responsible for creating a client-safe configuration object.
+ *
+ * It reads public environment variables that have been safely passed from the server
+ * to the client via the `window.__RUNTIME_CONFIG__` object. This ensures that only
+ * non-secret, "public" environment variables are accessible in the browser.
+ *
+ * The module structures these variables into a strongly-typed `clientConfig` object,
+ * providing a single, reliable source for client-side configuration.
+ *
+ * @packageDocumentation
+ */
+import type { ClientConfig, RuntimeConfig } from "~/types/config.d"
 
 declare global {
     interface Window {
@@ -6,21 +18,20 @@ declare global {
     }
 }
 
-// Define a function to initialize the runtime environment map
+/**
+ * Initializes the runtime environment map by reading from `window.__RUNTIME_CONFIG__`
+ * on the client, or from `process.env` on the server as a fallback.
+ * @internal
+ */
 const initializeRuntimeEnvMap = (): RuntimeConfig => {
-    // On the client, __RUNTIME_CONFIG__ is populated by the root loader.
-    // biome-ignore lint/complexity/useOptionalChain: Is required to run
+    // Client-side: Use the config object injected by the root loader.
+    // biome-ignore lint/complexity/useOptionalChain: Required for checking window object existence.
     if (typeof window !== "undefined" && window.__RUNTIME_CONFIG__) {
         return window.__RUNTIME_CONFIG__
     }
 
-    // On the server (SSR context for routes like welcome.tsx, or other server-side uses):
-    // We need to construct a config map that mirrors what the root loader provides.
-    // Prioritize process.env for known public variables, then fallback to import.meta.env.
-    // This ensures consistency between SSR and client-side hydration.
+    // Server-side: Construct the config from process.env (for contexts like route handlers).
     const env: Partial<RuntimeConfig> = {}
-
-    // These are the keys that root.tsx loader includes in runtimeEnv
     const keysToProcess: Array<keyof RuntimeConfig> = [
         "PUBLIC_FDM_URL",
         "PUBLIC_FDM_NAME",
@@ -40,16 +51,10 @@ const initializeRuntimeEnvMap = (): RuntimeConfig => {
     ]
 
     for (const key of keysToProcess) {
-        const stringKey = key as string // Explicit cast for indexing
-
-        if (
-            typeof process !== "undefined" &&
-            process.env &&
-            process.env[stringKey] !== undefined
-        ) {
-            env[key] = process.env[stringKey]
-        } else if (import.meta.env[stringKey] !== undefined) {
-            env[key] = import.meta.env[stringKey]
+        if (typeof process !== "undefined" && process.env[key] !== undefined) {
+            env[key] = process.env[key]
+        } else if (import.meta.env[key] !== undefined) {
+            env[key] = import.meta.env[key]
         }
     }
 
@@ -58,7 +63,10 @@ const initializeRuntimeEnvMap = (): RuntimeConfig => {
 
 const runtimeEnvMap: RuntimeConfig = initializeRuntimeEnvMap()
 
-// Helper to get config value from the runtimeEnvMap
+/**
+ * Safely retrieves a configuration value from the runtime environment map.
+ * @internal
+ */
 const getConfigValue = (
     key: keyof RuntimeConfig,
     defaultValue?: RuntimeConfig[keyof RuntimeConfig],
@@ -67,7 +75,7 @@ const getConfigValue = (
     return typeof value !== "undefined" ? value : defaultValue
 }
 
-// Read Sentry config
+// Assemble the Sentry configuration object if all required variables are present.
 const sentryDsn = getConfigValue("PUBLIC_SENTRY_DSN")
 const sentryOrg = getConfigValue("PUBLIC_SENTRY_ORG")
 const sentryProject = getConfigValue("PUBLIC_SENTRY_PROJECT")
@@ -99,7 +107,7 @@ const sentryConfig =
           }
         : null
 
-// Read PostHog config
+// Assemble the PostHog configuration object if all required variables are present.
 const posthogKey = getConfigValue("PUBLIC_POSTHOG_KEY")
 const posthogHost = getConfigValue("PUBLIC_POSTHOG_HOST")
 const posthogConfig =
@@ -107,11 +115,13 @@ const posthogConfig =
         ? { key: String(posthogKey), host: String(posthogHost) }
         : null
 
-// Export the client-safe config object
+/**
+ * The configuration object containing all public, client-safe environment variables.
+ */
 export const clientConfig: ClientConfig = {
     name: String(getConfigValue("PUBLIC_FDM_NAME", "FDM")),
-    logo: "/fdm-high-resolution-logo-transparent.png", // Assuming static
-    logomark: "/fdm-high-resolution-logo-transparent-no-text.png", // Assuming static
+    logo: "/fdm-high-resolution-logo-transparent.png",
+    logomark: "/fdm-high-resolution-logo-transparent-no-text.png",
     url: String(getConfigValue("PUBLIC_FDM_URL")),
     privacy_url: String(getConfigValue("PUBLIC_FDM_PRIVACY_URL")),
     datasets_url: String(getConfigValue("PUBLIC_FDM_DATASETS_URL")),

@@ -1,3 +1,10 @@
+/**
+ * @file Calculates the "filling" of the animal manure usage norm (`dierlijke mest gebruiksnorm`)
+ * for the Dutch regulations of 2025. This involves quantifying the amount of nitrogen
+ * applied from fertilizers classified as animal manure.
+ *
+ * @packageDocumentation
+ */
 import { withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
@@ -5,15 +12,20 @@ import { table11Mestcodes } from "./table-11-mestcodes"
 import type { NL2025NormsFillingInput, NormFilling } from "./types"
 
 /**
- * Calculates the nitrogen usage from animal manure for a list of fertilizer applications.
+ * Calculates the total nitrogen applied from animal manure sources.
  *
- * This function determines the contribution of each fertilizer application to the nitrogen norm
- * based on the type of manure used. It uses predefined values from `table11Mestcodes` to identify
- * which fertilizers are considered animal manure and to find their nitrogen content.
+ * This function processes a list of fertilizer applications and identifies those that
+ * are classified as animal manure under the EU Nitrates Directive. For each relevant
+ * application, it calculates the amount of nitrogen applied by multiplying the
+ * application rate by the nitrogen content of the fertilizer.
  *
- * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
- * @returns {NormFilling} An object containing the total nitrogen usage (`normFilling`) and a detailed breakdown per application (`applicationFilling`).
- * @throws {Error} Throws an error if a fertilizer or its RVO type is not found, ensuring data integrity.
+ * The function aggregates these amounts to determine the total "filling" of the
+ * animal manure usage norm.
+ *
+ * @param input - A standardized object containing the list of applications and fertilizer definitions.
+ * @returns An object detailing the total `normFilling` from animal manure and a breakdown
+ *   for each individual `applicationFilling`.
+ * @throws {Error} If a fertilizer definition or its RVO type (`p_type_rvo`) is missing.
  */
 export function calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm(
     input: NL2025NormsFillingInput,
@@ -99,13 +111,15 @@ export function calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebru
 }
 
 /**
- * Memoized version of {@link calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm}.
+ * A cached version of the `calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm` function.
  *
- * This function is wrapped with `withCalculationCache` to optimize performance by caching
- * results based on the input and the current calculator version.
+ * This function enhances performance by caching the results of the norm filling calculation.
+ * The cache key is generated based on the function's input and the calculator's version,
+ * ensuring that the cache is invalidated when the underlying logic or data changes.
  *
- * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
- * @returns {NormFilling} An object containing the total nitrogen usage (`normFilling`) and a detailed breakdown per application (`applicationFilling`).
+ * @param input - A standardized object containing the list of applications and fertilizer definitions.
+ * @returns An object detailing the total `normFilling` from animal manure and a breakdown
+ *   for each individual `applicationFilling`.
  */
 export const getNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm =
     withCalculationCache(

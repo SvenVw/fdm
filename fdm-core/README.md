@@ -27,11 +27,46 @@ The `fdm-core` package is the heart of the Farm Data Model (FDM) project. It pro
 ## Key Functionalities
 `fdm-core` provides a range of functions for managing various aspects of farm data:
 
+* **Authentication & Authorization:** Manage users, organizations, and permissions with a robust role-based access control (RBAC) system.
 * **Farm Management:** Create, update, retrieve, and delete farm records.
 * **Field Management:** Handle field data, including geometry and linking to farms.
 * **Cultivation Management:** Manage cultivation catalogues and track sowing events.
 * **Fertilizer Management:** Interact with fertilizer catalogues, track acquisition, picking, and application.
 * **Soil Analysis Management:** Record and retrieve soil analysis results and sampling details.
+* **Harvest Management:** Record and retrieve harvest data, including yield and nutrient analysis.
+* **Derogation Management:** Manage derogations for farms.
+* **Organic Certification Management:** Manage organic certifications for farms.
+* **Grazing Intention Management:** Manage grazing intentions for farms.
+
+## Example Usage
+
+```typescript
+import { createFdmServer, addFarm, getFarm } from '@svenvw/fdm-core';
+
+// 1. Create a connection to your database
+const fdm = createFdmServer(
+  process.env.DB_HOST,
+  process.env.DB_PORT,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  process.env.DB_NAME,
+);
+
+// 2. Add a new farm
+const principalId = 'user-id-123'; // The ID of the user creating the farm
+const farmId = await addFarm(
+  fdm,
+  principalId,
+  'My Farm',
+  '12345',
+  '123 Farm Lane',
+  '12345',
+);
+
+// 3. Retrieve the farm
+const farm = await getFarm(fdm, principalId, farmId);
+console.log(farm);
+```
 
 ## Contributing
 Contributions are welcome! See the main FDM project documentation for guidelines on contributing code, reporting bugs, and requesting features.

@@ -1,3 +1,8 @@
+/**
+ * @file This file is responsible for displaying a list of organizations the user is a member of.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import { getOrganizationsForUser } from "@svenvw/fdm-core"
 import type { LoaderFunctionArgs } from "react-router"
 import { NavLink, useLoaderData } from "react-router-dom"
@@ -26,6 +31,16 @@ type OrganizationType = {
     description: string
 }
 
+/**
+ * Loads the list of organizations for the current user.
+ *
+ * This function retrieves the user's session and fetches a list of all
+ * organizations they are a member of using `getOrganizationsForUser`.
+ *
+ * @param request - The incoming request object.
+ * @returns An object containing the list of organizations.
+ * @throws {Error} If there is an issue fetching the organizations.
+ */
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         const session = await getSession(request)
@@ -39,6 +54,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the page that lists all organizations for the user.
+ *
+ * This component displays a welcome message and a list of organizations the user
+ * belongs to. If the user is not a member of any organization, it shows a
+ * message with a call to action to check for invitations.
+ *
+ * @returns The JSX for the organizations index page.
+ */
 export default function OrganizationsIndex() {
     const { organizations } = useLoaderData<{
         organizations: OrganizationType[]

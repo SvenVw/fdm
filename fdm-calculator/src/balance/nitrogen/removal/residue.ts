@@ -1,3 +1,12 @@
+/**
+ * @file This module is responsible for calculating nitrogen removal from a field that occurs
+ * when crop residues are taken away after harvest.
+ *
+ * The primary function, `calculateNitrogenRemovalByResidue`, quantifies this removal
+ * for each cultivation.
+ *
+ * @packageDocumentation
+ */
 import Decimal from "decimal.js"
 import type {
     CultivationDetail,
@@ -6,15 +15,22 @@ import type {
 } from "../types"
 
 /**
- * Calculates the amount of Nitrogen removed from the field through crop residue removal.
+ * Calculates the total nitrogen removed from a field through the removal of crop residues.
  *
- * This function determines the nitrogen removed based on the cultivations performed, harvest yields,
- * and crop residue management practices. It uses cultivation details and harvest information to estimate
- * the amount of nitrogen present in the crop residues and accounts for its removal.
- * @param cultivations - A list of cultivations on the field.
- * @param harvests - A list of harvests from the field.
- * @param cultivationDetailsMap - The map of cultivation details.
- * @returns The NitrogenRemovalResidues object containing the total amount of Nitrogen removed and the individual cultivation values.
+ * This function estimates the amount of nitrogen exported from the field when crop residues
+ * (e.g., straw, stalks) are removed rather than incorporated into the soil. The calculation
+ * is performed for each cultivation and depends on:
+ * - Whether the residues were actually removed (`m_cropresidue` flag).
+ * - The total biomass of the residue, calculated from the harvest yield and the crop's harvest index.
+ * - The nitrogen concentration of the residue (`b_lu_n_residue`).
+ *
+ * It aggregates the results from all relevant cultivations to provide a total for the field.
+ *
+ * @param cultivations - An array of all cultivations on the field.
+ * @param harvests - An array of all harvest events, used to determine average yield.
+ * @param cultivationDetailsMap - A map providing detailed data for each cultivation type.
+ * @returns An object detailing the total and per-cultivation nitrogen removal from residues.
+ * @throws {Error} If cultivation details are missing for a given cultivation.
  */
 export function calculateNitrogenRemovalByResidue(
     cultivations: FieldInput["cultivations"],

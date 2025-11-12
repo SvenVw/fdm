@@ -1,13 +1,27 @@
+/**
+ * @file This file is responsible for aggregating and exporting all server-side
+ * environment variables into a single, strongly-typed configuration object.
+ *
+ * It reads values from `process.env` and maps them to a structured `ServerConfig` object.
+ * This approach provides a centralized and type-safe way to access configuration
+ * throughout the server-side parts of the application, such as Remix loaders and actions.
+ *
+ * This file should only be imported in `.server.ts` files to prevent secret keys
+ * from being exposed to the client.
+ *
+ * @packageDocumentation
+ */
 import type { ServerConfig } from "~/types/config.d"
 
-// Export the full config for server-side use
+/**
+ * The configuration object containing all server-side environment variables.
+ */
 export const serverConfig: ServerConfig = {
     name: String(process.env.PUBLIC_FDM_NAME),
     url: String(process.env.PUBLIC_FDM_URL),
     privacy_url: String(process.env.PUBLIC_FDM_PRIVACY_URL),
     datasets_url: String(process.env.PUBLIC_FDM_DATASETS_URL),
 
-    // Authentication
     auth: {
         fdm_session_secret: String(process.env.FDM_SESSION_SECRET),
         better_auth_secret: String(process.env.BETTER_AUTH_SECRET),
@@ -21,7 +35,6 @@ export const serverConfig: ServerConfig = {
         },
     },
 
-    // Database
     database: {
         password: String(process.env.POSTGRES_PASSWORD),
         user: String(process.env.POSTGRES_USER),
@@ -30,7 +43,6 @@ export const serverConfig: ServerConfig = {
         port: Number(process.env.POSTGRES_PORT),
     },
 
-    // Integrations
     integrations: {
         mapbox: {
             token: String(process.env.PUBLIC_MAPBOX_TOKEN),
@@ -40,9 +52,7 @@ export const serverConfig: ServerConfig = {
         },
     },
 
-    // Analytics
     analytics: {
-        // Sentry
         sentry: {
             auth_token: String(process.env.SENTRY_AUTH_TOKEN),
         },
@@ -52,9 +62,7 @@ export const serverConfig: ServerConfig = {
         },
     },
 
-    // Mail
     mail: {
-        // Postmark
         postmark: {
             key: String(process.env.POSTMARK_API_KEY),
             sender_address: String(process.env.POSTMARK_SENDER_ADDRESS),

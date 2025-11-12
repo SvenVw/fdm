@@ -1,3 +1,9 @@
+/**
+ * @file This file handles the display and management of a specific organization.
+ * It includes functionality for viewing members, inviting new users, and managing roles.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import {
     cancelPendingInvitation,
     getOrganization,
@@ -38,6 +44,17 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 
+/**
+ * Loads the data for the organization page.
+ *
+ * This function fetches the organization's details, its members, and any pending
+ * invitations. It requires the user to be authenticated.
+ *
+ * @param request - The incoming request object.
+ * @param params - The route parameters, containing the organization slug.
+ * @returns An object containing the organization, members, and invitations.
+ * @throws {Error} If the organization is not found or if there's an issue fetching data.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!params.slug) {
         throw handleLoaderError("not found: organization")
@@ -70,6 +87,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the organization management page.
+ *
+ * This component displays the organization's members, pending invitations,
+ * and provides forms for inviting new users and managing existing members.
+ * The available actions are determined by the user's permissions.
+ *
+ * @returns The JSX for the organization page.
+ */
 export default function OrganizationIndex() {
     const { organization, invitations, members } =
         useLoaderData<typeof loader>()
@@ -377,6 +403,18 @@ const FormSchema = z.object({
     ]),
 })
 
+/**
+ * Handles form submissions for organization management actions.
+ *
+ * This function processes various actions such as inviting users, updating roles,
+ * removing users, and canceling invitations. It validates the form data and
+ * performs the corresponding action using functions from fdm-core.
+ *
+ * @param request - The incoming request object, containing the form data.
+ * @param params - The route parameters, containing the organization slug.
+ * @returns A response object with success or error messages.
+ * @throws {Error} If an invalid action is attempted or if required data is missing.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         if (!params.slug) {

@@ -1,20 +1,25 @@
+/**
+ * @file This module provides a function to determine the primary cultivation (`hoofdteelt`)
+ * for a field according to the specific definition used in the Dutch 2025 fertilizer regulations.
+ *
+ * @packageDocumentation
+ */
 import type { NL2025NormsInputForCultivation } from "./types"
 
 /**
- * Determines the main cultivation ('hoofdteelt') for the NL 2025 norms based on the legal definition.
- * The main cultivation is the one that is present for the longest duration within the period
- * from May 15th to July 15th.
+ * Determines the primary cultivation (`hoofdteelt`) for the 2025 norm calculations.
  *
- * @param cultivations An array of cultivation inputs, each containing start and end dates.
- * @returns The `b_lu_catalogue` of the main cultivation, or `null` if no cultivation is present in the period.
- * In case of a tie in duration, the cultivation with the alphabetically first `b_lu_catalogue` is chosen.
- * @example
- * const cultivations = [
- *   { cultivation: { b_lu_start: '2025-05-01', b_lu_end: '2025-06-10', b_lu_catalogue: 'cat_A' } },
- *   { cultivation: { b_lu_start: '2025-06-01', b_lu_end: '2025-07-20', b_lu_catalogue: 'cat_B' } }
- * ];
- * const hoofdteelt = await determineNL2025Hoofdteelt(cultivations);
- * // returns 'cat_B'
+ * According to the regulations, the primary cultivation is defined as the crop that is
+ * present on the field for the longest duration within the specific time window of
+ * May 15th to July 15th, 2025.
+ *
+ * This function calculates the duration of each cultivation within this window and identifies
+ * the one with the maximum duration. If there's a tie, the cultivation with the
+ * alphabetically first catalogue code is chosen. If no cultivation is present, a default
+ * code for fallow land is returned.
+ *
+ * @param cultivations - An array of all cultivations for the field.
+ * @returns The catalogue code (`b_lu_catalogue`) of the determined primary cultivation.
  */
 export function determineNL2025Hoofdteelt(
     cultivations: NL2025NormsInputForCultivation[],

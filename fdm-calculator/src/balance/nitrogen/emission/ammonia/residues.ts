@@ -1,3 +1,12 @@
+/**
+ * @file This module calculates ammonia (`NH3`) emissions resulting from the decomposition
+ * of crop residues left on the field after harvest.
+ *
+ * The primary function, `calculateNitrogenEmissionViaAmmoniaByResidues`, estimates
+ * the total ammonia volatilization from the residues of all cultivations on a field.
+ *
+ * @packageDocumentation
+ */
 import type { HarvestableAnalysis } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import type {
@@ -7,14 +16,22 @@ import type {
 } from "../../types"
 
 /**
- * Calculates the amount of Nitrogen volatilized via ammonia emissions from crop residues.
+ * Calculates the total ammonia (`NH3`) emission from crop residues on a field.
  *
- * This function determines the nitrogen volatilization from crop residues based on the cultivations performed, harvest yields,
- * and cultivation details, including the nitrogen content of the crop residues. It calculates an emission factor
- * based on the nitrogen content and then estimates the total nitrogen volatilization.
- * @param cultivations - A list of cultivations on the field.
- * @param harvests - A list of harvests from the field.
- * @param cultivationDetailsMap - The map of cultivation details.
+ * This function estimates the amount of nitrogen lost as ammonia gas during the decomposition
+ * of crop residues. The calculation is performed for each cultivation and is based on several factors:
+ * - The amount of residue left on the field, which is derived from harvest yield and the crop's harvest index.
+ * - The nitrogen content of the residue.
+ * - An empirically derived emission factor that correlates with the residue's nitrogen content.
+ *
+ * The function aggregates the emissions from all cultivations to provide a total for the field.
+ *
+ * @param cultivations - An array of all cultivations on the field.
+ * @param harvests - An array of all harvest events, used to determine average yield.
+ * @param cultivationDetailsMap - A map providing detailed data for each cultivation type, such as
+ *   harvest index and residue nitrogen content.
+ * @returns An object detailing total and per-cultivation ammonia emissions from residues.
+ * @throws {Error} If cultivation details are missing for a given cultivation.
  */
 export function calculateNitrogenEmissionViaAmmoniaByResidues(
     cultivations: FieldInput["cultivations"],

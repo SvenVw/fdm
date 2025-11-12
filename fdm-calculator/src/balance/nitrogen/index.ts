@@ -1,3 +1,19 @@
+/**
+ * @file This module provides a comprehensive set of functions for calculating the nitrogen balance
+ * at both the field and farm levels. It takes into account various nitrogen inputs (supply),
+ * outputs (removal), and losses (emission) to provide a clear picture of nitrogen efficiency.
+ *
+ * The main entry point is `calculateNitrogenBalance`, which orchestrates the entire calculation
+ * process. It processes multiple fields, aggregates their individual balances, and handles
+ * potential errors gracefully. For performance, a cached version, `getNitrogenBalance`, is
+ * also provided.
+ *
+ * The calculation adheres to standard agricultural models and relies on detailed input data,
+ * including cultivation practices, fertilizer applications, soil analyses, and harvest records.
+ * The use of the `Decimal.js` library ensures high precision in all calculations.
+ *
+ * @packageDocumentation
+ */
 import { type fdmSchema, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import {
@@ -372,16 +388,26 @@ function convertDecimalToNumberRecursive(data: unknown): unknown {
     return data
 }
 
-// Main conversion function with type safety
+/**
+ * Converts a `NitrogenBalance` object from `Decimal` types to standard numbers.
+ *
+ * This function recursively traverses a `NitrogenBalance` object and converts all instances
+ * of the `Decimal` class to JavaScript `number` types. This is typically done as the final
+ * step before returning the result to the user, as it provides a more common and easily
+ * serializable data format. The function also ensures that field-level results are correctly
+ * mapped, preserving error messages where calculations failed.
+ *
+ * @param balance - The `NitrogenBalance` object to convert, with values as `Decimal` instances.
+ * @returns A `NitrogenBalanceNumeric` object, where all `Decimal` values have been
+ *   converted to `number` types.
+ */
 export function convertNitrogenBalanceToNumeric(
-    balance: NitrogenBalance, // Input is the original Decimal-based type
+    balance: NitrogenBalance,
 ): NitrogenBalanceNumeric {
-    // Output is the new number-based type
     const numericBalance = convertDecimalToNumberRecursive(
         balance,
     ) as NitrogenBalanceNumeric
 
-    // Ensure fields are correctly converted, especially handling errorMessage
     numericBalance.fields = balance.fields.map((fieldResult) => {
         if (fieldResult.balance) {
             return {
@@ -403,14 +429,21 @@ export function convertNitrogenBalanceToNumeric(
 }
 
 /**
- * Combines multiple soil analysis records into a single record, prioritizing the most recent data.
+ * Merges multiple soil analysis records into a single, comprehensive record.
  *
- * This function takes an array of soil analysis records, sorts them by sampling date (most recent first),
- * and then merges them into a single record. For each soil parameter, the most recent non-null value
- * is used. If a parameter is missing in all records, it remains null. After merging, the function
- * attempts to estimate missing parameters using conversion functions if possible.
- * @param soilAnalyses - An array of soil analysis records.
- * @returns A single soil analysis record containing the most recent data and estimated values for missing parameters.
+ * This function consolidates an array of soil analyses for a single field into one representative
+ * analysis. It operates as follows:
+ * 1. Sorts the analyses by sampling date in descending order to prioritize the most recent data.
+ * 2. For each required soil parameter, it selects the most recent non-null value available.
+ * 3. If certain parameters are still missing (e.g., organic carbon, bulk density), it attempts
+ *    to estimate them using established soil science conversion formulas.
+ * 4. Finally, it validates that all critical soil parameters needed for the nitrogen balance
+ *    calculation are present, throwing an error if any are missing.
+ *
+ * @param soilAnalyses - An array of `SoilAnalysis` objects for a given field.
+ * @returns A single `SoilAnalysisPicked` object containing the most up-to-date and complete
+ *   soil data available.
+ * @throws {Error} If required soil parameters remain missing after merging and estimation.
  */
 export function combineSoilAnalyses(
     soilAnalyses: FieldInput["soilAnalyses"],

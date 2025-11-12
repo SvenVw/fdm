@@ -24,11 +24,28 @@ The `fdm-data` package extends the Farm Data Model (FDM) core functionality by p
 
 ### Fertilizers
 
+The `fdm-data` package provides two fertilizer catalogues: `srm` and `baat`.
+
 ```typescript
 import { getFertilizersCatalogue } from "@svenvw/fdm-data";
 
 // Get the BAAT fertilizer catalogue
-const baatCatalogue = getFertilizersCatalogue("baat");
+const baatCatalogue = await getFertilizersCatalogue("baat");
 
 // Now you can use the baatCatalogue data
 console.log(baatCatalogue[0]) // Logs the first entry of the baat fertilizer catalogue
+```
+
+### Cultivations
+
+The `fdm-data` package provides one cultivation catalogue: `brp`.
+
+```typescript
+import { getCultivationCatalogue } from "@svenvw/fdm-data";
+
+// Get the BRP cultivation catalogue
+const brpCatalogue = await getCultivationCatalogue("brp");
+
+// Now you can use the brpCatalogue data
+console.log(brpCatalogue[0]) // Logs the first entry of the brp cultivation catalogue
+```

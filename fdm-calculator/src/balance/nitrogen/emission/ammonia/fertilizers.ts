@@ -1,3 +1,14 @@
+/**
+ * @file This module is responsible for calculating ammonia (`NH3`) emissions specifically
+ * from fertilizer applications. It distinguishes between mineral and organic fertilizers,
+ * applying different emission factor models for each.
+ *
+ * The main function, `calculateNitrogenEmissionViaAmmoniaByFertilizers`, iterates through
+ * all fertilizer applications on a field, determines the appropriate emission factor,
+ * and calculates the resulting ammonia loss.
+ *
+ * @packageDocumentation
+ */
 import type { FertilizerApplication } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import type {
@@ -8,15 +19,26 @@ import type {
 } from "../../types"
 
 /**
- * Calculates the total ammonia emission from all fertilizer sources (mineral, manure, compost and other fertilizers).
+ * Calculates the total ammonia (`NH3`) emission from all fertilizer applications on a field.
  *
- * This function aggregates the nitrogen contributions from mineral fertilizers, manure, compost and other fertilizers
- * by iterating through the applications once and directing each to the appropriate calculation.
- * @param cultivations - An array of cultivation records for the field.
- * @param fertilizerApplications - An array of fertilizer applications, each containing the application amount and a reference to the fertilizer details.
- * @param cultivationDetailsMap - A Map containing details for each cultivation, including its type.
- * @param fertilizerDetailsMap - A map containing details for each fertilizer, including its type and nitrogen content.
- * @returns An object containing the total ammonia emitted by all fertilizers, as well as a breakdown by fertilizer type (mineral, manure, compost, other).
+ * This function processes a list of fertilizer applications and calculates the ammonia
+ * volatilization for each. It categorizes fertilizers into mineral, manure, compost, and other,
+ * applying specific emission factor calculations for each type.
+ *
+ * - For **mineral fertilizers**, it uses a formula based on their chemical composition.
+ * - For **organic fertilizers** (manure, compost, etc.), it determines the emission factor based
+ *   on the application method and the type of land cover (grassland, cropland, bare soil) at the
+ *   time of application.
+ *
+ * The function returns a detailed breakdown of emissions by fertilizer type and for each
+ * individual application.
+ *
+ * @param cultivations - An array of the field's cultivation history.
+ * @param fertilizerApplications - An array of all fertilizer applications to be analyzed.
+ * @param cultivationDetailsMap - A map providing detailed data for each cultivation type.
+ * @param fertilizerDetailsMap - A map providing detailed data for each fertilizer type.
+ * @returns An object detailing total and per-category ammonia emissions from fertilizers.
+ * @throws {Error} If fertilizer details are missing for a given application.
  */
 export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
     cultivations: FieldInput["cultivations"],
@@ -135,19 +157,20 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
 }
 
 /**
- * Determines the ammonia emission factor for mineral fertilizers based on their
- * nitrogen, nitrate, ammonium, and sulfur content, and the presence of an inhibitor.
+ * Determines the ammonia emission factor for a mineral fertilizer.
  *
- * This function calculates the emission factor using a specific formula that
- * considers various nutrient components and a boolean flag for inhibitor presence.
+ * This function calculates a specific emission factor based on the chemical properties of the
+ * fertilizer, including its nitrogen, nitrate, ammonium, and sulfur content. The formula also
+ * accounts for whether a urease inhibitor is present.
  *
- * Formula coefficients:
- * - Organic N squared coefficient: 3.166e-5 (with inhibitor) or 7.021e-5 (without)
- * - NO3 × S coefficient: -4.308e-5
- * - NH4 squared coefficient: 2.498e-4
+ * The formula coefficients are derived from empirical models:
+ * - Organic N squared coefficient: `3.166e-5` (with inhibitor) or `7.021e-5` (without).
+ * - NO3 × S coefficient: `-4.308e-5`.
+ * - NH4 squared coefficient: `2.498e-4`.
  *
- * @param fertilizerDetail - The detailed information for a specific mineral fertilizer.
- * @returns A Decimal representing the calculated ammonia emission factor.
+ * @param fertilizerDetail - An object containing the detailed chemical composition of the fertilizer.
+ * @returns The calculated ammonia emission factor as a `Decimal`.
+ * @internal
  */
 function determineMineralAmmoniaEmissionFactor(
     fertilizerDetail: FertilizerDetail,
@@ -169,18 +192,22 @@ function determineMineralAmmoniaEmissionFactor(
 }
 
 /**
- * Determines the ammonia emission factor for manure applications based on
- * application method and the presence of grassland or cropland.
+ * Determines the ammonia emission factor for an organic fertilizer (manure) application.
  *
- * This function checks the cultivation type at the time of fertilizer application
- * (grassland, cropland, or bare soil) and applies a specific emission factor
- * based on the application method.
+ * This function selects an appropriate emission factor based on a combination of:
+ * 1.  **Land Cover**: It first determines whether the application occurred on grassland, cropland,
+ *     or bare soil by analyzing the active cultivations at the application date.
+ * 2.  **Application Method**: It then uses a lookup table to find the corresponding emission
+ *     factor for the specified application technique (e.g., "injection", "broadcasting").
  *
- * @param fertilizerApplication - The specific fertilizer application record.
- * @param cultivations - An array of cultivation records for the field.
- * @param cultivationDetails - A Map where keys are cultivation IDs and values are detailed cultivation information.
- * @returns A Decimal representing the ammonia emission factor.
- * @throws Error if an unsupported application method is provided for the given land type.
+ * The emission factors are based on standard values from agricultural research (Bruggen et al., 2024).
+ *
+ * @param fertilizerApplication - The fertilizer application event being analyzed.
+ * @param cultivations - A complete history of cultivations for the field.
+ * @param cultivationDetails - A map providing detailed data for each cultivation type.
+ * @returns The appropriate ammonia emission factor as a `Decimal`.
+ * @throws {Error} If the application method is not supported or recognized for the determined land type.
+ * @internal
  */
 function determineManureAmmoniaEmissionFactor(
     fertilizerApplication: FertilizerApplication,

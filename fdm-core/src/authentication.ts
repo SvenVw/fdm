@@ -1,3 +1,10 @@
+/**
+ * @file This file provides authentication services for the FDM application.
+ *
+ * It uses the `better-auth` library to handle user authentication, including social providers like Google
+ * and Microsoft, as well as email-based magic links. It also manages user profiles, organizations, and sessions,
+ * integrating tightly with the Drizzle ORM for database operations.
+ */
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { magicLink, organization, username } from "better-auth/plugins"
@@ -9,21 +16,19 @@ import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 
 /**
- * Initializes and configures the authentication system for the FDM application using Better Auth.
+ * Creates and configures an authentication instance for the FDM.
  *
- * This function sets up the Better Auth system with a PostgreSQL database adapter and a custom schema,
- * allowing users to authenticate via social providers like Google and Microsoft, or optionally with email and password.
- * It configures additional user fields (firstname, surname, lang, farm_active), and manages session parameters
- * with a 30-day expiration and daily update. It also defines mappings from social provider profiles to user
- * formats, extracting relevant user information.
+ * This function initializes the `better-auth` library with database adapters, social providers (Google, Microsoft),
+ * and various plugins like magic link and organization management. It also sets up session handling and
+ * custom user fields, providing a comprehensive authentication solution for the FDM application.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param google Optional configuration for Google authentication. If provided, users can sign up and sign in with their Google accounts.
- * @param microsoft Optional configuration for Microsoft authentication. If provided, users can sign up and sign in with their Microsoft accounts.
- * @param sendMagicLinkEmail Optional function to send magic link emails. If provided, the magic link plugin will use this function to send emails.
- * @param emailAndPassword Optional boolean indicating whether to enable email and password authentication. Defaults to false.
- * @returns The configured authentication instance.
- * @throws {Error} If required environment variables are missing or if role assignment fails.
+ * @param fdm The FDM instance for database access.
+ * @param google Configuration for Google OAuth. Includes `clientId` and `clientSecret`. Optional.
+ * @param microsoft Configuration for Microsoft OAuth. Includes `clientId` and `clientSecret`. Optional.
+ * @param sendMagicLinkEmail A function to send magic link emails. Required for the magic link functionality. Optional.
+ * @param emailAndPassword A boolean to enable or disable email and password authentication. Defaults to `false`.
+ * @returns An initialized `FdmAuth` instance, ready to be used for authentication.
+ * @throws An error if there's a configuration issue or a problem during initialization.
  */
 export function createFdmAuth(
     fdm: FdmType,
@@ -220,20 +225,19 @@ export function createFdmAuth(
 }
 
 /**
- * Updates the profile information of a user.
+ * Updates a user's profile information in the database.
  *
- * This function allows updating the first name, surname, and language preference of a user. It constructs an object
- * containing only the fields that need to be updated and then performs the update operation. Additionally, it updates
- * the display username if either the first name or surname is being updated.
+ * This function allows for updating a user's first name, surname, and language preference.
+ * It dynamically constructs the update query based on the provided fields. If the first name or surname
+ * is updated, it also regenerates and updates the user's display name.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param user_id - The ID of the user to update.
- * @param firstname - (Optional) The new first name of the user.
- * @param surname - (Optional) The new surname of the user.
- * @param lang - (Optional) The new language preference of the user.
- * @returns A promise that resolves when the user's profile has been updated.
- * @throws {Error} Throws an error if any database operation fails.
- *
+ * @param fdm The FDM instance for database access.
+ * @param user_id The unique identifier of the user to update.
+ * @param firstname The user's new first name. Optional.
+ * @param surname The user's new surname. Optional.
+ * @param lang The user's new language preference. Currently supports "nl-NL". Optional.
+ * @returns A promise that resolves when the profile has been successfully updated.
+ * @throws An error if the database update fails.
  */
 export async function updateUserProfile(
     fdm: FdmType,
@@ -307,10 +311,14 @@ export async function updateUserProfile(
 }
 
 /**
- * Splits a full name into first name and surname, handling various formats including "LastName, FirstName".
+ * Splits a full name into a first name and a surname.
  *
- * @param fullName - The full name string.
- * @returns An object containing the first name and surname.
+ * This function handles various common formats, including names separated by spaces and the "LastName, FirstName"
+ * convention. It returns an object containing the parsed first name and surname, or null for either if the
+ * corresponding part is not found.
+ *
+ * @param fullName The full name string to be split. Can be undefined.
+ * @returns An object with `firstname` and `surname` properties, which can be strings or null.
  */
 export function splitFullName(fullName: string | undefined): {
     firstname: string | null
@@ -342,6 +350,17 @@ export function splitFullName(fullName: string | undefined): {
     return { firstname, surname }
 }
 
+/**
+ * Generates a unique username from an email address.
+ *
+ * This function creates a username from the user's email and ensures it is unique by checking against
+ * existing usernames in the database. If a generated username already exists, it appends random digits
+ * until a unique username is found.
+ *
+ * @param fdm The FDM instance providing the database connection.
+ * @param email The user's email address, which is used to generate the username.
+ * @returns A promise that resolves to a unique username string.
+ */
 async function createUsername(fdm: FdmType, email: string): Promise<string> {
     const digits = 3
 
@@ -375,6 +394,16 @@ async function createUsername(fdm: FdmType, email: string): Promise<string> {
     return username
 }
 
+/**
+ * Creates a display username from the user's first and last names.
+ *
+ * This function takes the user's first name and surname, filters out any null or empty parts, and joins them
+ * with a space to create a full name. If both names are null or empty, it returns null.
+ *
+ * @param firstname The user's first name. Can be null or undefined.
+ * @param surname The user's last name. Can be null or undefined.
+ * @returns The formatted display name as a string, or null if both names are empty.
+ */
 export function createDisplayUsername(
     firstname: string | null | undefined,
     surname: string | null | undefined,

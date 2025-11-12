@@ -1,3 +1,9 @@
+/**
+ * @file This file contains functions for managing organizations in the FDM.
+ *
+ * It provides a comprehensive set of CRUD operations for organizations, as well as functions
+ * for managing members, invitations, and permissions.
+ */
 import { and, asc, count, desc, eq, gt } from "drizzle-orm"
 import * as authNSchema from "./db/schema-authn"
 import { handleError } from "./error"
@@ -5,15 +11,16 @@ import type { FdmType } from "./fdm"
 import { createId } from "./id"
 
 /**
- * Creates a new organization and assigns the creating user as the owner.
+ * Creates a new organization.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param owner_id - The ID of the user creating the organization.
- * @param name - The name of the organization.
- * @param slug - The unique slug for the organization.
- * @param description - A description of the organization.
- * @returns A promise that resolves with the ID of the newly created organization.
- * @throws {Error} Throws an error if any database operation fails or if the input data is invalid.
+ * This function creates a new organization and assigns the user who created it as the owner.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param owner_id The identifier of the user creating the organization.
+ * @param name The name of the new organization.
+ * @param slug The unique slug for the new organization.
+ * @param description A description of the new organization.
+ * @returns A promise that resolves to the unique identifier of the newly created organization.
  */
 export async function createOrganization(
     fdm: FdmType,
@@ -64,18 +71,20 @@ export async function createOrganization(
 }
 
 /**
- * Updates an existing organization.
+ * Updates an organization's details.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param admin_id - The ID of the user initiating the update (must be owner or admin).
- * @param organization_id - The ID of the organization to update.
- * @param name - (Optional) The new name of the organization.
- * @param slug - (Optional) The new unique slug for the organization.
- * @param description - (Optional) The new description of the organization.
- * @param logo - (Optional) The new logo of the organization.
- * @param isVerified - (Optional) set isVerified boolean.
- * @returns A promise that resolves when the organization has been updated.
- * @throws {Error} Throws an error if any database operation fails, if the user does not have permissions, or if input data is invalid.
+ * This function allows for the modification of an organization's properties, such as its name, slug, and description.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param admin_id The identifier of the user making the request (must be an admin or owner).
+ * @param organization_id The unique identifier of the organization to update.
+ * @param name The new name for the organization (optional).
+ * @param slug The new slug for the organization (optional).
+ * @param description The new description for the organization (optional).
+ * @param logo The new logo for the organization (optional).
+ * @param isVerified The new verification status for the organization (optional).
+ * @returns A promise that resolves when the organization has been successfully updated.
+ * @throws An error if the user does not have permission.
  */
 export async function updateOrganization(
     fdm: FdmType,
@@ -156,13 +165,14 @@ export async function updateOrganization(
 }
 
 /**
- * Retrieves an organization by its ID.
+ * Retrieves an organization by its slug.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param organization_slug - The slug of the organization to retrieve.
- * @param user_id - The ID of the user for whom to retrieve organizations.
- * @returns A promise that resolves with the organization details and permisssions of user, or null if not found.
- * @throws {Error} Throws an error if any database operation fails.
+ * This function fetches the details of an organization, including the current user's permissions.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param organization_slug The slug of the organization to retrieve.
+ * @param user_id The identifier of the user making the request.
+ * @returns A promise that resolves to an organization object, or `null` if not found.
  */
 export async function getOrganization(
     fdm: FdmType,
@@ -221,12 +231,11 @@ export async function getOrganization(
 }
 
 /**
- * Retrieves a list of organizations that a user is a part of.
+ * Retrieves all organizations that a user is a member of.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param user_id - The ID of the user for whom to retrieve organizations.
- * @returns A promise that resolves with an array of organization details.
- * @throws {Error} Throws an error if any database operation fails.
+ * @param fdm The FDM instance for database access.
+ * @param user_id The identifier of the user.
+ * @returns A promise that resolves to an array of organization objects, each including the user's role.
  */
 export async function getOrganizationsForUser(
     fdm: FdmType,
@@ -292,12 +301,11 @@ export async function getOrganizationsForUser(
 }
 
 /**
- * Retrieves a list of users that are members of a specific organization.
+ * Retrieves all users who are members of an organization.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param organization_slug - The unique slug of the organization.
- * @returns A promise that resolves with an array of user details.
- * @throws {Error} Throws an error if any database operation fails.
+ * @param fdm The FDM instance for database access.
+ * @param organization_slug The slug of the organization.
+ * @returns A promise that resolves to an array of user objects, each including the user's role.
  */
 export async function getUsersInOrganization(
     fdm: FdmType,
@@ -348,15 +356,17 @@ export async function getUsersInOrganization(
 }
 
 /**
- * Invites a user to an organization.
+ * Invites a user to join an organization.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param inviter_id - The ID of the user initiating the invitation (must be owner or admin).
- * @param email - The email address of the user being invited.
- * @param role - The role to assign to the invited user in the organization.
- * @param organization_id - The ID of the organization to which the user is being invited.
- * @returns A promise that resolves with the ID of the newly created invitation.
- * @throws {Error} Throws an error if any database operation fails, if the user does not have permissions, or if input data is invalid.
+ * This function creates an invitation record in the database. The invitation is valid for a limited time.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param inviter_id The identifier of the user sending the invitation.
+ * @param email The email address of the user to invite.
+ * @param role The role to assign to the user upon joining.
+ * @param organization_id The unique identifier of the organization.
+ * @returns A promise that resolves to the unique identifier of the new invitation.
+ * @throws An error if the inviter does not have permission.
  */
 export async function inviteUserToOrganization(
     fdm: FdmType,
@@ -404,12 +414,11 @@ export async function inviteUserToOrganization(
 }
 
 /**
- * Retrieves a list of pending invitations for a specific organization.
+ * Retrieves all pending invitations for an organization.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param organization_id - The id of the organization.
- * @returns A promise that resolves with an array of pending invitation details, including the email, role, expiration date, and inviter's name.
- * @throws {Error} Throws an error if any database operation fails.
+ * @param fdm The FDM instance for database access.
+ * @param organization_id The unique identifier of the organization.
+ * @returns A promise that resolves to an array of pending invitation objects.
  */
 export async function getPendingInvitationsForOrganization(
     fdm: FdmType,
@@ -472,12 +481,11 @@ export async function getPendingInvitationsForOrganization(
 }
 
 /**
- * Retrieves a list of pending invitations for a specific user.
+ * Retrieves all pending invitations for a user.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param user_id - The ID of the user for whom to retrieve pending invitations.
- * @returns A promise that resolves with an array of pending invitation details.
- * @throws {Error} Throws an error if any database operation fails.
+ * @param fdm The FDM instance for database access.
+ * @param user_id The identifier of the user.
+ * @returns A promise that resolves to an array of pending invitation objects.
  */
 export async function getPendingInvitationsForUser(
     fdm: FdmType,
@@ -548,12 +556,12 @@ export async function getPendingInvitationsForUser(
 }
 
 /**
- * Retrieves the details of a specific pending invitation.
+ * Retrieves a single pending invitation by its unique identifier.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param invitation_id - The ID of the invitation to retrieve.
- * @returns A promise that resolves with the pending invitation details.
- * @throws {Error} Throws an error if any database operation fails or if the invitation is not found.
+ * @param fdm The FDM instance for database access.
+ * @param invitation_id The unique identifier of the invitation.
+ * @returns A promise that resolves to a pending invitation object.
+ * @throws An error if the invitation is not found.
  */
 export async function getPendingInvitation(
     fdm: FdmType,
@@ -612,10 +620,13 @@ export async function getPendingInvitation(
 /**
  * Accepts an invitation to join an organization.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param invitation_id - The ID of the invitation to accept.
- * @param user_id - The ID of the user accepting the invitation.
- * @throws {Error} Throws an error if any database operation fails, if the invitation is not found, is not pending, or has expired.
+ * This function allows a user to accept an invitation, which adds them as a member to the organization.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param invitation_id The unique identifier of the invitation.
+ * @param user_id The identifier of the user accepting the invitation.
+ * @returns A promise that resolves when the invitation has been successfully accepted.
+ * @throws An error if the invitation is not valid or has expired.
  */
 export async function acceptInvitation(
     fdm: FdmType,
@@ -681,10 +692,13 @@ export async function acceptInvitation(
 /**
  * Rejects an invitation to join an organization.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param invitation_id - The ID of the invitation to reject.
- * @param user_id - The ID of the user rejecting the invitation.
- * @throws {Error} Throws an error if any database operation fails, if the invitation is not found, or if the invitation is not pending.
+ * This function allows a user to decline an invitation.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param invitation_id The unique identifier of the invitation.
+ * @param user_id The identifier of the user rejecting the invitation.
+ * @returns A promise that resolves when the invitation has been successfully rejected.
+ * @throws An error if the invitation is not valid.
  */
 export async function rejectInvitation(
     fdm: FdmType,
@@ -734,11 +748,12 @@ export async function rejectInvitation(
 /**
  * Removes a user from an organization.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param admin_id - The ID of the user initiating the removal (must be owner or admin).
- * @param organization_id - The ID of the organization from which the user is being removed.
- * @param username - The username of the user being removed.
- * @throws {Error} Throws an error if any database operation fails, if the user initiating the removal does not have permissions, or if the user to be removed is not found.
+ * @param fdm The FDM instance for database access.
+ * @param admin_id The identifier of the user making the request (must be an admin or owner).
+ * @param organization_id The unique identifier of the organization.
+ * @param username The username of the user to remove.
+ * @returns A promise that resolves when the user has been successfully removed.
+ * @throws An error if the admin does not have permission or if the user is not found.
  */
 export async function removeUserFromOrganization(
     fdm: FdmType,
@@ -800,14 +815,15 @@ export async function removeUserFromOrganization(
 }
 
 /**
- * Updates the role of a user within an organization.
+ * Updates the role of a user in an organization.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param admin_id - The ID of the user initiating the update (must be owner or admin).
- * @param organization_id - The ID of the organization in which the user's role is being updated.
- * @param username - The username of the user whose role is being updated.
- * @param role - The new role to assign to the user.
- * @throws {Error} Throws an error if any database operation fails, if the user initiating the update does not have permissions, or if the user to be updated is not found.
+ * @param fdm The FDM instance for database access.
+ * @param admin_id The identifier of the user making the request (must be an admin or owner).
+ * @param organization_id The unique identifier of the organization.
+ * @param username The username of the user to update.
+ * @param role The new role to assign.
+ * @returns A promise that resolves when the user's role has been successfully updated.
+ * @throws An error if the admin does not have permission or if the user is not found.
  */
 export async function updateRoleOfUserAtOrganization(
     fdm: FdmType,
@@ -876,10 +892,11 @@ export async function updateRoleOfUserAtOrganization(
 /**
  * Deletes an organization.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param owner_id - The ID of the user initiating the deletion (must be the owner).
- * @param organization_id - The ID of the organization to delete.
- * @throws {Error} Throws an error if any database operation fails, if the user initiating the deletion is not the owner, or if the organization is not found.
+ * @param fdm The FDM instance for database access.
+ * @param owner_id The identifier of the user making the request (must be the owner).
+ * @param organization_id The unique identifier of the organization to delete.
+ * @returns A promise that resolves when the organization has been successfully deleted.
+ * @throws An error if the user does not have permission.
  */
 export async function deleteOrganization(
     fdm: FdmType,
@@ -912,12 +929,13 @@ export async function deleteOrganization(
 }
 
 /**
- * Checks if a given organization slug is available (not already in use).
+ * Checks if an organization slug is available.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param organization_slug - The slug to check for availability.
- * @returns A promise that resolves with a boolean indicating whether the slug is available. True if available, false if not.
- * @throws {Error} Throws an error if any database operation fails or if the slug is invalid
+ * This function checks if a given slug is already in use by another organization or user.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param organization_slug The slug to check.
+ * @returns A promise that resolves to `true` if the slug is available, otherwise `false`.
  */
 export async function checkOrganizationSlugForAvailability(
     fdm: FdmType,
@@ -958,12 +976,13 @@ export async function checkOrganizationSlugForAvailability(
 }
 
 /**
- * Cancels a pending invitation to join an organization.
+ * Cancels a pending invitation.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param invitation_id - The ID of the invitation to cancel.
- * @param admin_id - The ID of the user initiating the cancellation (must be owner or admin).
- * @throws {Error} Throws an error if any database operation fails, if the inviter does not have permissions, or if the invitation is not found.
+ * @param fdm The FDM instance for database access.
+ * @param invitation_id The unique identifier of the invitation to cancel.
+ * @param admin_id The identifier of the user making the request (must be an admin or owner).
+ * @returns A promise that resolves when the invitation has been successfully cancelled.
+ * @throws An error if the user does not have permission or if the invitation is not found.
  */
 export async function cancelPendingInvitation(
     fdm: FdmType,
@@ -1030,13 +1049,13 @@ interface OrganizationPermissions {
 type OrganizationRole = "owner" | "admin" | "member" | "viewer"
 
 /**
- * Retrieves the permissions of a user within a specified organization.
+ * Retrieves the permissions of a user within an organization.
  *
- * @param tx - The database transaction object.
- * @param user_id - The ID of the user.
- * @param organization_id - The ID of the organization.
- * @returns A promise that resolves to an OrganizationPermissions object.
- * @throws {Error} Throws an error if the user is not a member of the organization.
+ * @param tx The FDM instance for database access.
+ * @param user_id The identifier of the user.
+ * @param organization_id The unique identifier of the organization.
+ * @returns A promise that resolves to an `OrganizationPermissions` object.
+ * @internal
  */
 async function getUserOrganizationPermissions(
     tx: FdmType,

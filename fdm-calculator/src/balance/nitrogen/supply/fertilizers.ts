@@ -1,3 +1,12 @@
+/**
+ * @file This module calculates the nitrogen supply from various types of fertilizer applications.
+ *
+ * The primary function, `calculateNitrogenSupplyByFertilizers`, processes a list of
+ * fertilizer applications and quantifies the total nitrogen supplied by each, categorizing
+ * them by fertilizer type.
+ *
+ * @packageDocumentation
+ */
 import { Decimal } from "decimal.js"
 import type {
     FertilizerDetail,
@@ -6,13 +15,20 @@ import type {
 } from "../types"
 
 /**
- * Calculates the total nitrogen supply from all fertilizer sources (mineral, manure, compost and other fertilizers).
+ * Calculates the total nitrogen supply from all fertilizer applications on a field.
  *
- * This function aggregates the nitrogen contributions from mineral fertilizers, manure, compost and other fertilizers
- * by iterating through the applications once and directing each to the appropriate calculation.
- * @param fertilizerApplications - An array of fertilizer applications, each containing the application amount and a reference to the fertilizer details.
- * @param fertilizerDetailsMap - A map containing details for each fertilizer, including its type and nitrogen content.
- * @returns An object containing the total nitrogen supplied by all fertilizers, as well as a breakdown by fertilizer type (mineral, manure, compost, other).
+ * This function iterates through a list of fertilizer applications and calculates the
+ * total nitrogen supplied by each. It uses the application amount and the nitrogen
+ * content (`p_n_rt`) of the fertilizer.
+ *
+ * The results are aggregated and categorized into mineral, manure, compost, and other
+ * fertilizer types, providing a detailed breakdown of the nitrogen supply.
+ *
+ * @param fertilizerApplications - An array of fertilizer application events.
+ * @param fertilizerDetailsMap - A map providing detailed data for each fertilizer type,
+ *   including its nitrogen content.
+ * @returns An object detailing the total and per-category nitrogen supply from fertilizers.
+ * @throws {Error} If fertilizer details are missing for a given application.
  */
 export function calculateNitrogenSupplyByFertilizers(
     fertilizerApplications: FieldInput["fertilizerApplications"],

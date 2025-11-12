@@ -1,72 +1,52 @@
+/**
+ * @file This module handles all integrations with the NMI (Nutriënten Management Instituut) API.
+ *
+ * It provides functions for:
+ * - Retrieving the NMI API key from server-side configuration.
+ * - Fetching estimated soil parameter data for a given geographical location.
+ * - Uploading a soil analysis PDF and extracting its data using the NMI SoilReader API.
+ *
+ * The module also includes Zod schemas for validating the API responses to ensure data integrity.
+ *
+ * @packageDocumentation
+ */
 import centroid from "@turf/centroid"
 import type { Feature, Geometry, Polygon } from "geojson"
 import { z } from "zod"
 import { serverConfig } from "~/lib/config.server"
 
-export function getNmiApiKey() {
+/**
+ * Retrieves the NMI API key from the server-side configuration.
+ *
+ * @returns The NMI API key as a string, or `undefined` if it is not configured.
+ */
+export function getNmiApiKey(): string | undefined {
     if (!serverConfig.integrations.nmi) {
         return undefined
     }
-
-    const nmiApiKey = serverConfig.integrations.nmi.api_key
-    return nmiApiKey
+    return serverConfig.integrations.nmi.api_key
 }
 
+/**
+ * Fetches estimated soil parameters for a given field from the NMI API.
+ *
+ * This function calculates the centroid of the field's geometry and uses it to query
+ * the NMI's estimates endpoint. The response is validated against a Zod schema.
+ *
+ * @param field - A GeoJSON Feature or Polygon representing the field.
+ * @param nmiApiKey - The API key for authenticating with the NMI service.
+ * @returns A promise that resolves to an object containing the estimated soil parameters.
+ * @throws {Error} If the NMI API key is missing, the API request fails, or the response is invalid.
+ */
 export async function getSoilParameterEstimates(
     field: Feature | Polygon,
     nmiApiKey: string | undefined,
-): Promise<{
-    a_al_ox: number
-    a_c_of: number
-    a_ca_co: number
-    a_ca_co_po: number
-    a_caco3_if: number
-    a_cec_co: number
-    a_clay_mi: number
-    a_cn_fr: number
-    a_com_fr: number
-    a_cu_cc: number
-    a_density_sa: number
-    a_fe_ox: number
-    a_k_cc: number
-    a_k_co: number
-    a_k_co_po: number
-    a_mg_cc: number
-    a_mg_co: number
-    a_mg_co_po: number
-    a_n_pmn: number
-    a_n_rt: number
-    a_p_al: number
-    a_p_cc: number
-    a_p_ox: number
-    a_p_rt: number
-    a_p_sg: number
-    a_p_wa: number
-    a_ph_cc: number
-    a_s_rt: number
-    a_sand_mi: number
-    a_silt_mi: number
-    a_som_loi: number
-    a_zn_cc: number
-    b_soiltype_agr: string
-    b_gwl_class: string
-    b_gwl_ghg: number
-    b_gwl_glg: number
-    cultivations: { year: number; b_lu_brp: number }[]
-    a_source: string
-    a_depth_upper: number
-    a_depth_lower: number | undefined
-}> {
+): Promise<ReturnType<typeof soilParameterEstimatesSchema.parse>> {
     if (!nmiApiKey) {
         throw new Error("Please provide a NMI API key")
     }
 
-    let geometry: Geometry
-    if ("geometry" in field) {
-        geometry = field.geometry
-    } else {
-        geometry = field
-    }
+    const geometry: Geometry = "geometry" in field ? field.geometry : field
     const fieldCentroid = centroid(geometry)
     const a_lon = fieldCentroid.geometry.coordinates[0]
     const a_lat = fieldCentroid.geometry.coordinates[1]
@@ -89,13 +69,14 @@ export async function getSoilParameterEstimates(
     }
 
     const result = await responseApi.json()
-    const response = result.data
-    response.a_source = "nl-other-nmi"
-    response.a_depth_upper = 0
-    response.a_depth_lower = undefined
+    const response = {
+        ...result.data,
+        a_source: "nl-other-nmi",
+        a_depth_upper: 0,
+        a_depth_lower: undefined,
+    }
 
-    // Validate the response using the Zod schema
-    const parsedResponse = soilParameterEstimatesSchema.safeParse(result.data)
+    const parsedResponse = soilParameterEstimatesSchema.safeParse(response)
     if (!parsedResponse.success) {
         console.error(
             "NMI API response validation failed:",
@@ -106,9 +87,13 @@ export async function getSoilParameterEstimates(
         )
     }
 
-    return response
+    return parsedResponse.data
 }
 
+/**
+ * Zod schema for validating the response from the NMI's soil parameter estimates endpoint.
+ * @internal
+ */
 const soilParameterEstimatesSchema = z.object({
     a_al_ox: z.number(),
     a_ca_co: z.number(),
@@ -146,8 +131,21 @@ const soilParameterEstimatesSchema = z.object({
     b_gwl_glg: z.number(),
     cultivations: z.array(z.object({ year: z.number(), b_lu_brp: z.number() })),
     a_source: z.string(),
+    a_depth_upper: z.number(),
+    a_depth_lower: z.number().optional().undefined(),
 })
 
+/**
+ * Extracts soil analysis data from a PDF file using the NMI SoilReader API.
+ *
+ * This function takes a `FormData` object containing a file upload, sends it to the
+ * NMI API, and processes the response to extract and format the soil analysis parameters.
+ *
+ * @param formData - A `FormData` object containing the soil analysis PDF file under the key "soilAnalysisFile".
+ * @returns A promise that resolves to a structured object of soil analysis parameters.
+ * @throws {Error} If the NMI API key is not configured, no file is provided, the API request fails,
+ *   or the API response is invalid or contains no valid soil parameters.
+ */
 export async function extractSoilAnalysis(formData: FormData) {
     const nmiApiKey = getNmiApiKey()
 
@@ -155,9 +153,8 @@ export async function extractSoilAnalysis(formData: FormData) {
         throw new Error("NMI API key not configured")
     }
 
-    // Validate that FormData contains a file
-    const file = formData.get("soilAnalysisFile") as File
-    if (!file || !(file instanceof File)) {
+    const file = formData.get("soilAnalysisFile")
+    if (!(file instanceof File)) {
         throw new Error("No file provided in FormData")
     }
 
@@ -176,7 +173,6 @@ export async function extractSoilAnalysis(formData: FormData) {
     const result = await responseApi.json()
     const response = result.data
 
-    // Validate response structure
     if (
         !response.fields ||
         !Array.isArray(response.fields) ||
@@ -185,30 +181,27 @@ export async function extractSoilAnalysis(formData: FormData) {
         throw new Error("Invalid API response: no fields found")
     }
 
-    // Process the response
     const field = response.fields[0]
-
-    // Select the a_* parameters
     const soilAnalysis: { [key: string]: string | number | Date } = {}
+
+    // Extract all `a_*` parameters (analysis values).
     for (const key of Object.keys(field).filter((key) =>
         key.startsWith("a_"),
     )) {
         soilAnalysis[key] = field[key]
     }
 
-    // Check if soil parameters are returned
+    // Check if any soil parameters were actually found.
     if (Object.keys(soilAnalysis).length <= 1) {
-        // a_source is returned with invalid soil analysis
-        throw new Error("Invalid soil analysis")
+        throw new Error("Invalid soil analysis: No parameters found")
     }
 
-    // Process the other parameters
+    // Process and format other relevant fields from the response.
     if (field.b_date) {
-        // As b_date is in format dd-mm-yyyy
         const dateParts = field.b_date.split("-")
         if (dateParts.length === 3) {
             const day = Number.parseInt(dateParts[0], 10)
-            const month = Number.parseInt(dateParts[1], 10) - 1 // Month is 0-indexed
+            const month = Number.parseInt(dateParts[1], 10) - 1
             const year = Number.parseInt(dateParts[2], 10)
             soilAnalysis.b_sampling_date = new Date(year, month, day)
         }
@@ -218,17 +211,17 @@ export async function extractSoilAnalysis(formData: FormData) {
     }
     if (field.b_depth) {
         const depthParts = field.b_depth.split("-")
-        if (depthParts.length !== 2) {
-            throw new Error(`Invalid depth format: ${field.b_depth}`)
-        }
-        soilAnalysis.a_depth_upper = Number(depthParts[0]) as number
-        soilAnalysis.a_depth_lower = Number(depthParts[1]) as number
-        // Validate that the conversion to numbers was successful
-        if (
-            Number.isNaN(soilAnalysis.a_depth_upper) ||
-            Number.isNaN(soilAnalysis.a_depth_lower)
-        ) {
-            throw new Error(`Invalid numeric depth values: ${field.b_depth}`)
+        if (depthParts.length === 2) {
+            soilAnalysis.a_depth_upper = Number(depthParts[0])
+            soilAnalysis.a_depth_lower = Number(depthParts[1])
+            if (
+                Number.isNaN(soilAnalysis.a_depth_upper) ||
+                Number.isNaN(soilAnalysis.a_depth_lower)
+            ) {
+                throw new Error(
+                    `Invalid numeric depth values: ${field.b_depth}`,
+                )
+            }
         }
     }
     return soilAnalysis

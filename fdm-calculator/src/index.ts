@@ -1,3 +1,13 @@
+/**
+ * @file This is the main entry point for the `@svenvw/fdm-calculator` package.
+ * It exports all the public functions and types that are intended to be used by
+ * consumers of this library.
+ *
+ * The exports are organized by feature area, such as nitrogen balance, nutrient doses,
+ * regulatory norms, and nutrient advice.
+ *
+ * @packageDocumentation
+ */
 import pkg from "./package"
 export const fdmCalculator = pkg
 export {

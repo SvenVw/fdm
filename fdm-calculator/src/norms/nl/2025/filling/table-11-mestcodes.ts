@@ -1,5 +1,27 @@
+/**
+ * @file This file contains the data from "Table 11" of the Dutch fertilizer regulations.
+ * This table provides standard (default) values for various fertilizers, identified by
+ * their RVO `mestcode` (fertilizer code).
+ *
+ * The data includes:
+ * - `p_type_rvo`: The official RVO code for the fertilizer.
+ * - `p_type_nitratesdirective`: A boolean indicating if the fertilizer is classified as
+ *   animal manure under the EU Nitrates Directive. This is critical for the "dierlijke mest" norm.
+ * - `p_n_rt`: The default total nitrogen content (in g N / kg).
+ * - `p_p_rt`: The default phosphate content (in g P2O5 / kg).
+ *
+ * These default values are used in calculations when specific analysis data for a fertilizer
+ * is unavailable.
+ *
+ * @see https://www.rvo.nl/onderwerpen/mest/vervoeren/mestcodes
+ *
+ * @packageDocumentation
+ */
 import type { Table11Mestcodes } from "./types"
 
+/**
+ * Defines the standard properties for fertilizers based on their RVO codes (Table 11).
+ */
 export const table11Mestcodes: Table11Mestcodes = [
     {
         p_type_rvo: "10",

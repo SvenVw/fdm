@@ -1,5 +1,30 @@
+/**
+ * @file This file contains the data from "Table 9" of the Dutch fertilizer regulations
+ * for 2025. This table defines the nitrogen working coefficients (`werkingscoëfficiënt`)
+ * for various types of organic fertilizers.
+ *
+ * The working coefficient represents the percentage of the total nitrogen in a fertilizer
+ * that is considered effective or available to crops in the year of application. This value
+ * is crucial for calculating the "filling" of the nitrogen usage norm.
+ *
+ * The data is structured to accommodate complex rules, including variations based on:
+ * - Fertilizer type (identified by RVO codes).
+ * - Whether the fertilizer is produced on-farm.
+ * - Soil type (e.g., clay, sand).
+ * - Land use (arable vs. grassland).
+ * - Application timing.
+ * - Farm characteristics (e.g., presence of grazing).
+ *
+ * @see https://www.rvo.nl/onderwerpen/mest/gebruiken-en-vervoeren/stikstof-gebruiksnormen
+ *
+ * @packageDocumentation
+ */
 import type { Table9 } from "./types"
 
+/**
+ * Defines the nitrogen working coefficients for various organic fertilizers as per
+ * the Dutch 2025 regulations (Table 9).
+ */
 export const table9: Table9 = [
     {
         description:

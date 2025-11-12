@@ -1,3 +1,9 @@
+/**
+ * @file This file contains functions for managing fertilizers in the FDM.
+ *
+ * It provides a comprehensive set of CRUD operations for fertilizers and fertilizer applications,
+ * as well as functions for interacting with the fertilizer catalogue.
+ */
 import { type CatalogueFertilizerItem, hashFertilizer } from "@svenvw/fdm-data"
 import { and, asc, desc, eq, gte, inArray, lte } from "drizzle-orm"
 import { checkPermission } from "./authorization"
@@ -14,13 +20,16 @@ import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
 
 /**
- * Retrieves all fertilizers from the enabled catalogues for a farm.
+ * Retrieves all fertilizers from the catalogues that are enabled for a specific farm.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id The ID of the principal making the request.
- * @param b_id_farm The ID of the farm.
- * @returns A Promise that resolves with an array of fertilizer catalogue entries.
- * @alpha
+ * This function first checks if the principal has read access to the farm. It then fetches the list
+ * of enabled fertilizer catalogues for the farm and returns all fertilizer entries from those catalogues.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @returns A promise that resolves to an array of `fertilizersCatalogueTypeSelect` objects.
+ * @throws An error if the principal does not have permission to read the farm's data or if the database query fails.
  */
 export async function getFertilizersFromCatalogue(
     fdm: FdmType,
@@ -74,15 +83,17 @@ export async function getFertilizersFromCatalogue(
 }
 
 /**
- * Adds a new custom fertilizer to the catalogue of a farm.
+ * Adds a custom fertilizer to a farm's private catalogue.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id The ID of the principal making the request.
- * @param b_id_farm The ID of the farm.
- * @param properties The properties of the fertilizer to add.
- * @returns A Promise that resolves when the fertilizer has been added.
- * @throws If adding the fertilizer fails.
- * @alpha
+ * This function allows users to define their own fertilizers, which are then available for use
+ * on that farm.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param properties An object containing the properties of the new fertilizer.
+ * @returns A promise that resolves to the unique identifier of the newly created fertilizer catalogue entry.
+ * @throws An error if the principal does not have permission to modify the farm's data.
  */
 export async function addFertilizerToCatalogue(
     fdm: FdmType,
@@ -176,21 +187,19 @@ export async function addFertilizerToCatalogue(
 }
 
 /**
- * Adds a fertilizer aqcuiring record to a farm.
+ * Records the acquisition of a fertilizer for a farm.
  *
- * This function creates a new fertilizer acquiring record by performing a transactional insertion into the
- * fertilizers, fertilizerAcquiring, and fertilizerPicking tables. It verifies that the user has write permission
- * on the specified farm before proceeding.
+ * This function creates a record of a fertilizer being acquired, which is a prerequisite for
+ * applying it to a field.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id The identifier of the user making the request.
- * @param p_id_catalogue The catalogue ID of the fertilizer.
- * @param b_id_farm The ID of the farm where the fertilizer is applied.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param p_id_catalogue The catalogue identifier of the fertilizer being acquired.
+ * @param b_id_farm The unique identifier of the farm.
  * @param p_acquiring_amount The amount of fertilizer acquired.
- * @param p_acquiring_date The date when the fertilizer was acquired.
- * @returns A Promise resolving to the ID of the newly created fertilizer acquiring record.
- * @throws If adding the fertilizer acquiring record fails.
- * @alpha
+ * @param p_acquiring_date The date of acquisition.
+ * @returns A promise that resolves to the unique identifier of the new fertilizer record.
+ * @throws An error if the principal does not have permission to modify the farm's data.
  */
 export async function addFertilizer(
     fdm: FdmType,
@@ -253,13 +262,14 @@ export async function addFertilizer(
 }
 
 /**
- * Retrieves the details of a specific fertilizer.
+ * Retrieves a single fertilizer by its unique identifier.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param p_id The ID of the fertilizer.
- * @returns A Promise that resolves with the fertilizer details.
- * @throws If retrieving the fertilizer details fails or the fertilizer is not found.
- * @alpha
+ * This function fetches the details of a fertilizer, including its properties from the catalogue.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param p_id The unique identifier of the fertilizer.
+ * @returns A promise that resolves to a `Fertilizer` object.
+ * @throws An error if the fertilizer is not found.
  */
 export async function getFertilizer(
     fdm: FdmType,
@@ -378,16 +388,17 @@ export async function getFertilizer(
 }
 
 /**
- * Updates an existing fertilizer in the catalogue of a farm.
+ * Updates a custom fertilizer in a farm's private catalogue.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id The ID of the principal making the request.
- * @param b_id_farm The ID of the farm.
- * @param p_id_catalogue The ID of the fertilizer in the catalogue to update
- * @param properties The properties of the fertilizer to update.
- * @returns A Promise that resolves when the fertilizer has been updated.
- * @throws If updating the fertilizer fails.
- * @alpha
+ * This function allows for the modification of a custom fertilizer's properties.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param p_id_catalogue The unique identifier of the fertilizer catalogue entry to update.
+ * @param properties An object containing the properties to update.
+ * @returns A promise that resolves when the fertilizer has been successfully updated.
+ * @throws An error if the principal does not have permission or if the fertilizer is not found.
  */
 export async function updateFertilizerFromCatalogue(
     fdm: FdmType,
@@ -516,18 +527,16 @@ export async function updateFertilizerFromCatalogue(
 }
 
 /**
- * Retrieves fertilizer details for a specified farm.
+ * Retrieves all fertilizers that have been acquired by a farm.
  *
- * This function verifies that the requesting principal has read access to the farm,
- * then queries the database to return a list of fertilizers along with their catalogue
- * and application details.
+ * This function lists all fertilizers that a farm has on record, including their properties
+ * from the catalogue.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The ID of the principal making the request.
- * @param b_id_farm - The ID of the farm for which the fertilizers are retrieved.
- * @returns A promise that resolves with an array of fertilizer detail objects.
- *
- * @alpha
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @returns A promise that resolves to an array of `Fertilizer` objects.
+ * @throws An error if the principal does not have permission to read the farm's data.
  */
 export async function getFertilizers(
     fdm: FdmType,
@@ -652,13 +661,13 @@ export async function getFertilizers(
 }
 
 /**
- * Removes a fertilizer from a farm.
+ * Removes a record of an acquired fertilizer.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param p_id The ID of the fertilizer to remove.
- * @returns A Promise that resolves when the fertilizer has been removed.
- * @throws If removing the fertilizer fails.
- * @alpha
+ * This function deletes a fertilizer record, including its acquisition and picking information.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param p_id The unique identifier of the fertilizer to remove.
+ * @returns A promise that resolves when the fertilizer has been successfully removed.
  */
 export async function removeFertilizer(
     fdm: FdmType,
@@ -686,20 +695,20 @@ export async function removeFertilizer(
 }
 
 /**
- * Adds a fertilizer application record.
+ * Records a fertilizer application on a field.
  *
- * Validates that the specified field and fertilizer exist and that the principal has write permission on the field before inserting the application record.
+ * This function creates a record of a fertilizer being applied to a specific field, including details
+ * about the amount, method, and date of application.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The ID of the principal performing the operation.
- * @param b_id - The ID of the field where the fertilizer application is recorded.
- * @param p_id - The ID of the fertilizer to be applied.
- * @param p_app_amount - The amount of fertilizer applied.
- * @param p_app_method - The method used for applying the fertilizer.
- * @param p_app_date - The date of the fertilizer application.
- * @returns A Promise that resolves with the unique ID of the newly created fertilizer application record.
- *
- * @throws {Error} When the specified field or fertilizer does not exist or if the record insertion fails.
+ * @param fdm The Fdm instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id The unique identifier of the field.
+ * @param p_id The unique identifier of the fertilizer being applied.
+ * @param p_app_amount The amount of fertilizer applied.
+ * @param p_app_method The method of application.
+ * @param p_app_date The date of application.
+ * @returns A promise that resolves to the unique identifier of the new fertilizer application record.
+ * @throws An error if the principal does not have permission or if the field or fertilizer is not found.
  */
 export async function addFertilizerApplication(
     fdm: FdmType,
@@ -763,17 +772,19 @@ export async function addFertilizerApplication(
 }
 
 /**
- * Updates an existing fertilizer application record.
+ * Updates a fertilizer application record.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The ID of the principal performing the update.
- * @param p_app_id - The unique identifier of the fertilizer application record.
- * @param p_id - The unique identifier of the associated fertilizer.
- * @param p_app_amount - The amount of fertilizer applied.
- * @param p_app_method - The method used for applying the fertilizer.
- * @param p_app_date - The date when the fertilizer was applied.
+ * This function allows for the modification of an existing fertilizer application.
  *
- * @throws {Error} Thrown if the update operation fails due to insufficient permissions or a database error.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param p_app_id The unique identifier of the fertilizer application to update.
+ * @param p_id The new fertilizer identifier.
+ * @param p_app_amount The new application amount.
+ * @param p_app_method The new application method.
+ * @param p_app_date The new application date.
+ * @returns A promise that resolves when the application has been successfully updated.
+ * @throws An error if the principal does not have permission.
  */
 export async function updateFertilizerApplication(
     fdm: FdmType,
@@ -811,14 +822,11 @@ export async function updateFertilizerApplication(
 /**
  * Removes a fertilizer application record.
  *
- * This function verifies that the principal has write permissions before deleting the fertilizer
- * application record identified by the given ID.
- *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The ID of the principal performing the removal.
- * @param p_app_id - The fertilizer application record's ID to remove.
- *
- * @throws {Error} If the removal operation fails.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param p_app_id The unique identifier of the fertilizer application to remove.
+ * @returns A promise that resolves when the application has been successfully removed.
+ * @throws An error if the principal does not have permission.
  */
 export async function removeFertilizerApplication(
     fdm: FdmType,
@@ -846,17 +854,13 @@ export async function removeFertilizerApplication(
 }
 
 /**
- * Retrieves a fertilizer application record by its unique identifier.
+ * Retrieves a single fertilizer application by its unique identifier.
  *
- * Checks if the principal has read permission before querying the database for the fertilizer
- * application record, including associated catalogue details. Returns the record if found,
- * or null otherwise.
- *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The ID of the principal retrieving the application.
- * @param p_app_id - The unique ID of the fertilizer application record.
- * @returns A Promise that resolves with the fertilizer application record, or null if not found.
- * @throws Error if the retrieval process fails.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param p_app_id The unique identifier of the fertilizer application.
+ * @returns A promise that resolves to a `FertilizerApplication` object, or `null` if not found.
+ * @throws An error if the principal does not have permission.
  */
 export async function getFertilizerApplication(
     fdm: FdmType,
@@ -909,18 +913,14 @@ export async function getFertilizerApplication(
 }
 
 /**
- * Retrieves fertilizer application records for a specific field.
+ * Retrieves all fertilizer applications for a specific field, optionally filtered by a timeframe.
  *
- * This function first ensures that the requesting principal has read permission for the specified field, then
- * queries the database for fertilizer application records associated with that field. The returned records are
- * ordered by application date in descending order.
- *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal making the request.
- * @param b_id - The identifier of the field.
- * @param timeframe - Optional timeframe to filter the fertilizer applications.
- * @returns A promise that resolves with an array of fertilizer application records.
- * @throws {Error} If permission is denied or if an error occurs during record retrieval.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id The unique identifier of the field.
+ * @param timeframe An optional timeframe to filter the applications.
+ * @returns A promise that resolves to an array of `FertilizerApplication` objects.
+ * @throws An error if the principal does not have permission.
  */
 export async function getFertilizerApplications(
     fdm: FdmType,
@@ -991,16 +991,14 @@ export async function getFertilizerApplications(
 }
 
 /**
- * Retrieves a description of the available fertilizer parameters.
+ * Retrieves descriptions for all available fertilizer parameters.
  *
- * This function returns an array of objects, each describing a fertilizer parameter.
- * Each description includes the parameter's name, unit, type (numeric or enum),
- * a human-readable name, a detailed description, and optional constraints like
- * minimum and maximum values or a list of valid options for enum types.
+ * This function provides metadata for each fertilizer parameter, such as its name, unit, and type.
+ * This is useful for dynamically building user interfaces or for providing contextual help.
  *
- * @param locale - The locale for which to retrieve the descriptions. Currently only 'NL-nl' is supported.
- * @returns An array of fertilizerParameterDescriptionItem objects.
- * @throws {Error} If an unsupported locale is provided.
+ * @param locale The locale for the descriptions (currently only "NL-nl" is supported).
+ * @returns An array of `FertilizerParameterDescription` objects.
+ * @throws An error if an unsupported locale is provided.
  */
 export function getFertilizerParametersDescription(
     locale = "NL-nl",
@@ -1274,10 +1272,10 @@ export function getFertilizerParametersDescription(
 }
 
 /**
- * Determines the fertilizer type based on the RVO code.
+ * Converts an RVO fertilizer type code to a more general fertilizer type.
  *
- * @param p_type_rvo The RVO code for the fertilizer type.
- * @returns The fertilizer type ("manure", "mineral", "compost") or null if not classified.
+ * @param p_type_rvo The RVO type code.
+ * @returns The general fertilizer type, or `null` if the RVO code is not recognized.
  * @internal
  */
 function convertRvoTypeToFertilizerType(

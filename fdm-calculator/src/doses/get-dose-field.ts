@@ -1,3 +1,12 @@
+/**
+ * @file This module provides a high-level function to calculate nutrient doses for a specific
+ * field by fetching the necessary data from the FDM core services.
+ *
+ * It orchestrates the process of retrieving field data, fertilizer applications, and
+ * fertilizer definitions before using the `calculateDose` function to perform the calculation.
+ *
+ * @packageDocumentation
+ */
 import {
     type FdmType,
     getFertilizerApplications,
@@ -9,17 +18,21 @@ import { calculateDose } from "./calculate-dose"
 import type { Dose } from "./d"
 
 /**
- * Calculates the total NPK dose applied to a specific field.
+ * Fetches all necessary data and calculates the total nutrient dose for a specific field.
  *
- * This function retrieves fertilizer applications, obtains field details to determine the associated farm ID, and fetches the properties of the fertilizers used.
- * It then computes the total NPK dose based on the collected data.
+ * This function acts as a wrapper that:
+ * 1.  Retrieves all fertilizer applications for the given field ID.
+ * 2.  Fetches the field details to identify the parent farm.
+ * 3.  Retrieves the list of all available fertilizers for that farm.
+ * 4.  Calls the `calculateDose` function with the fetched data to compute the total
+ *     nutrient doses.
  *
- * @param fdm The FDM data object.
- * @param principal_id The identifier of the principal making the request.
- * @param b_id The ID of the field.
- * @returns A Promise resolving to the calculated NPK dose for the field.
- *
- * @throws {Error} If retrieving data or calculating the dose fails.
+ * @param params - The input object for the calculation.
+ * @param params.fdm - The FDM core data access object.
+ * @param params.principal_id - The identifier of the user or system making the request.
+ * @param params.b_id - The unique identifier of the field.
+ * @returns A promise that resolves to the calculated `Dose` object for the field.
+ * @throws {Error} If any of the data fetching steps or the final dose calculation fails.
  */
 export async function getDoseForField({
     fdm,

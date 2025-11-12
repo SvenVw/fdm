@@ -1,3 +1,10 @@
+/**
+ * @file This file contains functions for managing catalogues in the FDM.
+ *
+ * It provides functionalities to enable, disable, and check the status of fertilizer and cultivation
+ * catalogues for a given farm. It also includes functions to synchronize the catalogues with the
+ * data from the `@svenvw/fdm-data` package.
+ */
 import {
     getCultivationCatalogue,
     getFertilizersCatalogue,
@@ -13,13 +20,16 @@ import type { FdmType } from "./fdm"
 import type { FdmServerType } from "./fdm-server.d"
 
 /**
- * Gets all enabled fertilizer catalogues for a farm.
+ * Retrieves the enabled fertilizer catalogues for a specific farm.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id The ID of the principal making the request.
- * @param b_id_farm The ID of the farm.
- * @returns A Promise that resolves to an array of enabled fertilizer catalogue sources.
- * @throws If retrieving the catalogues fails.
+ * This function checks the permissions of the principal and then queries the database
+ * to get a list of all fertilizer catalogues that are enabled for the given farm.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @returns A promise that resolves to an array of strings, where each string is the source of an enabled fertilizer catalogue.
+ * @throws An error if the principal does not have permission to read the farm's data or if the database query fails.
  */
 export async function getEnabledFertilizerCatalogues(
     fdm: FdmType,
@@ -52,13 +62,16 @@ export async function getEnabledFertilizerCatalogues(
 }
 
 /**
- * Gets all enabled cultivation catalogues for a farm.
+ * Retrieves the enabled cultivation catalogues for a specific farm.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id The ID of the principal making the request.
- * @param b_id_farm The ID of the farm.
- * @returns A Promise that resolves to an array of enabled cultivation catalogue sources.
- * @throws If retrieving the catalogues fails.
+ * This function checks the permissions of the principal and then queries the database
+ * to get a list of all cultivation catalogues that are enabled for the given farm.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @returns A promise that resolves to an array of strings, where each string is the source of an enabled cultivation catalogue.
+ * @throws An error if the principal does not have permission to read the farm's data or if the database query fails.
  */
 export async function getEnabledCultivationCatalogues(
     fdm: FdmType,
@@ -97,14 +110,17 @@ export async function getEnabledCultivationCatalogues(
 }
 
 /**
- * Enables a fertilizer catalogue for a farm.
+ * Enables a fertilizer catalogue for a specific farm.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id The ID of the principal making the request.
- * @param b_id_farm The ID of the farm.
- * @param p_source The source/name of the fertilizer catalogue to enable.
- * @returns A Promise that resolves when the catalogue has been enabled.
- * @throws If enabling the catalogue fails.
+ * This function checks the principal's permissions and then adds an entry to the database
+ * to enable the specified fertilizer catalogue for the given farm.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param p_source The source identifier of the fertilizer catalogue to enable.
+ * @returns A promise that resolves when the catalogue has been successfully enabled.
+ * @throws An error if the principal does not have permission to modify the farm's data or if the database insertion fails.
  */
 export async function enableFertilizerCatalogue(
     fdm: FdmType,
@@ -135,14 +151,17 @@ export async function enableFertilizerCatalogue(
 }
 
 /**
- * Enables a cultivation catalogue for a farm.
+ * Enables a cultivation catalogue for a specific farm.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id The ID of the principal making the request.
- * @param b_id_farm The ID of the farm.
- * @param b_lu_source The source/name of the cultivation catalogue to enable.
- * @returns A Promise that resolves when the catalogue has been enabled.
- * @throws If enabling the catalogue fails.
+ * This function checks the principal's permissions and then adds an entry to the database
+ * to enable the specified cultivation catalogue for the given farm.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param b_lu_source The source identifier of the cultivation catalogue to enable.
+ * @returns A promise that resolves when the catalogue has been successfully enabled.
+ * @throws An error if the principal does not have permission to modify the farm's data or if the database insertion fails.
  */
 export async function enableCultivationCatalogue(
     fdm: FdmType,
@@ -173,14 +192,17 @@ export async function enableCultivationCatalogue(
 }
 
 /**
- * Disables a fertilizer catalogue for a farm.
+ * Disables a fertilizer catalogue for a specific farm.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id The ID of the principal making the request.
- * @param b_id_farm The ID of the farm.
- * @param p_source The source/name of the fertilizer catalogue to disable.
- * @returns A Promise that resolves when the catalogue has been disabled.
- * @throws If disabling the catalogue fails.
+ * This function checks the principal's permissions and then removes the entry from the database
+ * that enables the specified fertilizer catalogue for the given farm.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param p_source The source identifier of the fertilizer catalogue to disable.
+ * @returns A promise that resolves when the catalogue has been successfully disabled.
+ * @throws An error if the principal does not have permission to modify the farm's data or if the database deletion fails.
  */
 export async function disableFertilizerCatalogue(
     fdm: FdmType,
@@ -215,14 +237,17 @@ export async function disableFertilizerCatalogue(
 }
 
 /**
- * Disables a cultivation catalogue for a farm.
+ * Disables a cultivation catalogue for a specific farm.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id The ID of the principal making the request.
- * @param b_id_farm The ID of the farm.
- * @param b_lu_source The source/name of the cultivation catalogue to disable.
- * @returns A Promise that resolves when the catalogue has been disabled.
- * @throws If disabling the catalogue fails.
+ * This function checks the principal's permissions and then removes the entry from the database
+ * that enables the specified cultivation catalogue for the given farm.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param b_lu_source The source identifier of the cultivation catalogue to disable.
+ * @returns A promise that resolves when the catalogue has been successfully disabled.
+ * @throws An error if the principal does not have permission to modify the farm's data or if the database deletion fails.
  */
 export async function disableCultivationCatalogue(
     fdm: FdmType,
@@ -263,14 +288,17 @@ export async function disableCultivationCatalogue(
 }
 
 /**
- * Checks if a fertilizer catalogue is enabled for a farm.
+ * Checks if a fertilizer catalogue is enabled for a specific farm.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id The ID of the principal making the request.
- * @param b_id_farm The ID of the farm.
- * @param p_source The source/name of the fertilizer catalogue to check.
- * @returns A Promise that resolves to true if the catalogue is enabled, false otherwise.
- * @throws If checking the catalogue status fails.
+ * This function checks the principal's permissions and then queries the database to determine
+ * if the specified fertilizer catalogue is enabled for the given farm.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param p_source The source identifier of the fertilizer catalogue to check.
+ * @returns A promise that resolves to `true` if the catalogue is enabled, and `false` otherwise.
+ * @throws An error if the principal does not have permission to read the farm's data or if the database query fails.
  */
 export async function isFertilizerCatalogueEnabled(
     fdm: FdmType,
@@ -311,14 +339,17 @@ export async function isFertilizerCatalogueEnabled(
 }
 
 /**
- * Checks if a cultivation catalogue is enabled for a farm.
+ * Checks if a cultivation catalogue is enabled for a specific farm.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id The ID of the principal making the request.
- * @param b_id_farm The ID of the farm.
- * @param b_lu_source The source/name of the cultivation catalogue to check.
- * @returns A Promise that resolves to true if the catalogue is enabled, false otherwise.
- * @throws If checking the catalogue status fails.
+ * This function checks the principal's permissions and then queries the database to determine
+ * if the specified cultivation catalogue is enabled for the given farm.
+ *
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param b_lu_source The source identifier of the cultivation catalogue to check.
+ * @returns A promise that resolves to `true` if the catalogue is enabled, and `false` otherwise.
+ * @throws An error if the principal does not have permission to read the farm's data or if the database query fails.
  */
 export async function isCultivationCatalogueEnabled(
     fdm: FdmType,
@@ -365,16 +396,31 @@ export async function isCultivationCatalogueEnabled(
 }
 
 /**
- * Synchronizes the fertilizer and cultivation catalogues in the FDM database with the data from fdm-data.
+ * Synchronizes all catalogues from the `@svenvw/fdm-data` package with the database.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @returns A promise that resolves when the synchronization is complete.
+ * This function is a convenience wrapper that calls the synchronization functions for each type of catalogue.
+ * It is typically called during the application's startup process to ensure that the
+ * catalogue data in the database is up-to-date.
+ *
+ * @param fdm The FDM instance for database access.
+ * @returns A promise that resolves when all catalogues have been synchronized.
  */
 export async function syncCatalogues(fdm: FdmType): Promise<void> {
     await syncFertilizerCatalogue(fdm)
     await syncCultivationCatalogue(fdm)
 }
 
+/**
+ * Synchronizes the fertilizer catalogue from the `@svenvw/fdm-data` package with the database.
+ *
+ * This function retrieves the fertilizer catalogues, calculates a hash for each item, and then
+ * inserts or updates the items in the database as needed. This ensures that the data in the
+ * database is consistent with the data in the `@svenvw/fdm-data` package.
+ *
+ * @param fdm The FDM instance for database access.
+ * @returns A promise that resolves when the fertilizer catalogue has been synchronized.
+ * @internal
+ */
 async function syncFertilizerCatalogue(fdm: FdmType) {
     const srmCatalogue = await getFertilizersCatalogue("srm")
     const baatCatalogue = await getFertilizersCatalogue("baat")
@@ -425,6 +471,17 @@ async function syncFertilizerCatalogue(fdm: FdmType) {
     })
 }
 
+/**
+ * Synchronizes the cultivation catalogue from the `@svenvw/fdm-data` package with the database.
+ *
+ * This function retrieves the cultivation catalogue, calculates a hash for each item, and then
+ * inserts or updates the items in the database as needed. This ensures that the data in the
+ * database is consistent with the data in the `@svenvw/fdm-data` package.
+ *
+ * @param fdm The FDM instance for database access.
+ * @returns A promise that resolves when the cultivation catalogue has been synchronized.
+ * @internal
+ */
 async function syncCultivationCatalogue(fdm: FdmType) {
     const brpCatalogue = await getCultivationCatalogue("brp")
 

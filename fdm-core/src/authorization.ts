@@ -1,3 +1,11 @@
+/**
+ * @file This file implements the authorization logic for the FDM application.
+ *
+ * It provides a role-based access control (RBAC) system that is used to determine
+ * whether a principal (e.g., a user) is allowed to perform a certain action on a
+ * resource (e.g., a farm). The system is based on a set of predefined resources,
+ * roles, actions, and permissions.
+ */
 import { and, eq, inArray, isNull } from "drizzle-orm"
 import type {
     Action,
@@ -15,6 +23,11 @@ import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import { createId } from "./id"
 
+/**
+ * Defines the types of resources that can be managed by the authorization system.
+ * These are the entities upon which permissions can be granted.
+ * @public
+ */
 export const resources: Resource[] = [
     "user",
     "organization",
@@ -25,9 +38,24 @@ export const resources: Resource[] = [
     "soil_analysis",
     "harvesting",
 ] as const
+/**
+ * Defines the roles that can be assigned to principals.
+ * Each role is associated with a set of permissions.
+ * @public
+ */
 export const roles: Role[] = ["owner", "advisor", "researcher"] as const
+/**
+ * Defines the actions that can be performed on resources.
+ * These are the operations that are controlled by the authorization system.
+ * @public
+ */
 export const actions: Action[] = ["read", "write", "list", "share"] as const
 
+/**
+ * A comprehensive list of permissions that defines which roles can perform which actions on which resources.
+ * This is the core of the role-based access control (RBAC) system.
+ * @public
+ */
 export const permissions: Permission[] = [
     {
         resource: "farm",
@@ -137,21 +165,19 @@ export const permissions: Permission[] = [
 ]
 
 /**
- * Checks whether the principal is authorized to perform an action on a resource.
+ * Checks if a principal is authorized to perform a specific action on a resource.
  *
- * This function retrieves the valid roles for the specified action and resource, constructs the resource hierarchy,
- * and iterates through the chain to verify if any level grants the required permission for the principal(s). It records
- * the permission check details in the audit log and throws an error if the permission is denied.
+ * This function walks up the resource hierarchy (resource chain) to determine if the principal
+ * has the required permissions. It also logs the check in an audit trail.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param resource - The type of resource being accessed.
- * @param action - The action the principal intends to perform.
- * @param resource_id - The unique identifier of the specific resource.
- * @param principal_id - The principal identifier(s); supports a single ID or an array.
- * @param origin - The source origin used for audit logging the permission check.
- * @returns Resolves to true if the principal is permitted to perform the action.
- *
- * @throws {Error} When the principal does not have the required permission.
+ * @param fdm The FDM instance for database access.
+ * @param resource The type of resource being accessed (e.g., "farm", "field").
+ * @param action The action being performed (e.g., "read", "write").
+ * @param resource_id The unique identifier of the resource.
+ * @param principal_id The identifier of the principal (user or system) performing the action.
+ * @param origin A string indicating the origin of the request, for auditing purposes.
+ * @returns A promise that resolves to `true` if the action is permitted, otherwise throws an error.
+ * @throws An error if the permission is denied.
  */
 export async function checkPermission(
     fdm: FdmType,
@@ -240,19 +266,17 @@ export async function checkPermission(
 }
 
 /**
- * Retrieves a list of roles a principal has for a specific resource.
+ * Retrieves the roles of a principal for a specific resource.
  *
- * This function queries the database to find all roles that a principal has been granted for the given resource.
- * It returns an array of role strings.
- * CAUTION: This function does not return inherited roles yet.
+ * This function queries the database to find the roles directly assigned to a principal for a given resource.
+ * Note: This function does not currently resolve inherited roles from the resource chain.
  *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param resource - The type of the resource to query for the principal's roles.
- * @param resource_id - The identifier of the specific resource instance.
- * @param principal_id - The identifier of the principal.
- * @returns A promise that resolves to an array of roles (strings) that the principal has for the given resource.
- *   Returns an empty array if the principal has no roles for the resource.
- * @throws {Error} If the resource type is invalid or if the database operation fails.
+ * @param fdm The FDM instance for database access.
+ * @param resource The type of resource (e.g., "farm", "field").
+ * @param resource_id The unique identifier of the resource.
+ * @param principal_id The identifier of the principal.
+ * @returns A promise that resolves to an array of `Role` strings.
+ * @throws An error if the resource type is invalid or the database query fails.
  */
 export async function getRolesOfPrincipalForResource(
     fdm: FdmType,
@@ -301,19 +325,18 @@ export async function getRolesOfPrincipalForResource(
 }
 
 /**
- * Grants a specified role to a principal for a given resource.
+ * Grants a role to a principal for a specific resource.
  *
- * This function validates that the provided resource and role are allowed. It then generates a unique role identifier and
- * inserts a new role record into the database within a transaction. If the resource or role is invalid, or if the database
- * operation fails, an error is thrown.
+ * This function assigns a role to a principal, creating an entry in the database. It prevents
+ * duplicate roles by checking if the principal already has a role on the resource.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param resource - The target resource type for which the role is being assigned.
- * @param role - The role to be granted.
- * @param resource_id - The identifier of the resource.
- * @param target_id - The identifier of the principal receiving the role.
- *
- * @throws {Error} If the specified resource or role is invalid or if the database transaction fails.
+ * @param fdm The FDM instance for database access.
+ * @param resource The type of resource (e.g., "farm", "field").
+ * @param role The role to grant (e.g., "owner", "advisor").
+ * @param resource_id The unique identifier of the resource.
+ * @param target_id The identifier of the principal to whom the role is being granted.
+ * @returns A promise that resolves when the role has been successfully granted.
+ * @throws An error if the resource or role type is invalid, or if the principal already has a role.
  */
 export async function grantRole(
     fdm: FdmType,
@@ -373,18 +396,17 @@ export async function grantRole(
 }
 
 /**
- * Revokes the principal from a specified resource.
+ * Revokes a principal's role from a specific resource.
  *
- * This function revokes the role of a principal by marking the corresponding record as deleted in the database. It validates
- * that the provided resource is valid, and executes the update within a transaction. If the input
- * values are invalid or if the operation fails, an error is thrown.
+ * This function performs a soft delete on the role entry, marking it as deleted in the database.
+ * This preserves the historical record of the role assignment while effectively removing the permission.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param resource - The type of the resource from which the role should be revoked.
- * @param resource_id - The identifier of the resource instance.
- * @param target_id - The identifier of the principal whose role is being revoked.
- *
- * @throws {Error} If the resource is invalid, or if the revocation operation fails.
+ * @param fdm The FDM instance for database access.
+ * @param resource The type of resource (e.g., "farm", "field").
+ * @param resource_id The unique identifier of the resource.
+ * @param target_id The identifier of the principal whose role is being revoked.
+ * @returns A promise that resolves when the role has been successfully revoked.
+ * @throws An error if the resource type is invalid or the database operation fails.
  */
 export async function revokePrincipal(
     fdm: FdmType,
@@ -424,23 +446,17 @@ export async function revokePrincipal(
 /**
  * Updates the role of a principal for a specific resource.
  *
- * This function revokes the existing role of the principal on the resource and then grants a new role. It first validates
- * that the provided resource and role are valid. Both the revocation and granting operations are performed within a single
- * transaction to maintain database consistency.
+ * This function performs an atomic update by first revoking the principal's existing role and then
+ * granting the new role. This ensures that the principal always has a valid role and prevents
+ * inconsistencies.
  *
- * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param resource - The type of the resource for which the role should be updated.
- * @param role - The new role to assign.
- * @param resource_id - The identifier of the specific resource.
- * @param target_id - The identifier of the principal whose role is being updated.
- * @returns A promise that resolves when the role has been updated
- * @throws {Error} If the specified resource or role is invalid or if the database transaction fails.
- *
- * @example
- * ```typescript
- * // Example usage of updateRole
- * await updateRole(fdm, "farm", "advisor", "farm123", "user456");
- * ```
+ * @param fdm The FDM instance for database access.
+ * @param resource The type of resource (e.g., "farm", "field").
+ * @param role The new role to assign.
+ * @param resource_id The unique identifier of the resource.
+ * @param target_id The identifier of the principal whose role is being updated.
+ * @returns A promise that resolves with the new role ID upon successful update.
+ * @throws An error if the resource or role type is invalid, or if the database transaction fails.
  */
 export async function updateRole(
     fdm: FdmType,
@@ -494,19 +510,18 @@ export async function updateRole(
 }
 
 /**
- * Retrieves a list of resource IDs accessible by a principal for a specified action.
+ * Lists the resources that a principal can access for a given action.
  *
- * This function validates the provided resource and action, retrieves the roles allowed
- * for the action on the resource, and queries the authorization schema to fetch matching
- * resource IDs. The principal identifier is normalized to an array, ensuring multiple
- * identifiers are handled consistently.
+ * This function returns a list of resource IDs that the principal is authorized to perform the
+ * specified action on. It determines the allowed roles for the action and then queries for
+ * all resources where the principal has one of those roles.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param resource - The type of resource to check access for.
- * @param action - The action based on which access permissions are determined.
- * @param principal_id - The principal's identifier or an array of identifiers.
- * @returns A promise that resolves to an array of resource IDs that the principal can access.
- * @throws {Error} If the resource or action is invalid or if the database query fails.
+ * @param fdm The FDM instance for database access.
+ * @param resource The type of resource to list (e.g., "farm", "field").
+ * @param action The action for which to check permissions (e.g., "read", "write").
+ * @param principal_id The identifier of the principal.
+ * @returns A promise that resolves to an array of resource IDs.
+ * @throws An error if the resource or action type is invalid, or if the database query fails.
  */
 export async function listResources(
     fdm: FdmType,
@@ -560,33 +575,15 @@ export async function listResources(
 }
 
 /**
- * Retrieves a list of principals associated with a specific resource along with their roles.
+ * Lists the principals and their roles for a specific resource.
  *
- * This function queries the database to find all principals that have been granted
- * any role on the given resource. It returns an array of objects, each containing the
- * principal's identifier and the role they possess for that resource.
+ * This function retrieves all principals that have a direct role assignment on the given resource.
  *
- * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param resource - The type of the resource to query for associated principals.
- * @param resource_id - The identifier of the specific resource instance.
- * @returns A promise that resolves to an array of objects, each with `principal_id` and `role` properties.
- *   Returns an empty array if no principals are associated with the resource.
- *
- * @throws {Error} If the resource type is invalid or if the database operation fails.
- *
- * @example
- * ```typescript
- * // Example usage to list principals for a specific farm
- * const principals = await listPrincipalsForResource(fdm, "farm", "farm123");
- * if (principals.length > 0) {
- *   console.log("Principals associated with farm123:", principals);
- *   principals.forEach((principal) => {
- *     console.log(`- Principal ID: ${principal.principal_id}, Role: ${principal.role}`);
- *   });
- * } else {
- *   console.log("No principals associated with farm123.");
- * }
- * ```
+ * @param fdm The FDM instance for database access.
+ * @param resource The type of resource (e.g., "farm", "field").
+ * @param resource_id The unique identifier of the resource.
+ * @returns A promise that resolves to an array of objects, each containing a `principal_id` and their `role`.
+ * @throws An error if the resource type is invalid or the database query fails.
  */
 export async function listPrincipalsForResource(
     fdm: FdmType,
@@ -628,15 +625,15 @@ export async function listPrincipalsForResource(
 }
 
 /**
- * Retrieves the roles authorized to perform a specific action on a given resource.
+ * Retrieves the roles that are permitted to perform a given action on a resource.
  *
- * This function filters the global permissions array for entries that match the specified
- * resource and include the provided action. It then extracts and returns a flattened list of roles
- * from the matching permission entries.
+ * This function consults the `permissions` array to find all roles that have the
+ * specified action allowed for the given resource.
  *
- * @param action - The action to check permissions for.
- * @param resource - The resource associated with the action.
- * @returns An array of roles permitted to perform the specified action on the resource.
+ * @param action The action to check (e.g., "read", "write").
+ * @param resource The resource in question (e.g., "farm", "field").
+ * @returns An array of `Role` strings that are permitted to perform the action.
+ * @internal
  */
 function getRolesForAction(action: Action, resource: Resource): Role[] {
     const roles = permissions.filter((permission) => {
@@ -654,20 +651,17 @@ function getRolesForAction(action: Action, resource: Resource): Role[] {
 }
 
 /**
- * Constructs a sorted chain of related resources for a provided resource type and identifier.
+ * Retrieves the hierarchical chain of resources leading up to a specific resource.
  *
- * This function retrieves and assembles linked resource information from the database based on the resource type.
- * For supported resource types ("farm", "field", "cultivation", "soil_analysis", "harvesting", "fertilizer_application"),
- * it gathers associated resource identifiers and orders them following the sequence:
- * "farm", "field", "cultivation", "harvesting", "fertilizer_application", "soil_analysis". If the resource is not found,
- * an empty array is returned.
+ * This function is crucial for permission checking, as it allows `checkPermission` to walk
+ * up the resource hierarchy. For example, a "field" is a sub-resource of a "farm".
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param resource - The type of the resource for which to construct the chain.
- * @param resource_id - The identifier of the resource.
- * @returns A promise that resolves to an array representing the ordered chain of resource beads.
- *
- * @throws {Error} If the resource type is not recognized or if a database error occurs.
+ * @param fdm The FDM instance for database access.
+ * @param resource The type of resource for which to get the chain.
+ * @param resource_id The unique identifier of the resource.
+ * @returns A promise that resolves to a `ResourceChain`, which is an array of `ResourceBead` objects.
+ * @throws An error if the resource type is not supported or a database error occurs.
+ * @internal
  */
 async function getResourceChain(
     fdm: FdmType,

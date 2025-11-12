@@ -18,23 +18,19 @@ import { getPrincipal, identifyPrincipal } from "./principal"
 import type { Principal } from "./principal.d"
 
 /**
- * Creates a new farm record and assigns the "owner" role to the specified principal.
+ * Creates a new farm and assigns the creator as the owner.
  *
- * This function starts a database transaction, generates a unique identifier for the new farm,
- * inserts the farm details into the database, and then grants the given principal the owner role.
+ * This function handles the creation of a new farm, including assigning it a unique identifier
+ * and setting up the initial ownership permissions.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal creating the farm.
- * @param b_name_farm - The name of the farm.
- * @param b_businessid_farm - The business identifier for the farm.
- * @param b_address_farm - The address of the farm.
- * @param b_postalcode_farm - The postal code associated with the farm.
- *
- * @returns The generated unique identifier for the new farm.
- *
- * @throws {Error} If the transaction fails to create the farm record.
- *
- * @alpha
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal creating the farm.
+ * @param b_name_farm The name of the new farm.
+ * @param b_businessid_farm The business ID of the new farm.
+ * @param b_address_farm The address of the new farm.
+ * @param b_postalcode_farm The postal code of the new farm.
+ * @returns A promise that resolves to the unique identifier of the newly created farm.
+ * @throws An error if the database transaction fails.
  */
 export async function addFarm(
     fdm: FdmType,
@@ -74,16 +70,16 @@ export async function addFarm(
 }
 
 /**
- * Retrieves a farm's details after verifying that the requesting principal has read access.
+ * Retrieves a single farm by its unique identifier.
  *
- * This function checks the principal's permissions before querying the database for the farm identified by the provided ID.
+ * This function fetches the details of a farm, including the roles of the current principal
+ * and the identifier of the farm's owner.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal making the request.
- * @param b_id_farm - The unique identifier of the farm to retrieve.
- * @returns A Promise that resolves with the farm's details.
- * @throws {Error} If permission checks fail or if an error occurs while retrieving the farm.
- * @alpha
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @returns A promise that resolves to a farm object, which includes role and owner information.
+ * @throws An error if the principal does not have permission to read the farm's data or if the farm is not found.
  */
 export async function getFarm(
     fdm: FdmType,
@@ -153,14 +149,14 @@ export async function getFarm(
 }
 
 /**
- * Retrieves a list of farms accessible by the specified principal.
+ * Retrieves all farms that a principal has access to.
  *
- * This function uses authorization checks to determine which farms the principal is allowed to read, then returns the corresponding farm details ordered by name.
+ * This function lists all farms for which the principal has read access, including information
+ * about the principal's roles on each farm.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal requesting access.
- * @returns A Promise that resolves with an array of farm detail objects.
- * @alpha
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @returns A promise that resolves to an array of farm objects, each including role information.
  */
 export async function getFarms(
     fdm: FdmType,
@@ -229,23 +225,20 @@ export async function getFarms(
 }
 
 /**
- * Updates a farm's details after confirming the principal has write access.
+ * Updates the details of a farm.
  *
- * This function first checks if the specified principal is authorized to update the farm,
- * then updates the farm's name, business ID, address, and postal code along with a new timestamp.
+ * This function allows for the modification of a farm's properties. It ensures that the principal
+ * making the request has the necessary permissions to update the farm.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - ID of the principal initiating the update.
- * @param b_id_farm - Unique identifier of the farm to update.
- * @param b_name_farm - New name for the farm.
- * @param b_businessid_farm - New business ID for the farm.
- * @param b_address_farm - New address for the farm.
- * @param b_postalcode_farm - New postal code for the farm.
- * @returns A Promise resolving to the updated farm details.
- *
- * @throws {Error} If the principal lacks the necessary write permission or the update operation fails.
- *
- * @alpha
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm to update.
+ * @param b_name_farm The new name for the farm.
+ * @param b_businessid_farm The new business ID for the farm.
+ * @param b_address_farm The new address for the farm.
+ * @param b_postalcode_farm The new postal code for the farm.
+ * @returns A promise that resolves to the updated farm object.
+ * @throws An error if the principal does not have permission to update the farm or if the database transaction fails.
  */
 export async function updateFarm(
     fdm: FdmType,
@@ -298,17 +291,18 @@ export async function updateFarm(
 }
 
 /**
- * Grants a specified role to a principal for a given farm.
+ * Grants a role to a principal for a specific farm.
  *
- * This function checks if the acting principal has 'share' permission on the farm, then grants the specified role to the grantee.
+ * This function is used to manage access control for a farm. It ensures that the principal
+ * granting the role has the necessary "share" permission.
  *
- * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal performing the grant (must have 'share' permission).
- * @param target - The username, email or slug of the principal whose role is being updated.
- * @param b_id_farm - The identifier of the farm.
- * @param role - The role to be granted ('owner', 'advisor', or 'researcher').
- *
- * @throws {Error} If the acting principal does not have 'share' permission, or if any other error occurs during the operation.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal granting the role.
+ * @param target The identifier of the principal to whom the role is being granted.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param role The role to grant.
+ * @returns A promise that resolves when the role has been successfully granted.
+ * @throws An error if the principal does not have permission or if the target principal is not found.
  */
 export async function grantRoleToFarm(
     fdm: FdmType,
@@ -356,17 +350,18 @@ export async function grantRoleToFarm(
 }
 
 /**
- * Updates the role of a principal for a given farm.
+ * Updates the role of a principal on a specific farm.
  *
- * This function checks if the acting principal has 'share' permission on the farm, then updates the specified role of the grantee.
+ * This function allows for the modification of a principal's role on a farm, which is essential for
+ * managing access control.
  *
- * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal performing the update (must have 'share' permission).
- * @param target - The username, email or slug of the principal whose role is being updated.
- * @param b_id_farm - The identifier of the farm.
- * @param role - The new role to assign ('owner', 'advisor', or 'researcher').
- *
- * @throws {Error} If the acting principal does not have 'share' permission, or if any other error occurs during the operation.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the change.
+ * @param target The identifier of the principal whose role is being updated.
+ * @param b_id_farm The unique identifier of the farm.
+ * @param role The new role to assign.
+ * @returns A promise that resolves when the role has been successfully updated.
+ * @throws An error if the principal does not have permission or if the target principal is not found.
  */
 export async function updateRoleOfPrincipalAtFarm(
     fdm: FdmType,
@@ -414,16 +409,16 @@ export async function updateRoleOfPrincipalAtFarm(
 }
 
 /**
- * Revokes a specified role from a principal for a given farm.
+ * Revokes a principal's access to a farm.
  *
- * This function checks if the acting principal has 'share' permission on the farm, then revokes the specified role from the revokee.
+ * This function removes a principal's role from a farm, effectively revoking their access.
  *
- * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal performing the revoke (must have 'share' permission).
- * @param target -The username, email or slug of the principal whose role is being revoked.
- * @param b_id_farm - The identifier of the farm.
- *
- * @throws {Error} If the acting principal does not have 'share' permission, or if any other error occurs during the operation.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal revoking the access.
+ * @param target The identifier of the principal whose access is being revoked.
+ * @param b_id_farm The unique identifier of the farm.
+ * @returns A promise that resolves when the principal's access has been successfully revoked.
+ * @throws An error if the principal does not have permission or if the target principal is not found.
  */
 export async function revokePrincipalFromFarm(
     fdm: FdmType,
@@ -468,17 +463,16 @@ export async function revokePrincipalFromFarm(
 }
 
 /**
- * Lists all principals (users or organizations) associated with a specific farm.
+ * Lists all principals who have a role on a specific farm.
  *
- * This function checks if the acting principal has 'read' permission on the farm, then retrieves a list of all principals that have any role on the farm.
+ * This function retrieves a list of all principals (users and organizations) that have been granted
+ * access to a farm, along with their roles.
  *
- * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal requesting the list (must have 'read' permission).
- * @param b_id_farm - The identifier of the farm.
- *
- * @returns A Promise that resolves to an array of Principal objects, each representing a principal associated with the farm.
- *
- * @throws {Error} If the acting principal does not have 'read' permission, or if any other error occurs during the operation.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm.
+ * @returns A promise that resolves to an array of `Principal` objects, each with an added `role` property.
+ * @throws An error if the principal does not have permission to read the farm's data.
  */
 export async function listPrincipalsForFarm(
     fdm: FdmType,
@@ -525,15 +519,15 @@ export async function listPrincipalsForFarm(
 }
 
 /**
- * Checks if the specified principal is allowed to share a given farm.
+ * Checks if a principal is allowed to share a farm.
  *
- * This function verifies if the acting principal has 'share' permission on the farm.
+ * This function is a convenience wrapper around `checkPermission` that can be used to quickly
+ * determine if a principal has "share" permissions on a farm.
  *
- * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal whose permissions are being checked.
- * @param b_id_farm - The identifier of the farm.
- *
- * @returns A Promise that resolves to true if the principal has 'share' permission, false otherwise.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal.
+ * @param b_id_farm The unique identifier of the farm.
+ * @returns A promise that resolves to `true` if the principal is allowed to share, otherwise `false`.
  */
 export async function isAllowedToShareFarm(
     fdm: FdmType,
@@ -556,15 +550,15 @@ export async function isAllowedToShareFarm(
 }
 
 /**
- * Checks if the specified principal is allowed to delete a given farm.
+ * Checks if a principal is allowed to delete a farm.
  *
- * This function verifies if the acting principal has 'write' permission on the farm.
+ * This function is a convenience wrapper around `checkPermission` that can be used to quickly
+ * determine if a principal has "write" permissions on a farm.
  *
- * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal whose permissions are being checked.
- * @param b_id_farm - The identifier of the farm.
- *
- * @returns A Promise that resolves to true if the principal has 'write' permission, false otherwise.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal.
+ * @param b_id_farm The unique identifier of the farm.
+ * @returns A promise that resolves to `true` if the principal is allowed to delete, otherwise `false`.
  */
 export async function isAllowedToDeleteFarm(
     fdm: FdmType,
@@ -587,21 +581,16 @@ export async function isAllowedToDeleteFarm(
 }
 
 /**
- * Removes a farm and all its associated data.
+ * Deletes a farm and all its associated data.
  *
- * This function checks if the principal has permission to delete the farm, then proceeds to delete
- * the farm and all cascading data, including fields, associated events and assets (like fertilizer
- * application, soil analysis), farm-related data (like fertilizers, catalogue enabling), and
- * principal permissions.
+ * This function performs a cascaded delete of a farm, which includes all its fields, cultivations,
+ * fertilizer applications, and other related data. It is a critical operation that should be used with caution.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The unique identifier of the principal performing the operation.
- * @param b_id_farm - The unique identifier of the farm to be removed.
- * @returns A promise that resolves when the farm has been successfully removed.
- *
- * @throws {Error} If the principal does not have permission to delete the farm.
- *
- * @alpha
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id_farm The unique identifier of the farm to delete.
+ * @returns A promise that resolves when the farm has been successfully deleted.
+ * @throws An error if the principal does not have permission to delete the farm.
  */
 export async function removeFarm(
     fdm: FdmType,

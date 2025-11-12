@@ -1,3 +1,11 @@
+/**
+ * @file This module provides a centralized function for collecting all the necessary data
+ * required for calculating the Dutch 2025 norm values. It serves as a data aggregation
+ * layer, similar to its counterpart in the `filling` directory, by fetching information
+ * from `fdm-core` services.
+ *
+ * @packageDocumentation
+ */
 import {
     type FdmType,
     getCultivations,
@@ -11,16 +19,22 @@ import {
 import type { NL2025NormsInput } from "./types.d"
 
 /**
- * Collects all necessary input data from the FDM to calculate the Dutch (NL) norms for the year 2025.
+ * Gathers and standardizes all input data required for the 2025 norm value calculations.
  *
- * This function orchestrates fetching data for a given farm, its fields, cultivations, and soil analyses,
- * and structures it into a format suitable for the various NL 2025 norm calculation functions.
+ * This function orchestrates the retrieval of various data points for a specific field for
+ * the 2025 regulatory year, including:
+ * - Field details.
+ * - Farm-level status, such as derogation and grazing intention.
+ * - Cultivation history.
+ * - The most current soil analysis data, specifically focusing on phosphate-related values.
  *
- * @param fdm - An initialized FdmType instance for data access.
- * @param principal_id - The ID of the principal initiating the data collection.
- * @param b_id - The unique identifier of the field for which to collect data.
- * @returns A promise that resolves to an `NL2025NormsInput` object, containing all the
- *   structured data required for the norm calculations.
+ * It then assembles this information into a single, standardized `NL2025NormsInput` object
+ * that can be consumed by the different norm value calculation functions.
+ *
+ * @param fdm - The FDM core data access object.
+ * @param principal_id - The identifier of the user or system making the request.
+ * @param b_id - The unique identifier of the field.
+ * @returns A promise that resolves to the fully populated `NL2025NormsInput` object.
  */
 export async function collectNL2025InputForNorms(
     fdm: FdmType,

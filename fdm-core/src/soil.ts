@@ -1,3 +1,9 @@
+/**
+ * @file This file contains functions for managing soil data in the FDM.
+ *
+ * It provides a comprehensive set of CRUD operations for soil analyses, as well as functions
+ * for retrieving current soil data and soil parameter descriptions.
+ */
 import { and, eq, gte, isNull, lte, or, type SQL, sql } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
@@ -14,23 +20,21 @@ import type {
 import type { Timeframe } from "./timeframe"
 
 /**
- * Adds a new soil analysis record along with its soil sampling details.
+ * Adds a new soil analysis to a field.
  *
- * This function verifies that the principal has write access to the specified field, then creates new entries
- * in the soil analysis and soil sampling tables within a database transaction. The ID of the newly created soil
- * analysis record is returned.
+ * This function records a new soil analysis, including the sampling details and the analysis results.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal performing the operation.
- * @param a_date - The date when the soil analysis was performed.
- * @param a_source - The source of the soil analysis data.
- * @param b_id - The identifier of the field where the soil sample was collected.
- * @param a_depth_lower - The lower depth up to which the soil sample was taken.
- * @param b_sampling_date - The date when the soil sample was collected.
- * @param a_depth_upper - The upper depth from which the soil sample was taken. Defaults to 0
- * @param soilAnalysisData - Optional additional data for the soil analysis (e.g., pH, nutrient levels).
- * @returns The ID of the newly added soil analysis record.
- * @throws {Error} If the database transaction fails.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param a_date The date of the analysis.
+ * @param a_source The source of the analysis (e.g., the lab).
+ * @param b_id The unique identifier of the field.
+ * @param a_depth_lower The lower depth of the soil sample.
+ * @param b_sampling_date The date of the soil sample.
+ * @param soilAnalysisData An object containing the analysis results (optional).
+ * @param a_depth_upper The upper depth of the soil sample (optional, defaults to 0).
+ * @returns A promise that resolves to the unique identifier of the new soil analysis.
+ * @throws An error if the principal does not have permission or if the depth values are invalid.
  */
 export async function addSoilAnalysis(
     fdm: FdmType,
@@ -98,17 +102,16 @@ export async function addSoilAnalysis(
 }
 
 /**
- * Updates an existing soil analysis record and the related soil sampling timestamp.
+ * Updates a soil analysis.
  *
- * This function first verifies whether the principal has write permission for the specified soil
- * analysis record. It then executes a transaction to update the soil analysis entry with the provided
- * changes and refreshes the corresponding soil sampling record's update timestamp.
+ * This function allows for the modification of an existing soil analysis record.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - Identifier of the principal performing the update.
- * @param a_id - The unique identifier of the soil analysis record to update.
- * @param soilAnalysisData - Object containing the fields to update; supports partial updates.
- * @throws {Error} If the database transaction fails or the permission check does not pass.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param a_id The unique identifier of the soil analysis to update.
+ * @param soilAnalysisData An object containing the properties to update.
+ * @returns A promise that resolves when the soil analysis has been successfully updated.
+ * @throws An error if the principal does not have permission.
  */
 export async function updateSoilAnalysis(
     fdm: FdmType,
@@ -148,16 +151,15 @@ export async function updateSoilAnalysis(
 }
 
 /**
- * Removes a soil analysis record and its associated sampling data.
+ * Removes a soil analysis.
  *
- * Verifies that the principal has write permissions, then executes a transaction to delete
- * the corresponding entries from both the soil sampling and soil analysis tables.
+ * This function deletes a soil analysis and its associated sampling record.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The ID of the principal performing the removal.
- * @param a_id - The ID of the soil analysis record to remove.
- *
- * @throws {Error} If the operation fails due to permission issues or database errors.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param a_id The unique identifier of the soil analysis to remove.
+ * @returns A promise that resolves when the soil analysis has been successfully removed.
+ * @throws An error if the principal does not have permission.
  */
 export async function removeSoilAnalysis(
     fdm: FdmType,
@@ -188,15 +190,13 @@ export async function removeSoilAnalysis(
 }
 
 /**
- * Retrieves the soil analysis record for a specified analysis.
+ * Retrieves a single soil analysis by its unique identifier.
  *
- * This function validates that the requesting principal has the necessary read permissions for the soil analysis before querying for soil analysis data based on the id.
- *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The unique ID of the principal requesting the soil analysis.
- * @param a_id - The identifier of the analysis.
- * @returns The soil analysis record for the field
- * @throws {Error} If an error occurs during permission verification or data retrieval.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param a_id The unique identifier of the soil analysis.
+ * @returns A promise that resolves to a `SoilAnalysis` object.
+ * @throws An error if the principal does not have permission or if the analysis is not found.
  */
 export async function getSoilAnalysis(
     fdm: FdmType,
@@ -274,15 +274,14 @@ export async function getSoilAnalysis(
 }
 
 /**
- * Retrieves all soil analysis records for a specified field, sorted by sampling date in descending order.
+ * Retrieves all soil analyses for a field, optionally filtered by a timeframe.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal requesting the data.
- * @param b_id - The identifier of the field.
- * @param timeframe - Optional timeframe to filter the soil analyses.
- * @returns An array of soil analysis records with corresponding soil sampling details. Returns an empty array if no records are found.
- *
- * @throws {Error} If the principal lacks read permissions for the field or if the database query fails.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id The unique identifier of the field.
+ * @param timeframe An optional timeframe to filter the analyses.
+ * @returns A promise that resolves to an array of `SoilAnalysis` objects.
+ * @throws An error if the principal does not have permission.
  */
 export async function getSoilAnalyses(
     fdm: FdmType,
@@ -399,21 +398,17 @@ export async function getSoilAnalyses(
 }
 
 /**
- * Retrieves the last available value for each soil parameter for a specified field.
+ * Retrieves the most recent soil data for a field.
  *
- * This function queries the database to find the most recent value for each soil parameter
- * (e.g., a_p_al, a_p_cc, a_som_loi, etc.) within the soil analysis records associated with a given field.
- * It also returns the a_id, b_sampling_date, and a_source for each retrieved value.
+ * This function fetches the latest available values for all soil parameters for a given field,
+ * optionally within a specified timeframe.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal requesting the data.
- * @param b_id - The identifier of the field.
- * @param timeframe - Optional timeframe to filter the soil analyses. Only analyses after `timeframe.end` are excluded.
- * @returns An object where each key is a soil parameter name and the value is an object containing the last available value,
- *          the a_id of the analysis record it was retrieved from, the b_sampling_date, and the a_source.
- *          Returns an empty object if no records are found.
- *
- * @throws {Error} If the principal lacks read permissions for the field or if the database query fails.
+ * @param fdm The FDM instance for database access.
+ * @param principal_id The identifier of the principal making the request.
+ * @param b_id The unique identifier of the field.
+ * @param timeframe An optional timeframe to filter the analyses.
+ * @returns A promise that resolves to a `CurrentSoilData` object.
+ * @throws An error if the principal does not have permission.
  */
 export async function getCurrentSoilData(
     fdm: FdmType,
@@ -567,16 +562,13 @@ export async function getCurrentSoilData(
 }
 
 /**
- * Retrieves a description of the available soil parameters.
+ * Retrieves descriptions for all available soil parameters.
  *
- * This function returns an array of objects, each describing a soil parameter.
- * Each description includes the parameter's name, unit, type (numeric or enum),
- * a human-readable name, a detailed description, and optional constraints like
- * minimum and maximum values or a list of valid options for enum types.
+ * This function provides metadata for each soil parameter, such as its name, unit, and type.
  *
- * @param locale - The locale for which to retrieve the descriptions. Currently only 'NL-nl' is supported.
- * @returns An array of SoilParameterDescriptionItem objects.
- * @throws {Error} If an unsupported locale is provided.
+ * @param locale The locale for the descriptions (currently only "NL-nl" is supported).
+ * @returns An array of `SoilParameterDescription` objects.
+ * @throws An error if an unsupported locale is provided.
  */
 export function getSoilParametersDescription(
     locale = "NL-nl",

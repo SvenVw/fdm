@@ -1,3 +1,9 @@
+/**
+ * @file This file serves as the layout component for all user-related routes.
+ * It handles session validation, loads user data for the sidebar, and renders the nested routes.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import posthog from "posthog-js"
 import { useEffect } from "react"
 import type { LoaderFunctionArgs } from "react-router"
@@ -18,15 +24,14 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 
 /**
- * Retrieves the session from the HTTP request and returns user information if available.
+ * Loads data for the user layout.
  *
- * If the session does not contain a user, the function redirects to the "/signin" route.
- * Any errors encountered during session retrieval are processed by the designated error handler.
+ * This function ensures the user is authenticated and fetches their session data.
+ * If the user is not logged in, it redirects them to the sign-in page.
  *
- * @param request - The HTTP request used for obtaining session data.
- * @returns An object with a "user" property when a valid session is found.
- *
- * @throws {Error} If an error occurs during session retrieval, processed by handleLoaderError.
+ * @param request - The incoming request object.
+ * @returns An object containing the user's session data.
+ * @throws {Response} A redirect response if the session is invalid.
  */
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
@@ -50,9 +55,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the main application layout.
+ * Renders the layout for the user section.
  *
- * This component retrieves user data from the loader using React Router's useLoaderData hook and passes it to the SidebarApp component within a SidebarProvider context. It also renders an Outlet to display nested routes.
+ * This component sets up the main structure with a sidebar and a content area
+ * for user-specific pages. It also initializes PostHog for analytics if enabled.
+ *
+ * @returns The JSX for the user layout.
  */
 export default function App() {
     const loaderData = useLoaderData<typeof loader>()

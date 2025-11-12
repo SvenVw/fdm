@@ -1,3 +1,13 @@
+/**
+ * @file This module calculates total nitrogen emissions from a field by aggregating various
+ * emission pathways. It serves as an orchestrator, calling specialized functions to quantify
+ * emissions from different sources, such as ammonia volatilization and nitrate leaching.
+ *
+ * The primary function, `calculateNitrogenEmission`, combines these individual emission
+ * calculations into a single, comprehensive `NitrogenEmission` object.
+ *
+ * @packageDocumentation
+ */
 import type {
     CultivationDetail,
     FertilizerDetail,
@@ -8,14 +18,21 @@ import { calculateNitrogenEmissionViaAmmonia } from "./ammonia"
 import { calculateNitrogenEmissionViaNitrate } from "./nitrate"
 
 /**
- * Calculates the total nitrogen volatilization from a field, through ammonia emissions from fertilizer appplications and crop residues.
+ * Calculates the total nitrogen emission from a field by summing losses from various pathways.
  *
- * This function orchestrates the calculation of ammonia emission by calling separate functions for fertilizer applications and
- * residue volatilization, then aggregates the results.
- * @param cultivations - A list of cultivations on the field.
- * @param harvests - A list of harvests from the field.
- * @param cultivationDetailsMap - A map containing details for each cultivation, including its nitrogen content and residue management practices.
- * @returns The NitrogenEmmissionAmmonia object containing the total amount of Nitrogen volatilized and the individual ammonia values.
+ * This function integrates calculations for different forms of nitrogen loss, including:
+ * - Ammonia (`NH3`) volatilization from fertilizers and crop residues.
+ * - Nitrate (`NO3`) leaching.
+ *
+ * It calls dedicated calculators for each pathway and aggregates their results to provide a
+ * complete picture of nitrogen emissions for a given field.
+ *
+ * @param cultivations - An array of cultivations occurring on the field.
+ * @param harvests - An array of harvest events from the field.
+ * @param fertilizerApplications - An array of fertilizer application events.
+ * @param cultivationDetailsMap - A map providing detailed data for each cultivation type.
+ * @param fertilizerDetailsMap - A map providing detailed data for each fertilizer type.
+ * @returns A `NitrogenEmission` object detailing the total and component-specific nitrogen losses.
  */
 export function calculateNitrogenEmission(
     cultivations: FieldInput["cultivations"],

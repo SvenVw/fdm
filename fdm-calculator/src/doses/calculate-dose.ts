@@ -1,37 +1,39 @@
+/**
+ * @file This module provides functionality to calculate the total and per-application
+ * nutrient doses from a series of fertilizer applications.
+ *
+ * The core function, `calculateDose`, is essential for understanding the total amount of
+ * each nutrient applied to a field over time.
+ *
+ * @packageDocumentation
+ */
 import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
 import type { Dose } from "./d"
 
 /**
- * Calculates the cumulative nutrient doses from a series of fertilizer applications.
+ * Calculates the cumulative and individual nutrient doses from fertilizer applications.
  *
- * This function processes an array of fertilizer applications, matching each with its corresponding fertilizer definition to calculate the dose of each nutrient. The nutrient rates are converted from grams or milligrams per kilogram to kilograms per kilogram and then multiplied by the application amount to determine the dose in kg/ha.
+ * This function takes a list of fertilizer applications and a corresponding list of fertilizer
+ * definitions. It calculates the dose of each nutrient (e.g., N, P, K) for every application
+ * by multiplying the application amount (in kg/ha) by the nutrient concentration in the
+ * fertilizer.
  *
- * @param applications An array of fertilizer application objects, each specifying the fertilizer `p_id` and the applied amount `p_app_amount` in kg/ha.
- * @param fertilizers An array of fertilizer objects, providing the nutrient rates for each fertilizer. Nutrient rates are expected to be non-negative.
- * @returns An object containing:
- *   - `dose`: An object with the total cumulative doses for all nutrients in kg/ha.
- *   - `applications`: An array of objects, each detailing the individual nutrient doses for each fertilizer application.
- * @throws {Error} If any application amount or nutrient rate is negative, ensuring data integrity.
+ * It returns both the total aggregated dose of all nutrients across all applications and a
+ * detailed breakdown of the doses for each individual application.
+ *
+ * @param params - The input object for the dose calculation.
+ * @param params.applications - An array of fertilizer application records.
+ * @param params.fertilizers - An array of fertilizer definitions containing nutrient concentrations.
+ * @returns An object containing the total cumulative `dose` and a list of `applications` with their individual doses.
+ * @throws {Error} If an application amount or a nutrient rate is negative.
+ * @throws {Error} If a fertilizer definition cannot be found for an application.
  *
  * @example
  * ```typescript
- * import { calculateDose } from "./calculate-dose";
- *
- * const applications = [
- *   { p_app_id: "app1", p_id: "fert1", p_app_amount: 100 },
- *   { p_app_id: "app2", p_id: "fert2", p_app_amount: 50 },
- * ];
- *
- * const fertilizers = [
- *   { p_id: "fert1", p_n_rt: 100, p_p_rt: 50, p_k_rt: 30, p_n_wc: 0.5, p_s_rt: 20, p_mg_rt: 10 },
- *   { p_id: "fert2", p_n_rt: 200, p_p_rt: 0, p_k_rt: 60, p_n_wc: 1.0, p_cu_rt: 5, p_zn_rt: 3 },
- * ];
- *
- * const result = calculateDose({ applications, fertilizers });
- * console.log(result.dose);
- * // Expected output: { p_dose_n: 20, p_dose_nw: 15, p_dose_p: 5, p_dose_k: 6, p_dose_s: 2, p_dose_mg: 1, ... }
- * console.log(result.applications);
- * // Expected output: [ { p_app_id: "app1", p_dose_n: 10, ... }, { p_app_id: "app2", p_dose_n: 10, ... } ]
+ * const applications = [{ p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 100 }];
+ * const fertilizers = [{ p_id_catalogue: "fert1", p_n_rt: 100, p_p_rt: 50, p_k_rt: 30 }];
+ * const { dose, applications: appDoses } = calculateDose({ applications, fertilizers });
+ * // dose.p_dose_n will be 10 (100 kg/ha * 100 g/kg / 1000)
  * ```
  */
 export function calculateDose({

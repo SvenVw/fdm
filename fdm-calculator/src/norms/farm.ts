@@ -1,10 +1,16 @@
+/**
+ * @file This module provides functions for aggregating field-level norm calculations
+ * up to the farm level. This is crucial for assessing the overall compliance and
+ * nutrient balance of an entire agricultural operation.
+ *
+ * @packageDocumentation
+ */
 import { Decimal } from "decimal.js"
 import type { NormFilling } from "./nl/2025/filling/types"
 import type { GebruiksnormResult } from "./nl/2025/value/types"
 
 /**
- * Represents the input structure for the `aggregateNormsToFarmLevel` function.
- * It is an array of objects, where each object contains information for a single field.
+ * Defines the input structure for aggregating field-level norms to the farm level.
  */
 export type InputAggregateNormsToFarmLevel = {
     /**
@@ -16,7 +22,7 @@ export type InputAggregateNormsToFarmLevel = {
      */
     b_area: number
     /**
-     * The calculated norm values for manure, nitrogen, and phosphate for this field.
+     * The calculated norm values (per hectare) for the field.
      */
     norms: {
         manure: GebruiksnormResult
@@ -26,64 +32,41 @@ export type InputAggregateNormsToFarmLevel = {
 }[]
 
 /**
- * Represents the aggregated output of the `aggregateNormsToFarmLevel` function.
- * The results are expressed as total amounts for the farm, not per hectare.
+ * Represents the total, farm-level aggregated norm values.
  */
 export type AggregatedNormsToFarmLevel = {
     /**
-     * Total manure norm in kg N for the entire farm.
+     * Total manure application norm for the farm (in kg N).
      */
-    manure: number // kg N
+    manure: number
     /**
-     * Total nitrogen norm in kg N for the entire farm.
+     * Total nitrogen application norm for the farm (in kg N).
      */
-    nitrogen: number // kg N
+    nitrogen: number
     /**
-     * Total phosphate norm in kg P2O5 for the entire farm.
+     * Total phosphate application norm for the farm (in kg P2O5).
      */
-    phosphate: number // kg P2O5
+    phosphate: number
 }
 
 /**
- * Aggregates the norm values from individual fields to the farm level.
- * This function takes the output per field of the norm calculation,
- * multiplies each norm by the field's area, and sums these values
- * across all fields to provide total norms for the farm.
+ * Aggregates per-hectare norm values from individual fields to farm-level totals.
  *
- * The result are three numbers (manure, nitrogen, phosphate) expressed as totals, not per hectare.
+ * This function takes an array of field data, where each entry includes the field's area
+ * and its calculated per-hectare norms. It calculates the total norm for each nutrient
+ * for each field (by multiplying the norm value by the area) and then sums these
+ * totals across all fields to produce a single, farm-level result.
  *
- * @param input An array of field data, each containing field ID, area, and calculated norms.
- * @returns An object containing the total aggregated norms for manure, nitrogen, and phosphate for the farm.
+ * @param input - An array of field data with their respective norms.
+ * @returns An object containing the total manure, nitrogen, and phosphate norms for the entire farm.
  *
  * @example
- * const fieldData = [
- *   {
- *     b_id: "field1",
- *     b_area: 10, // hectares
- *     norms: {
- *       manure: { normValue: 100, normSource: "Source A" }, // kg N/ha
- *       nitrogen: { normValue: 150, normSource: "Source B" }, // kg N/ha
- *       phosphate: { normValue: 50, normSource: "Source C" }, // kg P2O5/ha
- *     },
- *   },
- *   {
- *     b_id: "field2",
- *     b_area: 5, // hectares
- *     norms: {
- *       manure: { normValue: 90, normSource: "Source A" }, // kg N/ha
- *       nitrogen: { normValue: 140, normSource: "Source B" }, // kg N/ha
- *       phosphate: { normValue: 45, normSource: "Source C" }, // kg P2O5/ha
- *     },
- *   },
+ * const fields = [
+ *   { b_id: "F1", b_area: 10, norms: { manure: { normValue: 170 }, nitrogen: { normValue: 200 }, phosphate: { normValue: 80 } } },
+ *   { b_id: "F2", b_area: 5, norms: { manure: { normValue: 170 }, nitrogen: { normValue: 180 }, phosphate: { normValue: 70 } } }
  * ];
- *
- * const aggregatedNorms = aggregateNormsToFarmLevel(fieldData);
- * // aggregatedNorms will be:
- * // {
- * //   manure: (100 * 10) + (90 * 5) = 1000 + 450 = 1450,
- * //   nitrogen: (150 * 10) + (140 * 5) = 1500 + 700 = 2200,
- * //   phosphate: (50 * 10) + (45 * 5) = 500 + 225 = 725,
- * // }
+ * const farmNorms = aggregateNormsToFarmLevel(fields);
+ * // farmNorms.manure would be (10 * 170) + (5 * 170) = 2550
  */
 export function aggregateNormsToFarmLevel(
     input: InputAggregateNormsToFarmLevel,
@@ -113,8 +96,7 @@ export function aggregateNormsToFarmLevel(
 }
 
 /**
- * Represents the input structure for the `aggregateNormFillingsToFarmLevel` function.
- * It is an array of objects, where each object contains information for a single field.
+ * Defines the input structure for aggregating field-level norm fillings to the farm level.
  */
 export type InputAggregateNormFillingsToFarmLevel = {
     /**
@@ -126,7 +108,7 @@ export type InputAggregateNormFillingsToFarmLevel = {
      */
     b_area: number
     /**
-     * The calculated norm fillings for manure, nitrogen, and phosphate for this field.
+     * The calculated norm filling data (per hectare) for the field.
      */
     normsFilling: {
         manure: NormFilling
@@ -136,35 +118,33 @@ export type InputAggregateNormFillingsToFarmLevel = {
 }[]
 
 /**
- * Represents the aggregated output of the `aggregateNormFillingsToFarmLevel` function.
- * The results are expressed as total amounts for the farm, not per hectare.
+ * Represents the total, farm-level aggregated norm filling values.
  */
 export type AggregatedNormFillingsToFarmLevel = {
     /**
-     * Total manure norm filling in kg N for the entire farm.
+     * Total manure norm filling for the farm (in kg N).
      */
     manure: number
     /**
-     * Total nitrogen norm filling in kg N for the entire farm.
+     * Total nitrogen norm filling for the farm (in kg N).
      */
     nitrogen: number
     /**
-     * Total phosphate norm filling in kg P2O5 for the entire farm.
+     * Total phosphate norm filling for the farm (in kg P2O5).
      */
     phosphate: number
 }
 
 /**
- * Aggregates the norm filling values from individual fields to the farm level.
- * This function takes the output per field of the norm filling calculation,
- * multiplies each norm filling by the field's area, and sums these values
- * across all fields to provide total norm fillings for the farm.
+ * Aggregates per-hectare norm filling values from individual fields to farm-level totals.
  *
- * The result are three objects (manure, nitrogen, phosphate) each containing
- * the total normFilling and combined applicationFillings, expressed as totals, not per hectare.
+ * This function is analogous to `aggregateNormsToFarmLevel` but operates on norm *fillings*.
+ * It calculates the total nutrient application for each field by multiplying the per-hectare
+ * filling value by the field's area, and then sums these totals across all fields to
+ * produce a single, farm-level result.
  *
- * @param input An array of field data, each containing field ID, area, and calculated norm fillings.
- * @returns An object containing the total aggregated norm fillings for manure, nitrogen, and phosphate for the farm.
+ * @param input - An array of field data with their respective norm fillings.
+ * @returns An object containing the total manure, nitrogen, and phosphate norm fillings for the entire farm.
  */
 export function aggregateNormFillingsToFarmLevel(
     input: InputAggregateNormFillingsToFarmLevel,

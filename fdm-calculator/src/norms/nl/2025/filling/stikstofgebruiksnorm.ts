@@ -1,3 +1,10 @@
+/**
+ * @file Calculates the "filling" of the nitrogen usage norm (`stikstofgebruiksnorm`) for the
+ * Dutch regulations of 2025. This involves calculating the effective nitrogen applied from
+ * various fertilizers, which depends on their nitrogen working coefficients (`werkingscoëfficiënt`).
+ *
+ * @packageDocumentation
+ */
 import { type Cultivation, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
@@ -12,13 +19,21 @@ import type {
 } from "./types"
 
 /**
- * Calculates the nitrogen utilization norm filling for a set of fertilizer applications.
- * This function determines the amount of effective nitrogen applied, taking into account
- * fertilizer type, nitrogen content, working coefficients, soil type, grazing intention,
- * and land use (bouwland/arable land).
+ * Calculates the effective nitrogen application (norm filling) for a given set of fertilizers.
  *
- * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
- * @returns {Promise<NormFilling>} An object containing the total norm filling and details for each application.
+ * This function determines the contribution of each fertilizer application to the nitrogen
+ * usage norm. The core of the calculation is the application of a "working coefficient"
+ * to the total nitrogen in the fertilizer, which represents the portion of nitrogen that
+ * is considered effective in the year of application.
+ *
+ * The working coefficient is determined by a complex set of rules based on fertilizer type,
+ * soil type, land use (arable vs. grassland), application timing, and whether the manure
+ * is produced on-farm.
+ *
+ * @param input - The standardized input object containing all necessary data for the calculation.
+ * @returns A promise that resolves to an object containing the total `normFilling` for nitrogen
+ *   and a detailed breakdown for each individual `applicationFilling`.
+ * @throws {Error} If a fertilizer definition cannot be found for an application.
  */
 export async function calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm(
     input: NL2025NormsFillingInput,
@@ -104,13 +119,15 @@ export async function calculateNL2025FertilizerApplicationFillingForStikstofGebr
 }
 
 /**
- * Determines if a field is considered "Bouwland" (arable land) at a given application date.
- * A field is not considered Bouwland if its active cultivation's `b_lu_catalogue` code
- * is one of the specified non-bouwland codes.
+ * Determines if a field is classified as "Bouwland" (arable land) on a specific date.
  *
- * @param {Cultivation[]} cultivations - An array of cultivations for the farm.
- * @param {Date} p_app_date - The date of the fertilizer application.
- * @returns {boolean} True if the field is considered Bouwland, false otherwise.
+ * This function checks the active cultivation on the given date and determines if it
+ * falls into a category that is exempt from being considered arable land (e.g., certain
+ * types of grassland).
+ *
+ * @param cultivations - An array of all cultivations for the field.
+ * @param p_app_date - The date of the fertilizer application.
+ * @returns `true` if the field is considered arable land on the given date, otherwise `false`.
  */
 export function isBouwland(
     cultivations: Cultivation[],
@@ -138,17 +155,26 @@ export function isBouwland(
 }
 
 /**
- * Determines the working coefficient for a given fertilizer application based on various conditions.
- * The working coefficient is retrieved from `table9` and depends on the fertilizer type,
- * whether it's produced on-farm, soil type, grazing intention, land use, and application date.
+ * Determines the nitrogen working coefficient for a specific fertilizer application.
  *
- * @param {string | null | undefined} p_type_rvo - The RVO fertilizer type code.
- * @param {RegionKey | undefined} soilType - The soil type of the field.
- * @param {boolean} b_grazing_intention - Indicates if there is a grazing intention for the farm.
- * @param {boolean} isBouwland - True if the land is arable land (bouwland), false otherwise.
- * @param {Date} p_app_date - The date of the fertilizer application.
- * @param {boolean} fertilizerOnFarmProduced - True if the fertilizer is produced on the farm, false otherwise.
- * @returns {WorkingCoefficientDetails} An object containing the working coefficient, its main description, and an optional subtype description.
+ * This function navigates a complex set of rules, primarily defined in `table9.ts`, to find
+ * the correct working coefficient. The selection depends on a hierarchy of conditions:
+ * - The RVO fertilizer type (`p_type_rvo`).
+ * - Whether the fertilizer was produced on the farm.
+ * - For certain fertilizers, subtypes are considered based on soil type, grazing intention,
+ *   land use (arable/grassland), and the application date.
+ *
+ * If no specific rule matches, a default coefficient of 1.0 (100%) is returned, which is
+ * typical for synthetic mineral fertilizers.
+ *
+ * @param p_type_rvo - The RVO code identifying the fertilizer type.
+ * @param soilType - The soil type classification of the field.
+ * @param b_grazing_intention - A flag indicating if the farm has a grazing intention.
+ * @param isBouwland - A flag indicating if the field is currently arable land.
+ * @param p_app_date - The date of the fertilizer application.
+ * @param fertilizerOnFarmProduced - A flag indicating if the fertilizer was produced on-farm.
+ * @returns An object containing the `p_n_wcl` (the working coefficient), and a descriptive
+ *   string explaining how the coefficient was determined.
  */
 export function getWorkingCoefficient(
     p_type_rvo: string | null | undefined,
@@ -244,13 +270,15 @@ export function getWorkingCoefficient(
 }
 
 /**
- * Memoized version of {@link calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm}.
+ * A cached version of the `calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm` function.
  *
- * This function is wrapped with `withCalculationCache` to optimize performance by caching
- * results based on the input and the current calculator version.
+ * This function enhances performance by caching the results of the norm filling calculation.
+ * The cache key is generated based on the function's input and the calculator's version,
+ * ensuring that the cache is invalidated when the underlying logic or data changes.
  *
- * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
- * @returns {Promise<NormFilling>} An object containing the total norm filling and details for each application.
+ * @param input - The standardized input object containing all necessary data for the calculation.
+ * @returns A promise that resolves to an object containing the total `normFilling` for nitrogen
+ *   and a detailed breakdown for each individual `applicationFilling`.
  */
 export const getNL2025FertilizerApplicationFillingForStikstofGebruiksNorm =
     withCalculationCache(

@@ -1,3 +1,11 @@
+/**
+ * @file This module calculates the usage norm for phosphate (`fosfaatgebruiksnorm`) for the
+ * Dutch regulations of 2025. The norm is differentiated based on the soil's phosphate
+ * status, which is determined from soil analysis data, and the type of land use
+ * (grassland or arable land).
+ *
+ * @packageDocumentation
+ */
 import { withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
@@ -10,9 +18,11 @@ import type {
 } from "./types.d"
 
 /**
- * Determines if a cultivation is a type of grassland based on its catalogue entry.
- * @param b_lu_catalogue - The cultivation catalogue code.
- * @returns A promise that resolves to a boolean.
+ * Determines if a given cultivation code represents a type of grassland.
+ *
+ * @param b_lu_catalogue - The cultivation catalogue code to check.
+ * @returns `true` if the code corresponds to a grassland type, otherwise `false`.
+ * @internal
  */
 function isCultivationGrasland(b_lu_catalogue: string): boolean {
     const graslandCodes = ["nl_265", "nl_266", "nl_331", "nl_332", "nl_335"]
@@ -25,17 +35,17 @@ function isCultivationGrasland(b_lu_catalogue: string): boolean {
 }
 
 /**
- * Helper function to determine the phosphate class ('Arm', 'Laag', 'Neutraal', 'Ruim', 'Hoog')
- * based on P-CaCl2 and P-Al soil analysis values and land type (grasland/bouwland).
+ * Determines the phosphate status class of the soil.
  *
- * This logic is derived directly from "Tabel 1: Grasland (P-CaCl2/P-Al getal)" and
- * "Tabel 2: Bouwland (P-CaCl2/P-Al getal)" in the RVO documentation for 2025.
+ * This function implements the official RVO tables for classifying soil phosphate status
+ * (from "Arm" to "Hoog") based on P-CaCl2 and P-Al soil analysis values. Separate
+ * classification logic is applied for grassland and arable land.
  *
- * @param a_p_cc - The P-CaCl2 (P-PAE) value from soil analysis.
- * @param a_p_al - The P-Al value from soil analysis.
- * @param is_grasland - True if the land is grassland, false if arable land.
- * @returns The determined `FosfaatKlasse`.
- * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond/differentiatie | RVO Fosfaatdifferentiatie (official page)}
+ * @param a_p_cc - The P-CaCl2 value from the soil analysis.
+ * @param a_p_al - The P-Al value from the soil analysis.
+ * @param is_grasland - A boolean indicating if the land is grassland.
+ * @returns The determined phosphate class (`FosfaatKlasse`).
+ * @internal
  */
 function getFosfaatKlasse(
     a_p_cc: number,
@@ -109,33 +119,21 @@ function getFosfaatKlasse(
 }
 
 /**
- * Determines the 'gebruiksnorm' (usage standard) for phosphate for a given field
- * based on its land type (grasland/bouwland) and soil phosphate condition,
- * derived from P-CaCl2 and P-Al soil analysis values.
+ * Calculates the phosphate usage norm for a specific field for the year 2025.
  *
- * This function implements the "Tabel Fosfaatgebruiksnormen 2025" and the
- * "Differentiatie fosfaatgebruiksnorm 2025" rules from RVO.
+ * This function determines the maximum permissible amount of phosphate (as P2O5) that can be
+ * applied to a field. The process involves:
+ * 1.  Determining the primary cultivation (`hoofdteelt`) for the year.
+ * 2.  Classifying the land as either grassland or arable land based on the primary cultivation.
+ * 3.  Determining the soil's phosphate status class using the `getFosfaatKlasse` function.
+ * 4.  Looking up the appropriate norm value in `fosfaatNormsData` based on the land type
+ *     and phosphate class.
  *
- * @param input - An object containing all necessary parameters for the calculation.
- *   See {@link FosfaatGebruiksnormInput} for details.
- * @returns An object of type `FosfaatGebruiksnormResult` containing the determined
- *   phosphate usage standard (`normValue`) and the `fosfaatKlasse` (the phosphate
- *   class determined from the soil analysis). Returns `null` if a norm cannot be determined.
- *
- * @remarks
- * The function operates as follows:
- * 1.  **Determine Phosphate Class**: The `getFosfaatKlasse` helper function is used
- *     to classify the soil's phosphate condition ('Arm', 'Laag', 'Neutraal', 'Ruim', 'Hoog')
- *     based on the provided `a_p_cc` and `a_p_al` values and whether it's grassland or arable land.
- *     This classification directly uses the lookup tables provided by RVO for 2025.
- * 2.  **Retrieve Base Norm**: The determined `fosfaatKlasse` is then used to look up the
- *     corresponding base phosphate norm from the `fosfaatNormsData.json` file.
- * 3.  **Apply Land Type**: The specific norm for either `grasland` or `bouwland` is selected
- *     from the base norm based on the `is_grasland` input parameter.
- * 4.  **Return Result**: The function returns the final `normValue` and the `fosfaatKlasse`.
- *
- * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond | RVO Fosfaat landbouwgrond (official page)}
- * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond/differentiatie | RVO Fosfaatdifferentiatie (official page, including tables for 2025)}
+ * @param input - A standardized object containing cultivation and soil analysis data for the field.
+ * @returns A promise that resolves to an object containing the calculated `normValue` (in kg P2O5/ha)
+ *   and the determined `normSource` (which includes the land type and phosphate class).
+ * @throws {Error} If essential soil analysis data (P-Al or P-CaCl2) is missing.
+ * @throws {Error} If no norm value can be found for the determined phosphate class.
  */
 export async function calculateNL2025FosfaatGebruiksNorm(
     input: NL2025NormsInput,
@@ -175,15 +173,15 @@ export async function calculateNL2025FosfaatGebruiksNorm(
 }
 
 /**
- * Memoized version of {@link calculateNL2025FosfaatGebruiksNorm}.
+ * A cached version of the `calculateNL2025FosfaatGebruiksNorm` function.
  *
- * This function is wrapped with `withCalculationCache` to optimize performance by caching
- * results based on the input and the current calculator version.
+ * This function enhances performance by caching the results of the norm calculation.
+ * The cache key is generated based on the function's input and the calculator's version,
+ * ensuring that the cache is invalidated when the underlying logic or data changes.
  *
- * @param {NL2025NormsInput} input - An object containing all necessary parameters for the calculation.
- * @returns {Promise<FosfaatGebruiksnormResult>} An object of type `FosfaatGebruiksnormResult` containing the determined
- *   phosphate usage standard (`normValue`) and the `fosfaatKlasse` (the phosphate
- *   class determined from the soil analysis). Returns `null` if a norm cannot be determined.
+ * @param input - A standardized object containing cultivation and soil analysis data for the field.
+ * @returns A promise that resolves to an object containing the calculated `normValue` (in kg P2O5/ha)
+ *   and the determined `normSource`.
  */
 export const getNL2025FosfaatGebruiksNorm = withCalculationCache(
     calculateNL2025FosfaatGebruiksNorm,

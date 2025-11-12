@@ -1,3 +1,8 @@
+/**
+ * @file This file is responsible for displaying a list of pending organization invitations for the user.
+ * @copyright 2023 Batavi
+ * @license MIT
+ */
 import {
     acceptInvitation,
     getPendingInvitationsForUser,
@@ -44,6 +49,16 @@ type InvitationType = {
     expires_at: Date
 }
 
+/**
+ * Loads the list of pending invitations for the current user.
+ *
+ * This function retrieves the user's session and fetches all pending invitations
+ * they have received to join organizations.
+ *
+ * @param request - The incoming request object.
+ * @returns An object containing the list of invitations.
+ * @throws {Error} If there is an issue fetching the invitations.
+ */
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         const session = await getSession(request)
@@ -57,6 +72,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the page that lists all pending invitations for the user.
+ *
+ * This component displays a list of invitations, each with details about the
+ * organization, the inviter, and the role offered. It provides options to
+ * accept or reject each invitation. If there are no pending invitations,
+ * it displays a corresponding message.
+ *
+ * @returns The JSX for the invitations index page.
+ */
 export default function OrganizationsIndex() {
     const { invitations } = useLoaderData<{
         invitations: InvitationType[]
@@ -208,6 +233,18 @@ const FormSchema = z.object({
     intent: z.enum(["accept", "reject"]),
 })
 
+/**
+ * Handles form submissions for accepting or rejecting invitations.
+ *
+ * This function processes the user's decision on an invitation. Based on the
+ * submitted 'intent', it calls the appropriate function to either accept or
+ * reject the invitation and then redirects the user back to the main
+ * organization page with a confirmation message.
+ *
+ * @param request - The incoming request object containing the form data.
+ * @returns A redirect response with a success message.
+ * @throws {Error} If the intent is invalid or if there is an issue processing the request.
+ */
 export async function action({ request }: ActionFunctionArgs) {
     try {
         const formValues = await extractFormValuesFromRequest(

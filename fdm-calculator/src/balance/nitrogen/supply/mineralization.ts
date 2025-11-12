@@ -1,3 +1,11 @@
+/**
+ * @file This module calculates nitrogen supply from soil organic matter mineralization.
+ * It provides different models for estimating mineralization, including a primary
+ * calculation function that uses default values based on soil type and land use,
+ * and a more detailed model based on the MINIP formula.
+ *
+ * @packageDocumentation
+ */
 import type { fdmSchema } from "@svenvw/fdm-core"
 import { differenceInCalendarDays } from "date-fns"
 import Decimal from "decimal.js"
@@ -10,12 +18,19 @@ import type {
 } from "../types"
 
 /**
- * Calculates the amount of nitrogen supplied through soil mineralization using Minip.
+ * Calculates the nitrogen supply from soil mineralization over a given time frame.
  *
- * This function determines the mineralization based on the soil analyses conducted.
- * @param soilAnalysis - Combined soil analysis data for the field.
- * @param timeFrame - The timeframe for which to calculate the nitrogen mineralization.
- * @returns The NitrogenSupplyMineralization object containing the total amount of Nitrogen mineralized.
+ * This function estimates nitrogen mineralization on an annual basis and adjusts the value
+ * for the specified time frame. It determines the land use (grassland or other) for each
+ * year within the period and applies a default mineralization rate based on the soil type.
+ * The final value is an aggregation of the pro-rated mineralization for each year.
+ *
+ * @param cultivations - An array of cultivations to determine land use over time.
+ * @param soilAnalysis - The consolidated soil analysis data, including soil type.
+ * @param cultivationDetails - A map providing detailed data for each cultivation type.
+ * @param timeFrame - The start and end dates for the calculation period.
+ * @returns An object detailing the total nitrogen supply from mineralization and a
+ *   breakdown of the value contributed by each year.
  */
 export function calculateNitrogenSupplyBySoilMineralization(
     cultivations: FieldInput["cultivations"],
@@ -93,11 +108,16 @@ export function calculateNitrogenSupplyBySoilMineralization(
 }
 
 /**
- * Calculates the default nitrogen supply by soil mineralization based on soil type and land use.
+ * Determines the default annual nitrogen mineralization rate based on soil type and land use.
  *
- * @param b_soiltype_agr - The agricultural soil type from the soil analysis.
- * @param is_grassland - A boolean indicating if the land is grassland.
- * @returns The default mineralization value in kg N / ha / year as a Decimal.
+ * This function provides a simplified estimation of nitrogen mineralization using standard,
+ * tabulated values. It currently implements specific rates for "dalgrond" and "veen"
+ * (peat) soils, with different values for grassland versus other land uses on peat soils.
+ *
+ * @param b_soiltype_agr - The agricultural soil type.
+ * @param is_grassland - A boolean indicating if the land is used as grassland.
+ * @returns The estimated annual nitrogen mineralization in kg N/ha/year as a `Decimal`.
+ * @internal
  */
 function calculateNitrogenSupplyBySoilMineralizationUsingDefaults(
     b_soiltype_agr: SoilAnalysisPicked["b_soiltype_agr"],
@@ -124,15 +144,22 @@ function calculateNitrogenSupplyBySoilMineralizationUsingDefaults(
 }
 
 /**
- * Calculates the amount of nitrogen supplied through soil mineralization by using the MINIP model
+ * Calculates nitrogen mineralization using the MINIP model.
  *
- * This function applies a specific formula to calculate nitrogen mineralization based on organic carbon content,
- * C/N ratio, and soil bulk density.
- * @param a_c_of - The organic carbon content of the soil (g C / kg soil).
- * @param a_cn_fr - The C/N ratio of the soil organic matter.
- * @param a_density_sa - The soil bulk density (kg / m³).
- * @returns The amount of nitrogen mineralized in kg N / ha.
- * @throws Throws an error if required soil analysis data is missing or average yearly temperature is too high.
+ * This function implements a more detailed model for mineralization based on specific
+ * soil properties and temperature. It calculates the amount of decomposable carbon (`cDec`)
+ * and then uses this to estimate the nitrogen released. The model incorporates:
+ * - Soil organic carbon content (`a_c_of`).
+ * - Carbon-to-nitrogen ratio (`a_cn_fr`).
+ * - Soil bulk density (`a_density_sa`).
+ * - A temperature correction factor based on mean annual temperature.
+ *
+ * @param a_c_of - The organic carbon content of the soil (in g C / kg soil).
+ * @param a_cn_fr - The carbon-to-nitrogen ratio of the soil.
+ * @param a_density_sa - The bulk density of the soil (in kg / m³).
+ * @returns The calculated annual nitrogen mineralization in kg N/ha as a `Decimal`.
+ * @throws {Error} If required soil parameters are null or if the average yearly temperature
+ *   is outside the model's valid range.
  */
 export function calculateNitrogenSupplyBySoilMineralizationUsingMinip(
     a_c_of: fdmSchema.soilAnalysisTypeSelect["a_c_of"],
