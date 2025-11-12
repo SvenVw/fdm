@@ -7,7 +7,7 @@ import {
     Square,
 } from "lucide-react"
 import { useState } from "react"
-import { NavLink, useLocation } from "react-router"
+import { NavLink, useLocation, useSearchParams } from "react-router"
 import { getCalendarSelection } from "@/app/lib/calendar"
 import { useCalendarStore } from "@/app/store/calendar"
 import { useFarmStore } from "@/app/store/farm"
@@ -37,9 +37,12 @@ export function SidebarFarm() {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false)
     const calendarSelection = getCalendarSelection()
 
-    // Check if page contains `farm/create` in url
+    // Check if the page or its return page contains `farm/create` in url
     const location = useLocation()
-    const isCreateFarmWizard = location.pathname.includes("farm/create")
+    const [searchParams] = useSearchParams()
+    const isCreateFarmWizard =
+        location.pathname.includes("farm/create") ||
+        searchParams.get("returnUrl")?.includes("farm/create")
 
     // Set the farm link
     let farmLink: string
