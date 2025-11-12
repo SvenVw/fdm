@@ -68,6 +68,7 @@
         "@svenvw/fdm-data": "workspace:*",
         "@types/geojson": "^7946.0.16",
         "better-auth": "catalog:",
+        "decimal.js": "^10.6.0",
         "drizzle-orm": "catalog:",
         "nanoid": "^5.1.6",
         "postgres": "^3.4.7",

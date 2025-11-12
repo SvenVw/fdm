@@ -121,6 +121,7 @@ export {
     getHarvests,
     removeHarvest,
     updateHarvest,
+    getHarvestableTypeOfCultivation,
 } from "./harvest"
 export type {
     Harvest,

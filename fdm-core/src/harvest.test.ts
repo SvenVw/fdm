@@ -84,6 +84,8 @@ describe("Harvest Data Model", () => {
             b_lu_hcat3: "test-hcat3",
             b_lu_hcat3_name: "test-hcat3-name",
             b_lu_croprotation: "cereal",
+            b_lu_harvestcat: "HC050",
+            b_lu_dm: 500,
             b_lu_yield: 6000,
             b_lu_hi: 0.4,
             b_lu_n_harvestable: 4,
@@ -91,6 +93,8 @@ describe("Harvest Data Model", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
         })
 
         await addCultivationToCatalogue(fdm, {
@@ -102,6 +106,8 @@ describe("Harvest Data Model", () => {
             b_lu_hcat3: "test-hcat3-multiple",
             b_lu_hcat3_name: "test-hcat3-name-multiple",
             b_lu_croprotation: "grass",
+            b_lu_harvestcat: "HC042",
+            b_lu_dm: 500,
             b_lu_yield: 2000,
             b_lu_hi: 0.4,
             b_lu_n_harvestable: 12,
@@ -109,6 +115,8 @@ describe("Harvest Data Model", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: ["Agria"],
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
         })
 
         b_lu_start = new Date("2024-01-01")

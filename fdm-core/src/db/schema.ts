@@ -455,7 +455,7 @@ export const cultivationsCatalogue = fdmSchema.table(
         b_lu_name: text().notNull(),
         b_lu_name_en: text(),
         b_lu_harvestable: harvestableEnum().notNull(),
-        b_lu_harvestcat: harvestCatEnum().notNull(),
+        b_lu_harvestcat: harvestCatEnum(),
         b_lu_hcat3: text(),
         b_lu_hcat3_name: text(),
         b_lu_croprotation: rotationEnum(),

@@ -53,6 +53,7 @@ export async function addHarvest(
     b_lu_moist?: schema.harvestableAnalysesTypeInsert["b_lu_moist"],
     b_lu_uww?: schema.harvestableAnalysesTypeInsert["b_lu_uww"],
     b_lu_cp?: schema.harvestableAnalysesTypeInsert["b_lu_cp"],
+    f_no3_td_asis?: schema.harvestableAnalysesTypeInsert["f_no3_td_asis"],
     b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
     b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"],
     b_lu_p_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_p_harvestable"],
@@ -73,8 +74,18 @@ export async function addHarvest(
         return await fdm.transaction(async (tx: FdmType) => {
             // Validate if cultivation exists
             const cultivation = await tx
-                .select()
+                .select({
+                    b_lu_harvestcat:
+                        schema.cultivationsCatalogue.b_lu_harvestcat,
+                })
                 .from(schema.cultivations)
+                .leftJoin(
+                    schema.cultivationsCatalogue,
+                    eq(
+                        schema.cultivations.b_lu_catalogue,
+                        schema.cultivationsCatalogue.b_lu_catalogue,
+                    ),
+                )
                 .where(eq(schema.cultivations.b_lu, b_lu))
                 .limit(1)
             if (cultivation.length === 0) {
@@ -85,6 +96,22 @@ export async function addHarvest(
                 tx,
                 b_lu,
                 b_lu_harvest_date,
+            )
+
+            // Get the standardized harvest parameters
+            const b_lu_harvestcat = cultivation[0].b_lu_harvestcat
+            const standardHarvest = convertHarvestParameters(
+                b_lu_harvestcat,
+                b_lu_yield,
+                b_lu_yield_bruto,
+                b_lu_yield_fresh,
+                b_lu_tarra,
+                b_lu_moist,
+                b_lu_uww,
+                b_lu_dm,
+                b_lu_cp,
+                f_no3_td_asis,
+                b_lu_n_harvestable,
             )
 
             // Insert the harvestable in the db
@@ -114,7 +141,7 @@ export async function addHarvest(
             const b_id_harvestable_analysis = createId()
             await tx.insert(schema.harvestableAnalyses).values({
                 b_id_harvestable_analysis: b_id_harvestable_analysis,
-                b_lu_yield: b_lu_yield,
+                b_lu_yield: standardHarvest.b_lu_yield,
                 b_lu_yield_bruto: b_lu_yield_bruto,
                 b_lu_yield_fresh: b_lu_yield_fresh,
                 b_lu_tarra: b_lu_tarra,
@@ -122,7 +149,7 @@ export async function addHarvest(
                 b_lu_moist: b_lu_moist,
                 b_lu_uww: b_lu_uww,
                 b_lu_cp: b_lu_cp,
-                b_lu_n_harvestable: b_lu_n_harvestable,
+                b_lu_n_harvestable: standardHarvest.b_lu_n_harvestable,
                 b_lu_n_residue: b_lu_n_residue,
                 b_lu_p_harvestable: b_lu_p_harvestable,
                 b_lu_p_residue: b_lu_p_residue,
@@ -543,6 +570,7 @@ export async function updateHarvest(
     b_lu_uww?: schema.harvestableAnalysesTypeInsert["b_lu_uww"],
     b_lu_dm?: schema.harvestableAnalysesTypeInsert["b_lu_dm"],
     b_lu_cp?: schema.harvestableAnalysesTypeInsert["b_lu_cp"],
+    f_no3_td_asis?: schema.harvestableAnalysesTypeInsert["f_no3_td_asis"],
     b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
     b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"],
     b_lu_p_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_p_harvestable"],
@@ -596,6 +624,49 @@ export async function updateHarvest(
                 b_lu,
             )
 
+            // Get the standardized harvest parameters
+            const cultivation = await tx
+                .select({
+                    b_lu_harvestcat:
+                        schema.cultivationsCatalogue.b_lu_harvestcat,
+                })
+                .from(schema.cultivationHarvesting)
+                .leftJoin(
+                    schema.cultivations,
+                    eq(
+                        schema.cultivations.b_lu,
+                        schema.cultivationHarvesting.b_lu,
+                    ),
+                )
+                .leftJoin(
+                    schema.cultivationsCatalogue,
+                    eq(
+                        schema.cultivations.b_lu_catalogue,
+                        schema.cultivationsCatalogue.b_lu_catalogue,
+                    ),
+                )
+                .where(
+                    eq(
+                        schema.cultivationHarvesting.b_id_harvesting,
+                        b_id_harvesting,
+                    ),
+                )
+                .limit(1)
+            const b_lu_harvestcat = cultivation[0].b_lu_harvestcat
+            const standardHarvest = convertHarvestParameters(
+                b_lu_harvestcat,
+                b_lu_yield,
+                b_lu_yield_bruto,
+                b_lu_yield_fresh,
+                b_lu_tarra,
+                b_lu_moist,
+                b_lu_uww,
+                b_lu_dm,
+                b_lu_cp,
+                f_no3_td_asis,
+                b_lu_n_harvestable,
+            )
+
             if (b_lu_harvestable === "multiple") {
                 const terminatingDate = await tx
                     .select({
@@ -638,7 +709,7 @@ export async function updateHarvest(
             await tx
                 .update(schema.harvestableAnalyses)
                 .set({
-                    b_lu_yield: b_lu_yield,
+                    b_lu_yield: standardHarvest.b_lu_yield,
                     b_lu_yield_bruto: b_lu_yield_bruto,
                     b_lu_yield_fresh: b_lu_yield_fresh,
                     b_lu_tarra: b_lu_tarra,
@@ -646,7 +717,7 @@ export async function updateHarvest(
                     b_lu_uww: b_lu_uww,
                     b_lu_dm: b_lu_dm,
                     b_lu_cp: b_lu_cp,
-                    b_lu_n_harvestable: b_lu_n_harvestable,
+                    b_lu_n_harvestable: standardHarvest.b_lu_n_harvestable,
                     b_lu_n_residue: b_lu_n_residue,
                     b_lu_p_harvestable: b_lu_p_harvestable,
                     b_lu_p_residue: b_lu_p_residue,
@@ -767,6 +838,7 @@ async function getHarvestSimplified(
             b_lu_moist: schema.harvestableAnalyses.b_lu_moist,
             b_lu_uww: schema.harvestableAnalyses.b_lu_uww,
             b_lu_cp: schema.harvestableAnalyses.b_lu_cp,
+            f_no3_td_asis: schema.harvestableAnalyses.f_no3_td_asis,
             b_lu_n_harvestable: schema.harvestableAnalyses.b_lu_n_harvestable,
             b_lu_n_residue: schema.harvestableAnalyses.b_lu_n_residue,
             b_lu_p_harvestable: schema.harvestableAnalyses.b_lu_p_harvestable,
@@ -802,4 +874,42 @@ async function getHarvestSimplified(
     return harvest
 }
 
-export function getParametersForHarvestClass() {}
+export function getParametersForHarvestClass(
+    b_lu_harvestcat: schema.cultivationsCatalogueTypeSelect["b_lu_harvestcat"],
+) {
+    switch (b_lu_harvestcat) {
+        case "HC010":
+            return ["b_lu_yield_fresh", "b_lu_dm", "b_lu_n_harvestable"]
+        case "HC020":
+            return ["b_lu_yield", "b_lu_cp"]
+        case "HC031":
+            return ["b_lu_yield", "b_lu_cp"]
+        case "HC040":
+            return [
+                "b_lu_yield_bruto",
+                "b_lu_tarra",
+                "b_lu_dm",
+                "b_lu_n_harvestable",
+            ]
+        case "HC041":
+            return [
+                "b_lu_yield_bruto",
+                "b_lu_tarra",
+                "b_lu_dm",
+                "b_lu_n_harvestable",
+            ]
+        case "HC042":
+            return [
+                "b_lu_yield_bruto",
+                "b_lu_tarra",
+                "b_lu_uww",
+                "b_lu_n_harvestable",
+            ]
+        case "HC050":
+            return ["b_lu_yield_fresh", "b_lu_moist", "b_lu_cp"]
+        case "HC061":
+            return ["b_lu_yield_fresh", "b_lu_dm", "f_no3_td_asis"]
+        default:
+            return []
+    }
+}
