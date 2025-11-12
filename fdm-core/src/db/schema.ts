@@ -551,6 +551,7 @@ export const harvestableAnalyses = fdmSchema.table(
         b_lu_moist: numericCasted(),
         b_lu_uww: numericCasted(),
         b_lu_cp: numericCasted(),
+        f_no3_td_asis: numericCasted(),
         b_lu_n_harvestable: numericCasted(),
         b_lu_n_residue: numericCasted(),
         b_lu_p_harvestable: numericCasted(),
