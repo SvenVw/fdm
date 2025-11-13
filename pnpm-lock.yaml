@@ -445,9 +445,6 @@ importers:
       '@rollup/plugin-node-resolve':
         specifier: 'catalog:'
         version: 16.0.3(rollup@4.52.5)
-      '@rollup/plugin-terser':
-        specifier: 'catalog:'
-        version: 0.4.4(rollup@4.52.5)
       '@rollup/plugin-typescript':
         specifier: 'catalog:'
         version: 12.3.0(rollup@4.52.5)(tslib@2.8.1)(typescript@5.9.3)
