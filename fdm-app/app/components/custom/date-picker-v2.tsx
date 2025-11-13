@@ -26,6 +26,7 @@ type DatePickerProps = {
     defaultValue?: Date
     field: ControllerRenderProps<FieldValues, string>
     fieldState: ControllerFieldState
+    required?: boolean
 }
 
 export function DatePicker({
@@ -33,6 +34,7 @@ export function DatePicker({
     defaultValue,
     field,
     fieldState,
+    required,
 }: DatePickerProps) {
     const [open, setOpen] = React.useState(false)
     const [inputValue, setInputValue] = React.useState(
@@ -100,6 +102,7 @@ export function DatePicker({
                             setOpen(true)
                         }
                     }}
+                    required={required}
                 />
                 <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>

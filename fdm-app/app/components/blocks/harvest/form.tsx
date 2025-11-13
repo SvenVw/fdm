@@ -136,6 +136,7 @@ export function HarvestFormDialog({
                                             defaultValue={b_lu_harvest_date}
                                             field={field}
                                             fieldState={fieldState}
+                                            required={true}
                                         />
                                     )}
                                 />
