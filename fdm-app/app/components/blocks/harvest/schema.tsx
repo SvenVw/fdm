@@ -156,18 +156,20 @@ export const FormSchema = z
                 message: "Hoeveelheid moet een safe getal zijn",
             })
             .optional(),
-        b_lu_start: z.preprocess((value) => {
-            if (typeof value === "string") {
-                if (value.toLowerCase() === "null") return null
-            }
-            return value
-        }, z.coerce.date().optional().nullable()),
-        b_lu_end: z.preprocess((value) => {
-            if (typeof value === "string") {
-                if (value.toLowerCase() === "null") return null
-            }
-            return value
-        }, z.coerce.date().optional().nullable()),
+        b_lu_start: z.preprocess(
+            (value) =>
+                typeof value === "string" && value.toLowerCase() === "null"
+                    ? null
+                    : value,
+            z.coerce.date().optional().nullable(),
+        ),
+        b_lu_end: z.preprocess(
+            (value) =>
+                typeof value === "string" && value.toLowerCase() === "null"
+                    ? null
+                    : value,
+            z.coerce.date().optional().nullable(),
+        ),
         b_lu_harvestable: z.enum(["once", "multiple", "none"]),
     })
     .superRefine((data, ctx) => {

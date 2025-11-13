@@ -11,7 +11,7 @@ import {
     type MetaFunction,
     useLoaderData,
 } from "react-router"
-import { redirectWithSuccess } from "remix-toast"
+import { dataWithWarning, redirectWithSuccess } from "remix-toast"
 import { HarvestFormDialog } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import { getSession } from "~/lib/auth.server"
@@ -135,18 +135,68 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
 
         const session = await getSession(request)
+
+        // Fetch cultivation details to get b_lu_harvestcat
+        const cultivation = await getCultivation(
+            fdm,
+            session.principal_id,
+            b_lu,
+        )
+        if (!cultivation) {
+            throw data("Cultivation not found", { status: 404 })
+        }
+
+        // First, validate against the full FormSchema
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
         )
+
+        // Get required harvest parameters for the cultivation's harvest category
+        const requiredHarvestParameters = getParametersForHarvestCat(
+            cultivation.b_lu_harvestcat,
+        )
+
+        // Check if all required parameters are present
+        const missingParameters: string[] = []
+        for (const param of requiredHarvestParameters) {
+            if (
+                (formValues as Record<string, any>)[param] === undefined ||
+                (formValues as Record<string, any>)[param] === null
+            ) {
+                missingParameters.push(param)
+            }
+        }
+
+        if (missingParameters.length > 0) {
+            return dataWithWarning(
+                {
+                    warning: `Missing required harvest parameters: ${missingParameters.join(
+                        ", ",
+                    )}`,
+                },
+                `Missing required harvest parameters: ${missingParameters.join(
+                    ", ",
+                )}`,
+            )
+        }
+
+        // Filter form values to include only required parameters for addHarvest
+        const harvestProperties: Record<string, any> = {}
+        for (const param of requiredHarvestParameters) {
+            if ((formValues as Record<string, any>)[param] !== undefined) {
+                harvestProperties[param] = (formValues as Record<string, any>)[
+                    param
+                ]
+            }
+        }
 
         await addHarvest(
             fdm,
             session.principal_id,
             b_lu,
             formValues.b_lu_harvest_date,
-            formValues.b_lu_yield_fresh,
-            formValues.b_lu_n_harvestable,
+            harvestProperties,
         )
 
         return redirectWithSuccess("..", {
