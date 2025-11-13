@@ -1,6 +1,7 @@
 import {
     getCultivation,
     getHarvest,
+    getParametersForHarvestCat,
     removeHarvest,
     updateHarvest,
 } from "@svenvw/fdm-core"
@@ -105,12 +106,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_harvesting,
         )
 
+        const harvestParameters = getParametersForHarvestCat(
+            cultivation.b_lu_harvestcat,
+        )
+
         // Return user information from loader
         return {
             cultivation: cultivation,
             harvest: harvest,
             b_id_farm: b_id_farm,
             calendar: calendar,
+            harvestParameters: harvestParameters,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -131,6 +137,7 @@ export default function FarmFieldsOverviewBlock() {
 
     return (
         <HarvestFormDialog
+            harvestParameters={loaderData.harvestParameters}
             b_lu_harvest_date={loaderData.harvest.b_lu_harvest_date}
             b_lu_yield_fresh={loaderData.harvest.b_lu_yield_fresh}
             b_lu_dm={loaderData.harvest.b_lu_dm}

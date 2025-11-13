@@ -6,7 +6,41 @@ export const FormSchema = z
             required_error: "Oogstdatum is verplicht",
             invalid_type_error: "Oogstdatum moet een datum zijn",
         }),
+        b_lu_yield: z.coerce
+            .number({
+                invalid_type_error: "Hoeveelheid moet een getal zijn",
+            })
+            .positive({
+                message: "Hoeveelheid moet positief zijn",
+            })
+            .finite({
+                message: "Hoeveelheid moet een geheel getal zijn",
+            })
+            .max(250000, {
+                message: "Hoeveelheid mag niet groter zijn dan 250000",
+            })
+            .safe({
+                message: "Hoeveelheid moet een safe getal zijn",
+            })
+            .optional(),
         b_lu_yield_fresh: z.coerce
+            .number({
+                invalid_type_error: "Hoeveelheid moet een getal zijn",
+            })
+            .positive({
+                message: "Hoeveelheid moet positief zijn",
+            })
+            .finite({
+                message: "Hoeveelheid moet een geheel getal zijn",
+            })
+            .max(250000, {
+                message: "Hoeveelheid mag niet groter zijn dan 250000",
+            })
+            .safe({
+                message: "Hoeveelheid moet een safe getal zijn",
+            })
+            .optional(),
+        b_lu_yield_bruto: z.coerce
             .number({
                 invalid_type_error: "Hoeveelheid moet een getal zijn",
             })
@@ -51,43 +85,77 @@ export const FormSchema = z
                 message: "Hoeveelheid mag niet groter zijn dan 1000",
             })
             .optional(),
-        // b_lu_yield_bruto: z.coerce
-        //     .number({
-        //         invalid_type_error: "Hoeveelheid moet een getal zijn",
-        //     })
-        //     .positive({
-        //         message: "Hoeveelheid moet positief zijn",
-        //     })
-        //     .finite({
-        //         message: "Hoeveelheid moet een geheel getal zijn",
-        //     })
-        //     .max(250000, {
-        //         message: "Hoeveelheid mag niet groter zijn dan 250000",
-        //     })
-        //     .safe({
-        //         message: "Hoeveelheid moet een safe getal zijn",
-        //     })
-        //     .optional(),
-        // b_lu_yield_uvw: z.coerce
-        //     .number({
-        //         invalid_type_error: "Hoeveelheid moet een getal zijn",
-        //     })
-        //     .positive({
-        //         message: "Hoeveelheid moet positief zijn",
-        //     })
-        //     .finite({
-        //         message: "Hoeveelheid moet een geheel getal zijn",
-        //     })
-        //     .max(100, {
-        //         message: "Hoeveelheid mag niet kleiner zijn dan 100",
-        //     })
-        //     .max(1000, {
-        //         message: "Hoeveelheid mag niet groter zijn dan 1000",
-        //     })
-        //     .safe({
-        //         message: "Hoeveelheid moet een safe getal zijn",
-        //     })
-        //     .optional(),
+        b_lu_tarra: z.coerce
+            .number({
+                invalid_type_error: "Hoeveelheid moet een getal zijn",
+            })
+            .positive({
+                message: "Hoeveelheid moet positief zijn",
+            })
+            .finite({
+                message: "Hoeveelheid moet een geheel getal zijn",
+            })
+            .max(25, {
+                message: "Hoeveelheid mag niet groter zijn dan 25",
+            })
+            .safe({
+                message: "Hoeveelheid moet een safe getal zijn",
+            })
+            .optional(),
+        b_lu_uww: z.coerce
+            .number({
+                invalid_type_error: "Hoeveelheid moet een getal zijn",
+            })
+            .positive({
+                message: "Hoeveelheid moet positief zijn",
+            })
+            .finite({
+                message: "Hoeveelheid moet een geheel getal zijn",
+            })
+            .min(100, {
+                message: "Hoeveelheid mag niet kleiner zijn dan 100",
+            })
+            .max(1000, {
+                message: "Hoeveelheid mag niet groter zijn dan 1000",
+            })
+            .safe({
+                message: "Hoeveelheid moet een safe getal zijn",
+            })
+            .optional(),
+        b_lu_moist: z.coerce
+            .number({
+                invalid_type_error: "Hoeveelheid moet een getal zijn",
+            })
+            .positive({
+                message: "Hoeveelheid moet positief zijn",
+            })
+            .finite({
+                message: "Hoeveelheid moet een geheel getal zijn",
+            })
+            .max(100, {
+                message: "Hoeveelheid mag niet groter zijn dan 100",
+            })
+            .safe({
+                message: "Hoeveelheid moet een safe getal zijn",
+            })
+            .optional(),
+        b_lu_cp: z.coerce
+            .number({
+                invalid_type_error: "Hoeveelheid moet een getal zijn",
+            })
+            .positive({
+                message: "Hoeveelheid moet positief zijn",
+            })
+            .finite({
+                message: "Hoeveelheid moet een geheel getal zijn",
+            })
+            .max(500, {
+                message: "Hoeveelheid mag niet groter zijn dan 500",
+            })
+            .safe({
+                message: "Hoeveelheid moet een safe getal zijn",
+            })
+            .optional(),
         b_lu_start: z.preprocess((value) => {
             if (typeof value === "string") {
                 if (value.toLowerCase() === "null") return null

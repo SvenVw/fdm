@@ -1,4 +1,8 @@
-import { addHarvest, getCultivation } from "@svenvw/fdm-core"
+import {
+    addHarvest,
+    getCultivation,
+    getParametersForHarvestCat,
+} from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     data,
@@ -7,9 +11,7 @@ import {
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
-import {
-    HarvestFormDialog,
-} from "~/components/blocks/harvest/form"
+import { HarvestFormDialog } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
@@ -50,10 +52,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             throw data("Cultivation not found", { status: 404 })
         }
 
+        const harvestParameters = getParametersForHarvestCat(
+            cultivation.b_lu_harvestcat,
+        )
         return {
             b_id_farm,
             b_lu,
             cultivation,
+            harvestParameters,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -65,6 +71,7 @@ export default function HarvestNewBlock() {
 
     return (
         <HarvestFormDialog
+            harvestParameters={loaderData.harvestParameters}
             b_lu_harvest_date={undefined}
             b_lu_yield_fresh={undefined}
             b_lu_dm={undefined}

@@ -19,7 +19,6 @@ import {
 } from "~/components/ui/dialog"
 import {
     Field,
-    FieldDescription,
     FieldError,
     FieldGroup,
     FieldLabel,
@@ -28,11 +27,19 @@ import {
 } from "~/components/ui/field"
 import { Controller } from "react-hook-form"
 import { useEffect, useState } from "react"
+import type { HarvestParameters } from "@svenvw/fdm-core"
 
 type HarvestFormDialogProps = {
+    harvestParameters: HarvestParameters
     b_lu_harvest_date: Date | undefined
+    b_lu_yield: number | undefined
     b_lu_yield_fresh: number | undefined
+    b_lu_yield_bruto: number | undefined
+    b_lu_tarra: number | undefined
+    b_lu_uww: number | undefined
+    b_lu_moist: number | undefined
     b_lu_dm: number | undefined
+    b_lu_cp: number | undefined
     b_lu_n_harvestable: number | undefined
     b_lu_harvestable: "once" | "multiple" | "none" | undefined
     b_lu_start: Date | undefined | null
@@ -40,9 +47,16 @@ type HarvestFormDialogProps = {
 }
 
 export function HarvestFormDialog({
+    harvestParameters,
     b_lu_harvest_date,
+    b_lu_yield,
     b_lu_yield_fresh,
+    b_lu_yield_bruto,
+    b_lu_tarra,
+    b_lu_uww,
+    b_lu_moist,
     b_lu_dm,
+    b_lu_cp,
     b_lu_n_harvestable,
     b_lu_harvestable,
     b_lu_start,
@@ -62,12 +76,33 @@ export function HarvestFormDialog({
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_lu_harvest_date: b_lu_harvest_date,
-            b_lu_yield_fresh: b_lu_yield_fresh,
-            b_lu_dm: b_lu_dm,
-            b_lu_n_harvestable: b_lu_n_harvestable,
-            // b_lu_yield_bruto: b_lu_yield_bruto,
-            // b_lu_yield_uvw: b_lu_yield_uvw,
-            // b_lu_n_harvestable: b_lu_n_harvestable,,
+            b_lu_yield: harvestParameters.includes("b_lu_yield")
+                ? b_lu_yield
+                : undefined,
+            b_lu_yield_fresh: harvestParameters.includes("b_lu_yield_fresh")
+                ? b_lu_yield_fresh
+                : undefined,
+            b_lu_yield_bruto: harvestParameters.includes("b_lu_yield_bruto")
+                ? b_lu_yield_bruto
+                : undefined,
+            b_lu_tarra: harvestParameters.includes("b_lu_tarra")
+                ? b_lu_tarra
+                : undefined,
+            b_lu_dm: harvestParameters.includes("b_lu_dm")
+                ? b_lu_dm
+                : undefined,
+            b_lu_uww: harvestParameters.includes("b_lu_uww")
+                ? b_lu_uww
+                : undefined,
+            b_lu_moist: harvestParameters.includes("b_lu_moist")
+                ? b_lu_moist
+                : undefined,
+            b_lu_cp: harvestParameters.includes("b_lu_cp")
+                ? b_lu_cp
+                : undefined,
+            b_lu_n_harvestable: harvestParameters.includes("b_lu_n_harvestable")
+                ? b_lu_n_harvestable
+                : undefined,
             b_lu_start: b_lu_start,
             b_lu_end: b_lu_end,
             b_lu_harvestable: b_lu_harvestable,
@@ -93,8 +128,12 @@ export function HarvestFormDialog({
     // Calculate nitrogen uptake
     useEffect(() => {
         if (yieldDryMatter && form.getValues("b_lu_n_harvestable")) {
-            const b_lu_n_harvestable = Number(form.getValues("b_lu_n_harvestable"))
-            const nitrogenUptake = Math.round(yieldDryMatter * b_lu_n_harvestable  / 1000)
+            const b_lu_n_harvestable = Number(
+                form.getValues("b_lu_n_harvestable"),
+            )
+            const nitrogenUptake = Math.round(
+                (yieldDryMatter * b_lu_n_harvestable) / 1000,
+            )
             setNitrogenUptake(nitrogenUptake)
         } else {
             setNitrogenUptake(undefined)
@@ -141,12 +180,56 @@ export function HarvestFormDialog({
                                     )}
                                 />
                                 <Controller
+                                    name="b_lu_yield"
+                                    control={form.control}
+                                    render={({ field, fieldState }) => (
+                                        <Field
+                                            data-invalid={fieldState.invalid}
+                                            className={cn(
+                                                "gap-1",
+                                                harvestParameters.includes(
+                                                    field.name,
+                                                )
+                                                    ? ""
+                                                    : "hidden",
+                                            )}
+                                        >
+                                            <FieldLabel>
+                                                Opbrengst (kg DS / ha)
+                                            </FieldLabel>
+                                            <Input
+                                                {...field}
+                                                placeholder="Bv. 37500 kg / ha"
+                                                aria-required="true"
+                                                aria-invalid={
+                                                    fieldState.invalid
+                                                }
+                                                type="number"
+                                                value={field.value ?? ""}
+                                            />
+                                            {fieldState.invalid && (
+                                                <FieldError
+                                                    errors={[fieldState.error]}
+                                                />
+                                            )}
+                                        </Field>
+                                    )}
+                                />
+
+                                <Controller
                                     name="b_lu_yield_fresh"
                                     control={form.control}
                                     render={({ field, fieldState }) => (
                                         <Field
                                             data-invalid={fieldState.invalid}
-                                            className="gap-1"
+                                            className={cn(
+                                                "gap-1",
+                                                harvestParameters.includes(
+                                                    field.name,
+                                                )
+                                                    ? ""
+                                                    : "hidden",
+                                            )}
                                         >
                                             <FieldLabel>
                                                 Opbrengst (kg versproduct / ha)
@@ -170,12 +253,90 @@ export function HarvestFormDialog({
                                     )}
                                 />
                                 <Controller
+                                    name="b_lu_yield_bruto"
+                                    control={form.control}
+                                    render={({ field, fieldState }) => (
+                                        <Field
+                                            data-invalid={fieldState.invalid}
+                                            className={cn(
+                                                "gap-1",
+                                                harvestParameters.includes(
+                                                    field.name,
+                                                )
+                                                    ? ""
+                                                    : "hidden",
+                                            )}
+                                        >
+                                            <FieldLabel>
+                                                Opbrengst incl. tarra (kg
+                                                versproduct / ha)
+                                            </FieldLabel>
+                                            <Input
+                                                {...field}
+                                                placeholder="Bv. 37500 kg / ha"
+                                                aria-required="true"
+                                                aria-invalid={
+                                                    fieldState.invalid
+                                                }
+                                                type="number"
+                                                value={field.value ?? ""}
+                                            />
+                                            {fieldState.invalid && (
+                                                <FieldError
+                                                    errors={[fieldState.error]}
+                                                />
+                                            )}
+                                        </Field>
+                                    )}
+                                />
+                                <Controller
+                                    name="b_lu_tarra"
+                                    control={form.control}
+                                    render={({ field, fieldState }) => (
+                                        <Field
+                                            data-invalid={fieldState.invalid}
+                                            className={cn(
+                                                "gap-1",
+                                                harvestParameters.includes(
+                                                    field.name,
+                                                )
+                                                    ? ""
+                                                    : "hidden",
+                                            )}
+                                        >
+                                            <FieldLabel>Tarra (%)</FieldLabel>
+                                            <Input
+                                                {...field}
+                                                placeholder="Bv. 5 %"
+                                                aria-required="true"
+                                                aria-invalid={
+                                                    fieldState.invalid
+                                                }
+                                                type="number"
+                                                value={field.value ?? ""}
+                                            />
+                                            {fieldState.invalid && (
+                                                <FieldError
+                                                    errors={[fieldState.error]}
+                                                />
+                                            )}
+                                        </Field>
+                                    )}
+                                />
+                                <Controller
                                     name="b_lu_dm"
                                     control={form.control}
                                     render={({ field, fieldState }) => (
                                         <Field
                                             data-invalid={fieldState.invalid}
-                                            className="gap-1"
+                                            className={cn(
+                                                "gap-1",
+                                                harvestParameters.includes(
+                                                    field.name,
+                                                )
+                                                    ? ""
+                                                    : "hidden",
+                                            )}
                                         >
                                             <FieldLabel>
                                                 Droge stofgehalte (g DS / kg
@@ -200,12 +361,91 @@ export function HarvestFormDialog({
                                     )}
                                 />
                                 <Controller
+                                    name="b_lu_uuw"
+                                    control={form.control}
+                                    render={({ field, fieldState }) => (
+                                        <Field
+                                            data-invalid={fieldState.invalid}
+                                            className={cn(
+                                                "gap-1",
+                                                harvestParameters.includes(
+                                                    field.name,
+                                                )
+                                                    ? ""
+                                                    : "hidden",
+                                            )}
+                                        >
+                                            <FieldLabel>
+                                                Onderwatergewicht (g / 5 kg)
+                                            </FieldLabel>
+                                            <Input
+                                                {...field}
+                                                placeholder="Bv. 350 g / 5 kg"
+                                                aria-required="true"
+                                                aria-invalid={
+                                                    fieldState.invalid
+                                                }
+                                                type="number"
+                                                value={field.value ?? ""}
+                                            />
+                                            {fieldState.invalid && (
+                                                <FieldError
+                                                    errors={[fieldState.error]}
+                                                />
+                                            )}
+                                        </Field>
+                                    )}
+                                />
+                                <Controller
+                                    name="b_lu_moist"
+                                    control={form.control}
+                                    render={({ field, fieldState }) => (
+                                        <Field
+                                            data-invalid={fieldState.invalid}
+                                            className={cn(
+                                                "gap-1",
+                                                harvestParameters.includes(
+                                                    field.name,
+                                                )
+                                                    ? ""
+                                                    : "hidden",
+                                            )}
+                                        >
+                                            <FieldLabel>
+                                                Vochtgehalte (%)
+                                            </FieldLabel>
+                                            <Input
+                                                {...field}
+                                                placeholder="Bv. 15 %"
+                                                aria-required="true"
+                                                aria-invalid={
+                                                    fieldState.invalid
+                                                }
+                                                type="number"
+                                                value={field.value ?? ""}
+                                            />
+                                            {fieldState.invalid && (
+                                                <FieldError
+                                                    errors={[fieldState.error]}
+                                                />
+                                            )}
+                                        </Field>
+                                    )}
+                                />
+                                <Controller
                                     name="b_lu_n_harvestable"
                                     control={form.control}
                                     render={({ field, fieldState }) => (
                                         <Field
                                             data-invalid={fieldState.invalid}
-                                            className="gap-1"
+                                            className={cn(
+                                                "gap-1",
+                                                harvestParameters.includes(
+                                                    field.name,
+                                                )
+                                                    ? ""
+                                                    : "hidden",
+                                            )}
                                         >
                                             <FieldLabel>
                                                 Stiktstofgehalte (g N / kg DS)
@@ -213,6 +453,42 @@ export function HarvestFormDialog({
                                             <Input
                                                 {...field}
                                                 placeholder="Bv. 850 g / kg"
+                                                aria-required="true"
+                                                aria-invalid={
+                                                    fieldState.invalid
+                                                }
+                                                type="number"
+                                                value={field.value ?? ""}
+                                            />
+                                            {fieldState.invalid && (
+                                                <FieldError
+                                                    errors={[fieldState.error]}
+                                                />
+                                            )}
+                                        </Field>
+                                    )}
+                                />
+                                <Controller
+                                    name="b_lu_cp"
+                                    control={form.control}
+                                    render={({ field, fieldState }) => (
+                                        <Field
+                                            data-invalid={fieldState.invalid}
+                                            className={cn(
+                                                "gap-1",
+                                                harvestParameters.includes(
+                                                    field.name,
+                                                )
+                                                    ? ""
+                                                    : "hidden",
+                                            )}
+                                        >
+                                            <FieldLabel>
+                                                Ruw eiwit (g RE / kg DS)
+                                            </FieldLabel>
+                                            <Input
+                                                {...field}
+                                                placeholder="Bv. 170 g RE / kg DS"
                                                 aria-required="true"
                                                 aria-invalid={
                                                     fieldState.invalid
