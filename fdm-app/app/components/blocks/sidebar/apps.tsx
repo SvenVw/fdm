@@ -6,7 +6,7 @@ import {
     MapIcon,
     Scale,
 } from "lucide-react"
-import { NavLink, useLocation } from "react-router"
+import { NavLink, useLocation, useSearchParams } from "react-router"
 import { useCalendarStore } from "@/app/store/calendar"
 import { useFarmStore } from "@/app/store/farm"
 import { Badge } from "~/components/ui/badge"
@@ -24,9 +24,12 @@ export function SidebarApps() {
     const farmId = useFarmStore((state) => state.farmId)
     const selectedCalendar = useCalendarStore((state) => state.calendar)
 
-    // Check if page contains `farm/create` in url
+    // Check if the page or its return page contains `farm/create` in url
     const location = useLocation()
-    const isCreateFarmWizard = location.pathname.includes("farm/create")
+    const [searchParams] = useSearchParams()
+    const isCreateFarmWizard =
+        location.pathname.includes("farm/create") ||
+        searchParams.get("returnUrl")?.includes("farm/create")
 
     let atlasLink: string | undefined
     if (isCreateFarmWizard) {

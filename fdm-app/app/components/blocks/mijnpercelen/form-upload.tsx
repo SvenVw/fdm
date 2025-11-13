@@ -5,7 +5,6 @@ import {
     Circle,
     FileUp,
     FlaskConical,
-    X,
 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { Form, NavLink, useActionData, useNavigation } from "react-router"
@@ -14,6 +13,7 @@ import { parseDbf } from "shpjs"
 import { toast as notify } from "sonner"
 import { z } from "zod"
 import { cn } from "@/app/lib/utils"
+import { Dropzone } from "~/components/custom/dropzone"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
     Accordion,
@@ -36,7 +36,7 @@ import {
     FormItem,
     FormMessage,
 } from "~/components/ui/form"
-import { Input } from "~/components/ui/input"
+
 import { MijnPercelenUploadAnimation } from "./upload-animation"
 
 type UploadState = "idle" | "animating" | "success" | "error"
@@ -50,9 +50,7 @@ export function MijnPercelenUploadForm({
     b_id_farm: string
     calendar: string
 }) {
-    const [fileNames, setFileNames] = useState<string[]>([])
     const [fieldNames, setFieldNames] = useState<string[]>([])
-    const [hasAllRequiredFiles, setHasAllRequiredFiles] = useState(false)
     const [uploadState, setUploadState] = useState<UploadState>("idle")
     const uploadStartTime = useRef<number | null>(null)
 
@@ -108,21 +106,19 @@ export function MijnPercelenUploadForm({
             const timer = setTimeout(() => {
                 setUploadState("idle")
                 form.reset()
-                setFileNames([])
-                setFieldNames([])
-                setHasAllRequiredFiles(false)
             }, 3000)
             return () => clearTimeout(timer)
         }
     }, [uploadState, form.reset])
 
-    const checkRequiredFiles = (files: File[]) => {
-        const extensions = files.map((file) => getFileExtension(file.name))
-        const hasAll = requiredExtensions.every((ext) =>
-            extensions.includes(ext),
-        )
-        setHasAllRequiredFiles(hasAll)
-    }
+    const selectedFiles = form.watch("shapefile")
+
+    const selectedFileExtensions = selectedFiles.map((file) =>
+        getFileExtension(file.name),
+    )
+    const hasAllRequiredFiles = requiredExtensions.every((ext) =>
+        selectedFileExtensions.includes(ext),
+    )
 
     useEffect(() => {
         return () => {
@@ -130,20 +126,8 @@ export function MijnPercelenUploadForm({
         }
     }, [form.reset])
 
-    const handleFilesSet = async (files: File[]) => {
-        const validFiles = files.filter((file) => {
-            const extension = getFileExtension(file.name)
-            const isValid = requiredExtensions.includes(extension)
-            if (!isValid) {
-                notify.warning(`Bestandstype niet ondersteund: ${extension}`, {
-                    id: `invalid-file-type-${file.name}`,
-                })
-            }
-            return isValid
-        })
-
-        setFileNames(validFiles.map((file) => file.name))
-        checkRequiredFiles(validFiles)
+    const handleFilesSet = async (validFiles: File[]) => {
+        form.setValue("shapefile", validFiles)
         setUploadState("idle")
 
         const dbfFile = validFiles.find(
@@ -162,88 +146,6 @@ export function MijnPercelenUploadForm({
             }
         } else {
             setFieldNames([])
-        }
-    }
-
-    const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
-        e.preventDefault()
-    }
-
-    const handleFileChange = async (
-        event: React.ChangeEvent<HTMLInputElement>,
-        onChange: (files: File[]) => void,
-    ) => {
-        if (event.target.files) {
-            const newFiles = Array.from(event.target.files)
-            const validNewFiles = newFiles.filter((file) => {
-                const extension = getFileExtension(file.name)
-                const isValid = requiredExtensions.includes(extension)
-                if (!isValid) {
-                    notify.warning(
-                        `Bestandstype niet ondersteund: ${extension}`,
-                        {
-                            id: `invalid-file-type-${file.name}`,
-                        },
-                    )
-                }
-                return isValid
-            })
-
-            if (validNewFiles.length === 0) return
-
-            const currentFiles = form.getValues("shapefile") || []
-            const updatedFiles = mergeShapefileParts(
-                currentFiles,
-                validNewFiles,
-                requiredExtensions,
-            )
-
-            onChange(updatedFiles)
-            await handleFilesSet(updatedFiles)
-        }
-    }
-
-    const handleDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
-        e.preventDefault()
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            const newFiles = Array.from(e.dataTransfer.files)
-            const validNewFiles = newFiles.filter((file) => {
-                const extension = getFileExtension(file.name)
-                const isValid = requiredExtensions.includes(extension)
-                if (!isValid) {
-                    notify.warning(
-                        `Bestandstype niet ondersteund: ${extension}`,
-                        {
-                            id: `invalid-file-type-${file.name}`,
-                        },
-                    )
-                }
-                return isValid
-            })
-
-            if (validNewFiles.length === 0) return
-
-            const currentFiles = form.getValues("shapefile") || []
-            const updatedFiles = mergeShapefileParts(
-                currentFiles,
-                validNewFiles,
-                requiredExtensions,
-            )
-
-            form.setValue("shapefile", updatedFiles, { shouldValidate: true })
-
-            const fileInput = document.getElementById(
-                "file-upload",
-            ) as HTMLInputElement | null
-            if (fileInput) {
-                const container = new DataTransfer()
-                updatedFiles.forEach((f) => {
-                    container.items.add(f)
-                })
-                fileInput.files = container.files
-            }
-            await handleFilesSet(updatedFiles)
-            e.dataTransfer.clearData()
         }
     }
 
@@ -311,8 +213,10 @@ export function MijnPercelenUploadForm({
                         >
                             <FileUp className="w-8 h-8 mb-2 text-muted-foreground" />
                             <div className="text-sm text-muted-foreground">
-                                {fileNames.length > 0
-                                    ? fileNames.join(", ")
+                                {selectedFiles.length > 0
+                                    ? selectedFiles
+                                          .map((file) => file.name)
+                                          .join(", ")
                                     : "Klik om te uploaden of sleep de bestanden hierheen"}
                             </div>
                             <div className="text-xs text-muted-foreground mt-1">
@@ -370,151 +274,103 @@ export function MijnPercelenUploadForm({
                                                 render={({
                                                     field: {
                                                         name,
+                                                        value,
                                                         onBlur,
-                                                        onChange,
                                                         ref,
                                                     },
                                                 }) => (
                                                     <FormItem>
                                                         <div>Shapefile</div>
-                                                        <Input
-                                                            name={name}
-                                                            onBlur={onBlur}
-                                                            onChange={async (
-                                                                event,
-                                                            ) => {
-                                                                await handleFileChange(
-                                                                    event,
-                                                                    onChange,
-                                                                )
-                                                            }}
+                                                        <Dropzone
                                                             ref={ref}
-                                                            type="file"
-                                                            placeholder=""
-                                                            className="hidden"
-                                                            multiple
-                                                            required
-                                                            id="file-upload"
-                                                        />
-                                                        <label
-                                                            // biome-ignore lint/a11y/noNoninteractiveTabindex: The label is interactive and should be focusable
-                                                            tabIndex={0}
-                                                            className="relative block"
-                                                            htmlFor="file-upload"
-                                                            aria-label="Upload shapefile files by clicking or dragging and dropping"
-                                                            onKeyDown={(e) => {
-                                                                if (
-                                                                    e.key ===
-                                                                        "Enter" ||
-                                                                    e.key ===
-                                                                        " "
-                                                                ) {
-                                                                    e.preventDefault()
-                                                                    document
-                                                                        .getElementById(
-                                                                            "file-upload",
-                                                                        )
-                                                                        ?.click()
-                                                                }
-                                                            }}
-                                                            onDragOver={
-                                                                handleDragOver
+                                                            name={name}
+                                                            value={value}
+                                                            accept={
+                                                                requiredExtensions
                                                             }
-                                                            onDrop={handleDrop}
-                                                        >
-                                                            {fileNames.length >
-                                                                0 && (
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="absolute top-2 right-2 h-6 w-6"
-                                                                    onClick={() => {
-                                                                        form.reset()
-                                                                        setFileNames(
-                                                                            [],
-                                                                        )
-                                                                        setFieldNames(
-                                                                            [],
-                                                                        )
-                                                                        setHasAllRequiredFiles(
-                                                                            false,
-                                                                        )
-                                                                    }}
-                                                                >
-                                                                    <X className="h-4 w-4" />
-                                                                </Button>
+                                                            maxSize={
+                                                                fileSizeLimit
+                                                            }
+                                                            multiple
+                                                            onBlur={onBlur}
+                                                            onFilesChange={
+                                                                handleFilesSet
+                                                            }
+                                                            className={cn(
+                                                                hasAllRequiredFiles &&
+                                                                    "border-green-500 bg-green-50",
+                                                                uploadState ===
+                                                                    "error" &&
+                                                                    "border-red-500 bg-red-50",
+                                                                uploadState ===
+                                                                    "success" &&
+                                                                    "border-green-500 bg-green-50",
                                                             )}
-                                                            <div
-                                                                className={cn(
-                                                                    "flex flex-col items-center justify-center w-full h-32 rounded-md border border-dashed border-muted-foreground/25 px-6 py-4 text-center transition-colors hover:bg-muted/25",
-                                                                    hasAllRequiredFiles &&
-                                                                        "border-green-500 bg-green-50",
-                                                                    uploadState ===
-                                                                        "error" &&
-                                                                        "border-red-500 bg-red-50",
-                                                                    uploadState ===
-                                                                        "success" &&
-                                                                        "border-green-500 bg-green-50",
-                                                                )}
-                                                            >
-                                                                <div className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
-                                                                    {uploadState ===
-                                                                        "idle" && (
-                                                                        <>
-                                                                            <FileUp className="w-8 h-8 mb-2 text-muted-foreground" />
-                                                                            <div className="text-sm text-muted-foreground">
-                                                                                {fileNames.length >
-                                                                                0
-                                                                                    ? fileNames.join(
-                                                                                          ", ",
-                                                                                      )
-                                                                                    : "Klik om te uploaden of sleep de bestanden hierheen"}
-                                                                            </div>
-                                                                            <div className="text-xs text-muted-foreground mt-1">
-                                                                                {/* .shp,
+                                                            mergeFiles={(
+                                                                oldFiles,
+                                                                newFiles,
+                                                            ) =>
+                                                                mergeShapefileParts(
+                                                                    oldFiles,
+                                                                    newFiles,
+                                                                    requiredExtensions,
+                                                                )
+                                                            }
+                                                        >
+                                                            <FileUp className="w-8 h-8 mb-2 text-muted-foreground" />
+                                                            <div className="text-sm text-muted-foreground">
+                                                                {selectedFiles.length >
+                                                                0
+                                                                    ? selectedFiles
+                                                                          .map(
+                                                                              (
+                                                                                  file,
+                                                                              ) =>
+                                                                                  file.name,
+                                                                          )
+                                                                          .join(
+                                                                              ", ",
+                                                                          )
+                                                                    : "Klik om te uploaden of sleep de bestanden hierheen"}
+                                                            </div>
+                                                            <div className="text-xs text-muted-foreground mt-1">
+                                                                {/* .shp,
                                                                                 .shx,
                                                                                 .dbf,
                                                                                 .prj */}
-                                                                            </div>
-                                                                            <RequiredFilesStatus
-                                                                                files={
-                                                                                    form.getValues(
-                                                                                        "shapefile",
-                                                                                    ) ||
-                                                                                    []
-                                                                                }
-                                                                                requiredExtensions={
-                                                                                    requiredExtensions
-                                                                                }
-                                                                            />
-                                                                        </>
-                                                                    )}
-                                                                    {uploadState ===
-                                                                        "success" && (
-                                                                        <>
-                                                                            <CheckCircle className="w-8 h-8 mb-2 text-green-500" />
-                                                                            <div className="text-sm text-green-600">
-                                                                                Uploaden
-                                                                                succesvol!
-                                                                            </div>
-                                                                        </>
-                                                                    )}
-                                                                    {uploadState ===
-                                                                        "error" && (
-                                                                        <>
-                                                                            <AlertCircle className="w-8 h-8 mb-2 text-red-500" />
-                                                                            <div className="text-sm text-red-600">
-                                                                                Uploaden
-                                                                                mislukt.
-                                                                                Probeer
-                                                                                het
-                                                                                opnieuw.
-                                                                            </div>
-                                                                        </>
-                                                                    )}
-                                                                </div>
                                                             </div>
-                                                        </label>
+                                                            <RequiredFilesStatus
+                                                                files={
+                                                                    selectedFiles
+                                                                }
+                                                                requiredExtensions={
+                                                                    requiredExtensions
+                                                                }
+                                                            />
+                                                            {uploadState ===
+                                                                "success" && (
+                                                                <>
+                                                                    <CheckCircle className="w-8 h-8 mb-2 text-green-500" />
+                                                                    <div className="text-sm text-green-600">
+                                                                        Uploaden
+                                                                        succesvol!
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                            {uploadState ===
+                                                                "error" && (
+                                                                <>
+                                                                    <AlertCircle className="w-8 h-8 mb-2 text-red-500" />
+                                                                    <div className="text-sm text-red-600">
+                                                                        Uploaden
+                                                                        mislukt.
+                                                                        Probeer
+                                                                        het
+                                                                        opnieuw.
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                        </Dropzone>
                                                         <FormDescription />
                                                         <FormMessage />
                                                     </FormItem>
