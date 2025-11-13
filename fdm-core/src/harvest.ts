@@ -9,9 +9,10 @@ import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import type { Harvest } from "./harvest.d"
+import type { Harvest, HarvestParameters } from "./harvest.d"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
+import { convertHarvestParameters } from "./harvest-conversion"
 
 /**
  * Adds a new harvest to a cultivation.
@@ -28,13 +29,21 @@ import type { Timeframe } from "./timeframe"
  * @param principal_id - The principal's ID used for permission verification.
  * @param b_lu - The cultivation ID.
  * @param b_lu_harvest_date - The date of the harvest.
- * @param b_lu_yield - The dry-matter yield for the harvest, in kg/ha.
- * @param b_lu_n_harvestable - The total nitrogen content in the harvestable yield (g N/kg).
- * @param b_lu_n_residue - The total nitrogen content in the crop residue (g N/kg).
- * @param b_lu_p_harvestable - The total phosphorus content in the harvestable yield (g P2O5/kg).
- * @param b_lu_p_residue - The total phosphorus content in the crop residue (g P2O5/kg).
- * @param b_lu_k_harvestable - The total potassium content in the harvestable yield (g K2O/kg).
- * @param b_lu_k_residue - The total potassium content in the crop residue (g K2O/kg).
+ * @param properties - An object containing the harvest properties.
+ * @param properties.b_lu_yield - The dry-matter yield for the harvest, in kg/ha.
+ * @param properties.b_lu_yield_bruto - The gross yield of the harvest, in kg/ha.
+ * @param properties.b_lu_yield_fresh - The fresh-matter yield of the harvest, in kg/ha.
+ * @param properties.b_lu_tarra - The tarra percentage of the harvest (e.g., soil).
+ * @param properties.b_lu_dm - The dry matter content of the harvest, in g/kg.
+ * @param properties.b_lu_moist - The moisture content of the harvest, in g/kg.
+ * @param properties.b_lu_uww - The underwater weight of the harvest, in g/5kg.
+ * @param properties.b_lu_cp - The crude protein content of the harvest, in g/kg.
+ * @param properties.b_lu_n_harvestable - The total nitrogen content in the harvestable yield (g N/kg).
+ * @param properties.b_lu_n_residue - The total nitrogen content in the crop residue (g N/kg).
+ * @param properties.b_lu_p_harvestable - The total phosphorus content in the harvestable yield (g P2O5/kg).
+ * @param properties.b_lu_p_residue - The total phosphorus content in the crop residue (g P2O5/kg).
+ * @param properties.b_lu_k_harvestable - The total potassium content in the harvestable yield (g K2O/kg).
+ * @param properties.b_lu_k_residue - The total potassium content in the crop residue (g K2O/kg).
  *
  * @returns A Promise that resolves with the new harvest's unique identifier.
  *
@@ -45,13 +54,22 @@ export async function addHarvest(
     principal_id: PrincipalId,
     b_lu: schema.cultivationHarvestingTypeInsert["b_lu"],
     b_lu_harvest_date: schema.cultivationHarvestingTypeInsert["b_lu_harvest_date"],
-    b_lu_yield: schema.harvestableAnalysesTypeInsert["b_lu_yield"],
-    b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
-    b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"],
-    b_lu_p_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_p_harvestable"],
-    b_lu_p_residue?: schema.harvestableAnalysesTypeInsert["b_lu_p_residue"],
-    b_lu_k_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_k_harvestable"],
-    b_lu_k_residue?: schema.harvestableAnalysesTypeInsert["b_lu_k_residue"],
+    properties?: {
+        b_lu_yield?: schema.harvestableAnalysesTypeInsert["b_lu_yield"]
+        b_lu_yield_bruto?: schema.harvestableAnalysesTypeInsert["b_lu_yield_bruto"]
+        b_lu_yield_fresh?: schema.harvestableAnalysesTypeInsert["b_lu_yield_fresh"]
+        b_lu_tarra?: schema.harvestableAnalysesTypeInsert["b_lu_tarra"]
+        b_lu_dm?: schema.harvestableAnalysesTypeInsert["b_lu_dm"]
+        b_lu_moist?: schema.harvestableAnalysesTypeInsert["b_lu_moist"]
+        b_lu_uww?: schema.harvestableAnalysesTypeInsert["b_lu_uww"]
+        b_lu_cp?: schema.harvestableAnalysesTypeInsert["b_lu_cp"]
+        b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"]
+        b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"]
+        b_lu_p_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_p_harvestable"]
+        b_lu_p_residue?: schema.harvestableAnalysesTypeInsert["b_lu_p_residue"]
+        b_lu_k_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_k_harvestable"]
+        b_lu_k_residue?: schema.harvestableAnalysesTypeInsert["b_lu_k_residue"]
+    },
 ): Promise<schema.cultivationHarvestingTypeSelect["b_id_harvesting"]> {
     try {
         await checkPermission(
@@ -66,8 +84,18 @@ export async function addHarvest(
         return await fdm.transaction(async (tx: FdmType) => {
             // Validate if cultivation exists
             const cultivation = await tx
-                .select()
+                .select({
+                    b_lu_harvestcat:
+                        schema.cultivationsCatalogue.b_lu_harvestcat,
+                })
                 .from(schema.cultivations)
+                .leftJoin(
+                    schema.cultivationsCatalogue,
+                    eq(
+                        schema.cultivations.b_lu_catalogue,
+                        schema.cultivationsCatalogue.b_lu_catalogue,
+                    ),
+                )
                 .where(eq(schema.cultivations.b_lu, b_lu))
                 .limit(1)
             if (cultivation.length === 0) {
@@ -79,6 +107,60 @@ export async function addHarvest(
                 b_lu,
                 b_lu_harvest_date,
             )
+
+            // Setup the harvestable analysis record
+            const b_id_harvestable_analysis = createId()
+            let harvestableAnalysis: {
+                b_id_harvestable_analysis: schema.harvestableAnalysesTypeInsert["b_id_harvestable_analysis"]
+                b_lu_yield?: schema.harvestableAnalysesTypeInsert["b_lu_yield"]
+                b_lu_yield_bruto?: schema.harvestableAnalysesTypeInsert["b_lu_yield_bruto"]
+                b_lu_yield_fresh?: schema.harvestableAnalysesTypeInsert["b_lu_yield_fresh"]
+                b_lu_tarra?: schema.harvestableAnalysesTypeInsert["b_lu_tarra"]
+                b_lu_dm?: schema.harvestableAnalysesTypeInsert["b_lu_dm"]
+                b_lu_moist?: schema.harvestableAnalysesTypeInsert["b_lu_moist"]
+                b_lu_uww?: schema.harvestableAnalysesTypeInsert["b_lu_uww"]
+                b_lu_cp?: schema.harvestableAnalysesTypeInsert["b_lu_cp"]
+                b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"]
+                b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"]
+                b_lu_p_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_p_harvestable"]
+                b_lu_p_residue?: schema.harvestableAnalysesTypeInsert["b_lu_p_residue"]
+                b_lu_k_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_k_harvestable"]
+                b_lu_k_residue?: schema.harvestableAnalysesTypeInsert["b_lu_k_residue"]
+            } = {
+                b_id_harvestable_analysis: b_id_harvestable_analysis,
+            }
+            if (properties) {
+                const b_lu_harvestcat = cultivation[0].b_lu_harvestcat
+                const standardHarvest = convertHarvestParameters(
+                    b_lu_harvestcat,
+                    properties.b_lu_yield,
+                    properties.b_lu_yield_bruto,
+                    properties.b_lu_yield_fresh,
+                    properties.b_lu_tarra,
+                    properties.b_lu_moist,
+                    properties.b_lu_uww,
+                    properties.b_lu_dm,
+                    properties.b_lu_cp,
+                    properties.b_lu_n_harvestable,
+                )
+                harvestableAnalysis = {
+                    ...harvestableAnalysis,
+                    b_lu_yield: standardHarvest.b_lu_yield,
+                    b_lu_yield_bruto: properties.b_lu_yield_bruto,
+                    b_lu_yield_fresh: properties.b_lu_yield_fresh,
+                    b_lu_tarra: properties.b_lu_tarra,
+                    b_lu_dm: properties.b_lu_dm,
+                    b_lu_moist: properties.b_lu_moist,
+                    b_lu_uww: properties.b_lu_uww,
+                    b_lu_cp: properties.b_lu_cp,
+                    b_lu_n_harvestable: standardHarvest.b_lu_n_harvestable,
+                    b_lu_n_residue: properties.b_lu_n_residue,
+                    b_lu_p_harvestable: properties.b_lu_p_harvestable,
+                    b_lu_p_residue: properties.b_lu_p_residue,
+                    b_lu_k_harvestable: properties.b_lu_k_harvestable,
+                    b_lu_k_residue: properties.b_lu_k_residue,
+                }
+            }
 
             // Insert the harvestable in the db
             const b_id_harvestable = createId()
@@ -104,17 +186,9 @@ export async function addHarvest(
             }
 
             // Add harvestable analysis
-            const b_id_harvestable_analysis = createId()
-            await tx.insert(schema.harvestableAnalyses).values({
-                b_id_harvestable_analysis: b_id_harvestable_analysis,
-                b_lu_yield: b_lu_yield,
-                b_lu_n_harvestable: b_lu_n_harvestable,
-                b_lu_n_residue: b_lu_n_residue,
-                b_lu_p_harvestable: b_lu_p_harvestable,
-                b_lu_p_residue: b_lu_p_residue,
-                b_lu_k_harvestable: b_lu_k_harvestable,
-                b_lu_k_residue: b_lu_k_residue,
-            })
+            await tx
+                .insert(schema.harvestableAnalyses)
+                .values(harvestableAnalysis)
 
             // Add sampling for harvestable analysis, defaults to same date as harvest
             await tx.insert(schema.harvestableSampling).values({
@@ -129,13 +203,7 @@ export async function addHarvest(
         throw handleError(err, "Exception for addHarvest", {
             b_lu,
             b_lu_harvest_date,
-            b_lu_yield,
-            b_lu_n_harvestable,
-            b_lu_n_residue,
-            b_lu_p_harvestable,
-            b_lu_p_residue,
-            b_lu_k_harvestable,
-            b_lu_k_residue,
+            properties,
         })
     }
 }
@@ -360,6 +428,17 @@ export async function removeHarvest(
     }
 }
 
+/**
+ * Retrieves the harvestable type of a cultivation.
+ *
+ * This function queries the database to determine whether a cultivation can be harvested
+ * 'once', 'multiple' times, or 'none'. This is based on the cultivation's catalogue information.
+ *
+ * @param tx The FDM transaction instance.
+ * @param b_lu The identifier of the cultivation.
+ * @returns A promise that resolves with the harvestable type ('once', 'multiple', or 'none').
+ * @throws {Error} If the cultivation does not exist.
+ */
 export async function getHarvestableTypeOfCultivation(
     tx: FdmType,
     b_lu: schema.cultivationsTypeSelect["b_lu"],
@@ -497,13 +576,21 @@ export async function checkHarvestDateCompability(
  * @param principal_id The ID of the principal performing the update, for permission checking.
  * @param b_id_harvesting The unique identifier of the harvest to be updated.
  * @param b_lu_harvest_date The new date of the harvest.
- * @param b_lu_yield The new dry-matter yield for the harvest, in kg/ha.
- * @param b_lu_n_harvestable The new total nitrogen content in the harvestable yield (g N/kg).
- * @param b_lu_n_residue The new total nitrogen content in the crop residue (g N/kg).
- * @param b_lu_p_harvestable The new total phosphorus content in the harvestable yield (g P2O5/kg).
- * @param b_lu_p_residue The new total phosphorus content in the crop residue (g P2O5/kg).
- * @param b_lu_k_harvestable The new total potassium content in the harvestable yield (g K2O/kg).
- * @param b_lu_k_residue The new total potassium content in the crop residue (g K2O/kg).
+ * @param properties - An object containing the harvest properties.
+ * @param properties.b_lu_yield - The new dry-matter yield for the harvest, in kg/ha.
+ * @param properties.b_lu_yield_bruto - The gross yield of the harvest, in kg/ha.
+ * @param properties.b_lu_yield_fresh - The fresh-matter yield of the harvest, in kg/ha.
+ * @param properties.b_lu_tarra - The tarra percentage of the harvest (e.g., soil).
+ * @param properties.b_lu_dm - The dry matter content of the harvest, in g/kg.
+ * @param properties.b_lu_moist - The moisture content of the harvest, in g/kg.
+ * @param properties.b_lu_uww - The underwater weight of the harvest, in g/5kg.
+ * @param properties.b_lu_cp - The crude protein content of the harvest, in g/kg.
+ * @param properties.b_lu_n_harvestable - The new total nitrogen content in the harvestable yield (g N/kg).
+ * @param properties.b_lu_n_residue - The new total nitrogen content in the crop residue (g N/kg).
+ * @param properties.b_lu_p_harvestable - The new total phosphorus content in the harvestable yield (g P2O5/kg).
+ * @param properties.b_lu_p_residue - The new total phosphorus content in the crop residue (g P2O5/kg).
+ * @param properties.b_lu_k_harvestable - The new total potassium content in the harvestable yield (g K2O/kg).
+ * @param properties.b_lu_k_residue - The new total potassium content in the crop residue (g K2O/kg).
  *
  * @returns A Promise that resolves when the update is complete.
  *
@@ -514,13 +601,22 @@ export async function updateHarvest(
     principal_id: PrincipalId,
     b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"],
     b_lu_harvest_date: schema.cultivationHarvestingTypeInsert["b_lu_harvest_date"],
-    b_lu_yield: schema.harvestableAnalysesTypeInsert["b_lu_yield"],
-    b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
-    b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"],
-    b_lu_p_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_p_harvestable"],
-    b_lu_p_residue?: schema.harvestableAnalysesTypeInsert["b_lu_p_residue"],
-    b_lu_k_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_k_harvestable"],
-    b_lu_k_residue?: schema.harvestableAnalysesTypeInsert["b_lu_k_residue"],
+    properties?: {
+        b_lu_yield?: schema.harvestableAnalysesTypeInsert["b_lu_yield"]
+        b_lu_yield_bruto?: schema.harvestableAnalysesTypeInsert["b_lu_yield_bruto"]
+        b_lu_yield_fresh?: schema.harvestableAnalysesTypeInsert["b_lu_yield_fresh"]
+        b_lu_tarra?: schema.harvestableAnalysesTypeInsert["b_lu_tarra"]
+        b_lu_dm?: schema.harvestableAnalysesTypeInsert["b_lu_dm"]
+        b_lu_moist?: schema.harvestableAnalysesTypeInsert["b_lu_moist"]
+        b_lu_uww?: schema.harvestableAnalysesTypeInsert["b_lu_uww"]
+        b_lu_cp?: schema.harvestableAnalysesTypeInsert["b_lu_cp"]
+        b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"]
+        b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"]
+        b_lu_p_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_p_harvestable"]
+        b_lu_p_residue?: schema.harvestableAnalysesTypeInsert["b_lu_p_residue"]
+        b_lu_k_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_k_harvestable"]
+        b_lu_k_residue?: schema.harvestableAnalysesTypeInsert["b_lu_k_residue"]
+    },
 ): Promise<void> {
     try {
         await checkPermission(
@@ -540,7 +636,7 @@ export async function updateHarvest(
 
             const b_lu = harvest.b_lu
 
-            // --- Validation logic ---
+            // Validation logic
             if (!b_lu_harvest_date) {
                 throw new Error("Argument b_lu_harvest_date is missing")
             }
@@ -568,6 +664,36 @@ export async function updateHarvest(
                 b_lu,
             )
 
+            // Get the standardized harvest parameters
+            const cultivation = await tx
+                .select({
+                    b_lu_harvestcat:
+                        schema.cultivationsCatalogue.b_lu_harvestcat,
+                })
+                .from(schema.cultivationHarvesting)
+                .leftJoin(
+                    schema.cultivations,
+                    eq(
+                        schema.cultivations.b_lu,
+                        schema.cultivationHarvesting.b_lu,
+                    ),
+                )
+                .leftJoin(
+                    schema.cultivationsCatalogue,
+                    eq(
+                        schema.cultivations.b_lu_catalogue,
+                        schema.cultivationsCatalogue.b_lu_catalogue,
+                    ),
+                )
+                .where(
+                    eq(
+                        schema.cultivationHarvesting.b_id_harvesting,
+                        b_id_harvesting,
+                    ),
+                )
+                .limit(1)
+            const b_lu_harvestcat = cultivation[0].b_lu_harvestcat
+
             if (b_lu_harvestable === "multiple") {
                 const terminatingDate = await tx
                     .select({
@@ -588,8 +714,7 @@ export async function updateHarvest(
                     )
                 }
             }
-            // --- End of validation logic ---
-
+            // End of validation logic
             const b_id_harvestable_analysis =
                 harvest.harvestable.harvestable_analyses[0]
                     .b_id_harvestable_analysis
@@ -607,24 +732,46 @@ export async function updateHarvest(
                     ),
                 )
 
-            await tx
-                .update(schema.harvestableAnalyses)
-                .set({
-                    b_lu_yield: b_lu_yield,
-                    b_lu_n_harvestable: b_lu_n_harvestable,
-                    b_lu_n_residue: b_lu_n_residue,
-                    b_lu_p_harvestable: b_lu_p_harvestable,
-                    b_lu_p_residue: b_lu_p_residue,
-                    b_lu_k_harvestable: b_lu_k_harvestable,
-                    b_lu_k_residue: b_lu_k_residue,
-                    updated: new Date(),
-                })
-                .where(
-                    eq(
-                        schema.harvestableAnalyses.b_id_harvestable_analysis,
-                        b_id_harvestable_analysis,
-                    ),
+            if (properties) {
+                const standardHarvest = convertHarvestParameters(
+                    b_lu_harvestcat,
+                    properties.b_lu_yield,
+                    properties.b_lu_yield_bruto,
+                    properties.b_lu_yield_fresh,
+                    properties.b_lu_tarra,
+                    properties.b_lu_moist,
+                    properties.b_lu_uww,
+                    properties.b_lu_dm,
+                    properties.b_lu_cp,
+                    properties.b_lu_n_harvestable,
                 )
+                await tx
+                    .update(schema.harvestableAnalyses)
+                    .set({
+                        b_lu_yield: standardHarvest.b_lu_yield,
+                        b_lu_yield_bruto: properties.b_lu_yield_bruto,
+                        b_lu_yield_fresh: properties.b_lu_yield_fresh,
+                        b_lu_tarra: properties.b_lu_tarra,
+                        b_lu_moist: properties.b_lu_moist,
+                        b_lu_uww: properties.b_lu_uww,
+                        b_lu_dm: properties.b_lu_dm,
+                        b_lu_cp: properties.b_lu_cp,
+                        b_lu_n_harvestable: standardHarvest.b_lu_n_harvestable,
+                        b_lu_n_residue: properties.b_lu_n_residue,
+                        b_lu_p_harvestable: properties.b_lu_p_harvestable,
+                        b_lu_p_residue: properties.b_lu_p_residue,
+                        b_lu_k_harvestable: properties.b_lu_k_harvestable,
+                        b_lu_k_residue: properties.b_lu_k_residue,
+                        updated: new Date(),
+                    })
+                    .where(
+                        eq(
+                            schema.harvestableAnalyses
+                                .b_id_harvestable_analysis,
+                            b_id_harvestable_analysis,
+                        ),
+                    )
+            }
 
             if (b_lu_harvestable === "once") {
                 await tx
@@ -637,13 +784,7 @@ export async function updateHarvest(
         throw handleError(err, "Exception for updateHarvest", {
             b_id_harvesting,
             b_lu_harvest_date,
-            b_lu_yield,
-            b_lu_n_harvestable,
-            b_lu_n_residue,
-            b_lu_p_harvestable,
-            b_lu_p_residue,
-            b_lu_k_harvestable,
-            b_lu_k_residue,
+            properties,
         })
     }
 }
@@ -718,6 +859,13 @@ async function getHarvestSimplified(
             b_id_harvestable_analysis:
                 schema.harvestableAnalyses.b_id_harvestable_analysis,
             b_lu_yield: schema.harvestableAnalyses.b_lu_yield,
+            b_lu_yield_fresh: schema.harvestableAnalyses.b_lu_yield_fresh,
+            b_lu_yield_bruto: schema.harvestableAnalyses.b_lu_yield_bruto,
+            b_lu_tarra: schema.harvestableAnalyses.b_lu_tarra,
+            b_lu_dm: schema.harvestableAnalyses.b_lu_dm,
+            b_lu_moist: schema.harvestableAnalyses.b_lu_moist,
+            b_lu_uww: schema.harvestableAnalyses.b_lu_uww,
+            b_lu_cp: schema.harvestableAnalyses.b_lu_cp,
             b_lu_n_harvestable: schema.harvestableAnalyses.b_lu_n_harvestable,
             b_lu_n_residue: schema.harvestableAnalyses.b_lu_n_residue,
             b_lu_p_harvestable: schema.harvestableAnalyses.b_lu_p_harvestable,
@@ -751,4 +899,52 @@ async function getHarvestSimplified(
     harvest.harvestable.harvestable_analyses = harvestableAnalyses
 
     return harvest
+}
+
+/**
+ * Retrieves the required harvest parameters for a given harvest category.
+ *
+ * This function returns an array of parameter names that are required for a specific
+ * harvest category (`b_lu_harvestcat`). Each category corresponds to a different type of crop
+ * or harvest measurement, and thus requires a different set of parameters.
+ *
+ * @param b_lu_harvestcat - The harvest category identifier from the cultivations catalogue.
+ * @returns An array of strings, where each string is a required parameter name for the given harvest class. Returns an empty array if the class is not recognized.
+ */
+export function getParametersForHarvestCat(
+    b_lu_harvestcat: schema.cultivationsCatalogueTypeSelect["b_lu_harvestcat"],
+): HarvestParameters {
+    switch (b_lu_harvestcat) {
+        case "HC010":
+            return ["b_lu_yield_fresh", "b_lu_dm", "b_lu_n_harvestable"]
+        case "HC020":
+            return ["b_lu_yield", "b_lu_cp"]
+        case "HC031":
+            return ["b_lu_yield", "b_lu_cp"]
+        case "HC040":
+            return [
+                "b_lu_yield_bruto",
+                "b_lu_tarra",
+                "b_lu_dm",
+                "b_lu_n_harvestable",
+            ]
+        case "HC041":
+            return [
+                "b_lu_yield_bruto",
+                "b_lu_tarra",
+                "b_lu_dm",
+                "b_lu_n_harvestable",
+            ]
+        case "HC042":
+            return [
+                "b_lu_yield_bruto",
+                "b_lu_tarra",
+                "b_lu_uww",
+                "b_lu_n_harvestable",
+            ]
+        case "HC050":
+            return ["b_lu_yield_fresh", "b_lu_moist", "b_lu_cp"]
+        default:
+            return []
+    }
 }

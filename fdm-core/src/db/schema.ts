@@ -423,6 +423,15 @@ export const harvestableEnum = fdmSchema.enum("b_lu_harvestable", [
     "once",
     "multiple",
 ])
+export const harvestCatEnum = fdmSchema.enum("b_lu_harvestcat", [
+    "HC010", // Standard
+    "HC020", // Grass
+    "HC031", // Maize
+    "HC040", // Root crops
+    "HC041", // Sugar beets
+    "HC042", // Potatoes
+    "HC050", // Cereals
+])
 export const rotationEnum = fdmSchema.enum("b_lu_croprotation", [
     "other",
     "clover",
@@ -445,10 +454,12 @@ export const cultivationsCatalogue = fdmSchema.table(
         b_lu_name: text().notNull(),
         b_lu_name_en: text(),
         b_lu_harvestable: harvestableEnum().notNull(),
+        b_lu_harvestcat: harvestCatEnum(),
         b_lu_hcat3: text(),
         b_lu_hcat3_name: text(),
         b_lu_croprotation: rotationEnum(),
         b_lu_yield: numericCasted(),
+        b_lu_dm: numericCasted(),
         b_lu_hi: numericCasted(),
         b_lu_n_harvestable: numericCasted(),
         b_lu_n_residue: numericCasted(),
@@ -532,6 +543,13 @@ export const harvestableAnalyses = fdmSchema.table(
     {
         b_id_harvestable_analysis: text().primaryKey(),
         b_lu_yield: numericCasted(),
+        b_lu_yield_fresh: numericCasted(),
+        b_lu_yield_bruto: numericCasted(),
+        b_lu_tarra: numericCasted(),
+        b_lu_dm: numericCasted(),
+        b_lu_moist: numericCasted(),
+        b_lu_uww: numericCasted(),
+        b_lu_cp: numericCasted(),
         b_lu_n_harvestable: numericCasted(),
         b_lu_n_residue: numericCasted(),
         b_lu_p_harvestable: numericCasted(),

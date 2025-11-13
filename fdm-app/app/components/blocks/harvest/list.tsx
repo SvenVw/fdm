@@ -2,6 +2,7 @@ import type { Harvest } from "@svenvw/fdm-core"
 import { format } from "date-fns/format"
 import { NavLink } from "react-router"
 import type { HarvestableType } from "./types"
+import { nl } from "date-fns/locale/nl"
 
 export function HarvestsList({
     harvests,
@@ -35,7 +36,8 @@ export function HarvestsList({
                                     <p className="text-sm font-medium leading-none hover:underline">
                                         {format(
                                             harvest.b_lu_harvest_date,
-                                            "yyyy-MM-dd",
+                                            "PPP",
+                                            { locale: nl },
                                         )}
                                     </p>
                                 </NavLink>

@@ -7,7 +7,7 @@ import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField } from "./field"
-import { addHarvest, getHarvest, getHarvests, updateHarvest } from "./harvest"
+import { addHarvest, getHarvest, getHarvests, updateHarvest, getParametersForHarvestCat } from "./harvest"
 import { createId } from "./id"
 
 describe("Harvest Data Model", () => {
@@ -84,6 +84,8 @@ describe("Harvest Data Model", () => {
             b_lu_hcat3: "test-hcat3",
             b_lu_hcat3_name: "test-hcat3-name",
             b_lu_croprotation: "cereal",
+            b_lu_harvestcat: "HC050",
+            b_lu_dm: 500,
             b_lu_yield: 6000,
             b_lu_hi: 0.4,
             b_lu_n_harvestable: 4,
@@ -91,6 +93,8 @@ describe("Harvest Data Model", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
         })
 
         await addCultivationToCatalogue(fdm, {
@@ -102,6 +106,8 @@ describe("Harvest Data Model", () => {
             b_lu_hcat3: "test-hcat3-multiple",
             b_lu_hcat3_name: "test-hcat3-name-multiple",
             b_lu_croprotation: "grass",
+            b_lu_harvestcat: "HC042",
+            b_lu_dm: 500,
             b_lu_yield: 2000,
             b_lu_hi: 0.4,
             b_lu_n_harvestable: 12,
@@ -109,6 +115,8 @@ describe("Harvest Data Model", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: ["Agria"],
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
         })
 
         b_lu_start = new Date("2024-01-01")
@@ -135,7 +143,11 @@ describe("Harvest Data Model", () => {
             principal_id,
             b_lu,
             harvestDate,
-            yieldValue,
+            {
+                b_lu_yield_fresh: yieldValue,
+                b_lu_moist: 15,
+                b_lu_cp: 110,
+            },
         )
 
         expect(newHarvestId).toBeDefined()
@@ -148,7 +160,7 @@ describe("Harvest Data Model", () => {
         expect(newHarvest).toBeDefined()
         expect(newHarvest?.b_lu_harvest_date).toEqual(harvestDate)
         expect(
-            newHarvest?.harvestable.harvestable_analyses[0].b_lu_yield,
+            newHarvest?.harvestable.harvestable_analyses[0].b_lu_yield_fresh,
         ).toEqual(yieldValue)
     })
 
@@ -158,13 +170,11 @@ describe("Harvest Data Model", () => {
             principal_id,
             b_lu,
             new Date("2024-07-01"),
-            5000,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
+            {
+                b_lu_yield_fresh: 10000,
+                b_lu_moist: 15,
+                b_lu_cp: 110,
+            },
         )
         const harvest = await getHarvest(fdm, principal_id, b_id_harvesting)
         expect(harvest).toBeDefined()
@@ -177,35 +187,27 @@ describe("Harvest Data Model", () => {
             principal_id,
             b_lu,
             new Date("2024-07-01"),
-            5000,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
+            {
+                b_lu_yield_fresh: 10000,
+                b_lu_moist: 15,
+                b_lu_cp: 110,
+            },
         )
         const newHarvestDate = new Date("2024-07-15")
         const newYield = 5500
-        const newNHarvestable = 1.1
-        const newNResidue = 2.2
-        const newPHarvestable = 3.3
-        const newPResidue = 4.4
-        const newKHarvestable = 5.5
-        const newKResidue = 6.6
+        const newMoist = 16
+        const newCP = 111
 
         await updateHarvest(
             fdm,
             principal_id,
             b_id_harvesting,
             newHarvestDate,
-            newYield,
-            newNHarvestable,
-            newNResidue,
-            newPHarvestable,
-            newPResidue,
-            newKHarvestable,
-            newKResidue,
+            {
+                b_lu_yield_fresh: newYield,
+                b_lu_moist: newMoist,
+                b_lu_cp: newCP,
+            },
         )
 
         const updatedHarvest = await getHarvest(
@@ -216,25 +218,18 @@ describe("Harvest Data Model", () => {
 
         expect(updatedHarvest.b_lu_harvest_date).toEqual(newHarvestDate)
         const analysis = updatedHarvest.harvestable.harvestable_analyses[0]
-        expect(analysis.b_lu_yield).toEqual(newYield)
-        expect(analysis.b_lu_n_harvestable).toEqual(newNHarvestable)
-        expect(analysis.b_lu_n_residue).toEqual(newNResidue)
-        expect(analysis.b_lu_p_harvestable).toEqual(newPHarvestable)
-        expect(analysis.b_lu_p_residue).toEqual(newPResidue)
-        expect(analysis.b_lu_k_harvestable).toEqual(newKHarvestable)
-        expect(analysis.b_lu_k_residue).toEqual(newKResidue)
+        expect(analysis.b_lu_yield_fresh).toEqual(newYield)
+        expect(analysis.b_lu_moist).toEqual(newMoist)
+        expect(analysis.b_lu_cp).toEqual(newCP)
     })
 
     it("should throw an error when updating a non-existent harvest", async () => {
         const nonExistentHarvestId = createId()
         await expect(
-            updateHarvest(
-                fdm,
-                principal_id,
-                nonExistentHarvestId,
-                new Date(),
-                5000,
-            ),
+            updateHarvest(fdm, principal_id, nonExistentHarvestId, new Date(), {
+                b_lu_yield: 5000,
+                b_lu_n_harvestable: 1.1,
+            }),
         ).rejects.toThrowError(
             "Principal does not have permission to perform this action",
         )
@@ -246,13 +241,11 @@ describe("Harvest Data Model", () => {
             principal_id,
             b_lu,
             new Date("2024-07-01"),
-            5000,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
+            {
+                b_lu_yield_fresh: 10000,
+                b_lu_moist: 15,
+                b_lu_cp: 110,
+            },
         )
         const other_principal_id = createId()
         await expect(
@@ -261,7 +254,10 @@ describe("Harvest Data Model", () => {
                 other_principal_id,
                 b_id_harvesting,
                 new Date(),
-                5000,
+                {
+                    b_lu_yield: 5000,
+                    b_lu_n_harvestable: 1.1,
+                },
             ),
         ).rejects.toThrowError(
             "Principal does not have permission to perform this action",
@@ -274,13 +270,11 @@ describe("Harvest Data Model", () => {
             principal_id,
             b_lu,
             new Date("2024-07-01"),
-            5000,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
+            {
+                b_lu_yield_fresh: 10000,
+                b_lu_moist: 15,
+                b_lu_cp: 110,
+            },
         )
         const invalidHarvestDate = new Date("2023-12-31") // Before sowing date
         await expect(
@@ -289,7 +283,10 @@ describe("Harvest Data Model", () => {
                 principal_id,
                 b_id_harvesting,
                 invalidHarvestDate,
-                5000,
+                {
+                    b_lu_yield: 5000,
+                    b_lu_n_harvestable: 1.1,
+                },
             ),
         ).rejects.toThrowError("Exception for updateHarvest")
     })
@@ -300,13 +297,11 @@ describe("Harvest Data Model", () => {
             principal_id,
             b_lu,
             new Date("2024-07-01"),
-            5000,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
+            {
+                b_lu_yield_fresh: 10000,
+                b_lu_moist: 15,
+                b_lu_cp: 110,
+            },
         )
         const newHarvestDate = new Date("2024-08-01")
         await updateHarvest(
@@ -314,7 +309,11 @@ describe("Harvest Data Model", () => {
             principal_id,
             b_id_harvesting,
             newHarvestDate,
-            5000,
+            {
+                b_lu_yield_fresh: 10000,
+                b_lu_moist: 15,
+                b_lu_cp: 110,
+            },
         )
 
         const cultivation = await fdm
@@ -341,13 +340,12 @@ describe("Harvest Data Model", () => {
             principal_id,
             b_lu_multiple,
             new Date("2024-07-01"),
-            5000,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
+            {
+                b_lu_yield_bruto: 10000,
+                b_lu_tarra: 5,
+                b_lu_uww: 400,
+                b_lu_n_harvestable: 20,
+            },
         )
 
         await updateHarvest(
@@ -355,7 +353,12 @@ describe("Harvest Data Model", () => {
             principal_id,
             b_id_harvesting_multiple,
             newHarvestDate,
-            5000,
+            {
+                b_lu_yield_bruto: 10000,
+                b_lu_tarra: 5,
+                b_lu_uww: 400,
+                b_lu_n_harvestable: 20,
+            },
         )
 
         const cultivation = await fdm
@@ -381,13 +384,12 @@ describe("Harvest Data Model", () => {
             principal_id,
             b_lu_multiple,
             new Date("2024-07-01"),
-            5000,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
+            {
+                b_lu_yield_bruto: 10000,
+                b_lu_tarra: 5,
+                b_lu_uww: 400,
+                b_lu_n_harvestable: 20,
+            },
         )
 
         // Set a terminating date for the cultivation
@@ -404,8 +406,75 @@ describe("Harvest Data Model", () => {
                 principal_id,
                 b_id_harvesting_multiple,
                 newHarvestDate,
-                5000,
+                {},
             ),
         ).rejects.toThrowError("Exception for updateHarvest")
+    })
+})
+
+describe("getParametersForHarvestCat", () => {
+    it('should return correct parameters for "HC010"', () => {
+        const params = getParametersForHarvestCat("HC010")
+        expect(params).toEqual(["b_lu_yield_fresh", "b_lu_dm", "b_lu_n_harvestable"])
+    })
+
+    it('should return correct parameters for "HC020"', () => {
+        const params = getParametersForHarvestCat("HC020")
+        expect(params).toEqual(["b_lu_yield", "b_lu_cp"])
+    })
+
+    it('should return correct parameters for "HC031"', () => {
+        const params = getParametersForHarvestCat("HC031")
+        expect(params).toEqual(["b_lu_yield", "b_lu_cp"])
+    })
+
+    it('should return correct parameters for "HC040"', () => {
+        const params = getParametersForHarvestCat("HC040")
+        expect(params).toEqual([
+            "b_lu_yield_bruto",
+            "b_lu_tarra",
+            "b_lu_dm",
+            "b_lu_n_harvestable",
+        ])
+    })
+
+    it('should return correct parameters for "HC041"', () => {
+        const params = getParametersForHarvestCat("HC041")
+        expect(params).toEqual([
+            "b_lu_yield_bruto",
+            "b_lu_tarra",
+            "b_lu_dm",
+            "b_lu_n_harvestable",
+        ])
+    })
+
+    it('should return correct parameters for "HC042"', () => {
+        const params = getParametersForHarvestCat("HC042")
+        expect(params).toEqual([
+            "b_lu_yield_bruto",
+            "b_lu_tarra",
+            "b_lu_uww",
+            "b_lu_n_harvestable",
+        ])
+    })
+
+    it('should return correct parameters for "HC050"', () => {
+        const params = getParametersForHarvestCat("HC050")
+        expect(params).toEqual(["b_lu_yield_fresh", "b_lu_moist", "b_lu_cp"])
+    })
+
+    it("should return an empty array for an unrecognized harvest category", () => {
+        const params = getParametersForHarvestCat("UNKNOWN_CAT")
+        expect(params).toEqual([])
+    })
+
+    it("should return an empty array for null input", () => {
+        const params = getParametersForHarvestCat(null as any)
+        expect(params).toEqual([])
+    })
+
+    it("should return an empty array for undefined input", () => {
+        const params = getParametersForHarvestCat(undefined as any)
+        expect(params).toEqual([])
     })
 })

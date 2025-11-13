@@ -8,7 +8,7 @@ import {
     useNavigate,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
-import { HarvestForm } from "~/components/blocks/harvest/form"
+// import { HarvestForm } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import {
     Dialog,
@@ -82,14 +82,6 @@ export default function AddHarvestRoute() {
                 <DialogHeader>
                     <DialogTitle>Oogst toevoegen</DialogTitle>
                 </DialogHeader>
-                <HarvestForm
-                    b_lu_yield={undefined}
-                    b_lu_n_harvestable={undefined}
-                    b_lu_harvest_date={undefined}
-                    b_lu_start={loaderData.cultivation.b_lu_start}
-                    b_lu_end={loaderData.cultivation.b_lu_end}
-                    b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
-                />
             </DialogContent>
         </Dialog>
     )
