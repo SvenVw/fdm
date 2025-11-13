@@ -29,3 +29,16 @@ export interface HarvestableAnalysis {
     b_lu_k_harvestable: schema.harvestableAnalysesTypeSelect["b_lu_k_harvestable"]
     b_lu_k_residue: schema.harvestableAnalysesTypeSelect["b_lu_k_residue"]
 }
+
+export type HarvestParameter =
+    | "b_lu_yield"
+    | "b_lu_yield_fresh"
+    | "b_lu_yield_bruto"
+    | "b_lu_tarra"
+    | "b_lu_uww"
+    | "b_lu_moist"
+    | "b_lu_dm"
+    | "b_lu_cp"
+    | "b_lu_n_harvestable"
+
+export type HarvestParameters = HarvestParameter[]

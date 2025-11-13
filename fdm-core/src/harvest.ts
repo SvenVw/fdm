@@ -9,7 +9,7 @@ import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import type { Harvest } from "./harvest.d"
+import type { Harvest, HarvestParameters } from "./harvest.d"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
 import { convertHarvestParameters } from "./harvest-conversion"
@@ -140,7 +140,7 @@ export async function addHarvest(
                     properties.b_lu_moist,
                     properties.b_lu_uww,
                     properties.b_lu_dm,
-                    properties.b_lu_cp,        
+                    properties.b_lu_cp,
                     properties.b_lu_n_harvestable,
                 )
                 harvestableAnalysis = {
@@ -152,7 +152,7 @@ export async function addHarvest(
                     b_lu_dm: properties.b_lu_dm,
                     b_lu_moist: properties.b_lu_moist,
                     b_lu_uww: properties.b_lu_uww,
-                    b_lu_cp: properties.b_lu_cp,        
+                    b_lu_cp: properties.b_lu_cp,
                     b_lu_n_harvestable: standardHarvest.b_lu_n_harvestable,
                     b_lu_n_residue: properties.b_lu_n_residue,
                     b_lu_p_harvestable: properties.b_lu_p_harvestable,
@@ -913,7 +913,7 @@ async function getHarvestSimplified(
  */
 export function getParametersForHarvestCat(
     b_lu_harvestcat: schema.cultivationsCatalogueTypeSelect["b_lu_harvestcat"],
-) {
+): HarvestParameters {
     switch (b_lu_harvestcat) {
         case "HC010":
             return ["b_lu_yield_fresh", "b_lu_dm", "b_lu_n_harvestable"]

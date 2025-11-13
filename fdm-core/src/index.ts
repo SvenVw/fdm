@@ -128,6 +128,7 @@ export type {
     Harvest,
     Harvestable,
     HarvestableAnalysis,
+    HarvestParameters,
 } from "./harvest.d"
 export { runMigration } from "./migrate"
 export {
