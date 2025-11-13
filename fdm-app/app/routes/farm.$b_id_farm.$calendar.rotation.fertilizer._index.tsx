@@ -642,7 +642,9 @@ export default function FarmRotationFertilizerAddIndex() {
                                             navigation={navigation}
                                             b_id_farm={loaderData.b_id_farm}
                                             b_id_or_b_lu_catalogue={
-                                                selectedFieldIds.join(",") || ""
+                                                searchParams.get(
+                                                    "cultivationIds",
+                                                ) || "cultivationIds"
                                             }
                                             fertilizerApplication={undefined}
                                         />
