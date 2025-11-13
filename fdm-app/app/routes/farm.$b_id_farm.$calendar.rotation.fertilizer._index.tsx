@@ -7,7 +7,7 @@ import {
     getFertilizers,
     getFields,
 } from "@svenvw/fdm-core"
-import { Info, AlertTriangle, ChevronDown } from "lucide-react"
+import { AlertTriangle, Info } from "lucide-react"
 import { useEffect, useState } from "react"
 import {
     type ActionFunctionArgs,
@@ -33,6 +33,12 @@ import { FormSchema } from "~/components/blocks/fertilizer-applications/formsche
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "~/components/ui/accordion"
 import { Badge } from "~/components/ui/badge"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
@@ -45,12 +51,6 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { Checkbox } from "~/components/ui/checkbox"
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "~/components/ui/accordion"
 import {
     Dialog,
     DialogContent,
@@ -278,13 +278,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             ), // All fields for selection
             cultivationName: cultivationName,
             cultivationIds: cultivationIds,
-            fertilizerApplication: {
-                // Dummy data for now
-                p_id: "",
-                p_app_amount: 0,
-                p_app_method: "",
-                p_app_date: new Date(),
-            },
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -641,9 +634,7 @@ export default function FarmRotationFertilizerAddIndex() {
                                             b_id_or_b_lu_catalogue={
                                                 selectedFieldIds.join(",") || ""
                                             }
-                                            fertilizerApplication={
-                                                loaderData.fertilizerApplication
-                                            }
+                                            fertilizerApplication={undefined}
                                         />
                                     ) : (
                                         <div className="flex h-full min-h-60 items-center justify-center rounded-md border border-dashed">
