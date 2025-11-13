@@ -13,7 +13,7 @@ import {
     useNavigate,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
-import { HarvestForm } from "~/components/blocks/harvest/form"
+// import { HarvestForm } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import {
     Dialog,
@@ -140,20 +140,6 @@ export default function FarmFieldsOverviewBlock() {
                 <DialogHeader>
                     <DialogTitle>Oogst bijwerken</DialogTitle>
                 </DialogHeader>
-                <HarvestForm
-                    b_lu_yield={
-                        loaderData.harvest?.harvestable
-                            ?.harvestable_analyses?.[0]?.b_lu_yield
-                    }
-                    b_lu_n_harvestable={
-                        loaderData.harvest?.harvestable
-                            ?.harvestable_analyses?.[0]?.b_lu_n_harvestable
-                    }
-                    b_lu_harvest_date={loaderData.harvest?.b_lu_harvest_date}
-                    b_lu_start={loaderData.cultivation.b_lu_start}
-                    b_lu_end={loaderData.cultivation.b_lu_end}
-                    b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
-                />
             </DialogContent>
         </Dialog>
     )
