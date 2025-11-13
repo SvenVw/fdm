@@ -29,7 +29,7 @@ export type RotationExtended = {
     b_lu: string[]
     b_lu_name: string
     b_lu_croprotation: string
-    b_lu_harvestable: "once" | "multiple" | "nonde"
+    b_lu_harvestable: "once" | "multiple" | "none"
     b_lu_start: Date[]
     b_lu_end: Date[]
     calendar: string
@@ -204,7 +204,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
                         </DropdownMenuContent>
                     </DropdownMenu>
                 )
-            }, [cultivation.fields])
+            }, [cultivation.calendar, cultivation.fields])
 
             return fieldsDisplay
         },

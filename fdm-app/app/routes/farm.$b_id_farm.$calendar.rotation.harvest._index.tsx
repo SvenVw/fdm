@@ -706,10 +706,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     fdm,
                     session.principal_id,
                     b_lu,
-                    {
-                        start: new Date(0), // Get all harvests
-                        end: new Date(),
-                    },
                 )
 
                 if (existingHarvests.length > 0) {

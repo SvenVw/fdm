@@ -45,6 +45,7 @@ import { FieldFilterToggle } from "../../custom/field-filter-toggle"
 import type { RotationExtended } from "./columns"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
+import { toast as notify } from "sonner"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -189,10 +190,18 @@ export function DataTable<TData extends RotationExtended, TValue>({
         ? "Selecteer één of meerdere gewassen om bemesting toe te voegen"
         : "Bemesting toevoegen aan geselecteerd gewas"
 
-    const isHarvestButtonDisabled = selectedCultivationIds.length !== 1
-    const harvestTooltipContent = isHarvestButtonDisabled
-        ? "Selecteer één gewas om oogst toe te voegen"
-        : "Oogst toevoegen aan geselecteerd gewas"
+    const isHarvestButtonDisabled =
+        selectedCultivationIds.length !== 1
+    const harvestTooltipContent =
+        selectedCultivationIds.length !== 1
+            ? "Selecteer één gewas om oogst toe te voegen"
+            : "Oogst toevoegen aan geselecteerd gewas"
+    const harvestErrorMessage =
+        selectedCultivations.length > 0
+            ? selectedCultivations[0].b_lu_harvestable === "none"
+                ? "Dit perceel kan niet worden geoogst."
+                : null
+            : null
 
     return (
         <div className="w-full flex flex-col h-full">
@@ -279,8 +288,17 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                 <div>
                                     {isHarvestButtonDisabled ? (
                                         <Button
-                                            disabled={
-                                                isHarvestButtonDisabled
+                                            disabled={isHarvestButtonDisabled}
+                                        >
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Oogst toevoegen
+                                        </Button>
+                                    ) : harvestErrorMessage ? (
+                                        <Button
+                                            onClick={() =>
+                                                notify.error(
+                                                    harvestErrorMessage,
+                                                )
                                             }
                                         >
                                             <Plus className="mr-2 h-4 w-4" />
