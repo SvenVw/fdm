@@ -15,7 +15,6 @@ describe("convertHarvestParameters", () => {
                 undefined,
                 200, // b_lu_dm
                 undefined,
-                undefined,
                 15, // b_lu_n_harvestable
             )
             expect(result.b_lu_yield).toBe(2000)
@@ -92,7 +91,6 @@ describe("convertHarvestParameters", () => {
                 undefined,
                 250, // b_lu_dm
                 undefined,
-                undefined,
                 20, // b_lu_n_harvestable
             )
             expect(result.b_lu_yield).toBe(13500)
@@ -119,7 +117,6 @@ describe("convertHarvestParameters", () => {
                 undefined,
                 230, // b_lu_dm
                 undefined,
-                undefined,
                 18, // b_lu_n_harvestable
             )
             expect(result.b_lu_yield).toBe(15640)
@@ -144,7 +141,6 @@ describe("convertHarvestParameters", () => {
                 5, // b_lu_tarra
                 undefined,
                 380, // b_lu_uww
-                undefined,
                 undefined,
                 undefined,
                 25, // b_lu_n_harvestable
