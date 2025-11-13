@@ -74,6 +74,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { modifySearchParams } from "../lib/url-utils"
 
 export const meta: MetaFunction = () => {
     return [
@@ -628,7 +629,16 @@ export default function FarmRotationFertilizerAddIndex() {
                                             options={
                                                 loaderData.fertilizerOptions
                                             }
-                                            action={`${location.pathname}${location.search}`}
+                                            action={modifySearchParams(
+                                                `${location.pathname}${location.search}`,
+                                                (searchParams) =>
+                                                    searchParams.set(
+                                                        "fieldIds",
+                                                        selectedFieldIds.join(
+                                                            ",",
+                                                        ),
+                                                    ),
+                                            )}
                                             navigation={navigation}
                                             b_id_farm={loaderData.b_id_farm}
                                             b_id_or_b_lu_catalogue={
