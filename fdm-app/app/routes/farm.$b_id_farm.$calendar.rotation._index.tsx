@@ -1,5 +1,5 @@
 import {
-    CultivationCatalogue,
+    type CultivationCatalogue,
     getCultivations,
     getCultivationsFromCatalogue,
     getCurrentSoilData,
@@ -30,12 +30,11 @@ import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useFieldFilterStore } from "~/store/field-filter"
-import { getCultivationCatalogue } from "@svenvw/fdm-data"
 
 export const meta: MetaFunction = () => {
     return [
@@ -79,7 +78,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
-        // Get timeframe from calendar store
+        // Get calendar and timeframe from calendar store
+        const calendar = getCalendar(params)
         const timeframe = getTimeframe(params)
 
         // Get a list of possible farms of the user
@@ -267,6 +267,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         )?.b_lu_harvestable ?? "once",
                     b_lu_start: b_lu_start,
                     b_lu_end: b_lu_end,
+                    calendar: calendar,
                     fields: fieldsWithThisCultivation.map((field: any) => ({ // TODO: Define a proper type for field
                         b_id: field.b_id,
                         b_name: field.b_name,

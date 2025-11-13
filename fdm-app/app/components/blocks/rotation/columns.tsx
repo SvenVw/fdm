@@ -32,6 +32,7 @@ export type RotationExtended = {
     b_lu_harvestable: "once" | "multiple" | "nonde"
     b_lu_start: Date[]
     b_lu_end: Date[]
+    calendar: string
     fields: {
         b_id: string
         b_name: string
@@ -190,7 +191,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
                                 <div className="grid grid-cols-1 gap-2">
                                     {fieldsSorted.map((field) => (
                                         <NavLink
-                                            to={`../field/${field.b_id}`}
+                                            to={`../${cultivation.calendar}/field/${field.b_id}`}
                                             key={`${field.b_id}`}
                                         >
                                             <DropdownMenuItem>
