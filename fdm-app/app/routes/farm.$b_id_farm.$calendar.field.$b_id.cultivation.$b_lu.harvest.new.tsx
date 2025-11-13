@@ -1,6 +1,7 @@
 import {
     addHarvest,
     getCultivation,
+    getCultivationsFromCatalogue,
     getParametersForHarvestCat,
 } from "@svenvw/fdm-core"
 import {
@@ -55,11 +56,42 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const harvestParameters = getParametersForHarvestCat(
             cultivation.b_lu_harvestcat,
         )
+
+        // Default harvest parameters
+
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+        const cultivationsCatalogueItem = cultivationsCatalogue.find(
+            (item) => item.b_lu_catalogue === cultivation.b_lu_catalogue,
+        )
+        const defaultHarvestParameters = {
+            b_lu_yield: cultivationsCatalogueItem.b_lu_yield,
+            b_lu_n_harvestable: cultivationsCatalogueItem.b_lu_n_harvestable,
+            b_lu_yield_fresh: Math.round(
+                cultivationsCatalogueItem.b_lu_yield /
+                    (cultivationsCatalogueItem.b_lu_dm / 1000),
+            ),
+            b_lu_dm: cultivationsCatalogueItem.b_lu_dm,
+            b_lu_cp: 170,
+            b_lu_moist: 15,
+            b_lu_tarra: 5,
+            b_lu_uww: 350,
+            b_lu_yield_bruto: Math.round(
+                (cultivationsCatalogueItem.b_lu_yield /
+                    (cultivationsCatalogueItem.b_lu_dm / 1000)) *
+                    1.05,
+            ),
+        }
+
         return {
             b_id_farm,
             b_lu,
             cultivation,
             harvestParameters,
+            defaultHarvestParameters,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -73,9 +105,21 @@ export default function HarvestNewBlock() {
         <HarvestFormDialog
             harvestParameters={loaderData.harvestParameters}
             b_lu_harvest_date={undefined}
-            b_lu_yield_fresh={undefined}
-            b_lu_dm={undefined}
-            b_lu_n_harvestable={undefined}
+            b_lu_yield={loaderData.defaultHarvestParameters.b_lu_yield}
+            b_lu_yield_fresh={
+                loaderData.defaultHarvestParameters.b_lu_yield_fresh
+            }
+            b_lu_yield_bruto={
+                loaderData.defaultHarvestParameters.b_lu_yield_bruto
+            }
+            b_lu_tarra={loaderData.defaultHarvestParameters.b_lu_tarra}
+            b_lu_uww={loaderData.defaultHarvestParameters.b_lu_uww}
+            b_lu_moist={loaderData.defaultHarvestParameters.b_lu_moist}
+            b_lu_dm={loaderData.defaultHarvestParameters.b_lu_dm}
+            b_lu_cp={loaderData.defaultHarvestParameters.b_lu_cp}
+            b_lu_n_harvestable={
+                loaderData.defaultHarvestParameters.b_lu_n_harvestable
+            }
             b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
             b_lu_start={loaderData.cultivation.b_lu_start}
             b_lu_end={loaderData.cultivation.b_lu_end}
