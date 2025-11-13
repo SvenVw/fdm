@@ -22,7 +22,6 @@ export interface HarvestableAnalysis {
     b_lu_moist: schema.harvestableAnalysesTypeSelect["b_lu_moist"]
     b_lu_uww: schema.harvestableAnalysesTypeSelect["b_lu_uww"]
     b_lu_cp: schema.harvestableAnalysesTypeSelect["b_lu_cp"]
-    f_no3_td_asis: schema.harvestableAnalysesTypeSelect["f_no3_td_asis"]
     b_lu_n_harvestable: schema.harvestableAnalysesTypeSelect["b_lu_n_harvestable"]
     b_lu_n_residue: schema.harvestableAnalysesTypeSelect["b_lu_n_residue"]
     b_lu_p_harvestable: schema.harvestableAnalysesTypeSelect["b_lu_p_harvestable"]

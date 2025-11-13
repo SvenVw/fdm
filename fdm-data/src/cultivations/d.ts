@@ -29,7 +29,6 @@ export interface CatalogueCultivationItem {
         | "HC041" // Sugar beets
         | "HC042" // Potatoes
         | "HC050" // Cereals
-        | "HC061" // Spinach
         | null
     b_lu_yield: number
     b_lu_dm: number

@@ -1,5 +1,5 @@
 {
-    "id": "f21a690d-8ec9-40ac-84b1-c333d4bb3562",
+    "id": "122b4399-b701-4def-b753-3cc5158dc88d",
     "prevId": "a869127f-3bc4-48ac-aeaa-90e78bd04932",
     "version": "7",
     "dialect": "postgresql",
@@ -1644,12 +1644,6 @@
                 },
                 "b_lu_cp": {
                     "name": "b_lu_cp",
-                    "type": "numeric",
-                    "primaryKey": false,
-                    "notNull": false
-                },
-                "f_no3_td_asis": {
-                    "name": "f_no3_td_asis",
                     "type": "numeric",
                     "primaryKey": false,
                     "notNull": false
@@ -3327,8 +3321,7 @@
                 "HC040",
                 "HC041",
                 "HC042",
-                "HC050",
-                "HC061"
+                "HC050"
             ]
         },
         "fdm.b_lu_harvestable": {

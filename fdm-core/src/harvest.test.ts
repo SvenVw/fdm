@@ -463,11 +463,6 @@ describe("getParametersForHarvestCat", () => {
         expect(params).toEqual(["b_lu_yield_fresh", "b_lu_moist", "b_lu_cp"])
     })
 
-    it('should return correct parameters for "HC061"', () => {
-        const params = getParametersForHarvestCat("HC061")
-        expect(params).toEqual(["b_lu_yield_fresh", "b_lu_dm", "f_no3_td_asis"])
-    })
-
     it("should return an empty array for an unrecognized harvest category", () => {
         const params = getParametersForHarvestCat("UNKNOWN_CAT")
         expect(params).toEqual([])

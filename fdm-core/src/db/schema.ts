@@ -431,7 +431,6 @@ export const harvestCatEnum = fdmSchema.enum("b_lu_harvestcat", [
     "HC041", // Sugar beets
     "HC042", // Potatoes
     "HC050", // Cereals
-    "HC061", // Spinach
 ])
 export const rotationEnum = fdmSchema.enum("b_lu_croprotation", [
     "other",
@@ -551,7 +550,6 @@ export const harvestableAnalyses = fdmSchema.table(
         b_lu_moist: numericCasted(),
         b_lu_uww: numericCasted(),
         b_lu_cp: numericCasted(),
-        f_no3_td_asis: numericCasted(),
         b_lu_n_harvestable: numericCasted(),
         b_lu_n_residue: numericCasted(),
         b_lu_p_harvestable: numericCasted(),

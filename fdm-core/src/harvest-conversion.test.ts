@@ -184,30 +184,4 @@ describe("convertHarvestParameters", () => {
             )
         })
     })
-
-    // Tests for HC061
-    describe("HC061 - Spinach", () => {
-        it("should convert HC061 parameters correctly", () => {
-            const result = convertHarvestParameters(
-                "HC061",
-                undefined,
-                undefined,
-                20000, // b_lu_yield_fresh
-                undefined,
-                undefined,
-                undefined,
-                100, // b_lu_dm
-                undefined,
-                5, // f_no3_td_asis
-            )
-            expect(result.b_lu_yield).toBe(2000)
-            expect(result.b_lu_n_harvestable).toBeCloseTo(11.3)
-        })
-
-        it("should throw an error for HC061 if required parameters are missing", () => {
-            expect(() => convertHarvestParameters("HC061")).toThrow(
-                "Missing required parameters for HC061: b_lu_yield_fresh, b_lu_dm, f_no3_td_asis",
-            )
-        })
-    })
 })

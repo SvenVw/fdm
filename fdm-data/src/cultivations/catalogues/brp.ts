@@ -55,7 +55,6 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
             cultivation.b_lu_harvestcat !== "HC041" &&
             cultivation.b_lu_harvestcat !== "HC042" &&
             cultivation.b_lu_harvestcat !== "HC050" &&
-            cultivation.b_lu_harvestcat !== "HC061" &&
             cultivation.b_lu_harvestcat !== null
                 ? (() => {
                       throw new Error(

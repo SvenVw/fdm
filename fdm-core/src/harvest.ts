@@ -29,21 +29,21 @@ import { convertHarvestParameters } from "./harvest-conversion"
  * @param principal_id - The principal's ID used for permission verification.
  * @param b_lu - The cultivation ID.
  * @param b_lu_harvest_date - The date of the harvest.
- * @param b_lu_yield - The dry-matter yield for the harvest, in kg/ha.
- * @param b_lu_yield_bruto - The gross yield of the harvest, in kg/ha.
- * @param b_lu_yield_fresh - The fresh-matter yield of the harvest, in kg/ha.
- * @param b_lu_tarra - The tarra percentage of the harvest (e.g., soil).
- * @param b_lu_dm - The dry matter content of the harvest, in g/kg.
- * @param b_lu_moist - The moisture content of the harvest, in g/kg.
- * @param b_lu_uww - The underwater weight of the harvest, in g/5kg.
- * @param b_lu_cp - The crude protein content of the harvest, in g/kg.
- * @param f_no3_td_asis - The nitrate content of the harvest, in mg/kg.
- * @param b_lu_n_harvestable - The total nitrogen content in the harvestable yield (g N/kg).
- * @param b_lu_n_residue - The total nitrogen content in the crop residue (g N/kg).
- * @param b_lu_p_harvestable - The total phosphorus content in the harvestable yield (g P2O5/kg).
- * @param b_lu_p_residue - The total phosphorus content in the crop residue (g P2O5/kg).
- * @param b_lu_k_harvestable - The total potassium content in the harvestable yield (g K2O/kg).
- * @param b_lu_k_residue - The total potassium content in the crop residue (g K2O/kg).
+ * @param properties - An object containing the harvest properties.
+ * @param properties.b_lu_yield - The dry-matter yield for the harvest, in kg/ha.
+ * @param properties.b_lu_yield_bruto - The gross yield of the harvest, in kg/ha.
+ * @param properties.b_lu_yield_fresh - The fresh-matter yield of the harvest, in kg/ha.
+ * @param properties.b_lu_tarra - The tarra percentage of the harvest (e.g., soil).
+ * @param properties.b_lu_dm - The dry matter content of the harvest, in g/kg.
+ * @param properties.b_lu_moist - The moisture content of the harvest, in g/kg.
+ * @param properties.b_lu_uww - The underwater weight of the harvest, in g/5kg.
+ * @param properties.b_lu_cp - The crude protein content of the harvest, in g/kg.
+ * @param properties.b_lu_n_harvestable - The total nitrogen content in the harvestable yield (g N/kg).
+ * @param properties.b_lu_n_residue - The total nitrogen content in the crop residue (g N/kg).
+ * @param properties.b_lu_p_harvestable - The total phosphorus content in the harvestable yield (g P2O5/kg).
+ * @param properties.b_lu_p_residue - The total phosphorus content in the crop residue (g P2O5/kg).
+ * @param properties.b_lu_k_harvestable - The total potassium content in the harvestable yield (g K2O/kg).
+ * @param properties.b_lu_k_residue - The total potassium content in the crop residue (g K2O/kg).
  *
  * @returns A Promise that resolves with the new harvest's unique identifier.
  *
@@ -63,7 +63,6 @@ export async function addHarvest(
         b_lu_moist?: schema.harvestableAnalysesTypeInsert["b_lu_moist"]
         b_lu_uww?: schema.harvestableAnalysesTypeInsert["b_lu_uww"]
         b_lu_cp?: schema.harvestableAnalysesTypeInsert["b_lu_cp"]
-        f_no3_td_asis?: schema.harvestableAnalysesTypeInsert["f_no3_td_asis"]
         b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"]
         b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"]
         b_lu_p_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_p_harvestable"]
@@ -121,7 +120,6 @@ export async function addHarvest(
                 b_lu_moist?: schema.harvestableAnalysesTypeInsert["b_lu_moist"]
                 b_lu_uww?: schema.harvestableAnalysesTypeInsert["b_lu_uww"]
                 b_lu_cp?: schema.harvestableAnalysesTypeInsert["b_lu_cp"]
-                f_no3_td_asis?: schema.harvestableAnalysesTypeInsert["f_no3_td_asis"]
                 b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"]
                 b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"]
                 b_lu_p_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_p_harvestable"]
@@ -142,8 +140,7 @@ export async function addHarvest(
                     properties.b_lu_moist,
                     properties.b_lu_uww,
                     properties.b_lu_dm,
-                    properties.b_lu_cp,
-                    properties.f_no3_td_asis,
+                    properties.b_lu_cp,        
                     properties.b_lu_n_harvestable,
                 )
                 harvestableAnalysis = {
@@ -155,8 +152,7 @@ export async function addHarvest(
                     b_lu_dm: properties.b_lu_dm,
                     b_lu_moist: properties.b_lu_moist,
                     b_lu_uww: properties.b_lu_uww,
-                    b_lu_cp: properties.b_lu_cp,
-                    f_no3_td_asis: properties.f_no3_td_asis,
+                    b_lu_cp: properties.b_lu_cp,        
                     b_lu_n_harvestable: standardHarvest.b_lu_n_harvestable,
                     b_lu_n_residue: properties.b_lu_n_residue,
                     b_lu_p_harvestable: properties.b_lu_p_harvestable,
@@ -580,21 +576,21 @@ export async function checkHarvestDateCompability(
  * @param principal_id The ID of the principal performing the update, for permission checking.
  * @param b_id_harvesting The unique identifier of the harvest to be updated.
  * @param b_lu_harvest_date The new date of the harvest.
- * @param b_lu_yield The new dry-matter yield for the harvest, in kg/ha.
- * @param b_lu_yield_bruto - The gross yield of the harvest, in kg/ha.
- * @param b_lu_yield_fresh - The fresh-matter yield of the harvest, in kg/ha.
- * @param b_lu_tarra - The tarra percentage of the harvest (e.g., soil).
- * @param b_lu_dm - The dry matter content of the harvest, in g/kg.
- * @param b_lu_moist - The moisture content of the harvest, in g/kg.
- * @param b_lu_uww - The underwater weight of the harvest, in g/5kg.
- * @param b_lu_cp - The crude protein content of the harvest, in g/kg.
- * @param f_no3_td_asis - The nitrate content of the harvest, in mg/kg.
- * @param b_lu_n_harvestable The new total nitrogen content in the harvestable yield (g N/kg).
- * @param b_lu_n_residue The new total nitrogen content in the crop residue (g N/kg).
- * @param b_lu_p_harvestable The new total phosphorus content in the harvestable yield (g P2O5/kg).
- * @param b_lu_p_residue The new total phosphorus content in the crop residue (g P2O5/kg).
- * @param b_lu_k_harvestable The new total potassium content in the harvestable yield (g K2O/kg).
- * @param b_lu_k_residue The new total potassium content in the crop residue (g K2O/kg).
+ * @param properties - An object containing the harvest properties.
+ * @param properties.b_lu_yield - The new dry-matter yield for the harvest, in kg/ha.
+ * @param properties.b_lu_yield_bruto - The gross yield of the harvest, in kg/ha.
+ * @param properties.b_lu_yield_fresh - The fresh-matter yield of the harvest, in kg/ha.
+ * @param properties.b_lu_tarra - The tarra percentage of the harvest (e.g., soil).
+ * @param properties.b_lu_dm - The dry matter content of the harvest, in g/kg.
+ * @param properties.b_lu_moist - The moisture content of the harvest, in g/kg.
+ * @param properties.b_lu_uww - The underwater weight of the harvest, in g/5kg.
+ * @param properties.b_lu_cp - The crude protein content of the harvest, in g/kg.
+ * @param properties.b_lu_n_harvestable - The new total nitrogen content in the harvestable yield (g N/kg).
+ * @param properties.b_lu_n_residue - The new total nitrogen content in the crop residue (g N/kg).
+ * @param properties.b_lu_p_harvestable - The new total phosphorus content in the harvestable yield (g P2O5/kg).
+ * @param properties.b_lu_p_residue - The new total phosphorus content in the crop residue (g P2O5/kg).
+ * @param properties.b_lu_k_harvestable - The new total potassium content in the harvestable yield (g K2O/kg).
+ * @param properties.b_lu_k_residue - The new total potassium content in the crop residue (g K2O/kg).
  *
  * @returns A Promise that resolves when the update is complete.
  *
@@ -610,11 +606,10 @@ export async function updateHarvest(
         b_lu_yield_bruto?: schema.harvestableAnalysesTypeInsert["b_lu_yield_bruto"]
         b_lu_yield_fresh?: schema.harvestableAnalysesTypeInsert["b_lu_yield_fresh"]
         b_lu_tarra?: schema.harvestableAnalysesTypeInsert["b_lu_tarra"]
+        b_lu_dm?: schema.harvestableAnalysesTypeInsert["b_lu_dm"]
         b_lu_moist?: schema.harvestableAnalysesTypeInsert["b_lu_moist"]
         b_lu_uww?: schema.harvestableAnalysesTypeInsert["b_lu_uww"]
-        b_lu_dm?: schema.harvestableAnalysesTypeInsert["b_lu_dm"]
         b_lu_cp?: schema.harvestableAnalysesTypeInsert["b_lu_cp"]
-        f_no3_td_asis?: schema.harvestableAnalysesTypeInsert["f_no3_td_asis"]
         b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"]
         b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"]
         b_lu_p_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_p_harvestable"]
@@ -748,7 +743,6 @@ export async function updateHarvest(
                     properties.b_lu_uww,
                     properties.b_lu_dm,
                     properties.b_lu_cp,
-                    properties.f_no3_td_asis,
                     properties.b_lu_n_harvestable,
                 )
                 await tx
@@ -872,7 +866,6 @@ async function getHarvestSimplified(
             b_lu_moist: schema.harvestableAnalyses.b_lu_moist,
             b_lu_uww: schema.harvestableAnalyses.b_lu_uww,
             b_lu_cp: schema.harvestableAnalyses.b_lu_cp,
-            f_no3_td_asis: schema.harvestableAnalyses.f_no3_td_asis,
             b_lu_n_harvestable: schema.harvestableAnalyses.b_lu_n_harvestable,
             b_lu_n_residue: schema.harvestableAnalyses.b_lu_n_residue,
             b_lu_p_harvestable: schema.harvestableAnalyses.b_lu_p_harvestable,
@@ -951,8 +944,6 @@ export function getParametersForHarvestCat(
             ]
         case "HC050":
             return ["b_lu_yield_fresh", "b_lu_moist", "b_lu_cp"]
-        case "HC061":
-            return ["b_lu_yield_fresh", "b_lu_dm", "f_no3_td_asis"]
         default:
             return []
     }
