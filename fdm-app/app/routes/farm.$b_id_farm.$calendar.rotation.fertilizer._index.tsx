@@ -74,7 +74,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { modifySearchParams } from "../lib/url-utils"
+import { modifySearchParams } from "~/lib/url-utils"
 
 export const meta: MetaFunction = () => {
     return [

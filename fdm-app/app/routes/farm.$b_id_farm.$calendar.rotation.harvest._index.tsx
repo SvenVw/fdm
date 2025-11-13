@@ -71,6 +71,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { modifySearchParams } from "~/lib/url-utils"
 
 export const meta: MetaFunction = () => {
     return [
@@ -556,7 +557,16 @@ export default function FarmRotationHarvestAddIndex() {
                                             b_lu_harvestable={
                                                 loaderData.b_lu_harvestable
                                             }
-                                            action={`${location.pathname}${location.search}`}
+                                            action={modifySearchParams(
+                                                `${location.pathname}${location.search}`,
+                                                (searchParams) =>
+                                                    searchParams.set(
+                                                        "fieldIds",
+                                                        selectedFieldIds.join(
+                                                            ",",
+                                                        ),
+                                                    ),
+                                            )}
                                         />
                                     ) : (
                                         <div className="flex h-full min-h-60 items-center justify-center rounded-md border border-dashed">
