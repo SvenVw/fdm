@@ -199,7 +199,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
     const harvestErrorMessage =
         selectedCultivations.length > 0
             ? selectedCultivations[0].b_lu_harvestable === "none"
-                ? "Dit perceel kan niet worden geoogst."
+                ? "Dit gewas is niet oogstbaar."
                 : null
             : null
 
