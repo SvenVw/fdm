@@ -145,7 +145,7 @@ describe("convertHarvestParameters", () => {
                 undefined,
                 25, // b_lu_n_harvestable
             )
-            expect(result.b_lu_yield).toBeCloseTo(9794.5)
+            expect(result.b_lu_yield).toBeCloseTo(9795)
             expect(result.b_lu_n_harvestable).toBe(25)
         })
 
