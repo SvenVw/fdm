@@ -137,14 +137,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             throw data("Cultivation is not found", { status: 404 })
         }
 
-        // Get harvests
-        const harvests = await getHarvests(
-            fdm,
-            session.principal_id,
-            b_lu,
-            timeframe,
-        )
-
         const cultivationCatalogueItem: CultivationCatalogueItem | undefined =
             cultivationsCatalogue.find((item) => {
                 return item.b_lu_catalogue === cultivation.b_lu_catalogue
@@ -161,6 +153,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     )
             }
         }
+
+        // Get harvests
+        const harvests = await getHarvests(
+            fdm,
+            session.principal_id,
+            b_lu,
+            b_lu_harvestable === "once" ? undefined : timeframe,
+        )
 
         // Return user information from loader
         return {

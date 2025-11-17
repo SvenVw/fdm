@@ -129,6 +129,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm,
         )
 
+        function getHarvestabilityFromCatalogue(b_lu_catalogue: string) {
+            return cultivationCatalogue.find(
+                (item: { b_lu_catalogue: string }) => item.b_lu_catalogue === b_lu_catalogue,
+            )?.b_lu_harvestable ?? "once"
+        }
+
         const fieldsExtended = await Promise.all(
             fields.map(async (field) => {
                 const cultivations = await getCultivations(
@@ -140,11 +146,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
                 const harvests = await Promise.all(
                     cultivations.flatMap(async (cultivation) => {
+                        const b_lu_harvestable = getHarvestabilityFromCatalogue(cultivation.b_lu_catalogue)
+
                         const harvests = await getHarvests(
                             fdm,
                             session.principal_id,
                             cultivation.b_lu,
-                            timeframe,
+                            b_lu_harvestable === "once" ? undefined : timeframe,
                         )
 
                         return {
@@ -259,10 +267,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     b_lu_name: cultivationsForCatalogue[0]?.b_lu_name ?? "",
                     b_lu_croprotation:
                         cultivationsForCatalogue[0]?.b_lu_croprotation ?? "",
-                    b_lu_harvestable:
-                        cultivationCatalogue.find(
-                            (item: { b_lu_catalogue: string }) => item.b_lu_catalogue === b_lu_catalogue,
-                        )?.b_lu_harvestable ?? "once",
+                    b_lu_harvestable: getHarvestabilityFromCatalogue(b_lu_catalogue),
                     b_lu_start: b_lu_start,
                     b_lu_end: b_lu_end,
                     calendar: calendar,
