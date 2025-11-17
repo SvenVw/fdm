@@ -19,7 +19,7 @@ export function getHarvestParameterLabel(param: HarvestParameters[number]) {
         case "b_lu_cp":
             return "Ruw eiwit (g RE / kg DS)"
         case "b_lu_n_harvestable":
-            return "Stiktstofgehalte (g N / kg DS)"
+            return "Stikstofgehalte (g N / kg DS)"
         default:
             return param
     }

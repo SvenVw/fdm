@@ -516,12 +516,13 @@ export function HarvestFormDialog({
                                     <CollapsibleContent className="flex flex-row gap-1 items-center text-xs text-muted-foreground">
                                         <p>
                                             De getoonde oogstparameters zijn
-                                            gebaseerd op wat gangbare gegevens
-                                            zijn die bekend zijn voor dit gewas
-                                            en wat er nodig is om de berekening
-                                            voor de stikstofbalans uit te
-                                            rekenen. Klopt dit niet? Stuur een
-                                            mail naar{" "}
+                                            gebaseerd op de meest gangbare
+                                            praktijkgegevens voor dit gewas.
+                                            Deze waarden zijn nodig voor een
+                                            nauwkeurige
+                                            stikstofbalansberekening. Komen deze
+                                            niet overeen met uw eigen metingen?
+                                            Stuur dan een e-mail naar{" "}
                                             <a
                                                 href={`mailto:support@${hostname}`}
                                                 className="underline"
@@ -529,8 +530,8 @@ export function HarvestFormDialog({
                                                 support@
                                                 {hostname}
                                             </a>{" "}
-                                            met welke oogstparameters volgens
-                                            jou gemeten worden voor dit gewas.
+                                            met welke parameters volgens u
+                                            gemeten worden voor dit gewas.
                                             Alvast bedankt!
                                         </p>
                                     </CollapsibleContent>
