@@ -273,9 +273,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         b_isproductive: field.b_isproductive,
                         a_som_loi: field.a_som_loi ?? 0,
                         b_soiltype_agr: field.b_soiltype_agr ?? "",
-                        b_lu_harvest_date: field.harvests.flatMap(
-                            (harvest: { b_lu_harvest_date: Date[] }) => harvest.b_lu_harvest_date,
-                        ),
+                        b_lu_harvest_date: field.harvests
+                            .filter((harvest: { b_lu: string }) => b_lu.includes(harvest.b_lu))
+                            .flatMap(
+                                (harvest: { b_lu_harvest_date: Date[] }) => harvest.b_lu_harvest_date,
+                            ),
                         fertilizerApplications:
                             field.fertilizerApplications.map((app: { p_name_nl: string; p_id: string; p_type: string }) => ({
                                 p_name_nl: app.p_name_nl,
