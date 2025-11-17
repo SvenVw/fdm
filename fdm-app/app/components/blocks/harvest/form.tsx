@@ -123,11 +123,11 @@ export function HarvestFormDialog({
                     >
                         <DialogContent className="gap-6">
                             <DialogHeader>
-                                <DialogTitle>Oogst toevoegen</DialogTitle>
+                                <DialogTitle>{isHarvestUpdate ? "Oogst bijwerken" : "Oogst toevoegen"}</DialogTitle>
                                 <DialogDescription>
-                                    Voeg een oogst toe aan dit gewas. Vul de
-                                    gegevens in, zodat deze gebruikt kunnen
-                                    worden in de berekeningen.
+                                    {
+                                        isHarvestUpdate ? "Werk de oogst bij van dit gewas. Vul de gegevens in, zodat deze gebruikt kunnen worden in de berekeningen." : "Voeg een oogst toe aan dit gewas. Vul de gegevens in, zodat deze gebruikt kunnen worden in de berekeningen."
+                                    }
                                 </DialogDescription>
                             </DialogHeader>
 
