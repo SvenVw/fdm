@@ -132,7 +132,6 @@ export function HarvestFormDialog({
                 >
                     <FieldSet
                         disabled={form.formState.isSubmitting}
-                        // className="flex flex-col items-center"
                     >
                         <DialogContent className="gap-6">
                             <DialogHeader>
@@ -547,7 +546,7 @@ export function HarvestFormDialog({
                                             Sluiten
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" className="">
+                                    <Button type="submit" form="formHarvest">
                                         {form.formState.isSubmitting ? (
                                             <div className="flex items-center space-x-2">
                                                 <LoadingSpinner />
