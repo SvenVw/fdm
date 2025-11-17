@@ -106,6 +106,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session.principal_id,
             b_id_harvesting,
         )
+        const harvestableAnalysis = harvest.harvestable.harvestable_analyses[0]
 
         const harvestParameters = getParametersForHarvestCat(
             cultivation.b_lu_harvestcat,
@@ -115,6 +116,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         return {
             cultivation: cultivation,
             harvest: harvest,
+            harvestableAnalysis: harvestableAnalysis,
             b_id_farm: b_id_farm,
             calendar: calendar,
             harvestParameters: harvestParameters,
@@ -140,15 +142,17 @@ export default function FarmFieldsOverviewBlock() {
         <HarvestFormDialog
             harvestParameters={loaderData.harvestParameters}
             b_lu_harvest_date={loaderData.harvest.b_lu_harvest_date}
-            b_lu_yield={loaderData.harvest.b_lu_yield}
-            b_lu_yield_fresh={loaderData.harvest.b_lu_yield_fresh}
-            b_lu_yield_bruto={loaderData.harvest.b_lu_yield_bruto}
-            b_lu_tarra={loaderData.harvest.b_lu_tarra}
-            b_lu_uww={loaderData.harvest.b_lu_uww}
-            b_lu_moist={loaderData.harvest.b_lu_moist}
-            b_lu_dm={loaderData.harvest.b_lu_dm}
-            b_lu_cp={loaderData.harvest.b_lu_cp}
-            b_lu_n_harvestable={loaderData.harvest.b_lu_n_harvestable}
+            b_lu_yield={loaderData.harvestableAnalysis.b_lu_yield}
+            b_lu_yield_fresh={loaderData.harvestableAnalysis.b_lu_yield_fresh}
+            b_lu_yield_bruto={loaderData.harvestableAnalysis.b_lu_yield_bruto}
+            b_lu_tarra={loaderData.harvestableAnalysis.b_lu_tarra}
+            b_lu_uww={loaderData.harvestableAnalysis.b_lu_uww}
+            b_lu_moist={loaderData.harvestableAnalysis.b_lu_moist}
+            b_lu_dm={loaderData.harvestableAnalysis.b_lu_dm}
+            b_lu_cp={loaderData.harvestableAnalysis.b_lu_cp}
+            b_lu_n_harvestable={
+                loaderData.harvestableAnalysis.b_lu_n_harvestable
+            }
             b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
             b_lu_start={loaderData.cultivation.b_lu_start}
             b_lu_end={loaderData.cultivation.b_lu_end}
