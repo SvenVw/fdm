@@ -248,12 +248,11 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                 .map((column) => {
                                     const columnNames: Record<string, string> =
                                         {
-                                            b_name: "Naam",
-                                            cultivations: "Gewassen",
-                                            fertilizerApplications:
-                                                "Bemesting met:",
-                                            a_som_loi: "OS",
-                                            b_soiltype_agr: "Bodemtype",
+                                            b_lu_name: "Gewas",
+                                            b_lu_start: "Zaaidatum",
+                                            b_harvest_date: "Oogstdata",
+                                            fertilizers: "Bemesting",
+                                            b_name: "Percelen",
                                             b_area: "Oppervlakte",
                                         }
                                     return (
