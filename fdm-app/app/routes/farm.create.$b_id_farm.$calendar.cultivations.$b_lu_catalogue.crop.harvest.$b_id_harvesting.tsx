@@ -1,6 +1,7 @@
 import {
     getCultivationPlan,
     getHarvest,
+    getParametersForHarvestCat,
     removeHarvest,
     updateHarvest,
 } from "@svenvw/fdm-core"
@@ -27,6 +28,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { HarvestFormDialog } from "../components/blocks/harvest/form"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -107,11 +109,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session.principal_id,
             b_id_harvesting,
         )
+        const harvestableAnalysis = harvest.harvestable.harvestable_analyses[0]
+
+        const harvestParameters = getParametersForHarvestCat(
+            cultivation.b_lu_harvestcat,
+        )
 
         // Return user information from loader
         return {
             cultivation: cultivation,
             harvest: harvest,
+            harvestableAnalysis: harvestableAnalysis,
+            harvestParameters: harvestParameters,
             b_id_farm: b_id_farm,
             calendar: calendar,
             b_lu_catalogue: b_lu_catalogue,
@@ -130,18 +139,28 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  *
  * @returns The JSX element representing the harvest overview block.
  */
-export default function FarmFieldsOverviewBlock() {
+export default function updateHarvestBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const navigate = useNavigate()
 
     return (
-        <Dialog open={true} onOpenChange={() => navigate("..")}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Oogst bijwerken</DialogTitle>
-                </DialogHeader>
-            </DialogContent>
-        </Dialog>
+        <HarvestFormDialog
+            harvestParameters={loaderData.harvestParameters}
+            b_lu_harvest_date={loaderData.harvest.b_lu_harvest_date}
+            b_lu_yield={loaderData.harvestableAnalysis.b_lu_yield}
+            b_lu_yield_fresh={loaderData.harvestableAnalysis.b_lu_yield_fresh}
+            b_lu_yield_bruto={loaderData.harvestableAnalysis.b_lu_yield_bruto}
+            b_lu_tarra={loaderData.harvestableAnalysis.b_lu_tarra}
+            b_lu_uww={loaderData.harvestableAnalysis.b_lu_uww}
+            b_lu_moist={loaderData.harvestableAnalysis.b_lu_moist}
+            b_lu_dm={loaderData.harvestableAnalysis.b_lu_dm}
+            b_lu_cp={loaderData.harvestableAnalysis.b_lu_cp}
+            b_lu_n_harvestable={
+                loaderData.harvestableAnalysis.b_lu_n_harvestable
+            }
+            b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
+            b_lu_start={loaderData.cultivation.b_lu_start}
+            b_lu_end={loaderData.cultivation.b_lu_end}
+        />
     )
 }
 

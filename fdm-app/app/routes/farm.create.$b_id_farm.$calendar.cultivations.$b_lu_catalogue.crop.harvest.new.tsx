@@ -1,4 +1,9 @@
-import { addHarvest, getCultivationPlan } from "@svenvw/fdm-core"
+import {
+    addHarvest,
+    getCultivationPlan,
+    getCultivationsFromCatalogue,
+    getParametersForHarvestCat,
+} from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     data,
@@ -22,6 +27,8 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { HarvestFormDialog } from "../components/blocks/harvest/form"
+import { getHarvestParameterDefaults } from "../components/blocks/harvest/parameters"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -62,28 +69,59 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             throw data("Cultivation not found", { status: 404 })
         }
 
+        const harvestParameters = getParametersForHarvestCat(
+            cultivation.b_lu_harvestcat,
+        )
+
+        // Default harvest parameters
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+        const defaultHarvestParameters = getHarvestParameterDefaults(
+            cultivationsCatalogue,
+            cultivation.b_lu_catalogue,
+        )
+
         return {
             b_id_farm,
             b_lu_catalogue,
             cultivation,
+            harvestParameters,
+            defaultHarvestParameters,
         }
     } catch (error) {
         throw handleLoaderError(error)
     }
 }
 
-export default function AddHarvestRoute() {
-    const navigate = useNavigate()
+export default function AddHarvestBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
-        <Dialog open={true} onOpenChange={() => navigate("..")}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Oogst toevoegen</DialogTitle>
-                </DialogHeader>
-            </DialogContent>
-        </Dialog>
+        <HarvestFormDialog
+            harvestParameters={loaderData.harvestParameters}
+            b_lu_harvest_date={undefined}
+            b_lu_yield={loaderData.defaultHarvestParameters.b_lu_yield}
+            b_lu_yield_fresh={
+                loaderData.defaultHarvestParameters.b_lu_yield_fresh
+            }
+            b_lu_yield_bruto={
+                loaderData.defaultHarvestParameters.b_lu_yield_bruto
+            }
+            b_lu_tarra={loaderData.defaultHarvestParameters.b_lu_tarra}
+            b_lu_uww={loaderData.defaultHarvestParameters.b_lu_uww}
+            b_lu_moist={loaderData.defaultHarvestParameters.b_lu_moist}
+            b_lu_dm={loaderData.defaultHarvestParameters.b_lu_dm}
+            b_lu_cp={loaderData.defaultHarvestParameters.b_lu_cp}
+            b_lu_n_harvestable={
+                loaderData.defaultHarvestParameters.b_lu_n_harvestable
+            }
+            b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
+            b_lu_start={loaderData.cultivation.b_lu_start}
+            b_lu_end={loaderData.cultivation.b_lu_end}
+        />
     )
 }
 

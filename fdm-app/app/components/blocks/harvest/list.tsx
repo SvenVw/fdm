@@ -77,10 +77,18 @@ export function HarvestsList({
         if (b_lu_harvestable === "once") {
             const harvest = harvests[0]
             return (
-                <Card className="w-full">
-                    <CardHeader>{renderHarvestSummary(harvest)}</CardHeader>
-                    <CardContent>{renderHarvestDetails(harvest)}</CardContent>
-                </Card>
+                <NavLink
+                    key={harvest.b_id_harvesting}
+                    to={`./harvest/${harvest.b_id_harvesting}`}
+                    className="block rounded-lg"
+                >
+                    <Card className="transition-all hover:bg-muted/50">
+                        <CardHeader>{renderHarvestSummary(harvest)}</CardHeader>
+                        <CardContent>
+                            {renderHarvestDetails(harvest)}
+                        </CardContent>
+                    </Card>
+                </NavLink>
             )
         }
         return (

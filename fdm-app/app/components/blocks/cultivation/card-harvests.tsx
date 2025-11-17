@@ -54,7 +54,6 @@ export function CultivationHarvestsCard({
                     harvests={harvests}
                     b_lu_harvestable={b_lu_harvestable}
                     harvestParameters={harvestParameters}
-                    state={"active"}
                 />
             </CardContent>
         </Card>
