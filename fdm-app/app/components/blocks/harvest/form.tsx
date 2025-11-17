@@ -22,11 +22,16 @@ import {
     FieldError,
     FieldGroup,
     FieldLabel,
-    FieldSeparator,
     FieldSet,
 } from "~/components/ui/field"
 import { Controller } from "react-hook-form"
 import type { HarvestParameters } from "@svenvw/fdm-core"
+import { CircleQuestionMark } from "lucide-react"
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "~/components/ui/collapsible"
 
 type HarvestFormDialogProps = {
     harvestParameters: HarvestParameters
@@ -123,11 +128,15 @@ export function HarvestFormDialog({
                     >
                         <DialogContent className="gap-6">
                             <DialogHeader>
-                                <DialogTitle>{isHarvestUpdate ? "Oogst bijwerken" : "Oogst toevoegen"}</DialogTitle>
+                                <DialogTitle>
+                                    {isHarvestUpdate
+                                        ? "Oogst bijwerken"
+                                        : "Oogst toevoegen"}
+                                </DialogTitle>
                                 <DialogDescription>
-                                    {
-                                        isHarvestUpdate ? "Werk de oogst bij van dit gewas. Vul de gegevens in, zodat deze gebruikt kunnen worden in de berekeningen." : "Voeg een oogst toe aan dit gewas. Vul de gegevens in, zodat deze gebruikt kunnen worden in de berekeningen."
-                                    }
+                                    {isHarvestUpdate
+                                        ? "Werk de oogst bij van dit gewas. Vul de gegevens in, zodat deze gebruikt kunnen worden in de berekeningen."
+                                        : "Voeg een oogst toe aan dit gewas. Vul de gegevens in, zodat deze gebruikt kunnen worden in de berekeningen."}
                                 </DialogDescription>
                             </DialogHeader>
 
@@ -470,6 +479,37 @@ export function HarvestFormDialog({
                                         </Field>
                                     )}
                                 />
+                            </FieldGroup>
+                            <FieldGroup>
+                                <Collapsible className="space-y-2">
+                                    <CollapsibleTrigger className="flex flex-row gap-1 items-center text-xs text-muted-foreground hover:underline">
+                                        <CircleQuestionMark className="h-4" />
+                                        <p>
+                                            Waarom zie ik deze oogstparameters?
+                                        </p>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent className="flex flex-row gap-1 items-center text-xs text-muted-foreground">
+                                        <p>
+                                            De getoonde oogstparameters zijn
+                                            gebaseerd op wat gangbare gegevens
+                                            zijn die bekend zijn voor dit gewas
+                                            en wat er nodig is om de berekening
+                                            voor de stikstofbalans uit te
+                                            rekenen. Klopt dit niet? Stuur een
+                                            mail naar{" "}
+                                            <a
+                                                href={`mailto:support@${window.location.hostname}`}
+                                                className="underline"
+                                            >
+                                                support@
+                                                {window.location.hostname}
+                                            </a>{" "}
+                                            met welke oogstparameters volgens
+                                            jou gemeten worden voor dit gewas.
+                                            Alvast bedankt!
+                                        </p>
+                                    </CollapsibleContent>
+                                </Collapsible>
                             </FieldGroup>
                             <DialogFooter>
                                 <Field orientation="horizontal">
