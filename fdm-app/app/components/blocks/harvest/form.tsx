@@ -32,6 +32,7 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "~/components/ui/collapsible"
+import { useState, useEffect } from "react"
 
 type HarvestFormDialogProps = {
     harvestParameters: HarvestParameters
@@ -68,6 +69,13 @@ export function HarvestFormDialog({
 }: HarvestFormDialogProps) {
     const navigate = useNavigate()
     const fetcher = useFetcher()
+    const [hostname, setHostname] = useState("")
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            setHostname(window.location.hostname)
+        }
+    }, [])
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -498,11 +506,11 @@ export function HarvestFormDialog({
                                             rekenen. Klopt dit niet? Stuur een
                                             mail naar{" "}
                                             <a
-                                                href={`mailto:support@${window.location.hostname}`}
+                                                href={`mailto:support@${hostname}`}
                                                 className="underline"
                                             >
                                                 support@
-                                                {window.location.hostname}
+                                                {hostname}
                                             </a>{" "}
                                             met welke oogstparameters volgens
                                             jou gemeten worden voor dit gewas.
