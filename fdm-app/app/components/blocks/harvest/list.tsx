@@ -1,35 +1,24 @@
-import type { Cultivation, Harvest, HarvestParameters } from "@svenvw/fdm-core"
-import { getParametersForHarvestCat } from "@svenvw/fdm-core"
+import type { Harvest, HarvestParameters } from "@svenvw/fdm-core"
 import { format } from "date-fns/format"
 import { NavLink } from "react-router-dom"
 import type { HarvestableType } from "./types"
 import { nl } from "date-fns/locale/nl"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "../../ui/card"
-import { Label } from "../../ui/label"
+import { Card, CardContent, CardHeader } from "~/components/ui/card"
+import { Label } from "~/components/ui/label"
 import { getHarvestParameterLabel } from "./parameters"
-import { Button } from "../../ui/button"
-import { ArrowRight, Calendar, Info, PlusCircle } from "lucide-react"
-import { Badge } from "../../ui/badge"
+import { ArrowRight, Calendar } from "lucide-react"
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "../../ui/tooltip"
+} from "~/components/ui/tooltip"
 import {
     Empty,
-    EmptyContent,
     EmptyDescription,
     EmptyHeader,
-    EmptyMedia,
     EmptyTitle,
-} from "../../ui/empty"
+} from "~/components/ui/empty"
 
 export function HarvestsList({
     harvests,
@@ -153,21 +142,12 @@ export function HarvestsList({
         return (
             <Empty>
                 <EmptyHeader>
-                    <EmptyMedia variant="icon">
-                        <PlusCircle />
-                    </EmptyMedia>
                     <EmptyTitle>Nog geen oogst</EmptyTitle>
                     <EmptyDescription>
                         Voeg een oogst toe om belangrijke gegevens zoals
                         opbrengst, datum en gehaltes bij te houden.
                     </EmptyDescription>
                 </EmptyHeader>
-                <EmptyContent>
-                    <Button size="sm">
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Voeg oogst toe
-                    </Button>
-                </EmptyContent>
             </Empty>
         )
     }
@@ -175,9 +155,6 @@ export function HarvestsList({
     return (
         <Empty>
             <EmptyHeader>
-                <EmptyMedia variant="icon">
-                    <Info />
-                </EmptyMedia>
                 <EmptyTitle>Dit gewas is niet oogstbaar</EmptyTitle>
                 <EmptyDescription>
                     Kies een einddatum om aan te geven wanneer dit gewas is
