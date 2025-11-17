@@ -37,7 +37,7 @@ import { getHarvestParameterLabel } from "./parameters"
 
 type HarvestFormDialogProps = {
     harvestParameters: HarvestParameters
-    b_lu_harvest_date: Date
+    b_lu_harvest_date: Date | undefined
     b_lu_yield: number | undefined
     b_lu_yield_fresh: number | undefined
     b_lu_yield_bruto: number | undefined
