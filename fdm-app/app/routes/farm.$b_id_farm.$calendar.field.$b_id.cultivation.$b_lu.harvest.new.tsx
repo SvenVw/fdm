@@ -65,8 +65,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm,
         )
         const defaultHarvestParameters = getHarvestParameterDefaults(
-            cultivationsCatalogue,
             cultivation.b_lu_catalogue,
+            cultivationsCatalogue,
         )
 
         return {

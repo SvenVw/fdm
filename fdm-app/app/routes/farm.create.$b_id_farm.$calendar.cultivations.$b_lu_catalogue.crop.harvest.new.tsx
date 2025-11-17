@@ -2,6 +2,7 @@ import {
     addHarvest,
     getCultivationPlan,
     getCultivationsFromCatalogue,
+    getDefaultsForHarvestParameters,
     getParametersForHarvestCat,
 } from "@svenvw/fdm-core"
 import {
@@ -10,17 +11,9 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
-    useNavigate,
 } from "react-router"
-import { redirectWithSuccess } from "remix-toast"
-// import { HarvestForm } from "~/components/blocks/harvest/form"
+import { dataWithWarning, redirectWithSuccess } from "remix-toast"
 import { FormSchema } from "~/components/blocks/harvest/schema"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "~/components/ui/dialog"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -28,7 +21,6 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { HarvestFormDialog } from "../components/blocks/harvest/form"
-import { getHarvestParameterDefaults } from "../components/blocks/harvest/parameters"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -79,9 +71,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session.principal_id,
             b_id_farm,
         )
-        const defaultHarvestParameters = getHarvestParameterDefaults(
-            cultivationsCatalogue,
+        const defaultHarvestParameters = getDefaultsForHarvestParameters(
             cultivation.b_lu_catalogue,
+            cultivationsCatalogue,
         )
 
         return {
@@ -157,10 +149,50 @@ export async function action({ request, params }: ActionFunctionArgs) {
             (field: { b_lu: string }) => field.b_lu,
         )
 
+        // First, validate against the full FormSchema
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
         )
+
+        // Get required harvest parameters for the cultivation's harvest category
+        const requiredHarvestParameters = getParametersForHarvestCat(
+            cultivation.b_lu_harvestcat,
+        )
+
+        // Check if all required parameters are present
+        const missingParameters: string[] = []
+        for (const param of requiredHarvestParameters) {
+            if (
+                (formValues as Record<string, any>)[param] === undefined ||
+                (formValues as Record<string, any>)[param] === null
+            ) {
+                missingParameters.push(param)
+            }
+        }
+
+        if (missingParameters.length > 0) {
+            return dataWithWarning(
+                {
+                    warning: `Missing required harvest parameters: ${missingParameters.join(
+                        ", ",
+                    )}`,
+                },
+                `Missing required harvest parameters: ${missingParameters.join(
+                    ", ",
+                )}`,
+            )
+        }
+
+        // Filter form values to include only required parameters for addHarvest
+        const harvestProperties: Record<string, any> = {}
+        for (const param of requiredHarvestParameters) {
+            if ((formValues as Record<string, any>)[param] !== undefined) {
+                harvestProperties[param] = (formValues as Record<string, any>)[
+                    param
+                ]
+            }
+        }
 
         await Promise.all(
             b_lu_ids.map(async (b_lu: string) => {
@@ -169,8 +201,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     session.principal_id,
                     b_lu,
                     formValues.b_lu_harvest_date,
-                    formValues.b_lu_yield,
-                    formValues.b_lu_n_harvestable,
+                    harvestProperties,
                 )
             }),
         )

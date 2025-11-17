@@ -11,17 +11,9 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
-    useNavigate,
 } from "react-router"
-import { redirectWithSuccess } from "remix-toast"
-// import { HarvestForm } from "~/components/blocks/harvest/form"
+import { dataWithWarning, redirectWithSuccess } from "remix-toast"
 import { FormSchema } from "~/components/blocks/harvest/schema"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "~/components/ui/dialog"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -110,7 +102,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_harvesting,
         )
         const harvestableAnalysis = harvest.harvestable.harvestable_analyses[0]
-
         const harvestParameters = getParametersForHarvestCat(
             cultivation.b_lu_harvestcat,
         )
@@ -196,13 +187,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!b_id_harvesting) {
                 throw new Error("missing: b_id_harvesting")
             }
-            // Collect form entry
-            const formValues = await extractFormValuesFromRequest(
-                request,
-                FormSchema,
-            )
-            const { b_lu_yield, b_lu_n_harvestable, b_lu_harvest_date } =
-                formValues
 
             // Get all cultivation IDs associated with this catalogue
             const cultivationPlan = await getCultivationPlan(
@@ -217,6 +201,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!cultivation) {
                 throw new Error("Cultivation not found")
             }
+
+            // First, validate against the full FormSchema
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                FormSchema,
+            )
+            const b_lu_harvest_date = new Date(formValues.b_lu_harvest_date)
 
             // Update harvests for all cultivations that share the same harvest date for this cultivation
             const targetHarvests = cultivation.fields.flatMap(
@@ -239,6 +230,46 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     )
                 },
             )
+            console.log(targetHarvests)
+
+            // Get required harvest parameters for the cultivation's harvest category
+            const requiredHarvestParameters = getParametersForHarvestCat(
+                cultivation.b_lu_harvestcat,
+            )
+
+            // Check if all required parameters are present
+            const missingParameters: string[] = []
+            for (const param of requiredHarvestParameters) {
+                if (
+                    (formValues as Record<string, any>)[param] === undefined ||
+                    (formValues as Record<string, any>)[param] === null
+                ) {
+                    missingParameters.push(param)
+                }
+            }
+
+            if (missingParameters.length > 0) {
+                return dataWithWarning(
+                    {
+                        warning: `Missing required harvest parameters: ${missingParameters.join(
+                            ", ",
+                        )}`,
+                    },
+                    `Missing required harvest parameters: ${missingParameters.join(
+                        ", ",
+                    )}`,
+                )
+            }
+
+            // Filter form values to include only required parameters for updateHarvest
+            const harvestProperties: Record<string, any> = {}
+            for (const param of requiredHarvestParameters) {
+                if ((formValues as Record<string, any>)[param] !== undefined) {
+                    harvestProperties[param] = (
+                        formValues as Record<string, any>
+                    )[param]
+                }
+            }
 
             await Promise.all(
                 targetHarvests.map(
@@ -248,8 +279,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                             session.principal_id,
                             targetHarvest.b_id_harvesting,
                             b_lu_harvest_date,
-                            b_lu_yield,
-                            b_lu_n_harvestable,
+                            harvestProperties,
                         )
                     },
                 ),
