@@ -1,3 +1,4 @@
+import { cn } from "@/app/lib/utils"
 import { HarvestParameters, type Harvest } from "@svenvw/fdm-core"
 import { NavLink } from "react-router"
 import { HarvestsList } from "~/components/blocks/harvest/list"
@@ -38,7 +39,11 @@ export function CultivationHarvestsCard({
                         }}
                         className={!canAddHarvest ? "cursor-not-allowed" : ""}
                     >
-                        <Button variant="default" disabled={!canAddHarvest}>
+                        <Button
+                            variant="default"
+                            className={cn(!canAddHarvest ? "hidden" : "")}
+                            disabled={!canAddHarvest}
+                        >
                             Oogst toevoegen
                         </Button>
                     </NavLink>
