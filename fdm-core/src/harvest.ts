@@ -4,15 +4,22 @@
 // The current join structure is: cultivations (1) => cultivation_harvesting (M) => harvestables (1) => harvestable_sampling (1) => harvestable_analyses (1)
 
 import { and, desc, eq, gte, lte, type SQL } from "drizzle-orm"
+import { Decimal } from "decimal.js"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import type { Harvest, HarvestParameters } from "./harvest.d"
+import type {
+    Harvest,
+    HarvestParameters,
+    HarvestParametersDefault,
+} from "./harvest.d"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
 import { convertHarvestParameters } from "./harvest-conversion"
+import { getCultivation, getCultivationsFromCatalogue } from "./cultivation"
+import { get } from "http"
 
 /**
  * Adds a new harvest to a cultivation.
@@ -947,4 +954,118 @@ export function getParametersForHarvestCat(
         default:
             return []
     }
+}
+
+/**
+ * Generates default harvest parameter values for a given cultivation.
+ *
+ * This function retrieves the required harvest parameters for a specific cultivation's harvest category
+ * and calculates default values for each. The calculations are performed using `decimal.js` to ensure
+ * precision. The default values are derived from the cultivation's catalogue data.
+ *
+ * @param b_lu_catalogue - The identifier for the cultivation in the catalogue.
+ * @param cultivationsCatalogue - An array of cultivation catalogue items.
+ * @returns An object containing the default harvest parameters.
+ * @throws If the cultivation catalogue item is not found.
+ *
+ * @example
+ * const defaults = getDefaultsForHarvestParameters("crop-001", catalogue);
+ * console.log(defaults);
+ * // Output might be: { b_lu_yield: 10000, b_lu_dm: 850 }
+ */
+export function getDefaultsForHarvestParameters(
+    b_lu_catalogue: schema.cultivationsCatalogueTypeSelect["b_lu_catalogue"],
+    cultivationsCatalogue: schema.cultivationsCatalogueTypeSelect[],
+): HarvestParametersDefault {
+    // Find the corresponding cultivation item in the catalogue.
+    const cultivationsCatalogueItem = cultivationsCatalogue.find(
+        (item) => item.b_lu_catalogue === b_lu_catalogue,
+    )
+    if (!cultivationsCatalogueItem) {
+        throw new Error("Cultivations catalogue item not found")
+    }
+
+    // Get the list of required harvest parameters for the given harvest category.
+    const harvestParameters = getParametersForHarvestCat(
+        cultivationsCatalogueItem.b_lu_harvestcat,
+    )
+
+    const defaultHarvestParameters = {} as HarvestParametersDefault
+
+    // Initialize Decimal values from the catalogue, providing defaults if nullish.
+    const b_lu_yield = new Decimal(cultivationsCatalogueItem.b_lu_yield ?? 0)
+    const b_lu_dm = new Decimal(cultivationsCatalogueItem.b_lu_dm ?? 1)
+    // Default tarra (tare) percentage.
+    const b_lu_tarra = new Decimal(5)
+
+    // Iterate over the required parameters and calculate their default values.
+    for (const parameter of harvestParameters) {
+        if (parameter === "b_lu_yield") {
+            // Default dry matter yield.
+            defaultHarvestParameters[parameter] = b_lu_yield.toNumber()
+        } else if (parameter === "b_lu_yield_fresh") {
+            // Calculate fresh yield based on dry matter yield and content.
+            // Formula: fresh_yield = dry_yield / (dry_matter_content / 1000)
+            defaultHarvestParameters[parameter] = b_lu_yield
+                .dividedBy(b_lu_dm.dividedBy(1000))
+                .round()
+                .toNumber()
+        } else if (parameter === "b_lu_yield_bruto") {
+            // Calculate gross yield including tarra.
+            // Formula: gross_yield = dry_yield / (1 - tarra / 100)
+            defaultHarvestParameters[parameter] = b_lu_yield
+                .dividedBy(b_lu_dm.dividedBy(1000))
+                .dividedBy(new Decimal(1).minus(b_lu_tarra.dividedBy(100)))
+                .round()
+                .toNumber()
+        } else if (parameter === "b_lu_tarra") {
+            // Default tarra percentage.
+            defaultHarvestParameters[parameter] = b_lu_tarra.toNumber()
+        } else if (parameter === "b_lu_dm") {
+            // Default dry matter content.
+            defaultHarvestParameters[parameter] = b_lu_dm.toNumber()
+        } else if (parameter === "b_lu_moist") {
+            // Calculate moisture content from dry matter.
+            // Formula: moisture = (1000 - dry_matter_content) / 10
+            defaultHarvestParameters[parameter] = new Decimal(1000)
+                .minus(b_lu_dm)
+                .dividedBy(10)
+                .round()
+                .toNumber()
+        } else if (parameter === "b_lu_uww") {
+            // Default underwater weight.
+            defaultHarvestParameters[parameter] = 350
+        } else if (parameter === "b_lu_cp") {
+            const b_lu_n_harvestable = new Decimal(
+                cultivationsCatalogueItem.b_lu_n_harvestable ?? 0,
+            )
+            // Calculate crude protein based on nitrogen content and harvest category.
+            // The conversion factor from nitrogen to crude protein varies by crop type.
+            if (cultivationsCatalogueItem.b_lu_harvestcat === "HC020") {
+                defaultHarvestParameters[parameter] = b_lu_n_harvestable
+                    .times(6.25)
+                    .round()
+                    .toNumber()
+            } else if (cultivationsCatalogueItem.b_lu_harvestcat === "HC031") {
+                defaultHarvestParameters[parameter] = b_lu_n_harvestable
+                    .times(6.25)
+                    .round()
+                    .toNumber()
+            } else if (cultivationsCatalogueItem.b_lu_harvestcat === "HC050") {
+                defaultHarvestParameters[parameter] = b_lu_n_harvestable
+                    .times(5.7)
+                    .round()
+                    .toNumber()
+            } else {
+                // Default crude protein value if no specific category matches.
+                defaultHarvestParameters[parameter] = 170
+            }
+        } else if (parameter === "b_lu_n_harvestable") {
+            // Default harvestable nitrogen content.
+            defaultHarvestParameters[parameter] =
+                cultivationsCatalogueItem[parameter]
+        }
+    }
+
+    return defaultHarvestParameters
 }

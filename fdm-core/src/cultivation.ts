@@ -26,6 +26,7 @@ import type { FdmType } from "./fdm"
 import { determineIfFieldIsProductive } from "./field"
 import {
     addHarvest,
+    getDefaultsForHarvestParameters,
     getHarvestableTypeOfCultivation,
     getHarvests,
 } from "./harvest"
@@ -472,7 +473,19 @@ export async function addCultivation(
 
                 if (harvestableType === "once") {
                     // If cultivation can only be harvested once, add harvest on terminate date
-                    await addHarvest(tx, principal_id, b_lu, b_lu_end)
+                    const defaultHarvestParameters =
+                        await getDefaultsForHarvestParameters(
+                            b_lu_catalogue,
+                            cultivation,
+                        )
+
+                    await addHarvest(
+                        tx,
+                        principal_id,
+                        b_lu,
+                        b_lu_end,
+                        defaultHarvestParameters,
+                    )
                 }
             }
             return b_lu
@@ -776,8 +789,18 @@ export async function getCultivationPlan(
                 b_id_harvesting: schema.cultivationHarvesting.b_id_harvesting,
                 b_lu_harvest_date:
                     schema.cultivationHarvesting.b_lu_harvest_date,
-                b_id_harvestable: schema.harvestables.b_id_harvestable,
+                b_lu_croprotation:
+                    schema.cultivationsCatalogue.b_lu_croprotation,
+                b_lu_harvestcat: schema.cultivationsCatalogue.b_lu_harvestcat,
+                b_lu_harvestable: schema.cultivationsCatalogue.b_lu_harvestable,
                 b_lu_yield: schema.harvestableAnalyses.b_lu_yield,
+                b_lu_yield_fresh: schema.harvestableAnalyses.b_lu_yield_fresh,
+                b_lu_yield_bruto: schema.harvestableAnalyses.b_lu_yield_bruto,
+                b_lu_tarra: schema.harvestableAnalyses.b_lu_tarra,
+                b_lu_dm: schema.harvestableAnalyses.b_lu_dm,
+                b_lu_moist: schema.harvestableAnalyses.b_lu_moist,
+                b_lu_uww: schema.harvestableAnalyses.b_lu_uww,
+                b_lu_cp: schema.harvestableAnalyses.b_lu_cp,
                 b_lu_n_harvestable:
                     schema.harvestableAnalyses.b_lu_n_harvestable,
                 b_lu_n_residue: schema.harvestableAnalyses.b_lu_n_residue,
@@ -898,6 +921,9 @@ export async function getCultivationPlan(
                         b_lu_catalogue: curr.b_lu_catalogue,
                         b_lu_name: curr.b_lu_name,
                         b_lu_variety: curr.b_lu_variety,
+                        b_lu_croprotation: curr.b_lu_croprotation,
+                        b_lu_harvestcat: curr.b_lu_harvestcat,
+                        b_lu_harvestable: curr.b_lu_harvestable,
                         b_area: 0,
                         b_lu_start: curr.b_lu_start,
                         b_lu_end: curr.b_lu_end,
@@ -953,6 +979,13 @@ export async function getCultivationPlan(
                             harvestable_analyses: [
                                 {
                                     b_lu_yield: curr.b_lu_yield,
+                                    b_lu_yield_fresh: curr.b_lu_yield_fresh,
+                                    b_lu_yield_bruto: curr.b_lu_yield_bruto,
+                                    b_lu_tarra: curr.b_lu_tarra,
+                                    b_lu_dm: curr.b_lu_dm,
+                                    b_lu_moist: curr.b_lu_moist,
+                                    b_lu_uww: curr.b_lu_uww,
+                                    b_lu_cp: curr.b_lu_cp,
                                     b_lu_n_harvestable: curr.b_lu_n_harvestable,
                                     b_lu_n_residue: curr.b_lu_n_residue,
                                     b_lu_p_harvestable: curr.b_lu_p_harvestable,

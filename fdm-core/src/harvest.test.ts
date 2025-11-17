@@ -7,8 +7,17 @@ import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField } from "./field"
-import { addHarvest, getHarvest, getHarvests, updateHarvest, getParametersForHarvestCat } from "./harvest"
+import {
+    addHarvest,
+    getHarvest,
+    getHarvests,
+    updateHarvest,
+    getParametersForHarvestCat,
+    getDefaultsForHarvestParameters,
+} from "./harvest"
 import { createId } from "./id"
+import { convertHarvestParameters } from "./harvest-conversion"
+import type { cultivationsCatalogueTypeSelect } from "./db/schema"
 
 describe("Harvest Data Model", () => {
     let fdm: FdmServerType
@@ -415,7 +424,11 @@ describe("Harvest Data Model", () => {
 describe("getParametersForHarvestCat", () => {
     it('should return correct parameters for "HC010"', () => {
         const params = getParametersForHarvestCat("HC010")
-        expect(params).toEqual(["b_lu_yield_fresh", "b_lu_dm", "b_lu_n_harvestable"])
+        expect(params).toEqual([
+            "b_lu_yield_fresh",
+            "b_lu_dm",
+            "b_lu_n_harvestable",
+        ])
     })
 
     it('should return correct parameters for "HC020"', () => {
@@ -476,5 +489,501 @@ describe("getParametersForHarvestCat", () => {
     it("should return an empty array for undefined input", () => {
         const params = getParametersForHarvestCat(undefined as any)
         expect(params).toEqual([])
+    })
+})
+
+describe("getDefaultsForHarvestParameters", () => {
+    const mockCultivationsCatalogue: cultivationsCatalogueTypeSelect[] = [
+        {
+            b_lu_catalogue: "HC010-catalogue",
+            b_lu_source: "test",
+            b_lu_name: "Test Crop HC010",
+            b_lu_name_en: "Test Crop HC010",
+            b_lu_harvestable: "once",
+            b_lu_hcat3: "maize",
+            b_lu_hcat3_name: "test",
+            b_lu_croprotation: "cereal",
+            b_lu_harvestcat: "HC010",
+            b_lu_dm: 200,
+            b_lu_yield: 2000,
+            b_lu_hi: 0.5,
+            b_lu_n_harvestable: 15,
+            b_lu_n_residue: 5,
+            b_n_fixation: 0,
+            b_lu_rest_oravib: false,
+            b_lu_variety_options: null,
+            b_lu_start_default: "01-01",
+            b_date_harvest_default: "12-31",
+            created: new Date(),
+            updated: new Date(),
+            hash: "test-hash-HC010",
+        },
+        {
+            b_lu_catalogue: "HC020-catalogue",
+            b_lu_source: "test",
+            b_lu_name: "Test Crop HC020",
+            b_lu_name_en: "Test Crop HC020",
+            b_lu_harvestable: "once",
+            b_lu_hcat3: "grass",
+            b_lu_hcat3_name: "test",
+            b_lu_croprotation: "grass",
+            b_lu_harvestcat: "HC020",
+            b_lu_dm: 150,
+            b_lu_yield: 2000,
+            b_lu_hi: 0.5,
+            b_lu_n_harvestable: 20,
+            b_lu_n_residue: 5,
+            b_n_fixation: 0,
+            b_lu_rest_oravib: false,
+            b_lu_variety_options: null,
+            b_lu_start_default: "01-01",
+            b_date_harvest_default: "12-31",
+            created: new Date(),
+            updated: new Date(),
+            hash: "test-hash-HC020",
+        },
+        {
+            b_lu_catalogue: "HC031-catalogue",
+            b_lu_source: "test",
+            b_lu_name: "Test Crop HC031",
+            b_lu_name_en: "Test Crop HC031",
+            b_lu_harvestable: "once",
+            b_lu_hcat3: "maize",
+            b_lu_hcat3_name: "test",
+            b_lu_croprotation: "maize",
+            b_lu_harvestcat: "HC031",
+            b_lu_dm: 350,
+            b_lu_yield: 4900,
+            b_lu_hi: 0.5,
+            b_lu_n_harvestable: 14,
+            b_lu_n_residue: 5,
+            b_n_fixation: 0,
+            b_lu_rest_oravib: false,
+            b_lu_variety_options: null,
+            b_lu_start_default: "01-01",
+            b_date_harvest_default: "12-31",
+            created: new Date(),
+            updated: new Date(),
+            hash: "test-hash-HC031",
+        },
+        {
+            b_lu_catalogue: "HC040-catalogue",
+            b_lu_source: "test",
+            b_lu_name: "Test Crop HC040",
+            b_lu_name_en: "Test Crop HC040",
+            b_lu_harvestable: "once",
+            b_lu_hcat3: "maize",
+            b_lu_hcat3_name: "test",
+            b_lu_croprotation: "potato",
+            b_lu_harvestcat: "HC040",
+            b_lu_dm: 250,
+            b_lu_yield: 13500,
+            b_lu_hi: 0.5,
+            b_lu_n_harvestable: 20,
+            b_lu_n_residue: 5,
+            b_n_fixation: 0,
+            b_lu_rest_oravib: false,
+            b_lu_variety_options: null,
+            b_lu_start_default: "01-01",
+            b_date_harvest_default: "12-31",
+            created: new Date(),
+            updated: new Date(),
+            hash: "test-hash-HC040",
+        },
+        {
+            b_lu_catalogue: "HC041-catalogue",
+            b_lu_source: "test",
+            b_lu_name: "Test Crop HC041",
+            b_lu_name_en: "Test Crop HC041",
+            b_lu_harvestable: "once",
+            b_lu_hcat3: "sugarbeet",
+            b_lu_hcat3_name: "test",
+            b_lu_croprotation: "sugarbeet",
+            b_lu_harvestcat: "HC041",
+            b_lu_dm: 220,
+            b_lu_yield: 14960,
+            b_lu_hi: 0.5,
+            b_lu_n_harvestable: 18,
+            b_lu_n_residue: 5,
+            b_n_fixation: 0,
+            b_lu_rest_oravib: false,
+            b_lu_variety_options: null,
+            b_lu_start_default: "01-01",
+            b_date_harvest_default: "12-31",
+            created: new Date(),
+            updated: new Date(),
+            hash: "test-hash-HC041",
+        },
+        {
+            b_lu_catalogue: "HC042-catalogue",
+            b_lu_source: "test",
+            b_lu_name: "Test Crop HC042",
+            b_lu_name_en: "Test Crop HC042",
+            b_lu_harvestable: "once",
+            b_lu_hcat3: "potato",
+            b_lu_hcat3_name: "test",
+            b_lu_croprotation: "potato",
+            b_lu_harvestcat: "HC042",
+            b_lu_dm: 191.5, // This will be calculated from uww
+            b_lu_yield: 7000,
+            b_lu_hi: 0.5,
+            b_lu_n_harvestable: 25,
+            b_lu_n_residue: 5,
+            b_n_fixation: 0,
+            b_lu_rest_oravib: false,
+            b_lu_variety_options: null,
+            b_lu_start_default: "01-01",
+            b_date_harvest_default: "12-31",
+            created: new Date(),
+            updated: new Date(),
+            hash: "test-hash-HC042",
+        },
+        {
+            b_lu_catalogue: "HC050-catalogue",
+            b_lu_source: "test",
+            b_lu_name: "Test Crop HC050",
+            b_lu_name_en: "Test Crop HC050",
+            b_lu_harvestable: "once",
+            b_lu_hcat3: "cereal",
+            b_lu_hcat3_name: "test",
+            b_lu_croprotation: "cereal",
+            b_lu_harvestcat: "HC050",
+            b_lu_dm: 850, // 15% moisture
+            b_lu_yield: 6800,
+            b_lu_hi: 0.5,
+            b_lu_n_harvestable: 20, // Corresponds to 114 g/kg CP
+            b_lu_n_residue: 5,
+            b_n_fixation: 0,
+            b_lu_rest_oravib: false,
+            b_lu_variety_options: null,
+            b_lu_start_default: "01-01",
+            b_date_harvest_default: "12-31",
+            created: new Date(),
+            updated: new Date(),
+            hash: "test-hash-HC050",
+        },
+        {
+            b_lu_catalogue: "UNKNOWN-catalogue",
+            b_lu_source: "test",
+            b_lu_name: "Test Crop UNKNOWN",
+            b_lu_name_en: "Test Crop UNKNOWN",
+            b_lu_harvestable: "once",
+            b_lu_hcat3: "maize",
+            b_lu_hcat3_name: "test",
+            b_lu_croprotation: "cereal",
+            b_lu_harvestcat: null, // Changed to null to match schema type
+            b_lu_dm: 800,
+            b_lu_yield: 5000,
+            b_lu_hi: 0.5,
+            b_lu_n_harvestable: 10,
+            b_lu_n_residue: 5,
+            b_n_fixation: 0,
+            b_lu_rest_oravib: false,
+            b_lu_variety_options: null,
+            b_lu_start_default: "01-01",
+            b_date_harvest_default: "12-31",
+            created: new Date(),
+            updated: new Date(),
+            hash: "test-hash-UNKNOWN",
+        },
+    ]
+
+    it("should throw an error if cultivation catalogue item is not found", () => {
+        expect(() =>
+            getDefaultsForHarvestParameters(
+                "non-existent",
+                mockCultivationsCatalogue,
+            ),
+        ).toThrowError("Cultivations catalogue item not found")
+    })
+
+    describe("HC010 - Standard", () => {
+        it("should return correct default parameters for HC010", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC010-catalogue",
+                mockCultivationsCatalogue,
+            )
+            expect(defaults).toEqual({
+                b_lu_yield_fresh: 10000,
+                b_lu_dm: 200,
+                b_lu_n_harvestable: 15,
+            })
+        })
+
+        it("should convert HC010 defaults back to original standardized values", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC010-catalogue",
+                mockCultivationsCatalogue,
+            )
+            const originalCatalogueItem = mockCultivationsCatalogue.find(
+                (item) => item.b_lu_catalogue === "HC010-catalogue",
+            )!
+            const converted = convertHarvestParameters(
+                originalCatalogueItem.b_lu_harvestcat,
+                undefined,
+                undefined,
+                defaults.b_lu_yield_fresh,
+                undefined,
+                undefined,
+                undefined,
+                defaults.b_lu_dm,
+                undefined,
+                defaults.b_lu_n_harvestable,
+            )
+            expect(converted.b_lu_yield).toBe(originalCatalogueItem.b_lu_yield)
+            expect(converted.b_lu_n_harvestable).toBe(
+                originalCatalogueItem.b_lu_n_harvestable,
+            )
+        })
+    })
+
+    describe("HC020 - Grassland", () => {
+        it("should return correct default parameters for HC020", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC020-catalogue",
+                mockCultivationsCatalogue,
+            )
+            expect(defaults).toEqual({
+                b_lu_yield: 2000,
+                b_lu_cp: 125, // 20 * 6.25
+            })
+        })
+
+        it("should convert HC020 defaults back to original standardized values", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC020-catalogue",
+                mockCultivationsCatalogue,
+            )
+            const originalCatalogueItem = mockCultivationsCatalogue.find(
+                (item) => item.b_lu_catalogue === "HC020-catalogue",
+            )!
+            const converted = convertHarvestParameters(
+                originalCatalogueItem.b_lu_harvestcat,
+                defaults.b_lu_yield,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                defaults.b_lu_cp,
+                undefined,
+            )
+            expect(converted.b_lu_yield).toBe(originalCatalogueItem.b_lu_yield)
+            expect(converted.b_lu_n_harvestable).toBe(
+                originalCatalogueItem.b_lu_n_harvestable,
+            )
+        })
+    })
+
+    describe("HC031 - Maize", () => {
+        it("should return correct default parameters for HC031", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC031-catalogue",
+                mockCultivationsCatalogue,
+            )
+            expect(defaults).toEqual({
+                b_lu_yield: 4900,
+                b_lu_cp: 88, // Rounded from 87.5
+            })
+        })
+
+        it("should convert HC031 defaults back to original standardized values", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC031-catalogue",
+                mockCultivationsCatalogue,
+            )
+            const originalCatalogueItem = mockCultivationsCatalogue.find(
+                (item) => item.b_lu_catalogue === "HC031-catalogue",
+            )!
+            const converted = convertHarvestParameters(
+                originalCatalogueItem.b_lu_harvestcat,
+                defaults.b_lu_yield,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                defaults.b_lu_cp,
+                undefined,
+            )
+            expect(converted.b_lu_yield).toBe(originalCatalogueItem.b_lu_yield)
+            expect(converted.b_lu_n_harvestable).toBe(
+                originalCatalogueItem.b_lu_n_harvestable,
+            )
+        })
+    })
+
+    describe("HC040 - Root crops", () => {
+        it("should return correct default parameters for HC040", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC040-catalogue",
+                mockCultivationsCatalogue,
+            )
+            expect(defaults).toEqual({
+                b_lu_yield_bruto: 56842,
+                b_lu_tarra: 5,
+                b_lu_dm: 250,
+                b_lu_n_harvestable: 20,
+            })
+        })
+
+        it("should convert HC040 defaults back to original standardized values", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC040-catalogue",
+                mockCultivationsCatalogue,
+            )
+            const originalCatalogueItem = mockCultivationsCatalogue.find(
+                (item) => item.b_lu_catalogue === "HC040-catalogue",
+            )!
+            const converted = convertHarvestParameters(
+                originalCatalogueItem.b_lu_harvestcat,
+                undefined,
+                defaults.b_lu_yield_bruto,
+                undefined,
+                defaults.b_lu_tarra,
+                undefined,
+                undefined,
+                defaults.b_lu_dm,
+                undefined,
+                defaults.b_lu_n_harvestable,
+            )
+            expect(converted.b_lu_yield).toBe(originalCatalogueItem.b_lu_yield)
+            expect(converted.b_lu_n_harvestable).toBe(
+                originalCatalogueItem.b_lu_n_harvestable,
+            )
+        })
+    })
+
+    describe("HC041 - Sugar beet", () => {
+        it("should return correct default parameters for HC041", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC041-catalogue",
+                mockCultivationsCatalogue,
+            )
+            expect(defaults).toEqual({
+                b_lu_yield_bruto: 71579,
+                b_lu_tarra: 5,
+                b_lu_dm: 220,
+                b_lu_n_harvestable: 18,
+            })
+        })
+
+        it("should convert HC041 defaults back to original standardized values", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC041-catalogue",
+                mockCultivationsCatalogue,
+            )
+            console.log(defaults)
+            const originalCatalogueItem = mockCultivationsCatalogue.find(
+                (item) => item.b_lu_catalogue === "HC041-catalogue",
+            )!
+            const converted = convertHarvestParameters(
+                originalCatalogueItem.b_lu_harvestcat,
+                undefined,
+                defaults.b_lu_yield_bruto,
+                undefined,
+                defaults.b_lu_tarra,
+                undefined,
+                undefined,
+                defaults.b_lu_dm,
+                undefined,
+                defaults.b_lu_n_harvestable,
+            )
+            expect(converted.b_lu_yield).toBe(originalCatalogueItem.b_lu_yield)
+            expect(converted.b_lu_n_harvestable).toBe(
+                originalCatalogueItem.b_lu_n_harvestable,
+            )
+        })
+    })
+
+    describe("HC042 - Potatoes", () => {
+        it("should return correct default parameters for HC042", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC042-catalogue",
+                mockCultivationsCatalogue,
+            )
+            expect(defaults).toEqual({
+                b_lu_yield_bruto: 38477,
+                b_lu_tarra: 5,
+                b_lu_uww: 350,
+                b_lu_n_harvestable: 25,
+            })
+        })
+
+        it("should convert HC042 defaults back to original standardized values", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC042-catalogue",
+                mockCultivationsCatalogue,
+            )
+            const originalCatalogueItem = mockCultivationsCatalogue.find(
+                (item) => item.b_lu_catalogue === "HC042-catalogue",
+            )!
+            const converted = convertHarvestParameters(
+                originalCatalogueItem.b_lu_harvestcat,
+                undefined,
+                defaults.b_lu_yield_bruto,
+                undefined,
+                defaults.b_lu_tarra,
+                undefined,
+                defaults.b_lu_uww,
+                undefined,
+                undefined,
+                defaults.b_lu_n_harvestable,
+            )
+            expect(converted.b_lu_yield).toBe(originalCatalogueItem.b_lu_yield)
+            expect(converted.b_lu_n_harvestable).toBe(
+                originalCatalogueItem.b_lu_n_harvestable,
+            )
+        })
+    })
+
+    describe("HC050 - Cereals", () => {
+        it("should return correct default parameters for HC050", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC050-catalogue",
+                mockCultivationsCatalogue,
+            )
+            expect(defaults).toEqual({
+                b_lu_yield_fresh: 8000, // 6800 / (850/1000) rounded
+                b_lu_moist: 15, // (1000 - 850) / 10
+                b_lu_cp: 114, // 20 * 5.7
+            })
+        })
+
+        it("should convert HC050 defaults back to original standardized values", () => {
+            const defaults = getDefaultsForHarvestParameters(
+                "HC050-catalogue",
+                mockCultivationsCatalogue,
+            )
+            const originalCatalogueItem = mockCultivationsCatalogue.find(
+                (item) => item.b_lu_catalogue === "HC050-catalogue",
+            )!
+            const converted = convertHarvestParameters(
+                originalCatalogueItem.b_lu_harvestcat,
+                undefined,
+                undefined,
+                defaults.b_lu_yield_fresh,
+                undefined,
+                defaults.b_lu_moist,
+                undefined,
+                undefined,
+                defaults.b_lu_cp,
+                undefined,
+            )
+            expect(converted.b_lu_yield).toBe(originalCatalogueItem.b_lu_yield)
+            expect(converted.b_lu_n_harvestable).toBe(
+                originalCatalogueItem.b_lu_n_harvestable,
+            )
+        })
+    })
+
+    it("should return empty object for an unrecognized harvest category (null)", () => {
+        const defaults = getDefaultsForHarvestParameters(
+            "UNKNOWN-catalogue",
+            mockCultivationsCatalogue,
+        )
+        expect(defaults).toEqual({})
     })
 })

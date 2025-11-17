@@ -42,3 +42,15 @@ export type HarvestParameter =
     | "b_lu_n_harvestable"
 
 export type HarvestParameters = HarvestParameter[]
+
+export interface HarvestParametersDefault {
+    b_lu_yield?: schema.harvestableAnalysesTypeInsert["b_lu_yield"],
+    b_lu_yield_bruto?: schema.harvestableAnalysesTypeInsert["b_lu_yield_bruto"],
+    b_lu_yield_fresh?: schema.harvestableAnalysesTypeInsert["b_lu_yield_fresh"],
+    b_lu_tarra?: schema.harvestableAnalysesTypeInsert["b_lu_tarra"],
+    b_lu_dm?: schema.harvestableAnalysesTypeInsert["b_lu_dm"],
+    b_lu_moist?: schema.harvestableAnalysesTypeInsert["b_lu_moist"],
+    b_lu_uww?: schema.harvestableAnalysesTypeInsert["b_lu_uww"],
+    b_lu_cp?: schema.harvestableAnalysesTypeInsert["b_lu_cp"],
+    b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
+}
