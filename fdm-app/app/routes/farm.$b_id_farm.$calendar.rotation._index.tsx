@@ -10,7 +10,6 @@ import {
     getHarvests,
 } from "@svenvw/fdm-core"
 import {
-    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
@@ -34,7 +33,6 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { useFieldFilterStore } from "~/store/field-filter"
 
 export const meta: MetaFunction = () => {
     return [
@@ -299,21 +297,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             cultivationCatalogue,        
         )
 
-        const { showProductiveOnly } = useFieldFilterStore.getState() // Get state directly in loader
-
-        const filteredRotations = rotationExtended.filter((rotation) => {
-            if (!showProductiveOnly) {
-                return true
-            }
-            return rotation.fields.some((field) => field.b_isproductive)
-        })
-
         // Return user information from loader
         return {
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
             fieldOptions: fieldOptions,
-            rotationExtended: filteredRotations, // Return filtered data
+            rotationExtended: rotationExtended, // Return filtered data
             userName: session.userName,
         }
     } catch (error) {

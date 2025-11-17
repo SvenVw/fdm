@@ -46,6 +46,7 @@ import type { RotationExtended } from "./columns"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
 import { toast as notify } from "sonner"
+import { useFieldFilterStore } from "@/app/store/field-filter"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -58,7 +59,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-    const [globalFilter, setGlobalFilter] = useState("")
+    const [searchTerms, setSearchTerms] = useState("")
     const isMobile = useIsMobile()
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
         isMobile
@@ -138,20 +139,37 @@ export function DataTable<TData extends RotationExtended, TValue>({
             ].join(" ")} ${[
                 ...new Set(
                     item.fields.flatMap((field) =>
-                        field.fertilizers.map((fertilizer) => fertilizer.p_name_nl),
+                        field.fertilizers.map(
+                            (fertilizer) => fertilizer.p_name_nl,
+                        ),
                     ),
                 ),
             ].join(" ")}`,
         }))
     }, [data])
 
-    const fuzzyFilter: FilterFn<TData> = (row, _columnId, filterValue) => {
-        const result = fuzzysort.go(filterValue, [
+    const fuzzySearchAndProductivityFilter: FilterFn<TData> = (
+        row,
+        _columnId,
+        { searchTerms, showProductiveOnly },
+    ) => {
+        if (
+            showProductiveOnly &&
+            !row.original.fields.some((field) => field.b_isproductive)
+        ) {
+            console.log("field is not productive")
+            return false
+        }
+        return searchTerms === "" ? true : fuzzysort.go(searchTerms, [
             (row.original as any).searchTarget,
-        ])
-        return result.length > 0
+        ]).length > 0
     }
 
+    const showProductiveOnly = useFieldFilterStore((s) => s.showProductiveOnly)
+    const globalFilter = useMemo(
+        () => ({ searchTerms, showProductiveOnly }),
+        [searchTerms, showProductiveOnly],
+    )
     const table = useReactTable({
         data: memoizedData,
         columns,
@@ -162,9 +180,12 @@ export function DataTable<TData extends RotationExtended, TValue>({
         getFilteredRowModel: getFilteredRowModel(),
         getFacetedRowModel: getFacetedRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
-        onGlobalFilterChange: setGlobalFilter,
+        onGlobalFilterChange: (globalFilter) => {
+            if (globalFilter?.searchTerms ?? "" !== searchTerms)
+                setSearchTerms(globalFilter?.searchTerms ?? "")
+        },
         onRowSelectionChange: setRowSelection,
-        globalFilterFn: fuzzyFilter,
+        globalFilterFn: fuzzySearchAndProductivityFilter,
         state: {
             sorting,
             columnFilters,
@@ -190,8 +211,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
         ? "Selecteer één of meerdere gewassen om bemesting toe te voegen"
         : "Bemesting toevoegen aan geselecteerd gewas"
 
-    const isHarvestButtonDisabled =
-        selectedCultivationIds.length !== 1
+    const isHarvestButtonDisabled = selectedCultivationIds.length !== 1
     const harvestTooltipContent =
         selectedCultivationIds.length !== 1
             ? "Selecteer één gewas om oogst toe te voegen"
@@ -208,8 +228,8 @@ export function DataTable<TData extends RotationExtended, TValue>({
             <div className="sticky top-0 z-10 bg-background py-4 flex flex-col sm:flex-row gap-2 items-center">
                 <Input
                     placeholder="Zoek op gewas, meststof of datum"
-                    value={globalFilter ?? ""}
-                    onChange={(event) => setGlobalFilter(event.target.value)}
+                    value={globalFilter?.searchTerms ?? ""}
+                    onChange={(event) => setSearchTerms(event.target.value)}
                     className="w-full sm:w-auto sm:grow"
                 />
                 <div className="flex w-full items-center justify-start sm:justify-end gap-2 sm:w-auto flex-wrap">
