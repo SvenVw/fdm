@@ -157,12 +157,13 @@ export function DataTable<TData extends RotationExtended, TValue>({
             showProductiveOnly &&
             !row.original.fields.some((field) => field.b_isproductive)
         ) {
-            console.log("field is not productive")
             return false
         }
-        return searchTerms === "" ? true : fuzzysort.go(searchTerms, [
-            (row.original as any).searchTarget,
-        ]).length > 0
+        return (
+            searchTerms === "" ||
+            fuzzysort.go(searchTerms, [(row.original as any).searchTarget])
+                .length > 0
+        )
     }
 
     const showProductiveOnly = useFieldFilterStore((s) => s.showProductiveOnly)
