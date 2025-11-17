@@ -33,10 +33,11 @@ import {
     CollapsibleTrigger,
 } from "~/components/ui/collapsible"
 import { useState, useEffect } from "react"
+import { getHarvestParameterLabel } from "./parameters"
 
 type HarvestFormDialogProps = {
     harvestParameters: HarvestParameters
-    b_lu_harvest_date: Date | undefined
+    b_lu_harvest_date: Date
     b_lu_yield: number | undefined
     b_lu_yield_fresh: number | undefined
     b_lu_yield_bruto: number | undefined
@@ -46,7 +47,7 @@ type HarvestFormDialogProps = {
     b_lu_dm: number | undefined
     b_lu_cp: number | undefined
     b_lu_n_harvestable: number | undefined
-    b_lu_harvestable: "once" | "multiple" | "none" | undefined
+    b_lu_harvestable: "once" | "multiple" | "none"
     b_lu_start: Date | undefined | null
     b_lu_end: Date | undefined | null
 }
@@ -130,9 +131,7 @@ export function HarvestFormDialog({
                     onSubmit={form.handleSubmit}
                     method="post"
                 >
-                    <FieldSet
-                        disabled={form.formState.isSubmitting}
-                    >
+                    <FieldSet disabled={form.formState.isSubmitting}>
                         <DialogContent className="gap-6">
                             <DialogHeader>
                                 <DialogTitle>
@@ -177,7 +176,9 @@ export function HarvestFormDialog({
                                             )}
                                         >
                                             <FieldLabel>
-                                                Opbrengst (kg DS / ha)
+                                                {getHarvestParameterLabel(
+                                                    field.name,
+                                                )}
                                             </FieldLabel>
                                             <Input
                                                 {...field}
@@ -214,7 +215,9 @@ export function HarvestFormDialog({
                                             )}
                                         >
                                             <FieldLabel>
-                                                Opbrengst (kg versproduct / ha)
+                                                {getHarvestParameterLabel(
+                                                    field.name,
+                                                )}
                                             </FieldLabel>
                                             <Input
                                                 {...field}
@@ -250,8 +253,9 @@ export function HarvestFormDialog({
                                             )}
                                         >
                                             <FieldLabel>
-                                                Opbrengst incl. tarra (kg
-                                                versproduct / ha)
+                                                {getHarvestParameterLabel(
+                                                    field.name,
+                                                )}
                                             </FieldLabel>
                                             <Input
                                                 {...field}
@@ -286,7 +290,12 @@ export function HarvestFormDialog({
                                                     : "hidden",
                                             )}
                                         >
-                                            <FieldLabel>Tarra (%)</FieldLabel>
+                                            <FieldLabel>
+                                                {" "}
+                                                {getHarvestParameterLabel(
+                                                    field.name,
+                                                )}
+                                            </FieldLabel>
                                             <Input
                                                 {...field}
                                                 placeholder="Bv. 5 %"
@@ -321,8 +330,9 @@ export function HarvestFormDialog({
                                             )}
                                         >
                                             <FieldLabel>
-                                                Droge stofgehalte (g DS / kg
-                                                versproduct)
+                                                {getHarvestParameterLabel(
+                                                    field.name,
+                                                )}
                                             </FieldLabel>
                                             <Input
                                                 {...field}
@@ -358,7 +368,9 @@ export function HarvestFormDialog({
                                             )}
                                         >
                                             <FieldLabel>
-                                                Onderwatergewicht (g / 5 kg)
+                                                {getHarvestParameterLabel(
+                                                    field.name,
+                                                )}
                                             </FieldLabel>
                                             <Input
                                                 {...field}
@@ -394,7 +406,9 @@ export function HarvestFormDialog({
                                             )}
                                         >
                                             <FieldLabel>
-                                                Vochtgehalte (%)
+                                                {getHarvestParameterLabel(
+                                                    field.name,
+                                                )}
                                             </FieldLabel>
                                             <Input
                                                 {...field}
@@ -430,7 +444,9 @@ export function HarvestFormDialog({
                                             )}
                                         >
                                             <FieldLabel>
-                                                Stiktstofgehalte (g N / kg DS)
+                                                {getHarvestParameterLabel(
+                                                    field.name,
+                                                )}
                                             </FieldLabel>
                                             <Input
                                                 {...field}
@@ -466,7 +482,9 @@ export function HarvestFormDialog({
                                             )}
                                         >
                                             <FieldLabel>
-                                                Ruw eiwit (g RE / kg DS)
+                                                {getHarvestParameterLabel(
+                                                    field.name,
+                                                )}
                                             </FieldLabel>
                                             <Input
                                                 {...field}

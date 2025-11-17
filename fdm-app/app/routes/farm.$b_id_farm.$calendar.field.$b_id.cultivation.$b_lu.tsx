@@ -5,9 +5,11 @@ import {
     getCultivationsFromCatalogue,
     getField,
     getHarvests,
+    getParametersForHarvestCat,
     removeCultivation,
     updateCultivation,
 } from "@svenvw/fdm-core"
+import { get } from "proj4/dist/lib/projections"
 import {
     type ActionFunctionArgs,
     data,
@@ -162,6 +164,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         }
 
+        const harvestParameters = getParametersForHarvestCat(
+            cultivation.b_lu_harvestcat,
+        )
+
         // Return user information from loader
         return {
             field: field,
@@ -169,6 +175,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             cultivation: cultivation,
             harvests: harvests,
             b_lu_harvestable: b_lu_harvestable,
+            harvestParameters: harvestParameters,
             b_lu_variety_options: b_lu_variety_options,
             b_id_farm: b_id_farm,
             calendar: calendar,
@@ -197,7 +204,7 @@ export default function FarmFieldsOverviewBlock() {
             <CultivationHarvestsCard
                 harvests={loaderData.harvests}
                 b_lu_harvestable={loaderData.b_lu_harvestable}
-                cultivation={loaderData.cultivation}
+                harvestParameters={loaderData.harvestParameters}
             />
             <Outlet />
         </div>
