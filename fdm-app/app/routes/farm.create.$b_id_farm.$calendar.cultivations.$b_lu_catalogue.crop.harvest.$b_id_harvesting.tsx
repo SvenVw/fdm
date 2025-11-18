@@ -202,12 +202,18 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 throw new Error("Cultivation not found")
             }
 
+            const harvestOriginal = await getHarvest(
+                fdm,
+                session.principal_id,
+                b_id_harvesting,
+            )
+            const harvestDateOriginal = harvestOriginal.b_lu_harvest_date
+
             // First, validate against the full FormSchema
             const formValues = await extractFormValuesFromRequest(
                 request,
                 FormSchema,
             )
-            const b_lu_harvest_date = new Date(formValues.b_lu_harvest_date)
 
             // Update harvests for all cultivations that share the same harvest date for this cultivation
             const targetHarvests = cultivation.fields.flatMap(
@@ -224,7 +230,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                         }) => {
                             return (
                                 harvest.b_lu_harvest_date.getTime() ===
-                                b_lu_harvest_date.getTime()
+                                harvestDateOriginal.getTime()
                             )
                         },
                     )
@@ -278,7 +284,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                             fdm,
                             session.principal_id,
                             targetHarvest.b_id_harvesting,
-                            b_lu_harvest_date,
+                            formValues.b_lu_harvest_date,
                             harvestProperties,
                         )
                     },
