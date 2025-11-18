@@ -2,6 +2,7 @@ import {
     addHarvest,
     getCultivation,
     getCultivationsFromCatalogue,
+    getDefaultsForHarvestParameters,
     getParametersForHarvestCat,
 } from "@svenvw/fdm-core"
 import {
@@ -19,7 +20,6 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { getHarvestParameterDefaults } from "../components/blocks/harvest/parameters"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -64,7 +64,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session.principal_id,
             b_id_farm,
         )
-        const defaultHarvestParameters = getHarvestParameterDefaults(
+        const defaultHarvestParameters = getDefaultsForHarvestParameters(
             cultivation.b_lu_catalogue,
             cultivationsCatalogue,
         )
