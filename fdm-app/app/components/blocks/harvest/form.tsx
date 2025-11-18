@@ -75,7 +75,7 @@ export function HarvestForm({
     })
 
     const handleDeleteHarvest = () => {
-        return fetcher.submit(null, { method: "DELETE" })
+        return fetcher.submit(null, { action: action, method: "DELETE" })
     }
 
     // Check if this is a new harvest or is has already values

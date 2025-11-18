@@ -319,7 +319,12 @@ export default function FarmRotationHarvestAddIndex() {
         useState<Promise<boolean>>()
 
     function handleConfirmation() {
-        if (loaderData.b_lu_harvestable === "once") {
+        // Check if this is a new harvest or is has already values
+        if (
+            loaderData.harvestApplication.b_lu_yield !== undefined ||
+            loaderData.harvestApplication.b_lu_n_harvestable !== undefined ||
+            loaderData.harvestApplication.b_lu_harvest_date !== undefined
+        ) {
             return initiateConfirmation()
         }
 
@@ -718,6 +723,52 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         if (b_lu_harvestable === "none") {
             return dataWithError(null, "Dit gewas is niet oogstbaar.")
+        }
+
+        if (request.method === "DELETE") {
+            for (const fieldId of fieldIds) {
+                const cultivationsForField = await getCultivations(
+                    fdm,
+                    session.principal_id,
+                    fieldId,
+                    { start: new Date(0), end: new Date() }, // Get all cultivations for the field
+                )
+
+                const targetCultivationInstance = cultivationsForField.find(
+                    (c) => c.b_lu_catalogue === cultivationIds[0],
+                )
+
+                if (!targetCultivationInstance) {
+                    return dataWithError(
+                        null,
+                        `Gewas niet gevonden voor perceel ${fieldId}.`,
+                    )
+                }
+
+                const b_lu = targetCultivationInstance.b_lu
+
+                // Check for existing harvests for this specific cultivation instance
+                const existingHarvests = await getHarvests(
+                    fdm,
+                    session.principal_id,
+                    b_lu,
+                )
+                // If there are existing harvests, remove them before adding new ones
+                for (const harvest of existingHarvests) {
+                    await removeHarvest(
+                        fdm,
+                        session.principal_id,
+                        harvest.b_id_harvesting,
+                    )
+                }
+            }
+
+            return redirectWithSuccess(
+                `/farm/${b_id_farm}/${calendar}/rotation`,
+                {
+                    message: `Oogst succesvol verwijderd van ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
+                },
+            )
         }
 
         const validatedData = await extractFormValuesFromRequest(
