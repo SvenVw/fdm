@@ -697,6 +697,9 @@ export async function updateHarvest(
                     ),
                 )
                 .limit(1)
+            if (cultivation.length === 0) {
+                throw new Error("Cultivation catalogue not found")
+            }
             const b_lu_harvestcat = cultivation[0].b_lu_harvestcat
 
             if (b_lu_harvestable === "multiple") {
