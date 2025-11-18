@@ -875,7 +875,6 @@ describe("getDefaultsForHarvestParameters", () => {
                 "HC041-catalogue",
                 mockCultivationsCatalogue,
             )
-            console.log(defaults)
             const originalCatalogueItem = mockCultivationsCatalogue.find(
                 (item) => item.b_lu_catalogue === "HC041-catalogue",
             )!
