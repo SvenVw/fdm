@@ -2,10 +2,22 @@ import { z } from "zod"
 
 export const FormSchema = z
     .object({
-        b_lu_harvest_date: z.coerce.date({
-            required_error: "Oogstdatum is verplicht",
-            invalid_type_error: "Oogstdatum moet een datum zijn",
-        }),
+        b_lu_harvest_date: z
+            .string({
+                required_error: "Oogstdatum is verplicht",
+                invalid_type_error: "Oogstdatum moet een datum zijn",
+            })
+            .transform((val, ctx) => {
+                // biome-ignore lint/suspicious/noGlobalIsNan: <false positive>
+                if (isNaN(new Date(val).getTime())) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message: "Oogstdatum moet een datum zijn",
+                    })
+                    return z.NEVER
+                }
+                return new Date(val)
+            }),
         b_lu_yield: z.coerce
             .number({
                 invalid_type_error: "Hoeveelheid moet een getal zijn",
