@@ -4,15 +4,18 @@ export const FormSchema = z
     .object({
         b_lu_harvest_date: z
             .string({
-                required_error: "Oogstdatum is verplicht",
-                invalid_type_error: "Oogstdatum moet een datum zijn",
+                required_error:
+                    "Geef een datum voor wanneer dit gewas is geoogst",
+                invalid_type_error:
+                    "Geef een datum voor wanneer dit gewas is geoogst",
             })
             .transform((val, ctx) => {
                 const date = new Date(val)
                 if (Number.isNaN(date.getTime())) {
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,
-                        message: "Oogstdatum moet een datum zijn",
+                        message:
+                            "Geef een datum voor wanneer dit gewas is geoogst",
                     })
                     return z.NEVER
                 }
@@ -25,7 +28,7 @@ export const FormSchema = z
                     invalid_type_error: "Hoeveelheid moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet positief zijn",
+                    message: "Hoeveelheid moet groter zijn dan 0",
                 })
                 .finite({
                     message: "Hoeveelheid moet een geheel getal zijn",
@@ -46,7 +49,7 @@ export const FormSchema = z
                     invalid_type_error: "Hoeveelheid moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet positief zijn",
+                    message: "Hoeveelheid moet groter zijn dan 0",
                 })
                 .finite({
                     message: "Hoeveelheid moet een geheel getal zijn",
@@ -67,7 +70,7 @@ export const FormSchema = z
                     invalid_type_error: "Hoeveelheid moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet positief zijn",
+                    message: "Hoeveelheid moet groter zijn dan 0",
                 })
                 .finite({
                     message: "Hoeveelheid moet een geheel getal zijn",
@@ -88,7 +91,7 @@ export const FormSchema = z
                     invalid_type_error: "Hoeveelheid moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet positief zijn",
+                    message: "Hoeveelheid moet groter zijn dan 0",
                 })
                 .finite({
                     message: "Hoeveelheid moet een geheel getal zijn",
@@ -109,7 +112,7 @@ export const FormSchema = z
                     invalid_type_error: "Hoeveelheid moet een getal zijn",
                 })
                 .min(0, {
-                    message: "Hoeveelheid moet positief zijn",
+                    message: "Hoeveelheid moet groter zijn dan 0",
                 })
                 .max(1000, {
                     message: "Hoeveelheid mag niet groter zijn dan 1000",
@@ -123,7 +126,7 @@ export const FormSchema = z
                     invalid_type_error: "Hoeveelheid moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet positief zijn",
+                    message: "Hoeveelheid moet groter zijn dan 0",
                 })
                 .finite({
                     message: "Hoeveelheid moet een geheel getal zijn",
@@ -143,7 +146,7 @@ export const FormSchema = z
                     invalid_type_error: "Hoeveelheid moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet positief zijn",
+                    message: "Hoeveelheid moet groter zijn dan 0",
                 })
                 .finite({
                     message: "Hoeveelheid moet een geheel getal zijn",
@@ -152,7 +155,8 @@ export const FormSchema = z
                     message: "Hoeveelheid mag niet kleiner zijn dan 100",
                 })
                 .max(1000, {
-                    message: "Hoeveelheid mag niet groter zijn dan 1.000 g / 5 kg",
+                    message:
+                        "Hoeveelheid mag niet groter zijn dan 1.000 g / 5 kg",
                 })
                 .safe({
                     message: "Hoeveelheid moet een safe getal zijn",
@@ -166,7 +170,7 @@ export const FormSchema = z
                     invalid_type_error: "Hoeveelheid moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet positief zijn",
+                    message: "Hoeveelheid moet groter zijn dan 0",
                 })
                 .finite({
                     message: "Hoeveelheid moet een geheel getal zijn",
@@ -186,7 +190,7 @@ export const FormSchema = z
                     invalid_type_error: "Hoeveelheid moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet positief zijn",
+                    message: "Hoeveelheid moet groter zijn dan 0",
                 })
                 .finite({
                     message: "Hoeveelheid moet een geheel getal zijn",
