@@ -1132,23 +1132,23 @@ export async function updateCultivation(
                 throw new Error("Cultivation does not exist")
             }
 
+            //Validate if the cultivation exists in catalogue
+            const cultivation = await tx
+                .select()
+                .from(schema.cultivationsCatalogue)
+                .where(
+                    eq(
+                        schema.cultivationsCatalogue.b_lu_catalogue,
+                        b_lu_catalogue ?? existingCultivation[0].b_lu_catalogue,
+                    ),
+                )
+                .limit(1)
+
+            if (cultivation.length === 0) {
+                throw new Error("Cultivation does not exist in catalogue")
+            }
+
             if (b_lu_catalogue) {
-                //Validate if the cultivation exists in catalogue
-                const cultivation = await tx
-                    .select()
-                    .from(schema.cultivationsCatalogue)
-                    .where(
-                        eq(
-                            schema.cultivationsCatalogue.b_lu_catalogue,
-                            b_lu_catalogue,
-                        ),
-                    )
-                    .limit(1)
-
-                if (cultivation.length === 0) {
-                    throw new Error("Cultivation does not exist in catalogue")
-                }
-
                 await tx
                     .update(schema.cultivations)
                     .set({ b_lu_catalogue: b_lu_catalogue, updated: updated })
@@ -1300,7 +1300,21 @@ export async function updateCultivation(
                                 ),
                             )
                     } else {
-                        await addHarvest(tx, principal_id, b_lu, b_lu_end)
+                        // If cultivation can only be harvested once, add harvest on terminate date
+                        const defaultHarvestParameters =
+                            await getDefaultsForHarvestParameters(
+                                b_lu_catalogue ??
+                                    existingCultivation[0].b_lu_catalogue,
+                                cultivation,
+                            )
+
+                        await addHarvest(
+                            tx,
+                            principal_id,
+                            b_lu,
+                            b_lu_end,
+                            defaultHarvestParameters,
+                        )
                     }
                 }
             }
