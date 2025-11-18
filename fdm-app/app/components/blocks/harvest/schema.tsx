@@ -111,7 +111,7 @@ export const FormSchema = z
                 .number({
                     invalid_type_error: "Hoeveelheid moet een getal zijn",
                 })
-                .min(0, {
+                .positive({
                     message: "Hoeveelheid moet groter zijn dan 0",
                 })
                 .max(1000, {
