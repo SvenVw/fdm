@@ -125,9 +125,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             session.principal_id,
             b_lu,
         )
-        if (!cultivation) {
-            throw data("Cultivation not found", { status: 404 })
-        }
 
         // First, validate against the full FormSchema
         const formValues = await extractFormValuesFromRequest(

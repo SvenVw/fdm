@@ -8,12 +8,6 @@ import { Label } from "~/components/ui/label"
 import { getHarvestParameterLabel } from "./parameters"
 import { ArrowRight, Calendar } from "lucide-react"
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "~/components/ui/tooltip"
-import {
     Empty,
     EmptyDescription,
     EmptyHeader,
@@ -35,20 +29,11 @@ export function HarvestsList({
 
     const renderHarvestDetails = (harvest: Harvest) => (
         <div className="grid grid-cols-2 gap-4 pt-4">
-            {harvestParameters.map((param: string) => (
+            {harvestParameters.map((param: HarvestParameters[number]) => (
                 <div key={param}>
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger>
-                                <Label className="text-xs text-muted-foreground">
-                                    {getHarvestParameterLabel(param)}
-                                </Label>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>{getHarvestParameterLabel(param)}</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                    <Label className="text-xs text-muted-foreground">
+                        {getHarvestParameterLabel(param)}
+                    </Label>
                     <p className="text-sm font-medium leading-none">
                         {harvest.harvestable?.harvestable_analyses?.[0]?.[
                             param

@@ -2,4 +2,4 @@
 "@svenvw/fdm-core": minor
 ---
 
-Add b_lu_dm at cultivation catalogue to describe the dry matter content of harvested products of the cultivation
+Add dry matter content column (`b_lu_dm`) to cultivation catalogue for standardizing harvest parameter calculations

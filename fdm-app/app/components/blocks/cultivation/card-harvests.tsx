@@ -42,7 +42,6 @@ export function CultivationHarvestsCard({
                         <Button
                             variant="default"
                             className={cn(!canAddHarvest ? "hidden" : "")}
-                            disabled={!canAddHarvest}
                         >
                             Oogst toevoegen
                         </Button>

@@ -46,7 +46,7 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
               })()
             : cultivation.b_lu_croprotation
 
-        // Valide harvestcat
+        // Validate harvestcat
         const harvestcat =
             cultivation.b_lu_harvestcat !== "HC010" &&
             cultivation.b_lu_harvestcat !== "HC020" &&
