@@ -341,7 +341,6 @@ export default function FarmRotationHarvestAddIndex() {
     }
 
     function resolveConfirmation(response: boolean) {
-        console.error("resolveConfirmation", response)
         if (resolveConfirmationPromise) {
             resolveConfirmationPromise[0](response)
         }
@@ -657,8 +656,6 @@ export default function FarmRotationHarvestAddIndex() {
                                     Annuleren
                                 </Button>
                                 <Button
-                                    type="submit"
-                                    form="formHarvest"
                                     onClick={() => resolveConfirmation(true)}
                                 >
                                     Overschrijven
