@@ -102,6 +102,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 ?.split(",")
                 .filter(Boolean) ?? []
 
+        if (cultivationIds.length === 0) {
+            throw data("missing: cultivationIds", {
+                status: 400,
+                statusText: "missing: cultivationIds",
+            })
+        }
+
         // Ensure only one cultivationId is selected
         if (cultivationIds.length !== 1) {
             throw data("invalid: cultivationIds", {
@@ -141,67 +148,81 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const allFieldsWithCultivations = await Promise.all(
             (
                 await getFields(fdm, session.principal_id, b_id_farm, timeframe)
-            ).map(async (field) => {
-                const cultivations = await getCultivations(
-                    fdm,
-                    session.principal_id,
-                    field.b_id,
-                    timeframe,
-                )
-                return {
-                    ...field,
-                    cultivations: cultivations.map(
-                        (c: { b_lu_catalogue: string }) => c.b_lu_catalogue,
-                    ),
-                }
-            }),
+            ).map(
+                async (field: {
+                    b_id: string
+                    b_name: string
+                    b_area: number
+                }) => {
+                    const cultivations = await getCultivations(
+                        fdm,
+                        session.principal_id,
+                        field.b_id,
+                        timeframe,
+                    )
+                    return {
+                        ...field,
+                        cultivations: cultivations,
+                    }
+                },
+            ),
         )
 
         // Get fieldIds from search params (if any)
         const fieldIdsFromSearchParams =
             url.searchParams.get("fieldIds")?.split(",").filter(Boolean) ?? []
 
-        // Filter fields based on cultivationIds or fieldIdsFromSearchParams
+        const cultivationCatalogueData = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+
+        const targetCultivation = cultivationCatalogueData.find(
+            (c) => c.b_lu_catalogue === cultivationIds[0],
+        )
+
         let selectedFields = []
-        let cultivationName = ""
-        let cultivationCatalogueData = []
-        let b_lu_harvestable: "once" | "multiple" | "none" = "none"
-
-        if (cultivationIds.length > 0) {
-            cultivationCatalogueData = await getCultivationsFromCatalogue(
-                fdm,
-                session.principal_id,
-                b_id_farm,
+        if (fieldIdsFromSearchParams.length > 0) {
+            // If fieldIds are in search params, use them to determine selected fields
+            selectedFields = allFieldsWithCultivations.filter((field) =>
+                fieldIdsFromSearchParams.includes(field.b_id),
             )
-
-            const targetCultivation = cultivationCatalogueData.find(
-                (c: {
-                    b_lu_catalogue: string
-                    b_lu_harvestable: "once" | "multiple" | "none"
-                }) => c.b_lu_catalogue === cultivationIds[0],
-            )
-
-            if (targetCultivation) {
-                cultivationName = targetCultivation.b_lu_name
-                b_lu_harvestable = targetCultivation.b_lu_harvestable
-            }
-
-            if (fieldIdsFromSearchParams.length > 0) {
-                // If fieldIds are in search params, use them to determine selected fields
-                selectedFields = allFieldsWithCultivations.filter((field) =>
-                    fieldIdsFromSearchParams.includes(field.b_id!),
-                )
-            } else {
-                // Otherwise, default to fields with the selected cultivation
-                selectedFields = allFieldsWithCultivations.filter((field) =>
-                    field.cultivations.some((c) => cultivationIds.includes(c)),
-                )
-            }
         } else {
-            throw data("missing: cultivationIds", {
-                status: 400,
-                statusText: "missing: cultivationIds",
-            })
+            // Otherwise, default to fields with the selected cultivation
+            selectedFields = allFieldsWithCultivations.filter((field) =>
+                field.cultivations.some((c) =>
+                    cultivationIds.includes(c.b_lu_catalogue),
+                ),
+            )
+        }
+
+        let harvestApplication = {
+            b_lu_yield: undefined,
+            b_lu_n_harvestable: undefined,
+            b_lu_harvest_date: undefined,
+            b_lu_start: undefined,
+            b_lu_end: undefined,
+            b_lu_harvestable: undefined,
+        }
+
+        if (
+            targetCultivation.b_lu_harvestable === "once" &&
+            selectedFields.length > 0
+        ) {
+            const targetFieldCultivation = selectedFields[0].cultivations.find(
+                (c) => c.b_lu_catalogue === targetCultivation.b_lu_catalogue,
+            )
+            if (targetFieldCultivation) {
+                const harvests = await getHarvests(
+                    fdm,
+                    session.principal_id,
+                    targetFieldCultivation.b_lu,
+                )
+                if (harvests.length > 0) {
+                    harvestApplication = harvests[0]
+                }
+            }
         }
 
         const fieldOptions = allFieldsWithCultivations.map((field) => {
@@ -212,7 +233,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 b_id: field.b_id,
                 b_name: field.b_name,
                 b_area: Math.round(field.b_area * 10) / 10,
-                cultivations: field.cultivations, // Pass cultivations for each field
+                cultivations: field.cultivations.map((c) => c.b_lu_catalogue), // Pass cultivations for each field
             }
         })
 
@@ -222,43 +243,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             farmOptions: farmOptions,
             fieldAmount: selectedFields.length,
             calendar: calendar,
-            selectedFields: selectedFields.map(
-                (field: {
-                    b_id: string
-                    b_name: string
-                    b_area: number
-                    cultivations: string[]
-                }) => ({
-                    b_id: field.b_id,
-                    b_name: field.b_name,
-                    b_area: Math.round(field.b_area * 10) / 10,
-                    cultivations: field.cultivations,
-                }),
-            ),
-            fieldOptions: fieldOptions.map(
-                (field: {
-                    b_id: string
-                    b_name: string
-                    b_area: number
-                    cultivations: string[]
-                }) => ({
-                    b_id: field.b_id,
-                    b_name: field.b_name,
-                    b_area: field.b_area,
-                    cultivations: field.cultivations,
-                }),
-            ), // All fields for selection
-            cultivationName: cultivationName,
+            selectedFields: selectedFields.map((field) => ({
+                b_id: field.b_id,
+                b_name: field.b_name,
+                b_area: Math.round(field.b_area * 10) / 10,
+                cultivations: field.cultivations.map((c) => c.b_lu_catalogue),
+            })),
+            fieldOptions: fieldOptions, // All fields for selection
+            cultivationName: targetCultivation?.b_lu_name ?? "onbekend gewas",
             cultivationIds: cultivationIds,
-            b_lu_harvestable: b_lu_harvestable,
-            harvestApplication: {
-                b_lu_yield: undefined,
-                b_lu_n_harvestable: undefined,
-                b_lu_harvest_date: undefined,
-                b_lu_start: undefined,
-                b_lu_end: undefined,
-                b_lu_harvestable: undefined,
-            },
+            b_lu_harvestable: targetCultivation.b_lu_harvestable ?? "once",
+            harvestApplication: harvestApplication,
         }
     } catch (error) {
         throw handleLoaderError(error)
