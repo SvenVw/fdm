@@ -552,8 +552,7 @@ export function HarvestFormDialog({
                                             !isHarvestUpdate ? "invisible" : "",
                                         )}
                                     >
-                                        {form.formState.isSubmitting ||
-                                        fetcher.state === "submitting" ? (
+                                        {fetcher.state === "submitting" ? (
                                             <div className="flex items-center space-x-2">
                                                 <LoadingSpinner />
                                             </div>
@@ -561,11 +560,20 @@ export function HarvestFormDialog({
                                         Verwijderen
                                     </Button>
                                     <DialogClose asChild>
-                                        <Button variant="outline">
+                                        <Button
+                                            variant="outline"
+                                            disabled={
+                                                form.formState.isSubmitting
+                                            }
+                                        >
                                             Sluiten
                                         </Button>
                                     </DialogClose>
-                                    <Button type="submit" form="formHarvest">
+                                    <Button
+                                        type="submit"
+                                        form="formHarvest"
+                                        disabled={form.formState.isSubmitting}
+                                    >
                                         {form.formState.isSubmitting ? (
                                             <div className="flex items-center space-x-2">
                                                 <LoadingSpinner />
