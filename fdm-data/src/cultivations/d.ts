@@ -21,7 +21,17 @@ export interface CatalogueCultivationItem {
         | "sugarbeet"
         | "alfalfa"
         | "catchcrop"
+    b_lu_harvestcat:
+        | "HC010" // Standard
+        | "HC020" // Grass
+        | "HC031" // Maize
+        | "HC040" // Root crops
+        | "HC041" // Sugar beets
+        | "HC042" // Potatoes
+        | "HC050" // Cereals
+        | null
     b_lu_yield: number
+    b_lu_dm: number
     b_lu_hi: number
     b_lu_n_harvestable: number
     b_lu_n_residue: number
