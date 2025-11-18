@@ -7,7 +7,7 @@ Harvesting is a critical event in the cultivation cycle, representing the culmin
 In FDM, a harvest is intrinsically linked to a **cultivation**. A single cultivation can have multiple harvest events, especially for crops like grass that are cut multiple times a season. The core data structure for a harvest involves several related entities:
 
 -   `cultivation_harvesting`: This table links a harvest event to a specific cultivation (`b_lu`) and records the `b_lu_harvest_date`.
--   `harvestables`: Each harvest event can produce one or more "harvestables", and "harverstable" can be linked to multiple harvest events. For example, a potato harvestable might be linked to multiple fields, but collected in the same batch. Note that while the dtabase schema supports it, due to the complexity fdm-core functions currently only support 1:1 relations between harvests and haverstables.
+-   `harvestables`: Each harvest event can produce one or more "harvestables", and "harvestable" can be linked to multiple harvest events. For example, a potato harvestable might be linked to multiple fields, but collected in the same batch. Note that while the database schema supports it, due to the complexity fdm-core functions currently only support 1:1 relations between harvests and haverstables.
 -   `harvestable_analyses`: For each harvestable, one or more analyses can be recorded. This is where the specific measurements for the harvest are stored.
 
 This structure provides a flexible and detailed representation of harvest events, accommodating a wide range of crops and harvesting practices.
