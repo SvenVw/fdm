@@ -59,6 +59,7 @@ export function HarvestForm({
             // If submitting, handle the confirmation procedure
             // (it might just return true without a dialog)
             if (submitting.current && !(await handleConfirmation(values))) {
+                submitting.current = false
                 return { values: {}, errors: true }
             }
             // Reset the submitting state before any page redirects can happen
