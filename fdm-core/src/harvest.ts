@@ -1034,7 +1034,12 @@ export function getDefaultsForHarvestParameters(
                 .toNumber()
         } else if (parameter === "b_lu_uww") {
             // Default underwater weight.
-            defaultHarvestParameters[parameter] = 350
+            defaultHarvestParameters[parameter] = b_lu_dm
+                .dividedBy(10)
+                .minus(2.0)
+                .dividedBy(0.049)
+                .round()
+                .toNumber()
         } else if (parameter === "b_lu_cp") {
             const b_lu_n_harvestable = new Decimal(
                 cultivationsCatalogueItem.b_lu_n_harvestable ?? 0,
