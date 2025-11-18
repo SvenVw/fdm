@@ -37,7 +37,7 @@ import { getHarvestParameterLabel } from "./parameters"
 
 type HarvestFormDialogProps = {
     harvestParameters: HarvestParameters
-    b_lu_harvest_date: Date | undefined
+    b_lu_harvest_date: Date | string | undefined // Changed to allow Date or string
     b_lu_yield: number | undefined
     b_lu_yield_fresh: number | undefined
     b_lu_yield_bruto: number | undefined
@@ -82,7 +82,9 @@ export function HarvestFormDialog({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            b_lu_harvest_date: b_lu_harvest_date,
+            b_lu_harvest_date: b_lu_harvest_date
+                ? new Date(b_lu_harvest_date)
+                : undefined,
             b_lu_yield: harvestParameters.includes("b_lu_yield")
                 ? b_lu_yield
                 : undefined,
@@ -153,8 +155,23 @@ export function HarvestFormDialog({
                                     render={({ field, fieldState }) => (
                                         <DatePicker
                                             label="Oogstdatum"
-                                            defaultValue={b_lu_harvest_date}
-                                            field={field}
+                                            defaultValue={
+                                                b_lu_harvest_date instanceof Date
+                                                    ? b_lu_harvest_date
+                                                    : b_lu_harvest_date
+                                                      ? new Date(
+                                                            b_lu_harvest_date,
+                                                        )
+                                                      : undefined
+                                            }
+                                            field={{
+                                                ...field,
+                                                value: field.value
+                                                    ? new Date(
+                                                          field.value,
+                                                      ).toISOString()
+                                                    : "",
+                                            }}
                                             fieldState={fieldState}
                                             required={true}
                                         />

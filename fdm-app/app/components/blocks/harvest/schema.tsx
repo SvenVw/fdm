@@ -8,15 +8,16 @@ export const FormSchema = z
                 invalid_type_error: "Oogstdatum moet een datum zijn",
             })
             .transform((val, ctx) => {
+                const date = new Date(val)
                 // biome-ignore lint/suspicious/noGlobalIsNan: <false positive>
-                if (isNaN(new Date(val).getTime())) {
+                if (isNaN(date.getTime())) {
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,
                         message: "Oogstdatum moet een datum zijn",
                     })
                     return z.NEVER
                 }
-                return new Date(val)
+                return date
             }),
         b_lu_yield: z.coerce
             .number({

@@ -39,9 +39,11 @@ export function DatePicker({
     const [open, setOpen] = useState(false)
     const initialDate =
         (field.value && parseDateText(field.value)) || defaultValue
-    const [inputValue, setInputValue] = useState(formatDate(initialDate))
+    const [inputValue, setInputValue] = useState(
+        initialDate ? formatDate(initialDate) : "",
+    )
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-        field.value ? parseDateText(field.value) || undefined : undefined,
+        initialDate || undefined,
     )
     const [month, setMonth] = useState<Date | undefined>(selectedDate)
 
@@ -50,9 +52,11 @@ export function DatePicker({
             const date = parseDateText(field.value)
             setSelectedDate(date || undefined)
             setInputValue(date ? formatDate(date) : "")
+            setMonth(date || undefined)
         } else {
             setInputValue("")
             setSelectedDate(undefined)
+            setMonth(undefined)
         }
     }, [field.value])
 
@@ -65,18 +69,19 @@ export function DatePicker({
         if (date) {
             setSelectedDate(date)
             setMonth(date)
-            field.onChange(formatDate(date))
+            field.onChange(date.toISOString()) // Submit ISO string
         } else {
             setSelectedDate(undefined)
             field.onChange("")
         }
+        field.onBlur()
     }
 
     const handleDateSelect = (date: Date | undefined) => {
         setSelectedDate(date)
         const formattedDate = formatDate(date)
         setInputValue(formattedDate)
-        field.onChange(formattedDate)
+        field.onChange(date ? date.toISOString() : "") // Submit ISO string
         setOpen(false)
     }
 
@@ -148,6 +153,14 @@ function parseDateText(date: string | Date | undefined): Date | undefined {
     if (!date || date === "") {
         return undefined
     }
+
+    // Attempt to parse as ISO string first
+    const isoDate = new Date(date)
+    if (!Number.isNaN(isoDate.getTime())) {
+        return isoDate
+    }
+
+    // Fallback to chrono-node for localized strings
     const referenceDate = new Date()
     const parsedDate = chrono.nl.parseDate(date, referenceDate)
     if (!parsedDate) {
