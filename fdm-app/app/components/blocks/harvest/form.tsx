@@ -166,11 +166,7 @@ export function HarvestFormDialog({
                                             }
                                             field={{
                                                 ...field,
-                                                value: field.value
-                                                    ? new Date(
-                                                          field.value,
-                                                      ).toISOString()
-                                                    : "",
+                                                value: field.value,
                                             }}
                                             fieldState={fieldState}
                                             required={true}

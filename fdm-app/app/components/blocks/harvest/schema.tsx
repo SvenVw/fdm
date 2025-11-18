@@ -5,9 +5,9 @@ export const FormSchema = z
         b_lu_harvest_date: z
             .string({
                 required_error:
-                    "Geef een datum voor wanneer dit gewas is geoogst",
+                    "Geef een datum op voor wanneer dit gewas is geoogst",
                 invalid_type_error:
-                    "Geef een datum voor wanneer dit gewas is geoogst",
+                    "Geef een datum op voor wanneer dit gewas is geoogst",
             })
             .transform((val, ctx) => {
                 const date = new Date(val)
@@ -15,7 +15,7 @@ export const FormSchema = z
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,
                         message:
-                            "Geef een datum voor wanneer dit gewas is geoogst",
+                            "Geef een datum op voor wanneer dit gewas is geoogst",
                     })
                     return z.NEVER
                 }
@@ -204,12 +204,8 @@ export const FormSchema = z
                 })
                 .optional(),
         ),
-        b_lu_start: z
-            .union([z.coerce.date().optional(), z.literal("null")])
-            .nullable(),
-        b_lu_end: z
-            .union([z.coerce.date().optional(), z.literal("null")])
-            .nullable(),
+        b_lu_start: z.coerce.date().optional().nullable(),
+        b_lu_end: z.coerce.date().optional().nullable(),
         b_lu_harvestable: z.enum(["once", "multiple", "none"]),
     })
     .superRefine((data, ctx) => {
