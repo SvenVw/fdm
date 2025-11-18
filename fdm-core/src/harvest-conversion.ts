@@ -292,7 +292,6 @@ function convertHarvestParametersForClassHC042(
     // Calculate dry matter content (g/kg) from underwater weight (g)
     // Formula from Ludwig, 1972 (https://edepot.wur.nl/368270 page 11)
     const b_lu_dm = new Decimal(b_lu_uww).times(0.049).add(2.0).times(10)
-    console.log(b_lu_dm)
 
     // Calculate fresh yield from gross yield and tare
     const b_lu_yield_fresh = new Decimal(100)
