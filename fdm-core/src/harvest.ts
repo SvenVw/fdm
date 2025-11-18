@@ -18,8 +18,6 @@ import type {
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
 import { convertHarvestParameters } from "./harvest-conversion"
-import { getCultivation, getCultivationsFromCatalogue } from "./cultivation"
-import { get } from "http"
 
 /**
  * Adds a new harvest to a cultivation.
