@@ -236,7 +236,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     )
                 },
             )
-            console.log(targetHarvests)
 
             // Get required harvest parameters for the cultivation's harvest category
             const requiredHarvestParameters = getParametersForHarvestCat(
