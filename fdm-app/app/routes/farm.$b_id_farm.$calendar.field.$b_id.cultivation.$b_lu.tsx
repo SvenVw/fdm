@@ -1,6 +1,5 @@
 import {
     type CultivationCatalogue,
-    type CultivationCatalogueItem,
     getCultivation,
     getCultivationsFromCatalogue,
     getField,
@@ -9,7 +8,6 @@ import {
     removeCultivation,
     updateCultivation,
 } from "@svenvw/fdm-core"
-import { get } from "proj4/dist/lib/projections"
 import {
     type ActionFunctionArgs,
     data,
@@ -147,7 +145,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             timeframe,
         )
 
-        const cultivationCatalogueItem: CultivationCatalogueItem | undefined =
+        const cultivationCatalogueItem: CultivationCatalogue | undefined =
             cultivationsCatalogue.find((item) => {
                 return item.b_lu_catalogue === cultivation.b_lu_catalogue
             })
