@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { type FormEventHandler, useRef } from "react"
 import { Form, useFetcher } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
@@ -38,7 +37,6 @@ export function HarvestForm({
     handleConfirmation?: (data: z.infer<typeof FormSchema>) => Promise<boolean>
 }) {
     const fetcher = useFetcher()
-    const submitting = useRef(false)
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -58,12 +56,12 @@ export function HarvestForm({
             }
             // If submitting, handle the confirmation procedure
             // (it might just return true without a dialog)
-            if (submitting.current && !(await handleConfirmation(values))) {
-                submitting.current = false
+            if (
+                form.formState.isSubmitting &&
+                !(await handleConfirmation(values))
+            ) {
                 return { values: {}, errors: true }
             }
-            // Reset the submitting state before any page redirects can happen
-            submitting.current = false
             return validation
         },
         defaultValues: {
@@ -80,11 +78,6 @@ export function HarvestForm({
         return fetcher.submit(null, { method: "DELETE" })
     }
 
-    const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
-        submitting.current = true
-        form.handleSubmit(e)
-    }
-
     // Check if this is a new harvest or is has already values
     const isHarvestUpdate =
         b_lu_yield !== undefined ||
@@ -96,7 +89,7 @@ export function HarvestForm({
             <RemixFormProvider {...form}>
                 <Form
                     id="formHarvest"
-                    onSubmit={handleSubmit}
+                    onSubmit={form.handleSubmit}
                     method="post"
                     action={action}
                 >
