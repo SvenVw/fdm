@@ -23,7 +23,7 @@ describe("convertHarvestParameters", () => {
 
         it("should throw an error for HC010 if required parameters are missing", () => {
             expect(() => convertHarvestParameters("HC010")).toThrow(
-                "Missing required parameters for HC010: b_lu_yield_fresh, b_lu_dm, b_lu_n_harvestable",
+                "Missing required parameter for HC010: b_lu_yield_fresh",
             )
         })
     })
@@ -48,7 +48,7 @@ describe("convertHarvestParameters", () => {
 
         it("should throw an error for HC020 if required parameters are missing", () => {
             expect(() => convertHarvestParameters("HC020")).toThrow(
-                "Missing required parameters for HC020: b_lu_yield, b_lu_cp",
+                "Missing required parameter for HC020: b_lu_yield",
             )
         })
     })
@@ -73,7 +73,7 @@ describe("convertHarvestParameters", () => {
 
         it("should throw an error for HC031 if required parameters are missing", () => {
             expect(() => convertHarvestParameters("HC031")).toThrow(
-                "Missing required parameters for HC031: b_lu_yield, b_lu_cp",
+                "Missing required parameter for HC031: b_lu_yield",
             )
         })
     })
@@ -99,7 +99,7 @@ describe("convertHarvestParameters", () => {
 
         it("should throw an error for HC040 if required parameters are missing", () => {
             expect(() => convertHarvestParameters("HC040")).toThrow(
-                "Missing required parameters for HC040: b_lu_yield_bruto, b_lu_tarra, b_lu_dm, b_lu_n_harvestable",
+                "Missing required parameter for HC040: b_lu_yield_bruto",
             )
         })
     })
@@ -125,7 +125,7 @@ describe("convertHarvestParameters", () => {
 
         it("should throw an error for HC041 if required parameters are missing", () => {
             expect(() => convertHarvestParameters("HC041")).toThrow(
-                "Missing required parameters for HC041: b_lu_yield_bruto, b_lu_tarra, b_lu_dm, b_lu_n_harvestable",
+                "Missing required parameter for HC041: b_lu_yield_bruto",
             )
         })
     })
@@ -151,7 +151,7 @@ describe("convertHarvestParameters", () => {
 
         it("should throw an error for HC042 if required parameters are missing", () => {
             expect(() => convertHarvestParameters("HC042")).toThrow(
-                "Missing required parameters for HC042: b_lu_yield_bruto, b_lu_tarra, b_lu_uww, b_lu_n_harvestable",
+                "Missing required parameter for HC042: b_lu_yield_bruto",
             )
         })
     })
@@ -176,7 +176,7 @@ describe("convertHarvestParameters", () => {
 
         it("should throw an error for HC050 if required parameters are missing", () => {
             expect(() => convertHarvestParameters("HC050")).toThrow(
-                "Missing required parameters for HC050: b_lu_yield_fresh, b_lu_moist, b_lu_cp",
+                "Missing required parameter for HC050: b_lu_yield_fresh",
             )
         })
     })
