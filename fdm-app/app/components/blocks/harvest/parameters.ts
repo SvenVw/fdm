@@ -5,13 +5,13 @@ export function getHarvestParameterLabel(param: HarvestParameters[number]) {
         case "b_lu_yield":
             return "Opbrengst (kg DS / ha)"
         case "b_lu_yield_fresh":
-            return " Opbrengst (kg versproduct / ha)"
+            return "Opbrengst (kg versproduct / ha)"
         case "b_lu_yield_bruto":
             return "Opbrengst incl. tarra (kg versproduct / ha)"
         case "b_lu_tarra":
             return "Tarra (%)"
         case "b_lu_dm":
-            return " Droge stofgehalte (g DS / kg versproduct))"
+            return "Droge stofgehalte (g DS / kg versproduct)"
         case "b_lu_moist":
             return "Vochtgehalte (%)"
         case "b_lu_uww":
