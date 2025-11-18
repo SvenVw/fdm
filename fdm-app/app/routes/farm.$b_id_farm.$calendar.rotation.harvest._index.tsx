@@ -309,6 +309,50 @@ export default function FarmRotationHarvestAddIndex() {
         selectedFieldIds.includes(field.b_id!),
     )
 
+    // Confirmation Handling
+    const [resolveConfirmationPromise, setResolveConfirmationPromise] =
+        useState<[(value: boolean) => void]>()
+    const [confirmationPromise, setConfirmationPromise] =
+        useState<Promise<boolean>>()
+
+    function handleConfirmation() {
+        if (loaderData.b_lu_harvestable === "once") {
+            return initiateConfirmation()
+        }
+
+        return Promise.resolve(true)
+    }
+
+    function initiateConfirmation() {
+        if (!showOverwriteWarning) {
+            setShowOverwriteWarning(true)
+        }
+
+        if (confirmationPromise) {
+            return confirmationPromise
+        }
+
+        const myConfirmationPromise = new Promise<boolean>((resolve) =>
+            setResolveConfirmationPromise([resolve]),
+        )
+        setConfirmationPromise(myConfirmationPromise)
+
+        return myConfirmationPromise
+    }
+
+    function resolveConfirmation(response: boolean) {
+        console.error("resolveConfirmation", response)
+        if (resolveConfirmationPromise) {
+            resolveConfirmationPromise[0](response)
+        }
+
+        if (confirmationPromise) {
+            setConfirmationPromise(undefined)
+        }
+
+        setShowOverwriteWarning(false)
+    }
+
     return (
         <SidebarInset>
             <Header
@@ -567,6 +611,9 @@ export default function FarmRotationHarvestAddIndex() {
                                                         ),
                                                     ),
                                             )}
+                                            handleConfirmation={
+                                                handleConfirmation
+                                            }
                                         />
                                     ) : (
                                         <div className="flex h-full min-h-60 items-center justify-center rounded-md border border-dashed">
@@ -581,46 +628,45 @@ export default function FarmRotationHarvestAddIndex() {
                         </div>
                     </FarmContent>
                 </div>
-                {loaderData.b_lu_harvestable === "once" &&
-                    showOverwriteWarning && (
-                        <Dialog
-                            open={showOverwriteWarning}
-                            onOpenChange={setShowOverwriteWarning}
-                        >
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>
-                                        Bestaande oogst overschrijven?
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                        Er is al een oogst geregistreerd voor
-                                        één of meerdere van de geselecteerde
-                                        percelen. Als u doorgaat, worden eerdere
-                                        oogsten verwijderd en overschreven.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() =>
-                                            setShowOverwriteWarning(false)
-                                        }
-                                    >
-                                        Annuleren
-                                    </Button>
-                                    <Button
-                                        type="submit"
-                                        form="formHarvest"
-                                        onClick={() =>
-                                            setShowOverwriteWarning(false)
-                                        }
-                                    >
-                                        Overschrijven
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                    )}
+                {showOverwriteWarning && (
+                    <Dialog
+                        open={showOverwriteWarning}
+                        onOpenChange={(open) => {
+                            if (!open) {
+                                resolveConfirmation(false)
+                            }
+                        }}
+                    >
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>
+                                    Bestaande oogst overschrijven?
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Er is al een oogst geregistreerd voor één of
+                                    meerdere van de geselecteerde percelen. Als
+                                    u doorgaat, worden eerdere oogsten
+                                    verwijderd en overschreven.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => resolveConfirmation(false)}
+                                >
+                                    Annuleren
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    form="formHarvest"
+                                    onClick={() => resolveConfirmation(true)}
+                                >
+                                    Overschrijven
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                )}
             </main>
         </SidebarInset>
     )

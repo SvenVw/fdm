@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { type FormEventHandler, useRef } from "react"
 import { Form, useFetcher } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
@@ -16,6 +17,7 @@ import {
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
 import { FormSchema } from "./schema"
+
 export function HarvestForm({
     b_lu_yield,
     b_lu_n_harvestable,
@@ -24,6 +26,7 @@ export function HarvestForm({
     b_lu_end,
     b_lu_harvestable,
     action,
+    handleConfirmation = () => Promise.resolve(true),
 }: {
     b_lu_yield: number | undefined
     b_lu_n_harvestable: number | undefined
@@ -32,12 +35,36 @@ export function HarvestForm({
     b_lu_end: Date | null | undefined
     b_lu_harvestable: "once" | "multiple" | "none" | undefined
     action: string
+    handleConfirmation?: (data: z.infer<typeof FormSchema>) => Promise<boolean>
 }) {
     const fetcher = useFetcher()
+    const submitting = useRef(false)
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(FormSchema),
+        resolver: async (values, bypass, options) => {
+            // Do the validation using Zod
+            const validation = await zodResolver(FormSchema)(
+                values,
+                bypass,
+                options,
+            )
+            // If there are validation errors anyways, just return them
+            if (
+                validation.errors &&
+                Object.keys(validation.errors).length > 0
+            ) {
+                return validation
+            }
+            // If submitting, handle the confirmation procedure
+            // (it might just return true without a dialog)
+            if (submitting.current && !(await handleConfirmation(values))) {
+                return { values: {}, errors: true }
+            }
+            // Reset the submitting state before any page redirects can happen
+            submitting.current = false
+            return validation
+        },
         defaultValues: {
             b_lu_yield: b_lu_yield,
             b_lu_n_harvestable: b_lu_n_harvestable,
@@ -52,6 +79,11 @@ export function HarvestForm({
         return fetcher.submit(null, { method: "DELETE" })
     }
 
+    const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+        submitting.current = true
+        form.handleSubmit(e)
+    }
+
     // Check if this is a new harvest or is has already values
     const isHarvestUpdate =
         b_lu_yield !== undefined ||
@@ -63,7 +95,7 @@ export function HarvestForm({
             <RemixFormProvider {...form}>
                 <Form
                     id="formHarvest"
-                    onSubmit={form.handleSubmit}
+                    onSubmit={handleSubmit}
                     method="post"
                     action={action}
                 >
