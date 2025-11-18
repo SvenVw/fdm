@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import * as chrono from "chrono-node"
 import { CalendarIcon } from "lucide-react"
 import { Button } from "~/components/ui/button"
@@ -20,6 +19,7 @@ import type {
     FieldValues,
 } from "react-hook-form"
 import { nl as calenderLocale } from "react-day-picker/locale"
+import { type ChangeEvent, useEffect, useState } from "react"
 
 type DatePickerProps = {
     label: string
@@ -36,19 +36,16 @@ export function DatePicker({
     fieldState,
     required,
 }: DatePickerProps) {
-    const [open, setOpen] = React.useState(false)
-    const [inputValue, setInputValue] = React.useState(
-        field.value
-            ? parseDateText(field.value)?.toDateString() ||
-                  defaultValue?.toDateString()
-            : "",
-    )
-    const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
+    const [open, setOpen] = useState(false)
+    const initialDate =
+        (field.value && parseDateText(field.value)) || defaultValue
+    const [inputValue, setInputValue] = useState(formatDate(initialDate))
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(
         field.value ? parseDateText(field.value) || undefined : undefined,
     )
-    const [month, setMonth] = React.useState<Date | undefined>(selectedDate)
+    const [month, setMonth] = useState<Date | undefined>(selectedDate)
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (field.value) {
             const date = parseDateText(field.value)
             setSelectedDate(date || undefined)
@@ -59,7 +56,7 @@ export function DatePicker({
         }
     }, [field.value])
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value)
     }
 
@@ -73,6 +70,7 @@ export function DatePicker({
             setSelectedDate(undefined)
             field.onChange("")
         }
+        field.onBlur()
     }
 
     const handleDateSelect = (date: Date | undefined) => {
@@ -90,7 +88,7 @@ export function DatePicker({
                 <Input
                     {...field}
                     value={inputValue}
-                    aria-required="true"
+                    aria-required={required ? "true" : "false"}
                     aria-invalid={fieldState.invalid}
                     placeholder="Kies een datum"
                     className="bg-background pr-10"
