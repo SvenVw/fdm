@@ -70,7 +70,6 @@ export function DatePicker({
             setSelectedDate(undefined)
             field.onChange("")
         }
-        field.onBlur()
     }
 
     const handleDateSelect = (date: Date | undefined) => {
@@ -84,7 +83,7 @@ export function DatePicker({
     return (
         <Field data-invalid={fieldState.invalid} className="gap-1">
             <FieldLabel>{label}</FieldLabel>
-            <div className="relative flex gap-2">
+            <div className="flex relative gap-2">
                 <Input
                     {...field}
                     value={inputValue}
@@ -128,10 +127,8 @@ export function DatePicker({
                         />
                     </PopoverContent>
                 </Popover>
-                {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                )}
             </div>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
         </Field>
     )
 }
