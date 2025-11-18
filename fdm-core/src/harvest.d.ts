@@ -17,7 +17,7 @@ export interface HarvestableAnalysis {
     b_lu_yield: schema.harvestableAnalysesTypeSelect["b_lu_yield"]
     b_lu_yield_fresh: schema.harvestableAnalysesTypeSelect["b_lu_yield_fresh"]
     b_lu_yield_bruto: schema.harvestableAnalysesTypeSelect["b_lu_yield_bruto"]
-    b_lu_tarra: schema.harvestableAnalysesTypeSelect["b_lu_yield_tarra"]
+    b_lu_tarra: schema.harvestableAnalysesTypeSelect["b_lu_tarra"]
     b_lu_dm: schema.harvestableAnalysesTypeSelect["b_lu_dm"]
     b_lu_moist: schema.harvestableAnalysesTypeSelect["b_lu_moist"]
     b_lu_uww: schema.harvestableAnalysesTypeSelect["b_lu_uww"]
