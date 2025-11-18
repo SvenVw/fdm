@@ -96,9 +96,17 @@ function convertHarvestParametersForClassHC010(
     b_lu_n_harvestable: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
 ): StandardHarvestParameters {
     // Check if the required parameters are present
-    if (!b_lu_yield_fresh || !b_lu_dm || !b_lu_n_harvestable) {
+    if (b_lu_yield_fresh == null) {
         throw new Error(
-            "Missing required parameters for HC010: b_lu_yield_fresh, b_lu_dm, b_lu_n_harvestable",
+            "Missing required parameter for HC010: b_lu_yield_fresh",
+        )
+    }
+    if (b_lu_dm == null) {
+        throw new Error("Missing required parameter for HC010: b_lu_dm")
+    }
+    if (b_lu_n_harvestable == null) {
+        throw new Error(
+            "Missing required parameter for HC010: b_lu_n_harvestable",
         )
     }
 
@@ -129,10 +137,11 @@ function convertHarvestParametersForClassHC020(
     b_lu_cp: schema.harvestableAnalysesTypeInsert["b_lu_cp"],
 ): StandardHarvestParameters {
     // Check if the required parameters are present
-    if (!b_lu_yield || !b_lu_cp) {
-        throw new Error(
-            "Missing required parameters for HC020: b_lu_yield, b_lu_cp",
-        )
+    if (b_lu_yield == null) {
+        throw new Error("Missing required parameter for HC020: b_lu_yield")
+    }
+    if (b_lu_cp == null) {
+        throw new Error("Missing required parameter for HC020: b_lu_cp")
     }
 
     // Calculate b_lu_n_harvestable (Nitrogen content in harvestable yield)
@@ -162,10 +171,11 @@ function convertHarvestParametersForClassHC031(
     b_lu_cp: schema.harvestableAnalysesTypeInsert["b_lu_cp"],
 ): StandardHarvestParameters {
     // Check if the required parameters are present
-    if (!b_lu_yield || !b_lu_cp) {
-        throw new Error(
-            "Missing required parameters for HC031: b_lu_yield, b_lu_cp",
-        )
+    if (b_lu_yield == null) {
+        throw new Error("Missing required parameter for HC031: b_lu_yield")
+    }
+    if (b_lu_cp == null) {
+        throw new Error("Missing required parameter for HC031: b_lu_cp")
     }
 
     // Calculate b_lu_n_harvestable (Nitrogen content in harvestable yield)
@@ -199,9 +209,20 @@ function convertHarvestParametersForClassHC040(
     b_lu_n_harvestable: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
 ): StandardHarvestParameters {
     // Check if the required parameters are present
-    if (!b_lu_yield_bruto || !b_lu_tarra || !b_lu_dm || !b_lu_n_harvestable) {
+    if (b_lu_yield_bruto == null) {
         throw new Error(
-            "Missing required parameters for HC040: b_lu_yield_bruto, b_lu_tarra, b_lu_dm, b_lu_n_harvestable",
+            "Missing required parameter for HC040: b_lu_yield_bruto",
+        )
+    }
+    if (b_lu_tarra == null) {
+        throw new Error("Missing required parameter for HC040: b_lu_tarra")
+    }
+    if (b_lu_dm == null) {
+        throw new Error("Missing required parameter for HC040: b_lu_dm")
+    }
+    if (b_lu_n_harvestable == null) {
+        throw new Error(
+            "Missing required parameter for HC040: b_lu_n_harvestable",
         )
     }
 
@@ -241,9 +262,20 @@ function convertHarvestParametersForClassHC041(
     b_lu_n_harvestable: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
 ): StandardHarvestParameters {
     // Check if the required parameters are present
-    if (!b_lu_yield_bruto || !b_lu_tarra || !b_lu_dm || !b_lu_n_harvestable) {
+    if (b_lu_yield_bruto == null) {
         throw new Error(
-            "Missing required parameters for HC041: b_lu_yield_bruto, b_lu_tarra, b_lu_dm, b_lu_n_harvestable",
+            "Missing required parameter for HC041: b_lu_yield_bruto",
+        )
+    }
+    if (b_lu_tarra == null) {
+        throw new Error("Missing required parameter for HC041: b_lu_tarra")
+    }
+    if (b_lu_dm == null) {
+        throw new Error("Missing required parameter for HC041: b_lu_dm")
+    }
+    if (b_lu_n_harvestable == null) {
+        throw new Error(
+            "Missing required parameter for HC041: b_lu_n_harvestable",
         )
     }
 
@@ -283,9 +315,20 @@ function convertHarvestParametersForClassHC042(
     b_lu_n_harvestable: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
 ): StandardHarvestParameters {
     // Check if the required parameters are present
-    if (!b_lu_yield_bruto || !b_lu_tarra || !b_lu_uww || !b_lu_n_harvestable) {
+    if (b_lu_yield_bruto == null) {
         throw new Error(
-            "Missing required parameters for HC042: b_lu_yield_bruto, b_lu_tarra, b_lu_uww, b_lu_n_harvestable",
+            "Missing required parameter for HC042: b_lu_yield_bruto",
+        )
+    }
+    if (b_lu_tarra == null) {
+        throw new Error("Missing required parameter for HC042: b_lu_tarra")
+    }
+    if (b_lu_uww == null) {
+        throw new Error("Missing required parameter for HC042: b_lu_uww")
+    }
+    if (b_lu_n_harvestable == null) {
+        throw new Error(
+            "Missing required parameter for HC042: b_lu_n_harvestable",
         )
     }
 
@@ -327,10 +370,16 @@ function convertHarvestParametersForClassHC050(
     b_lu_cp: schema.harvestableAnalysesTypeInsert["b_lu_cp"],
 ): StandardHarvestParameters {
     // Check if the required parameters are present
-    if (!b_lu_yield_fresh || !b_lu_moist || !b_lu_cp) {
+    if (b_lu_yield_fresh == null) {
         throw new Error(
-            "Missing required parameters for HC050: b_lu_yield_fresh, b_lu_moist, b_lu_cp",
+            "Missing required parameter for HC050: b_lu_yield_fresh",
         )
+    }
+    if (b_lu_moist == null) {
+        throw new Error("Missing required parameter for HC050: b_lu_moist")
+    }
+    if (b_lu_cp == null) {
+        throw new Error("Missing required parameter for HC050: b_lu_cp")
     }
 
     // Calculate dry matter content (g/kg) from moisture percentage
