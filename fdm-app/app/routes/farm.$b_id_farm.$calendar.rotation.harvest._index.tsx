@@ -210,6 +210,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             targetCultivation.b_lu_harvestable === "once" &&
             selectedFields.length > 0
         ) {
+            // For cultivations that can only be harvested once, we assume
+            // one harvesting, one harvestable, one harvestable analysis
             const targetFieldCultivation = selectedFields[0].cultivations.find(
                 (c) => c.b_lu_catalogue === targetCultivation.b_lu_catalogue,
             )
@@ -220,7 +222,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     targetFieldCultivation.b_lu,
                 )
                 if (harvests.length > 0) {
-                    harvestApplication = harvests[0]
+                    harvestApplication = {
+                        ...harvests[0],
+                        ...(harvests[0].harvestable?.harvestable_analyses
+                            ?.length > 0
+                            ? harvests[0].harvestable.harvestable_analyses[0]
+                            : {}),
+                    }
                 }
             }
         }
