@@ -9,8 +9,7 @@ export const FormSchema = z
             })
             .transform((val, ctx) => {
                 const date = new Date(val)
-                // biome-ignore lint/suspicious/noGlobalIsNan: <false positive>
-                if (isNaN(date.getTime())) {
+                if (Number.isNaN(date.getTime())) {
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,
                         message: "Oogstdatum moet een datum zijn",
