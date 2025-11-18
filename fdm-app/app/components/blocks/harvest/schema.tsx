@@ -17,7 +17,8 @@ export const FormSchema = z
                 message: "Hoeveelheid moet een geheel getal zijn",
             })
             .max(250000, {
-                message: "Hoeveelheid mag niet groter zijn dan 250000",
+                message:
+                    "Hoeveelheid mag niet groter zijn dan 250.000 kg DS / ha",
             })
             .safe({
                 message: "Hoeveelheid moet een safe getal zijn",
@@ -34,7 +35,8 @@ export const FormSchema = z
                 message: "Hoeveelheid moet een geheel getal zijn",
             })
             .max(250000, {
-                message: "Hoeveelheid mag niet groter zijn dan 250000",
+                message:
+                    "Hoeveelheid mag niet groter zijn dan 250.000 kg versproduct / ha",
             })
             .safe({
                 message: "Hoeveelheid moet een safe getal zijn",
@@ -51,7 +53,8 @@ export const FormSchema = z
                 message: "Hoeveelheid moet een geheel getal zijn",
             })
             .max(250000, {
-                message: "Hoeveelheid mag niet groter zijn dan 250000",
+                message:
+                    "Hoeveelheid mag niet groter zijn dan 250.000 kg versproduct (incl. tarra) / ha",
             })
             .safe({
                 message: "Hoeveelheid moet een safe getal zijn",
@@ -68,7 +71,8 @@ export const FormSchema = z
                 message: "Hoeveelheid moet een geheel getal zijn",
             })
             .max(1000, {
-                message: "Hoeveelheid mag niet groter zijn dan 1000",
+                message:
+                    "Hoeveelheid mag niet groter zijn dan 1.000 g Ds / kg versproduct",
             })
             .safe({
                 message: "Hoeveelheid moet een safe getal zijn",
@@ -96,7 +100,7 @@ export const FormSchema = z
                 message: "Hoeveelheid moet een geheel getal zijn",
             })
             .max(25, {
-                message: "Hoeveelheid mag niet groter zijn dan 25",
+                message: "Hoeveelheid mag niet groter zijn dan 25 %",
             })
             .safe({
                 message: "Hoeveelheid moet een safe getal zijn",
@@ -116,7 +120,7 @@ export const FormSchema = z
                 message: "Hoeveelheid mag niet kleiner zijn dan 100",
             })
             .max(1000, {
-                message: "Hoeveelheid mag niet groter zijn dan 1000",
+                message: "Hoeveelheid mag niet groter zijn dan 1.000 g / 5 kg",
             })
             .safe({
                 message: "Hoeveelheid moet een safe getal zijn",
@@ -133,7 +137,7 @@ export const FormSchema = z
                 message: "Hoeveelheid moet een geheel getal zijn",
             })
             .max(100, {
-                message: "Hoeveelheid mag niet groter zijn dan 100",
+                message: "Hoeveelheid mag niet groter zijn dan 100 %",
             })
             .safe({
                 message: "Hoeveelheid moet een safe getal zijn",
@@ -150,14 +154,19 @@ export const FormSchema = z
                 message: "Hoeveelheid moet een geheel getal zijn",
             })
             .max(500, {
-                message: "Hoeveelheid mag niet groter zijn dan 500",
+                message:
+                    "Hoeveelheid mag niet groter zijn dan 500 g RE / kg DS",
             })
             .safe({
                 message: "Hoeveelheid moet een safe getal zijn",
             })
             .optional(),
-        b_lu_start: z.union([z.coerce.date().optional(), z.literal("null")]).nullable(),
-        b_lu_end: z.union([z.coerce.date().optional(), z.literal("null")]).nullable(),
+        b_lu_start: z
+            .union([z.coerce.date().optional(), z.literal("null")])
+            .nullable(),
+        b_lu_end: z
+            .union([z.coerce.date().optional(), z.literal("null")])
+            .nullable(),
         b_lu_harvestable: z.enum(["once", "multiple", "none"]),
     })
     .superRefine((data, ctx) => {
