@@ -3,18 +3,16 @@ title: Setting up Local Environment
 sidebar_label: Setting up Local Environment
 ---
 
-# Setting up Local Environment
-
 This guide will walk you through the process of setting up a local development environment for the Farm Data Model (FDM) project.
 
 ## Prerequisites
 
 Before you begin, you will need to have the following software installed on your machine:
 
-*   **Node.js:** FDM is a TypeScript and JavaScript project, so you will need to have Node.js installed.
-*   **`pnpm`**: FDM uses `pnpm` for package management, so you will need to have it installed.
-*   **Git:** FDM is hosted on GitHub, so you will need to have Git installed to clone the repository.
-*   **Docker:** FDM uses Docker to run the necessary services, such as the PostgreSQL database.
+* **Node.js:** FDM is a TypeScript and JavaScript project, so you will need to have Node.js installed.
+* **`pnpm`**: FDM uses `pnpm` for package management, so you will need to have it installed.
+* **Git:** FDM is hosted on GitHub, so you will need to have Git installed to clone the repository.
+* **Docker:** FDM uses Docker to run the necessary services, such as the PostgreSQL database.
 
 ## Cloning the Repository
 

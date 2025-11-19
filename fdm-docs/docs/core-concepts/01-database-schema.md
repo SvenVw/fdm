@@ -2,8 +2,6 @@
 title: Database Schema
 ---
 
-# Database Schema
-
 This document provides a comprehensive overview of the Farm Data Model (FDM) database schema. It details each schema and table, their properties, and columns, explaining their purpose and how they relate to the overall data structure.
 
 FDM uses a relational database to store its data. The schema is defined using TypeScript and then translated into a physical database schema using a tool called an **Object-Relational Mapper (ORM)**.
@@ -18,10 +16,10 @@ FDM uses a relational database to store its data. The schema is defined using Ty
 
 The FDM database is organized into four distinct PostgreSQL schemas:
 
-1.  **`fdm`**: Contains the core tables related to farm management, fields, cultivations, fertilizers, soil data, etc.
-2.  **`fdm-authn`**: Handles authentication, storing user accounts, sessions, organizations, and related information.
-3.  **`fdm-authz`**: Manages authorization, defining roles, permissions, and maintaining an audit trail.
-4.  **`fdm-calculator`**: Caches calculation results and stores calculation errors to improve performance and provide better debugging capabilities.
+1. **`fdm`**: Contains the core tables related to farm management, fields, cultivations, fertilizers, soil data, etc.
+2. **`fdm-authn`**: Handles authentication, storing user accounts, sessions, organizations, and related information.
+3. **`fdm-authz`**: Manages authorization, defining roles, permissions, and maintaining an audit trail.
+4. **`fdm-calculator`**: Caches calculation results and stores calculation errors to improve performance and provide better debugging capabilities.
 
 ---
 
@@ -32,6 +30,7 @@ This schema holds the primary data related to farm operations.
 ### Farms & Fields
 
 #### **`farms`**
+
 **Purpose**: Stores basic information about each farm entity in the system.
 
 | Column              | Type                        | Constraints | Description                               |
@@ -45,9 +44,11 @@ This schema holds the primary data related to farm operations.
 | **updated**         | `timestamp with time zone`  |             | Timestamp when this record was last updated. |
 
 **Indexes:**
-*   Unique index on `b_id_farm`.
+
+* Unique index on `b_id_farm`.
 
 #### **`fields`**
+
 **Purpose**: Stores information about each agricultural field, including its geometry and identifiers.
 
 | Column          | Type                        | Constraints | Description                                                     |
@@ -60,10 +61,12 @@ This schema holds the primary data related to farm operations.
 | **updated**     | `timestamp with time zone`  |             | Timestamp when this record was last updated.                    |
 
 **Indexes:**
-*   Unique index on `b_id`.
-*   GIST index on `b_geometry` for spatial queries.
+
+* Unique index on `b_id`.
+* GIST index on `b_geometry` for spatial queries.
 
 #### **`fieldAcquiring`**
+
 **Purpose**: Tracks the relationship between a farm and a field it manages, including the method and timeframe of acquisition.
 
 | Column                | Type                        | Constraints                                  | Description                                                              |
@@ -76,13 +79,16 @@ This schema holds the primary data related to farm operations.
 | **updated**           | `timestamp with time zone`  |                                              | Timestamp when this record was last updated.                             |
 
 **Constraints:**
-*   Primary Key on (`b_id`, `b_id_farm`).
+
+* Primary Key on (`b_id`, `b_id_farm`).
 
 ##### `acquiringMethodEnum`
-*   **Name**: `b_acquiring_method`
-*   **Possible values**: `nl_01`, `nl_02`, `nl_03`, `nl_04`, `nl_07`, `nl_09`, `nl_10`, `nl_11`, `nl_12`, `nl_13`, `nl_61`, `nl_63`, `unknown`
+
+* **Name**: `b_acquiring_method`
+* **Possible values**: `nl_01`, `nl_02`, `nl_03`, `nl_04`, `nl_07`, `nl_09`, `nl_10`, `nl_11`, `nl_12`, `nl_13`, `nl_61`, `nl_63`, `unknown`
 
 #### **`fieldDiscarding`**
+
 **Purpose**: Marks when a field is no longer actively managed or used within the system.
 
 | Column      | Type                        | Constraints                                  | Description                                      |
@@ -97,6 +103,7 @@ This schema holds the primary data related to farm operations.
 ### Cultivations
 
 #### **`cultivationsCatalogue`**
+
 **Purpose**: A standardized catalogue of possible cultivation types (crops, cover crops, etc.).
 
 | Column              | Type                        | Constraints | Description                                                                        |
@@ -115,7 +122,7 @@ This schema holds the primary data related to farm operations.
 | **b_lu_n_residue**  | `numeric` (custom)         |             | Nitrogen content in the crop residue.                                              |
 | **b_n_fixation**    | `numeric` (custom)         |             | Nitrogen fixation rate (for legumes).                                              |
 | **b_lu_rest_oravib**| `boolean`                   |             | Is the cultivation a 'rustgewas' with regards to Dutch manure legislation                                                                         |
-| **b_lu_variety_options**| `text[]`                |             | A set of varieties (cultivars) that a cultivation may be	                                                                                |
+| **b_lu_variety_options**| `text[]`                |             | A set of varieties (cultivars) that a cultivation may be                                                                                 |
 | **b_lu_start_default**| `text`                    |             | Default start date of the cultivation (MM-DD).                                     |
 | **b_date_harvest_default**| `text`                |             | Default harvest date of the cultivation (MM-DD).                                   |
 | **hash**            | `text`                      |             | A hash value representing the content of the catalogue entry, for change tracking. |
@@ -123,17 +130,21 @@ This schema holds the primary data related to farm operations.
 | **updated**         | `timestamp with time zone`  |             | Timestamp when this record was last updated.                                       |
 
 **Indexes:**
-*   Unique index on `b_lu_catalogue`.
+
+* Unique index on `b_lu_catalogue`.
 
 ##### `harvestableEnum`
-*   **Name**: `b_lu_harvestable`
-*   **Possible values**: `none`, `once`, `multiple`
+
+* **Name**: `b_lu_harvestable`
+* **Possible values**: `none`, `once`, `multiple`
 
 ##### `rotationEnum`
-*   **Name**: `b_lu_croprotation`
-*   **Possible values**: `other`, `clover`, `nature`, `potato`, `grass`, `rapeseed`, `starch`, `maize`, `cereal`, `sugarbeet`, `alfalfa`, `catchcrop`
+
+* **Name**: `b_lu_croprotation`
+* **Possible values**: `other`, `clover`, `nature`, `potato`, `grass`, `rapeseed`, `starch`, `maize`, `cereal`, `sugarbeet`, `alfalfa`, `catchcrop`
 
 #### **`cultivations`**
+
 **Purpose**: Represents an instance of a cultivation being grown, linking it to its catalogue definition.
 
 | Column             | Type                        | Constraints                                                  | Description                                                              |
@@ -145,9 +156,11 @@ This schema holds the primary data related to farm operations.
 | **updated**        | `timestamp with time zone`  |                                                              | Timestamp when this record was last updated.                             |
 
 **Indexes:**
-*   Unique index on `b_lu`.
+
+* Unique index on `b_lu`.
 
 #### **`cultivationStarting`**
+
 **Purpose**: Records the event of starting a specific cultivation instance on a particular field.
 
 | Column            | Type                        | Constraints                                  | Description                                                        |
@@ -161,9 +174,11 @@ This schema holds the primary data related to farm operations.
 | **updated**       | `timestamp with time zone`  |                                              | Timestamp when this record was last updated.                       |
 
 **Constraints:**
-*   Primary Key on (`b_id`, `b_lu`).
+
+* Primary Key on (`b_id`, `b_lu`).
 
 #### **`cultivationEnding`**
+
 **Purpose**: Marks the end date for a specific cultivation instance.
 
 | Column      | Type                        | Constraints                                  | Description                                                     |
@@ -175,6 +190,7 @@ This schema holds the primary data related to farm operations.
 | **updated** | `timestamp with time zone`  |                                              | Timestamp when this record was last updated.                    |
 
 #### **`cultivationCatalogueSelecting`**
+
 **Purpose**: Indicates which cultivation catalogues are actively selected or used by a specific farm.
 
 | Column        | Type                        | Constraints                                                        | Description                                                     |
@@ -185,13 +201,15 @@ This schema holds the primary data related to farm operations.
 | **updated**   | `timestamp with time zone`  |                                                                    | Timestamp when this record was last updated.                    |
 
 **Constraints:**
-*   Primary Key on (`b_id_farm`, `b_lu_source`).
+
+* Primary Key on (`b_id_farm`, `b_lu_source`).
 
 ---
 
 ### Harvestables
 
 #### **`harvestables`**
+
 **Purpose**: Represents a potential or actual harvestable product derived from a cultivation.
 
 | Column             | Type                        | Constraints | Description                                      |
@@ -201,9 +219,11 @@ This schema holds the primary data related to farm operations.
 | **updated**        | `timestamp with time zone`  |             | Timestamp when this record was last updated.     |
 
 **Indexes:**
-*   Unique index on `b_id_harvestable`.
+
+* Unique index on `b_id_harvestable`.
 
 #### **`harvestableAnalyses`**
+
 **Purpose**: Stores the results of analyses performed on harvested products.
 
 | Column                      | Type                        | Constraints | Description                                                                 |
@@ -227,9 +247,11 @@ This schema holds the primary data related to farm operations.
 | **updated**                 | `timestamp with time zone`  |             | Timestamp when this record was last updated.                                |
 
 **Indexes:**
-*   Unique index on `b_id_harvestable_analysis`.
+
+* Unique index on `b_id_harvestable_analysis`.
 
 #### **`harvestableSampling`**
+
 **Purpose**: Links a harvestable product instance to its analysis results, recording the sampling date.
 
 | Column                      | Type                        | Constraints                                                  | Description                                                              |
@@ -241,9 +263,11 @@ This schema holds the primary data related to farm operations.
 | **updated**                 | `timestamp with time zone`  |                                                              | Timestamp when this record was last updated.                             |
 
 **Constraints:**
-*   Primary Key on (`b_id_harvestable`, `b_id_harvestable_analysis`).
+
+* Primary Key on (`b_id_harvestable`, `b_id_harvestable_analysis`).
 
 #### **`cultivationHarvesting`**
+
 **Purpose**: Records a specific harvesting event, linking the cultivation instance to the resulting harvestable product.
 
 | Column             | Type                        | Constraints                                                  | Description                                                              |
@@ -260,6 +284,7 @@ This schema holds the primary data related to farm operations.
 ### Fertilizers
 
 #### **`fertilizersCatalogue`**
+
 **Purpose**: A standardized catalogue of fertilizer products, detailing their composition and properties.
 
 | Column             | Type                        | Constraints | Description                                                                    |
@@ -322,9 +347,11 @@ This schema holds the primary data related to farm operations.
 | **updated**        | `timestamp with time zone`  |             | Timestamp when this record was last updated.                                   |
 
 **Indexes:**
-*   Unique index on `p_id_catalogue`.
+
+* Unique index on `p_id_catalogue`.
 
 #### **`fertilizers`**
+
 **Purpose**: Represents an instance of a fertilizer product (e.g., a specific batch or acquisition).
 
 | Column      | Type                        | Constraints | Description                                      |
@@ -334,9 +361,11 @@ This schema holds the primary data related to farm operations.
 | **updated** | `timestamp with time zone`  |             | Timestamp when this record was last updated.     |
 
 **Indexes:**
-*   Unique index on `p_id`.
+
+* Unique index on `p_id`.
 
 #### **`fertilizerAcquiring`**
+
 **Purpose**: Tracks the acquisition of a specific fertilizer instance by a farm.
 
 | Column               | Type                        | Constraints                                  | Description                                                 |
@@ -349,6 +378,7 @@ This schema holds the primary data related to farm operations.
 | **updated**          | `timestamp with time zone`  |                                              | Timestamp when this record was last updated.                |
 
 #### **`fertilizerPicking`**
+
 **Purpose**: Links a specific fertilizer instance to its corresponding entry in the `fertilizersCatalogue`.
 
 | Column             | Type                        | Constraints                                                  | Description                                                              |
@@ -360,6 +390,7 @@ This schema holds the primary data related to farm operations.
 | **updated**        | `timestamp with time zone`  |                                                              | Timestamp when this record was last updated.                             |
 
 #### **`fertilizerApplication`**
+
 **Purpose**: Logs the event of applying a specific fertilizer instance to a field.
 
 | Column         | Type                        | Constraints                                  | Description                                                              |
@@ -374,13 +405,16 @@ This schema holds the primary data related to farm operations.
 | **updated**    | `timestamp with time zone`  |                                              | Timestamp when this record was last updated.                             |
 
 **Indexes:**
-*   Unique index on `p_app_id`.
+
+* Unique index on `p_app_id`.
 
 ##### `applicationMethodEnum`
-*   **Name**: `p_app_method`
-*   **Possible values**: `slotted coulter`, `incorporation`, `incorporation 2 tracks`, `injection`, `shallow injection`, `spraying`, `broadcasting`, `spoke wheel`, `pocket placement`, `narrowband`
+
+* **Name**: `p_app_method`
+* **Possible values**: `slotted coulter`, `incorporation`, `incorporation 2 tracks`, `injection`, `shallow injection`, `spraying`, `broadcasting`, `spoke wheel`, `pocket placement`, `narrowband`
 
 #### **`fertilizerCatalogueEnabling`**
+
 **Purpose**: Indicates which fertilizer catalogue sources are actively enabled or used by a specific farm.
 
 | Column      | Type                        | Constraints                                                        | Description                                                        |
@@ -391,13 +425,15 @@ This schema holds the primary data related to farm operations.
 | **updated** | `timestamp with time zone`  |                                                                    | Timestamp when this record was last updated.                       |
 
 **Constraints:**
-*   Primary Key on (`b_id_farm`, `p_source`).
+
+* Primary Key on (`b_id_farm`, `p_source`).
 
 ---
 
 ### Soil
 
 #### **`soilAnalysis`**
+
 **Purpose**: Stores the results of a soil analysis.
 
 | Column            | Type                        | Constraints | Description                                                         |
@@ -446,18 +482,22 @@ This schema holds the primary data related to farm operations.
 | **updated**       | `timestamp with time zone`  |             | Timestamp when this record was last updated.                        |
 
 ##### `soiltypeEnum`
-*   **Name**: `b_soiltype_agr`
-*   **Possible values**: `moerige_klei`, `rivierklei`, `dekzand`, `zeeklei`, `dalgrond`, `veen`, `loess`, `duinzand`, `maasklei`
+
+* **Name**: `b_soiltype_agr`
+* **Possible values**: `moerige_klei`, `rivierklei`, `dekzand`, `zeeklei`, `dalgrond`, `veen`, `loess`, `duinzand`, `maasklei`
 
 ##### `gwlClassEnum`
-*   **Name**: `b_gwl_class`
-*   **Possible values**: `I`, `Ia`, `Ic`, `II`, `IIa`, `IIb`, `IIc`, `III`, `IIIa`, `IIIb`, `IV`, `IVu`, `IVc`, `V`, `Va`, `Vao`, `Vad`, `Vb`, `Vbo`, `Vbd`, `sV`, `sVb`, `VI`, `VIo`, `VId`, `VII`, `VIIo`, `VIId`, `VIII`, `VIIIo`, `VIIId`
+
+* **Name**: `b_gwl_class`
+* **Possible values**: `I`, `Ia`, `Ic`, `II`, `IIa`, `IIb`, `IIc`, `III`, `IIIa`, `IIIb`, `IV`, `IVu`, `IVc`, `V`, `Va`, `Vao`, `Vad`, `Vb`, `Vbo`, `Vbd`, `sV`, `sVb`, `VI`, `VIo`, `VId`, `VII`, `VIIo`, `VIId`, `VIII`, `VIIIo`, `VIIId`
 
 ##### `soilAnalysisSourceEnum`
-*   **Name**: `a_source`
-*   **Possible values**: `nl-rva-l122` (Eurofins Agro Testing Wageningen B.V.), `nl-rva-l136` (Nutrilab B.V.), `nl-rva-l264` (Normec Robalab B.V.), `nl-rva-l320` (Agrarisch Laboratorium Noord-Nederland/Alnn B.V.), `nl-rva-l335` (Normec Groen Agro Control), `nl-rva-l610` (Normec Dumea B.V.), `nl-rva-l648` (Fertilab B.V.), `nl-rva-l697` (Care4Agro B.V.), `nl-other-nmi` (NMI BodemSchat), `other` (Ander laboratorium)
+
+* **Name**: `a_source`
+* **Possible values**: `nl-rva-l122` (Eurofins Agro Testing Wageningen B.V.), `nl-rva-l136` (Nutrilab B.V.), `nl-rva-l264` (Normec Robalab B.V.), `nl-rva-l320` (Agrarisch Laboratorium Noord-Nederland/Alnn B.V.), `nl-rva-l335` (Normec Groen Agro Control), `nl-rva-l610` (Normec Dumea B.V.), `nl-rva-l648` (Fertilab B.V.), `nl-rva-l697` (Care4Agro B.V.), `nl-other-nmi` (NMI BodemSchat), `other` (Ander laboratorium)
 
 #### **`soilSampling`**
+
 **Purpose**: Records the details of a soil sampling event, linking a field location to a soil analysis.
 
 | Column                | Type                        | Constraints                                  | Description                                                              |
@@ -477,6 +517,7 @@ This schema holds the primary data related to farm operations.
 ### Derogations & Certifications
 
 #### **`derogations`**
+
 **Purpose**: Stores information about derogations, which is special permissions by year related to legal norms for fertilizer application.
 
 | Column | Type | Constraints | Description |
@@ -487,9 +528,11 @@ This schema holds the primary data related to farm operations.
 | **updated** | `timestamp with time zone` | | Timestamp when this record was last updated. |
 
 **Indexes:**
-*   Unique index on `b_id_derogation`.
+
+* Unique index on `b_id_derogation`.
 
 #### **`derogationApplying`**
+
 **Purpose**: Links a farm to a specific derogation, indicating that the farm is applying or making use of that derogation.
 
 | Column | Type | Constraints | Description |
@@ -500,9 +543,11 @@ This schema holds the primary data related to farm operations.
 | **updated** | `timestamp with time zone` | | Timestamp when this record was last updated. |
 
 **Constraints:**
-*   Primary Key on (`b_id_farm`, `b_id_derogation`).
+
+* Primary Key on (`b_id_farm`, `b_id_derogation`).
 
 #### **`organicCertifications`**
+
 **Purpose**: Stores information about organic certifications for a farm.
 
 | Column | Type | Constraints | Description |
@@ -516,6 +561,7 @@ This schema holds the primary data related to farm operations.
 | **updated** | `timestamp with time zone` | | Timestamp when this record was last updated. |
 
 #### **`organicCertificationsHolding`**
+
 **Purpose**: Links a farm to a specific organic certification.
 
 | Column | Type | Constraints | Description |
@@ -526,9 +572,11 @@ This schema holds the primary data related to farm operations.
 | **updated** | `timestamp with time zone` | | Timestamp when this record was last updated. |
 
 **Constraints:**
-*   Primary Key on (`b_id_farm`, `b_id_organic`).
+
+* Primary Key on (`b_id_farm`, `b_id_organic`).
 
 #### **`intendingGrazing`**
+
 **Purpose**: Stores the grazing intention for a farm for a specific year.
 
 | Column | Type | Constraints | Description |
@@ -540,7 +588,8 @@ This schema holds the primary data related to farm operations.
 | **updated** | `timestamp with time zone` | | Timestamp when this record was last updated. |
 
 **Constraints:**
-*   Primary Key on (`b_id_farm`, `b_grazing_intention_year`).
+
+* Primary Key on (`b_id_farm`, `b_grazing_intention_year`).
 
 ---
 
@@ -551,6 +600,7 @@ This schema handles user authentication, sessions, accounts, organizations, and 
 **Note:** This schema is largely defined and managed by the [`better-auth`](https://github.com/BetterStackHQ/better-auth) library. While the specific table structures are documented here for completeness, refer to the `better-auth` documentation for the most detailed information on its implementation and usage.
 
 #### **`user`**
+
 **Purpose**: Stores user account information.
 
 | Column          | Type        | Constraints          | Description                                      |
@@ -570,6 +620,7 @@ This schema handles user authentication, sessions, accounts, organizations, and 
 | **farm_active** | `text`      |                      | Identifier of the user's currently active farm.  |
 
 #### **`session`**
+
 **Purpose**: Stores active user sessions.
 
 | Column      | Type        | Constraints                               | Description                                      |
@@ -585,6 +636,7 @@ This schema handles user authentication, sessions, accounts, organizations, and 
 | **activeOrganizationId**| `text`|                                           | Identifier of the user's currently active organization. |
 
 #### **`account`**
+
 **Purpose**: Links user accounts to external authentication providers (e.g., OAuth providers) or stores credentials for password-based login.
 
 | Column                 | Type        | Constraints                               | Description                                                                 |
@@ -604,6 +656,7 @@ This schema handles user authentication, sessions, accounts, organizations, and 
 | **updatedAt**          | `timestamp` | Not Null                                  | Timestamp when the account link was last updated.                           |
 
 #### **`verification`**
+
 **Purpose**: Stores tokens used for verification purposes (e.g., email verification, password reset).
 
 | Column      | Type        | Constraints | Description                                      |
@@ -616,6 +669,7 @@ This schema handles user authentication, sessions, accounts, organizations, and 
 | **updatedAt**| `timestamp` |             | Timestamp when the verification record was last updated. |
 
 #### **`organization`**
+
 **Purpose**: Stores information about organizations in a multi-tenant setup.
 
 | Column       | Type                        | Constraints | Description                                      |
@@ -628,6 +682,7 @@ This schema handles user authentication, sessions, accounts, organizations, and 
 | **metadata** | `text`                      |             | JSON string for additional organization metadata. |
 
 #### **`member`**
+
 **Purpose**: Links users to organizations and defines their role within that organization.
 
 | Column          | Type                        | Constraints                                  | Description                                      |
@@ -639,6 +694,7 @@ This schema handles user authentication, sessions, accounts, organizations, and 
 | **createdAt**   | `timestamp`                 | Not Null    | Timestamp when the membership was created.       |
 
 #### **`invitation`**
+
 **Purpose**: Stores invitations for users to join an organization.
 
 | Column       | Type                        | Constraints                                  | Description                                      |
@@ -652,6 +708,7 @@ This schema handles user authentication, sessions, accounts, organizations, and 
 | **inviterId**| `text`                      | Not Null, Foreign Key (references `user.id`, onDelete: cascade) | Identifier of the user who sent the invitation.  |
 
 #### **`rateLimit`**
+
 **Purpose**: Used for tracking and enforcing rate limits on certain actions.
 
 | Column       | Type    | Constraints | Description                                      |
@@ -668,6 +725,7 @@ This schema handles user authentication, sessions, accounts, organizations, and 
 This schema manages roles, permissions, and auditing for authorization purposes.
 
 #### **`role`**
+
 **Purpose**: Defines roles assigned to principals (users) for specific resources.
 
 | Column             | Type                        | Constraints | Description                                                                 |
@@ -681,9 +739,11 @@ This schema manages roles, permissions, and auditing for authorization purposes.
 | **deleted**        | `timestamp with time zone`  |             | Timestamp when the role assignment was revoked (soft delete).               |
 
 **Indexes:**
-*   Composite index on (`resource`, `resource_id`, `principal_id`, `role`, `deleted`).
+
+* Composite index on (`resource`, `resource_id`, `principal_id`, `role`, `deleted`).
 
 #### **`audit`**
+
 **Purpose**: Logs authorization checks (audit trail) to record who attempted what action on which resource.
 
 | Column                 | Type                        | Constraints | Description                                                                 |
@@ -707,6 +767,7 @@ This schema manages roles, permissions, and auditing for authorization purposes.
 This schema is used to cache calculation results and store errors that occur during calculations.
 
 #### **`calculationCache`**
+
 **Purpose**: Caches the results of calculations to improve performance.
 
 | Column | Type | Constraints | Description |
@@ -719,6 +780,7 @@ This schema is used to cache calculation results and store errors that occur dur
 | **created_at** | `timestamp with time zone` | Not Null | Timestamp when the calculation was cached (default: now()). |
 
 #### **`calculationErrors`**
+
 **Purpose**: Logs errors that occur during calculations.
 
 | Column | Type | Constraints | Description |
@@ -738,16 +800,18 @@ This schema is used to cache calculation results and store errors that occur dur
 These custom types are defined in `schema-custom-types.ts` to handle specific data representations.
 
 #### **`numericCasted`**
-*   **Purpose**: A workaround for Drizzle ORM potentially returning `numeric` SQL types as strings. This custom type ensures that numeric values are correctly parsed as numbers (`float`) in the application layer.
-*   **SQL Type**: `numeric` or `numeric(precision, scale)`
-*   **Application Type**: `number`
-*   **Note**: Maps SQL `numeric` to TypeScript `number`. Be aware of potential precision loss for values exceeding JavaScript's `Number.MAX_SAFE_INTEGER` range, though this is rare for agricultural data.
+
+* **Purpose**: A workaround for Drizzle ORM potentially returning `numeric` SQL types as strings. This custom type ensures that numeric values are correctly parsed as numbers (`float`) in the application layer.
+* **SQL Type**: `numeric` or `numeric(precision, scale)`
+* **Application Type**: `number`
+* **Note**: Maps SQL `numeric` to TypeScript `number`. Be aware of potential precision loss for values exceeding JavaScript's `Number.MAX_SAFE_INTEGER` range, though this is rare for agricultural data.
 
 #### **`geometry`**
-*   **Purpose**: Handles PostGIS `geometry` types, allowing storage and retrieval of GeoJSON-like data.
-*   **SQL Type**: `geometry` (optionally constrained, e.g., `geometry(Polygon, 4326)`)
-*   **Application Type**: GeoJSON `Geometry` object (e.g., `Polygon`, `MultiPoint`).
-*   **Dependencies**: Requires the PostGIS extension enabled in the PostgreSQL database.
-*   **Current Implementation**: The provided code in `schema-custom-types.ts` includes parsing logic primarily for `Polygon` and `MultiPoint` types when reading from the database (especially from hexewkb format). Writing uses `ST_GeomFromGeoJSON`. Support for other geometry types might be limited or require additional parsing logic.
-*   **SRID**: Assumes SRID 4326 (WGS 84).
-*   **Note**: Stored as SRID 4326 (WGS 84). Area and distance calculations should cast to `geography` to account for earth curvature.
+
+* **Purpose**: Handles PostGIS `geometry` types, allowing storage and retrieval of GeoJSON-like data.
+* **SQL Type**: `geometry` (optionally constrained, e.g., `geometry(Polygon, 4326)`)
+* **Application Type**: GeoJSON `Geometry` object (e.g., `Polygon`, `MultiPoint`).
+* **Dependencies**: Requires the PostGIS extension enabled in the PostgreSQL database.
+* **Current Implementation**: The provided code in `schema-custom-types.ts` includes parsing logic primarily for `Polygon` and `MultiPoint` types when reading from the database (especially from hexewkb format). Writing uses `ST_GeomFromGeoJSON`. Support for other geometry types might be limited or require additional parsing logic.
+* **SRID**: Assumes SRID 4326 (WGS 84).
+* **Note**: Stored as SRID 4326 (WGS 84). Area and distance calculations should cast to `geography` to account for earth curvature.

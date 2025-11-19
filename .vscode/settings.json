@@ -12,5 +12,8 @@
     "editor.formatOnSave": true,
     "[json]": {
         "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[markdown]": {
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
     }
 }

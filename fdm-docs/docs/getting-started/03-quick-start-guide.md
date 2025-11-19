@@ -2,8 +2,6 @@
 title: Quick Start Guide
 ---
 
-# Quick Start Guide
-
 This guide will walk you through the basics of using the Farm Data Model (FDM) in your own applications. We will cover how to install FDM, connect to a database, create a `farm`, add a `field`, and perform a simple `action` like sowing a crop.
 
 ## Installation

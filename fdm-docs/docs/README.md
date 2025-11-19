@@ -3,8 +3,6 @@ title: Introduction
 sidebar_position: 0
 ---
 
-# Welcome to the FDM Documentation
-
 This documentation provides a comprehensive overview of the Farm Data Model (FDM). It is designed to help you understand the core concepts of the FDM, learn how to use it in your own applications, and contribute to its development.
 
 ## Getting Started
