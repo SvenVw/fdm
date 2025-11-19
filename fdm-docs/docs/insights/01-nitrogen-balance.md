@@ -202,7 +202,7 @@ Ammonia emissions from fertilizers are calculated differently depending on the f
         `NH3 Emission (kg N / ha) = Application Amount (kg / ha) * Total N Content (g N / kg) * Emission Factor (fraction)`
         Where:
     * `Application Amount`: `p_app_amount` (kg / ha).
-    * `Total N Content`: `p_n_rt` (fraction).
+    * `Total N Content`: `p_n_rt` (g N / kg).
     * `Emission Factor`: `p_ef_nh3` (fraction). This factor can be directly provided in the `FertilizerDetail`. If it is not provided, it is calculated using an empirical formula based on the fertilizer's composition:
 
         `Emission Factor = p_n_org^2 * K_1 + p_no3_rt * p_s_rt * K_2 + p_nh4_rt^2 * K_3`
