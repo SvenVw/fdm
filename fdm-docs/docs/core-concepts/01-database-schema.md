@@ -209,8 +209,15 @@ This schema holds the primary data related to farm operations.
 | Column                      | Type                        | Constraints | Description                                                                 |
 |-----------------------------|-----------------------------|-------------|-----------------------------------------------------------------------------|
 | **b_id_harvestable_analysis**| `text`                     | Primary Key | Unique identifier for the harvest analysis record.                          |
-| **b_lu_yield**              | `numeric` (custom)         |             | Measured yield of the harvestable product (units may vary, e.g., kg/ha).    |
-| **b_lu_n_harvestable**      | `numeric` (custom)         |             | Nitrogen content in the harvested portion.                                  |
+| **b_lu_yield**              | `numeric` (custom)         |             | Measured dry matter yield of the harvestable product (kg DM / ha).    |
+| **b_lu_yield_fresh**        | `numeric` (custom)         |             | Measured fresh yield of the harvestable product (kg fresh / ha).                            |
+| **b_lu_yield_bruto**        | `numeric` (custom)         |             | Measured gross yield (including tare) of the harvestable product (kg fresh / ha).                            |
+| **b_lu_tarra**              | `numeric` (custom)         |             | Measured tarra (tare) of the harvestable product (%).                           |
+| **b_lu_dm**                 | `numeric` (custom)         |             | Measured dry matter content of the harvestable product (g DM / kg fresh).                     |
+| **b_lu_moist**              | `numeric` (custom)         |             | Measured moisture content of the harvestable product (%).                       |
+| **b_lu_uww**                | `numeric` (custom)         |             | Measured underwater weight of the harvestable product (g  / 5 kg).                      |
+| **b_lu_cp**                 | `numeric` (custom)         |             | Measured crude protein content of the harvestable product (g RE / kg DM).                  |
+| **b_lu_n_harvestable**      | `numeric` (custom)         |             | Nitrogen content in the harvested portion (g N/ kg DM).                                  |
 | **b_lu_n_residue**          | `numeric` (custom)         |             | Nitrogen content in the crop residue.                                       |
 | **b_lu_p_harvestable**      | `numeric` (custom)         |             | Phosphorus content in the harvested portion.                                |
 | **b_lu_p_residue**          | `numeric` (custom)         |             | Phosphorus content in the crop residue.                                     |
