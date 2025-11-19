@@ -1,3 +1,8 @@
+---
+title: Releasing FDM
+sidebar_label: Releasing FDM
+---
+
 # Release Process
 
 This document outlines the release process for the `fdm` monorepo. Our process is built on a `development` -> `release` -> `main` branching strategy and is automated using GitHub Actions and [Changesets](https://github.com/changesets/changesets).

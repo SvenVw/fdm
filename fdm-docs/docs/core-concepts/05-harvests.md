@@ -1,13 +1,17 @@
-# Harvest
+---
+title: Harvests
+---
 
-Harvesting is a critical event in the cultivation cycle, representing the culmination of a season's efforts. In the Farm Data Model (FDM), the harvest is not just a single data point but a comprehensive model that captures the nuances of different crops and their specific measurements. This detailed approach allows for accurate agronomic calculations, such as nutrient balances and yield comparisons.
+# Harvests
+
+Harvesting is a critical event in the cultivation cycle. In the Farm Data Model (FDM), the harvest is not just a single data point but a detailed data structure that captures the nuances of different crops and their specific measurements. This detailed approach allows for accurate agronomic calculations, such as nutrient balances and yield comparisons.
 
 ## The Harvest Data Model
 
 In FDM, a harvest is intrinsically linked to a **cultivation**. A single cultivation can have multiple harvest events, especially for crops like grass that are cut multiple times a season. The core data structure for a harvest involves several related entities:
 
 -   `cultivation_harvesting`: This table links a harvest event to a specific cultivation (`b_lu`) and records the `b_lu_harvest_date`.
--   `harvestables`: Each harvest event can produce one or more "harvestables", and "harvestable" can be linked to multiple harvest events. For example, a potato harvestable might be linked to multiple fields, but collected in the same batch. Note that while the database schema supports it, due to the complexity fdm-core functions currently only support 1:1 relations between harvests and haverstables.
+-   `harvestables`: Each harvest event can produce one or more "harvestables", and "harvestable" can be linked to multiple harvest events. For example, a potato harvestable might be linked to multiple fields, but collected in the same batch. Note that while the database schema supports it, due to the complexity fdm-core functions currently only support 1:1 relations between harvests and harvestables.
 -   `harvestable_analyses`: For each harvestable, one or more analyses can be recorded. This is where the specific measurements for the harvest are stored.
 
 This structure provides a flexible and detailed representation of harvest events, accommodating a wide range of crops and harvesting practices.

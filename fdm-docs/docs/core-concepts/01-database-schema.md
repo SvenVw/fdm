@@ -1,10 +1,18 @@
 ---
-title: "Schema"
+title: Database Schema
 ---
 
-# Farm Data Model (FDM) Database Schema
+# Database Schema
 
 This document provides a comprehensive overview of the Farm Data Model (FDM) database schema. It details each schema and table, their properties, and columns, explaining their purpose and how they relate to the overall data structure.
+
+FDM uses a relational database to store its data. The schema is defined using TypeScript and then translated into a physical database schema using a tool called an **Object-Relational Mapper (ORM)**.
+
+> **What is an ORM?**
+>
+> An ORM is a library that provides a way to interact with a database using an object-oriented programming language. It maps the tables in a database to classes in the code, and the rows in those tables to instances of those classes. This allows developers to work with the database in a more intuitive and natural way, without having to write raw SQL queries.
+>
+> FDM uses the [Drizzle ORM](https://orm.drizzle.team/) to manage its database schema.
 
 ## Schema Overview
 
@@ -344,7 +352,7 @@ This schema holds the primary data related to farm operations.
 | **created**        | `timestamp with time zone`  | Not Null                                                     | Timestamp when this record was created (default: now()).                 |
 | **updated**        | `timestamp with time zone`  |                                                              | Timestamp when this record was last updated.                             |
 
-#### **`fertilizer_applying`**
+#### **`fertilizerApplication`**
 **Purpose**: Logs the event of applying a specific fertilizer instance to a field.
 
 | Column         | Type                        | Constraints                                  | Description                                                              |
@@ -726,6 +734,7 @@ These custom types are defined in `schema-custom-types.ts` to handle specific da
 *   **Purpose**: A workaround for Drizzle ORM potentially returning `numeric` SQL types as strings. This custom type ensures that numeric values are correctly parsed as numbers (`float`) in the application layer.
 *   **SQL Type**: `numeric` or `numeric(precision, scale)`
 *   **Application Type**: `number`
+*   **Note**: Maps SQL `numeric` to TypeScript `number`. Be aware of potential precision loss for values exceeding JavaScript's `Number.MAX_SAFE_INTEGER` range, though this is rare for agricultural data.
 
 #### **`geometry`**
 *   **Purpose**: Handles PostGIS `geometry` types, allowing storage and retrieval of GeoJSON-like data.
@@ -734,3 +743,4 @@ These custom types are defined in `schema-custom-types.ts` to handle specific da
 *   **Dependencies**: Requires the PostGIS extension enabled in the PostgreSQL database.
 *   **Current Implementation**: The provided code in `schema-custom-types.ts` includes parsing logic primarily for `Polygon` and `MultiPoint` types when reading from the database (especially from hexewkb format). Writing uses `ST_GeomFromGeoJSON`. Support for other geometry types might be limited or require additional parsing logic.
 *   **SRID**: Assumes SRID 4326 (WGS 84).
+*   **Note**: Stored as SRID 4326 (WGS 84). Area and distance calculations should cast to `geography` to account for earth curvature.

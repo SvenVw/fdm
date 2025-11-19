@@ -21,6 +21,10 @@ const config: Config = {
         defaultLocale: "en",
         locales: ["en"],
     },
+    markdown: {
+        mermaid: true,
+    },
+    themes: ["@docusaurus/theme-mermaid"],
 
     presets: [
         [
@@ -138,23 +142,19 @@ const config: Config = {
                         },
                         {
                             label: "Getting Started",
-                            to: "/docs/getting-started/prerequisites",
+                            to: "/docs/getting-started/what-is-fdm",
                         },
                         {
                             label: "Core Concepts",
-                            to: "/docs/core-concepts/asset-action-model",
+                            to: "/docs/core-concepts/database-schema",
                         },
                         {
                             label: "API Reference",
                             to: "/api",
                         },
                         {
-                            label: "Installation",
-                            to: "/docs/installation",
-                        },
-                        {
                             label: "Contributing",
-                            to: "/docs/contributing",
+                            to: "/docs/contributing/project-architecture",
                         },
                     ],
                 },
