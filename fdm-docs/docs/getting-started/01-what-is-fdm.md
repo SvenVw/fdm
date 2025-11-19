@@ -2,7 +2,7 @@
 title: What is FDM?
 ---
 
-The Farm Data Model (FDM) is an open-source project designed to standardize and simplify the management of agricultural data. Our mission is to provide a robust and flexible data model that empowers agronomists, developers, and researchers to build powerful and interoperable farm management solutions that lowers the barries to deliver latest agronomic insights to farmers.
+The Farm Data Model (FDM) is an open-source project designed to standardize and simplify the management of agricultural data. Our mission is to provide a robust and flexible data model that empowers agronomists, developers, and researchers to build powerful and interoperable farm management solutions that lowers the barriers to deliver latest agronomic insights to farmers.
 
 ## What Problem Does FDM Solve?
 
