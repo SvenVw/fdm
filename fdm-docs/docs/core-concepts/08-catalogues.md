@@ -24,13 +24,3 @@ The `fdm-data` package includes the following catalogues, which are stored in th
 ## Farm-Specific Catalogue Selection
 
 FDM provides a flexible system for managing which catalogues a farm uses. The `cultivationCatalogueSelecting` and `fertilizerCatalogueEnabling` tables allow each farm to specify which catalogue sources (`b_lu_source` and `p_source`) they want to use. This allows for customization and localization of the standardized data.
-
-## Benefits of Data Consistency
-
-The data consistency provided by the catalogues is essential for a wide range of applications, including:
-
-*   **Benchmarking:** Comparing the performance of different farms or fields.
-*   **Agronomic Modeling:** Building accurate models to predict crop growth and nutrient dynamics.
-*   **Supply Chain Management:** Tracking the flow of agricultural products from farm to fork.
-
-By providing a common language for describing agricultural data, the catalogues in `fdm-data` play a crucial role in enabling a more connected and data-driven agricultural industry.

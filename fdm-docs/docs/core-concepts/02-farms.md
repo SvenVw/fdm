@@ -4,7 +4,7 @@ title: Farms
 
 # Farms
 
-The `Farm` asset is the top-level container for all other assets and actions in the Farm Data Model (FDM). It represents a single farming operation and is the primary organizational unit within the system.
+The `Farm` asset is the top-level container for all other assets and actions in the Farm Data Model (FDM). It represents a single farming operation and is the primary unit within the system.
 
 ## Properties
 
@@ -27,6 +27,6 @@ For a detailed explanation of the authorization system, please see the [Authoriz
 In addition to the basic properties, a `Farm` can have several other types of data associated with it:
 
 *   **Organic Certifications:** You can store information about a farm's organic certifications in the `organicCertifications` and `organicCertificationsHolding` tables. This includes details like the certification body, certification numbers (e.g., TRACES, Skal), and the dates the certification was issued and expires.
-*   **Derogations:** The `derogations` and `derogationApplying` tables are used to track any special permissions (derogations) that a farm has been granted for a specific year. These are often related to legal norms for fertilizer application.
+*   **Derogations:** The `derogations` and `derogationApplying` tables are used to track any special permissions (derogations) that a farm has been granted for a specific year. These are related to legal norms for fertilizer application.
 *   **Grazing Intentions:** The `intendingGrazing` table allows you to record a farm's intention to graze animals for a specific year. This is a boolean flag associated with the farm and the year.
 *   **Catalogue Preferences:** The `fertilizerCatalogueEnabling` and `cultivationCatalogueSelecting` tables allow you to specify which data sources a farm uses for its fertilizer and cultivation catalogues. This provides flexibility in managing standardized data.

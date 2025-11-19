@@ -4,23 +4,35 @@ title: Authentication
 
 # Authentication
 
-Authentication is the process of verifying the identity of a user. The Farm Data Model (FDM) provides a standard authentication system that supports a variety of authentication strategies.
-
-## How Users are Verified
-
-FDM uses a combination of JSON Web Tokens (JWTs) and sessions to authenticate users.
-
-> **What is a JWT?**
->
-> A JSON Web Token (JWT) is a compact, URL-safe means of representing claims to be transferred between two parties. The claims in a JWT are encoded as a JSON object that is used as the payload of a JSON Web Signature (JWS) structure or as the plaintext of a JSON Web Encryption (JWE) structure, enabling the claims to be digitally signed or integrity protected with a Message Authentication Code (MAC) and/or encrypted.
-
-When a user logs in, they are issued a JWT that contains their user ID and other relevant information. This JWT is then sent with each subsequent request to the server, where it is used to verify the user's identity.
+Authentication is the process of verifying the identity of a user. The Farm Data Model (FDM) utilizes the [Better Auth](https://better-auth.com/) library to provide a standard authentication system. This implementation supports multiple authentication strategies and handles session management through a database-backed approach.
 
 ## Supported Strategies
 
-FDM supports a variety of authentication strategies, including:
+FDM is configured to support several authentication methods. The availability of these methods can depend on the specific configuration of the FDM instance.
 
-*   **Username and Password:** The traditional method of authentication, where users provide a username and password to log in.
-*   **OAuth Providers:** FDM can be integrated with popular OAuth providers, such as Google and Microsoft, to allow users to log in with their existing accounts.
+### Magic Links
+FDM supports passwordless authentication via Magic Links.
+*   Users provide their email address.
+*   The system sends a secure, time-limited link to that email.
+*   Clicking the link authenticates the user without requiring a password.
 
-The authentication mechanisms are handled by the `fdm-core/src/authentication.ts` file, which is built on top of the `better-auth` library.
+### OAuth Providers
+FDM includes integration with **Google** and **Microsoft** OAuth providers.
+*   **Account Linking:** Users can log in using their existing Google or Microsoft accounts.
+*   **Profile Mapping:** Upon login, FDM maps profile information from the provider (First Name, Last Name, and Profile Picture) to the FDM user profile.
+*   **User Creation:** New users authenticating via OAuth are automatically provisioned with a unique username and default settings (e.g., language preference set to `nl-NL`).
+
+## Session Management
+
+FDM uses a database-backed session system managed by Better Auth.
+
+*   **Session Storage:** Sessions are stored in the database using the Drizzle ORM adapter. This allows for server-side session control and revocation.
+*   **Expiration:** By default, sessions are configured to expire after 30 days.
+*   **Renewal:** Active sessions are automatically updated every 24 hours to extend their validity.
+
+## Implementation Details
+
+The core authentication logic resides in `fdm-core/src/authentication.ts`.
+
+*   **Schema Extensions:** The user schema is extended to include FDM-specific fields such as `firstname`, `surname`, `lang`, and `farm_active`.
+*   **Organizations:** The system utilizes the Better Auth organization plugin, which supports the creation and management of organizations within the authentication flow.

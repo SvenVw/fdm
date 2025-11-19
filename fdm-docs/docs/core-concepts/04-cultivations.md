@@ -17,7 +17,7 @@ A `Cultivation` is defined by a sequence of actions that are stored in separate 
 2.  **`cultivationHarvesting`**: This action represents the gathering of the crop. It links a `cultivation` to a `harvestable` and records the `b_lu_harvest_date`. A single cultivation can have multiple harvesting events.
 3.  **`cultivationEnding`**: This action marks the end of a cultivation. It records the `b_lu_end` date and whether the crop residue was left on the field (`m_cropresidue`).
 
-This sequence of actions defines a single cultivation period. A `Field` can have multiple cultivations over time, but only one active cultivation at any given time.
+This sequence of actions defines a single cultivation period. A `Field` can have multiple cultivations over time, be fallow or have multiple cultivations on the same time.
 
 ## Linking to Catalogues
 

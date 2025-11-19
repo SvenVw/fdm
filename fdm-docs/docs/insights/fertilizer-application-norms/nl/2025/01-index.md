@@ -1,6 +1,6 @@
 ---
 title: 2025 Dutch Fertilizer Application Norms
-sidebar_label: "Introduction"
+sidebar_label: "Overview"
 position: 1
 ---
 
@@ -10,9 +10,11 @@ This guide explains how the FDM Calculator determines the official Dutch legal u
 
 The FDM Calculator automates these complex calculations based on your specific farm, field, and cultivation data. It calculates three key norms:
 
-1.  **Nitrogen Usage Norm (`Stikstofgebruiksnorm`)**: The maximum effective nitrogen from all fertilizers.
-2.  **Phosphate Usage Norm (`Fosfaatgebruiksnorm`)**: The maximum phosphate, based on your soil's phosphate status.
-3.  **Animal Manure Usage Norm (`Dierlijke Mest Gebruiksnorm`)**: The maximum nitrogen from animal manure, with specific rules for derogation farms.
+*   **[Nitrogen Usage Norm (`Stikstofgebruiksnorm`)](./stikstofgebruiksnorm.md):** This norm sets the maximum total effective nitrogen (in kg N/ha) that can be applied to a field. The calculation takes into account the main crop, the geographical location (including `NV-gebieden`), and the soil region.
+*   **[Phosphate Usage Norm (`Fosfaatgebruiksnorm`)](./fosfaatgebruiksnorm.md):** This norm defines the maximum amount of phosphate (in kg P₂O₅ per hectare) that can be applied to a parcel of land. The maximum is determined by the land use type (grassland or arable land) and the phosphate status of the soil.
+*   **[Animal Manure Usage Norm (`Dierlijke Mest Gebruiksnorm`)](./dierlijke-mest-gebruiksnorm.md):** This norm defines the maximum nitrogen from animal manure (in kg N/ha) that can be applied. The calculation is based on the farm's derogation status and the field's location.
+
+For more detailed information on these norms, please refer to the specific pages for each one.
 
 :::danger Official Source & Disclaimer
 The calculations in this document are based on the official 2025 norms published by the RVO (Rijksdienst voor Ondernemend Nederland). While we strive for accuracy, this document is for informational purposes only.
