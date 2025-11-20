@@ -21,7 +21,7 @@ import type { OrganicMatterBalanceInput } from "./types.d"
  *
  * This function acts as a data-gathering layer, interacting with the FDM core to fetch
  * all records required for the organic matter balance calculation. It retrieves data for a given farm
- * and timeframe, including field details, cultivation history, harvests, soil analyses, and fertilizer applications.
+ * and timeframe, including field details, cultivation history, soil analyses, and fertilizer applications.
  * It also fetches the complete fertilizer and cultivation catalogues for the farm to provide necessary details
  * for the calculations (e.g., EOM values).
  *
@@ -76,17 +76,7 @@ export async function collectInputForOrganicMatterBalance(
                         principal_id,
                         field.b_id,
                         timeframe,
-                    )
-
-                    // Fetch harvest data for each cultivation.
-                    const harvestPromises = cultivations.map(
-                        (cultivation) => getHarvests(tx, principal_id, cultivation.b_lu, timeframe)
-                    )
-                    const harvests = (await Promise.all(harvestPromises)).flat()
-                    // Filter out any harvest records that are not linked to a cultivation.
-                    const harvestsFiltered = harvests.filter(
-                        (harvest) => harvest.b_lu !== undefined,
-                    )
+                    )                   
 
                     // Fetch all soil analysis records for the field.
                     const soilAnalyses = await getSoilAnalyses(
@@ -109,7 +99,6 @@ export async function collectInputForOrganicMatterBalance(
                     return {
                         field,
                         cultivations,
-                        harvests: harvestsFiltered,
                         fertilizerApplications,
                         soilAnalyses,
                     }

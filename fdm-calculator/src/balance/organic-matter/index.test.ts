@@ -31,7 +31,6 @@ describe("Organic Matter Balance Calculation", () => {
         b_area: 10,
     } as FieldInput["field"]
     const mockCultivations: FieldInput["cultivations"] = []
-    const mockHarvests: FieldInput["harvests"] = []
     const mockFertilizerApplications: FieldInput["fertilizerApplications"] = []
     const mockSoilAnalyses: FieldInput["soilAnalyses"] = []
     const mockCultivationDetailsMap = new Map<string, CultivationDetail>()

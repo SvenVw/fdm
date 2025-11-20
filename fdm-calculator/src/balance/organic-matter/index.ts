@@ -60,7 +60,6 @@ export async function calculateOrganicMatterBalance(
             return calculateOrganicMatterBalanceField(
                 field.field,
                 field.cultivations,
-                field.harvests,
                 field.fertilizerApplications,
                 field.soilAnalyses,
                 fertilizerDetailsMap,
@@ -121,7 +120,6 @@ export const getOrganicMatterBalance = withCalculationCache(
  *
  * @param field - The core details of the field.
  * @param cultivations - An array of cultivation records for the field.
- * @param harvests - An array of harvest records (kept for structural consistency, not used in OM calc).
  * @param fertilizerApplications - An array of fertilizer application records.
  * @param soilAnalyses - An array of soil analysis records.
  * @param fertilizerDetailsMap - A map of available fertilizer details.
@@ -132,7 +130,6 @@ export const getOrganicMatterBalance = withCalculationCache(
 export function calculateOrganicMatterBalanceField(
     field: FieldInput["field"],
     cultivations: FieldInput["cultivations"],
-    harvests: FieldInput["harvests"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
     soilAnalyses: FieldInput["soilAnalyses"],
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
@@ -144,6 +141,7 @@ export function calculateOrganicMatterBalanceField(
 
         // 1. Combine multiple soil analyses into a single representative record for the field.
         // We need 'a_som_loi' and 'a_density_sa' for the degradation calculation.
+        console.log(soilAnalyses)
         const soilAnalysis = combineSoilAnalyses<SoilAnalysisPicked>(
             soilAnalyses,
             ["a_som_loi", "a_density_sa"],
