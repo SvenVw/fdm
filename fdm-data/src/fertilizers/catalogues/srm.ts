@@ -83,6 +83,10 @@ export async function getCatalogueSrm(): Promise<CatalogueFertilizer> {
             p_type_manure: fertilizer.p_type_manure,
             p_type_mineral: fertilizer.p_type_mineral,
             p_type_compost: fertilizer.p_type_compost,
+            p_type_rvo:
+                fertilizer.p_type_rvo === undefined
+                    ? null
+                    : String(fertilizer.p_type_rvo),
             hash: null,
         }
 
