@@ -48,7 +48,7 @@ export function calculateOrganicMatterDegradation(
     })
 
     // Set the active soil depth based on land use: 10 cm for grassland, 30 cm for arable land.
-    const b_depth = isGrassland ? new Decimal(0.1) : new Decimal(0.3) // meters
+    const b_depth = isGrassland ? new Decimal(10) : new Decimal(30)
 
     // Average yearly temperature for the region (e.g., Netherlands/Belgium). This could be made more dynamic.
     const averageYearlyTemperature = new Decimal(11.7) // degrees Celsius

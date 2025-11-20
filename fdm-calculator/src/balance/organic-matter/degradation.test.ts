@@ -124,8 +124,8 @@ describe("calculateOrganicMatterDegradation", () => {
 
     it("should handle multiple years correctly", () => {
         const multiYearTimeFrame = {
-            start: new Date("2022-01-01"),
-            end: new Date("2024-12-31"), // 3 years
+            start: new Date("2021-01-01"),
+            end: new Date("2023-12-31"), // 3 years
         }
         const soilAnalysis: SoilAnalysisPicked = {
             a_som_loi: 3,
