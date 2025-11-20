@@ -5,7 +5,7 @@ import type {
     CultivationDetail,
     SoilAnalysisPicked,
 } from "./types.d"
-import { addDays, differenceInCalendarISOWeekYears } from "date-fns/fp"
+import { addDays, differenceInDays } from "date-fns"
 
 /**
  * Calculates the total degradation of soil organic matter (SOM) for a given period.
@@ -35,6 +35,10 @@ export function calculateOrganicMatterDegradation(
     cultivationDetailsMap: Map<string, CultivationDetail>,
     timeFrame: { start: Date; end: Date },
 ): OrganicMatterDegradation {
+    if (soilAnalysis.a_som_loi == null || soilAnalysis.a_density_sa == null) {
+        return { total: new Decimal(0) }
+    }
+
     // Determine if the land use is grassland based on the crop rotation type of the cultivations.
     const isGrassland = cultivations.some((c) => {
         const b_lu_catalogue = c.b_lu_catalogue
@@ -56,7 +60,7 @@ export function calculateOrganicMatterDegradation(
 
     // Extract soil properties from the analysis.
     const a_som_loi = new Decimal(soilAnalysis.a_som_loi) // Soil Organic Matter content (%)
-    const a_density_sa = new Decimal(soilAnalysis.a_density_sa) // Bulk density (g/cm³)
+    const a_density_sa = new Decimal(soilAnalysis.a_density_sa).times(1000) // Bulk density (g/cm³)
 
     // Calculate the annual degradation rate using an empirical formula.
     // The formula combines soil properties and the temperature correction factor.
@@ -76,10 +80,9 @@ export function calculateOrganicMatterDegradation(
 
     // Calculate the total degradation over the given timeframe.
     // The number of years is calculated between the start and end of the timeframe.
-    const numberOfYears = differenceInCalendarISOWeekYears(
-        addDays(timeFrame.end, 1),
-        timeFrame.start,
-    )
+    const numberOfYears = new Decimal(
+        differenceInDays(addDays(timeFrame.end, 1), timeFrame.start),
+    ).dividedBy(365)
     const totalDegradation = annualDegradation.times(numberOfYears)
 
     return {
