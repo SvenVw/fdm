@@ -334,6 +334,8 @@ export default function FarmRotationHarvestAddIndex() {
         selectedFieldIds.includes(field.b_id!),
     )
 
+    const isHarvestUpdate = loaderData.harvestApplication.b_lu_harvest_date
+
     // Confirmation Handling
     const [resolveConfirmationPromise, setResolveConfirmationPromise] =
         useState<[(value: boolean) => void]>()
@@ -401,13 +403,21 @@ export default function FarmRotationHarvestAddIndex() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem className="hidden md:block">
-                    Oogst toevoegen
+                    {isHarvestUpdate ? "Oogst bijwerken" : "Oogst toevoegen"}
                 </BreadcrumbItem>
             </Header>
             <main>
                 <FarmTitle
-                    title={`Oogst toevoegen aan ${loaderData.cultivationName}`}
-                    description="Kies 1 of meerdere percelen om een oogst toe te voegen"
+                    title={
+                        isHarvestUpdate
+                            ? `Oogst bijwerken in ${loaderData.cultivationName}`
+                            : `Oogst toevoegen aan ${loaderData.cultivationName}`
+                    }
+                    description={
+                        isHarvestUpdate
+                            ? "Kies 1 of meerdere percelen om hun oogst bij te werken of te verwijderen"
+                            : "Kies 1 of meerdere percelen om een oogst toe te voegen"
+                    }
                 />
                 <div className="relative">
                     {isSubmitting && (
