@@ -67,7 +67,14 @@ export function SidebarApps() {
         normsLink = undefined
     }
 
-    const omBalanceLink = undefined
+    let omBalanceLink: string | undefined
+    if (isCreateFarmWizard) {
+        omBalanceLink = undefined
+    } else if (farmId && farmId !== "undefined") {
+        omBalanceLink = `/farm/${farmId}/${selectedCalendar}/balance/organic-matter`
+    } else {
+        omBalanceLink = undefined
+    }
     const baatLink = undefined
     return (
         <SidebarGroup>
@@ -115,6 +122,26 @@ export function SidebarApps() {
                         )}
                     </SidebarMenuItem>
                     <SidebarMenuItem>
+                        {omBalanceLink ? (
+                            <SidebarMenuButton asChild>
+                                <NavLink to={omBalanceLink}>
+                                    <Scale />
+                                    <span>OS Balans</span>
+                                </NavLink>
+                            </SidebarMenuButton>
+                        ) : (
+                            <SidebarMenuButton
+                                asChild
+                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                            >
+                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                    <Scale />
+                                    <span>OS Balans</span>
+                                </span>
+                            </SidebarMenuButton>
+                        )}
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
                         {nutrientAdviceLink ? (
                             <SidebarMenuButton asChild>
                                 <NavLink to={nutrientAdviceLink}>
@@ -153,53 +180,7 @@ export function SidebarApps() {
                                 </span>
                             </SidebarMenuButton>
                         )}
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        {omBalanceLink ? (
-                            <SidebarMenuButton asChild>
-                                <NavLink to={omBalanceLink}>
-                                    <Scale />
-                                    <span>OS Balans</span>
-                                </NavLink>
-                            </SidebarMenuButton>
-                        ) : (
-                            <SidebarMenuButton
-                                asChild
-                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
-                            >
-                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
-                                    <Scale />
-                                    <span>OS Balans</span>
-                                </span>
-                            </SidebarMenuButton>
-                        )}
-                        <SidebarMenuBadge>
-                            <Badge variant={"outline"}>Binnenkort</Badge>
-                        </SidebarMenuBadge>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        {baatLink ? (
-                            <SidebarMenuButton asChild>
-                                <NavLink to={baatLink}>
-                                    <GitPullRequestArrow />
-                                    <span>BAAT</span>
-                                </NavLink>
-                            </SidebarMenuButton>
-                        ) : (
-                            <SidebarMenuButton
-                                asChild
-                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
-                            >
-                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
-                                    <GitPullRequestArrow />
-                                    <span>BAAT</span>
-                                </span>
-                            </SidebarMenuButton>
-                        )}
-                        <SidebarMenuBadge>
-                            <Badge variant={"outline"}>Binnenkort</Badge>
-                        </SidebarMenuBadge>
-                    </SidebarMenuItem>
+                    </SidebarMenuItem>                   
                 </SidebarMenu>
             </SidebarGroupContent>
         </SidebarGroup>

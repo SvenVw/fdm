@@ -38,15 +38,25 @@ export function HeaderBalance({
             <BreadcrumbItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger className="flex items-center gap-1">
-                        Stikstof
+                        {currentPath.includes("/balance/nitrogen") ? "Stikstof" : "Organische Stof"}
                         <ChevronDown className="text-muted-foreground h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
                         <DropdownMenuCheckboxItem
-                            checked={true}
+                            checked={currentPath.includes("/balance/nitrogen")}
                             key={"nitrogen"}
                         >
-                            Stikstof
+                             <NavLink to={`/farm/${b_id_farm}/${calendar}/balance/nitrogen`}>
+                                Stikstof
+                             </NavLink>
+                        </DropdownMenuCheckboxItem>
+                        <DropdownMenuCheckboxItem
+                            checked={currentPath.includes("/balance/organic-matter")}
+                            key={"organic-matter"}
+                        >
+                            <NavLink to={`/farm/${b_id_farm}/${calendar}/balance/organic-matter`}>
+                                Organische Stof
+                            </NavLink>
                         </DropdownMenuCheckboxItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -71,10 +81,7 @@ export function HeaderBalance({
                                         key={option.b_id}
                                     >
                                         <NavLink
-                                            to={currentPath.replace(
-                                                `/balance/nitrogen/${b_id}`,
-                                                `/balance/nitrogen/${option.b_id}`,
-                                            )}
+                                            to={`/farm/${b_id_farm}/${calendar}/balance/${currentPath.includes('nitrogen') ? 'nitrogen' : 'organic-matter'}/${option.b_id}`}
                                         >
                                             {option.b_name}
                                         </NavLink>
