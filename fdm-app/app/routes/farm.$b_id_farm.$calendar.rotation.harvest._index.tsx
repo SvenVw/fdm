@@ -1,10 +1,15 @@
 import {
     addHarvest,
+    getCultivation,
     getCultivations,
     getCultivationsFromCatalogue,
+    getDefaultsForHarvestParameters,
     getFarms,
     getFields,
     getHarvests,
+    getParametersForHarvestCat,
+    HarvestableAnalysis,
+    HarvestParameters,
     removeHarvest,
 } from "@svenvw/fdm-core"
 import { Info, AlertTriangle, ChevronDown } from "lucide-react"
@@ -21,11 +26,15 @@ import {
     useNavigation,
     useSearchParams,
 } from "react-router"
-import { dataWithError, redirectWithSuccess } from "remix-toast"
+import {
+    dataWithError,
+    dataWithWarning,
+    redirectWithSuccess,
+} from "remix-toast"
 import { z } from "zod"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { HarvestForm } from "~/components/blocks/harvest/form"
+import { HarvestFormDialog } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
@@ -197,7 +206,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             )
         }
 
-        let harvestApplication = {
+        type HarvestApplication = Awaited<
+            ReturnType<typeof getHarvests>
+        >[number]
+        let harvestApplication: HarvestApplication = {
             b_lu_yield: undefined,
             b_lu_n_harvestable: undefined,
             b_lu_harvest_date: undefined,
@@ -205,6 +217,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_lu_end: undefined,
             b_lu_harvestable: undefined,
         }
+        let harvestableAnalysis: HarvestApplication["harvestable"]["harvestable_analyses"]["number"] =
+            null
 
         if (
             targetCultivation.b_lu_harvestable === "once" &&
@@ -222,14 +236,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     targetFieldCultivation.b_lu,
                 )
                 if (harvests.length > 0) {
-                    harvestApplication = {
-                        ...harvests[0],
-                        ...(harvests[0].harvestable?.harvestable_analyses
-                            ?.length > 0
-                            ? harvests[0].harvestable.harvestable_analyses[0]
-                            : {}),
+                    harvestApplication = harvests[0]
+                    if (
+                        harvests[0].harvestable?.harvestable_analyses.length > 0
+                    ) {
+                        harvestableAnalysis =
+                            harvests[0].harvestable.harvestable_analyses[0]
                     }
                 }
+            }
+
+            if (!harvestableAnalysis) {
+                harvestableAnalysis = getDefaultsForHarvestParameters(
+                    targetCultivation.b_lu_catalogue,
+                    cultivationCatalogueData,
+                )
             }
         }
 
@@ -244,6 +265,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 cultivations: field.cultivations.map((c) => c.b_lu_catalogue), // Pass cultivations for each field
             }
         })
+
+        const harvestParameters = getParametersForHarvestCat(
+            targetCultivation.b_lu_harvestcat,
+        )
 
         // Return user information from loader
         return {
@@ -262,6 +287,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             cultivationIds: cultivationIds,
             b_lu_harvestable: targetCultivation.b_lu_harvestable ?? "once",
             harvestApplication: harvestApplication,
+            harvestableAnalysis: harvestableAnalysis,
+            harvestParameters: harvestParameters,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -584,18 +611,53 @@ export default function FarmRotationHarvestAddIndex() {
                                             </p>
                                         </div>
                                     ) : loaderData.fieldAmount > 0 ? (
-                                        <HarvestForm
-                                            b_lu_yield={
-                                                loaderData.harvestApplication
-                                                    .b_lu_yield
-                                            }
-                                            b_lu_n_harvestable={
-                                                loaderData.harvestApplication
-                                                    .b_lu_n_harvestable
+                                        <HarvestFormDialog
+                                            harvestParameters={
+                                                loaderData.harvestParameters
                                             }
                                             b_lu_harvest_date={
                                                 loaderData.harvestApplication
                                                     .b_lu_harvest_date
+                                            }
+                                            b_lu_yield={
+                                                loaderData.harvestableAnalysis
+                                                    .b_lu_yield
+                                            }
+                                            b_lu_yield_fresh={
+                                                loaderData.harvestableAnalysis
+                                                    .b_lu_yield_fresh
+                                            }
+                                            b_lu_yield_bruto={
+                                                loaderData.harvestableAnalysis
+                                                    .b_lu_yield_bruto
+                                            }
+                                            b_lu_tarra={
+                                                loaderData.harvestableAnalysis
+                                                    .b_lu_tarra
+                                            }
+                                            b_lu_uww={
+                                                loaderData.harvestableAnalysis
+                                                    .b_lu_uww
+                                            }
+                                            b_lu_moist={
+                                                loaderData.harvestableAnalysis
+                                                    .b_lu_moist
+                                            }
+                                            b_lu_dm={
+                                                loaderData.harvestableAnalysis
+                                                    .b_lu_dm
+                                            }
+                                            b_lu_cp={
+                                                loaderData.harvestableAnalysis
+                                                    .b_lu_cp
+                                            }
+                                            b_lu_n_harvestable={
+                                                loaderData.harvestableAnalysis
+                                                    .b_lu_n_harvestable
+                                            }
+                                            b_lu_harvestable={
+                                                loaderData.harvestApplication
+                                                    .b_lu_harvestable
                                             }
                                             b_lu_start={
                                                 loaderData.harvestApplication
@@ -604,9 +666,6 @@ export default function FarmRotationHarvestAddIndex() {
                                             b_lu_end={
                                                 loaderData.harvestApplication
                                                     .b_lu_end
-                                            }
-                                            b_lu_harvestable={
-                                                loaderData.b_lu_harvestable
                                             }
                                             action={modifySearchParams(
                                                 `${location.pathname}${location.search}`,
@@ -771,7 +830,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
 
-        const validatedData = await extractFormValuesFromRequest(
+        const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
         )
@@ -797,6 +856,45 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
             const b_lu = targetCultivationInstance.b_lu
 
+            // Get required harvest parameters for the cultivation's harvest category
+            const requiredHarvestParameters = getParametersForHarvestCat(
+                targetCultivationInstance.b_lu_harvestcat,
+            )
+
+            // Check if all required parameters are present
+            const missingParameters: string[] = []
+            for (const param of requiredHarvestParameters) {
+                if (
+                    (formValues as Record<string, any>)[param] === undefined ||
+                    (formValues as Record<string, any>)[param] === null
+                ) {
+                    missingParameters.push(param)
+                }
+            }
+
+            if (missingParameters.length > 0) {
+                return dataWithWarning(
+                    {
+                        warning: `Missing required harvest parameters: ${missingParameters.join(
+                            ", ",
+                        )}`,
+                    },
+                    `Missing required harvest parameters: ${missingParameters.join(
+                        ", ",
+                    )}`,
+                )
+            }
+
+            // Filter form values to include only required parameters for updateHarvest
+            const harvestProperties: Record<string, any> = {}
+            for (const param of requiredHarvestParameters) {
+                if ((formValues as Record<string, any>)[param] !== undefined) {
+                    harvestProperties[param] = (
+                        formValues as Record<string, any>
+                    )[param]
+                }
+            }
+
             if (b_lu_harvestable === "once") {
                 // Check for existing harvests for this specific cultivation instance
                 const existingHarvests = await getHarvests(
@@ -821,9 +919,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 fdm,
                 session.principal_id,
                 b_lu,
-                validatedData.b_lu_harvest_date,
-                validatedData.b_lu_yield,
-                validatedData.b_lu_n_harvestable,
+                formValues.b_lu_harvest_date,
+                harvestProperties,
             )
         }
 

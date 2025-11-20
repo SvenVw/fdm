@@ -1,4 +1,5 @@
-import type { Harvest } from "@svenvw/fdm-core"
+import { cn } from "@/app/lib/utils"
+import { HarvestParameters, type Harvest } from "@svenvw/fdm-core"
 import { NavLink } from "react-router"
 import { HarvestsList } from "~/components/blocks/harvest/list"
 import type { HarvestableType } from "~/components/blocks/harvest/types"
@@ -8,9 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 export function CultivationHarvestsCard({
     harvests,
     b_lu_harvestable,
+    harvestParameters,
 }: {
     harvests: Harvest[]
     b_lu_harvestable: HarvestableType
+    harvestParameters: HarvestParameters
 }) {
     let canAddHarvest = false
     if (b_lu_harvestable === "once" && harvests.length === 0) {
@@ -36,7 +39,10 @@ export function CultivationHarvestsCard({
                         }}
                         className={!canAddHarvest ? "cursor-not-allowed" : ""}
                     >
-                        <Button variant="default" disabled={!canAddHarvest}>
+                        <Button
+                            variant="default"
+                            className={cn(!canAddHarvest ? "hidden" : "")}
+                        >
                             Oogst toevoegen
                         </Button>
                     </NavLink>
@@ -46,7 +52,7 @@ export function CultivationHarvestsCard({
                 <HarvestsList
                     harvests={harvests}
                     b_lu_harvestable={b_lu_harvestable}
-                    state={"active"}
+                    harvestParameters={harvestParameters}
                 />
             </CardContent>
         </Card>

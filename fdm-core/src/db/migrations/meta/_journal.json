@@ -127,6 +127,13 @@
             "when": 1761909360538,
             "tag": "0017_v0-26-0-4",
             "breakpoints": true
+        },
+        {
+            "idx": 18,
+            "version": "7",
+            "when": 1763025310900,
+            "tag": "0018_curly_mongoose",
+            "breakpoints": true
         }
     ]
 }

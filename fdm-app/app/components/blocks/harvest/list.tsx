@@ -1,80 +1,159 @@
-import type { Harvest } from "@svenvw/fdm-core"
+import type { Harvest, HarvestParameters } from "@svenvw/fdm-core"
 import { format } from "date-fns/format"
 import { NavLink } from "react-router"
 import type { HarvestableType } from "./types"
+import { nl } from "date-fns/locale"
+import { Card, CardContent, CardHeader } from "~/components/ui/card"
+import { Label } from "~/components/ui/label"
+import { getHarvestParameterLabel } from "./parameters"
+import { ArrowRight, Calendar } from "lucide-react"
+import {
+    Empty,
+    EmptyDescription,
+    EmptyHeader,
+    EmptyTitle,
+} from "~/components/ui/empty"
 
 export function HarvestsList({
     harvests,
     b_lu_harvestable,
+    harvestParameters,
 }: {
     harvests: Harvest[]
     b_lu_harvestable: HarvestableType
-    state: string
+    harvestParameters: HarvestParameters
 }) {
-    let canAddHarvest = false
-    if (b_lu_harvestable === "once" && harvests.length === 0) {
-        canAddHarvest = true
+    const canAddHarvest =
+        b_lu_harvestable === "multiple" ||
+        (b_lu_harvestable === "once" && harvests.length === 0)
+
+    const renderHarvestDetails = (harvest: Harvest) => (
+        <div className="grid grid-cols-2 gap-4 pt-4">
+            {harvestParameters.map((param: HarvestParameters[number]) => (
+                <div key={param}>
+                    <Label className="text-xs text-muted-foreground">
+                        {getHarvestParameterLabel(param)}
+                    </Label>
+                    <p className="text-sm font-medium leading-none">
+                        {harvest.harvestable?.harvestable_analyses?.[0]?.[
+                            param
+                        ] ?? "–"}
+                    </p>
+                </div>
+            ))}
+        </div>
+    )
+
+    const renderHarvestSummary = (harvest: Harvest) => (
+        <div className="flex items-center justify-between">
+            <div className="flex items-center">
+                <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+                <span className="text-md font-medium">
+                    {format(harvest.b_lu_harvest_date, "PPP", {
+                        locale: nl,
+                    })}
+                </span>
+            </div>
+            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+        </div>
+    )
+
+    if (harvests && harvests.length > 0) {
+        if (b_lu_harvestable === "once") {
+            const harvest = harvests[0]
+            return (
+                <NavLink
+                    key={harvest.b_id_harvesting}
+                    to={`./harvest/${harvest.b_id_harvesting}`}
+                    className="block rounded-lg"
+                >
+                    <Card className="transition-all hover:bg-muted/50">
+                        <CardHeader>{renderHarvestSummary(harvest)}</CardHeader>
+                        <CardContent>
+                            {renderHarvestDetails(harvest)}
+                        </CardContent>
+                    </Card>
+                </NavLink>
+            )
+        }
+        return (
+            <div className="space-y-3">
+                {harvests.map((harvest) => {
+                    const analyses =
+                        harvest.harvestable?.harvestable_analyses?.[0]
+                    const summaryParams: { label: string; value: any }[] = []
+                    if (analyses) {
+                        for (const param of harvestParameters) {
+                            const value = analyses[param]
+                            if (value !== null && value !== undefined) {
+                                summaryParams.push({
+                                    label: getHarvestParameterLabel(param),
+                                    value: value,
+                                })
+                            }
+                            if (summaryParams.length >= 2) {
+                                break
+                            }
+                        }
+                    }
+
+                    return (
+                        <NavLink
+                            key={harvest.b_id_harvesting}
+                            to={`./harvest/${harvest.b_id_harvesting}`}
+                            className="block rounded-lg"
+                        >
+                            <Card className="transition-all hover:bg-muted/50">
+                                <CardHeader>
+                                    {renderHarvestSummary(harvest)}
+                                </CardHeader>
+                                {summaryParams.length > 0 && (
+                                    <CardContent className="pt-0">
+                                        <div className="flex items-center space-x-6">
+                                            {summaryParams.map((p) => (
+                                                <div key={p.label}>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {p.label}
+                                                    </p>
+                                                    <p className="text-sm font-semibold">
+                                                        {p.value}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                )}
+                            </Card>
+                        </NavLink>
+                    )
+                })}
+            </div>
+        )
     }
-    if (b_lu_harvestable === "multiple") {
-        canAddHarvest = true
+
+    if (canAddHarvest) {
+        return (
+            <Empty>
+                <EmptyHeader>
+                    <EmptyTitle>Nog geen oogst</EmptyTitle>
+                    <EmptyDescription>
+                        Voeg een oogst toe om belangrijke gegevens zoals
+                        opbrengst, datum en gehaltes bij te houden.
+                    </EmptyDescription>
+                </EmptyHeader>
+            </Empty>
+        )
     }
 
     return (
-        <div>
-            {harvests && harvests.length > 0 ? (
-                <div className="space-y-6">
-                    <div className="space-y-3">
-                        {harvests.map((harvest) => (
-                            <div
-                                className="flex flex-cols items-center"
-                                key={harvest.b_id_harvesting}
-                            >
-                                <NavLink
-                                    to={`./harvest/${harvest.b_id_harvesting}`}
-                                >
-                                    <p className="text-sm font-medium leading-none hover:underline">
-                                        {format(
-                                            harvest.b_lu_harvest_date,
-                                            "yyyy-MM-dd",
-                                        )}
-                                    </p>
-                                </NavLink>
-
-                                <div className="ml-auto">
-                                    <p className="text-sm text-muted-foreground leading-none">
-                                        {`${harvest.harvestable?.harvestable_analyses?.[0]?.b_lu_yield ?? "–"} kg DS/ha`}
-                                    </p>
-                                    {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ) : canAddHarvest ? (
-                <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6">
-                    <div className="flex flex-col space-y-2 text-center">
-                        <h1 className="text-2xl font-semibold tracking-tight">
-                            Dit gewas heeft nog geen oogst
-                        </h1>
-                        <p className="text-sm text-muted-foreground">
-                            Voeg een oogst toe om gegevens zoals, opbrengst,
-                            datum en gehaltes bij te houden.
-                        </p>
-                    </div>
-                </div>
-            ) : (
-                <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6">
-                    <div className="flex flex-col space-y-2 text-center">
-                        <h1 className="text-2xl font-semibold tracking-tight">
-                            Dit gewas is niet oogstbaar
-                        </h1>
-                        <p className="text-sm text-muted-foreground">
-                            Kies een einddatum om aan te geven wanneer dit gewas
-                            is beëindigd.
-                        </p>
-                    </div>
-                </div>
-            )}
-        </div>
+        <Empty>
+            <EmptyHeader>
+                <EmptyTitle>Dit gewas is niet oogstbaar</EmptyTitle>
+                <EmptyDescription>
+                    Kies een einddatum om aan te geven wanneer dit gewas is
+                    beëindigd.
+                </EmptyDescription>
+            </EmptyHeader>
+        </Empty>
     )
 }

@@ -1,10 +1,10 @@
 import {
     type CultivationCatalogue,
-    type CultivationCatalogueItem,
     getCultivation,
     getCultivationsFromCatalogue,
     getField,
     getHarvests,
+    getParametersForHarvestCat,
     removeCultivation,
     updateCultivation,
 } from "@svenvw/fdm-core"
@@ -137,7 +137,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             throw data("Cultivation is not found", { status: 404 })
         }
 
-        const cultivationCatalogueItem: CultivationCatalogueItem | undefined =
+        // Get harvests
+        const harvests = await getHarvests(
+            fdm,
+            session.principal_id,
+            b_lu,
+            timeframe,
+        )
+
+        const cultivationCatalogueItem: CultivationCatalogue | undefined =
             cultivationsCatalogue.find((item) => {
                 return item.b_lu_catalogue === cultivation.b_lu_catalogue
             })
@@ -154,12 +162,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         }
 
-        // Get harvests
-        const harvests = await getHarvests(
-            fdm,
-            session.principal_id,
-            b_lu,
-            b_lu_harvestable === "once" ? undefined : timeframe,
+        const harvestParameters = getParametersForHarvestCat(
+            cultivation.b_lu_harvestcat,
         )
 
         // Return user information from loader
@@ -169,6 +173,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             cultivation: cultivation,
             harvests: harvests,
             b_lu_harvestable: b_lu_harvestable,
+            harvestParameters: harvestParameters,
             b_lu_variety_options: b_lu_variety_options,
             b_id_farm: b_id_farm,
             calendar: calendar,
@@ -197,7 +202,7 @@ export default function FarmFieldsOverviewBlock() {
             <CultivationHarvestsCard
                 harvests={loaderData.harvests}
                 b_lu_harvestable={loaderData.b_lu_harvestable}
-                cultivation={loaderData.cultivation}
+                harvestParameters={loaderData.harvestParameters}
             />
             <Outlet />
         </div>
