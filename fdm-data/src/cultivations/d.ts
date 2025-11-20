@@ -33,6 +33,8 @@ export interface CatalogueCultivationItem {
     b_lu_yield: number
     b_lu_dm: number
     b_lu_hi: number
+    b_lu_eom: number
+    b_lu_eom_residue: number
     b_lu_n_harvestable: number
     b_lu_n_residue: number
     b_n_fixation: number

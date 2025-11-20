@@ -77,6 +77,8 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
             b_lu_yield: cultivation.b_lu_yield,
             b_lu_dm: cultivation.b_lu_dm,
             b_lu_hi: cultivation.b_lu_hi,
+            b_lu_eom: cultivation.b_lu_eom,
+            b_lu_eom_residue: cultivation.b_lu_eom_residue,
             b_lu_n_harvestable: cultivation.b_lu_n_harvestable,
             b_lu_n_residue: cultivation.b_lu_n_residue,
             b_n_fixation: cultivation.b_n_fixation,
