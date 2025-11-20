@@ -208,39 +208,43 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_lu_end: undefined,
             b_lu_harvestable: undefined,
         }
-        let harvestableAnalysis: HarvestApplication["harvestable"]["harvestable_analyses"]["number"] =
-            null
-        let targetFieldCultivation:
-            | (typeof selectedFields)[number]["cultivations"][number]
-            | undefined = null
+        let harvestableAnalysis: Partial<
+            HarvestApplication["harvestable"]["harvestable_analyses"][number]
+        > = {}
 
         if (
             targetCultivation.b_lu_harvestable === "once" &&
             selectedFields.length > 0
         ) {
-            // For cultivations that can only be harvested once, we assume
-            // one harvesting, one harvestable, one harvestable analysis
-            targetFieldCultivation = selectedFields[0].cultivations.find(
-                (c) => c.b_lu_catalogue === targetCultivation.b_lu_catalogue,
-            )
-            if (targetFieldCultivation) {
-                const harvests = await getHarvests(
-                    fdm,
-                    session.principal_id,
-                    targetFieldCultivation.b_lu,
+            // Find a field that has the cultivation
+            // Some selected fields might not have a harvest anymore
+            // if they were changed before the user changes their selection
+            for (const field of selectedFields) {
+                const targetFieldCultivation = field.cultivations.find(
+                    (c) =>
+                        c.b_lu_catalogue === targetCultivation.b_lu_catalogue,
                 )
-                if (harvests.length > 0) {
-                    harvestApplication = harvests[0]
-                    if (
-                        harvests[0].harvestable?.harvestable_analyses.length > 0
-                    ) {
-                        harvestableAnalysis =
-                            harvests[0].harvestable.harvestable_analyses[0]
+                if (targetFieldCultivation) {
+                    // For cultivations that can only be harvested once, we assume
+                    // one harvesting, one harvestable, one harvestable analysis
+                    const harvests = await getHarvests(
+                        fdm,
+                        session.principal_id,
+                        targetFieldCultivation.b_lu,
+                    )
+                    if (harvests.length > 0) {
+                        harvestApplication = harvests[0]
+                        break
                     }
                 }
             }
 
-            if (!harvestableAnalysis) {
+            if (
+                harvestApplication?.harvestable?.harvestable_analyses.length > 0
+            ) {
+                harvestableAnalysis =
+                    harvestApplication.harvestable.harvestable_analyses[0]
+            } else {
                 harvestableAnalysis = getDefaultsForHarvestParameters(
                     targetCultivation.b_lu_catalogue,
                     cultivationCatalogueData,
@@ -277,7 +281,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 cultivations: field.cultivations.map((c) => c.b_lu_catalogue),
             })),
             fieldOptions: fieldOptions, // All fields for selection
-            fieldCultivation: targetFieldCultivation,
+            cultivation: targetCultivation,
             cultivationName: targetCultivation?.b_lu_name ?? "onbekend gewas",
             cultivationIds: cultivationIds,
             b_lu_harvestable: targetCultivation.b_lu_harvestable ?? "once",
@@ -661,16 +665,15 @@ export default function FarmRotationHarvestAddIndex() {
                                                     .b_lu_n_harvestable
                                             }
                                             b_lu_harvestable={
-                                                loaderData.fieldCultivation
+                                                loaderData.cultivation
                                                     .b_lu_harvestable
                                             }
                                             b_lu_start={
-                                                loaderData.fieldCultivation
+                                                loaderData.cultivation
                                                     .b_lu_start
                                             }
                                             b_lu_end={
-                                                loaderData.fieldCultivation
-                                                    .b_lu_end
+                                                loaderData.cultivation.b_lu_end
                                             }
                                             action={modifySearchParams(
                                                 `${location.pathname}${location.search}`,
