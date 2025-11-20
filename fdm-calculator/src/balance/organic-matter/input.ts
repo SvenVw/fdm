@@ -17,19 +17,24 @@ import {
 import type { OrganicMatterBalanceInput } from "./types.d"
 
 /**
- * Collects necessary input data from a FDM instance for calculating the organic matter balance.
+ * Collects all necessary input data from an FDM instance to calculate the organic matter balance for a farm or a specific field.
  *
- * This function orchestrates the retrieval of data related to fields, cultivations,
- * harvests, soil analyses, fertilizer applications, fertilizer details, and cultivation details
- * within a specified farm and timeframe. It fetches data from the FDM database and structures
- * it into a `OrganicMatterBalanceInput` object.
+ * This function acts as a data-gathering layer, interacting with the FDM core to fetch
+ * all records required for the organic matter balance calculation. It retrieves data for a given farm
+ * and timeframe, including field details, cultivation history, harvests, soil analyses, and fertilizer applications.
+ * It also fetches the complete fertilizer and cultivation catalogues for the farm to provide necessary details
+ * for the calculations (e.g., EOM values).
  *
- * @param fdm - The FDM instance for database interaction.
- * @param principal_id - The ID of the principal (user or service) initiating the data collection.
- * @param b_id_farm - The ID of the farm for which to collect the organic matter balance input.
- * @param timeframe - The timeframe for which to collect the data.
- * @returns A promise that resolves with a `OrganicMatterBalanceInput` object containing all the necessary data.
- * @throws {Error} - Throws an error if data collection or processing fails.
+ * The collected data is then structured into an `OrganicMatterBalanceInput` object, which can be directly
+ * passed to the main `calculateOrganicMatterBalance` function.
+ *
+ * @param fdm - The FDM instance, used for all database interactions.
+ * @param principal_id - The ID of the user or service principal requesting the data, for authorization purposes.
+ * @param b_id_farm - The unique identifier for the farm.
+ * @param timeframe - The time period (start and end dates) for which to collect the data.
+ * @param b_id - Optional. If provided, the data collection will be limited to this specific field ID. Otherwise, data for all fields in the farm will be collected.
+ * @returns A promise that resolves with a single `OrganicMatterBalanceInput` object containing all the structured data for the calculation.
+ * @throws {Error} Throws an error if any of the database queries fail or if a specified field is not found.
  *
  * @alpha
  */
@@ -41,16 +46,19 @@ export async function collectInputForOrganicMatterBalance(
     b_id?: fdmSchema.fieldsTypeSelect["b_id"],
 ): Promise<OrganicMatterBalanceInput> {
     try {
+        // All data fetching is wrapped in a single database transaction to ensure consistency.
         return await fdm.transaction(async (tx: FdmType) => {
-            // Collect the fields for the farm
+            // 1. Determine which fields to process: a single field or all fields for the farm.
             let farmFields: fdmSchema.fieldsTypeSelect[]
             if (b_id) {
+                // Fetch a single specified field.
                 const field = await getField(tx, principal_id, b_id)
                 if (!field) {
                     throw new Error(`Field not found: ${String(b_id)}`)
                 }
                 farmFields = [field]
             } else {
+                // Fetch all fields associated with the farm within the given timeframe.
                 farmFields = await getFields(
                     tx,
                     principal_id,
@@ -59,10 +67,10 @@ export async function collectInputForOrganicMatterBalance(
                 )
             }
 
-            // Collect the details per field
+            // 2. For each field, collect all related data concurrently.
             const fields = await Promise.all(
                 farmFields.map(async (field) => {
-                    // Collect the cultivations of the field
+                    // Fetch cultivation history for the field.
                     const cultivations = await getCultivations(
                         tx,
                         principal_id,
@@ -70,27 +78,17 @@ export async function collectInputForOrganicMatterBalance(
                         timeframe,
                     )
 
-                    // Collect the harvests of the cultivations
-                    // Collect a promise per cultivation
+                    // Fetch harvest data for each cultivation.
                     const harvestPromises = cultivations.map(
-                        async (cultivation) => {
-                            return await getHarvests(
-                                tx,
-                                principal_id,
-                                cultivation.b_lu,
-                                timeframe,
-                            )
-                        },
+                        (cultivation) => getHarvests(tx, principal_id, cultivation.b_lu, timeframe)
                     )
-
-                    // Wait for all, then flatten the resulting arrays into one list
-                    const harvestArrays = await Promise.all(harvestPromises)
-                    const harvests = harvestArrays.flat()
+                    const harvests = (await Promise.all(harvestPromises)).flat()
+                    // Filter out any harvest records that are not linked to a cultivation.
                     const harvestsFiltered = harvests.filter(
                         (harvest) => harvest.b_lu !== undefined,
                     )
 
-                    // Get the soil analyses of the field
+                    // Fetch all soil analysis records for the field.
                     const soilAnalyses = await getSoilAnalyses(
                         tx,
                         principal_id,
@@ -98,7 +96,7 @@ export async function collectInputForOrganicMatterBalance(
                         timeframe,
                     )
 
-                    // Get the fertilizer applications of the field
+                    // Fetch all fertilizer application records for the field.
                     const fertilizerApplications =
                         await getFertilizerApplications(
                             tx,
@@ -107,38 +105,40 @@ export async function collectInputForOrganicMatterBalance(
                             timeframe,
                         )
 
+                    // Structure the collected data for this field.
                     return {
-                        field: field,
-                        cultivations: cultivations,
+                        field,
+                        cultivations,
                         harvests: harvestsFiltered,
-                        fertilizerApplications: fertilizerApplications,
-                        soilAnalyses: soilAnalyses,
+                        fertilizerApplications,
+                        soilAnalyses,
                     }
                 }),
             )
 
-            // Collect the details of the fertilizers
+            // 3. Fetch farm-level catalogue data.
+            // These details are fetched once for the entire farm and reused for each field.
             const fertilizerDetails = await getFertilizers(
                 tx,
                 principal_id,
                 b_id_farm,
             )
-
-            // Collect the details of the cultivations
             const cultivationDetails = await getCultivationsFromCatalogue(
                 tx,
                 principal_id,
                 b_id_farm,
             )
 
+            // 4. Assemble the final input object.
             return {
                 fields,
-                fertilizerDetails: fertilizerDetails,
-                cultivationDetails: cultivationDetails,
+                fertilizerDetails,
+                cultivationDetails,
                 timeFrame: timeframe,
             }
         })
     } catch (error) {
+        // Wrap any errors in a more descriptive error message.
         throw new Error(
             `Failed to collect organic matter balance input for farm ${b_id_farm}: ${
                 error instanceof Error ? error.message : String(error)

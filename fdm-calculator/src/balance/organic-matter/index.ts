@@ -15,27 +15,30 @@ import type {
     OrganicMatterBalanceInput,
     OrganicMatterBalanceNumeric,
     SoilAnalysisPicked,
-} from "./types"
+} from "./types.d"
 
 /**
- * Calculates the organic matter balance for a set of fields, considering organic matter supply and degradation.
+ * Calculates the organic matter balance for a farm, aggregating results from all its fields.
  *
- * This function takes comprehensive input data, including field details, fertilizer information,
- * and cultivation practices, to provide a detailed organic matter balance analysis. It processes each field
- * individually and then aggregates the results to provide an overall farm-level balance.
+ * This function serves as the main entry point for the organic matter balance calculation.
+ * It takes a comprehensive set of input data for a farm, processes each field in batches
+ * to calculate its individual balance, and then aggregates these results into a single,
+ * farm-level balance. The final output is a numeric representation of the balance,
+ * suitable for display or further analysis.
  *
- * @param organicMatterBalanceInput - The input data for the organic matter balance calculation, including fields, fertilizer details, and cultivation details.
- * @returns A promise that resolves with the calculated organic matter balance, with numeric values as numbers.
- * @throws Throws an error if any of the calculations fail.
+ * @param organicMatterBalanceInput - The complete dataset required for the calculation, including all fields,
+ *   fertilizer catalogues, and cultivation catalogues for the farm.
+ * @returns A promise that resolves to the aggregated `OrganicMatterBalanceNumeric` object for the farm.
+ * @throws {Error} Throws an error if the calculation process fails for any reason.
  */
 export async function calculateOrganicMatterBalance(
     organicMatterBalanceInput: OrganicMatterBalanceInput,
 ): Promise<OrganicMatterBalanceNumeric> {
-    // Destructure input directly
+    // Destructure input for easier access.
     const { fields, fertilizerDetails, cultivationDetails, timeFrame } =
         organicMatterBalanceInput
 
-    // Pre-process details into Maps for efficient lookups
+    // Pre-process catalogue details into Maps for efficient lookups within the calculation functions.
     const fertilizerDetailsMap = new Map(
         fertilizerDetails.map((detail) => [detail.p_id_catalogue, detail]),
     )
@@ -43,8 +46,9 @@ export async function calculateOrganicMatterBalance(
         cultivationDetails.map((detail) => [detail.b_lu_catalogue, detail]),
     )
 
-    // Process fields in batches to control concurrency.
-    const batchSize = 50 // A sensible default, can be tuned based on profiling.
+    // Process fields in batches to avoid overwhelming the system with concurrent promises,
+    // especially for farms with a large number of fields.
+    const batchSize = 50 // This can be adjusted based on performance testing.
     const fieldsWithBalanceResults: OrganicMatterBalanceFieldResult[] = []
     let hasErrors = false
     const fieldErrorMessages: string[] = []
@@ -52,6 +56,7 @@ export async function calculateOrganicMatterBalance(
     for (let i = 0; i < fields.length; i += batchSize) {
         const batch = fields.slice(i, i + batchSize)
         const batchPromises = batch.map(async (field: FieldInput) => {
+            // Calculate the balance for each field individually.
             return calculateOrganicMatterBalanceField(
                 field.field,
                 field.cultivations,
@@ -64,8 +69,10 @@ export async function calculateOrganicMatterBalance(
             )
         })
 
+        // Wait for the current batch to complete.
         const batchResults = await Promise.all(batchPromises)
         for (const r of batchResults) {
+            // Collect any errors that occurred during field calculations.
             if (r.errorMessage) {
                 hasErrors = true
                 fieldErrorMessages.push(`[${r.b_id}] ${r.errorMessage}`)
@@ -74,7 +81,7 @@ export async function calculateOrganicMatterBalance(
         fieldsWithBalanceResults.push(...batchResults)
     }
 
-    // Aggregate the field balances to farm level
+    // Aggregate the results from all individual fields into a single farm-level balance.
     const farmWithBalanceDecimal = calculateOrganicMatterBalancesFieldToFarm(
         fieldsWithBalanceResults,
         fields,
@@ -82,20 +89,21 @@ export async function calculateOrganicMatterBalance(
         fieldErrorMessages,
     )
 
-    // Convert the final result to use numbers instead of Decimals
+    // Convert the final `Decimal`-based result to a plain `number`-based object.
     return convertOrganicMatterBalanceToNumeric(farmWithBalanceDecimal)
 }
 
 /**
  * A cached version of the `calculateOrganicMatterBalance` function.
  *
- * This function provides the same functionality as `calculateOrganicMatterBalance` but
- * includes a caching mechanism to improve performance for repeated calls with the
- * same input. The cache is managed by `withCalculationCache` and uses the
- * `pkg.calculatorVersion` as part of its cache key.
+ * This wrapper provides caching capabilities to the main calculation function,
+ * returning a stored result if the same input has been processed before. This can
+ * significantly improve performance for repeated requests with identical data.
+ * The cache is versioned using the calculator's package version to ensure data integrity
+ * after updates.
  *
  * @param organicMatterBalanceInput - The input data for the organic matter balance calculation.
- * @returns A promise that resolves with the calculated organic matter balance, with numeric values as numbers.
+ * @returns A promise that resolves with the calculated `OrganicMatterBalanceNumeric`.
  */
 export const getOrganicMatterBalance = withCalculationCache(
     calculateOrganicMatterBalance,
@@ -104,33 +112,27 @@ export const getOrganicMatterBalance = withCalculationCache(
 )
 
 /**
- * Calculates the organic matter balance for a single field, considering organic matter supply and degradation.
+ * Calculates the organic matter balance for a single field.
  *
- * This function performs a detailed calculation of the organic matter balance for a single field,
- * taking into account various sources of organic matter supply (e.g., fertilizers, crops, residues)
- * and organic matter losses through degradation.
+ * This function computes the balance by subtracting the total organic matter degradation
+ * from the total supply of effective organic matter (EOM). It orchestrates calls to
+ * `calculateOrganicMatterSupply` and `calculateOrganicMatterDegradation` to get the two
+ * main components of the balance.
  *
- * The calculation relies on detailed input parameters, including:
- *   - field characteristics
- *   - cultivation details
- *   - harvest yields (though not directly used for OM balance, kept for consistency)
- *   - fertilizer applications and their organic matter contributions
- *   - soil analysis data
- *
- * @param field - The field to calculate the organic matter balance for.
- * @param cultivations - The cultivations on the field.
- * @param harvests - The harvests from the field (not directly used for OM balance but kept for consistency).
- * @param fertilizerApplications - The fertilizer applications on the field.
- * @param soilAnalyses - The soil analyses for the field.
- * @param fertilizerDetailsMap - A map containing details for each fertilizer.
- * @param cultivationDetailsMap - A map containing details for each cultivation.
- * @param timeFrame - The time frame for the calculation.
- * @returns The calculated organic matter balance for the field, or an error message if the calculation fails.
+ * @param field - The core details of the field.
+ * @param cultivations - An array of cultivation records for the field.
+ * @param harvests - An array of harvest records (kept for structural consistency, not used in OM calc).
+ * @param fertilizerApplications - An array of fertilizer application records.
+ * @param soilAnalyses - An array of soil analysis records.
+ * @param fertilizerDetailsMap - A map of available fertilizer details.
+ * @param cultivationDetailsMap - A map of available cultivation details.
+ * @param timeFrame - The calculation period.
+ * @returns A `OrganicMatterBalanceFieldResult` object containing the detailed balance or an error message.
  */
 export function calculateOrganicMatterBalanceField(
     field: FieldInput["field"],
     cultivations: FieldInput["cultivations"],
-    harvests: FieldInput["harvests"], // Not used in OM balance, but kept for consistency with nitrogen
+    harvests: FieldInput["harvests"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
     soilAnalyses: FieldInput["soilAnalyses"],
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
@@ -138,17 +140,17 @@ export function calculateOrganicMatterBalanceField(
     timeFrame: Timeframe,
 ): OrganicMatterBalanceFieldResult {
     try {
-        // Get the details of the field
         const fieldDetails = field
 
-        // Combine soil analyses
+        // 1. Combine multiple soil analyses into a single representative record for the field.
+        // We need 'a_som_loi' and 'a_density_sa' for the degradation calculation.
         const soilAnalysis = combineSoilAnalyses<SoilAnalysisPicked>(
             soilAnalyses,
             ["a_som_loi", "a_density_sa"],
-            true,
+            true, // Enable estimation of missing values if possible (though not configured for these specific keys).
         )
 
-        // Calculate the amount of Organic Matter supplied
+        // 2. Calculate the total supply of effective organic matter (EOM).
         const supply = calculateOrganicMatterSupply(
             cultivations,
             fertilizerApplications,
@@ -157,7 +159,7 @@ export function calculateOrganicMatterBalanceField(
             timeFrame,
         )
 
-        // Calculate the amount of Organic Matter degraded
+        // 3. Calculate the total degradation of soil organic matter (SOM).
         const degradation = calculateOrganicMatterDegradation(
             soilAnalysis,
             cultivations,
@@ -165,6 +167,7 @@ export function calculateOrganicMatterBalanceField(
             timeFrame,
         )
 
+        // 4. Calculate the final balance: EOM Supply - SOM Degradation.
         return {
             b_id: fieldDetails.b_id,
             b_area: fieldDetails.b_area ?? 0,
@@ -176,6 +179,7 @@ export function calculateOrganicMatterBalanceField(
             },
         }
     } catch (error) {
+        // If any step fails, return a result object with an error message.
         return {
             b_id: field.b_id,
             b_area: field.b_area ?? 0,
@@ -185,19 +189,17 @@ export function calculateOrganicMatterBalanceField(
 }
 
 /**
- * Aggregates organic matter balances from individual fields to the farm level.
+ * Aggregates the organic matter balances from individual fields to a farm-level summary.
  *
- * This function takes an array of organic matter balance results for individual fields and aggregates
- * them to provide an overall organic matter balance for the entire farm. It calculates weighted
- * averages of organic matter supply and degradation based on the area of each field.
+ * This function takes the results for all fields, filters out any that failed,
+ * and calculates a weighted average for the farm's overall supply, degradation, and balance,
+ * using the area of each field as the weight.
  *
- * The function returns a comprehensive organic matter balance for the farm, including total supply,
- * degradation, and the overall balance.
- * @param fieldsWithBalanceResults - An array of organic matter balance results for individual fields, potentially including errors.
- * @param fields - All field inputs, used to get original field data like area.
- * @param hasErrors - Indicates if any field calculations failed.
- * @param fieldErrorMessages - A list of error messages for fields that failed to calculate.
- * @returns The aggregated organic matter balance for the farm.
+ * @param fieldsWithBalanceResults - An array of `OrganicMatterBalanceFieldResult` objects.
+ * @param fields - The original array of `FieldInput` objects, used to retrieve field areas.
+ * @param hasErrors - A boolean flag indicating if any field calculations failed.
+ * @param fieldErrorMessages - An array of error messages from failed calculations.
+ * @returns A single `OrganicMatterBalance` object representing the aggregated farm-level results.
  */
 export function calculateOrganicMatterBalancesFieldToFarm(
     fieldsWithBalanceResults: OrganicMatterBalanceFieldResult[],
@@ -205,20 +207,21 @@ export function calculateOrganicMatterBalancesFieldToFarm(
     hasErrors: boolean,
     fieldErrorMessages: string[],
 ): OrganicMatterBalance {
-    // Filter out fields that have errors for aggregation
+    // Filter out fields that have errors to ensure they are not included in the aggregation.
     const successfulFieldBalances = fieldsWithBalanceResults.filter(
         (result) => result.balance !== undefined,
     ) as (OrganicMatterBalanceFieldResult & { balance: OrganicMatterBalanceField })[]
 
-    // Calculate total weighted supply and degradation across the farm
     let totalFarmSupply = new Decimal(0)
     let totalFarmDegradation = new Decimal(0)
     let totalFarmArea = new Decimal(0)
 
+    // Calculate the total supply and degradation across the farm, weighted by field area.
     for (const fieldResult of successfulFieldBalances) {
         const fieldInput = fields.find((f) => f.field.b_id === fieldResult.b_id)
 
         if (!fieldInput) {
+            // This should not happen in a normal flow but is a safeguard.
             console.warn(
                 `Could not find field input for field balance ${fieldResult.b_id}`,
             )
@@ -227,6 +230,7 @@ export function calculateOrganicMatterBalancesFieldToFarm(
         const fieldArea = new Decimal(fieldInput.field.b_area ?? 0)
         totalFarmArea = totalFarmArea.add(fieldArea)
 
+        // Add the area-weighted supply and degradation to the farm totals.
         totalFarmSupply = totalFarmSupply.add(
             fieldResult.balance.supply.total.times(fieldArea),
         )
@@ -235,7 +239,7 @@ export function calculateOrganicMatterBalancesFieldToFarm(
         )
     }
 
-    // Calculate average values per hectare for the farm, only considering the area of successfully calculated fields
+    // Calculate the average values per hectare for the entire farm.
     const avgFarmSupply = totalFarmArea.isZero()
         ? new Decimal(0)
         : totalFarmSupply.dividedBy(totalFarmArea)
@@ -243,15 +247,15 @@ export function calculateOrganicMatterBalancesFieldToFarm(
         ? new Decimal(0)
         : totalFarmDegradation.dividedBy(totalFarmArea)
 
-    // Calculate the average balance at farm level
+    // The final farm balance is the difference between the average supply and average degradation.
     const avgFarmBalance = avgFarmSupply.minus(avgFarmDegradation)
 
-    // Return the farm with average balances per hectare
+    // Construct the final farm-level balance object.
     const farmWithBalance: OrganicMatterBalance = {
         balance: avgFarmBalance,
         supply: avgFarmSupply,
         degradation: avgFarmDegradation,
-        fields: fieldsWithBalanceResults,
+        fields: fieldsWithBalanceResults, // Include results for all fields, even those with errors.
         hasErrors:
             hasErrors ||
             fieldsWithBalanceResults.length !== successfulFieldBalances.length,
