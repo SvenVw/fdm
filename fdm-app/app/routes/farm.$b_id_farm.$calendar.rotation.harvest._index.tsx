@@ -1,6 +1,5 @@
 import {
     addHarvest,
-    getCultivation,
     getCultivations,
     getCultivationsFromCatalogue,
     getDefaultsForHarvestParameters,
@@ -8,11 +7,9 @@ import {
     getFields,
     getHarvests,
     getParametersForHarvestCat,
-    HarvestableAnalysis,
-    HarvestParameters,
     removeHarvest,
 } from "@svenvw/fdm-core"
-import { Info, AlertTriangle, ChevronDown } from "lucide-react"
+import { AlertTriangle, Info } from "lucide-react"
 import { useEffect, useState } from "react"
 import {
     type ActionFunctionArgs,
@@ -34,7 +31,7 @@ import {
 import { z } from "zod"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { HarvestFormDialog } from "~/components/blocks/harvest/form"
+import { HarvestForm } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
@@ -51,12 +48,6 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { Checkbox } from "~/components/ui/checkbox"
-import {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-} from "~/components/ui/accordion"
 import {
     Dialog,
     DialogContent,
@@ -615,7 +606,7 @@ export default function FarmRotationHarvestAddIndex() {
                                             </p>
                                         </div>
                                     ) : loaderData.fieldAmount > 0 ? (
-                                        <HarvestFormDialog
+                                        <HarvestForm
                                             harvestParameters={
                                                 loaderData.harvestParameters
                                             }
