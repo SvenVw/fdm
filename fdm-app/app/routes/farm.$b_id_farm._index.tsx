@@ -8,9 +8,9 @@ import {
     Icon,
     Landmark,
     MapIcon,
-    Plus,
     ScrollText,
     Shapes,
+    Sprout,
     Square,
     Trash2,
     UserRoundCheck,
@@ -155,28 +155,6 @@ export default function FarmDashboardIndex() {
                                     Snelle acties
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <NavLink
-                                        to={`${calendar}/field/fertilizer`}
-                                    >
-                                        <Card className="transition-all hover:shadow-md">
-                                            <CardHeader>
-                                                <div className="flex items-center gap-4">
-                                                    <div className="rounded-lg bg-primary text-primary-foreground p-3">
-                                                        <Plus className="h-6 w-6" />
-                                                    </div>
-                                                    <div>
-                                                        <CardTitle>
-                                                            Bemesting toevoegen
-                                                        </CardTitle>
-                                                        <CardDescription>
-                                                            Voor één of meerdere
-                                                            percelen.
-                                                        </CardDescription>
-                                                    </div>
-                                                </div>
-                                            </CardHeader>
-                                        </Card>
-                                    </NavLink>
                                     <NavLink to={`${calendar}/field`}>
                                         <Card className="transition-all hover:shadow-md">
                                             <CardHeader>
@@ -193,6 +171,29 @@ export default function FarmDashboardIndex() {
                                                             met o.a. gewassen en
                                                             meststoffen per
                                                             perceel.
+                                                        </CardDescription>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                        </Card>
+                                    </NavLink>
+                                    <NavLink to={`${calendar}/rotation`}>
+                                        <Card className="transition-all hover:shadow-md">
+                                            <CardHeader>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="rounded-lg bg-primary text-primary-foreground p-3">
+                                                        <Sprout className="h-6 w-6" />
+                                                    </div>
+                                                    <div>
+                                                        <CardTitle>
+                                                            Bouwplan
+                                                        </CardTitle>
+                                                        <CardDescription>
+                                                            Uitgebreide tabel
+                                                            met o.a. zaaidata,
+                                                            oogstdata en
+                                                            bemestingen per
+                                                            gewas.
                                                         </CardDescription>
                                                     </div>
                                                 </div>
