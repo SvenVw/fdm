@@ -1,5 +1,14 @@
 # Changelog fdm-app
 
+## 0.24.2
+
+### Patch Changes
+
+- Updated dependencies [ed53b86]
+  - @svenvw/fdm-data@0.18.1
+  - @svenvw/fdm-core@0.26.1
+  - @svenvw/fdm-calculator@0.8.0
+
 ## 0.24.1
 
 ### Patch Changes
