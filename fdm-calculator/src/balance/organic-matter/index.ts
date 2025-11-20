@@ -147,7 +147,7 @@ export function calculateOrganicMatterBalanceField(
         const soilAnalysis = combineSoilAnalyses<SoilAnalysisPicked>(
             soilAnalyses,
             ["a_som_loi", "a_density_sa"],
-            true, // Enable estimation of missing values if possible (though not configured for these specific keys).
+            true, // Enable estimation of missing values if possible
         )
 
         // 2. Calculate the total supply of effective organic matter (EOM).
@@ -173,7 +173,7 @@ export function calculateOrganicMatterBalanceField(
             b_area: fieldDetails.b_area ?? 0,
             balance: {
                 b_id: fieldDetails.b_id,
-                balance: supply.total.minus(degradation.total),
+                balance: supply.total.plus(degradation.total),
                 supply: supply,
                 degradation: degradation,
             },
@@ -248,7 +248,7 @@ export function calculateOrganicMatterBalancesFieldToFarm(
         : totalFarmDegradation.dividedBy(totalFarmArea)
 
     // The final farm balance is the difference between the average supply and average degradation.
-    const avgFarmBalance = avgFarmSupply.minus(avgFarmDegradation)
+    const avgFarmBalance = avgFarmSupply.plus(avgFarmDegradation)
 
     // Construct the final farm-level balance object.
     const farmWithBalance: OrganicMatterBalance = {

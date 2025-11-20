@@ -12,13 +12,12 @@ Soil organic matter is a cornerstone of a healthy and productive agricultural sy
 The final organic matter balance for each field is determined by the formula:
 
 ```text
-OM Balance (kg OM / ha) = Effective OM Supply - OM Degradation
+OM Balance (kg OM / ha) = Effective OM Supply + OM Degradation
 ```
 
 Where:
-
-* **Effective OM Supply (EOM):** The portion of applied organic matter that is expected to remain in the soil after one year of decomposition. This includes inputs from fertilizers, crops, and residues.
-* **OM Degradation:** The amount of existing soil organic matter that is lost through decomposition over the same period.
+* **Effective OM Supply (EOM):** The portion of applied organic matter that is expected to remain in the soil after one year of decomposition. This includes inputs from fertilizers, cultivations, and residues.
+* **OM Degradation:** The amount of existing soil organic matter that is lost through decomposition over the same period. This is a **negative** value.
 
 A positive balance indicates that management practices are contributing to an increase in soil organic matter, while a negative balance suggests a decline. The calculations are performed for a user-defined **Time Frame**.
 
@@ -96,14 +95,14 @@ Organic matter degradation is the natural process of decomposition of SOM by soi
     4. **Annual Degradation Formula:** The annual rate of degradation is calculated using an empirical formula that incorporates soil properties and the correction factors.
         `Annual Degradation = a_som_loi * b_depth * a_density_sa * (ln(a_som_loi) * -0.008934 + 0.038228) * TempCorrection`
     5. **Capping:** The calculated annual degradation is capped at a maximum of `3500` kg OM/ha/year to prevent unrealistic values.
-    6. **Total Degradation:** The annual degradation rate is multiplied by the number of years in the calculation `Timeframe` to get the total degradation for the period.
-
-*Note: The degradation formula is based on models developed for specific regions (e.g., Flanders, Belgium). The dimensional consistency of the empirical formula should be considered within the context of its source.*
-
-## 4. Field and Farm Level Balance
-
-* **Field Balance:** For each field, the balance is calculated as:
-    `OM Balance = Total EOM Supply - Total OM Degradation`
+        6. **Total Degradation:** The annual degradation rate is multiplied by the number of years in the calculation `Timeframe` to get the total degradation for the period. The result of this calculation is then multiplied by -1 to represent a loss from the system.
+    
+    *Note: The degradation formula is based on models developed for specific regions (e.g., Flanders, Belgium). The dimensional consistency of the empirical formula should be considered within the context of its source.*
+    
+    ## 4. Field and Farm Level Balance
+    
+    *   **Field Balance:** For each field, the balance is calculated as:
+        `OM Balance = Total EOM Supply + Total OM Degradation`
 * **Farm Balance:**
     1. The total EOM supply and OM degradation for each field are weighted by the field's area (e.g., `supply_kg_per_field = supply_kg_per_ha * area_ha`).
     2. These weighted totals are summed across all fields that were successfully calculated.

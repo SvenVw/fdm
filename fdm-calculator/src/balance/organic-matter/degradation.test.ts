@@ -54,7 +54,7 @@ describe("calculateOrganicMatterDegradation", () => {
         )
 
         expect(degradation.total).toBeInstanceOf(Decimal)
-        expect(degradation.total.toNumber()).toBeGreaterThan(0)
+        expect(degradation.total.toNumber()).toBeLessThan(0)
     })
 
     it("should calculate degradation correctly for arable land", () => {
@@ -76,7 +76,7 @@ describe("calculateOrganicMatterDegradation", () => {
         )
 
         expect(degradation.total).toBeInstanceOf(Decimal)
-        expect(degradation.total.toNumber()).toBeGreaterThan(0)
+        expect(degradation.total.toNumber()).toBeLessThan(0)
     })
 
     it("should return 0 degradation if formula result is negative", () => {
@@ -119,7 +119,7 @@ describe("calculateOrganicMatterDegradation", () => {
             mockTimeFrame,
         )
 
-        expect(degradation.total.toNumber()).toBe(3500)
+        expect(degradation.total.toNumber()).toBe(-3500)
     })
 
     it("should handle multiple years correctly", () => {

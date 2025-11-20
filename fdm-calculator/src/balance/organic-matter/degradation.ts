@@ -86,6 +86,6 @@ export function calculateOrganicMatterDegradation(
     const totalDegradation = annualDegradation.times(numberOfYears)
 
     return {
-        total: totalDegradation,
+        total: totalDegradation.times(-1),
     }
 }

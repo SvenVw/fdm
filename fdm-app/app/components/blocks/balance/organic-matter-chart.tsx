@@ -20,7 +20,7 @@ export function OrganicMatterBalanceChart({
         {
             name: "Balans",
             supply: supply,
-            degradation: Math.abs(degradation) * -1, // Show as negative
+            degradation: degradation,
         },
     ]
 
