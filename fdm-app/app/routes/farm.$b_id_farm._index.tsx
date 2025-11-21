@@ -25,29 +25,29 @@ import {
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
-import { FarmContent } from "../components/blocks/farm/farm-content"
-import { FarmTitle } from "../components/blocks/farm/farm-title"
-import { Header } from "../components/blocks/header/base"
-import { HeaderFarm } from "../components/blocks/header/farm"
-import { Button } from "../components/ui/button"
+import { FarmContent } from "~/components/blocks/farm/farm-content"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "../components/ui/card"
+} from "~/components/ui/card"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "../components/ui/select"
-import { SidebarInset } from "../components/ui/sidebar"
-import { getCalendarSelection } from "../lib/calendar"
-import { fdm } from "../lib/fdm.server"
-import { useCalendarStore } from "../store/calendar"
+} from "~/components/ui/select"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { getCalendarSelection } from "~/lib/calendar"
+import { fdm } from "~/lib/fdm.server"
+import { useCalendarStore } from "~/store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -142,7 +142,7 @@ export default function FarmDashboardIndex() {
                 <FarmTitle
                     title={`${loaderData.b_name_farm}`}
                     description={
-                        "Een overzicht van de bedrijfsgegevens, snelle acties en applicaties."
+                        "Een overzicht van de bedrijfsgegevens en applicaties."
                     }
                 />
                 <FarmContent>
@@ -152,7 +152,7 @@ export default function FarmDashboardIndex() {
                             {/* Quick Actions */}
                             <div className="space-y-4">
                                 <h2 className="text-2xl font-semibold tracking-tight">
-                                    Snelle acties
+                                    Overzichten
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <NavLink to={`${calendar}/field`}>
@@ -164,11 +164,12 @@ export default function FarmDashboardIndex() {
                                                     </div>
                                                     <div>
                                                         <CardTitle>
-                                                            Perceelsoverzicht
+                                                            Percelen
                                                         </CardTitle>
                                                         <CardDescription>
                                                             Uitgebreide tabel
                                                             met o.a. gewassen en
+                                                            gebruikte
                                                             meststoffen per
                                                             perceel.
                                                         </CardDescription>
@@ -192,7 +193,8 @@ export default function FarmDashboardIndex() {
                                                             Uitgebreide tabel
                                                             met o.a. zaaidata,
                                                             oogstdata en
-                                                            bemestingen per
+                                                            gebruikte
+                                                            meststoffen per
                                                             gewas.
                                                         </CardDescription>
                                                     </div>
