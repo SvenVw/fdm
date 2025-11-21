@@ -217,8 +217,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         const selectedFields = await Promise.all(
             selectedFieldsData.map(async (field) => {
-                let harvestApplication: HarvestApplication | undefined =
-                    undefined
+                let harvestApplication: HarvestApplication | undefined
                 let harvestableAnalysis: Partial<
                     HarvestApplication["harvestable"]["harvestable_analyses"][number]
                 > = {}
@@ -262,12 +261,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }),
         )
 
-        let firstFieldWithData
+        let firstFieldWithData: (typeof selectedFields)[number] | undefined
         if (targetCultivation.b_lu_harvestable === "once") {
             firstFieldWithData = selectedFields.find((f) => f.hasHarvest)
         }
 
-        let harvestApplication:
+        const harvestApplication:
             | HarvestApplication
             | Partial<HarvestApplication> =
             firstFieldWithData?.harvestApplication ?? {
