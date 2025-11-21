@@ -1,6 +1,6 @@
 {
     "name": "@svenvw/fdm-app",
-    "version": "0.24.1",
+    "version": "0.24.2",
     "private": true,
     "sideEffects": false,
     "type": "module",
@@ -42,6 +42,7 @@
         "@turf/centroid": "^7.2.0",
         "@turf/turf": "^7.2.0",
         "better-auth": "catalog:",
+        "chrono-node": "^2.9.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "1.1.1",

@@ -148,9 +148,7 @@ export function FertilizerApplicationForm({
             )
         }
         navigate(
-            searchParams.has("fieldIds")
-                ? `./manage/new?fieldIds=${searchParams.get("fieldIds")}`
-                : "./manage/new",
+            `/farm/${b_id_farm}/fertilizers/new?returnUrl=${encodeURIComponent(`${location.pathname}${location.search}`)}`,
         )
     }
 

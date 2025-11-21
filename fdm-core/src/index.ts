@@ -121,11 +121,16 @@ export {
     getHarvests,
     removeHarvest,
     updateHarvest,
+    getHarvestableTypeOfCultivation,
+    getParametersForHarvestCat,
+    getDefaultsForHarvestParameters,
 } from "./harvest"
 export type {
     Harvest,
     Harvestable,
     HarvestableAnalysis,
+    HarvestParameters,
+    HarvestParametersDefault,
 } from "./harvest.d"
 export { runMigration } from "./migrate"
 export {

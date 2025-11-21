@@ -2,57 +2,211 @@ import { z } from "zod"
 
 export const FormSchema = z
     .object({
-        b_lu_yield: z.coerce
-            .number({
-                invalid_type_error: "Hoeveelheid moet een getal zijn",
+        b_lu_harvest_date: z
+            .string({
+                required_error:
+                    "Geef een datum op voor wanneer dit gewas is geoogst",
+                invalid_type_error:
+                    "Geef een datum op voor wanneer dit gewas is geoogst",
             })
-            .positive({
-                message: "Hoeveelheid moet positief zijn",
-            })
-            .finite({
-                message: "Hoeveelheid moet een geheel getal zijn",
-            })
-            .max(100000, {
-                message: "Hoeveelheid mag niet groter zijn dan 100000",
-            })
-            .safe({
-                message: "Hoeveelheid moet een safe getal zijn",
-            })
-            .optional(),
-        b_lu_n_harvestable: z.preprocess(
-            (val) => {
-                if (val === "" || val === null) return undefined
-                return val as number | undefined
-            },
+            .transform((val, ctx) => {
+                const date = new Date(val)
+                if (Number.isNaN(date.getTime())) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        message:
+                            "Geef een datum op voor wanneer dit gewas is geoogst",
+                    })
+                    return z.NEVER
+                }
+                return date
+            }),
+        b_lu_yield: z.preprocess(
+            (val) => (val === "" ? undefined : val),
             z.coerce
                 .number({
                     invalid_type_error: "Hoeveelheid moet een getal zijn",
                 })
-                .min(0, {
-                    message: "Hoeveelheid moet positief zijn",
+                .positive({
+                    message: "Hoeveelheid moet groter zijn dan 0",
+                })
+                .finite({
+                    message: "Hoeveelheid moet een geheel getal zijn",
+                })
+                .max(250000, {
+                    message:
+                        "Hoeveelheid mag niet groter zijn dan 250.000 kg DS / ha",
+                })
+                .safe({
+                    message: "Hoeveelheid moet een safe getal zijn",
+                })
+                .optional(),
+        ),
+        b_lu_yield_fresh: z.preprocess(
+            (val) => (val === "" ? undefined : val),
+            z.coerce
+                .number({
+                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                })
+                .positive({
+                    message: "Hoeveelheid moet groter zijn dan 0",
+                })
+                .finite({
+                    message: "Hoeveelheid moet een geheel getal zijn",
+                })
+                .max(250000, {
+                    message:
+                        "Hoeveelheid mag niet groter zijn dan 250.000 kg versproduct / ha",
+                })
+                .safe({
+                    message: "Hoeveelheid moet een safe getal zijn",
+                })
+                .optional(),
+        ),
+        b_lu_yield_bruto: z.preprocess(
+            (val) => (val === "" ? undefined : val),
+            z.coerce
+                .number({
+                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                })
+                .positive({
+                    message: "Hoeveelheid moet groter zijn dan 0",
+                })
+                .finite({
+                    message: "Hoeveelheid moet een geheel getal zijn",
+                })
+                .max(250000, {
+                    message:
+                        "Hoeveelheid mag niet groter zijn dan 250.000 kg versproduct (incl. tarra) / ha",
+                })
+                .safe({
+                    message: "Hoeveelheid moet een safe getal zijn",
+                })
+                .optional(),
+        ),
+        b_lu_dm: z.preprocess(
+            (val) => (val === "" ? undefined : val),
+            z.coerce
+                .number({
+                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                })
+                .positive({
+                    message: "Hoeveelheid moet groter zijn dan 0",
+                })
+                .finite({
+                    message: "Hoeveelheid moet een geheel getal zijn",
+                })
+                .max(1000, {
+                    message:
+                        "Hoeveelheid mag niet groter zijn dan 1.000 g Ds / kg versproduct",
+                })
+                .safe({
+                    message: "Hoeveelheid moet een safe getal zijn",
+                })
+                .optional(),
+        ),
+        b_lu_n_harvestable: z.preprocess(
+            (val) => (val === "" ? undefined : val),
+            z.coerce
+                .number({
+                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                })
+                .positive({
+                    message: "Hoeveelheid moet groter zijn dan 0",
                 })
                 .max(1000, {
                     message: "Hoeveelheid mag niet groter zijn dan 1000",
                 })
                 .optional(),
         ),
-        b_lu_start: z.preprocess((value) => {
-            if (typeof value === "string") {
-                if (value.toLowerCase() === "null") return null
-            }
-            return value
-        }, z.coerce.date().optional().nullable()),
-        b_lu_end: z.preprocess((value) => {
-            if (typeof value === "string") {
-                if (value.toLowerCase() === "null") return null
-            }
-            return value
-        }, z.coerce.date().optional().nullable()),
-        b_lu_harvest_date: z.coerce.date({
-            required_error: "Oogstdatum is verplicht",
-            invalid_type_error: "Oogstdatum moet een datum zijn",
-        }),
-        b_lu_harvestable: z.enum(["once", "multiple", "none"]).optional(),
+        b_lu_tarra: z.preprocess(
+            (val) => (val === "" ? undefined : val),
+            z.coerce
+                .number({
+                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                })
+                .positive({
+                    message: "Hoeveelheid moet groter zijn dan 0",
+                })
+                .finite({
+                    message: "Hoeveelheid moet een geheel getal zijn",
+                })
+                .max(25, {
+                    message: "Hoeveelheid mag niet groter zijn dan 25 %",
+                })
+                .safe({
+                    message: "Hoeveelheid moet een safe getal zijn",
+                })
+                .optional(),
+        ),
+        b_lu_uww: z.preprocess(
+            (val) => (val === "" ? undefined : val),
+            z.coerce
+                .number({
+                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                })
+                .positive({
+                    message: "Hoeveelheid moet groter zijn dan 0",
+                })
+                .finite({
+                    message: "Hoeveelheid moet een geheel getal zijn",
+                })
+                .min(100, {
+                    message: "Hoeveelheid mag niet kleiner zijn dan 100",
+                })
+                .max(1000, {
+                    message:
+                        "Hoeveelheid mag niet groter zijn dan 1.000 g / 5 kg",
+                })
+                .safe({
+                    message: "Hoeveelheid moet een safe getal zijn",
+                })
+                .optional(),
+        ),
+        b_lu_moist: z.preprocess(
+            (val) => (val === "" ? undefined : val),
+            z.coerce
+                .number({
+                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                })
+                .positive({
+                    message: "Hoeveelheid moet groter zijn dan 0",
+                })
+                .finite({
+                    message: "Hoeveelheid moet een geheel getal zijn",
+                })
+                .max(100, {
+                    message: "Hoeveelheid mag niet groter zijn dan 100 %",
+                })
+                .safe({
+                    message: "Hoeveelheid moet een safe getal zijn",
+                })
+                .optional(),
+        ),
+        b_lu_cp: z.preprocess(
+            (val) => (val === "" ? undefined : val),
+            z.coerce
+                .number({
+                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                })
+                .positive({
+                    message: "Hoeveelheid moet groter zijn dan 0",
+                })
+                .finite({
+                    message: "Hoeveelheid moet een geheel getal zijn",
+                })
+                .max(500, {
+                    message:
+                        "Hoeveelheid mag niet groter zijn dan 500 g RE / kg DS",
+                })
+                .safe({
+                    message: "Hoeveelheid moet een safe getal zijn",
+                })
+                .optional(),
+        ),
+        b_lu_start: z.coerce.date().optional().nullable(),
+        b_lu_end: z.coerce.date().optional().nullable(),
+        b_lu_harvestable: z.enum(["once", "multiple", "none"]),
     })
     .superRefine((data, ctx) => {
         if (

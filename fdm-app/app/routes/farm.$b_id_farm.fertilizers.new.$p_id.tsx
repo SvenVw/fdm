@@ -22,6 +22,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { isOfOrigin, modifySearchParams } from "~/lib/url-utils"
 
 export const meta: MetaFunction = () => {
     return [
@@ -138,6 +139,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
             throw new Error("missing: p_id")
         }
 
+        const requestUrl = new URL(request.url)
+        const returnUrl =
+            requestUrl.searchParams.get("returnUrl") ??
+            `/farm/${b_id_farm}/fertilizers`
+
         const session = await getSession(request)
         const formValues = await extractFormValuesFromRequest(
             request,
@@ -201,7 +207,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             },
         )
 
-        await addFertilizer(
+        const p_new_id = await addFertilizer(
             fdm,
             session.principal_id,
             p_id_catalogue,
@@ -210,9 +216,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
             undefined,
         )
 
-        return redirectWithSuccess(`/farm/${b_id_farm}/fertilizers`, {
-            message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
-        })
+        return redirectWithSuccess(
+            isOfOrigin(returnUrl, requestUrl.origin)
+                ? modifySearchParams(returnUrl, (searchParams) =>
+                      searchParams.set("p_id", p_new_id),
+                  )
+                : `/farm/${b_id_farm}/fertilizers`,
+            {
+                message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
+            },
+        )
     } catch (error) {
         throw handleActionError(error)
     }

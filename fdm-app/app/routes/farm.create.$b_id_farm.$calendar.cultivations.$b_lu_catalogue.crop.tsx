@@ -2,6 +2,7 @@ import {
     type CultivationCatalogue,
     getCultivationPlan,
     getCultivationsFromCatalogue,
+    getParametersForHarvestCat,
     type Harvest,
     updateCultivation,
 } from "@svenvw/fdm-core"
@@ -10,6 +11,7 @@ import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
+    Outlet,
     useLoaderData,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
@@ -156,11 +158,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             [],
         )
 
+        const harvestParameters = getParametersForHarvestCat(
+            targetCultivation.b_lu_harvestcat,
+        )
+
         return {
             b_lu_catalogue: b_lu_catalogue,
             b_id_farm: b_id_farm,
             cultivation: targetCultivation,
             b_lu_harvestable: b_lu_harvestable,
+            harvestParameters: harvestParameters,
             b_lu_variety_options: b_lu_variety_options,
             harvests: harvests,
             calendar: calendar,
@@ -193,8 +200,9 @@ export default function FarmAFieldCultivationBlock() {
             <CultivationHarvestsCard
                 harvests={loaderData.harvests}
                 b_lu_harvestable={loaderData.b_lu_harvestable}
-                cultivation={loaderData.cultivation}
+                harvestParameters={loaderData.harvestParameters}
             />
+            <Outlet />
         </div>
     )
 }
