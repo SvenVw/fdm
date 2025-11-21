@@ -23,7 +23,7 @@ export const meta: MetaFunction = () => {
         { title: `Organische Stof | Nutriëntenbalans| ${clientConfig.name}` },
         {
             name: "description",
-            content: "Bekijk organische stof voor je nutriëntenbalans.",
+            content: "Bekijk de organische stofbalans van je bedrijf.",
         },
     ]
 }
@@ -141,13 +141,14 @@ export default function FarmBalanceOrganicMatterBlock() {
                 />
             </Header>
             <main>
-                <FarmTitle
-                    title={"Organische Stof"}
-                    description={
-                        "Bekijk organische stof voor je nutriëntenbalans."
-                    }
-                />
-                <div className="space-y-6 p-10 pb-0">
+                <div className="space-y-6 py-5 px-10 pb-0">
+                    <div className="flex items-center gap-4">
+                        <div className="space-y-0.5 ">
+                            <h2 className="text-2xl font-bold tracking-tight">
+                                Organische stof
+                            </h2>
+                        </div>
+                    </div>
                     <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
                         <div className="flex-1">{<Outlet />}</div>
                     </div>

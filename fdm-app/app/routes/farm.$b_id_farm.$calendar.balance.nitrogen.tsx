@@ -6,7 +6,6 @@ import {
     Outlet,
     useLoaderData,
 } from "react-router"
-import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { HeaderBalance } from "~/components/blocks/header/balance"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
@@ -141,11 +140,14 @@ export default function FarmBalanceNitrogenBlock() {
                 />
             </Header>
             <main>
-                <FarmTitle
-                    title={"Stikstof"}
-                    description={"Bekijk stikstof voor je nutriëntenbalans."}
-                />
-                <div className="space-y-6 p-10 pb-0">
+                <div className="space-y-6 py-5 px-10 pb-0">
+                    <div className="flex items-center gap-4">
+                        <div className="space-y-0.5 ">
+                            <h2 className="text-2xl font-bold tracking-tight">
+                                Stikstof
+                            </h2>
+                        </div>
+                    </div>
                     <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
                         <div className="flex-1">{<Outlet />}</div>
                     </div>

@@ -50,7 +50,8 @@ const OrganicMatterBalanceDetails: React.FC<
                             (app: { id: string; value: number }) => {
                                 const application =
                                     fieldInput.fertilizerApplications.find(
-                                        (fa) => fa.p_app_id === app.id,
+                                        (fa: { p_app_id: string }) =>
+                                            fa.p_app_id === app.id,
                                     )
                                 if (
                                     !application ||
@@ -128,7 +129,7 @@ const OrganicMatterBalanceDetails: React.FC<
                 {items.map((item) => {
                     if (item.value === 0) return null
                     const cultivation = fieldInput.cultivations.find(
-                        (c) => c.b_lu === item.id,
+                        (c: { b_lu: string }) => c.b_lu === item.id,
                     )
                     if (!cultivation) return null
                     return (

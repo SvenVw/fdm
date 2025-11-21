@@ -30,11 +30,6 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "~/components/ui/tooltip"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -50,7 +45,7 @@ export const meta: MetaFunction = () => {
         },
         {
             name: "description",
-            content: "Bekijk organische stof voor je nutriëntenbalans.",
+            content: "Bekijk de organische stofbalans van je bedrijf.",
         },
     ]
 }
@@ -213,7 +208,7 @@ function FarmBalanceOrganicMatterOverview({
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Aanvoer (EOM)
+                            Aanvoer
                         </CardTitle>
                         <ArrowDownToLine className="text-xs text-muted-foreground" />
                     </CardHeader>

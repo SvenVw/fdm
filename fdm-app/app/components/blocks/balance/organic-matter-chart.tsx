@@ -20,13 +20,13 @@ export function OrganicMatterBalanceChart({
         {
             name: "Balans",
             supply: supply,
-            degradation: degradation,
+            degradation: degradation  * -1,
         },
     ]
 
     const chartConfig = {
         supply: {
-            label: "Aanvoer (EOM)",
+            label: "Aanvoer",
             color: "hsl(var(--chart-1))",
         },
         degradation: {
