@@ -138,7 +138,7 @@ function useHarvestRemixForm({
     return form
 }
 
-function FormFields({
+function HarvestFields({
     b_lu_harvest_date,
     harvestParameters,
     form,
@@ -447,7 +447,7 @@ function FormFields({
     )
 }
 
-function FormExplainer() {
+function HarvestFormExplainer() {
     const [hostname, setHostname] = useState("")
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -520,8 +520,8 @@ export function HarvestFormDialog(props: HarvestFormDialogProps) {
                                         : "Voeg een oogst toe aan dit gewas. Vul de gegevens in, zodat deze gebruikt kunnen worden in de berekeningen."}
                                 </DialogDescription>
                             </DialogHeader>
-                            <FormFields {...props} form={form} />
-                            <FormExplainer />
+                            <HarvestFields {...props} form={form} />
+                            <HarvestFormExplainer />
                             <DialogFooter>
                                 <Field orientation="horizontal">
                                     <Button
@@ -606,12 +606,12 @@ export function HarvestForm(props: HarvestFormDialogProps) {
                         disabled={form.formState.isSubmitting}
                         className="space-y-8"
                     >
-                        <FormFields
+                        <HarvestFields
                             {...props}
                             form={form}
                             className="grid lg:grid-cols-2 items-center gap-y-6 gap-x-8"
                         />
-                        <FormExplainer />
+                        <HarvestFormExplainer />
                         <div className="grid grid-cols-2 items">
                             <Button
                                 type="button"
