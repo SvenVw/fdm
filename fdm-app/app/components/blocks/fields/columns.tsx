@@ -128,9 +128,9 @@ export const columns: ColumnDef<FieldExtended>[] = [
         enableSorting: true,
         sortingFn: (rowA, rowB, _columnId) => {
             const fertilizerA =
-                rowA.original.fertilizers[0].p_name_nl || ""
+                rowA.original.fertilizers[0]?.p_name_nl || ""
             const fertilizerB =
-                rowB.original.fertilizers[0].p_name_nl || ""
+                rowB.original.fertilizers[0]?.p_name_nl || ""
             return fertilizerA.localeCompare(fertilizerB)
         },
         header: ({ column }) => {
