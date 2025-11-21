@@ -261,7 +261,7 @@ function OrganicMatterBalance({
                             </div>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            kg OM / ha
+                            kg OS / ha
                         </p>
                     </CardContent>
                 </Card>
@@ -277,7 +277,7 @@ function OrganicMatterBalance({
                             {result.supply.total}
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            kg EOM / ha
+                            kg EOS / ha
                         </p>
                     </CardContent>
                 </Card>
@@ -293,7 +293,7 @@ function OrganicMatterBalance({
                             {result.degradation.total}
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            kg OM / ha
+                            kg OS / ha
                         </p>
                     </CardContent>
                 </Card>

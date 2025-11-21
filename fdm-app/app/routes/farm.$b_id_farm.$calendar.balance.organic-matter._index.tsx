@@ -201,7 +201,7 @@ function FarmBalanceOrganicMatterOverview({
                             {organicMatterBalanceResult.balance}
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            kg OM / ha
+                            kg OS / ha
                         </p>
                     </CardContent>
                 </Card>
@@ -217,7 +217,7 @@ function FarmBalanceOrganicMatterOverview({
                             {organicMatterBalanceResult.supply}
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            kg EOM / ha
+                            kg EOS / ha
                         </p>
                     </CardContent>
                 </Card>
@@ -233,7 +233,7 @@ function FarmBalanceOrganicMatterOverview({
                             {organicMatterBalanceResult.degradation}
                         </div>
                         <p className="text-xs text-muted-foreground">
-                            kg OM / ha
+                            kg OS / ha
                         </p>
                     </CardContent>
                 </Card>
