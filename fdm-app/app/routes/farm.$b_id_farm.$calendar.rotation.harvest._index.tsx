@@ -361,11 +361,7 @@ export default function FarmRotationHarvestAddIndex() {
 
     function handleConfirmation() {
         // Check if this is a new harvest or is has already values
-        if (
-            loaderData.harvestApplication.b_lu_yield !== undefined ||
-            loaderData.harvestApplication.b_lu_n_harvestable !== undefined ||
-            loaderData.harvestApplication.b_lu_harvest_date !== undefined
-        ) {
+        if (loaderData.harvestApplication.b_lu_harvest_date !== undefined) {
             return initiateConfirmation()
         }
 
@@ -525,7 +521,7 @@ export default function FarmRotationHarvestAddIndex() {
                                                 <NavLink
                                                     to={`/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`}
                                                 >
-                                                    Naar bouwplanoverzicht
+                                                    Terug naar bouwplan
                                                 </NavLink>
                                             </Button>
                                         </div>
@@ -616,13 +612,21 @@ export default function FarmRotationHarvestAddIndex() {
                             </Card>
                             <Card className="flex-1">
                                 <CardHeader>
-                                    <CardTitle>Oogst toevoegen</CardTitle>
+                                    <CardTitle>
+                                        {isHarvestUpdate
+                                            ? "Oogst bijwerken"
+                                            : "Oogst toevoegen"}
+                                    </CardTitle>
                                     <CardDescription>
                                         {loaderData.fieldAmount === 0
                                             ? "Selecteer eerst een of meerdere percelen."
                                             : loaderData.fieldAmount === 1
-                                              ? "Voeg een nieuwe oogst toe aan het geselecteerde perceel."
-                                              : `Voeg een nieuwe oogst toe aan de ${loaderData.fieldAmount} geselecteerde percelen.`}
+                                              ? isHarvestUpdate
+                                                  ? "Werk oogst bij van het geselecteerde perceel."
+                                                  : "Voeg een nieuwe oogst toe aan de geselecteerde perceel."
+                                              : isHarvestUpdate
+                                                ? "Werk oogst bij van de geselecteerde percelen."
+                                                : `Voeg een nieuwe oogst toe aan de ${loaderData.fieldAmount} geselecteerde percelen.`}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
@@ -732,8 +736,8 @@ export default function FarmRotationHarvestAddIndex() {
                                 <DialogDescription>
                                     Er is al een oogst geregistreerd voor één of
                                     meerdere van de geselecteerde percelen. Als
-                                    u doorgaat, worden eerdere oogsten
-                                    verwijderd en overschreven.
+                                    u doorgaat, worden de opgeslagen oogsten
+                                    overschreven.
                                 </DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
