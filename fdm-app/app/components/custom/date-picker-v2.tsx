@@ -47,8 +47,12 @@ export function DatePicker({
     )
     const [month, setMonth] = useState<Date | undefined>(selectedDate)
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: onChange is stable across renders for react-hook-form controllers
     useEffect(() => {
         if (field.value && field.value instanceof Date) {
+            setSelectedDate(field.value)
+            setInputValue(formatDate(field.value))
+            setMonth(field.value)
             field.onChange(field.value.toISOString())
         } else if (field.value) {
             const date = parseDateText(field.value)
@@ -60,7 +64,7 @@ export function DatePicker({
             setSelectedDate(undefined)
             setMonth(undefined)
         }
-    }, [field.value, field.onChange])
+    }, [field.value])
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value)
