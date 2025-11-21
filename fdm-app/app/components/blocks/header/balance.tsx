@@ -31,14 +31,16 @@ export function HeaderBalance({
             <BreadcrumbSeparator />
             <BreadcrumbItem className="hidden md:block">
                 <BreadcrumbLink href={`/farm/${b_id_farm}/${calendar}/balance`}>
-                    Nutriëntenbalans
+                    Balans
                 </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger className="flex items-center gap-1">
-                        {currentPath.includes("/balance/nitrogen") ? "Stikstof" : "Organische Stof"}
+                        {currentPath.includes("/balance/nitrogen")
+                            ? "Stikstof"
+                            : "Organische stof"}
                         <ChevronDown className="text-muted-foreground h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
@@ -46,16 +48,22 @@ export function HeaderBalance({
                             checked={currentPath.includes("/balance/nitrogen")}
                             key={"nitrogen"}
                         >
-                             <NavLink to={`/farm/${b_id_farm}/${calendar}/balance/nitrogen`}>
+                            <NavLink
+                                to={`/farm/${b_id_farm}/${calendar}/balance/nitrogen`}
+                            >
                                 Stikstof
-                             </NavLink>
+                            </NavLink>
                         </DropdownMenuCheckboxItem>
                         <DropdownMenuCheckboxItem
-                            checked={currentPath.includes("/balance/organic-matter")}
+                            checked={currentPath.includes(
+                                "/balance/organic-matter",
+                            )}
                             key={"organic-matter"}
                         >
-                            <NavLink to={`/farm/${b_id_farm}/${calendar}/balance/organic-matter`}>
-                                Organische Stof
+                            <NavLink
+                                to={`/farm/${b_id_farm}/${calendar}/balance/organic-matter`}
+                            >
+                                Organische stof
                             </NavLink>
                         </DropdownMenuCheckboxItem>
                     </DropdownMenuContent>
@@ -81,7 +89,7 @@ export function HeaderBalance({
                                         key={option.b_id}
                                     >
                                         <NavLink
-                                            to={`/farm/${b_id_farm}/${calendar}/balance/${currentPath.includes('nitrogen') ? 'nitrogen' : 'organic-matter'}/${option.b_id}`}
+                                            to={`/farm/${b_id_farm}/${calendar}/balance/${currentPath.includes("nitrogen") ? "nitrogen" : "organic-matter"}/${option.b_id}`}
                                         >
                                             {option.b_name}
                                         </NavLink>
