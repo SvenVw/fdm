@@ -247,7 +247,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         }
 
-        if (!harvestableAnalysis) {
+        if (Object.keys(harvestableAnalysis).length === 0) {
             harvestableAnalysis = getDefaultsForHarvestParameters(
                 targetCultivation.b_lu_catalogue,
                 cultivationCatalogueData,
