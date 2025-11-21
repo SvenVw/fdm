@@ -48,7 +48,9 @@ export function DatePicker({
     const [month, setMonth] = useState<Date | undefined>(selectedDate)
 
     useEffect(() => {
-        if (field.value) {
+        if (field.value && field.value instanceof Date) {
+            field.onChange(field.value.toISOString())
+        } else if (field.value) {
             const date = parseDateText(field.value)
             setSelectedDate(date || undefined)
             setInputValue(date ? formatDate(date) : "")
@@ -58,7 +60,7 @@ export function DatePicker({
             setSelectedDate(undefined)
             setMonth(undefined)
         }
-    }, [field.value])
+    }, [field.value, field.onChange])
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value)
