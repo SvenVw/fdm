@@ -366,7 +366,6 @@ export default function FarmRotationHarvestAddIndex() {
             loaderData.cultivationIds.join(","),
         )
         setSearchParams(newSearchParams, { preventScrollReset: true })
-        setOpen(false)
     }
 
     const isSelected = (fieldId: string) => selectedFieldIds.includes(fieldId)
@@ -384,6 +383,13 @@ export default function FarmRotationHarvestAddIndex() {
     )
 
     const isHarvestUpdate = loaderData.harvestApplication.b_lu_harvest_date
+
+    function handleSelectionDialogOpenChange(open: boolean) {
+        if (!open) {
+            handleSelectionChange()
+        }
+        setOpen(open)
+    }
 
     // Confirmation Handling
     const [resolveConfirmationPromise, setResolveConfirmationPromise] =
@@ -567,7 +573,12 @@ export default function FarmRotationHarvestAddIndex() {
                                     )}
                                 </CardContent>
                                 <CardFooter>
-                                    <Dialog open={open} onOpenChange={setOpen}>
+                                    <Dialog
+                                        open={open}
+                                        onOpenChange={
+                                            handleSelectionDialogOpenChange
+                                        }
+                                    >
                                         <DialogTrigger asChild>
                                             <Button
                                                 variant="secondary"
@@ -638,8 +649,10 @@ export default function FarmRotationHarvestAddIndex() {
                                             <DialogFooter>
                                                 <Button
                                                     type="button"
-                                                    onClick={
-                                                        handleSelectionChange
+                                                    onClick={() =>
+                                                        handleSelectionDialogOpenChange(
+                                                            false,
+                                                        )
                                                     }
                                                 >
                                                     Sluiten

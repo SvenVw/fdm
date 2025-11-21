@@ -331,6 +331,13 @@ export default function FarmRotationFertilizerAddIndex() {
         selectedFieldIds.includes(field.b_id!),
     )
 
+    function handleSelectionDialogOpenChange(open: boolean) {
+        if (!open) {
+            handleSelectionChange()
+        }
+        setOpen(open)
+    }
+
     return (
         <SidebarInset>
             <Header
@@ -454,7 +461,12 @@ export default function FarmRotationFertilizerAddIndex() {
                                     )}
                                 </CardContent>
                                 <CardFooter>
-                                    <Dialog open={open} onOpenChange={setOpen}>
+                                    <Dialog
+                                        open={open}
+                                        onOpenChange={
+                                            handleSelectionDialogOpenChange
+                                        }
+                                    >
                                         <DialogTrigger asChild>
                                             <Button
                                                 variant="secondary"
@@ -604,8 +616,10 @@ export default function FarmRotationFertilizerAddIndex() {
                                             <DialogFooter>
                                                 <Button
                                                     type="button"
-                                                    onClick={
-                                                        handleSelectionChange
+                                                    onClick={() =>
+                                                        handleSelectionDialogOpenChange(
+                                                            false,
+                                                        )
                                                     }
                                                 >
                                                     Sluiten
