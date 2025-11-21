@@ -5,7 +5,6 @@ import {
     getFertilizerApplications,
     getFertilizers,
     getFields,
-    getHarvests,
 } from "@svenvw/fdm-core"
 import {
     data,
