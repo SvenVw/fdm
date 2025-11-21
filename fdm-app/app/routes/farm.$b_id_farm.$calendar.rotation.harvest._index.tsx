@@ -171,7 +171,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get fieldIds from search params (if any)
         const fieldIdsFromSearchParams =
-            url.searchParams.get("fieldIds")?.split(",").filter(Boolean) ?? []
+            url.searchParams.get("fieldIds")?.split(",").filter(Boolean) ?? null
 
         const cultivationCatalogueData = await getCultivationsFromCatalogue(
             fdm,
@@ -194,11 +194,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         let selectedFieldsData = []
-        if (fieldIdsFromSearchParams.length > 0) {
+        if (fieldIdsFromSearchParams) {
             // If fieldIds are in search params, use them to determine selected fields
-            selectedFieldsData = allFieldsWithCultivations.filter((field) =>
-                fieldIdsFromSearchParams.includes(field.b_id),
-            )
+            selectedFieldsData =
+                fieldIdsFromSearchParams.length > 0
+                    ? allFieldsWithCultivations.filter((field) =>
+                          fieldIdsFromSearchParams.includes(field.b_id),
+                      )
+                    : []
         } else {
             // Otherwise, default to fields with the selected cultivation
             selectedFieldsData = allFieldsWithCultivations.filter((field) =>
