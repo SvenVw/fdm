@@ -72,6 +72,7 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { modifySearchParams } from "~/lib/url-utils"
+import { getHarvestParameterLabel } from "../components/blocks/harvest/parameters"
 
 export const meta: MetaFunction = () => {
     return [
@@ -879,6 +880,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     missingParameters.push(param)
                 }
             }
+            const missingParameterLabels = missingParameters.map((param) => {
+                return getHarvestParameterLabel(param)
+            })
 
             if (missingParameters.length > 0) {
                 return dataWithWarning(
@@ -887,7 +891,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                             ", ",
                         )}`,
                     },
-                    `Missing required harvest parameters: ${missingParameters.join(
+                    `Voor de volgende parameters ontbreekt een waarde: ${missingParameterLabels.join(
                         ", ",
                     )}`,
                 )
