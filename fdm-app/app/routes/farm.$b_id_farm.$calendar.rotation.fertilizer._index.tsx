@@ -690,17 +690,19 @@ export async function action({ request, params }: ActionFunctionArgs) {
             FormSchema,
         )
 
-        for (const fieldId of fieldIds) {
-            await addFertilizerApplication(
-                fdm,
-                session.principal_id,
-                fieldId,
-                validatedData.p_id,
-                validatedData.p_app_amount,
-                validatedData.p_app_method,
-                validatedData.p_app_date,
-            )
-        }
+        await Promise.all(
+            fieldIds.map((fieldId) =>
+                addFertilizerApplication(
+                    fdm,
+                    session.principal_id,
+                    fieldId,
+                    validatedData.p_id,
+                    validatedData.p_app_amount,
+                    validatedData.p_app_method,
+                    validatedData.p_app_date,
+                ),
+            ),
+        )
 
         return redirectWithSuccess(`/farm/${b_id_farm}/${calendar}/rotation`, {
             message: `Bemesting succesvol toegevoegd aan ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
