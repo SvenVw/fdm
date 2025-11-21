@@ -15,14 +15,9 @@ import { DataTableColumnHeader } from "./column-header"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
 import { Checkbox } from "~/components/ui/checkbox"
-import { Circle, Diamond, Square, Triangle } from "lucide-react"
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "~/components/ui/tooltip"
 import { HarvestDatesDisplay } from "./harvest-dates-display"
 import { FertilizerDisplay } from "./fertilizer-display"
+import { Row } from "@react-email/components"
 
 export type RotationExtended = {
     b_lu_catalogue: string
@@ -105,7 +100,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
     {
         accessorKey: "b_lu_start",
         enableSorting: true,
-        sortingFn: "alphanumeric",
+        sortingFn: "datetime",
         header: ({ column }) => {
             return <DataTableColumnHeader column={column} title="Zaaidatum" />
         },
@@ -127,17 +122,12 @@ export const columns: ColumnDef<RotationExtended>[] = [
                 return `${format(firstDate, "PP", { locale: nl })} - ${format(lastDate, "PP", { locale: nl })}`
             }, [cultivation.b_lu_start])
 
-            return (
-                <p className="text-muted-foreground">
-                    {formattedDateRange}
-                </p>
-            )
+            return <p className="text-muted-foreground">{formattedDateRange}</p>
         },
     },
     {
         accessorKey: "b_harvest_date",
-        enableSorting: true,
-        sortingFn: "alphanumeric",
+        enableSorting: false,
         header: ({ column }) => {
             return <DataTableColumnHeader column={column} title="Oogstdata" />
         },
@@ -164,6 +154,11 @@ export const columns: ColumnDef<RotationExtended>[] = [
     {
         accessorKey: "b_name",
         enableSorting: true,
+        sortingFn: (rowA, rowB, _columnId) => {
+            const fieldA = rowA.original.fields.length
+            const fieldB = rowB.original.fields.length
+            return fieldA - fieldB
+        },
         enableHiding: true, // Enable hiding for mobile
         header: ({ column }) => {
             return <DataTableColumnHeader column={column} title="Percelen" />
@@ -187,7 +182,13 @@ export const columns: ColumnDef<RotationExtended>[] = [
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                            <ScrollArea className={fieldsSorted.length >= 8 ? "h-72 overflow-y-auto w-48" : "w-48"}>
+                            <ScrollArea
+                                className={
+                                    fieldsSorted.length >= 8
+                                        ? "h-72 overflow-y-auto w-48"
+                                        : "w-48"
+                                }
+                            >
                                 <div className="grid grid-cols-1 gap-2">
                                     {fieldsSorted.map((field) => (
                                         <NavLink
@@ -212,7 +213,17 @@ export const columns: ColumnDef<RotationExtended>[] = [
     {
         accessorKey: "b_area",
         enableSorting: true,
-        sortingFn: "alphanumeric",
+        sortingFn: (rowA, rowB, _columnId) => {
+            const areaA = rowA.original.fields.reduce(
+                (acc, field) => acc + field.b_area,
+                0,
+            )
+            const areaB = rowB.original.fields.reduce(
+                (acc, field) => acc + field.b_area,
+                0,
+            )
+            return areaA - areaB
+        },
         header: ({ column }) => {
             return <DataTableColumnHeader column={column} title="Oppervlakte" />
         },
@@ -229,11 +240,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
                 return b_area < 0.1 ? "< 0.1 ha" : `${b_area.toFixed(1)} ha`
             }, [cultivation.fields])
 
-            return (
-                <p className="text-muted-foreground">
-                    {formattedArea}
-                </p>
-            )
+            return <p className="text-muted-foreground">{formattedArea}</p>
         },
     },
 ]
