@@ -141,10 +141,9 @@ export function calculateOrganicMatterBalanceField(
 
         // 1. Combine multiple soil analyses into a single representative record for the field.
         // We need 'a_som_loi' and 'a_density_sa' for the degradation calculation.
-        console.log(soilAnalyses)
         const soilAnalysis = combineSoilAnalyses<SoilAnalysisPicked>(
             soilAnalyses,
-            ["a_som_loi", "a_density_sa"],
+            ["a_som_loi", "a_density_sa", "b_soiltype_agr"],
             true, // Enable estimation of missing values if possible
         )
 

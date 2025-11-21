@@ -187,6 +187,7 @@ export type SoilAnalysisPicked = Pick<
     SoilAnalysis,
     | "a_som_loi" // Soil Organic Matter content (%)
     | "a_density_sa" // Bulk density (g/cm³)
+    | "b_soiltype_agr" // Agricultural soil type
 >
 
 /**
@@ -209,6 +210,7 @@ export type FieldInput = {
         | "b_sampling_date"
         | "a_som_loi"
         | "a_density_sa"
+        | "b_soiltype_agr"
     >[]
     /** The list of fertilizer applications on the field. */
     fertilizerApplications: FertilizerApplication[]
