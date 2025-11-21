@@ -51,7 +51,7 @@ export function calculateOrganicMatterDegradation(
     const b_depth = isGrassland ? new Decimal(10) : new Decimal(30)
 
     // Average yearly temperature for the region (e.g., Netherlands/Belgium). This could be made more dynamic.
-    const averageYearlyTemperature = new Decimal(11.7) // degrees Celsius
+    const averageYearlyTemperature = new Decimal(9.3) // degrees Celsius
     // Calculate a temperature correction factor based on the average temperature.
     // This factor adjusts the degradation rate based on how temperature affects microbial activity.
     const temperatureCorrection = new Decimal(2).pow(
