@@ -245,12 +245,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             ) {
                 harvestableAnalysis =
                     harvestApplication.harvestable.harvestable_analyses[0]
-            } else {
-                harvestableAnalysis = getDefaultsForHarvestParameters(
-                    targetCultivation.b_lu_catalogue,
-                    cultivationCatalogueData,
-                )
             }
+        }
+
+        if (!harvestableAnalysis) {
+            harvestableAnalysis = getDefaultsForHarvestParameters(
+                targetCultivation.b_lu_catalogue,
+                cultivationCatalogueData,
+            )
         }
 
         const fieldOptions = allFieldsWithCultivations.map((field) => {
