@@ -183,6 +183,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             (c) => c.b_lu_catalogue === cultivationIds[0],
         )
 
+        if (!targetCultivation) {
+            throw new Response(
+                `Cultivation with ID ${cultivationIds[0]} not found.`,
+                {
+                    status: 404,
+                    statusText: `Cultivation with ID ${cultivationIds[0]} not found.`,
+                },
+            )
+        }
+
         let selectedFields = []
         if (fieldIdsFromSearchParams.length > 0) {
             // If fieldIds are in search params, use them to determine selected fields
