@@ -212,17 +212,21 @@ export function DataTable<TData extends RotationExtended, TValue>({
         ? "Selecteer één of meerdere gewassen om bemesting toe te voegen"
         : "Bemesting toevoegen aan geselecteerd gewas"
 
-    const isHarvestButtonDisabled = selectedCultivationIds.length !== 1
-    const harvestTooltipContent =
-        selectedCultivationIds.length !== 1
-            ? "Selecteer één gewas om oogst toe te voegen"
-            : "Oogst toevoegen aan geselecteerd gewas"
+    const isHarvestButtonDisabled =
+        selectedCultivationIds.length !== 1 ||
+        selectedCultivations[0].b_lu_harvestable === "none"
     const harvestErrorMessage =
         selectedCultivations.length > 0
             ? selectedCultivations[0].b_lu_harvestable === "none"
                 ? "Dit gewas is niet oogstbaar."
                 : null
             : null
+    const harvestTooltipContent =
+        selectedCultivationIds.length !== 1
+            ? "Selecteer één gewas om oogst toe te voegen"
+            : harvestErrorMessage
+              ? harvestErrorMessage
+              : "Oogst toevoegen aan geselecteerd gewas"
 
     return (
         <div className="w-full flex flex-col h-full">
