@@ -587,7 +587,7 @@ export function HarvestForm(props: HarvestFormDialogProps) {
     const form = useHarvestRemixForm(props)
 
     const handleDeleteHarvest = () => {
-        return fetcher.submit(null, { method: "DELETE" })
+        return fetcher.submit(null, { method: "DELETE", action: action })
     }
 
     // Check if this is a new harvest or is has already values
