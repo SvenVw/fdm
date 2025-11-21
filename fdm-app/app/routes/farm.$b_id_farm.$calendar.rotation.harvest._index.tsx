@@ -847,8 +847,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
 
         if (request.method === "DELETE") {
-            const removalPromises: Promise<unknown>[] = []
-
             for (const fieldId of fieldIds) {
                 const cultivationsForField = await getCultivations(
                     fdm,
@@ -876,19 +874,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     session.principal_id,
                     b_lu,
                 )
-                // If there are existing harvests, add their removal to the promises
+                // If there are existing harvests, remove them before adding new ones
                 for (const harvest of existingHarvests) {
-                    removalPromises.push(
-                        removeHarvest(
-                            fdm,
-                            session.principal_id,
-                            harvest.b_id_harvesting,
-                        ),
+                    await removeHarvest(
+                        fdm,
+                        session.principal_id,
+                        harvest.b_id_harvesting,
                     )
                 }
             }
-
-            await Promise.all(removalPromises)
 
             return redirectWithSuccess(
                 `/farm/${b_id_farm}/${calendar}/rotation`,
@@ -902,8 +896,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             request,
             FormSchema,
         )
-
-        const promises: Promise<unknown>[] = []
 
         for (const fieldId of fieldIds) {
             const cultivationsForField = await getCultivations(
@@ -979,29 +971,23 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 if (existingHarvests.length > 0) {
                     // If there are existing harvests, remove them before adding new ones
                     for (const harvest of existingHarvests) {
-                        promises.push(
-                            removeHarvest(
-                                fdm,
-                                session.principal_id,
-                                harvest.b_id_harvesting,
-                            ),
+                        await removeHarvest(
+                            fdm,
+                            session.principal_id,
+                            harvest.b_id_harvesting,
                         )
                     }
                 }
             }
 
-            promises.push(
-                addHarvest(
-                    fdm,
-                    session.principal_id,
-                    b_lu,
-                    formValues.b_lu_harvest_date,
-                    harvestProperties,
-                ),
+            await addHarvest(
+                fdm,
+                session.principal_id,
+                b_lu,
+                formValues.b_lu_harvest_date,
+                harvestProperties,
             )
         }
-
-        await Promise.all(promises)
 
         return redirectWithSuccess(`/farm/${b_id_farm}/${calendar}/rotation`, {
             message: `Oogst succesvol toegevoegd aan ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
