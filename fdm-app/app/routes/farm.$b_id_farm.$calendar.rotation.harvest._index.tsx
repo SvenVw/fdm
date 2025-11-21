@@ -193,15 +193,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             )
         }
 
-        let selectedFields = []
+        let selectedFieldsData = []
         if (fieldIdsFromSearchParams.length > 0) {
             // If fieldIds are in search params, use them to determine selected fields
-            selectedFields = allFieldsWithCultivations.filter((field) =>
+            selectedFieldsData = allFieldsWithCultivations.filter((field) =>
                 fieldIdsFromSearchParams.includes(field.b_id),
             )
         } else {
             // Otherwise, default to fields with the selected cultivation
-            selectedFields = allFieldsWithCultivations.filter((field) =>
+            selectedFieldsData = allFieldsWithCultivations.filter((field) =>
                 field.cultivations.some((c) =>
                     cultivationIds.includes(c.b_lu_catalogue),
                 ),
@@ -211,33 +211,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         type HarvestApplication = Awaited<
             ReturnType<typeof getHarvests>
         >[number]
-        let harvestApplication: HarvestApplication = {
-            b_lu_yield: undefined,
-            b_lu_n_harvestable: undefined,
-            b_lu_harvest_date: undefined,
-            b_lu_start: undefined,
-            b_lu_end: undefined,
-            b_lu_harvestable: undefined,
-        }
-        let harvestableAnalysis: Partial<
-            HarvestApplication["harvestable"]["harvestable_analyses"][number]
-        > = {}
 
-        if (
-            targetCultivation.b_lu_harvestable === "once" &&
-            selectedFields.length > 0
-        ) {
-            // Find a field that has the cultivation
-            // Some selected fields might not have a harvest anymore
-            // if they were changed before the user changes their selection
-            for (const field of selectedFields) {
+        const selectedFields = await Promise.all(
+            selectedFieldsData.map(async (field) => {
+                let harvestApplication: HarvestApplication | undefined =
+                    undefined
+                let harvestableAnalysis: Partial<
+                    HarvestApplication["harvestable"]["harvestable_analyses"][number]
+                > = {}
+                let hasHarvest = false
+
                 const targetFieldCultivation = field.cultivations.find(
                     (c) =>
                         c.b_lu_catalogue === targetCultivation.b_lu_catalogue,
                 )
+
                 if (targetFieldCultivation) {
-                    // For cultivations that can only be harvested once, we assume
-                    // one harvesting, one harvestable, one harvestable analysis
                     const harvests = await getHarvests(
                         fdm,
                         session.principal_id,
@@ -245,20 +234,58 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     )
                     if (harvests.length > 0) {
                         harvestApplication = harvests[0]
-                        break
+                        hasHarvest =
+                            harvestApplication.b_lu_yield !== undefined ||
+                            harvestApplication.b_lu_n_harvestable !==
+                                undefined ||
+                            harvestApplication.b_lu_harvest_date !== undefined
+                        if (
+                            harvestApplication?.harvestable
+                                ?.harvestable_analyses.length > 0
+                        ) {
+                            harvestableAnalysis =
+                                harvestApplication.harvestable
+                                    .harvestable_analyses[0]
+                        }
                     }
                 }
-            }
 
-            if (
-                harvestApplication?.harvestable?.harvestable_analyses.length > 0
-            ) {
-                harvestableAnalysis =
-                    harvestApplication.harvestable.harvestable_analyses[0]
-            }
+                return {
+                    ...field,
+                    hasHarvest,
+                    harvestApplication,
+                    harvestableAnalysis,
+                }
+            }),
+        )
+
+        let firstFieldWithData
+        if (targetCultivation.b_lu_harvestable === "once") {
+            firstFieldWithData = selectedFields.find((f) => f.hasHarvest)
         }
 
-        if (Object.keys(harvestableAnalysis).length === 0) {
+        let harvestApplication:
+            | HarvestApplication
+            | Partial<HarvestApplication> =
+            firstFieldWithData?.harvestApplication ?? {
+                b_lu_yield: undefined,
+                b_lu_n_harvestable: undefined,
+                b_lu_harvest_date: undefined,
+                b_lu_start: undefined,
+                b_lu_end: undefined,
+                b_lu_harvestable: undefined,
+            }
+
+        let harvestableAnalysis: Partial<
+            HarvestApplication["harvestable"]["harvestable_analyses"][number]
+        > = firstFieldWithData?.harvestableAnalysis ?? {}
+
+        // Apply defaults if no harvest data was found to pre-fill the form
+        // This applies to both 'once' (if no existing harvest) and 'multiple' harvestable crops
+        if (
+            selectedFields.length > 0 && // Ensure fields are selected
+            Object.keys(harvestableAnalysis).length === 0 // Check if harvestableAnalysis is still empty
+        ) {
             harvestableAnalysis = getDefaultsForHarvestParameters(
                 targetCultivation.b_lu_catalogue,
                 cultivationCatalogueData,
@@ -291,7 +318,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 b_id: field.b_id,
                 b_name: field.b_name,
                 b_area: Math.round(field.b_area * 10) / 10,
-                cultivations: field.cultivations.map((c) => c.b_lu_catalogue),
+                cultivations: field.cultivations.map(
+                    (c: { b_lu_catalogue: string }) => c.b_lu_catalogue,
+                ),
+                hasHarvest: field.hasHarvest,
             })),
             fieldOptions: fieldOptions, // All fields for selection
             cultivation: targetCultivation,
@@ -360,8 +390,15 @@ export default function FarmRotationHarvestAddIndex() {
         useState<Promise<boolean>>()
 
     function handleConfirmation() {
-        // Check if this is a new harvest or is has already values
-        if (loaderData.harvestApplication.b_lu_harvest_date !== undefined) {
+        if (loaderData.b_lu_harvestable === "multiple") {
+            return Promise.resolve(true)
+        }
+        // Check if any of the currently selected fields already have a harvest.
+        const hasExistingHarvest = loaderData.selectedFields
+            .filter((field) => selectedFieldIds.includes(field.b_id!))
+            .some((field) => field.hasHarvest)
+
+        if (hasExistingHarvest) {
             return initiateConfirmation()
         }
 
