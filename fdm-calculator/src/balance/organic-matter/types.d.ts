@@ -199,7 +199,12 @@ export type FieldInput = {
     /** The list of cultivations that took place on the field. */
     cultivations: Pick<
         Cultivation,
-        "b_lu" | "b_lu_start" | "b_lu_end" | "b_lu_catalogue" | "m_cropresidue"
+        | "b_lu"
+        | "b_lu_name"
+        | "b_lu_start"
+        | "b_lu_end"
+        | "b_lu_catalogue"
+        | "m_cropresidue"
     >[]
     /** The list of soil analyses performed on the field. */
     soilAnalyses: Pick<
