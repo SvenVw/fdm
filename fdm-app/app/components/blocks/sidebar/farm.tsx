@@ -4,6 +4,7 @@ import {
     ChevronRight,
     House,
     Shapes,
+    Sprout,
     Square,
 } from "lucide-react"
 import { useState } from "react"
@@ -65,6 +66,15 @@ export function SidebarFarm() {
         fieldsLink = `/farm/${farmId}/${selectedCalendar}/field`
     } else {
         fieldsLink = undefined
+    }
+
+    let rotationLink: string | undefined
+    if (isCreateFarmWizard) {
+        rotationLink = undefined
+    } else if (farmId && farmId !== "undefined") {
+        rotationLink = `/farm/${farmId}/${selectedCalendar}/rotation`
+    } else {
+        rotationLink = undefined
     }
 
     let fertilizersLink: string | undefined
@@ -193,14 +203,26 @@ export function SidebarFarm() {
                             </SidebarMenuButton>
                         )}
                     </SidebarMenuItem>
-                    {/* <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <NavLink to="./cultivations">
-                                        <Sprout />
-                                        <span>Gewassen</span>
-                                    </NavLink>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem> */}
+                    <SidebarMenuItem>
+                        {rotationLink ? (
+                            <SidebarMenuButton asChild>
+                                <NavLink to={rotationLink}>
+                                    <Sprout />
+                                    <span>Bouwplan</span>
+                                </NavLink>
+                            </SidebarMenuButton>
+                        ) : (
+                            <SidebarMenuButton
+                                asChild
+                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                            >
+                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                    <Sprout />
+                                    <span>Bouwplan</span>
+                                </span>
+                            </SidebarMenuButton>
+                        )}
+                    </SidebarMenuItem>
                     <SidebarMenuItem>
                         {fertilizersLink ? (
                             <SidebarMenuButton asChild>

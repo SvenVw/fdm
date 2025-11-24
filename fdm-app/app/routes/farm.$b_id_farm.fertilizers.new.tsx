@@ -104,18 +104,12 @@ export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
     const loaderData = useLoaderData<typeof loader>()
 
     const returnUrl = searchParams.get("returnUrl")
-    const fieldsMatch =
-        returnUrl &&
-        /farm\/[^/]+\/[^/]+\/field(?:\/[^/]+)?\/fertilizer(?:\/|$|\?)/.test(
-            returnUrl,
-        )
-    const createMatch = returnUrl && /farm\/create/.test(returnUrl)
 
     return (
         <SidebarInset>
             <Header
                 action={
-                    fieldsMatch || createMatch
+                    returnUrl
                         ? {
                               label: "Terug naar bemesting toevoegen",
                               to: returnUrl,
