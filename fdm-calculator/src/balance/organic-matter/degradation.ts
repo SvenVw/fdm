@@ -58,9 +58,18 @@ export function calculateOrganicMatterDegradation(
         averageYearlyTemperature.minus(13).dividedBy(10),
     )
 
+    if (soilAnalysis.a_som_loi == null || soilAnalysis.a_density_sa == null) {
+        throw new Error(`"Soil analysis data (SOM or bulk density) is missing."`)
+    }
+
     // Extract soil properties from the analysis.
     const a_som_loi = new Decimal(soilAnalysis.a_som_loi) // Soil Organic Matter content (%)
     const a_density_sa = new Decimal(soilAnalysis.a_density_sa).times(1000) // Bulk density (g/cm³)
+
+    // Guard against non-positive SOM value
+    if (a_som_loi.lte(0)) {
+        return { total: new Decimal(0) }
+    }
 
     // Calculate the annual degradation rate using an empirical formula.
     // The formula combines soil properties and the temperature correction factor.
