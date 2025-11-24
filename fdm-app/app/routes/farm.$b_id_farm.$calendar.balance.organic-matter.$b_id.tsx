@@ -229,7 +229,9 @@ function OrganicMatterBalance({
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <NavLink to={`../../${calendar}/field/${field.b_id}/`}>
+                        <NavLink
+                            to={`/farm/${farm.b_id_farm}/${calendar}/field/${field.b_id}`}
+                        >
                             <Button>Naar perceelsinstelling</Button>
                         </NavLink>
                     </CardFooter>
