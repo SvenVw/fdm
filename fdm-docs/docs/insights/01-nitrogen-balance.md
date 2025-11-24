@@ -255,8 +255,8 @@ The final output (`NitrogenBalanceNumeric`) provides:
 * A list of balances for each field (`NitrogenBalanceFieldNumeric`), which includes:
   * Field ID.
   * Field-specific **N Surplus** (reported as `balance`, in kg N / ha). This is calculated as `N Supply - N Removal - Ammonia Emission`.
-  * Detailed breakdown of supply (total, fertilizers by type, fixation, deposition, mineralization).
-  * Detailed breakdown of removal (total, harvests, residues).
-  * Detailed breakdown of emission (total, plus sub-components for ammonia and nitrate).
+  * Supply breakdown (total, fertilizers by type, fixation, deposition, mineralization).
+  * Removal breakdown (total, harvests, residues).
+  * Emission breakdown (total, plus sub-components for ammonia and nitrate).
 
 All values are rounded numbers.

@@ -2,7 +2,7 @@
 title: Farms
 ---
 
-The `Farm` asset is the top-level container for all other assets and actions in the Farm Data Model (FDM). It represents a single farming operation and is the primary unit within the system.
+The `Farm` asset is the top-level container for all other assets and actions in the Farm Data Model (FDM). It represents a single farming business or enterprise and is the primary unit within the system.
 
 ## Properties
 
