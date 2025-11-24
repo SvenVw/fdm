@@ -6,6 +6,7 @@ import {
     getCoreRowModel,
     getFilteredRowModel,
     getSortedRowModel,
+    getFacetedRowModel,
     type Row,
     type RowSelectionState,
     type SortingState,
@@ -41,20 +42,24 @@ import {
 import { useIsMobile } from "~/hooks/use-mobile"
 import { cn } from "~/lib/utils"
 import { FieldFilterToggle } from "../../custom/field-filter-toggle"
-import type { FieldExtended } from "./columns"
+import type { RotationExtended } from "./columns"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale/nl"
+import { toast as notify } from "sonner"
+import { useFieldFilterStore } from "@/app/store/field-filter"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
 }
 
-export function DataTable<TData extends FieldExtended, TValue>({
+export function DataTable<TData extends RotationExtended, TValue>({
     columns,
     data,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-    const [globalFilter, setGlobalFilter] = useState("")
+    const [searchTerms, setSearchTerms] = useState("")
     const isMobile = useIsMobile()
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
         isMobile
@@ -117,17 +122,55 @@ export function DataTable<TData extends FieldExtended, TValue>({
     const memoizedData = useMemo(() => {
         return data.map((item) => ({
             ...item,
-            searchTarget: `${item.b_name} ${item.cultivations.map((c) => c.b_lu_name).join(" ")} ${item.fertilizers.map((f) => f.p_name_nl).join(" ")} ${item.b_soiltype_agr}`,
+            searchTarget: `${item.b_lu_name} ${[
+                ...new Set(
+                    item.b_lu_start.map((date: Date) =>
+                        format(date, "d MMMM yyy", { locale: nl }),
+                    ),
+                ),
+            ].join(" ")} ${[
+                ...new Set(
+                    item.fields.flatMap((field) =>
+                        field.b_lu_harvest_date.map((date: Date) =>
+                            format(date, "d MMMM yyy", { locale: nl }),
+                        ),
+                    ),
+                ),
+            ].join(" ")} ${[
+                ...new Set(
+                    item.fields.flatMap((field) =>
+                        field.fertilizers.map(
+                            (fertilizer) => fertilizer.p_name_nl,
+                        ),
+                    ),
+                ),
+            ].join(" ")}`,
         }))
     }, [data])
 
-    const fuzzyFilter: FilterFn<TData> = (row, _columnId, filterValue) => {
-        const result = fuzzysort.go(filterValue, [
-            (row.original as any).searchTarget,
-        ])
-        return result.length > 0
+    const fuzzySearchAndProductivityFilter: FilterFn<TData> = (
+        row,
+        _columnId,
+        { searchTerms, showProductiveOnly },
+    ) => {
+        if (
+            showProductiveOnly &&
+            !row.original.fields.some((field) => field.b_isproductive)
+        ) {
+            return false
+        }
+        return (
+            searchTerms === "" ||
+            fuzzysort.go(searchTerms, [(row.original as any).searchTarget])
+                .length > 0
+        )
     }
 
+    const showProductiveOnly = useFieldFilterStore((s) => s.showProductiveOnly)
+    const globalFilter = useMemo(
+        () => ({ searchTerms, showProductiveOnly }),
+        [searchTerms, showProductiveOnly],
+    )
     const table = useReactTable({
         data: memoizedData,
         columns,
@@ -136,10 +179,14 @@ export function DataTable<TData extends FieldExtended, TValue>({
         getSortedRowModel: getSortedRowModel(),
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
+        getFacetedRowModel: getFacetedRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
-        onGlobalFilterChange: setGlobalFilter,
+        onGlobalFilterChange: (globalFilter) => {
+            if (globalFilter?.searchTerms ?? "" !== searchTerms)
+                setSearchTerms(globalFilter?.searchTerms ?? "")
+        },
         onRowSelectionChange: setRowSelection,
-        globalFilterFn: fuzzyFilter,
+        globalFilterFn: fuzzySearchAndProductivityFilter,
         state: {
             sorting,
             columnFilters,
@@ -150,27 +197,45 @@ export function DataTable<TData extends FieldExtended, TValue>({
     })
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Bemesting button activation
-    const selectedFields = useMemo(() => {
+    const selectedCultivations = useMemo(() => {
         return table
             .getFilteredSelectedRowModel()
             .rows.map((row) => row.original)
     }, [table, rowSelection])
 
-    const selectedFieldIds = selectedFields.map((field) => field.b_id)
+    const selectedCultivationIds = selectedCultivations.map(
+        (field) => field.b_lu_catalogue,
+    )
 
-    const isFertilizerButtonDisabled = selectedFields.length === 0
+    const isFertilizerButtonDisabled = selectedCultivationIds.length === 0
     const fertilizerTooltipContent = isFertilizerButtonDisabled
-        ? "Selecteer één of meerdere percelen om bemesting toe te voegen"
-        : "Bemesting toevoegen aan geselecteerde percelen"
+        ? "Selecteer één of meerdere gewassen om bemesting toe te voegen"
+        : "Bemesting toevoegen aan geselecteerd gewas"
+
+    const isHarvestButtonDisabled =
+        selectedCultivationIds.length !== 1 ||
+        selectedCultivations[0].b_lu_harvestable === "none"
+    const harvestErrorMessage =
+        selectedCultivations.length > 0
+            ? selectedCultivations[0].b_lu_harvestable === "none"
+                ? "Dit gewas is niet oogstbaar."
+                : null
+            : null
+    const harvestTooltipContent =
+        selectedCultivationIds.length !== 1
+            ? "Selecteer één gewas om oogst toe te voegen"
+            : harvestErrorMessage
+              ? harvestErrorMessage
+              : "Oogst toevoegen aan geselecteerd gewas"
 
     return (
         <div className="w-full flex flex-col h-full">
             <div className="sticky top-0 z-10 bg-background py-4 flex flex-col sm:flex-row gap-2 items-center">
                 <Input
-                    placeholder="Zoek op naam, gewas of meststof"
-                    value={globalFilter ?? ""}
-                    onChange={(event) => setGlobalFilter(event.target.value)}
-                    className="w-full sm:w-auto sm:flex-grow"
+                    placeholder="Zoek op gewas, meststof of datum"
+                    value={globalFilter?.searchTerms ?? ""}
+                    onChange={(event) => setSearchTerms(event.target.value)}
+                    className="w-full sm:w-auto sm:grow"
                 />
                 <div className="flex w-full items-center justify-start sm:justify-end gap-2 sm:w-auto flex-wrap">
                     <DropdownMenu>
@@ -187,12 +252,11 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                 .map((column) => {
                                     const columnNames: Record<string, string> =
                                         {
-                                            b_name: "Naam",
-                                            cultivations: "Gewassen",
-                                            fertilizerApplications:
-                                                "Bemesting met:",
-                                            a_som_loi: "OS",
-                                            b_soiltype_agr: "Bodemtype",
+                                            b_lu_name: "Gewas",
+                                            b_lu_start: "Zaaidatum",
+                                            b_harvest_date: "Oogstdata",
+                                            fertilizers: "Bemesting",
+                                            b_name: "Percelen",
                                             b_area: "Oppervlakte",
                                         }
                                     return (
@@ -227,7 +291,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                         </Button>
                                     ) : (
                                         <NavLink
-                                            to={`/farm/${b_id_farm}/${calendar}/field/fertilizer?fieldIds=${selectedFieldIds.map(encodeURIComponent).join(",")}`}
+                                            to={`/farm/${b_id_farm}/${calendar}/rotation/fertilizer?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}`}
                                         >
                                             <Button>
                                                 <Plus className="mr-2 h-4 w-4" />
@@ -245,15 +309,39 @@ export function DataTable<TData extends FieldExtended, TValue>({
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <NavLink to={"./new"}>
-                                    <Button>
-                                        <Plus className="mr-2 h-4 w-4" />
-                                        Nieuw perceel
-                                    </Button>
-                                </NavLink>
+                                <div>
+                                    {isHarvestButtonDisabled ? (
+                                        <Button
+                                            disabled={isHarvestButtonDisabled}
+                                        >
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Oogst toevoegen
+                                        </Button>
+                                    ) : harvestErrorMessage ? (
+                                        <Button
+                                            onClick={() =>
+                                                notify.error(
+                                                    harvestErrorMessage,
+                                                )
+                                            }
+                                        >
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Oogst toevoegen
+                                        </Button>
+                                    ) : (
+                                        <NavLink
+                                            to={`/farm/${b_id_farm}/${calendar}/rotation/harvest?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}`}
+                                        >
+                                            <Button>
+                                                <Plus className="mr-2 h-4 w-4" />
+                                                Oogst toevoegen
+                                            </Button>
+                                        </NavLink>
+                                    )}
+                                </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>Voeg een nieuw perceel toe</p>
+                                <p>{harvestTooltipContent}</p>
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>

@@ -8,9 +8,9 @@ import {
     Icon,
     Landmark,
     MapIcon,
-    Plus,
     ScrollText,
     Shapes,
+    Sprout,
     Square,
     Trash2,
     UserRoundCheck,
@@ -25,29 +25,29 @@ import {
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
-import { FarmContent } from "../components/blocks/farm/farm-content"
-import { FarmTitle } from "../components/blocks/farm/farm-title"
-import { Header } from "../components/blocks/header/base"
-import { HeaderFarm } from "../components/blocks/header/farm"
-import { Button } from "../components/ui/button"
+import { FarmContent } from "~/components/blocks/farm/farm-content"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "../components/ui/card"
+} from "~/components/ui/card"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "../components/ui/select"
-import { SidebarInset } from "../components/ui/sidebar"
-import { getCalendarSelection } from "../lib/calendar"
-import { fdm } from "../lib/fdm.server"
-import { useCalendarStore } from "../store/calendar"
+} from "~/components/ui/select"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { getCalendarSelection } from "~/lib/calendar"
+import { fdm } from "~/lib/fdm.server"
+import { useCalendarStore } from "~/store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -142,7 +142,7 @@ export default function FarmDashboardIndex() {
                 <FarmTitle
                     title={`${loaderData.b_name_farm}`}
                     description={
-                        "Een overzicht van de bedrijfsgegevens, snelle acties en applicaties."
+                        "Een overzicht van de bedrijfsgegevens en applicaties."
                     }
                 />
                 <FarmContent>
@@ -152,31 +152,9 @@ export default function FarmDashboardIndex() {
                             {/* Quick Actions */}
                             <div className="space-y-4">
                                 <h2 className="text-2xl font-semibold tracking-tight">
-                                    Snelle acties
+                                    Overzichten
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <NavLink
-                                        to={`${calendar}/field/fertilizer`}
-                                    >
-                                        <Card className="transition-all hover:shadow-md">
-                                            <CardHeader>
-                                                <div className="flex items-center gap-4">
-                                                    <div className="rounded-lg bg-primary text-primary-foreground p-3">
-                                                        <Plus className="h-6 w-6" />
-                                                    </div>
-                                                    <div>
-                                                        <CardTitle>
-                                                            Bemesting toevoegen
-                                                        </CardTitle>
-                                                        <CardDescription>
-                                                            Voor één of meerdere
-                                                            percelen.
-                                                        </CardDescription>
-                                                    </div>
-                                                </div>
-                                            </CardHeader>
-                                        </Card>
-                                    </NavLink>
                                     <NavLink to={`${calendar}/field`}>
                                         <Card className="transition-all hover:shadow-md">
                                             <CardHeader>
@@ -186,13 +164,38 @@ export default function FarmDashboardIndex() {
                                                     </div>
                                                     <div>
                                                         <CardTitle>
-                                                            Perceelsoverzicht
+                                                            Percelen
                                                         </CardTitle>
                                                         <CardDescription>
                                                             Uitgebreide tabel
                                                             met o.a. gewassen en
+                                                            gebruikte
                                                             meststoffen per
                                                             perceel.
+                                                        </CardDescription>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                        </Card>
+                                    </NavLink>
+                                    <NavLink to={`${calendar}/rotation`}>
+                                        <Card className="transition-all hover:shadow-md">
+                                            <CardHeader>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="rounded-lg bg-primary text-primary-foreground p-3">
+                                                        <Sprout className="h-6 w-6" />
+                                                    </div>
+                                                    <div>
+                                                        <CardTitle>
+                                                            Bouwplan
+                                                        </CardTitle>
+                                                        <CardDescription>
+                                                            Uitgebreide tabel
+                                                            met o.a. zaaidata,
+                                                            oogstdata en
+                                                            gebruikte
+                                                            meststoffen per
+                                                            gewas.
                                                         </CardDescription>
                                                     </div>
                                                 </div>
