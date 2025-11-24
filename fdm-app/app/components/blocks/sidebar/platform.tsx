@@ -46,7 +46,10 @@ export function SidebarPlatform() {
                 <SidebarGroupContent>
                     <SidebarMenu>
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes("/user")}
+                            >
                                 <NavLink to={"/user"}>
                                     <User />
                                     <span>Profiel</span>
@@ -78,7 +81,17 @@ export function SidebarPlatform() {
                 <SidebarGroupContent>
                     <SidebarMenu>
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={
+                                    location.pathname.includes(
+                                        "/organization",
+                                    ) &&
+                                    !location.pathname.includes(
+                                        "/organization/invitations",
+                                    )
+                                }
+                            >
                                 <NavLink to={"/organization"}>
                                     <Users />
                                     <span>Overzicht</span>
@@ -86,7 +99,12 @@ export function SidebarPlatform() {
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    "/organization/invitations",
+                                )}
+                            >
                                 <NavLink to={"/organization/invitations"}>
                                     <Mail />
                                     <span>Uitnodigingen</span>
@@ -101,7 +119,12 @@ export function SidebarPlatform() {
                 <SidebarGroupContent>
                     <SidebarMenu>
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    "/about/whats-new",
+                                )}
+                            >
                                 <NavLink to={"/about/whats-new"}>
                                     <Sparkles />
                                     <span>Wat is er nieuw?</span>

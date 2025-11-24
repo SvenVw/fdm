@@ -88,7 +88,10 @@ export function SidebarApps() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         {atlasLink ? (
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(atlasLink)}
+                            >
                                 <NavLink to={atlasLink}>
                                     <MapIcon />
                                     <span>Atlas</span>
@@ -123,7 +126,12 @@ export function SidebarApps() {
                                 <SidebarMenuSub>
                                     <SidebarMenuSubItem>
                                         {nitrogenBalanceLink ? (
-                                            <SidebarMenuSubButton asChild>
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                isActive={location.pathname.includes(
+                                                    nitrogenBalanceLink,
+                                                )}
+                                            >
                                                 <NavLink
                                                     to={nitrogenBalanceLink}
                                                 >
@@ -143,7 +151,12 @@ export function SidebarApps() {
                                     </SidebarMenuSubItem>
                                     <SidebarMenuSubItem>
                                         {omBalanceLink ? (
-                                            <SidebarMenuSubButton asChild>
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                isActive={location.pathname.includes(
+                                                    omBalanceLink,
+                                                )}
+                                            >
                                                 <NavLink to={omBalanceLink}>
                                                     <span>Organische stof</span>
                                                 </NavLink>
@@ -165,7 +178,12 @@ export function SidebarApps() {
                     </Collapsible>
                     <SidebarMenuItem>
                         {nutrientAdviceLink ? (
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    nutrientAdviceLink,
+                                )}
+                            >
                                 <NavLink to={nutrientAdviceLink}>
                                     <BookOpenText />
                                     <span>Bemestingsadvies</span>
@@ -185,7 +203,10 @@ export function SidebarApps() {
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         {normsLink ? (
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(normsLink)}
+                            >
                                 <NavLink to={normsLink}>
                                     <Landmark />
                                     <span>Gebruiksruimte</span>
