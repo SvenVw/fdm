@@ -47,19 +47,22 @@ export function calculateOrganicMatterSupplyByFertilizers(
                 )
             }
             // Skip fertilizers that do not contribute to organic matter (e.g., most mineral fertilizers).
-            if (fertilizerDetail.p_eom === undefined || fertilizerDetail.p_eom === null) {
+            if (
+                fertilizerDetail.p_eom === undefined ||
+                fertilizerDetail.p_eom === null
+            ) {
                 return acc
             }
 
             const p_eom = new Decimal(fertilizerDetail.p_eom) // g EOM / kg product
             const p_amount = new Decimal(application.p_amount ?? 0) // kg product / ha
-            
+
             // Calculate the EOM supply for this specific application.
             // (g EOM / kg product) * (kg product / ha) / (1000 g / kg) = kg EOM / ha
             const applicationValue = p_amount.times(p_eom).dividedBy(1000)
-            
+
             const newApplicationEntry = {
-                id: application.p_id,
+                id: application.p_app_id,
                 value: applicationValue,
             }
 
