@@ -21,7 +21,7 @@ const allEstimationProperties = [
     "a_density_sa",
     "b_soiltype_agr",
     "b_gwl_class",
-] as const;
+] as const
 
 export function combineSoilAnalyses<T extends SoilAnalysisPicked>(
     soilAnalyses: Partial<SoilAnalysis>[],
@@ -41,32 +41,50 @@ export function combineSoilAnalyses<T extends SoilAnalysisPicked>(
 
     const fullSoilAnalysis: Partial<NitrogenSoilAnalysisPicked> = {}
 
-    // Extract all possible estimation properties
+    // Extract all possible estimation properties (preserve 0 values)
     for (const prop of allEstimationProperties) {
-        (fullSoilAnalysis as any)[prop] =
-            soilAnalyses.find(
-                (x: any) => x[prop] !== null && x[prop] !== undefined,
-            )?.[prop] || null
+        const value = soilAnalyses.find(
+            (x: any) => x[prop] !== null && x[prop] !== undefined,
+        )?.[prop]
+        ;(fullSoilAnalysis as any)[prop] = value ?? null
     }
 
     if (estimateMissing) {
         // When values for soil parameters are not available try to estimate them with conversion functions
-        if (fullSoilAnalysis.a_c_of == null && fullSoilAnalysis.a_som_loi != null) {
-            fullSoilAnalysis.a_c_of = calculateOrganicCarbon(fullSoilAnalysis.a_som_loi)
+        if (
+            fullSoilAnalysis.a_c_of == null &&
+            fullSoilAnalysis.a_som_loi != null
+        ) {
+            fullSoilAnalysis.a_c_of = calculateOrganicCarbon(
+                fullSoilAnalysis.a_som_loi,
+            )
         }
 
-        if (fullSoilAnalysis.a_som_loi == null && fullSoilAnalysis.a_c_of != null) {
-            fullSoilAnalysis.a_som_loi = calculateOrganicMatter(fullSoilAnalysis.a_c_of)
+        if (
+            fullSoilAnalysis.a_som_loi == null &&
+            fullSoilAnalysis.a_c_of != null
+        ) {
+            fullSoilAnalysis.a_som_loi = calculateOrganicMatter(
+                fullSoilAnalysis.a_c_of,
+            )
         }
 
-        if (fullSoilAnalysis.a_cn_fr == null && fullSoilAnalysis.a_c_of != null && fullSoilAnalysis.a_n_rt != null) {
+        if (
+            fullSoilAnalysis.a_cn_fr == null &&
+            fullSoilAnalysis.a_c_of != null &&
+            fullSoilAnalysis.a_n_rt != null
+        ) {
             fullSoilAnalysis.a_cn_fr = calculateCarbonNitrogenRatio(
                 fullSoilAnalysis.a_c_of,
                 fullSoilAnalysis.a_n_rt,
             )
         }
 
-        if (fullSoilAnalysis.a_density_sa == null && fullSoilAnalysis.a_som_loi != null && fullSoilAnalysis.b_soiltype_agr != null) {
+        if (
+            fullSoilAnalysis.a_density_sa == null &&
+            fullSoilAnalysis.a_som_loi != null &&
+            fullSoilAnalysis.b_soiltype_agr != null
+        ) {
             fullSoilAnalysis.a_density_sa = calculateBulkDensity(
                 fullSoilAnalysis.a_som_loi,
                 fullSoilAnalysis.b_soiltype_agr,
@@ -74,17 +92,17 @@ export function combineSoilAnalyses<T extends SoilAnalysisPicked>(
         }
     }
 
-    const soilAnalysis: T = {} as T;
+    const soilAnalysis: T = {} as T
     // Pick only the requested properties
     for (const prop of propertiesToExtract) {
-        (soilAnalysis as any)[prop] = (fullSoilAnalysis as any)[prop];
+        ;(soilAnalysis as any)[prop] = (fullSoilAnalysis as any)[prop]
     }
 
-
     // Validate if all required soil parameters are present
-    const missingParameters = propertiesToExtract.filter(
-        (param) => (soilAnalysis as any)[param] === null,
-    )
+    const missingParameters = propertiesToExtract.filter((param) => {
+        const value = (soilAnalysis as any)[param]
+        return value === null || value === undefined
+    })
 
     if (missingParameters.length > 0) {
         throw new Error(
