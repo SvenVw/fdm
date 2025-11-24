@@ -98,7 +98,7 @@ describe("calculateOrganicMatterDegradation", () => {
             mockTimeFrame,
         )
 
-        expect(degradation.total.toNumber()).toEqual(0)
+        expect(degradation.total.isZero()).toBe(true)
     })
 
     it("should cap the annual degradation at 3500 kg/ha", () => {
