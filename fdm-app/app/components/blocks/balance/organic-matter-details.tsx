@@ -10,7 +10,7 @@ import type {
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
 import type React from "react"
-import { NavLink } from "react-router"
+import { NavLink, useParams } from "react-router"
 import { useCalendarStore } from "@/app/store/calendar"
 import {
     Accordion,
@@ -28,6 +28,7 @@ const OrganicMatterBalanceDetails: React.FC<
     OrganicMatterBalanceDetailsProps
 > = ({ balanceData, fieldInput }) => {
     const calendar = useCalendarStore((state) => state.calendar)
+    const { farmId } = useParams()
 
     const renderFertilizerApplications = (
         applications: {
@@ -61,11 +62,13 @@ const OrganicMatterBalanceDetails: React.FC<
                                     return null
                                 }
                                 return (
-                                    <NavLink
-                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/fertilizer`}
+                                    <li
                                         key={app.id}
+                                        className="text-sm text-muted-foreground hover:underline"
                                     >
-                                        <li className="text-sm text-muted-foreground hover:underline">
+                                        <NavLink
+                                            to={`/farm/${farmId}/${calendar}/field/${fieldInput.field.b_id}/fertilizer`}
+                                        >
                                             {application.p_name_nl} op{" "}
                                             {format(
                                                 application.p_app_date,
@@ -73,8 +76,8 @@ const OrganicMatterBalanceDetails: React.FC<
                                                 { locale: nl },
                                             )}
                                             : {app.value} kg EOM / ha
-                                        </li>
-                                    </NavLink>
+                                        </NavLink>
+                                    </li>
                                 )
                             },
                         )}
