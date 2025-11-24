@@ -50,7 +50,7 @@ export function SidebarApps() {
     if (isCreateFarmWizard) {
         nitrogenBalanceLink = undefined
     } else if (farmId && farmId !== "undefined") {
-        nitrogenBalanceLink = `/farm/${farmId}/${selectedCalendar}/balance`
+        nitrogenBalanceLink = `/farm/${farmId}/${selectedCalendar}/balance/nitrogen`
     } else {
         nitrogenBalanceLink = undefined
     }
@@ -143,11 +143,11 @@ export function SidebarApps() {
                                     </SidebarMenuSubItem>
                                     <SidebarMenuSubItem>
                                         {omBalanceLink ? (
-                                            <SidebarMenuButton asChild>
+                                            <SidebarMenuSubButton asChild>
                                                 <NavLink to={omBalanceLink}>
                                                     <span>Organische stof</span>
                                                 </NavLink>
-                                            </SidebarMenuButton>
+                                            </SidebarMenuSubButton>
                                         ) : (
                                             <SidebarMenuSubButton
                                                 asChild
