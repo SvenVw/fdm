@@ -14,10 +14,12 @@ export function CultivationListCard({
     cultivationsCatalogueOptions,
     cultivations,
     harvests,
+    editable = true,
 }: {
     cultivationsCatalogueOptions: CultivationOption[]
     cultivations: Cultivation[]
     harvests: Harvest[]
+    editable?: boolean
 }) {
     return (
         <Card>
@@ -28,6 +30,7 @@ export function CultivationListCard({
                 {cultivations.length !== 0 ? (
                     <CultivationAddFormDialog
                         options={cultivationsCatalogueOptions}
+                        editable={editable}
                     />
                 ) : null}
             </CardHeader>

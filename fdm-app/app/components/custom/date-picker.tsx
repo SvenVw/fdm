@@ -74,6 +74,7 @@ interface DatePickerProps<TFieldValues extends FieldValues> {
     name: Path<TFieldValues> // Use Path for better type inference with react-hook-form
     label: string
     description: string
+    disabled?: boolean
 }
 
 export function DatePicker<TFieldValues extends FieldValues>({
@@ -81,6 +82,7 @@ export function DatePicker<TFieldValues extends FieldValues>({
     name,
     label,
     description,
+    disabled = false,
 }: DatePickerProps<TFieldValues>) {
     const [open, setOpen] = React.useState(false)
     const [date, setDate] = React.useState<Date | undefined>(
@@ -123,6 +125,7 @@ export function DatePicker<TFieldValues extends FieldValues>({
                                 value={value}
                                 placeholder="Kies een datum"
                                 className="bg-background pr-10"
+                                disabled={disabled}
                                 onChange={(e) => {
                                     const newDate = parseDateString(
                                         e.target.value,

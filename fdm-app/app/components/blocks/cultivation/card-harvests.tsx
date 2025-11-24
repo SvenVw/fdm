@@ -10,10 +10,12 @@ export function CultivationHarvestsCard({
     harvests,
     b_lu_harvestable,
     harvestParameters,
+    editable = true,
 }: {
     harvests: Harvest[]
     b_lu_harvestable: HarvestableType
     harvestParameters: HarvestParameters
+    editable?: boolean
 }) {
     let canAddHarvest = false
     if (b_lu_harvestable === "once" && harvests.length === 0) {
@@ -21,6 +23,9 @@ export function CultivationHarvestsCard({
     }
     if (b_lu_harvestable === "multiple") {
         canAddHarvest = true
+    }
+    if (typeof editable !== "undefined") {
+        canAddHarvest = editable
     }
 
     return (

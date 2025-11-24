@@ -5,6 +5,7 @@ import {
     getField,
     getHarvests,
     getParametersForHarvestCat,
+    hasPermission,
     removeCultivation,
     updateCultivation,
 } from "@svenvw/fdm-core"
@@ -166,6 +167,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             cultivation.b_lu_harvestcat,
         )
 
+        const fieldWritePermission = hasPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            session.principal_id,
+        )
+
+        const cultivationWritePermission = hasPermission(
+            fdm,
+            "cultivation",
+            "write",
+            b_lu,
+            session.principal_id,
+        )
+
         // Return user information from loader
         return {
             field: field,
@@ -177,6 +194,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_lu_variety_options: b_lu_variety_options,
             b_id_farm: b_id_farm,
             calendar: calendar,
+            cultivationWritePermission: await cultivationWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -198,11 +216,13 @@ export default function FarmFieldsOverviewBlock() {
                 harvests={loaderData.harvests}
                 b_lu_harvestable={loaderData.b_lu_harvestable}
                 b_lu_variety_options={loaderData.b_lu_variety_options}
+                editable={loaderData.cultivationWritePermission}
             />
             <CultivationHarvestsCard
                 harvests={loaderData.harvests}
                 b_lu_harvestable={loaderData.b_lu_harvestable}
                 harvestParameters={loaderData.harvestParameters}
+                editable={loaderData.cultivationWritePermission}
             />
             <Outlet />
         </div>

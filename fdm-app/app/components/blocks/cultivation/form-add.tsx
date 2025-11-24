@@ -17,13 +17,16 @@ import {
 import { CultivationAddFormSchema } from "./schema"
 import type { CultivationsFormProps } from "./types"
 
-export function CultivationAddFormDialog({ options }: CultivationsFormProps) {
+export function CultivationAddFormDialog({
+    options,
+    editable = true,
+}: CultivationsFormProps) {
     const [isOpen, setIsOpen] = useState(false)
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button>Gewas toevoegen</Button>
+                <Button disabled={!editable}>Gewas toevoegen</Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>

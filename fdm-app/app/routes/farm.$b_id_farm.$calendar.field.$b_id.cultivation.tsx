@@ -4,6 +4,7 @@ import {
     getCultivationsFromCatalogue,
     getField,
     getHarvests,
+    hasPermission,
     removeCultivation,
 } from "@svenvw/fdm-core"
 import {
@@ -77,6 +78,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get timeframe from calendar store
         const timeframe = getTimeframe(params)
 
+        const fieldWritePermission = await hasPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            session.principal_id,
+        )
+
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)
         if (!field) {
@@ -130,6 +139,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             cultivationsCatalogueOptions: cultivationsCatalogueOptions,
             cultivations: cultivations,
             harvests: harvests,
+            fieldWritePermission: fieldWritePermission,
         }
     } catch (error) {
         return handleLoaderError(error)
@@ -155,6 +165,7 @@ export default function FarmFieldsOverviewBlock() {
                     }
                     cultivations={loaderData.cultivations}
                     harvests={loaderData.harvests}
+                    editable={loaderData.fieldWritePermission}
                 />
                 <Outlet />
             </div>

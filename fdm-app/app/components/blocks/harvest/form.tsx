@@ -50,8 +50,9 @@ type HarvestFormDialogProps = {
     b_lu_harvestable: "once" | "multiple" | "none"
     b_lu_start: Date | undefined | null
     b_lu_end: Date | undefined | null
-    action: string
+    action?: string
     handleConfirmation?: (data: z.infer<typeof FormSchema>) => Promise<boolean>
+    editable?: boolean
 }
 
 function useHarvestRemixForm({
@@ -69,10 +70,12 @@ function useHarvestRemixForm({
     b_lu_harvestable,
     b_lu_start,
     b_lu_end,
+    editable = true,
     handleConfirmation,
 }: HarvestFormDialogProps) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
+        disabled: !editable,
         resolver: async (values, bypass, options) => {
             // Do the validation using Zod
             const validation = await zodResolver(FormSchema)(
@@ -485,7 +488,7 @@ function HarvestFormExplainer() {
     )
 }
 export function HarvestFormDialog(props: HarvestFormDialogProps) {
-    const { b_lu_harvest_date, action } = props
+    const { b_lu_harvest_date, action, editable = true } = props
     const navigate = useNavigate()
     const fetcher = useFetcher()
     const form = useHarvestRemixForm(props)
@@ -524,26 +527,30 @@ export function HarvestFormDialog(props: HarvestFormDialogProps) {
                             <HarvestFormExplainer />
                             <DialogFooter>
                                 <Field orientation="horizontal">
-                                    <Button
-                                        type="button"
-                                        variant="destructive"
-                                        onClick={handleDeleteHarvest}
-                                        disabled={
-                                            form.formState.isSubmitting ||
-                                            fetcher.state === "submitting"
-                                        }
-                                        className={cn(
-                                            "mr-auto",
-                                            !isHarvestUpdate ? "invisible" : "",
-                                        )}
-                                    >
-                                        {fetcher.state === "submitting" ? (
-                                            <div className="flex items-center space-x-2">
-                                                <LoadingSpinner />
-                                            </div>
-                                        ) : null}
-                                        Verwijderen
-                                    </Button>
+                                    {editable && (
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            onClick={handleDeleteHarvest}
+                                            disabled={
+                                                form.formState.isSubmitting ||
+                                                fetcher.state === "submitting"
+                                            }
+                                            className={cn(
+                                                "mr-auto",
+                                                !isHarvestUpdate
+                                                    ? "invisible"
+                                                    : "",
+                                            )}
+                                        >
+                                            {fetcher.state === "submitting" ? (
+                                                <div className="flex items-center space-x-2">
+                                                    <LoadingSpinner />
+                                                </div>
+                                            ) : null}
+                                            Verwijderen
+                                        </Button>
+                                    )}
                                     <DialogClose asChild>
                                         <Button
                                             variant="outline"
@@ -554,22 +561,26 @@ export function HarvestFormDialog(props: HarvestFormDialogProps) {
                                             Sluiten
                                         </Button>
                                     </DialogClose>
-                                    <Button
-                                        type="submit"
-                                        form="formHarvest"
-                                        disabled={form.formState.isSubmitting}
-                                    >
-                                        {form.formState.isSubmitting ? (
-                                            <div className="flex items-center space-x-2">
-                                                <LoadingSpinner />
-                                                <span>Opslaan...</span>
-                                            </div>
-                                        ) : isHarvestUpdate ? (
-                                            "Bijwerken"
-                                        ) : (
-                                            "Toevoegen"
-                                        )}
-                                    </Button>
+                                    {editable && (
+                                        <Button
+                                            type="submit"
+                                            form="formHarvest"
+                                            disabled={
+                                                form.formState.isSubmitting
+                                            }
+                                        >
+                                            {form.formState.isSubmitting ? (
+                                                <div className="flex items-center space-x-2">
+                                                    <LoadingSpinner />
+                                                    <span>Opslaan...</span>
+                                                </div>
+                                            ) : isHarvestUpdate ? (
+                                                "Bijwerken"
+                                            ) : (
+                                                "Toevoegen"
+                                            )}
+                                        </Button>
+                                    )}
                                 </Field>
                             </DialogFooter>
                         </DialogContent>
