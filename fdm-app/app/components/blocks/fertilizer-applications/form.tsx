@@ -37,7 +37,12 @@ import {
     FormSchema,
     FormSchemaModify,
 } from "./formschema"
-import type { FertilizerOption } from "./types.d"
+
+export type FertilizerOption = {
+    value: string
+    label: string
+    applicationMethodOptions?: { value: string; label: string }[]
+}
 
 export function FertilizerApplicationForm({
     options,
@@ -153,7 +158,7 @@ export function FertilizerApplicationForm({
     }
 
     return (
-        <RemixFormProvider {...form}>
+        <RemixFormProvider {...(form as any)}>
             <Form
                 id={formId}
                 action={action}
