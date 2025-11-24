@@ -4,7 +4,7 @@ import type {
     CultivationDetail,
     FieldInput,
     OrganicMatterBalanceInput,
-} from "../../types.d"
+} from "../types.d"
 
 /**
  * Calculates the supply of effective organic matter (EOM) from crop residues that are left on the field.
@@ -33,21 +33,32 @@ export function calculateOrganicMatterSupplyByResidues(
     for (const cult of cultivations) {
         // Get the detailed properties for this cultivation type.
         const cultivationDetail = cultivationDetailsMap.get(cult.b_lu_catalogue)
-        
+
         // Proceed only if the cultivation type has a defined EOM value for residues
         // and the 'm_cropresidue' flag is explicitly set to true.
-        if (cultivationDetail?.b_lu_eom_residues && cult.m_cropresidue) {
+        if (
+            cultivationDetail?.b_lu_eom_residues != null &&
+            cult.m_cropresidue
+        ) {
             // Ensure the cultivation ended within the calculation timeframe.
-            const terminationDate = cult.b_lu_end ? new Date(cult.b_lu_end) : null
-            if (terminationDate && terminationDate >= timeFrame.start && terminationDate <= timeFrame.end) {
+            const terminationDate = cult.b_lu_end
+                ? new Date(cult.b_lu_end)
+                : null
+            if (
+                terminationDate &&
+                terminationDate >= timeFrame.start &&
+                terminationDate <= timeFrame.end
+            ) {
                 // `b_lu_eom_residues` is the annual EOM supply from residues in kg/ha/year.
-                const omSupply = new Decimal(cultivationDetail.b_lu_eom_residues)
-                
+                const omSupply = new Decimal(
+                    cultivationDetail.b_lu_eom_residues,
+                )
+
                 // Add the supply from this residue to the total.
                 total = total.plus(omSupply)
-                
+
                 // Record the contribution for this specific cultivation's residue.
-                cultivationsSupply.push({ id: cult.b_id, value: omSupply })
+                cultivationsSupply.push({ id: cult.b_lu, value: omSupply })
             }
         }
     }
