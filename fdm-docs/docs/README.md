@@ -15,7 +15,7 @@ The **[Core Concepts](./core-concepts/01-database-schema.md)** section provides 
 
 ## Agronomic Calculations
 
-The **[Agronomic Calculations](./insights/01-nitrogen-balance.md)** section is dedicated to explaining the calculation engine within the FDM. Here you will find information on how to perform common agronomic calculations, such as nitrogen balance and fertilizer recommendations.
+The **[Agronomic Calculations](./insights/balance/01-nitrogen-balance.md)** section is dedicated to explaining the calculation engine within the FDM. Here you will find information on how to perform common agronomic calculations, such as nitrogen balance and fertilizer recommendations.
 
 ## Contributing to FDM
 

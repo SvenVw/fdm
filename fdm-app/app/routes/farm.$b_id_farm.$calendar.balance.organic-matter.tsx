@@ -6,6 +6,7 @@ import {
     Outlet,
     useLoaderData,
 } from "react-router"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { HeaderBalance } from "~/components/blocks/header/balance"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
@@ -19,10 +20,10 @@ import { fdm } from "~/lib/fdm.server"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Stikstof | Nutriëntenbalans| ${clientConfig.name}` },
+        { title: `Organische Stof | Nutriëntenbalans| ${clientConfig.name}` },
         {
             name: "description",
-            content: "Bekijk stikstof voor je nutriëntenbalans.",
+            content: "Bekijk de organische stofbalans van je bedrijf.",
         },
     ]
 }
@@ -123,7 +124,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
  * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
  */
-export default function FarmBalanceNitrogenBlock() {
+export default function FarmBalanceOrganicMatterBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
@@ -144,7 +145,7 @@ export default function FarmBalanceNitrogenBlock() {
                     <div className="flex items-center gap-4">
                         <div className="space-y-0.5 ">
                             <h2 className="text-2xl font-bold tracking-tight">
-                                Stikstof
+                                Organische stof
                             </h2>
                         </div>
                     </div>

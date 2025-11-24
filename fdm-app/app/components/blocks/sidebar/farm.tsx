@@ -90,7 +90,15 @@ export function SidebarFarm() {
             <SidebarGroupContent>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
+                        <SidebarMenuButton
+                            asChild
+                            isActive={
+                                location.pathname === farmLink ||
+                                location.pathname.includes(
+                                    `/farm/${farmId}/settings`,
+                                )
+                            }
+                        >
                             <NavLink to={farmLink}>
                                 <House />
                                 <span>{farmLinkDisplay}</span>
@@ -185,7 +193,12 @@ export function SidebarFarm() {
                     )}
                     <SidebarMenuItem>
                         {fieldsLink ? (
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    fieldsLink,
+                                )}
+                            >
                                 <NavLink to={fieldsLink}>
                                     <Square />
                                     <span>Percelen</span>
@@ -205,7 +218,12 @@ export function SidebarFarm() {
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         {rotationLink ? (
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    rotationLink,
+                                )}
+                            >
                                 <NavLink to={rotationLink}>
                                     <Sprout />
                                     <span>Bouwplan</span>
@@ -225,7 +243,12 @@ export function SidebarFarm() {
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         {fertilizersLink ? (
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    fertilizersLink,
+                                )}
+                            >
                                 <NavLink to={fertilizersLink}>
                                     <Shapes />
                                     <span>Meststoffen</span>

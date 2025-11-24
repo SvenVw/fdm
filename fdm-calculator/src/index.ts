@@ -22,6 +22,22 @@ export type {
     NitrogenSupplyMineralizationNumeric,
     NitrogenSupplyNumeric,
 } from "./balance/nitrogen/types"
+export {
+    calculateOrganicMatterBalance,
+    getOrganicMatterBalance,
+} from "./balance/organic-matter/index"
+export { collectInputForOrganicMatterBalance } from "./balance/organic-matter/input"
+export type {
+    OrganicMatterBalanceFieldNumeric,
+    OrganicMatterBalanceFieldResultNumeric,
+    OrganicMatterBalanceInput,
+    OrganicMatterBalanceNumeric,
+    OrganicMatterDegradationNumeric,
+    OrganicMatterSupplyCultivationsNumeric,
+    OrganicMatterSupplyFertilizersNumeric,
+    OrganicMatterSupplyNumeric,
+    OrganicMatterSupplyResiduesNumeric,
+} from "./balance/organic-matter/types"
 export { calculateDose } from "./doses/calculate-dose"
 export type { Dose } from "./doses/d"
 export { getDoseForField } from "./doses/get-dose-field"

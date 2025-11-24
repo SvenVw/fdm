@@ -1,24 +1,30 @@
 import {
     ArrowRightLeft,
     BookOpenText,
-    GitPullRequestArrow,
     Landmark,
     MapIcon,
-    Scale,
+    Minus,
+    Plus,
 } from "lucide-react"
 import { NavLink, useLocation, useSearchParams } from "react-router"
 import { useCalendarStore } from "@/app/store/calendar"
 import { useFarmStore } from "@/app/store/farm"
-import { Badge } from "~/components/ui/badge"
 import {
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
     SidebarMenu,
-    SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
 } from "~/components/ui/sidebar"
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "~/components/ui/collapsible"
 
 export function SidebarApps() {
     const farmId = useFarmStore((state) => state.farmId)
@@ -40,13 +46,13 @@ export function SidebarApps() {
         atlasLink = `/farm/undefined/${selectedCalendar}/atlas`
     }
 
-    let nutrientBalanceLink: string | undefined
+    let nitrogenBalanceLink: string | undefined
     if (isCreateFarmWizard) {
-        nutrientBalanceLink = undefined
+        nitrogenBalanceLink = undefined
     } else if (farmId && farmId !== "undefined") {
-        nutrientBalanceLink = `/farm/${farmId}/${selectedCalendar}/balance`
+        nitrogenBalanceLink = `/farm/${farmId}/${selectedCalendar}/balance/nitrogen`
     } else {
-        nutrientBalanceLink = undefined
+        nitrogenBalanceLink = undefined
     }
 
     let nutrientAdviceLink: string | undefined
@@ -67,8 +73,14 @@ export function SidebarApps() {
         normsLink = undefined
     }
 
-    const omBalanceLink = undefined
-    const baatLink = undefined
+    let omBalanceLink: string | undefined
+    if (isCreateFarmWizard) {
+        omBalanceLink = undefined
+    } else if (farmId && farmId !== "undefined") {
+        omBalanceLink = `/farm/${farmId}/${selectedCalendar}/balance/organic-matter`
+    } else {
+        omBalanceLink = undefined
+    }
     return (
         <SidebarGroup>
             <SidebarGroupLabel>Apps</SidebarGroupLabel>
@@ -76,7 +88,10 @@ export function SidebarApps() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         {atlasLink ? (
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(atlasLink)}
+                            >
                                 <NavLink to={atlasLink}>
                                     <MapIcon />
                                     <span>Atlas</span>
@@ -94,29 +109,81 @@ export function SidebarApps() {
                             </SidebarMenuButton>
                         )}
                     </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        {nutrientBalanceLink ? (
-                            <SidebarMenuButton asChild>
-                                <NavLink to={nutrientBalanceLink}>
+                    <Collapsible
+                        defaultOpen={true}
+                        className="group/collapsible"
+                    >
+                        <SidebarMenuItem>
+                            <CollapsibleTrigger asChild>
+                                <SidebarMenuButton>
                                     <ArrowRightLeft />
-                                    <span>Nutriëntenbalans</span>
-                                </NavLink>
-                            </SidebarMenuButton>
-                        ) : (
-                            <SidebarMenuButton
-                                asChild
-                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
-                            >
-                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
-                                    <ArrowRightLeft />
-                                    <span>Nutriëntenbalans</span>
-                                </span>
-                            </SidebarMenuButton>
-                        )}
-                    </SidebarMenuItem>
+                                    <span>Balans</span>
+                                    <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
+                                    <Minus className="ml-auto group-data-[state=closed]/collapsible:hidden" />
+                                </SidebarMenuButton>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent>
+                                <SidebarMenuSub>
+                                    <SidebarMenuSubItem>
+                                        {nitrogenBalanceLink ? (
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                isActive={location.pathname.includes(
+                                                    nitrogenBalanceLink,
+                                                )}
+                                            >
+                                                <NavLink
+                                                    to={nitrogenBalanceLink}
+                                                >
+                                                    <span>Stikstof</span>
+                                                </NavLink>
+                                            </SidebarMenuSubButton>
+                                        ) : (
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                                            >
+                                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                                    <span>Stikstof</span>
+                                                </span>
+                                            </SidebarMenuSubButton>
+                                        )}
+                                    </SidebarMenuSubItem>
+                                    <SidebarMenuSubItem>
+                                        {omBalanceLink ? (
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                isActive={location.pathname.includes(
+                                                    omBalanceLink,
+                                                )}
+                                            >
+                                                <NavLink to={omBalanceLink}>
+                                                    <span>Organische stof</span>
+                                                </NavLink>
+                                            </SidebarMenuSubButton>
+                                        ) : (
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                                            >
+                                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                                    <span>Organische stof</span>
+                                                </span>
+                                            </SidebarMenuSubButton>
+                                        )}
+                                    </SidebarMenuSubItem>
+                                </SidebarMenuSub>
+                            </CollapsibleContent>
+                        </SidebarMenuItem>
+                    </Collapsible>
                     <SidebarMenuItem>
                         {nutrientAdviceLink ? (
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    nutrientAdviceLink,
+                                )}
+                            >
                                 <NavLink to={nutrientAdviceLink}>
                                     <BookOpenText />
                                     <span>Bemestingsadvies</span>
@@ -136,7 +203,10 @@ export function SidebarApps() {
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         {normsLink ? (
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(normsLink)}
+                            >
                                 <NavLink to={normsLink}>
                                     <Landmark />
                                     <span>Gebruiksruimte</span>
@@ -153,52 +223,6 @@ export function SidebarApps() {
                                 </span>
                             </SidebarMenuButton>
                         )}
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        {omBalanceLink ? (
-                            <SidebarMenuButton asChild>
-                                <NavLink to={omBalanceLink}>
-                                    <Scale />
-                                    <span>OS Balans</span>
-                                </NavLink>
-                            </SidebarMenuButton>
-                        ) : (
-                            <SidebarMenuButton
-                                asChild
-                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
-                            >
-                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
-                                    <Scale />
-                                    <span>OS Balans</span>
-                                </span>
-                            </SidebarMenuButton>
-                        )}
-                        <SidebarMenuBadge>
-                            <Badge variant={"outline"}>Binnenkort</Badge>
-                        </SidebarMenuBadge>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        {baatLink ? (
-                            <SidebarMenuButton asChild>
-                                <NavLink to={baatLink}>
-                                    <GitPullRequestArrow />
-                                    <span>BAAT</span>
-                                </NavLink>
-                            </SidebarMenuButton>
-                        ) : (
-                            <SidebarMenuButton
-                                asChild
-                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
-                            >
-                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
-                                    <GitPullRequestArrow />
-                                    <span>BAAT</span>
-                                </span>
-                            </SidebarMenuButton>
-                        )}
-                        <SidebarMenuBadge>
-                            <Badge variant={"outline"}>Binnenkort</Badge>
-                        </SidebarMenuBadge>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarGroupContent>

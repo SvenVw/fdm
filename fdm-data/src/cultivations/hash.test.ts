@@ -17,6 +17,8 @@ describe("hashCultivation", () => {
             b_lu_yield: 51298,
             b_lu_dm: 500,
             b_lu_hi: 0.85,
+            b_lu_eom: 850,
+            b_lu_eom_residue: 0,
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
@@ -31,7 +33,7 @@ describe("hashCultivation", () => {
         expect(hash).toBeDefined()
         expect(typeof hash).toBe("string")
         expect(hash.length).toBeGreaterThan(0)
-        expect(hash).toBe("3aa9ed73")
+        expect(hash).toBe("c49afa2d")
     })
 
     it("should generate different hashes for different cultivation items", async () => {
@@ -48,6 +50,8 @@ describe("hashCultivation", () => {
             b_lu_yield: 51298,
             b_lu_dm: 500,
             b_lu_hi: 0.85,
+            b_lu_eom: 850,
+            b_lu_eom_residue: 0,
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
@@ -71,6 +75,8 @@ describe("hashCultivation", () => {
             b_lu_yield: 51298,
             b_lu_dm: 500,
             b_lu_hi: 0.85,
+            b_lu_eom: 850,
+            b_lu_eom_residue: 0,
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
@@ -101,6 +107,8 @@ describe("hashCultivation", () => {
             b_lu_yield: 51298,
             b_lu_dm: 500,
             b_lu_hi: 0.85,
+            b_lu_eom: 850,
+            b_lu_eom_residue: 0,
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
@@ -135,6 +143,8 @@ describe("hashCultivation", () => {
             b_lu_yield: 51298,
             b_lu_dm: 500,
             b_lu_hi: 0.85,
+            b_lu_eom: 850,
+            b_lu_eom_residue: 0,
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
@@ -169,6 +179,8 @@ describe("hashCultivation", () => {
             b_lu_yield: 51298,
             b_lu_dm: 500,
             b_lu_hi: 0.85,
+            b_lu_eom: 850,
+            b_lu_eom_residue: 0,
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
@@ -204,6 +216,8 @@ describe("hashCultivation", () => {
             b_lu_yield: 51298,
             b_lu_dm: 500,
             b_lu_hi: 0.85,
+            b_lu_eom: 850,
+            b_lu_eom_residue: 0,
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
@@ -239,6 +253,8 @@ describe("hashCultivation", () => {
             b_lu_yield: 51298,
             b_lu_dm: 500,
             b_lu_hi: 0.85,
+            b_lu_eom: 850,
+            b_lu_eom_residue: 0,
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
@@ -274,6 +290,8 @@ describe("hashCultivation", () => {
             b_lu_yield: 51298,
             b_lu_dm: 500,
             b_lu_hi: 0.85,
+            b_lu_eom: 850,
+            b_lu_eom_residue: 0,
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
@@ -316,6 +334,8 @@ describe("hashCultivation", () => {
             b_lu_yield: 51298,
             b_lu_dm: 500,
             b_lu_hi: 0.85,
+            b_lu_eom: 850,
+            b_lu_eom_residue: 0,
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
