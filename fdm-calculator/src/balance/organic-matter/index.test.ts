@@ -45,7 +45,7 @@ describe("Organic Matter Balance Calculation", () => {
                 degradation,
                 "calculateOrganicMatterDegradation",
             ).mockReturnValue({
-                total: new Decimal(200),
+                total: new Decimal(-200),
             })
             vi.spyOn(shared, "combineSoilAnalyses").mockReturnValue({} as any)
 
@@ -59,9 +59,9 @@ describe("Organic Matter Balance Calculation", () => {
                 timeFrame,
             )
 
-            expect(result.balance.balance.toNumber()).toBe(300)
-            expect(result.balance.supply.total.toNumber()).toBe(500)
-            expect(result.balance.degradation.total.toNumber()).toBe(200)
+            expect(result.balance?.balance.toNumber()).toBe(300)
+            expect(result.balance?.supply.total.toNumber()).toBe(500)
+            expect(result.balance?.degradation.total.toNumber()).toBe(-200)
         })
 
         it("should return an error message if a sub-calculation fails", () => {
@@ -188,7 +188,7 @@ describe("Organic Matter Balance Calculation", () => {
             expect(typeof numericResult.balance).toBe("number")
             expect(typeof numericResult.supply).toBe("number")
             expect(typeof numericResult.degradation).toBe("number")
-            expect(typeof numericResult.fields[0].balance).toBe("number")
+            expect(typeof numericResult.fields[0].balance).toBe("object")
             expect(numericResult.balance).toBe(233) // .round()
         })
     })
