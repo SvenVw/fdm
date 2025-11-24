@@ -201,8 +201,6 @@ export type FieldInput = {
         Cultivation,
         "b_lu" | "b_lu_start" | "b_lu_end" | "b_lu_catalogue" | "m_cropresidue"
     >[]
-    /** The list of harvests from the field's cultivations. */
-    harvests: Harvest[]
     /** The list of soil analyses performed on the field. */
     soilAnalyses: Pick<
         SoilAnalysis,
