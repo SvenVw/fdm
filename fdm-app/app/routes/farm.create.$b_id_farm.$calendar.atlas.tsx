@@ -218,6 +218,9 @@ export default function Index() {
         generateFeatureClass(),
     )
 
+    const [showFields, setShowFields] = useState(true)
+    const layerLayout = { visibility: showFields ? "visible" : "none" } as const
+
     return (
         <SidebarInset>
             <Header action={undefined}>
@@ -294,6 +297,10 @@ export default function Index() {
                                             bearing: currentViewState.bearing,
                                         }))
                                     }
+                                    showFields={showFields}
+                                    onToggleFields={() =>
+                                        setShowFields(!showFields)
+                                    }
                                 />
 
                                 <FieldsSourceAvailable
@@ -302,7 +309,12 @@ export default function Index() {
                                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                     redirectToDetailsPage={false}
                                 >
-                                    <Layer {...fieldsAvailableStyle} />
+                                    <Layer
+                                        {...({
+                                            ...fieldsAvailableStyle,
+                                            layout: layerLayout,
+                                        } as any)}
+                                    />
                                 </FieldsSourceAvailable>
 
                                 <FieldsSourceSelected
@@ -312,7 +324,12 @@ export default function Index() {
                                     setFieldsData={setSelectedFieldsData}
                                     excludedLayerId={fieldsSavedId}
                                 >
-                                    <Layer {...fieldsSelectedStyle} />
+                                    <Layer
+                                        {...({
+                                            ...fieldsSelectedStyle,
+                                            layout: layerLayout,
+                                        } as any)}
+                                    />
                                 </FieldsSourceSelected>
 
                                 <FieldsSourceNotClickable
