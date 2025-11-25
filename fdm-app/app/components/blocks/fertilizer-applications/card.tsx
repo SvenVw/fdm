@@ -24,6 +24,8 @@ export function FertilizerApplicationCard({
     applicationMethodOptions,
     fertilizers,
     fertilizerOptions,
+    canCreateFertilizerApplication = true,
+    canModifyFertilizerApplication = {},
 }: {
     fertilizerApplications: FertilizerApplication[]
     applicationMethodOptions: {
@@ -34,6 +36,8 @@ export function FertilizerApplicationCard({
     fertilizerOptions: FertilizerOption[]
     dose: Dose
     className?: string
+    canCreateFertilizerApplication?: boolean
+    canModifyFertilizerApplication?: Record<string, boolean>
 }) {
     const fetcher = useFetcher()
     const location = useLocation()
@@ -143,7 +147,7 @@ export function FertilizerApplicationCard({
                     onOpenChange={handleDialogOpenChange}
                 >
                     <DialogTrigger asChild>
-                        <Button>
+                        <Button disabled={!canCreateFertilizerApplication}>
                             <Plus className="size-4" />
                             Toevoegen
                         </Button>
@@ -181,6 +185,9 @@ export function FertilizerApplicationCard({
                     fertilizers={fertilizers}
                     handleDelete={handleDelete}
                     handleEdit={handleEdit}
+                    canModifyFertilizerApplication={
+                        canModifyFertilizerApplication
+                    }
                 />
             </CardContent>
         </Card>

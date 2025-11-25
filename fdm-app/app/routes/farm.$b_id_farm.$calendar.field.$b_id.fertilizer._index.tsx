@@ -5,6 +5,7 @@ import {
     getFertilizerParametersDescription,
     getFertilizers,
     getField,
+    hasPermission,
     removeFertilizerApplication,
     updateFertilizerApplication,
 } from "@svenvw/fdm-core"
@@ -165,6 +166,34 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             calendar: getCalendar(params),
         }
 
+        const fieldWritePermission = hasPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            session.principal_id,
+        )
+
+        const fertilizerApplicationWritePermissionsEntries = await Promise.all(
+            fertilizerApplications.map(
+                async (app) =>
+                    [
+                        app.p_app_id,
+                        await hasPermission(
+                            fdm,
+                            "fertilizer_application",
+                            "write",
+                            app.p_app_id,
+                            session.principal_id,
+                        ),
+                    ] as [string, boolean],
+            ),
+        )
+
+        const fertilizerApplicationWritePermissions = Object.fromEntries(
+            fertilizerApplicationWritePermissionsEntries,
+        )
+
         // Return user information from loader, including the promises
         return {
             field: field,
@@ -175,6 +204,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             applicationMethodOptions: applicationMethods.options,
             fertilizerApplicationMetricsData: fertilizerApplicationMetricsData,
             calendar: getCalendar(params),
+            fieldWritePermission: await fieldWritePermission,
+            fertilizerApplicationWritePermissions:
+                fertilizerApplicationWritePermissions,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -209,6 +241,12 @@ export default function FarmFieldsOverviewBlock() {
                         fertilizers={loaderData.fertilizers}
                         fertilizerOptions={loaderData.fertilizerOptions}
                         dose={loaderData.dose}
+                        canCreateFertilizerApplication={
+                            loaderData.fieldWritePermission
+                        }
+                        canModifyFertilizerApplication={
+                            loaderData.fertilizerApplicationWritePermissions
+                        }
                     />
                 </div>
                 <div className="md:col-span-1 lg:col-span-2">

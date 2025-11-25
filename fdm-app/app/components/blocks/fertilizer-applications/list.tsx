@@ -32,6 +32,7 @@ export function FertilizerApplicationsList({
     fertilizerApplications,
     applicationMethodOptions,
     fertilizers,
+    canModifyFertilizerApplication = {},
     handleDelete,
     handleEdit,
 }: {
@@ -41,6 +42,7 @@ export function FertilizerApplicationsList({
         label: string
     }[]
     fertilizers: Fertilizer[]
+    canModifyFertilizerApplication?: Record<string, boolean>
     handleDelete: (p_app_id: string | string[]) => void
     handleEdit: (fertilizerApplication: FertilizerApplication) => () => void
 }) {
@@ -57,6 +59,10 @@ export function FertilizerApplicationsList({
                         if (!fertilizer) {
                             return null
                         }
+                        const editable =
+                            canModifyFertilizerApplication[
+                                application.p_app_id
+                            ] ?? true
 
                         return (
                             <div key={application.p_app_id}>
@@ -82,8 +88,9 @@ export function FertilizerApplicationsList({
                                                 variant="link"
                                                 className="p-0 mt-0"
                                                 disabled={
+                                                    !editable ||
                                                     fetcher.state ===
-                                                    "submitting"
+                                                        "submitting"
                                                 }
                                                 onClick={handleEdit(
                                                     application,
@@ -117,45 +124,49 @@ export function FertilizerApplicationsList({
                                             </p>
                                         </ItemDescription>
                                     </ItemContent>
-                                    <ItemActions>
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        variant="destructive"
-                                                        size="icon"
-                                                        disabled={
-                                                            fetcher.state ===
-                                                            "submitting"
-                                                        }
-                                                        onClick={() => {
-                                                            if (
-                                                                application.p_app_ids
-                                                            ) {
-                                                                handleDelete(
-                                                                    application.p_app_ids,
-                                                                )
-                                                            } else {
-                                                                handleDelete([
-                                                                    application.p_app_id,
-                                                                ])
+                                    {editable && (
+                                        <ItemActions>
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="icon"
+                                                            disabled={
+                                                                fetcher.state ===
+                                                                "submitting"
                                                             }
-                                                        }}
-                                                    >
-                                                        {fetcher.state ===
-                                                        "submitting" ? (
-                                                            <LoadingSpinner />
-                                                        ) : (
-                                                            <Trash className="size-4" />
-                                                        )}
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Verwijder</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    </ItemActions>
+                                                            onClick={() => {
+                                                                if (
+                                                                    application.p_app_ids
+                                                                ) {
+                                                                    handleDelete(
+                                                                        application.p_app_ids,
+                                                                    )
+                                                                } else {
+                                                                    handleDelete(
+                                                                        [
+                                                                            application.p_app_id,
+                                                                        ],
+                                                                    )
+                                                                }
+                                                            }}
+                                                        >
+                                                            {fetcher.state ===
+                                                            "submitting" ? (
+                                                                <LoadingSpinner />
+                                                            ) : (
+                                                                <Trash className="size-4" />
+                                                            )}
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>Verwijder</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        </ItemActions>
+                                    )}
                                 </Item>
                             </div>
                         )
