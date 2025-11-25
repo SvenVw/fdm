@@ -113,7 +113,7 @@ export function SidebarApps() {
                         )}
                     </SidebarMenuItem>
                     <Collapsible
-                        defaultOpen={true}
+                        defaultOpen={!!nitrogenBalanceLink}
                         className="group/collapsible"
                     >
                         <SidebarMenuItem>
@@ -137,7 +137,6 @@ export function SidebarApps() {
                                     </span>
                                 </SidebarMenuButton>
                             )}
-
                             <CollapsibleContent>
                                 <SidebarMenuSub>
                                     <SidebarMenuSubItem>
@@ -154,12 +153,7 @@ export function SidebarApps() {
                                                     <span>Stikstof</span>
                                                 </NavLink>
                                             </SidebarMenuSubButton>
-                                        ) : (
-                                            <SidebarMenuSubButton
-                                                asChild
-                                                isActive={false}
-                                            ></SidebarMenuSubButton>
-                                        )}
+                                        ) : null}
                                     </SidebarMenuSubItem>
                                     <SidebarMenuSubItem>
                                         {omBalanceLink ? (
@@ -173,12 +167,7 @@ export function SidebarApps() {
                                                     <span>Organische stof</span>
                                                 </NavLink>
                                             </SidebarMenuSubButton>
-                                        ) : (
-                                            <SidebarMenuSubButton
-                                                asChild
-                                                isActive={false}
-                                            ></SidebarMenuSubButton>
-                                        )}
+                                        ) : null}
                                     </SidebarMenuSubItem>
                                 </SidebarMenuSub>
                             </CollapsibleContent>
