@@ -1,5 +1,5 @@
 import { cowHead } from "@lucide/lab"
-import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
+import { getFarm, getFarms, getFields, hasPermission } from "@svenvw/fdm-core"
 import {
     ArrowRightLeft,
     BookOpenText,
@@ -103,6 +103,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
+        const farmWritePermission = await hasPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+        )
+
         // Return the farm ID and session info
         return {
             b_id_farm: b_id_farm,
@@ -111,6 +119,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             farmArea: Math.round(farmArea),
             farmOptions: farmOptions,
             roles: farm.roles,
+            farmWritePermission: farmWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -449,26 +458,30 @@ export default function FarmDashboardIndex() {
                                                     Beweiding
                                                 </NavLink>
                                             </Button>
-                                            <Button
-                                                variant="ghost"
-                                                className="w-full justify-start"
-                                                asChild
-                                            >
-                                                <NavLink to="settings/access">
-                                                    <UserRoundCheck className="mr-2 h-4 w-4" />
-                                                    Toegang
-                                                </NavLink>
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                className="w-full justify-start"
-                                                asChild
-                                            >
-                                                <NavLink to="settings/delete">
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    Verwijderen
-                                                </NavLink>
-                                            </Button>
+                                            {loaderData.farmWritePermission && (
+                                                <Button
+                                                    variant="ghost"
+                                                    className="w-full justify-start"
+                                                    asChild
+                                                >
+                                                    <NavLink to="settings/access">
+                                                        <UserRoundCheck className="mr-2 h-4 w-4" />
+                                                        Toegang
+                                                    </NavLink>
+                                                </Button>
+                                            )}
+                                            {loaderData.farmWritePermission && (
+                                                <Button
+                                                    variant="ghost"
+                                                    className="w-full justify-start"
+                                                    asChild
+                                                >
+                                                    <NavLink to="settings/delete">
+                                                        <Trash2 className="mr-2 h-4 w-4" />
+                                                        Verwijderen
+                                                    </NavLink>
+                                                </Button>
+                                            )}
                                         </div>
                                     </CardContent>
                                 </Card>
