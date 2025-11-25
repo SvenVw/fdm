@@ -167,14 +167,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             cultivation.b_lu_harvestcat,
         )
 
-        const fieldWritePermission = hasPermission(
-            fdm,
-            "field",
-            "write",
-            b_id,
-            session.principal_id,
-        )
-
         const cultivationWritePermission = hasPermission(
             fdm,
             "cultivation",
