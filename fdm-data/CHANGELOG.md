@@ -1,5 +1,11 @@
 # fdm-data
 
+## 0.18.1
+
+### Patch Changes
+
+- ed53b86: Add `p_type_rvo` to SRM catalogue
+
 ## 0.18.0
 
 ### Minor Changes

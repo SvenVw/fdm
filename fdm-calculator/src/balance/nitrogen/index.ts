@@ -1,13 +1,9 @@
-import { type fdmSchema, withCalculationCache } from "@svenvw/fdm-core"
+import { withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
-import {
-    calculateBulkDensity,
-    calculateCarbonNitrogenRatio,
-    calculateOrganicCarbon,
-    calculateOrganicMatter,
-} from "../../conversions/soil"
 import pkg from "../../package"
 import { getFdmPublicDataUrl } from "../../shared/public-data-url"
+import { convertNitrogenBalanceToNumeric } from "../shared/conversion"
+import { combineSoilAnalyses } from "../shared/soil"
 import { calculateNitrogenEmission } from "./emission"
 import { calculateNitrogenRemoval } from "./removal"
 import { calculateNitrogenSupply } from "./supply"
@@ -19,7 +15,6 @@ import type {
     FieldInput,
     NitrogenBalance,
     NitrogenBalanceField,
-    NitrogenBalanceFieldNumeric,
     NitrogenBalanceFieldResult,
     NitrogenBalanceInput,
     NitrogenBalanceNumeric,
@@ -178,7 +173,19 @@ export function calculateNitrogenBalanceField(
         const fieldDetails = field
 
         // Combine soil analyses
-        const soilAnalysis = combineSoilAnalyses(soilAnalyses)
+        const soilAnalysis = combineSoilAnalyses<SoilAnalysisPicked>(
+            soilAnalyses,
+            [
+                "b_soiltype_agr",
+                "a_n_rt",
+                "a_c_of",
+                "a_cn_fr",
+                "a_density_sa",
+                "a_som_loi",
+                "b_gwl_class",
+            ],
+            true,
+        )
 
         // Use a field-local timeframe (intersection with input timeframe)
         const timeFrameField = {
@@ -361,153 +368,4 @@ export function calculateNitrogenBalancesFieldToFarm(
     }
 
     return farmWithBalance
-}
-
-// Helper function to convert Decimal to number recursively
-function convertDecimalToNumberRecursive(data: unknown): unknown {
-    if (data instanceof Decimal) {
-        return data.round().toNumber()
-    }
-    if (Array.isArray(data)) {
-        return data.map(convertDecimalToNumberRecursive)
-    }
-    if (typeof data === "object" && data !== null && !(data instanceof Date)) {
-        const newData: { [key: string]: unknown } = {}
-        for (const key in data) {
-            if (Object.hasOwn(data, key)) {
-                newData[key] = convertDecimalToNumberRecursive(
-                    (data as Record<string, unknown>)[key],
-                )
-            }
-        }
-        return newData
-    }
-    return data
-}
-
-// Main conversion function with type safety
-export function convertNitrogenBalanceToNumeric(
-    balance: NitrogenBalance, // Input is the original Decimal-based type
-): NitrogenBalanceNumeric {
-    // Output is the new number-based type
-    const numericBalance = convertDecimalToNumberRecursive(
-        balance,
-    ) as NitrogenBalanceNumeric
-
-    // Ensure fields are correctly converted, especially handling errorMessage
-    numericBalance.fields = balance.fields.map((fieldResult) => {
-        if (fieldResult.balance) {
-            return {
-                b_id: fieldResult.b_id,
-                b_area: fieldResult.b_area,
-                balance: convertDecimalToNumberRecursive(
-                    fieldResult.balance,
-                ) as NitrogenBalanceFieldNumeric,
-            }
-        }
-        return {
-            b_id: fieldResult.b_id,
-            b_area: fieldResult.b_area,
-            errorMessage: fieldResult.errorMessage,
-        }
-    })
-
-    return numericBalance
-}
-
-/**
- * Combines multiple soil analysis records into a single record, prioritizing the most recent data.
- *
- * This function takes an array of soil analysis records, sorts them by sampling date (most recent first),
- * and then merges them into a single record. For each soil parameter, the most recent non-null value
- * is used. If a parameter is missing in all records, it remains null. After merging, the function
- * attempts to estimate missing parameters using conversion functions if possible.
- * @param soilAnalyses - An array of soil analysis records.
- * @returns A single soil analysis record containing the most recent data and estimated values for missing parameters.
- */
-export function combineSoilAnalyses(
-    soilAnalyses: FieldInput["soilAnalyses"],
-): SoilAnalysisPicked {
-    // Sort the soil analyses by date (most recent first)
-    soilAnalyses.sort((a, b) => {
-        return (
-            new Date(b.b_sampling_date).getTime() -
-            new Date(a.b_sampling_date).getTime()
-        )
-    })
-
-    // Return the most recent value for each property, or undefined if not found
-    const soilAnalysis = {
-        b_soiltype_agr:
-            null as fdmSchema.soilAnalysisTypeSelect["b_soiltype_agr"],
-        a_n_rt: null as fdmSchema.soilAnalysisTypeSelect["a_n_rt"],
-        a_c_of: null as fdmSchema.soilAnalysisTypeSelect["a_c_of"],
-        a_cn_fr: null as fdmSchema.soilAnalysisTypeSelect["a_cn_fr"],
-        a_density_sa: null as fdmSchema.soilAnalysisTypeSelect["a_density_sa"],
-        a_som_loi: null as fdmSchema.soilAnalysisTypeSelect["a_som_loi"],
-        b_gwl_class: null as fdmSchema.soilAnalysisTypeSelect["b_gwl_class"],
-    }
-
-    // Define properties to extract
-    const propertiesToExtract = [
-        "b_soiltype_agr",
-        "a_n_rt",
-        "a_c_of",
-        "a_cn_fr",
-        "a_density_sa",
-        "a_som_loi",
-        "b_gwl_class",
-    ] as const
-
-    // Extract each property
-    for (const prop of propertiesToExtract) {
-        soilAnalysis[prop] =
-            soilAnalyses.find(
-                (x) => x[prop] !== null && x[prop] !== undefined,
-            )?.[prop] || null
-    }
-
-    // When values for soil parameters are not available try to estimate them with conversion functions
-    if (soilAnalysis.a_c_of == null) {
-        soilAnalysis.a_c_of = calculateOrganicCarbon(soilAnalysis.a_som_loi)
-    }
-
-    if (soilAnalysis.a_som_loi == null) {
-        soilAnalysis.a_som_loi = calculateOrganicMatter(soilAnalysis.a_c_of)
-    }
-
-    if (soilAnalysis.a_cn_fr == null) {
-        soilAnalysis.a_cn_fr = calculateCarbonNitrogenRatio(
-            soilAnalysis.a_c_of,
-            soilAnalysis.a_n_rt,
-        )
-    }
-
-    if (soilAnalysis.a_density_sa == null) {
-        soilAnalysis.a_density_sa = calculateBulkDensity(
-            soilAnalysis.a_som_loi,
-            soilAnalysis.b_soiltype_agr,
-        )
-    }
-
-    // Validate if all required soil parameters for nitrogen balance are present
-    const requiredSoilParameters = [
-        "b_soiltype_agr",
-        "a_n_rt",
-        "a_c_of",
-        "a_cn_fr",
-        "a_density_sa",
-        "b_gwl_class",
-    ]
-    const missingParameters = requiredSoilParameters.filter(
-        (param) => soilAnalysis[param as keyof typeof soilAnalysis] === null,
-    )
-
-    if (missingParameters.length > 0) {
-        throw new Error(
-            `Missing required soil parameters: ${missingParameters.join(", ")}`,
-        )
-    }
-
-    return soilAnalysis
 }

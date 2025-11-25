@@ -1,8 +1,0 @@
-{
-    "label": "Nutrient Balance",
-    "position": 5,
-    "link": {
-        "type": "generated-index",
-        "description": "Learn about how nutrient balances are calculated with `fdm-calculator`."
-    }
-}

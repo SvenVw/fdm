@@ -24,6 +24,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": true,
+        "p_type_rvo": 111,
         "p_id_catalogue": "0fa8fb5bc763ad9b",
         "p_app_method_options": "incorporation||broadcasting",
         "p_cn_of": 12.8333
@@ -53,6 +54,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 116,
         "p_id_catalogue": "46bd49cbb67bc7b7",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement",
         "p_cn_of": 13.6778
@@ -82,6 +84,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 116,
         "p_id_catalogue": "30be8cdc92e64ef2",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement",
         "p_cn_of": 13.1004
@@ -111,6 +114,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 116,
         "p_id_catalogue": "5e0f486cfce81f85",
         "p_app_method_options": "slotted coulter||injection",
         "p_cn_of": 3.7037
@@ -140,6 +144,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 116,
         "p_id_catalogue": "9e29a11332476286",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement",
         "p_cn_of": 5.2632
@@ -169,6 +174,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 116,
         "p_id_catalogue": "898ad56320a5614c",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement",
         "p_cn_of": 5.8571
@@ -198,6 +204,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 116,
         "p_id_catalogue": "ff4034f347f9c66e",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement",
         "p_cn_of": 14.3369
@@ -223,6 +230,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 115,
         "p_id_catalogue": "7e4ed7a0abb1c131",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement"
     },
@@ -251,6 +259,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 110,
         "p_id_catalogue": "6224a5cc4a92865d",
         "p_app_method_options": "slotted coulter||injection||broadcasting",
         "p_cn_of": 14.6528
@@ -280,6 +289,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 116,
         "p_id_catalogue": "cb59142efac34dc0",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement"
     },
@@ -304,6 +314,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 109,
         "p_id_catalogue": "34e762701f91a893",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement"
     },
@@ -328,6 +339,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": true,
+        "p_type_rvo": 111,
         "p_id_catalogue": "3efa9129f0eb2e62",
         "p_app_method_options": "incorporation||broadcasting"
     },
@@ -356,6 +368,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 111,
         "p_id_catalogue": "76b0d22ed29eb2af",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement",
         "p_cn_of": 9.3879
@@ -381,6 +394,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": true,
+        "p_type_rvo": 111,
         "p_id_catalogue": "1ae98c5a34997eac",
         "p_app_method_options": "incorporation||broadcasting"
     },
@@ -405,6 +419,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 116,
         "p_id_catalogue": "83f4f6f067ceecd4",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement"
     },
@@ -433,6 +448,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": true,
+        "p_type_rvo": 116,
         "p_id_catalogue": "a9e19e6db97c49aa",
         "p_app_method_options": "incorporation||broadcasting",
         "p_cn_of": 13.3
@@ -458,6 +474,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 116,
         "p_id_catalogue": "8aa0baeaa367dbef",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement"
     },
@@ -486,6 +503,7 @@
         "p_type_manure": false,
         "p_type_mineral": true,
         "p_type_compost": false,
+        "p_type_rvo": 115,
         "p_id_catalogue": "1d2e4f0b600af921",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement"
     },
@@ -510,6 +528,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 115,
         "p_id_catalogue": "56569b23583728e0",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement"
     },
@@ -534,6 +553,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 115,
         "p_id_catalogue": "62648ac045e9fff6",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement"
     },
@@ -558,6 +578,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 115,
         "p_id_catalogue": "1f616af7e94f3ec4",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement"
     },
@@ -586,6 +607,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 35,
         "p_id_catalogue": "db5cef16b5fd1be4",
         "p_app_method_options": "slotted coulter||injection||broadcasting",
         "p_cn_of": 7.3566
@@ -615,6 +637,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": true,
+        "p_type_rvo": 111,
         "p_id_catalogue": "35589ecec6988b94",
         "p_app_method_options": "incorporation||broadcasting",
         "p_cn_of": 14.5455
@@ -644,6 +667,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 116,
         "p_id_catalogue": "7fe1088167f5b3b6",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement"
     },
@@ -672,6 +696,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 115,
         "p_id_catalogue": "9eef309c5a21cac2",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement",
         "p_cn_of": 8.1
@@ -701,6 +726,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 14,
         "p_id_catalogue": "9d855a14df2045c2",
         "p_app_method_options": "slotted coulter||injection||broadcasting",
         "p_cn_of": 15.2381
@@ -730,6 +756,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 13,
         "p_id_catalogue": "0eac33098aed5a8c",
         "p_app_method_options": "slotted coulter||injection||broadcasting",
         "p_cn_of": 27.5714
@@ -759,6 +786,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 11,
         "p_id_catalogue": "e527c65c26e92c6b",
         "p_app_method_options": "slotted coulter||injection",
         "p_cn_of": 5.7143
@@ -788,6 +816,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 13,
         "p_id_catalogue": "50a1f75317b0833a",
         "p_app_method_options": "slotted coulter||injection||broadcasting",
         "p_cn_of": 113
@@ -817,6 +846,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 13,
         "p_id_catalogue": "9d3d0b2ecabb8727",
         "p_app_method_options": "slotted coulter||injection||broadcasting",
         "p_cn_of": 28.1034
@@ -846,6 +876,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 11,
         "p_id_catalogue": "433104c1442b62c2",
         "p_app_method_options": "slotted coulter||injection",
         "p_cn_of": 11.9231
@@ -875,6 +906,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 12,
         "p_id_catalogue": "68af2b5484d8ac21",
         "p_app_method_options": "slotted coulter||injection",
         "p_cn_of": 25
@@ -904,6 +936,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 10,
         "p_id_catalogue": "d05ee30018d8b9c5",
         "p_app_method_options": "incorporation||broadcasting",
         "p_cn_of": 17.3864
@@ -933,6 +966,7 @@
         "p_type_manure": false,
         "p_type_mineral": true,
         "p_type_compost": false,
+        "p_type_rvo": 115,
         "p_id_catalogue": "150a6c681a7c7da0",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement"
     },
@@ -961,6 +995,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 43,
         "p_id_catalogue": "bebf7c93d0a5ac01",
         "p_app_method_options": "slotted coulter||injection||broadcasting",
         "p_cn_of": 16.2879
@@ -990,6 +1025,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 41,
         "p_id_catalogue": "7e0ca9e00a1e04c3",
         "p_app_method_options": "slotted coulter||injection",
         "p_cn_of": 9.1667
@@ -1019,6 +1055,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 42,
         "p_id_catalogue": "82293b5baa991470",
         "p_app_method_options": "slotted coulter||injection",
         "p_cn_of": 6.25
@@ -1048,6 +1085,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 120,
         "p_id_catalogue": "982cffd52eb5a270",
         "p_app_method_options": "slotted coulter||injection||broadcasting",
         "p_cn_of": 9.2857
@@ -1077,6 +1115,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 50,
         "p_id_catalogue": "a68418f8d14e112b",
         "p_app_method_options": "slotted coulter||injection||broadcasting",
         "p_cn_of": 8.6
@@ -1106,6 +1145,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 116,
         "p_id_catalogue": "2a6eb018e1ef35b7",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement",
         "p_cn_of": 3.1787
@@ -1135,6 +1175,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 115,
         "p_id_catalogue": "7b8dc7437321b2c0",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement",
         "p_cn_of": 6.15
@@ -1164,6 +1205,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 39,
         "p_id_catalogue": "8eaafeff8a8bbffa",
         "p_app_method_options": "incorporation||broadcasting",
         "p_cn_of": 8.6929
@@ -1193,6 +1235,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 43,
         "p_id_catalogue": "9386a2ed7eefef8b",
         "p_app_method_options": "slotted coulter||injection||broadcasting",
         "p_cn_of": 2.0755
@@ -1222,6 +1265,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 41,
         "p_id_catalogue": "4cbce919da49811c",
         "p_app_method_options": "slotted coulter||injection",
         "p_cn_of": 7.5
@@ -1251,6 +1295,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 43,
         "p_id_catalogue": "f6bc9a9dac9d5ded",
         "p_app_method_options": "slotted coulter||injection||broadcasting",
         "p_cn_of": 11
@@ -1276,6 +1321,7 @@
         "p_type_manure": false,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 116,
         "p_id_catalogue": "c12ca3a82c6c8b68",
         "p_app_method_options": "spraying||broadcasting||spoke wheel||pocket placement"
     },
@@ -1304,6 +1350,7 @@
         "p_type_manure": true,
         "p_type_mineral": false,
         "p_type_compost": false,
+        "p_type_rvo": 42,
         "p_id_catalogue": "bfbb3200362c312a",
         "p_app_method_options": "slotted coulter||injection",
         "p_cn_of": 50

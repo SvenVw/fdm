@@ -117,7 +117,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
     const memoizedData = useMemo(() => {
         return data.map((item) => ({
             ...item,
-            searchTarget: `${item.b_name} ${item.cultivations.map((c) => c.b_lu_name).join(" ")} ${item.fertilizerApplications.map((f) => f.p_name_nl).join(" ")} ${item.b_soiltype_agr}`,
+            searchTarget: `${item.b_name} ${item.cultivations.map((c) => c.b_lu_name).join(" ")} ${item.fertilizers.map((f) => f.p_name_nl).join(" ")} ${item.b_soiltype_agr}`,
         }))
     }, [data])
 
@@ -259,7 +259,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
                     </TooltipProvider>
                 </div>
             </div>
-            <div className="rounded-md border flex-grow relative overflow-x-auto">
+            <div className="rounded-md border grow relative overflow-x-auto">
                 <Table>
                     <TableHeader className="sticky top-0 z-10 bg-background">
                         {table.getHeaderGroups().map((headerGroup) => (

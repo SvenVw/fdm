@@ -5,7 +5,9 @@ import {
     type MetaFunction,
     Outlet,
     useLoaderData,
+    useSearchParams,
 } from "react-router"
+import { redirectWithError } from "remix-toast"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
@@ -15,6 +17,7 @@ import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { isOfOrigin } from "~/lib/url-utils"
 import type { Route } from "./+types/farm.$b_id_farm.fertilizers.new"
 
 export const meta: MetaFunction = () => {
@@ -37,6 +40,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 status: 400,
                 statusText: "invalid: b_id_farm",
             })
+        }
+
+        const requestUrl = new URL(request.url)
+        const returnUrl =
+            requestUrl.searchParams.get("returnUrl") ??
+            `/farm/${b_id_farm}/fertilizers`
+
+        if (!isOfOrigin(returnUrl, requestUrl.origin)) {
+            return redirectWithError(
+                `/farm/${b_id_farm}/fertilizers`,
+                `Return URL ${returnUrl} is niet ondersteund.`,
+            )
         }
 
         // Get the session
@@ -85,16 +100,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
  */
 export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
+    const [searchParams] = useSearchParams()
     const loaderData = useLoaderData<typeof loader>()
+
+    const returnUrl = searchParams.get("returnUrl")
 
     return (
         <SidebarInset>
             <Header
-                action={{
-                    to: `/farm/${params.b_id_farm}/fertilizers`,
-                    label: "Terug naar overzicht",
-                    disabled: false,
-                }}
+                action={
+                    returnUrl
+                        ? {
+                              label: "Terug naar bemesting toevoegen",
+                              to: returnUrl,
+                              disabled: false,
+                          }
+                        : {
+                              to: `/farm/${loaderData.b_id_farm}/fertilizers`,
+                              label: "Terug naar overzicht",
+                              disabled: false,
+                          }
+                }
             >
                 <HeaderFarm
                     b_id_farm={loaderData.b_id_farm}

@@ -26,6 +26,7 @@ import type { FdmType } from "./fdm"
 import { determineIfFieldIsProductive } from "./field"
 import {
     addHarvest,
+    getDefaultsForHarvestParameters,
     getHarvestableTypeOfCultivation,
     getHarvests,
 } from "./harvest"
@@ -97,7 +98,7 @@ export async function getCultivationsFromCatalogue(
  * Adds a new cultivation to the catalogue.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param properties The properties of the cultivation to add. This includes fields like `b_lu_catalogue`, `b_lu_name`, `b_lu_harvestable`, and optionally `b_lu_variety_options` to specify available varieties.
+ * @param properties The properties of the cultivation to add. This includes fields like `b_lu_catalogue`, `b_lu_name`, `b_lu_harvestable`, `b_lu_eom`, `b_lu_eom_residues`, and optionally `b_lu_variety_options` to specify available varieties.
  * @returns A Promise that resolves when the cultivation is added.
  * @throws If the insertion fails.
  * @alpha
@@ -110,14 +111,18 @@ export async function addCultivationToCatalogue(
         b_lu_name: schema.cultivationsCatalogueTypeInsert["b_lu_name"]
         b_lu_name_en: schema.cultivationsCatalogueTypeInsert["b_lu_name_en"]
         b_lu_harvestable: schema.cultivationsCatalogueTypeInsert["b_lu_harvestable"]
+        b_lu_harvestcat: schema.cultivationsCatalogueTypeInsert["b_lu_harvestcat"]
         b_lu_hcat3: schema.cultivationsCatalogueTypeInsert["b_lu_hcat3"]
         b_lu_hcat3_name: schema.cultivationsCatalogueTypeInsert["b_lu_hcat3_name"]
         b_lu_croprotation: schema.cultivationsCatalogueTypeInsert["b_lu_croprotation"]
         b_lu_yield: schema.cultivationsCatalogueTypeInsert["b_lu_yield"]
+        b_lu_dm: schema.cultivationsCatalogueTypeInsert["b_lu_dm"]
         b_lu_hi: schema.cultivationsCatalogueTypeInsert["b_lu_hi"]
         b_lu_n_harvestable: schema.cultivationsCatalogueTypeInsert["b_lu_n_harvestable"]
         b_lu_n_residue: schema.cultivationsCatalogueTypeInsert["b_lu_n_residue"]
         b_n_fixation: schema.cultivationsCatalogueTypeInsert["b_n_fixation"]
+        b_lu_eom: schema.cultivationsCatalogueTypeInsert["b_lu_eom"]
+        b_lu_eom_residues: schema.cultivationsCatalogueTypeInsert["b_lu_eom_residues"]
         b_lu_rest_oravib: schema.cultivationsCatalogueTypeInsert["b_lu_rest_oravib"]
         b_lu_variety_options: schema.cultivationsCatalogueTypeInsert["b_lu_variety_options"]
         b_lu_start_default: schema.cultivationsCatalogueTypeInsert["b_lu_start_default"]
@@ -470,17 +475,18 @@ export async function addCultivation(
 
                 if (harvestableType === "once") {
                     // If cultivation can only be harvested once, add harvest on terminate date
+                    const defaultHarvestParameters =
+                        await getDefaultsForHarvestParameters(
+                            b_lu_catalogue,
+                            cultivation,
+                        )
+
                     await addHarvest(
                         tx,
                         principal_id,
                         b_lu,
                         b_lu_end,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
-                        undefined,
+                        defaultHarvestParameters,
                     )
                 }
             }
@@ -534,6 +540,11 @@ export async function getCultivation(
                 b_lu_name_en: schema.cultivationsCatalogue.b_lu_name_en,
                 b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
+                b_lu_harvestcat: schema.cultivationsCatalogue.b_lu_harvestcat,
+                b_lu_harvestable: schema.cultivationsCatalogue.b_lu_harvestable,
+                b_lu_eom: schema.cultivationsCatalogue.b_lu_eom,
+                b_lu_eom_residues:
+                    schema.cultivationsCatalogue.b_lu_eom_residues,
                 b_lu_croprotation:
                     schema.cultivationsCatalogue.b_lu_croprotation,
                 b_lu_variety: schema.cultivations.b_lu_variety,
@@ -618,6 +629,11 @@ export async function getCultivations(
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
                 b_lu_croprotation:
                     schema.cultivationsCatalogue.b_lu_croprotation,
+                b_lu_eom: schema.cultivationsCatalogue.b_lu_eom,
+                b_lu_eom_residues:
+                    schema.cultivationsCatalogue.b_lu_eom_residues,
+                b_lu_harvestcat: schema.cultivationsCatalogue.b_lu_harvestcat,
+                b_lu_harvestable: schema.cultivationsCatalogue.b_lu_harvestable,
                 b_lu_variety: schema.cultivations.b_lu_variety,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
@@ -678,14 +694,18 @@ export async function getCultivations(
  * {
  *   b_lu_catalogue: string;   // Unique ID of the cultivation catalogue item
  *   b_lu_name: string;        // Name of the cultivation
- *   b_lu_start: Date;      // Sowing date for the cultivation (if available)
- *   b_lu_end: Date; // Termination date for the cultivation (if available)
- *   m_cropresidue: boolean // Whether crop residues are left on the field or not after termination of the cultivation
+ *   b_lu_variety: string;     // Variety of the cultivation
+ *   b_area: number;           // Total area of the cultivation
+ *   b_lu_start: Date;         // Sowing date for the cultivation (if available)
+ *   b_lu_end: Date;           // Termination date for the cultivation (if available)
+ *   m_cropresidue: boolean    // Whether crop residues are left on the field or not after termination of the cultivation
  *   fields: [
  *     {
  *       b_lu: string;        // Unique ID of the cultivation record
  *       b_id: string;        // Unique ID of the field
  *       b_name: string;      // Name of the field
+ *       b_area: number;      // Area of the field
+ *       b_isproductive: boolean; // Whether the field is productive
  *       fertilizer_applications: [
  *         {
  *           p_id_catalogue: string; // Fertilizer catalogue ID
@@ -777,8 +797,21 @@ export async function getCultivationPlan(
                 b_id_harvesting: schema.cultivationHarvesting.b_id_harvesting,
                 b_lu_harvest_date:
                     schema.cultivationHarvesting.b_lu_harvest_date,
-                b_id_harvestable: schema.harvestables.b_id_harvestable,
+                b_lu_croprotation:
+                    schema.cultivationsCatalogue.b_lu_croprotation,
+                b_lu_eom: schema.cultivationsCatalogue.b_lu_eom,
+                b_lu_eom_residues:
+                    schema.cultivationsCatalogue.b_lu_eom_residues,
+                b_lu_harvestcat: schema.cultivationsCatalogue.b_lu_harvestcat,
+                b_lu_harvestable: schema.cultivationsCatalogue.b_lu_harvestable,
                 b_lu_yield: schema.harvestableAnalyses.b_lu_yield,
+                b_lu_yield_fresh: schema.harvestableAnalyses.b_lu_yield_fresh,
+                b_lu_yield_bruto: schema.harvestableAnalyses.b_lu_yield_bruto,
+                b_lu_tarra: schema.harvestableAnalyses.b_lu_tarra,
+                b_lu_dm: schema.harvestableAnalyses.b_lu_dm,
+                b_lu_moist: schema.harvestableAnalyses.b_lu_moist,
+                b_lu_uww: schema.harvestableAnalyses.b_lu_uww,
+                b_lu_cp: schema.harvestableAnalyses.b_lu_cp,
                 b_lu_n_harvestable:
                     schema.harvestableAnalyses.b_lu_n_harvestable,
                 b_lu_n_residue: schema.harvestableAnalyses.b_lu_n_residue,
@@ -899,6 +932,11 @@ export async function getCultivationPlan(
                         b_lu_catalogue: curr.b_lu_catalogue,
                         b_lu_name: curr.b_lu_name,
                         b_lu_variety: curr.b_lu_variety,
+                        b_lu_croprotation: curr.b_lu_croprotation,
+                        b_lu_eom: curr.b_lu_eom,
+                        b_lu_eom_residues: curr.b_lu_eom_residues,
+                        b_lu_harvestcat: curr.b_lu_harvestcat,
+                        b_lu_harvestable: curr.b_lu_harvestable,
                         b_area: 0,
                         b_lu_start: curr.b_lu_start,
                         b_lu_end: curr.b_lu_end,
@@ -954,6 +992,13 @@ export async function getCultivationPlan(
                             harvestable_analyses: [
                                 {
                                     b_lu_yield: curr.b_lu_yield,
+                                    b_lu_yield_fresh: curr.b_lu_yield_fresh,
+                                    b_lu_yield_bruto: curr.b_lu_yield_bruto,
+                                    b_lu_tarra: curr.b_lu_tarra,
+                                    b_lu_dm: curr.b_lu_dm,
+                                    b_lu_moist: curr.b_lu_moist,
+                                    b_lu_uww: curr.b_lu_uww,
+                                    b_lu_cp: curr.b_lu_cp,
                                     b_lu_n_harvestable: curr.b_lu_n_harvestable,
                                     b_lu_n_residue: curr.b_lu_n_residue,
                                     b_lu_p_harvestable: curr.b_lu_p_harvestable,
@@ -1100,23 +1145,23 @@ export async function updateCultivation(
                 throw new Error("Cultivation does not exist")
             }
 
+            //Validate if the cultivation exists in catalogue
+            const cultivation = await tx
+                .select()
+                .from(schema.cultivationsCatalogue)
+                .where(
+                    eq(
+                        schema.cultivationsCatalogue.b_lu_catalogue,
+                        b_lu_catalogue ?? existingCultivation[0].b_lu_catalogue,
+                    ),
+                )
+                .limit(1)
+
+            if (cultivation.length === 0) {
+                throw new Error("Cultivation does not exist in catalogue")
+            }
+
             if (b_lu_catalogue) {
-                //Validate if the cultivation exists in catalogue
-                const cultivation = await tx
-                    .select()
-                    .from(schema.cultivationsCatalogue)
-                    .where(
-                        eq(
-                            schema.cultivationsCatalogue.b_lu_catalogue,
-                            b_lu_catalogue,
-                        ),
-                    )
-                    .limit(1)
-
-                if (cultivation.length === 0) {
-                    throw new Error("Cultivation does not exist in catalogue")
-                }
-
                 await tx
                     .update(schema.cultivations)
                     .set({ b_lu_catalogue: b_lu_catalogue, updated: updated })
@@ -1268,17 +1313,20 @@ export async function updateCultivation(
                                 ),
                             )
                     } else {
+                        // If cultivation can only be harvested once, add harvest on terminate date
+                        const defaultHarvestParameters =
+                            await getDefaultsForHarvestParameters(
+                                b_lu_catalogue ??
+                                    existingCultivation[0].b_lu_catalogue,
+                                cultivation,
+                            )
+
                         await addHarvest(
                             tx,
                             principal_id,
                             b_lu,
                             b_lu_end,
-                            undefined,
-                            undefined,
-                            undefined,
-                            undefined,
-                            undefined,
-                            undefined,
+                            defaultHarvestParameters,
                         )
                     }
                 }
@@ -1296,13 +1344,18 @@ export async function updateCultivation(
     }
 }
 
-// Helper function to build a robust date range condition for cultivations.
-// This function constructs a SQL clause to filter cultivations that overlap
-// with a given timeframe.
-// An overlap occurs if the cultivation's start is before the timeframe's end,
-// AND the cultivation's end is after the timeframe's start.
-// A cultivation with no end date is considered to extend indefinitely into the future,
-// which correctly includes it in the timeframe if it started before the timeframe ended.
+/**
+ * Builds a SQL condition for filtering cultivations based on a timeframe.
+ *
+ * This function constructs a SQL clause to filter cultivations that overlap
+ * with a given timeframe. An overlap occurs if the cultivation's start is before
+ * the timeframe's end, AND the cultivation's end is after the timeframe's start.
+ * A cultivation with no end date is considered to extend indefinitely into the future,
+ * which correctly includes it in the timeframe if it started before the timeframe ended.
+ *
+ * @param timeframe - An object with optional `start` and `end` Date properties.
+ * @returns A Drizzle-ORM SQL condition, or `undefined` if the timeframe is not provided.
+ */
 export const buildCultivationTimeframeCondition = (
     timeframe: Timeframe | undefined,
 ): SQL | undefined => {

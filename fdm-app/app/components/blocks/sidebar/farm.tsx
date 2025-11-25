@@ -4,10 +4,11 @@ import {
     ChevronRight,
     House,
     Shapes,
+    Sprout,
     Square,
 } from "lucide-react"
 import { useState } from "react"
-import { NavLink, useLocation } from "react-router"
+import { NavLink, useLocation, useSearchParams } from "react-router"
 import { getCalendarSelection } from "@/app/lib/calendar"
 import { useCalendarStore } from "@/app/store/calendar"
 import { useFarmStore } from "@/app/store/farm"
@@ -37,9 +38,12 @@ export function SidebarFarm() {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false)
     const calendarSelection = getCalendarSelection()
 
-    // Check if page contains `farm/create` in url
+    // Check if the page or its return page contains `farm/create` in url
     const location = useLocation()
-    const isCreateFarmWizard = location.pathname.includes("farm/create")
+    const [searchParams] = useSearchParams()
+    const isCreateFarmWizard =
+        location.pathname.includes("farm/create") ||
+        searchParams.get("returnUrl")?.includes("farm/create")
 
     // Set the farm link
     let farmLink: string
@@ -64,6 +68,15 @@ export function SidebarFarm() {
         fieldsLink = undefined
     }
 
+    let rotationLink: string | undefined
+    if (isCreateFarmWizard) {
+        rotationLink = undefined
+    } else if (farmId && farmId !== "undefined") {
+        rotationLink = `/farm/${farmId}/${selectedCalendar}/rotation`
+    } else {
+        rotationLink = undefined
+    }
+
     let fertilizersLink: string | undefined
     if (farmId && farmId !== "undefined") {
         fertilizersLink = `/farm/${farmId}/fertilizers`
@@ -77,7 +90,15 @@ export function SidebarFarm() {
             <SidebarGroupContent>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
+                        <SidebarMenuButton
+                            asChild
+                            isActive={
+                                location.pathname === farmLink ||
+                                location.pathname.includes(
+                                    `/farm/${farmId}/settings`,
+                                )
+                            }
+                        >
                             <NavLink to={farmLink}>
                                 <House />
                                 <span>{farmLinkDisplay}</span>
@@ -172,7 +193,12 @@ export function SidebarFarm() {
                     )}
                     <SidebarMenuItem>
                         {fieldsLink ? (
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    fieldsLink,
+                                )}
+                            >
                                 <NavLink to={fieldsLink}>
                                     <Square />
                                     <span>Percelen</span>
@@ -190,17 +216,39 @@ export function SidebarFarm() {
                             </SidebarMenuButton>
                         )}
                     </SidebarMenuItem>
-                    {/* <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <NavLink to="./cultivations">
-                                        <Sprout />
-                                        <span>Gewassen</span>
-                                    </NavLink>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem> */}
+                    <SidebarMenuItem>
+                        {rotationLink ? (
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    rotationLink,
+                                )}
+                            >
+                                <NavLink to={rotationLink}>
+                                    <Sprout />
+                                    <span>Bouwplan</span>
+                                </NavLink>
+                            </SidebarMenuButton>
+                        ) : (
+                            <SidebarMenuButton
+                                asChild
+                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                            >
+                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                    <Sprout />
+                                    <span>Bouwplan</span>
+                                </span>
+                            </SidebarMenuButton>
+                        )}
+                    </SidebarMenuItem>
                     <SidebarMenuItem>
                         {fertilizersLink ? (
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    fertilizersLink,
+                                )}
+                            >
                                 <NavLink to={fertilizersLink}>
                                     <Shapes />
                                     <span>Meststoffen</span>
