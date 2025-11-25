@@ -50,7 +50,7 @@
         "@rollup/plugin-node-resolve": "catalog:",
         "@rollup/plugin-typescript": "catalog:",
         "@svenvw/fdm-data": "workspace:^0.18.1",
-        "@types/node": "^24.10.0",
+        "@types/node": "^24.10.1",
         "@vitest/coverage-v8": "catalog:",
         "drizzle-kit": "catalog:",
         "fs-extra": "^11.3.2",
@@ -63,7 +63,7 @@
         "vitest": "catalog:"
     },
     "dependencies": {
-        "@electric-sql/pglite": "^0.3.12",
+        "@electric-sql/pglite": "^0.3.14",
         "@svenvw/fdm-data": "workspace:*",
         "@types/geojson": "^7946.0.16",
         "better-auth": "catalog:",
