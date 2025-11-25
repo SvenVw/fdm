@@ -2,6 +2,7 @@ import {
     getField,
     getSoilAnalysis,
     getSoilParametersDescription,
+    hasPermission,
     updateSoilAnalysis,
 } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
@@ -98,11 +99,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             (item: { parameter: string }) => soilAnalysis[item.parameter],
         )
 
+        const soilAnalysisWritePermission = await hasPermission(fdm, "soil_analysis", "write", a_id, session.principal_id)
+
         // Return user information from loader
         return {
             field: field,
             soilParameterDescription: soilParameterDescription,
             soilAnalysis: soilAnalysis,
+            soilAnalysisWritePermission: soilAnalysisWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -139,6 +143,7 @@ export default function FarmFieldSoilOverviewBlock() {
                 soilAnalysis={loaderData.soilAnalysis}
                 soilParameterDescription={loaderData.soilParameterDescription}
                 action="."
+                editable={loaderData.soilAnalysisWritePermission}
             />
         </div>
     )

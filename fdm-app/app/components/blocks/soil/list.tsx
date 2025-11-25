@@ -49,31 +49,31 @@ export function SoilAnalysesList({
                             </p>
                         </div>
                         <div>{""}</div>
-                        {(canModifySoilAnalysis[analysis.a_id] ?? true) ? (
-                            <div className="justify-self-end">
-                                <div className="space-x-4">
-                                    <NavLink
-                                        to={`./analysis/${analysis.a_id}`}
-                                        asChild
-                                        className={cn(
-                                            "pointer-events-auto",
+
+                        <div className="justify-self-end">
+                            <div className="space-x-4">
+                                <NavLink
+                                    to={`./analysis/${analysis.a_id}`}
+                                    asChild
+                                    className={cn(
+                                        "pointer-events-auto",
+                                        analysis.a_source === "nl-other-nmi"
+                                            ? "pointer-events-none"
+                                            : "",
+                                    )}
+                                >
+                                    <Button
+                                        variant="default"
+                                        disabled={
+                                            fetcher.state === "submitting" ||
                                             analysis.a_source === "nl-other-nmi"
-                                                ? "pointer-events-none"
-                                                : "",
-                                        )}
+                                        }
                                     >
-                                        <Button
-                                            variant="default"
-                                            disabled={
-                                                fetcher.state ===
-                                                    "submitting" ||
-                                                analysis.a_source ===
-                                                    "nl-other-nmi"
-                                            }
-                                        >
-                                            Bewerk
-                                        </Button>
-                                    </NavLink>
+                                        Bewerk
+                                    </Button>
+                                </NavLink>
+                                {(canModifySoilAnalysis[analysis.a_id] ??
+                                true) ? (
                                     <Button
                                         variant="destructive"
                                         disabled={
@@ -93,9 +93,9 @@ export function SoilAnalysesList({
                                             "Verwijder"
                                         )}
                                     </Button>
-                                </div>
+                                ) : null}
                             </div>
-                        ) : null}
+                        </div>
                     </div>
                 ))}
             </div>
