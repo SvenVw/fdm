@@ -306,6 +306,8 @@ export function calculateNitrogenBalancesFieldToFarm(
     let totalFarmSupply = new Decimal(0)
     let totalFarmRemoval = new Decimal(0)
     let totalFarmEmission = new Decimal(0)
+    let totalFarmEmissionAmmonia = new Decimal(0)
+    let totalFarmEmissionNitrate = new Decimal(0)
     let totalFarmTarget = new Decimal(0)
     let totalFarmArea = new Decimal(0)
 
@@ -328,7 +330,13 @@ export function calculateNitrogenBalancesFieldToFarm(
             fieldResult.balance.removal.total.times(fieldArea),
         )
         totalFarmEmission = totalFarmEmission.add(
+            fieldResult.balance.emission.total.times(fieldArea),
+        )
+        totalFarmEmissionAmmonia = totalFarmEmission.add(
             fieldResult.balance.emission.ammonia.total.times(fieldArea),
+        )
+        totalFarmEmissionNitrate = totalFarmEmission.add(
+            fieldResult.balance.emission.nitrate.total.times(fieldArea),
         )
         totalFarmTarget = totalFarmTarget.add(
             fieldResult.balance.target.times(fieldArea),
@@ -345,6 +353,12 @@ export function calculateNitrogenBalancesFieldToFarm(
     const avgFarmEmission = totalFarmArea.isZero()
         ? new Decimal(0)
         : totalFarmEmission.dividedBy(totalFarmArea)
+    const avgFarmEmissionAmmonia = totalFarmArea.isZero()
+        ? new Decimal(0)
+        : totalFarmEmissionAmmonia.dividedBy(totalFarmArea)
+    const avgFarmEmissionNitrate = totalFarmArea.isZero()
+        ? new Decimal(0)
+        : totalFarmEmissionNitrate.dividedBy(totalFarmArea)
     const avgFarmTarget = totalFarmArea.isZero()
         ? new Decimal(0)
         : totalFarmTarget.dividedBy(totalFarmArea)
@@ -359,7 +373,11 @@ export function calculateNitrogenBalancesFieldToFarm(
         balance: avgFarmBalance,
         supply: avgFarmSupply,
         removal: avgFarmRemoval,
-        emission: avgFarmEmission,
+        emission: {
+            total: avgFarmEmission,
+            ammonia: avgFarmEmissionAmmonia,
+            nitrate: avgFarmEmissionNitrate,
+        },
         target: avgFarmTarget,
         fields: fieldsWithBalanceResults,
         hasErrors:
