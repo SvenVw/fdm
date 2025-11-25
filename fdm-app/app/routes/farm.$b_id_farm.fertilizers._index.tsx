@@ -3,6 +3,7 @@ import {
     getFarms,
     getFertilizerParametersDescription,
     getFertilizers,
+    hasPermission,
 } from "@svenvw/fdm-core"
 import {
     data,
@@ -102,12 +103,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })),
         )
 
+        const farmWritePermission = await hasPermission(fdm, "farm", "write", b_id_farm, session.principal_id)
+
         // Return user information from loader
         return {
             farm: farm,
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
             fertilizers: fertilizers,
+            farmWritePermission: farmWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -143,6 +147,7 @@ export default function FarmFertilizersIndexPage({
                             <DataTable
                                 columns={columns}
                                 data={loaderData.fertilizers}
+                                canAddItem={loaderData.farmWritePermission}
                             />
                         </div>
                     </div>

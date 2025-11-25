@@ -25,11 +25,13 @@ import {
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    canAddItem: boolean
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
+    canAddItem,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -65,14 +67,16 @@ export function DataTable<TData, TValue>({
                     }
                     className="max-w-sm"
                 />
-                <div className="ml-auto">
-                    <NavLink to={"./new"}>
-                        <Button>
-                            <Plus />
-                            Meststof toevoegen
-                        </Button>
-                    </NavLink>
-                </div>
+                {canAddItem && (
+                    <div className="ml-auto">
+                        <NavLink to={"./new"}>
+                            <Button>
+                                <Plus />
+                                Meststof toevoegen
+                            </Button>
+                        </NavLink>
+                    </div>
+                )}
             </div>
             <div className="rounded-md border">
                 <Table>

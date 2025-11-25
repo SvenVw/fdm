@@ -5,6 +5,7 @@ import {
     getFertilizer,
     getFertilizerParametersDescription,
     getFertilizers,
+    hasPermission,
     updateFertilizerFromCatalogue,
 } from "@svenvw/fdm-core"
 import {
@@ -109,6 +110,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         let editable = false
         if (fertilizer.p_source === b_id_farm) {
             editable = true
+        }
+        if (
+            editable &&
+            !(await hasPermission(
+                fdm,
+                "farm",
+                "write",
+                b_id_farm,
+                session.principal_id,
+            ))
+        ) {
+            editable = false
         }
 
         // Return user information from loader
