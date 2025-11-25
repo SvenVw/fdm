@@ -261,11 +261,13 @@ export default function FarmFieldIndex() {
                                     :(
                                 </h1>
                             </div>
-                            <div className="flex flex-col items-center relative">
-                                <NavLink to="./new">
-                                    <Button>Maak een perceel</Button>
-                                </NavLink>
-                            </div>
+                            {loaderData.farmWritePermission && (
+                                <div className="flex flex-col items-center relative">
+                                    <NavLink to="./new">
+                                        <Button>Maak een perceel</Button>
+                                    </NavLink>
+                                </div>
+                            )}
                             {/* <p className="px-8 text-center text-sm text-muted-foreground">
                             </p> */}
                         </div>

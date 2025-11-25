@@ -381,11 +381,13 @@ export default function FarmRotationIndex() {
                                     :(
                                 </h1>
                             </div>
-                            <div className="flex flex-col items-center relative">
-                                <NavLink to="../field/new">
-                                    <Button>Maak een perceel</Button>
-                                </NavLink>
-                            </div>
+                            {loaderData.farmWritePermission && (
+                                <div className="flex flex-col items-center relative">
+                                    <NavLink to="../field/new">
+                                        <Button>Maak een perceel</Button>
+                                    </NavLink>
+                                </div>
+                            )}
                         </div>
                     </>
                 ) : (
