@@ -70,12 +70,10 @@ function useHarvestRemixForm({
     b_lu_harvestable,
     b_lu_start,
     b_lu_end,
-    editable = true,
     handleConfirmation,
 }: HarvestFormDialogProps) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
-        disabled: !editable,
         resolver: async (values, bypass, options) => {
             // Do the validation using Zod
             const validation = await zodResolver(FormSchema)(
@@ -594,7 +592,7 @@ export function HarvestFormDialog(props: HarvestFormDialogProps) {
 }
 
 export function HarvestForm(props: HarvestFormDialogProps) {
-    const { b_lu_harvest_date, action, editable } = props
+    const { b_lu_harvest_date, action, editable = true } = props
     const fetcher = useFetcher()
 
     const form = useHarvestRemixForm(props)

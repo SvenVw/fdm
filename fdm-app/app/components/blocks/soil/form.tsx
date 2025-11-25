@@ -32,7 +32,7 @@ export function SoilAnalysisForm(props: {
     action: string
     editable?: boolean
 }) {
-    const { soilAnalysis, soilParameterDescription, editable } = props
+    const { soilAnalysis, soilParameterDescription, editable = true } = props
 
     const defaultValues: {
         [key: string]: string | number | Date | undefined | null
