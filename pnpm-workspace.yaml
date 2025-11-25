@@ -21,6 +21,6 @@ catalog:
   typedoc: ^0.28.14
   typedoc-plugin-missing-exports: ^4.1.2
   typescript: ^5.9.3
-  vite: ^7.1.12
+  vite: ^7.2.4
   vite-tsconfig-paths: ^5.1.4
   vitest: ^4.0.13
