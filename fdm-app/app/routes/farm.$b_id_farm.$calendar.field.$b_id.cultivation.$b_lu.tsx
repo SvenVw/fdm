@@ -99,6 +99,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const timeframe = getTimeframe(params)
         const calendar = getCalendar(params)
 
+        const cultivationWritePermission = hasPermission(
+            fdm,
+            "cultivation",
+            "write",
+            b_lu,
+            session.principal_id,
+            { fallback: true },
+        )
+
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)
         if (!field) {
@@ -165,15 +174,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         const harvestParameters = getParametersForHarvestCat(
             cultivation.b_lu_harvestcat,
-        )
-
-        const cultivationWritePermission = hasPermission(
-            fdm,
-            "cultivation",
-            "write",
-            b_lu,
-            session.principal_id,
-            { fallback: true },
         )
 
         // Return user information from loader
