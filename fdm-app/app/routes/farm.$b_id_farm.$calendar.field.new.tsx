@@ -9,12 +9,15 @@ import {
     getFields,
 } from "@svenvw/fdm-core"
 import type { Feature, FeatureCollection, Polygon } from "geojson"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import {
     GeolocateControl,
     Layer,
     Map as MapGL,
     NavigationControl,
+    type ViewState, // Import ViewState for onViewportChange
+    type ViewStateChangeEvent, // Import ViewStateChangeEvent for onViewportChange
+    type LayerProps, // Import LayerProps to fix casting errors
 } from "react-map-gl/mapbox"
 import {
     type ActionFunctionArgs,
@@ -26,6 +29,7 @@ import {
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { Controls } from "~/components/blocks/atlas/atlas-controls" // Import Controls
 import {
     FieldsPanelHover,
     FieldsPanelZoom,
@@ -197,15 +201,20 @@ export default function Index() {
 
     const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
 
-    const mapProps =
+    const initialViewState =
         fieldsSaved.features.length > 0
             ? getViewState(fieldsSaved)
-            : { initialViewState: getViewState(null) }
+            : getViewState(null)
+
+    const [viewState, setViewState] = useState<ViewState>(initialViewState as ViewState)
+
 
     const fieldsAvailableId = "fieldsAvailable"
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
 
     const [open, setOpen] = useState(false)
+    const [showFields, setShowFields] = useState(true) // Added showFields state
+    const layerLayout = { visibility: showFields ? "visible" : "none" } as const // Define layerLayout
 
     const [selectedField, setSelectedField] = useState<Feature<Polygon> | null>(
         null,
@@ -224,6 +233,11 @@ export default function Index() {
         setSelectedField(feature)
         setOpen(true)
     }
+
+    // onViewportChange handler as Controls requires it
+    const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
+        setViewState(event.viewState)
+    }, [])
 
     return (
         <SidebarInset>
@@ -280,7 +294,7 @@ export default function Index() {
                     >
                         {() => (
                             <MapGL
-                                {...mapProps}
+                                {...viewState} // Use viewState directly
                                 style={{
                                     height: "calc(100vh - 64px - 123px)",
                                     width: "100%",
@@ -292,6 +306,7 @@ export default function Index() {
                                     fieldsAvailableId,
                                     fieldsSavedId,
                                 ]}
+                                onMove={onViewportChange} // Set onMove handler
                                 onClick={(evt) => {
                                     if (!evt.features) return
                                     const polygonFeature = evt.features.find(
@@ -315,8 +330,21 @@ export default function Index() {
                                     }
                                 }}
                             >
-                                <GeolocateControl />
-                                <NavigationControl />
+                                {/* Replaced direct controls with <Controls /> */}
+                                <Controls
+                                    onViewportChange={(viewport) =>
+                                        setViewState((currentViewState) => ({
+                                            ...currentViewState,
+                                            ...viewport, // Spread viewport directly
+                                            pitch: currentViewState.pitch, // Keep current pitch
+                                            bearing: currentViewState.bearing, // Keep current bearing
+                                        }))
+                                    }
+                                    showFields={showFields}
+                                    onToggleFields={() =>
+                                        setShowFields(!showFields)
+                                    }
+                                />
 
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}
@@ -324,15 +352,15 @@ export default function Index() {
                                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                     redirectToDetailsPage={false}
                                 >
-                                    <Layer {...fieldsAvailableStyle} />
+                                    <Layer {...({...fieldsAvailableStyle, layout: layerLayout} as any)} />
                                 </FieldsSourceAvailable>
 
                                 <FieldsSourceNotClickable
                                     id={fieldsSavedId}
                                     fieldsData={fieldsSaved}
                                 >
-                                    <Layer {...fieldsSavedStyle} />
-                                    <Layer {...fieldsSavedOutlineStyle} />
+                                    <Layer {...({...fieldsSavedStyle, layout: layerLayout} as any)} />
+                                    <Layer {...({...fieldsSavedOutlineStyle, layout: layerLayout} as any)} />
                                 </FieldsSourceNotClickable>
 
                                 <div className="fields-panel grid gap-4 w-[350px]">

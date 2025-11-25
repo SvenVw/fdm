@@ -141,6 +141,8 @@ export default function FarmAtlasFieldsBlock() {
         return initialViewState as ViewState
     })
 
+    const [showFields, setShowFields] = useState(true)
+
     const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
         setViewState(event.viewState)
     }, [])
@@ -155,6 +157,8 @@ export default function FarmAtlasFieldsBlock() {
         }
         sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
     }, [viewState])
+
+    const layerLayout = { visibility: showFields ? "visible" : "none" } as const
 
     return (
         <MapGL
@@ -177,6 +181,8 @@ export default function FarmAtlasFieldsBlock() {
                         bearing: currentViewState.bearing, // Ensure bearing is carried over
                     }))
                 }
+                showFields={showFields}
+                onToggleFields={() => setShowFields(!showFields)}
             />
 
             <FieldsSourceAvailable
@@ -185,13 +191,13 @@ export default function FarmAtlasFieldsBlock() {
                 zoomLevelFields={ZOOM_LEVEL_FIELDS}
                 redirectToDetailsPage={true}
             >
-                <Layer {...fieldsAvailableStyle} />
+                <Layer {...fieldsAvailableStyle} layout={layerLayout} />
             </FieldsSourceAvailable>
 
             {fields ? (
                 <FieldsSourceNotClickable id={id} fieldsData={fields}>
-                    <Layer {...fieldsSavedStyle} />
-                    <Layer {...fieldsSavedOutlineStyle} />
+                    <Layer {...fieldsSavedStyle} layout={layerLayout} />
+                    <Layer {...fieldsSavedOutlineStyle} layout={layerLayout} />
                 </FieldsSourceNotClickable>
             ) : null}
             <div className="fields-panel grid gap-4 w-[350px]">
