@@ -60,7 +60,7 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
             cultivationDetails,
         )
 
-        expect(result.total.toString()).toBe("16")
+        expect(result.total.toString()).toBe("-16")
     })
 
     it("should calculate nitrate emission for cropland on clay soil", () => {
@@ -91,7 +91,7 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
             cultivationDetails,
         )
 
-        expect(result.total.toString()).toBe("33")
+        expect(result.total.toString()).toBe("-33")
     })
 
     it("should return zero emission for bare soil", () => {
@@ -123,7 +123,7 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
         )
 
         // Although landType is bare soil, the leaching factor is determined by cropland as a fallback
-        expect(result.total.toString()).toBe("44")
+        expect(result.total.toString()).toBe("-44")
     })
 
     it("should return zero emission if balance is not positive", () => {
@@ -192,7 +192,7 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
             cultivationDetails,
         )
 
-        expect(result.total.toString()).toBe("16")
+        expect(result.total.toString()).toBe("-16")
     })
 })
 
