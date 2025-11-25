@@ -235,9 +235,9 @@ export default function Index() {
     }
 
     // onViewportChange handler as Controls requires it
-    const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
+    const onViewportChange = (event: ViewStateChangeEvent) => {
         setViewState(event.viewState)
-    }, [])
+    }
 
     return (
         <SidebarInset>
