@@ -35,7 +35,7 @@
         "@docusaurus/tsconfig": "3.9.2",
         "@docusaurus/types": "3.9.2",
         "docusaurus-plugin-typedoc": "^1.4.2",
-        "markdownlint-cli2": "^0.19.0",
+        "markdownlint-cli2": "^0.19.1",
         "typedoc": "catalog:",
         "typedoc-plugin-markdown": "^4.9.0",
         "typescript": "catalog:"
