@@ -167,7 +167,7 @@ describe("Authorization Functions", () => {
             expect(auditLogs).toHaveLength(0)
         })
 
-        it("should return the fallback value when specified", async () => {
+        it("should return the fallback value on error when specified", async () => {
             await grantRole(fdm, "farm", "owner", farm_id, principal_id)
             await expect(
                 hasPermission(
@@ -193,7 +193,7 @@ describe("Authorization Functions", () => {
             ).resolves.toBe(false)
         })
 
-        it("should throw an error if the fallback value is not specified", async () => {
+        it("should throw any error encountered if the fallback value is not specified", async () => {
             await grantRole(fdm, "farm", "owner", farm_id, principal_id)
             await expect(
                 hasPermission(
@@ -204,7 +204,7 @@ describe("Authorization Functions", () => {
                     farm_id,
                     principal_id,
                 ),
-            ).rejects.toThrowError("Exception for checkPermission")
+            ).rejects.toThrowError("Exception for hasPermission")
         })
     })
 
