@@ -245,6 +245,7 @@ export function calculateNitrogenBalanceField(
             cultivationDetailsMap,
         )
         emission.nitrate = nitrateEmission
+        emission.total = emission.total.add(nitrateEmission.total)
 
         // Calculate the target for the Nitrogen balance
         const target = calculateTargetForNitrogenBalance(
