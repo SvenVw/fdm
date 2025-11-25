@@ -623,41 +623,43 @@ export function HarvestForm(props: HarvestFormDialogProps) {
                             className="grid lg:grid-cols-2 items-center gap-y-6 gap-x-8"
                         />
                         <HarvestFormExplainer />
-                        <div className="grid grid-cols-2 items">
-                            <Button
-                                type="button"
-                                variant="destructive"
-                                onClick={handleDeleteHarvest}
-                                disabled={
-                                    form.formState.isSubmitting ||
-                                    fetcher.state === "submitting"
-                                }
-                                className={cn(
-                                    "mr-auto",
-                                    !isHarvestUpdate ? "invisible" : "",
-                                )}
-                            >
-                                {form.formState.isSubmitting ||
-                                fetcher.state === "submitting" ? (
-                                    <div className="flex items-center space-x-2">
-                                        <LoadingSpinner />
-                                    </div>
-                                ) : null}
-                                Verwijderen
-                            </Button>
-                            <Button type="submit" className="ml-auto">
-                                {form.formState.isSubmitting ? (
-                                    <div className="flex items-center space-x-2">
-                                        <LoadingSpinner />
-                                        <span>Opslaan...</span>
-                                    </div>
-                                ) : isHarvestUpdate ? (
-                                    "Bijwerken"
-                                ) : (
-                                    "Toevoegen"
-                                )}
-                            </Button>
-                        </div>
+                        {editable && (
+                            <div className="grid grid-cols-2 items">
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    onClick={handleDeleteHarvest}
+                                    disabled={
+                                        form.formState.isSubmitting ||
+                                        fetcher.state === "submitting"
+                                    }
+                                    className={cn(
+                                        "mr-auto",
+                                        !isHarvestUpdate ? "invisible" : "",
+                                    )}
+                                >
+                                    {form.formState.isSubmitting ||
+                                    fetcher.state === "submitting" ? (
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />
+                                        </div>
+                                    ) : null}
+                                    Verwijderen
+                                </Button>
+                                <Button type="submit" className="ml-auto">
+                                    {form.formState.isSubmitting ? (
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />
+                                            <span>Opslaan...</span>
+                                        </div>
+                                    ) : isHarvestUpdate ? (
+                                        "Bijwerken"
+                                    ) : (
+                                        "Toevoegen"
+                                    )}
+                                </Button>
+                            </div>
+                        )}
                     </fieldset>
                 </Form>
             </RemixFormProvider>
