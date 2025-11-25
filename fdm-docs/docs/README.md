@@ -1,21 +1,26 @@
 ---
-sidebar_position: 1
-title: Introduction to FDM
+title: Introduction
+sidebar_position: 0
 ---
 
-The Farm Data Model (FDM) provides a robust and flexible framework for organizing and analyzing agricultural data. Designed with both developers and agronomists in mind, FDM-core offers a standardized schema for representing diverse farm information, enabling seamless data integration, analysis, and decision-making.
+This documentation provides a comprehensive overview of the Farm Data Model (FDM). It is designed to help you understand the core concepts of the FDM, learn how to use it in your own applications, and contribute to its development.
 
-FDM adopts an "Asset-Action" model as its core architectural principle. This model centers around two key concepts: Assets represent physical or conceptual entities within a farm, such as fields, crops, or equipment. Actions, on the other hand, represent operations or events related to these assets, such as planting, fertilizing, or harvesting. This clear separation allows for a granular understanding of farm activities and their impact on different assets.
+## Getting Started
 
-The FDM schema further structures data using a hierarchical approach. This allows for logical grouping and efficient querying. For example, a "field" asset might contain information about its boundaries and connects to various actions where it associated with. These associated actions, like "fertilizer application," include details like date, type of fertilizer, and application rate.
+If you are new to the FDM, we recommend that you start by reading the **[Getting Started](./getting-started/01-what-is-fdm.md)** section. This section provides a high-level overview of the FDM and walks you through the basics of using it in your own applications.
 
-This structured schema ensures data consistency and facilitates interoperability between different farm management systems. By adhering to the FDM schema, developers can build applications that seamlessly integrate with existing farm data, while agronomists can gain valuable insights from standardized data across multiple farms. FDM-core is designed for extensibility, allowing users to add custom attributes and actions to cater to specific needs while maintaining overall schema consistency. This balance of standardization and flexibility ensures FDM can adapt to the evolving needs of modern agriculture.
+## Core Concepts
 
-Key benefits of using the FDM include:
+The **[Core Concepts](./core-concepts/01-database-schema.md)** section provides a detailed explanation of the fundamental components of the FDM. This is the place to go if you want to understand the "what" and the "why" of each concept.
 
-* Improved Data Management: Standardizing data collection and storage through a well-defined schema simplifies data management and analysis.
-* Enhanced Interoperability: Facilitates data exchange between different systems and platforms, enabling a holistic view of farm operations.
-* Data-Driven Decision-Making: Provides a structured framework for analyzing farm data, enabling informed decisions related to resource allocation, crop management, and overall farm productivity.
-* Scalability and Extensibility: The FDM is designed to handle large datasets and can be extended to accommodate new data types and farm practices.
+## Agronomic Calculations
 
-This documentation site provides guides on core concepts, getting started with the FDM libraries, and contributing to the project. For detailed information on the functions and types exported by each package (`fdm-core`, `fdm-data`, `fdm-calculator`), please refer to the **API Reference** section. The **Architecture Overview** page in the Core Concepts section explains the different packages within the FDM monorepo and how they interact.
+The **[Agronomic Calculations](./insights/balance/01-nitrogen-balance.md)** section is dedicated to explaining the calculation engine within the FDM. Here you will find information on how to perform common agronomic calculations, such as nitrogen balance and fertilizer recommendations.
+
+## Contributing to FDM
+
+If you are a developer who wants to contribute to the FDM project, the **[Contributing to FDM](./contributing/01-project-architecture.md)** section is for you. Here you will find information on the project's architecture, how to set up a local development environment, and the release process.
+
+## FDM App
+
+The **[FDM App](./fdm-app/01-introduction-to-fdm-app.md)** section provides a brief introduction to the `fdm-app`, which is a practical, working example of an application that is built with the FDM.

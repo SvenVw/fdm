@@ -15,6 +15,7 @@ interface GeocoderResult extends GeoJSONFeature {
 
 type GeocoderControlProps = {
     marker?: boolean
+    collapsed?: boolean
     onResult?: (result: GeocoderResult) => void
     onViewportChange?: (viewport: {
         longitude: number
@@ -32,7 +33,7 @@ class GeocoderControlClass implements IControl {
         this._geocoder = new MapboxGeocoder({
             accessToken: getMapboxToken(),
             marker: props.marker,
-            collapsed: false,
+            collapsed: props.collapsed,
             countries: "nl",
             language: "nl",
         })

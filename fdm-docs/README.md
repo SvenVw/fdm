@@ -25,12 +25,12 @@ turbo run build
 ```
 
 ## Contributing
+
 We welcome contributions to improve the FDM documentation! See the contributing guidelines in the main FDM repository for details on how to contribute code, documentation, report bugs, and suggest improvements.
 
 ## Made Possible By
 
 FDM is developed by the [Nutriënten Management Instituut](https://www.nmi-agro.nl/) as part of the Horizon Europe projects: [NutriBudget](https://www.nutribudget.eu/) and [PPS BAAT](https://www.handboekbodemenbemesting.nl/nl/handboekbodemenbemesting/pps-baat.htm).
-
 
 ## Contact
 
