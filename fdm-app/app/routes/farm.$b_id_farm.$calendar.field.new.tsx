@@ -9,15 +9,12 @@ import {
     getFields,
 } from "@svenvw/fdm-core"
 import type { Feature, FeatureCollection, Polygon } from "geojson"
-import { useCallback, useState } from "react"
+import { useState } from "react"
 import {
-    GeolocateControl,
     Layer,
     Map as MapGL,
-    NavigationControl,
-    type ViewState, // Import ViewState for onViewportChange
-    type ViewStateChangeEvent, // Import ViewStateChangeEvent for onViewportChange
-    type LayerProps, // Import LayerProps to fix casting errors
+    type ViewState,
+    type ViewStateChangeEvent,
 } from "react-map-gl/mapbox"
 import {
     type ActionFunctionArgs,
@@ -29,7 +26,7 @@ import {
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
-import { Controls } from "~/components/blocks/atlas/atlas-controls" // Import Controls
+import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import {
     FieldsPanelHover,
     FieldsPanelZoom,
@@ -206,8 +203,9 @@ export default function Index() {
             ? getViewState(fieldsSaved)
             : getViewState(null)
 
-    const [viewState, setViewState] = useState<ViewState>(initialViewState as ViewState)
-
+    const [viewState, setViewState] = useState<ViewState>(
+        initialViewState as ViewState,
+    )
 
     const fieldsAvailableId = "fieldsAvailable"
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
@@ -330,14 +328,13 @@ export default function Index() {
                                     }
                                 }}
                             >
-                                {/* Replaced direct controls with <Controls /> */}
                                 <Controls
                                     onViewportChange={(viewport) =>
                                         setViewState((currentViewState) => ({
                                             ...currentViewState,
-                                            ...viewport, // Spread viewport directly
-                                            pitch: currentViewState.pitch, // Keep current pitch
-                                            bearing: currentViewState.bearing, // Keep current bearing
+                                            ...viewport,
+                                            pitch: currentViewState.pitch,
+                                            bearing: currentViewState.bearing,
                                         }))
                                     }
                                     showFields={showFields}
@@ -352,15 +349,30 @@ export default function Index() {
                                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                     redirectToDetailsPage={false}
                                 >
-                                    <Layer {...({...fieldsAvailableStyle, layout: layerLayout} as any)} />
+                                    <Layer
+                                        {...({
+                                            ...fieldsAvailableStyle,
+                                            layout: layerLayout,
+                                        } as any)}
+                                    />
                                 </FieldsSourceAvailable>
 
                                 <FieldsSourceNotClickable
                                     id={fieldsSavedId}
                                     fieldsData={fieldsSaved}
                                 >
-                                    <Layer {...({...fieldsSavedStyle, layout: layerLayout} as any)} />
-                                    <Layer {...({...fieldsSavedOutlineStyle, layout: layerLayout} as any)} />
+                                    <Layer
+                                        {...({
+                                            ...fieldsSavedStyle,
+                                            layout: layerLayout,
+                                        } as any)}
+                                    />
+                                    <Layer
+                                        {...({
+                                            ...fieldsSavedOutlineStyle,
+                                            layout: layerLayout,
+                                        } as any)}
+                                    />
                                 </FieldsSourceNotClickable>
 
                                 <div className="fields-panel grid gap-4 w-[350px]">
