@@ -46,11 +46,13 @@ import type { FieldExtended } from "./columns"
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    canAddItem: boolean
 }
 
 export function DataTable<TData extends FieldExtended, TValue>({
     columns,
     data,
+    canAddItem,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -212,51 +214,56 @@ export function DataTable<TData extends FieldExtended, TValue>({
                         </DropdownMenuContent>
                     </DropdownMenu>
                     <FieldFilterToggle />
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <div>
-                                    {isFertilizerButtonDisabled ? (
-                                        <Button
-                                            disabled={
-                                                isFertilizerButtonDisabled
-                                            }
-                                        >
-                                            <Plus className="mr-2 h-4 w-4" />
-                                            Bemesting
-                                        </Button>
-                                    ) : (
-                                        <NavLink
-                                            to={`/farm/${b_id_farm}/${calendar}/field/fertilizer?fieldIds=${selectedFieldIds.map(encodeURIComponent).join(",")}`}
-                                        >
+                    {canAddItem && (
+                        <>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <div>
+                                            {isFertilizerButtonDisabled ? (
+                                                <Button
+                                                    disabled={
+                                                        isFertilizerButtonDisabled
+                                                    }
+                                                >
+                                                    <Plus className="mr-2 h-4 w-4" />
+                                                    Bemesting
+                                                </Button>
+                                            ) : (
+                                                <NavLink
+                                                    to={`/farm/${b_id_farm}/${calendar}/field/fertilizer?fieldIds=${selectedFieldIds.map(encodeURIComponent).join(",")}`}
+                                                >
+                                                    <Button>
+                                                        <Plus className="mr-2 h-4 w-4" />
+                                                        Bemesting
+                                                    </Button>
+                                                </NavLink>
+                                            )}
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{fertilizerTooltipContent}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <NavLink to={"./new"}>
                                             <Button>
                                                 <Plus className="mr-2 h-4 w-4" />
-                                                Bemesting
+                                                Nieuw perceel
                                             </Button>
                                         </NavLink>
-                                    )}
-                                </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>{fertilizerTooltipContent}</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <NavLink to={"./new"}>
-                                    <Button>
-                                        <Plus className="mr-2 h-4 w-4" />
-                                        Nieuw perceel
-                                    </Button>
-                                </NavLink>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>Voeg een nieuw perceel toe</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>Voeg een nieuw perceel toe</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </>
+                    )}
                 </div>
             </div>
             <div className="rounded-md border grow relative overflow-x-auto">

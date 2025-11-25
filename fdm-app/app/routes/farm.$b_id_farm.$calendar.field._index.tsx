@@ -5,6 +5,7 @@ import {
     getFertilizerApplications,
     getFertilizers,
     getFields,
+    hasPermission,
 } from "@svenvw/fdm-core"
 import {
     data,
@@ -154,6 +155,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         (x) => x.parameter === "b_soiltype_agr",
                     )?.value ?? null
 
+                const has_write_permission = await hasPermission(
+                    fdm,
+                    "field",
+                    "write",
+                    field.b_id,
+                    session.principal_id,
+                )
                 return {
                     b_id: field.b_id,
                     b_name: field.b_name,
@@ -163,8 +171,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     b_soiltype_agr: b_soiltype_agr,
                     b_area: Math.round(field.b_area * 10) / 10,
                     b_isproductive: field.b_isproductive ?? true,
+                    has_write_permission: has_write_permission,
                 }
             }),
+        )
+
+        const farmWritePermission = await hasPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
         )
 
         // Return user information from loader
@@ -174,6 +191,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fieldOptions: fieldOptions,
             fieldsExtended: fieldsExtended,
             userName: session.userName,
+            farmWritePermission: farmWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -262,6 +280,7 @@ export default function FarmFieldIndex() {
                                 <DataTable
                                     columns={columns}
                                     data={filteredFields}
+                                    canAddItem={loaderData.farmWritePermission}
                                 />
                             </div>
                         </FarmContent>
