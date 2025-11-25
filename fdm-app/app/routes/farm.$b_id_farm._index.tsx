@@ -115,6 +115,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             "share",
             b_id_farm,
             session.principal_id,
+            { fallback: true },
         )
         // Check if user is allowed to delete farm
         let canDeleteFarm = await isAllowedToDeleteFarm(

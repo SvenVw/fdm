@@ -102,6 +102,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             "write",
             b_id,
             session.principal_id,
+            { fallback: true },
         )
 
         const soilAnalysisWritePermissionsEntries = await Promise.all(
@@ -113,6 +114,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     "write",
                     analysis.a_id,
                     session.principal_id,
+                    { fallback: true },
                 ),
             ]),
         )

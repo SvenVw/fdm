@@ -173,6 +173,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             "write",
             b_lu,
             session.principal_id,
+            { fallback: true },
         )
 
         // Return user information from loader

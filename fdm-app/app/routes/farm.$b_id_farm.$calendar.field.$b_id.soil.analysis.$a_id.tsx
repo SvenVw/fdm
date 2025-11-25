@@ -99,7 +99,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             (item: { parameter: string }) => soilAnalysis[item.parameter],
         )
 
-        const soilAnalysisWritePermission = await hasPermission(fdm, "soil_analysis", "write", a_id, session.principal_id)
+        const soilAnalysisWritePermission = await hasPermission(
+            fdm,
+            "soil_analysis",
+            "write",
+            a_id,
+            session.principal_id,
+            { fallback: true },
+        )
 
         // Return user information from loader
         return {

@@ -103,7 +103,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })),
         )
 
-        const farmWritePermission = await hasPermission(fdm, "farm", "write", b_id_farm, session.principal_id)
+        const farmWritePermission = await hasPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+            { fallback: true },
+        )
 
         // Return user information from loader
         return {

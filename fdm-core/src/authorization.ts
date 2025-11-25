@@ -209,7 +209,7 @@ export async function checkPermission(
 }
 
 /**
- * Gets the granting resource type and ID if the principal has permission to perform the action in the given resource.
+ * Returns whether the principal has permission to perform the action in the given resource.
  *
  * If an action is actually going to be taken based on the result, you should use `checkPermission` instead.
  *
@@ -218,7 +218,8 @@ export async function checkPermission(
  * @param action - The action the principal intends to perform.
  * @param resource_id - The unique identifier of the specific resource.
  * @param principal_id - The principal identifier(s); supports a single ID or an array.
- * @returns Resolves to true if the principal is permitted to perform the action.
+ * @param options - Options to customize the behavior
+ * @returns Resolves to true if the principal is permitted to perform the action. Returns undefined in case of error.
  */
 export async function hasPermission(
     fdm: FdmType,
@@ -226,6 +227,10 @@ export async function hasPermission(
     action: Action,
     resource_id: string,
     principal_id: PrincipalId,
+    options?: {
+        /** The value to return in case of error. Omit if you would like the return promise to be rejected instead. */
+        fallback?: boolean
+    },
 ) {
     try {
         return !!(await getPermission(
@@ -236,6 +241,9 @@ export async function hasPermission(
             principal_id,
         ))
     } catch (err) {
+        if (options && typeof options.fallback !== "undefined") {
+            return options.fallback
+        }
         const message = "Exception for hasPermission"
         throw handleError(err, message, {
             resource: resource,

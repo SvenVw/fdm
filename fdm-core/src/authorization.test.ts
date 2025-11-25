@@ -5,6 +5,7 @@ import {
     checkPermission,
     getRolesOfPrincipalForResource,
     grantRole,
+    hasPermission,
     listPrincipalsForResource,
     listResources,
     resources,
@@ -147,6 +148,63 @@ describe("Authorization Functions", () => {
             expect(auditLogs[0].target_resource_id).toBe(farm_id)
             expect(auditLogs[0].action).toBe("read")
             expect(auditLogs[0].allowed).toBe(false)
+        })
+    })
+
+    describe("hasPermission", () => {
+        it("should not store the audit log", async () => {
+            const principal_id_new = createId()
+
+            await expect(
+                hasPermission(fdm, "farm", "read", farm_id, principal_id_new),
+            ).resolves.toBe(false)
+
+            const auditLogs = await fdm
+                .select()
+                .from(authZSchema.audit)
+                .where(eq(authZSchema.audit.principal_id, principal_id_new))
+                .orderBy(desc(authZSchema.audit.audit_timestamp))
+            expect(auditLogs).toHaveLength(0)
+        })
+
+        it("should return the fallback value when specified", async () => {
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+            await expect(
+                hasPermission(
+                    fdm,
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
+                    "unknown_resource" as any,
+                    "read",
+                    farm_id,
+                    principal_id,
+                    { fallback: true },
+                ),
+            ).resolves.toBe(true)
+            await expect(
+                hasPermission(
+                    fdm,
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
+                    "unknown_resource" as any,
+                    "read",
+                    farm_id,
+                    principal_id,
+                    { fallback: false },
+                ),
+            ).resolves.toBe(false)
+        })
+
+        it("should throw an error if the fallback value is not specified", async () => {
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+            await expect(
+                hasPermission(
+                    fdm,
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
+                    "unknown_resource" as any,
+                    "read",
+                    farm_id,
+                    principal_id,
+                ),
+            ).rejects.toThrowError("Exception for checkPermission")
         })
     })
 

@@ -94,6 +94,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             "write",
             b_id_harvesting,
             session.principal_id,
+            { fallback: true },
         )
 
         // Get details of cultivation

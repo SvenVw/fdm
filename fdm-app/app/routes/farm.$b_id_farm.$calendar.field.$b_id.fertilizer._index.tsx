@@ -172,6 +172,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             "write",
             b_id,
             session.principal_id,
+            { fallback: true },
         )
 
         const fertilizerApplicationWritePermissionsEntries = await Promise.all(
@@ -185,6 +186,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                             "write",
                             app.p_app_id,
                             session.principal_id,
+                            { fallback: true },
                         ),
                     ] as [string, boolean],
             ),
