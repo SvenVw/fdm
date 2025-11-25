@@ -361,18 +361,8 @@ export default function Index() {
                                     id={fieldsSavedId}
                                     fieldsData={fieldsSaved}
                                 >
-                                    <Layer
-                                        {...({
-                                            ...fieldsSavedStyle,
-                                            layout: layerLayout,
-                                        } as any)}
-                                    />
-                                    <Layer
-                                        {...({
-                                            ...fieldsSavedOutlineStyle,
-                                            layout: layerLayout,
-                                        } as any)}
-                                    />
+                                    <Layer {...fieldsSavedStyle} />
+                                    <Layer {...fieldsSavedOutlineStyle} />
                                 </FieldsSourceNotClickable>
 
                                 <div className="fields-panel grid gap-4 w-[350px]">

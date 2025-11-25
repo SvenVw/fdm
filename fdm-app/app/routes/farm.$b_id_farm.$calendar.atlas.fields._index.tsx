@@ -194,12 +194,6 @@ export default function FarmAtlasFieldsBlock() {
                 <Layer {...fieldsAvailableStyle} layout={layerLayout} />
             </FieldsSourceAvailable>
 
-            {fields ? (
-                <FieldsSourceNotClickable id={id} fieldsData={fields}>
-                    <Layer {...fieldsSavedStyle} layout={layerLayout} />
-                    <Layer {...fieldsSavedOutlineStyle} layout={layerLayout} />
-                </FieldsSourceNotClickable>
-            ) : null}
             <div className="fields-panel grid gap-4 w-[350px]">
                 <FieldsPanelHover
                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
