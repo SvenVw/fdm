@@ -1,4 +1,4 @@
-import { getFarms, getField, getFields } from "@svenvw/fdm-core"
+import { getFarms, getField, getFields, hasPermission } from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
@@ -150,11 +150,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/atlas`,
                 title: "Kaart",
             },
-            {
+        ]
+
+        const fieldWritePermission = await hasPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            session.principal_id,
+        )
+
+        if (fieldWritePermission) {
+            sidebarPageItems.push({
                 to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/delete`,
                 title: "Verwijderen",
-            },
-        ]
+            })
+        }
 
         // Return user information from loader
         return {
