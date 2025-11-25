@@ -14,5 +14,4 @@ export interface CultivationOption {
 
 export interface CultivationsFormProps {
     options: CultivationOption[]
-    editable: boolean
 }

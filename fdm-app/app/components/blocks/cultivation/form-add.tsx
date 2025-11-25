@@ -19,14 +19,13 @@ import type { CultivationsFormProps } from "./types"
 
 export function CultivationAddFormDialog({
     options,
-    editable = true,
 }: CultivationsFormProps) {
     const [isOpen, setIsOpen] = useState(false)
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
-                <Button disabled={!editable}>Gewas toevoegen</Button>
+                <Button>Gewas toevoegen</Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
@@ -44,7 +43,8 @@ export function CultivationAddFormDialog({
 function CultivationAddForm({
     options,
     onSuccess,
-}: CultivationsFormProps & { onSuccess?: () => void }) {
+    editable = true,
+}: CultivationsFormProps & { editable?: boolean; onSuccess?: () => void }) {
     const form = useRemixForm<z.infer<typeof CultivationAddFormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(CultivationAddFormSchema),
@@ -73,7 +73,7 @@ function CultivationAddForm({
                 onSubmit={form.handleSubmit}
                 method="post"
             >
-                <fieldset disabled={form.formState.isSubmitting}>
+                <fieldset disabled={!editable || form.formState.isSubmitting}>
                     <div className="grid gap-4">
                         <div className="col-span-1">
                             <Combobox
