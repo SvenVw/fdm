@@ -112,10 +112,16 @@ export function FertilizerApplicationCard({
         if (savedFormValues && !isDialogOpen) {
             if (savedFormValues.p_app_id) {
                 // Do not open the form if there is a risk it will create a new application
-                if (applicationToEdit) {
+                if (
+                    applicationToEdit &&
+                    (canModifyFertilizerApplication[
+                        applicationToEdit.p_app_id
+                    ] ??
+                        true)
+                ) {
                     setIsDialogOpen(true)
                 }
-            } else {
+            } else if (canCreateFertilizerApplication) {
                 setIsDialogOpen(true)
             }
         }
