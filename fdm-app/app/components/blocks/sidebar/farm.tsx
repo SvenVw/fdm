@@ -117,7 +117,7 @@ export function SidebarFarm({
                                 <House />
                                 <span>{farmLinkDisplay}</span>
                                 {farmRole && (
-                                    <Badge key={farmRole} variant="outline">
+                                    <Badge key={farmRole} variant="outline" className="ml-auto">
                                         {farmRole === "owner"
                                             ? "Eigenaar"
                                             : farmRole === "advisor"
