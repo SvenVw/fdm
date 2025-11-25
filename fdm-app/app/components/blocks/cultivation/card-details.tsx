@@ -39,7 +39,6 @@ export function CultivationDetailsCard({
     const fetcher = useFetcher()
     const form = useRemixForm<CultivationDetailsFormSchemaType>({
         resolver: zodResolver(CultivationDetailsFormSchema),
-        disabled: !editable,
         mode: "onTouched",
         defaultValues: {
             b_lu_start: new Date(cultivation.b_lu_start),
@@ -101,6 +100,7 @@ export function CultivationDetailsCard({
                     <Form onSubmit={form.handleSubmit} method="post">
                         <fieldset
                             disabled={
+                                !editable ||
                                 form.formState.isSubmitting ||
                                 fetcher.state === "submitting"
                             }
