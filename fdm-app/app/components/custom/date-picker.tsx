@@ -111,6 +111,12 @@ export function DatePicker<TFieldValues extends FieldValues>({
         }
     }, [form, name, date])
 
+    React.useEffect(() => {
+        if (disabled && open) {
+            setOpen(false)
+        }
+    }, [disabled, open])
+
     return (
         <FormField
             control={form.control}
@@ -157,6 +163,7 @@ export function DatePicker<TFieldValues extends FieldValues>({
                                     id={`${field.name}-picker`}
                                     variant="ghost"
                                     className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
+                                    disabled={disabled}
                                 >
                                     <CalendarIcon className="size-3.5" />
                                     <span className="sr-only">
