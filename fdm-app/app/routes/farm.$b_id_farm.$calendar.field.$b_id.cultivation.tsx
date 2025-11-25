@@ -49,6 +49,7 @@ export const meta: MetaFunction = () => {
  *   - cultivationsCatalogueOptions: A list of catalogue options for cultivations, formatted for use in a combobox.
  *   - cultivations: The list of cultivations associated with the field.
  *   - harvests: The harvest data for the first collection of cultivation harvests, or an empty array if none are available.
+ *   - fieldWritePermissions: A Boolean indicating if the user is able to add cultivations to the field. Set to true if the information could not be obtained.
  *
  * @throws {Response} When the "b_id_farm" or "b_id" parameters are missing or if the field is not found.
  */

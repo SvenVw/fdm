@@ -60,6 +60,7 @@ export const meta: MetaFunction = () => {
  *   - harvests: The list of harvests related to the cultivation.
  *   - b_lu_harvestable: The harvestable type from the catalogue, or "none" if not applicable.
  *   - b_id_farm: The farm ID.
+ *   - cultivationWritePermission: A Boolean indicating if the user is able to edit or delete the cultivation or add harvests to it. Set to true if the information could not be obtained.
  *
  * @throws {Response} If the farm, field, or cultivation ID is missing (status 400) or if the field or cultivation cannot be found (status 404).
  */

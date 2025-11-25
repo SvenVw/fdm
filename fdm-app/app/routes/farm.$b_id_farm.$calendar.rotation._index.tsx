@@ -62,6 +62,7 @@ export const meta: MetaFunction = () => {
  * - farmOptions: An array of validated farm options.
  * - fieldOptions: A sorted array of processed field options.
  * - userName: The name of the current user.
+ * - farmWritePermission: A Boolean indicating if the user is able to add things to the farm. Set to true if the information could not be obtained.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
