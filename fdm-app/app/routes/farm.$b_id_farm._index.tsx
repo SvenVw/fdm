@@ -1,5 +1,11 @@
 import { cowHead } from "@lucide/lab"
-import { getFarm, getFarms, getFields, hasPermission } from "@svenvw/fdm-core"
+import {
+    getFarm,
+    getFarms,
+    getFields,
+    hasPermission,
+    isAllowedToDeleteFarm,
+} from "@svenvw/fdm-core"
 import {
     ArrowRightLeft,
     BookOpenText,
@@ -103,13 +109,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
-        const farmWritePermission = await hasPermission(
+        const farmSharePermission = hasPermission(
             fdm,
             "farm",
-            "write",
+            "share",
             b_id_farm,
             session.principal_id,
         )
+        // Check if user is allowed to delete farm
+        let canDeleteFarm = await isAllowedToDeleteFarm(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+        // Add temporary workaround (until implemented in fdm-core) so that advisors are not able to delete a farm
+        if (canDeleteFarm && farm.roles.includes("advisor")) {
+            canDeleteFarm = false
+        }
 
         // Return the farm ID and session info
         return {
@@ -119,7 +135,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             farmArea: Math.round(farmArea),
             farmOptions: farmOptions,
             roles: farm.roles,
-            farmWritePermission: farmWritePermission,
+            canDeleteFarm: canDeleteFarm,
+            farmSharePermission: await farmSharePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -458,7 +475,7 @@ export default function FarmDashboardIndex() {
                                                     Beweiding
                                                 </NavLink>
                                             </Button>
-                                            {loaderData.farmWritePermission && (
+                                            {loaderData.farmSharePermission && (
                                                 <Button
                                                     variant="ghost"
                                                     className="w-full justify-start"
@@ -470,7 +487,7 @@ export default function FarmDashboardIndex() {
                                                     </NavLink>
                                                 </Button>
                                             )}
-                                            {loaderData.farmWritePermission && (
+                                            {loaderData.canDeleteFarm && (
                                                 <Button
                                                     variant="ghost"
                                                     className="w-full justify-start"
