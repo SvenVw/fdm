@@ -8,6 +8,7 @@ import {
     getFertilizers,
     getFields,
     getHarvests,
+    hasPermission,
 } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -18,13 +19,13 @@ import {
 } from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
 import {
     columns,
     type RotationExtended,
 } from "~/components/blocks/rotation/columns"
 import { DataTable } from "~/components/blocks/rotation/table"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
 import { SidebarInset } from "~/components/ui/sidebar"
@@ -303,6 +304,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fieldsExtended,
             cultivationCatalogue,        
         )
+        
+        const farmWritePermission = await hasPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+        )
 
         // Return user information from loader
         return {
@@ -311,6 +320,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fieldOptions: fieldOptions,
             rotationExtended: rotationExtended, // Return filtered data
             userName: session.userName,
+            farmWritePermission: farmWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -389,6 +399,7 @@ export default function FarmRotationIndex() {
                                 <DataTable
                                     columns={columns}
                                     data={loaderData.rotationExtended}
+                                    canAddItem={loaderData.farmWritePermission}
                                 />
                             </div>
                         </FarmContent>
