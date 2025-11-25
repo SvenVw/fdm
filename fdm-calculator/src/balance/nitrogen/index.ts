@@ -332,10 +332,10 @@ export function calculateNitrogenBalancesFieldToFarm(
         totalFarmEmission = totalFarmEmission.add(
             fieldResult.balance.emission.total.times(fieldArea),
         )
-        totalFarmEmissionAmmonia = totalFarmEmission.add(
+        totalFarmEmissionAmmonia = totalFarmEmissionAmmonia.add(
             fieldResult.balance.emission.ammonia.total.times(fieldArea),
         )
-        totalFarmEmissionNitrate = totalFarmEmission.add(
+        totalFarmEmissionNitrate = totalFarmEmissionNitrate.add(
             fieldResult.balance.emission.nitrate.total.times(fieldArea),
         )
         totalFarmTarget = totalFarmTarget.add(
