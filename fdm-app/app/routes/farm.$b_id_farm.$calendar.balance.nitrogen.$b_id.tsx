@@ -398,7 +398,7 @@ function NitrogenBalance({
                             balance={result.balance}
                             supply={result.supply.total}
                             removal={result.removal.total}
-                            emission={result.emission.total}
+                            emission={result.emission}
                         />
                     </CardContent>
                 </Card>
