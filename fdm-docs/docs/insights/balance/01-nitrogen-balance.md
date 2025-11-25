@@ -282,7 +282,7 @@ Ammonia emissions from grazing are currently not calculated in the FDM Calculato
 * **Field Surplus (Field Balance):** For each field, the **N Surplus** is calculated as `N Supply - N Removal - Ammonia Emission`. This value is reported as the `balance` for each field in the output.
 * **Farm Balance:**
     1. The total N supplied, removed, and total emitted (including ammonia and nitrate) for each field (kg N / ha * field area (ha) = kg N per field) are summed across all fields.
-    2. These total farm-level amounts (in kg N) are then divided by the total farm area (ha) to provide an average farm-level balance (`N Supply - N Removal - Total N Emission`) in kg N / ha.
+    2. These total farm-level amounts (in kg N) are then divided by the total farm area (ha) to provide an average farm-level balance (`N Supply - N Removal -  Ammonia Emission`) in kg N / ha.
 
 ## 5. Output
 
