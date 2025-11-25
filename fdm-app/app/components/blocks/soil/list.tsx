@@ -9,12 +9,14 @@ import type { SoilAnalysis } from "./types"
 export function SoilAnalysesList({
     soilAnalyses,
     fetcher,
+    canModifySoilAnalysis = {},
 }: {
     soilAnalyses: SoilAnalysis[]
     fetcher: {
         state: string
         submit: (data: { a_id: string }, options: { method: string }) => void
     }
+    canModifySoilAnalysis?: Record<string, boolean>
 }) {
     const handleDelete = (a_id: string) => {
         if (fetcher.state === "submitting") return
@@ -47,49 +49,53 @@ export function SoilAnalysesList({
                             </p>
                         </div>
                         <div>{""}</div>
-                        <div className="justify-self-end">
-                            <div className="space-x-4">
-                                <NavLink
-                                    to={`./analysis/${analysis.a_id}`}
-                                    asChild
-                                    className={cn(
-                                        "pointer-events-auto",
-                                        analysis.a_source === "nl-other-nmi"
-                                            ? "pointer-events-none"
-                                            : "",
-                                    )}
-                                >
+                        {(canModifySoilAnalysis[analysis.a_id] ?? true) ? (
+                            <div className="justify-self-end">
+                                <div className="space-x-4">
+                                    <NavLink
+                                        to={`./analysis/${analysis.a_id}`}
+                                        asChild
+                                        className={cn(
+                                            "pointer-events-auto",
+                                            analysis.a_source === "nl-other-nmi"
+                                                ? "pointer-events-none"
+                                                : "",
+                                        )}
+                                    >
+                                        <Button
+                                            variant="default"
+                                            disabled={
+                                                fetcher.state ===
+                                                    "submitting" ||
+                                                analysis.a_source ===
+                                                    "nl-other-nmi"
+                                            }
+                                        >
+                                            Bewerk
+                                        </Button>
+                                    </NavLink>
                                     <Button
-                                        variant="default"
+                                        variant="destructive"
                                         disabled={
                                             fetcher.state === "submitting" ||
                                             analysis.a_source === "nl-other-nmi"
                                         }
+                                        onClick={() => {
+                                            handleDelete(analysis.a_id)
+                                        }}
                                     >
-                                        Bewerk
+                                        {fetcher.state === "submitting" ? (
+                                            <div className="flex items-center space-x-2">
+                                                <LoadingSpinner />
+                                                <span>Verwijderen...</span>
+                                            </div>
+                                        ) : (
+                                            "Verwijder"
+                                        )}
                                     </Button>
-                                </NavLink>
-                                <Button
-                                    variant="destructive"
-                                    disabled={
-                                        fetcher.state === "submitting" ||
-                                        analysis.a_source === "nl-other-nmi"
-                                    }
-                                    onClick={() => {
-                                        handleDelete(analysis.a_id)
-                                    }}
-                                >
-                                    {fetcher.state === "submitting" ? (
-                                        <div className="flex items-center space-x-2">
-                                            <LoadingSpinner />
-                                            <span>Verwijderen...</span>
-                                        </div>
-                                    ) : (
-                                        "Verwijder"
-                                    )}
-                                </Button>
+                                </div>
                             </div>
-                        </div>
+                        ) : null}
                     </div>
                 ))}
             </div>

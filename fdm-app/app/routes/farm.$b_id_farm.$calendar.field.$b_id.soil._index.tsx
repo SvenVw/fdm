@@ -3,6 +3,7 @@ import {
     getField,
     getSoilAnalyses,
     getSoilParametersDescription,
+    hasPermission,
     removeSoilAnalysis,
 } from "@svenvw/fdm-core"
 import { Plus } from "lucide-react"
@@ -95,12 +96,38 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get soil parameter descriptions
         const soilParameterDescription = getSoilParametersDescription()
 
+        const fieldWritePermission = hasPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            session.principal_id,
+        )
+
+        const soilAnalysisWritePermissionsEntries = await Promise.all(
+            soilAnalyses.map(async (analysis) => [
+                analysis.a_id,
+                await hasPermission(
+                    fdm,
+                    "soil_analysis",
+                    "write",
+                    analysis.a_id,
+                    session.principal_id,
+                ),
+            ]),
+        )
+        const soilAnalysisWritePermissions = Object.fromEntries(
+            soilAnalysisWritePermissionsEntries,
+        )
+
         // Return user information from loader
         return {
             field: field,
+            fieldWritePermission: await fieldWritePermission,
             currentSoilData: currentSoilData,
             soilParameterDescription: soilParameterDescription,
             soilAnalyses: soilAnalyses,
+            soilAnalysisWritePermissions: soilAnalysisWritePermissions,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -133,12 +160,14 @@ export default function FarmFieldSoilOverviewBlock() {
                         <TabsTrigger value="parameters">Parameters</TabsTrigger>
                         <TabsTrigger value="analyses">Analyses</TabsTrigger>
                     </TabsList>
-                    <Button asChild>
-                        <NavLink to="./analysis/new">
-                            <Plus />
-                            Bodemanalyse toevoegen
-                        </NavLink>
-                    </Button>
+                    {loaderData.fieldWritePermission && (
+                        <Button asChild>
+                            <NavLink to="./analysis/new">
+                                <Plus />
+                                Bodemanalyse toevoegen
+                            </NavLink>
+                        </Button>
+                    )}
                 </div>
             </div>
             <Separator />
@@ -155,11 +184,13 @@ export default function FarmFieldSoilOverviewBlock() {
                                     bodem bij te houden
                                 </p>
                             </div>
-                            <Button asChild>
-                                <NavLink to="./analysis/new">
-                                    Bodemanalyse toevoegen
-                                </NavLink>
-                            </Button>
+                            {loaderData.fieldWritePermission && (
+                                <Button asChild>
+                                    <NavLink to="./analysis/new">
+                                        Bodemanalyse toevoegen
+                                    </NavLink>
+                                </Button>
+                            )}
                         </div>
                     ) : (
                         <SoilDataCards
@@ -174,6 +205,9 @@ export default function FarmFieldSoilOverviewBlock() {
                     <SoilAnalysesList
                         soilAnalyses={loaderData.soilAnalyses}
                         fetcher={fetcher}
+                        canModifySoilAnalysis={
+                            loaderData.soilAnalysisWritePermissions
+                        }
                     />
                 </TabsContent>
             </div>
