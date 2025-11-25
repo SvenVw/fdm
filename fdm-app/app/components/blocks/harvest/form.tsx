@@ -509,7 +509,9 @@ export function HarvestFormDialog(props: HarvestFormDialogProps) {
                     method="post"
                     action={action}
                 >
-                    <FieldSet disabled={form.formState.isSubmitting}>
+                    <FieldSet
+                        disabled={!editable || form.formState.isSubmitting}
+                    >
                         <DialogContent className="gap-6">
                             <DialogHeader>
                                 <DialogTitle>
@@ -592,7 +594,7 @@ export function HarvestFormDialog(props: HarvestFormDialogProps) {
 }
 
 export function HarvestForm(props: HarvestFormDialogProps) {
-    const { b_lu_harvest_date, action } = props
+    const { b_lu_harvest_date, action, editable } = props
     const fetcher = useFetcher()
 
     const form = useHarvestRemixForm(props)
@@ -614,7 +616,7 @@ export function HarvestForm(props: HarvestFormDialogProps) {
                     action={action}
                 >
                     <fieldset
-                        disabled={form.formState.isSubmitting}
+                        disabled={!editable || form.formState.isSubmitting}
                         className="space-y-8"
                     >
                         <HarvestFields
