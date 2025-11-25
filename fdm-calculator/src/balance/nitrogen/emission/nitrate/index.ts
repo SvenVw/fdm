@@ -112,7 +112,7 @@ export function calculateNitrogenEmissionViaNitrate(
     // Emission only occurs if there is a surplus (balance > 0)
     let nitrateEmission = new Decimal(0)
     if (balance.gt(0)) {
-        nitrateEmission = balance.times(nitrateLeachingFactor)
+        nitrateEmission = balance.times(nitrateLeachingFactor).times(-1)
     }
 
     const nitrate = {
