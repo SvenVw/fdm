@@ -38,7 +38,7 @@ export function SidebarFarm({
 }) {
     function getSuperiorRole(allRoles: ("owner" | "advisor" | "researcher")[]) {
         if (allRoles.length > 0) {
-            const ordering: unknown[] = ["owner", "advisor", "researcher"]
+            const ordering = ["owner", "advisor", "researcher"] as const
             const sorted = [...allRoles].sort(
                 (a, b) => ordering.indexOf(a) - ordering.indexOf(b),
             )
