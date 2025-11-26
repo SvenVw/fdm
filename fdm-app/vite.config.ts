@@ -37,5 +37,8 @@ export default defineConfig((env) => {
             sourcemap: true,
             target: "ES2022",
         },
+        optimizeDeps: {
+            exclude: ["@svenvw/fdm-core", "@svenvw/fdm-data", "@svenvw/fdm-calculator"],
+        },
     }
 })

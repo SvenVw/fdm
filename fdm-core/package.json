@@ -16,14 +16,14 @@
         "url": "https://github.com/SvenVw"
     },
     "type": "module",
-    "main": "./dist/fdm-core.esm.js",
-    "module": "./dist/fdm-core.js",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
         ".": {
             "import": {
                 "types": "./dist/index.d.ts",
-                "default": "./dist/fdm-core.esm.js"
+                "default": "./dist/index.js"
             }
         }
     },
@@ -36,7 +36,7 @@
         "db:generate": "npx drizzle-kit generate",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
         "dotenvx": "dotenvx",
-        "build": "dotenvx run -- rollup -c",
+        "build": "dotenvx run -- rollup -c && tsc -p tsconfig.build.json",
         "check-types": "tsc --noEmit",
         "preinstall": "npx only-allow pnpm",
         "preview": "vite preview",
@@ -49,7 +49,6 @@
         "@rollup/plugin-commonjs": "catalog:",
         "@rollup/plugin-node-resolve": "catalog:",
         "@rollup/plugin-terser": "catalog:",
-        "@rollup/plugin-typescript": "catalog:",
         "@svenvw/fdm-data": "workspace:^0.18.1",
         "@types/node": "^24.10.1",
         "@vitest/coverage-v8": "catalog:",
@@ -57,6 +56,7 @@
         "fs-extra": "^11.3.2",
         "globals": "^16.5.0",
         "rollup": "catalog:",
+        "rollup-plugin-esbuild": "catalog:",
         "rollup-plugin-polyfill-node": "catalog:",
         "typedoc": "catalog:",
         "typedoc-plugin-missing-exports": "catalog:",

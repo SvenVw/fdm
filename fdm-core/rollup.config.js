@@ -1,32 +1,34 @@
 import commonjs from "@rollup/plugin-commonjs"
 import resolve from "@rollup/plugin-node-resolve"
-import terser from "@rollup/plugin-terser"
-import typescript from "@rollup/plugin-typescript"
 import { copy } from "fs-extra"
+import esbuild from "rollup-plugin-esbuild"
 import packageJson from "./package.json" with { type: "json" }
 
 const isProd = process.env.NODE_ENV === "production"
 
+const external = [
+    ...Object.keys(packageJson.dependencies || {}),
+    ...Object.keys(packageJson.peerDependencies || {}),
+    "fs", "os", "net", "tls", "crypto", "stream"
+]
+
 export default {
     input: "src/index.ts",
     output: {
-        file: "dist/fdm-core.esm.js",
+        dir: "dist",
         format: "esm",
-        inlineDynamicImports: true,
+        preserveModules: true,
+        entryFileNames: "[name].js",
         sourcemap: isProd ? true : "inline",
     },
     plugins: [
         resolve({ preferBuiltins: true }),
         commonjs(),
-        typescript({
-            tsconfig: "./tsconfig.json",
+        esbuild({
             sourceMap: !isProd,
-            inlineSources: !isProd,
+            minify: isProd, // Use esbuild's minifier in production
+            target: "node20",
         }),
-        isProd &&
-            terser({
-                sourceMap: true,
-            }),
         {
             name: "copy-migrations-folder",
             closeBundle: () => {
@@ -42,15 +44,5 @@ export default {
             },
         },
     ],
-    external: [
-        ...Object.keys(packageJson.dependencies || {}),
-        ...Object.keys(packageJson.peerDependencies || {}),
-        // Retain built-ins that were explicitly listed if they are not in dependencies
-        "fs",
-        "os",
-        "net",
-        "tls",
-        "crypto",
-        "stream",
-    ],
+    external,
 }
