@@ -125,7 +125,13 @@ export function FertilizerApplicationCard({
                 setIsDialogOpen(true)
             }
         }
-    }, [savedFormValues, applicationToEdit, isDialogOpen])
+    }, [
+        savedFormValues,
+        applicationToEdit,
+        isDialogOpen,
+        canCreateFertilizerApplication,
+        canModifyFertilizerApplication,
+    ])
 
     function handleDialogOpenChange(state: boolean) {
         if (!state && params.b_id_farm && b_id_or_b_lu_catalogue) {
