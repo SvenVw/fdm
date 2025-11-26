@@ -39,8 +39,10 @@ export function SidebarFarm({
     function getSuperiorRole(allRoles: ("owner" | "advisor" | "researcher")[]) {
         if (allRoles.length > 0) {
             const ordering: unknown[] = ["owner", "advisor", "researcher"]
-            allRoles.sort((a, b) => ordering.indexOf(a) - ordering.indexOf(b))
-            return allRoles[0]
+            const sorted = [...allRoles].sort(
+                (a, b) => ordering.indexOf(a) - ordering.indexOf(b),
+            )
+            return sorted[0]
         }
         return null
     }
@@ -117,7 +119,11 @@ export function SidebarFarm({
                                 <House />
                                 <span>{farmLinkDisplay}</span>
                                 {farmRole && (
-                                    <Badge key={farmRole} variant="outline" className="ml-auto">
+                                    <Badge
+                                        key={farmRole}
+                                        variant="outline"
+                                        className="ml-auto"
+                                    >
                                         {farmRole === "owner"
                                             ? "Eigenaar"
                                             : farmRole === "advisor"

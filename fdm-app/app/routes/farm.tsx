@@ -35,12 +35,13 @@ export const meta: MetaFunction = () => {
 
 /**
  * Retrieves the session from the HTTP request and returns user information if available.
+ * Also retrieves the current farm when available.
  *
  * If the session does not contain a user, the function redirects to the "/signin" route.
  * Any errors encountered during session retrieval are processed by the designated error handler.
  *
  * @param request - The HTTP request used for obtaining session data.
- * @returns An object with a "user" property when a valid session is found.
+ * @returns An object with a "user" property when a valid session is found, and a "farm" property when b_id_farm is found in the URL.
  *
  * @throws {Error} If an error occurs during session retrieval, processed by handleLoaderError.
  */
