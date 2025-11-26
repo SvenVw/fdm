@@ -152,12 +152,14 @@ export function FertilizerApplicationCard({
                     open={isDialogOpen}
                     onOpenChange={handleDialogOpenChange}
                 >
-                    <DialogTrigger asChild>
-                        <Button disabled={!canCreateFertilizerApplication}>
-                            <Plus className="size-4" />
-                            Toevoegen
-                        </Button>
-                    </DialogTrigger>
+                    {canCreateFertilizerApplication && (
+                        <DialogTrigger asChild>
+                            <Button>
+                                <Plus className="size-4" />
+                                Toevoegen
+                            </Button>
+                        </DialogTrigger>
+                    )}
                     <DialogContent className="sm:max-w-[800px]">
                         <DialogHeader>
                             <DialogTitle className="flex flex-row items-center justify-between mr-4">
