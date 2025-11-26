@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     getField,
+    hasPermission,
     listAvailableAcquiringMethods,
     updateField,
 } from "@svenvw/fdm-core"
@@ -41,6 +42,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { cn } from "~/lib/utils"
 
 export const meta: MetaFunction = () => {
     return [
@@ -86,9 +88,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
+        const fieldWritePermission = await hasPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            session.principal_id,
+            { fallback: true },
+        )
+
         // Return user information from loader
         return {
             field: field,
+            fieldWritePermission,
             acquiringMethodOptions: listAvailableAcquiringMethods(),
         }
     } catch (error) {
@@ -233,7 +245,10 @@ export default function FarmFieldsOverviewBlock() {
                         <Button
                             type="submit"
                             disabled={form.formState.isSubmitting}
-                            className="m-auto"
+                            className={cn(
+                                "m-auto",
+                                !loaderData.fieldWritePermission && "invisible",
+                            )}
                         >
                             {form.formState.isSubmitting && <LoadingSpinner />}
                             Bijwerken
