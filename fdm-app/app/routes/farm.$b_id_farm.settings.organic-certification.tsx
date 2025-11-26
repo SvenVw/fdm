@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addOrganicCertification,
+    hasPermission,
     listOrganicCertifications,
     removeOrganicCertification,
 } from "@svenvw/fdm-core"
@@ -93,7 +94,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // For now we expect that a farm can have only 1 certification
         const organicCertification = organicCertifications[0]
 
-        return { b_id_farm, organicCertification }
+        const farmWritePermission = await hasPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+        )
+
+        return { b_id_farm, organicCertification, farmWritePermission }
     } catch (error) {
         throw handleLoaderError(error)
     }
@@ -155,7 +164,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function OrganicCertificationSettings() {
-    const { organicCertification } = useLoaderData<typeof loader>()
+    const { organicCertification, farmWritePermission } =
+        useLoaderData<typeof loader>()
     const navigation = useNavigation()
 
     const isDeleting =
@@ -309,15 +319,16 @@ export default function OrganicCertificationSettings() {
                                 Dit bedrijf heeft geen bio-certificaat
                             </EmptyTitle>
                             <EmptyDescription>
-                                Als dit bedrijf wel een bio-certificaat heeft,
-                                kunt u deze toevoegen.
+                                {farmWritePermission ? "Als dit bedrijf wel een bio-certificaat heeft, kunt u deze toevoegen." : "U hebt geen toestemming om een bio-certificaat voor dit bedrijf toe te voegen."}
                             </EmptyDescription>
                         </EmptyHeader>
-                        <EmptyContent>
-                            <DialogTrigger asChild>
-                                <Button>Voeg toe</Button>
-                            </DialogTrigger>
-                        </EmptyContent>
+                        {farmWritePermission && (
+                            <EmptyContent>
+                                <DialogTrigger asChild>
+                                    <Button>Voeg toe</Button>
+                                </DialogTrigger>
+                            </EmptyContent>
+                        )}
                     </Empty>
                     <DialogContent>
                         <RemixFormProvider {...form}>
