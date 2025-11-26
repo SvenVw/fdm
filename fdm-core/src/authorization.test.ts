@@ -106,7 +106,6 @@ describe("Authorization Functions", () => {
             },
         })
         organization_member_id = organization_member.user.id
-        console.log(organization_member_email)
     })
 
     describe("checkPermission", () => {
