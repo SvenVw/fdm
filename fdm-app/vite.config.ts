@@ -24,7 +24,9 @@ export default defineConfig((config) => {
                               authToken: process.env.SENTRY_AUTH_TOKEN,
                               release: {
                                   name: process.env.npm_package_version,
-                                  setCommits: true,
+                                  setCommits: {
+                                      auto: true,
+                                  },
                               },
                           } as SentryReactRouterBuildOptions,
                           config,

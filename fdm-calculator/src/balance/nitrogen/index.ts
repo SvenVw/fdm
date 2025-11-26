@@ -20,6 +20,7 @@ import type {
     NitrogenBalanceNumeric,
     SoilAnalysisPicked,
 } from "./types"
+import { calculateNitrogenEmissionViaNitrate } from "./emission/nitrate"
 
 /**
  * Calculates the nitrogen balance for a set of fields, considering nitrogen supply, removal, and emission.
@@ -231,6 +232,21 @@ export function calculateNitrogenBalanceField(
             fertilizerDetailsMap,
         )
 
+        // Calculate the balance
+        const balance = supply.total
+            .add(removal.total)
+            .add(emission.ammonia.total)
+
+        // Calculate the Nitrogen Emssion via Nitrate as the surplus of nitrogen balance that is leached out
+        const nitrateEmission = calculateNitrogenEmissionViaNitrate(
+            balance,
+            cultivations,
+            soilAnalysis,
+            cultivationDetailsMap,
+        )
+        emission.nitrate = nitrateEmission
+        emission.total = emission.total.add(nitrateEmission.total)
+
         // Calculate the target for the Nitrogen balance
         const target = calculateTargetForNitrogenBalance(
             cultivations,
@@ -244,9 +260,7 @@ export function calculateNitrogenBalanceField(
             b_area: fieldDetails.b_area ?? 0,
             balance: {
                 b_id: fieldDetails.b_id,
-                balance: supply.total
-                    .add(removal.total)
-                    .add(emission.ammonia.total),
+                balance: balance,
                 supply: supply,
                 removal: removal,
                 emission: emission,
@@ -292,6 +306,8 @@ export function calculateNitrogenBalancesFieldToFarm(
     let totalFarmSupply = new Decimal(0)
     let totalFarmRemoval = new Decimal(0)
     let totalFarmEmission = new Decimal(0)
+    let totalFarmEmissionAmmonia = new Decimal(0)
+    let totalFarmEmissionNitrate = new Decimal(0)
     let totalFarmTarget = new Decimal(0)
     let totalFarmArea = new Decimal(0)
 
@@ -314,7 +330,13 @@ export function calculateNitrogenBalancesFieldToFarm(
             fieldResult.balance.removal.total.times(fieldArea),
         )
         totalFarmEmission = totalFarmEmission.add(
+            fieldResult.balance.emission.total.times(fieldArea),
+        )
+        totalFarmEmissionAmmonia = totalFarmEmissionAmmonia.add(
             fieldResult.balance.emission.ammonia.total.times(fieldArea),
+        )
+        totalFarmEmissionNitrate = totalFarmEmissionNitrate.add(
+            fieldResult.balance.emission.nitrate.total.times(fieldArea),
         )
         totalFarmTarget = totalFarmTarget.add(
             fieldResult.balance.target.times(fieldArea),
@@ -331,6 +353,12 @@ export function calculateNitrogenBalancesFieldToFarm(
     const avgFarmEmission = totalFarmArea.isZero()
         ? new Decimal(0)
         : totalFarmEmission.dividedBy(totalFarmArea)
+    const avgFarmEmissionAmmonia = totalFarmArea.isZero()
+        ? new Decimal(0)
+        : totalFarmEmissionAmmonia.dividedBy(totalFarmArea)
+    const avgFarmEmissionNitrate = totalFarmArea.isZero()
+        ? new Decimal(0)
+        : totalFarmEmissionNitrate.dividedBy(totalFarmArea)
     const avgFarmTarget = totalFarmArea.isZero()
         ? new Decimal(0)
         : totalFarmTarget.dividedBy(totalFarmArea)
@@ -345,7 +373,11 @@ export function calculateNitrogenBalancesFieldToFarm(
         balance: avgFarmBalance,
         supply: avgFarmSupply,
         removal: avgFarmRemoval,
-        emission: avgFarmEmission,
+        emission: {
+            total: avgFarmEmission,
+            ammonia: avgFarmEmissionAmmonia,
+            nitrate: avgFarmEmissionNitrate,
+        },
         target: avgFarmTarget,
         fields: fieldsWithBalanceResults,
         hasErrors:

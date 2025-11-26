@@ -5,8 +5,10 @@ import {
 } from "@svenvw/fdm-calculator"
 import { getFarm, getFields } from "@svenvw/fdm-core"
 import {
+    ArrowDown,
     ArrowDownToLine,
     ArrowRight,
+    ArrowRightFromLine,
     ArrowRightLeft,
     ArrowUpFromLine,
     CircleAlert,
@@ -213,7 +215,7 @@ function FarmBalanceNitrogenOverview({
 
     return (
         <>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
@@ -255,7 +257,7 @@ function FarmBalanceNitrogenOverview({
                         <CardTitle className="text-sm font-medium">
                             Aanvoer
                         </CardTitle>
-                        <ArrowDownToLine className="text-xs text-muted-foreground" />
+                        <ArrowDown className="text-xs text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
@@ -285,13 +287,29 @@ function FarmBalanceNitrogenOverview({
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Emissie
+                            Ammoniakemissie
                         </CardTitle>
                         <ArrowUpFromLine className="text-xs text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {resolvedNitrogenBalanceResult.emission}
+                            {resolvedNitrogenBalanceResult.emission.ammonia}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                            kg N / ha
+                        </p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            Nitraatemissie
+                        </CardTitle>
+                        <ArrowRightFromLine className="text-xs text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">
+                            {resolvedNitrogenBalanceResult.emission.nitrate}
                         </div>
                         <p className="text-xs text-muted-foreground">
                             kg N / ha

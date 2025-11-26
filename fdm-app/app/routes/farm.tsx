@@ -1,3 +1,4 @@
+import { getFarm } from "@svenvw/fdm-core"
 import posthog from "posthog-js"
 import { useEffect } from "react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
@@ -19,6 +20,7 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { useCalendarStore } from "~/store/calendar"
 import { useFarmStore } from "~/store/farm"
+import { fdm } from "../lib/fdm.server"
 
 export const meta: MetaFunction = () => {
     return [
@@ -33,16 +35,17 @@ export const meta: MetaFunction = () => {
 
 /**
  * Retrieves the session from the HTTP request and returns user information if available.
+ * Also retrieves the current farm when available.
  *
  * If the session does not contain a user, the function redirects to the "/signin" route.
  * Any errors encountered during session retrieval are processed by the designated error handler.
  *
  * @param request - The HTTP request used for obtaining session data.
- * @returns An object with a "user" property when a valid session is found.
+ * @returns An object with a "user" property when a valid session is found, and a "farm" property when b_id_farm is found in the URL.
  *
  * @throws {Error} If an error occurs during session retrieval, processed by handleLoaderError.
  */
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
     try {
         // Get the session
         const session = await getSession(request)
@@ -52,8 +55,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
             return sessionCheckResponse
         }
 
+        const farm = params.b_id_farm
+            ? await getFarm(fdm, session.principal_id, params.b_id_farm)
+            : undefined
+
         // Return user information from loader
         return {
+            farm: farm,
             user: session.user,
             userName: session.userName,
             initials: session.initials,
@@ -116,7 +124,7 @@ export default function App() {
             <Sidebar>
                 <SidebarTitle />
                 <SidebarContent>
-                    <SidebarFarm />
+                    <SidebarFarm farm={loaderData.farm} />
                     <SidebarApps />
                 </SidebarContent>
                 <SidebarSupport

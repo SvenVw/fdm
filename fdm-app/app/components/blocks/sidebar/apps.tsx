@@ -37,6 +37,9 @@ export function SidebarApps() {
         location.pathname.includes("farm/create") ||
         searchParams.get("returnUrl")?.includes("farm/create")
 
+    const isFarmOverview =
+        location.pathname === "/farm" || location.pathname === "/farm/"
+
     let atlasLink: string | undefined
     if (isCreateFarmWizard) {
         atlasLink = undefined
@@ -47,7 +50,7 @@ export function SidebarApps() {
     }
 
     let nitrogenBalanceLink: string | undefined
-    if (isCreateFarmWizard) {
+    if (isCreateFarmWizard || isFarmOverview) {
         nitrogenBalanceLink = undefined
     } else if (farmId && farmId !== "undefined") {
         nitrogenBalanceLink = `/farm/${farmId}/${selectedCalendar}/balance/nitrogen`
@@ -74,7 +77,7 @@ export function SidebarApps() {
     }
 
     let omBalanceLink: string | undefined
-    if (isCreateFarmWizard) {
+    if (isCreateFarmWizard || isFarmOverview) {
         omBalanceLink = undefined
     } else if (farmId && farmId !== "undefined") {
         omBalanceLink = `/farm/${farmId}/${selectedCalendar}/balance/organic-matter`
@@ -110,18 +113,30 @@ export function SidebarApps() {
                         )}
                     </SidebarMenuItem>
                     <Collapsible
-                        defaultOpen={true}
+                        defaultOpen={!!nitrogenBalanceLink}
                         className="group/collapsible"
                     >
                         <SidebarMenuItem>
-                            <CollapsibleTrigger asChild>
-                                <SidebarMenuButton>
-                                    <ArrowRightLeft />
-                                    <span>Balans</span>
-                                    <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
-                                    <Minus className="ml-auto group-data-[state=closed]/collapsible:hidden" />
+                            {nitrogenBalanceLink ? (
+                                <CollapsibleTrigger asChild>
+                                    <SidebarMenuButton>
+                                        <ArrowRightLeft />
+                                        <span>Balans</span>
+                                        <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
+                                        <Minus className="ml-auto group-data-[state=closed]/collapsible:hidden" />
+                                    </SidebarMenuButton>
+                                </CollapsibleTrigger>
+                            ) : (
+                                <SidebarMenuButton
+                                    isActive={false}
+                                    className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                                >
+                                    <ArrowRightLeft className="cursor-default text-muted-foreground" />
+                                    <span className="cursor-default text-muted-foreground">
+                                        Balans
+                                    </span>
                                 </SidebarMenuButton>
-                            </CollapsibleTrigger>
+                            )}
                             <CollapsibleContent>
                                 <SidebarMenuSub>
                                     <SidebarMenuSubItem>
@@ -138,16 +153,7 @@ export function SidebarApps() {
                                                     <span>Stikstof</span>
                                                 </NavLink>
                                             </SidebarMenuSubButton>
-                                        ) : (
-                                            <SidebarMenuSubButton
-                                                asChild
-                                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
-                                            >
-                                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
-                                                    <span>Stikstof</span>
-                                                </span>
-                                            </SidebarMenuSubButton>
-                                        )}
+                                        ) : null}
                                     </SidebarMenuSubItem>
                                     <SidebarMenuSubItem>
                                         {omBalanceLink ? (
@@ -161,16 +167,7 @@ export function SidebarApps() {
                                                     <span>Organische stof</span>
                                                 </NavLink>
                                             </SidebarMenuSubButton>
-                                        ) : (
-                                            <SidebarMenuSubButton
-                                                asChild
-                                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
-                                            >
-                                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
-                                                    <span>Organische stof</span>
-                                                </span>
-                                            </SidebarMenuSubButton>
-                                        )}
+                                        ) : null}
                                     </SidebarMenuSubItem>
                                 </SidebarMenuSub>
                             </CollapsibleContent>

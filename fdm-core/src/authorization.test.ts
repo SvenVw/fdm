@@ -1,5 +1,6 @@
 import { and, desc, eq, isNotNull, isNull } from "drizzle-orm"
 import { beforeAll, beforeEach, describe, expect, inject, it } from "vitest"
+import { type BetterAuth, createFdmAuth } from "./authentication"
 import {
     actions,
     checkPermission,
@@ -18,11 +19,20 @@ import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { createId } from "./id"
+import {
+    acceptInvitation,
+    createOrganization,
+    inviteUserToOrganization,
+} from "./organization"
 
 describe("Authorization Functions", () => {
     let fdm: FdmServerType
+    let fdmAuth: BetterAuth
     let principal_id: string
     let farm_id: string
+    let organization_id: string
+    let organization_member_email: string
+    let organization_member_id: string
     let host: string
     let port: number
     let user: string
@@ -35,8 +45,30 @@ describe("Authorization Functions", () => {
         user = inject("user")
         password = inject("password")
         database = inject("database")
+        // Mock environment variables
+        const googleAuth = {
+            clientId: "mock_google_client_id",
+            clientSecret: "mock_google_client_secret",
+        }
+        const microsoftAuth = {
+            clientId: "mock_ms_client_id",
+            clientSecret: "mock_ms_client_secret",
+        }
+
         fdm = createFdmServer(host, port, user, password, database, 10) // allow some connections
-        principal_id = createId()
+        fdmAuth = createFdmAuth(fdm, googleAuth, microsoftAuth, undefined, true)
+        const principal = await fdmAuth.api.signUpEmail({
+            headers: undefined,
+            body: {
+                email: "principal@example.com",
+                name: "Principal I",
+                firstname: "Principal",
+                surname: "I",
+                username: "principal",
+                password: "password",
+            },
+        })
+        principal_id = principal.user.id
     })
 
     beforeEach(async () => {
@@ -54,6 +86,27 @@ describe("Authorization Functions", () => {
             farmPostalCode,
             principal_id,
         )
+        organization_id = await createOrganization(
+            fdm,
+            principal_id,
+            "Test Organization",
+            `test-${createId()}`,
+            "This is an organization created for testing purposes.",
+        )
+        const organization_member_username = `orgmember${createId(8).toLowerCase()}`
+        organization_member_email = `${organization_member_username}@example.com`
+        const organization_member = await fdmAuth.api.signUpEmail({
+            headers: undefined,
+            body: {
+                email: organization_member_email,
+                name: "Organization Member",
+                firstname: "Organization",
+                surname: "Member",
+                username: organization_member_username,
+                password: "password",
+            },
+        })
+        organization_member_id = organization_member.user.id
     })
 
     describe("checkPermission", () => {
@@ -80,6 +133,65 @@ describe("Authorization Functions", () => {
                     "test",
                 ),
             ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
+
+        it("should grant access through the organization", async () => {
+            await grantRole(fdm, "farm", "owner", farm_id, organization_id)
+            const invitation_id = await inviteUserToOrganization(
+                fdm,
+                principal_id,
+                organization_member_email,
+                "owner",
+                organization_id,
+            )
+            await acceptInvitation(fdm, invitation_id, organization_member_id)
+            await checkPermission(
+                fdm,
+                "farm",
+                "write",
+                farm_id,
+                organization_member_id,
+                "test",
+            )
+        })
+
+        it("should not grant access through an organization not invited to a farm", async () => {
+            await expect(
+                checkPermission(
+                    fdm,
+                    "farm",
+                    "write",
+                    farm_id,
+                    organization_id,
+                    "test",
+                ),
+            ).rejects.toThrow(
+                "Principal does not have permission to perform this action",
+            )
+        })
+
+        it("should not grant permissions higher than the organization permissions", async () => {
+            await grantRole(fdm, "farm", "researcher", farm_id, organization_id)
+            const invitation_id = await inviteUserToOrganization(
+                fdm,
+                principal_id,
+                organization_member_email,
+                "owner",
+                organization_id,
+            )
+            await acceptInvitation(fdm, invitation_id, organization_member_id)
+            await expect(
+                checkPermission(
+                    fdm,
+                    "farm",
+                    "write",
+                    farm_id,
+                    organization_member_id,
+                    "test",
+                ),
+            ).rejects.toThrow(
                 "Principal does not have permission to perform this action",
             )
         })
@@ -501,6 +613,56 @@ describe("Authorization Functions", () => {
             expect(accessibleResources).toContain(farm_id2)
         })
 
+        it("should list resources that the user's organization has access to", async () => {
+            const farm_id2 = createId()
+            await grantRole(fdm, "farm", "owner", farm_id, organization_id)
+            await grantRole(fdm, "farm", "advisor", farm_id2, organization_id)
+            const invitation_id = await inviteUserToOrganization(
+                fdm,
+                principal_id,
+                organization_member_email,
+                "admin",
+                organization_id,
+            )
+            await acceptInvitation(fdm, invitation_id, organization_member_id)
+
+            const accessibleResources = await listResources(
+                fdm,
+                "farm",
+                "read",
+                organization_member_id,
+            )
+            expect(accessibleResources.length).toBe(2)
+            expect(accessibleResources).toContain(farm_id)
+            expect(accessibleResources).toContain(farm_id2)
+        })
+
+        it("should not list duplicates", async () => {
+            await grantRole(
+                fdm,
+                "farm",
+                "owner",
+                farm_id,
+                organization_member_id,
+            )
+            await grantRole(fdm, "farm", "advisor", farm_id, organization_id)
+            const invitation_id = await inviteUserToOrganization(
+                fdm,
+                principal_id,
+                organization_member_email,
+                "admin",
+                organization_id,
+            )
+            await acceptInvitation(fdm, invitation_id, organization_member_id)
+            const accessibleResources = await listResources(
+                fdm,
+                "farm",
+                "read",
+                organization_member_id,
+            )
+            expect(accessibleResources).toEqual([farm_id])
+        })
+
         it("should handle empty list", async () => {
             const principal_id_new = createId()
             const accessibleResources = await listResources(
@@ -629,6 +791,51 @@ describe("Authorization Functions", () => {
                 other_principal_id,
             )
             expect(roles).toEqual([])
+        })
+
+        it("should get roles derived from an organization", async () => {
+            await grantRole(fdm, "farm", "researcher", farm_id, organization_id)
+            const invitation_id = await inviteUserToOrganization(
+                fdm,
+                principal_id,
+                organization_member_email,
+                "admin",
+                organization_id,
+            )
+            await acceptInvitation(fdm, invitation_id, organization_member_id)
+            const roles = await getRolesOfPrincipalForResource(
+                fdm,
+                "farm",
+                farm_id,
+                organization_member_id,
+            )
+            expect(roles).toEqual(["researcher"])
+        })
+
+        it("should get all roles", async () => {
+            await grantRole(
+                fdm,
+                "farm",
+                "researcher",
+                farm_id,
+                organization_member_id,
+            )
+            await grantRole(fdm, "farm", "owner", farm_id, organization_id)
+            const invitation_id = await inviteUserToOrganization(
+                fdm,
+                principal_id,
+                organization_member_email,
+                "admin",
+                organization_id,
+            )
+            await acceptInvitation(fdm, invitation_id, organization_member_id)
+            const roles = await getRolesOfPrincipalForResource(
+                fdm,
+                "farm",
+                farm_id,
+                organization_member_id,
+            )
+            expect(roles).toEqual(["owner", "researcher"])
         })
 
         it("should throw error with invalid resource", async () => {

@@ -7,7 +7,7 @@ import {
     User,
     Users,
 } from "lucide-react"
-import { NavLink } from "react-router"
+import { NavLink, useLocation } from "react-router"
 import { clientConfig } from "@/app/lib/config"
 import { Button } from "~/components/ui/button"
 import {
@@ -20,6 +20,7 @@ import {
 } from "~/components/ui/sidebar"
 
 export function SidebarPlatform() {
+    const location = useLocation()
     return (
         <>
             <SidebarGroup>

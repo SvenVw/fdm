@@ -11,10 +11,10 @@ import {
 import type { Feature, FeatureCollection, Polygon } from "geojson"
 import { useState } from "react"
 import {
-    GeolocateControl,
     Layer,
     Map as MapGL,
-    NavigationControl,
+    type ViewState,
+    type ViewStateChangeEvent,
 } from "react-map-gl/mapbox"
 import {
     type ActionFunctionArgs,
@@ -26,6 +26,7 @@ import {
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import {
     FieldsPanelHover,
     FieldsPanelZoom,
@@ -197,15 +198,21 @@ export default function Index() {
 
     const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
 
-    const mapProps =
+    const initialViewState =
         fieldsSaved.features.length > 0
             ? getViewState(fieldsSaved)
-            : { initialViewState: getViewState(null) }
+            : getViewState(null)
+
+    const [viewState, setViewState] = useState<ViewState>(
+        initialViewState as ViewState,
+    )
 
     const fieldsAvailableId = "fieldsAvailable"
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
 
     const [open, setOpen] = useState(false)
+    const [showFields, setShowFields] = useState(true) // Added showFields state
+    const layerLayout = { visibility: showFields ? "visible" : "none" } as const // Define layerLayout
 
     const [selectedField, setSelectedField] = useState<Feature<Polygon> | null>(
         null,
@@ -223,6 +230,11 @@ export default function Index() {
     const handleSelectField = (feature: Feature<Polygon>) => {
         setSelectedField(feature)
         setOpen(true)
+    }
+
+    // onViewportChange handler as Controls requires it
+    const onViewportChange = (event: ViewStateChangeEvent) => {
+        setViewState(event.viewState)
     }
 
     return (
@@ -280,7 +292,7 @@ export default function Index() {
                     >
                         {() => (
                             <MapGL
-                                {...mapProps}
+                                {...viewState} // Use viewState directly
                                 style={{
                                     height: "calc(100vh - 64px - 123px)",
                                     width: "100%",
@@ -292,6 +304,7 @@ export default function Index() {
                                     fieldsAvailableId,
                                     fieldsSavedId,
                                 ]}
+                                onMove={onViewportChange} // Set onMove handler
                                 onClick={(evt) => {
                                     if (!evt.features) return
                                     const polygonFeature = evt.features.find(
@@ -315,8 +328,20 @@ export default function Index() {
                                     }
                                 }}
                             >
-                                <GeolocateControl />
-                                <NavigationControl />
+                                <Controls
+                                    onViewportChange={(viewport) =>
+                                        setViewState((currentViewState) => ({
+                                            ...currentViewState,
+                                            ...viewport,
+                                            pitch: currentViewState.pitch,
+                                            bearing: currentViewState.bearing,
+                                        }))
+                                    }
+                                    showFields={showFields}
+                                    onToggleFields={() =>
+                                        setShowFields(!showFields)
+                                    }
+                                />
 
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}
@@ -324,7 +349,12 @@ export default function Index() {
                                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                     redirectToDetailsPage={false}
                                 >
-                                    <Layer {...fieldsAvailableStyle} />
+                                    <Layer
+                                        {...({
+                                            ...fieldsAvailableStyle,
+                                            layout: layerLayout,
+                                        } as any)}
+                                    />
                                 </FieldsSourceAvailable>
 
                                 <FieldsSourceNotClickable

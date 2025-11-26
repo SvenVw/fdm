@@ -1,3 +1,4 @@
+import type { getFarm } from "@svenvw/fdm-core"
 import {
     Calendar,
     Check,
@@ -30,7 +31,22 @@ import {
     SidebarMenuSubItem,
 } from "~/components/ui/sidebar"
 
-export function SidebarFarm() {
+export function SidebarFarm({
+    farm,
+}: {
+    farm: Awaited<ReturnType<typeof getFarm>> | undefined
+}) {
+    function getSuperiorRole(allRoles: ("owner" | "advisor" | "researcher")[]) {
+        if (allRoles.length > 0) {
+            const ordering = ["owner", "advisor", "researcher"] as const
+            const sorted = [...allRoles].sort(
+                (a, b) => ordering.indexOf(a) - ordering.indexOf(b),
+            )
+            return sorted[0]
+        }
+        return null
+    }
+
     const farmId = useFarmStore((state) => state.farmId)
 
     const selectedCalendar = useCalendarStore((state) => state.calendar)
@@ -38,13 +54,13 @@ export function SidebarFarm() {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false)
     const calendarSelection = getCalendarSelection()
 
-    // Check if the page or its return page contains `farm/create` in url
     const location = useLocation()
     const [searchParams] = useSearchParams()
+    // Check if the page or its return page contains `farm/create` in url
     const isCreateFarmWizard =
         location.pathname.includes("farm/create") ||
         searchParams.get("returnUrl")?.includes("farm/create")
-
+    const farmRole = farm ? getSuperiorRole(farm.roles) : null
     // Set the farm link
     let farmLink: string
     let farmLinkDisplay: string
@@ -53,7 +69,7 @@ export function SidebarFarm() {
         farmLinkDisplay = "Terug naar bedrijven"
     } else if (farmId && farmId !== "undefined") {
         farmLink = `/farm/${farmId}`
-        farmLinkDisplay = "Bedrijf"
+        farmLinkDisplay = farm?.b_name_farm ? farm.b_name_farm : "Bedrijf"
     } else {
         farmLink = "/farm"
         farmLinkDisplay = "Overzicht bedrijven"
@@ -102,6 +118,21 @@ export function SidebarFarm() {
                             <NavLink to={farmLink}>
                                 <House />
                                 <span>{farmLinkDisplay}</span>
+                                {farmRole && (
+                                    <Badge
+                                        key={farmRole}
+                                        variant="outline"
+                                        className="ml-auto"
+                                    >
+                                        {farmRole === "owner"
+                                            ? "Eigenaar"
+                                            : farmRole === "advisor"
+                                              ? "Adviseur"
+                                              : farmRole === "researcher"
+                                                ? "Onderzoeker"
+                                                : "Onbekend"}
+                                    </Badge>
+                                )}
                             </NavLink>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

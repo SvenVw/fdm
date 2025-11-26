@@ -50,7 +50,7 @@
         "@rollup/plugin-node-resolve": "catalog:",
         "@rollup/plugin-typescript": "catalog:",
         "@svenvw/fdm-data": "workspace:^0.18.1",
-        "@types/node": "^24.10.0",
+        "@types/node": "^24.10.1",
         "@vitest/coverage-v8": "catalog:",
         "drizzle-kit": "catalog:",
         "fs-extra": "^11.3.2",
@@ -63,7 +63,7 @@
         "vitest": "catalog:"
     },
     "dependencies": {
-        "@electric-sql/pglite": "^0.3.12",
+        "@electric-sql/pglite": "^0.3.14",
         "@svenvw/fdm-data": "workspace:*",
         "@types/geojson": "^7946.0.16",
         "better-auth": "catalog:",
@@ -74,7 +74,7 @@
         "safe-stable-stringify": "^2.5.0",
         "unique-username-generator": "^1.5.1"
     },
-    "packageManager": "pnpm@10.20.0",
+    "packageManager": "pnpm@10.23.0",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     }
