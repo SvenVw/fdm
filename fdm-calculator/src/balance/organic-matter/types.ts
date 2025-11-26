@@ -4,7 +4,6 @@ import type {
     Fertilizer,
     FertilizerApplication,
     Field,
-    Harvest,
     SoilAnalysis,
 } from "@svenvw/fdm-core"
 import type { Decimal } from "decimal.js"

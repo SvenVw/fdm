@@ -11,10 +11,9 @@ import {
     getFertilizers,
     getField,
     getFields,
-    getHarvests,
     getSoilAnalyses,
 } from "@svenvw/fdm-core"
-import type { OrganicMatterBalanceInput } from "./types.d"
+import type { OrganicMatterBalanceInput } from "./types"
 
 /**
  * Collects all necessary input data from an FDM instance to calculate the organic matter balance for a farm or a specific field.

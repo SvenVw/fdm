@@ -29,7 +29,7 @@ export const numericCasted = customType<{
  * Originally from https://gist.github.com/ItsWendell/38ebe96b34d00d9138ce23cc363d7009
  */
 export const geometry = <
-    TType extends GeoJSON.Geometry["type"] = GeoJSON.Geometry["type"],
+    TType extends keyof GeometryTypes = keyof GeometryTypes,
     T extends CustomTypeValues = CustomTypeValues,
 >(
     dbName: string,
@@ -107,11 +107,9 @@ export const parseHexToGeometry = (hex: string): GeoJSON.Geometry => {
 
         const hasSRID = (geometryType & 0x20000000) > 0 // Check if the SRID flag is set
 
-        let _srid: number | undefined
-
         if (hasSRID) {
             // If SRID is included, read the SRID
-            _srid = dataView.getUint32(byteOffset, littleEndian)
+            // _srid = dataView.getUint32(byteOffset, littleEndian)
             // Set geometry type to the actual type, stripping the SRID flag
             geometryType &= ~0x20000000
             byteOffset += 4 // Move the byte offset past the SRID field
