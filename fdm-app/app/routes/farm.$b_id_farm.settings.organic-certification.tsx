@@ -100,6 +100,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             "write",
             b_id_farm,
             session.principal_id,
+            { fallback: true },
         )
 
         return { b_id_farm, organicCertification, farmWritePermission }
