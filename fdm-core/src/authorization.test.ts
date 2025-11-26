@@ -151,7 +151,7 @@ describe("Authorization Functions", () => {
                 "farm",
                 "write",
                 farm_id,
-                principal_id,
+                organization_member_id,
                 "test",
             )
         })
@@ -187,7 +187,7 @@ describe("Authorization Functions", () => {
                     "farm",
                     "write",
                     farm_id,
-                    organization_id,
+                    organization_member_id,
                     "test",
                 ),
             ).rejects.toThrow(
