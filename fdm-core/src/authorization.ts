@@ -258,12 +258,16 @@ export async function checkPermission(
  *
  * This function queries the database to find all roles that a principal has been granted for the given resource.
  * It returns an array of role strings.
- * CAUTION: This function does not return inherited roles yet.
+ *
+ * When the principal id is for an user, it can get any of the user's roles derived through their organizations.
+ *
+ * CAUTION: This function does not return roles inherited from related resources yet.
  *
  * @param fdm - The FDM instance providing the connection to the database.
  * @param resource - The type of the resource to query for the principal's roles.
  * @param resource_id - The identifier of the specific resource instance.
  * @param principal_id - The identifier of the principal.
+ *   If an user id is supplied, the function can also retrieve roles for the user's organizations.
  * @returns A promise that resolves to an array of roles (strings) that the principal has for the given resource.
  *   Returns an empty array if the principal has no roles for the resource.
  * @throws {Error} If the resource type is invalid or if the database operation fails.
