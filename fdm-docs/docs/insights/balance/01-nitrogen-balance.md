@@ -158,15 +158,52 @@ Crop residues (e.g., straw, stover, roots) contain significant amounts of nitrog
 
 Nitrogen emission refers to the loss of nitrogen from the agricultural system to the wider environment. This includes losses to the atmosphere, such as ammonia (NH₃) volatilization, and losses to water, such as nitrate (NO₃⁻) leaching. Accurately quantifying these emissions is crucial for improving nitrogen use efficiency and minimizing environmental impacts like air and water pollution.
 
-The total N emission is the sum of all calculated emission pathways. Currently, this includes ammonia emissions from fertilizers and crop residues. In the future, this will be expanded to include nitrate leaching.
+The total N emission is the sum of all calculated emission pathways. This includes ammonia emissions from fertilizers and crop residues, and nitrate leaching to groundwater.
 
 The calculations for ammonia emissions are derived from the **NEMA model (Nutrient Emission Model for Agriculture)**, a Dutch model used to estimate nutrient losses from agricultural sources.
 
-#### 3.3.1. Nitrate Leaching (Future Implementation)
+#### 3.3.1. Nitrate Leaching
 
-Nitrate leaching represents the loss of nitrogen to water bodies. In the FDM Calculator, this will be calculated as a fraction of the **Nitrogen Balance**. The balance is defined as `N Supply - N Removal - Ammonia Emission`. This approach acknowledges that leaching is primarily driven by the excess nitrogen that remains in the soil after crop uptake.
+Nitrate leaching represents the loss of nitrogen to water bodies (groundwater). In the FDM Calculator, this is calculated as a fraction of the **Nitrogen Surplus**. The surplus is defined as `N Supply - N Removal - Ammonia Emission`. This approach acknowledges that leaching is primarily driven by the excess nitrogen that remains in the soil.
 
-*Note: This component is not yet implemented and currently returns `0`.*
+* **Formula:**
+    `NO3 Leaching (kg N / ha) = Nitrogen Surplus (kg N / ha) * Leaching Factor * -1`
+  * *Note: Leaching is only calculated if the Nitrogen Surplus is positive. If the surplus is negative or zero, leaching is 0.*
+
+* **Leaching Factor:**
+    The leaching factor is determined based on the **Land Use** (Grassland vs. Cropland), **Agricultural Soil Type** (`b_soiltype_agr`), and for sandy soils, the **Groundwater Level Class (Gt)** (`b_gwl_class`).
+
+    1. **Land Use Determination:**
+        * **Grassland:** If the field has a cultivation with a grassland crop rotation code (and is not a "bare soil" type).
+        * **Cropland:** If the field has a cultivation with a cropland crop rotation code (and is not a "bare soil" type) and no grassland cultivation.
+        * **Bare Soil:** If neither of the above, or if the crop code is specifically for bare soil/fallow.
+
+    2. **Factor Determination:**
+
+    | Soil Type | Land Use | Gt (Groundwater Level) | Leaching Factor (Fraction) |
+    | :--- | :--- | :--- | :--- |
+    | **Peat** (veen) | Grassland | All | 0.06 |
+    | | Cropland | All | 0.17 |
+    | **Clay** (klei, e.g. moerige_klei, rivierklei, zeeklei, maasklei) | Grassland | All | 0.11 |
+    | | Cropland | All | 0.33 |
+    | **Loess** (loess) | Grassland | All | 0.14 |
+    | | Cropland | All | 0.74 |
+    | **Sand** (zand, e.g. dekzand, dalgrond, duinzand) | Grassland | I, Ia, Ic, II, IIa, IIb, IIc | 0.02 |
+    | | | III, IIIa | 0.03 |
+    | | | IIIb | 0.10 |
+    | | | IV, IVu, IVc | 0.14 |
+    | | | V, Va, Vao, Vad, Vb, Vbo, Vbd, sV, sVb | 0.16 |
+    | | | VI, VIo, VId | 0.21 |
+    | | | VII, VIIo, VIId | 0.27 |
+    | | | VIII, VIIIo, VIIId | 0.32 |
+    | **Sand** (zand) | Cropland | I, Ia, Ic, II, IIa, IIb, IIc | 0.04 |
+    | | | III, IIIa | 0.07 |
+    | | | IIIb | 0.28 |
+    | | | IV, IVu, IVc | 0.38 |
+    | | | V, Va, Vao, Vad, Vb, Vbo, Vbd, sV, sVb | 0.44 |
+    | | | VI, VIo, VId | 0.58 |
+    | | | VII, VIIo, VIId | 0.74 |
+    | | | VIII, VIIIo, VIIId | 0.89 |
 
 #### 3.3.2. Ammonia from Fertilizers
 
@@ -245,7 +282,7 @@ Ammonia emissions from grazing are currently not calculated in the FDM Calculato
 * **Field Surplus (Field Balance):** For each field, the **N Surplus** is calculated as `N Supply - N Removal - Ammonia Emission`. This value is reported as the `balance` for each field in the output.
 * **Farm Balance:**
     1. The total N supplied, removed, and total emitted (including ammonia and nitrate) for each field (kg N / ha * field area (ha) = kg N per field) are summed across all fields.
-    2. These total farm-level amounts (in kg N) are then divided by the total farm area (ha) to provide an average farm-level balance (`N Supply - N Removal - Total N Emission`) in kg N / ha.
+    2. These total farm-level amounts (in kg N) are then divided by the total farm area (ha) to provide an average farm-level balance (`N Supply - N Removal -  Ammonia Emission`) in kg N / ha.
 
 ## 5. Output
 

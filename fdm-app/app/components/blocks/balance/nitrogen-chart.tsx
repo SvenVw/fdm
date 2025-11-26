@@ -18,13 +18,20 @@ export function NitrogenBalanceChart({
     balance: number
     supply: number
     removal: number | undefined
-    emission: number | undefined
+    emission: {
+        total: number
+        ammonia: number
+        nitrate: number
+    }
 }): JSX.Element {
     const chartData = [
         {
             supply: supply,
             removal: removal === undefined ? undefined : Math.abs(removal),
-            emission: emission === undefined ? undefined : Math.abs(emission),
+            emissionAmmonia:
+                emission.ammonia === undefined ? undefined : Math.abs(emission.ammonia),
+            emissionNitrate:
+                emission.nitrate === undefined ? undefined : Math.abs(emission.nitrate),
         },
     ]
 
@@ -37,9 +44,13 @@ export function NitrogenBalanceChart({
             label: "Afvoer",
             color: "hsl(var(--chart-2))",
         },
-        emission: {
-            label: "Emissie",
+        emissionAmmonia: {
+            label: "Ammoniakemissie",
             color: "hsl(var(--chart-3))",
+        },
+        emissionNitrate: {
+            label: "Nitraatemissie",
+            color: "hsl(var(--chart-4))",
         },
     } satisfies ChartConfig
 
@@ -80,8 +91,14 @@ export function NitrogenBalanceChart({
                     stackId={"b"}
                 />
                 <Bar
-                    dataKey="emission"
-                    fill="var(--color-emission)"
+                    dataKey="emissionAmmonia"
+                    fill="var(--color-emissionAmmonia)"
+                    radius={5}
+                    stackId={"b"}
+                />
+                <Bar
+                    dataKey="emissionNitrate"
+                    fill="var(--color-emissionNitrate)"
                     radius={5}
                     stackId={"b"}
                 />

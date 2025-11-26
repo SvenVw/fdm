@@ -397,7 +397,7 @@ export function FertilizerApplicationMetricsCard({
                                                                     asChild
                                                                 >
                                                                     <p className="whitespace-nowrap px-2">
-                                                                        Emissie
+                                                                        Emissie (NH₃)
                                                                     </p>
                                                                 </TooltipTrigger>
                                                                 <TooltipContent>
@@ -407,7 +407,7 @@ export function FertilizerApplicationMetricsCard({
                                                                         via
                                                                         gasvormige
                                                                         verliezen
-                                                                        (NH3)
+                                                                        (NH₃)
                                                                     </p>
                                                                 </TooltipContent>
                                                             </Tooltip>
@@ -416,6 +416,7 @@ export function FertilizerApplicationMetricsCard({
                                                                     resolvedNitrogenBalance
                                                                         .balance
                                                                         .emission
+                                                                        .ammonia
                                                                         .total,
                                                                 )}{" "}
                                                                 kg N

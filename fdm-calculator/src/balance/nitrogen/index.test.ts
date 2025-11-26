@@ -99,7 +99,9 @@ describe("calculateNitrogenBalance", () => {
         expect(typeof result.balance).toBe("number")
         expect(typeof result.supply).toBe("number")
         expect(typeof result.removal).toBe("number")
-        expect(typeof result.emission).toBe("number")
+        expect(typeof result.emission.total).toBe("number")
+        expect(typeof result.emission.ammonia).toBe("number")
+        expect(typeof result.emission.nitrate).toBe("number")
         expect(typeof result.target).toBe("number")
         expect(Array.isArray(result.fields)).toBe(true)
     })
@@ -135,4 +137,3 @@ describe("calculateNitrogenBalance", () => {
         expect(result.fieldErrorMessages.length).toBeGreaterThan(0)
     })
 })
-
