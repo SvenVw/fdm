@@ -220,7 +220,8 @@ export async function checkPermission(
  * @param resource_id - The unique identifier of the specific resource.
  * @param principal_id - The principal identifier(s); supports a single ID or an array.
  * @param options - Options to customize the behavior
- * @returns Resolves to true if the principal is permitted to perform the action. Returns undefined in case of error.
+ * @returns Resolves to true if the principal is permitted to perform the action.
+ *   If an error occurs and `options.fallback` is provided, returns the fallback value; otherwise throws.
  */
 export async function hasPermission(
     fdm: FdmType,
