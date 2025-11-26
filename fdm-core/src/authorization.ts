@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNull, or } from "drizzle-orm"
+import { and, eq, inArray, isNotNull, isNull, or } from "drizzle-orm"
 import type {
     Action,
     Permission,
@@ -199,9 +199,12 @@ export async function checkPermission(
                                     authZSchema.role.principal_id,
                                     principal_ids,
                                 ),
-                                inArray(
-                                    authNSchema.member.userId,
-                                    principal_ids,
+                                and(
+                                    isNotNull(authNSchema.member.userId),
+                                    inArray(
+                                        authNSchema.member.userId,
+                                        principal_ids,
+                                    ),
                                 ),
                             ),
                             inArray(authZSchema.role.role, roles),
@@ -311,7 +314,13 @@ export async function getRolesOfPrincipalForResource(
                                 authZSchema.role.principal_id,
                                 principal_ids,
                             ),
-                            inArray(authNSchema.member.userId, principal_ids),
+                            and(
+                                isNotNull(authNSchema.member.userId),
+                                inArray(
+                                    authNSchema.member.userId,
+                                    principal_ids,
+                                ),
+                            ),
                         ),
                         isNull(authZSchema.role.deleted),
                     ),
@@ -584,7 +593,13 @@ export async function listResources(
                                 authZSchema.role.principal_id,
                                 principal_ids,
                             ),
-                            inArray(authNSchema.member.userId, principal_ids),
+                            and(
+                                isNotNull(authNSchema.member.userId),
+                                inArray(
+                                    authNSchema.member.userId,
+                                    principal_ids,
+                                ),
+                            ),
                         ),
                         inArray(authZSchema.role.role, roles),
                         isNull(authZSchema.role.deleted),
