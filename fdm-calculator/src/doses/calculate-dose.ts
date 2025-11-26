@@ -1,5 +1,5 @@
 import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
-import type { Dose } from "./d"
+import type { Dose, NumericDoseKeys } from "./d"
 
 /**
  * Calculates the cumulative nutrient doses from a series of fertilizer applications.
@@ -128,10 +128,8 @@ export function calculateDose({
         }
 
         applicationDoses.push(currentDose)
-        for (const key of Object.keys(totalDose) as (keyof Dose)[]) {
-            if (key !== "p_app_id") {
-                ;(totalDose as any)[key] += (currentDose as any)[key]
-            }
+        for (const key of Object.keys(totalDose) as NumericDoseKeys[]) {
+            totalDose[key] += currentDose[key]
         }
     }
 

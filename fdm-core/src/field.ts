@@ -491,7 +491,10 @@ export async function removeField(
                 .where(eq(schema.cultivationStarting.b_id, b_id))
 
             if (cultivations.length > 0) {
-                const cultivationIds = cultivations.map((c: { b_lu: string }) => c.b_lu)
+                const cultivationIds = cultivations.map(
+                    (c: { b_lu: schema.cultivationsTypeSelect["b_lu"] }) =>
+                        c.b_lu,
+                )
 
                 // Step 2: Get all harvestable IDs from these cultivations
                 const harvestings = await tx
@@ -509,7 +512,9 @@ export async function removeField(
 
                 if (harvestings.length > 0) {
                     const harvestableIds = harvestings.map(
-                        (h: { b_id_harvestable: string }) => h.b_id_harvestable,
+                        (h: {
+                            b_id_harvestable: schema.cultivationHarvestingTypeSelect["b_id_harvestable"]
+                        }) => h.b_id_harvestable,
                     )
 
                     // Step 3: Get all harvestable analysis IDs from these harvestables
@@ -529,7 +534,9 @@ export async function removeField(
 
                     if (harvestableSamplings.length > 0) {
                         const harvestableAnalysisIds = harvestableSamplings.map(
-                            (hs: { b_id_harvestable_analysis: string }) => hs.b_id_harvestable_analysis,
+                            (hs: {
+                                b_id_harvestable_analysis: schema.harvestableSamplingTypeSelect["b_id_harvestable_analysis"]
+                            }) => hs.b_id_harvestable_analysis,
                         )
 
                         // Step 4: Delete from harvestable_sampling first
@@ -602,7 +609,10 @@ export async function removeField(
                 .where(eq(schema.soilSampling.b_id, b_id))
 
             if (soilSamplings.length > 0) {
-                const soilAnalysisIds = soilSamplings.map((ss: { a_id: string }) => ss.a_id)
+                const soilAnalysisIds = soilSamplings.map(
+                    (ss: { a_id: schema.soilAnalysisTypeSelect["a_id"] }) =>
+                        ss.a_id,
+                )
 
                 // Step 10: Delete from soil_sampling first
                 await tx
