@@ -459,7 +459,10 @@ function HarvestFormExplainer() {
     return (
         <FieldGroup>
             <Collapsible className="space-y-2">
-                <CollapsibleTrigger className="flex flex-row gap-1 items-center text-xs text-muted-foreground hover:underline">
+                <CollapsibleTrigger
+                    type="button"
+                    className="flex flex-row gap-1 items-center text-xs text-muted-foreground hover:underline"
+                >
                     <CircleQuestionMark className="h-4" />
                     <p>Waarom zie ik deze oogstparameters?</p>
                 </CollapsibleTrigger>
@@ -507,84 +510,78 @@ export function HarvestFormDialog(props: HarvestFormDialogProps) {
                     method="post"
                     action={action}
                 >
-                    <FieldSet
-                        disabled={!editable || form.formState.isSubmitting}
-                    >
-                        <DialogContent className="gap-6">
-                            <DialogHeader>
-                                <DialogTitle>
-                                    {isHarvestUpdate
-                                        ? "Oogst bijwerken"
-                                        : "Oogst toevoegen"}
-                                </DialogTitle>
-                                <DialogDescription>
-                                    {isHarvestUpdate
-                                        ? "Werk de oogst bij van dit gewas. Vul de gegevens in, zodat deze gebruikt kunnen worden in de berekeningen."
-                                        : "Voeg een oogst toe aan dit gewas. Vul de gegevens in, zodat deze gebruikt kunnen worden in de berekeningen."}
-                                </DialogDescription>
-                            </DialogHeader>
+                    <DialogContent className="gap-6">
+                        <DialogHeader>
+                            <DialogTitle>
+                                {isHarvestUpdate
+                                    ? "Oogst bijwerken"
+                                    : "Oogst toevoegen"}
+                            </DialogTitle>
+                            <DialogDescription>
+                                {isHarvestUpdate
+                                    ? "Werk de oogst bij van dit gewas. Vul de gegevens in, zodat deze gebruikt kunnen worden in de berekeningen."
+                                    : "Voeg een oogst toe aan dit gewas. Vul de gegevens in, zodat deze gebruikt kunnen worden in de berekeningen."}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <FieldSet
+                            disabled={!editable || form.formState.isSubmitting}
+                        >
                             <HarvestFields {...props} form={form} />
-                            <HarvestFormExplainer />
-                            <DialogFooter>
-                                <Field orientation="horizontal">
-                                    {editable && (
-                                        <Button
-                                            type="button"
-                                            variant="destructive"
-                                            onClick={handleDeleteHarvest}
-                                            disabled={
-                                                form.formState.isSubmitting ||
-                                                fetcher.state === "submitting"
-                                            }
-                                            className={cn(
-                                                "mr-auto",
-                                                !isHarvestUpdate
-                                                    ? "invisible"
-                                                    : "",
-                                            )}
-                                        >
-                                            {fetcher.state === "submitting" ? (
-                                                <div className="flex items-center space-x-2">
-                                                    <LoadingSpinner />
-                                                </div>
-                                            ) : null}
-                                            Verwijderen
-                                        </Button>
-                                    )}
-                                    <DialogClose asChild>
-                                        <Button
-                                            variant="outline"
-                                            disabled={
-                                                form.formState.isSubmitting
-                                            }
-                                        >
-                                            Sluiten
-                                        </Button>
-                                    </DialogClose>
-                                    {editable && (
-                                        <Button
-                                            type="submit"
-                                            form="formHarvest"
-                                            disabled={
-                                                form.formState.isSubmitting
-                                            }
-                                        >
-                                            {form.formState.isSubmitting ? (
-                                                <div className="flex items-center space-x-2">
-                                                    <LoadingSpinner />
-                                                    <span>Opslaan...</span>
-                                                </div>
-                                            ) : isHarvestUpdate ? (
-                                                "Bijwerken"
-                                            ) : (
-                                                "Toevoegen"
-                                            )}
-                                        </Button>
-                                    )}
-                                </Field>
-                            </DialogFooter>
-                        </DialogContent>
-                    </FieldSet>
+                        </FieldSet>
+                        <HarvestFormExplainer />
+                        <DialogFooter>
+                            <Field orientation="horizontal">
+                                {editable && (
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        onClick={handleDeleteHarvest}
+                                        disabled={
+                                            form.formState.isSubmitting ||
+                                            fetcher.state === "submitting"
+                                        }
+                                        className={cn(
+                                            "mr-auto",
+                                            !isHarvestUpdate ? "invisible" : "",
+                                        )}
+                                    >
+                                        {fetcher.state === "submitting" ? (
+                                            <div className="flex items-center space-x-2">
+                                                <LoadingSpinner />
+                                            </div>
+                                        ) : null}
+                                        Verwijderen
+                                    </Button>
+                                )}
+                                <DialogClose asChild>
+                                    <Button
+                                        variant="outline"
+                                        disabled={form.formState.isSubmitting}
+                                    >
+                                        Sluiten
+                                    </Button>
+                                </DialogClose>
+                                {editable && (
+                                    <Button
+                                        type="submit"
+                                        form="formHarvest"
+                                        disabled={form.formState.isSubmitting}
+                                    >
+                                        {form.formState.isSubmitting ? (
+                                            <div className="flex items-center space-x-2">
+                                                <LoadingSpinner />
+                                                <span>Opslaan...</span>
+                                            </div>
+                                        ) : isHarvestUpdate ? (
+                                            "Bijwerken"
+                                        ) : (
+                                            "Toevoegen"
+                                        )}
+                                    </Button>
+                                )}
+                            </Field>
+                        </DialogFooter>
+                    </DialogContent>
                 </Form>
             </RemixFormProvider>
         </Dialog>

@@ -24,9 +24,7 @@ export function CultivationHarvestsCard({
     if (b_lu_harvestable === "multiple") {
         canAddHarvest = true
     }
-    if (typeof editable !== "undefined") {
-        canAddHarvest = editable
-    }
+    canAddHarvest &&= editable
 
     return (
         <Card>
@@ -35,22 +33,25 @@ export function CultivationHarvestsCard({
                     {b_lu_harvestable === "multiple" ? "Oogsten" : "Oogst"}
                 </CardTitle>
                 <div className="flex justify-between">
-                    <NavLink
-                        to="./harvest/new"
-                        onClick={(e) => {
-                            if (!canAddHarvest) {
-                                e.preventDefault()
-                            }
-                        }}
-                        className={!canAddHarvest ? "cursor-not-allowed" : ""}
+                    <Button
+                        asChild
+                        variant="default"
+                        className={cn(!canAddHarvest ? "hidden" : "")}
                     >
-                        <Button
-                            variant="default"
-                            className={cn(!canAddHarvest ? "hidden" : "")}
+                        <NavLink
+                            to="./harvest/new"
+                            onClick={(e) => {
+                                if (!canAddHarvest) {
+                                    e.preventDefault()
+                                }
+                            }}
+                            className={
+                                !canAddHarvest ? "cursor-not-allowed" : ""
+                            }
                         >
                             Oogst toevoegen
-                        </Button>
-                    </NavLink>
+                        </NavLink>
+                    </Button>
                 </div>
             </CardHeader>
             <CardContent className="space-y-6">
