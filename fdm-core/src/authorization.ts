@@ -142,7 +142,8 @@ export const permissions: Permission[] = [
  *
  * This function retrieves the valid roles for the specified action and resource, constructs the resource hierarchy,
  * and iterates through the chain to verify if any level grants the required permission for the principal(s). It records
- * the permission check details in the audit log and throws an error if the permission is denied.
+ * the permission check details in the audit log and throws an error if the permission is denied. `strict` may be
+ * specified as false in order to disable the exception.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param resource - The type of resource being accessed.
@@ -150,6 +151,7 @@ export const permissions: Permission[] = [
  * @param resource_id - The unique identifier of the specific resource.
  * @param principal_id - The principal identifier(s); supports a single ID or an array.
  * @param origin - The source origin used for audit logging the permission check.
+ * @param strict - When set to false, the function will not perform an audit log, or throw an exception if the user has no permission.
  * @returns Resolves to true if the principal is permitted to perform the action.
  *
  * @throws {Error} When the principal does not have the required permission.
@@ -161,6 +163,7 @@ export async function checkPermission(
     resource_id: string,
     principal_id: PrincipalId,
     origin: string,
+    strict = true,
 ) {
     const start = performance.now()
     try {
@@ -176,21 +179,23 @@ export async function checkPermission(
         const granting_resource_id = permission?.granting_resource_id ?? ""
 
         // Store check in audit
-        await fdm.insert(authZSchema.audit).values({
-            audit_id: createId(),
-            audit_origin: origin,
-            principal_id: principal_id,
-            target_resource: resource,
-            target_resource_id: resource_id,
-            granting_resource: granting_resource,
-            granting_resource_id: granting_resource_id,
-            action: action,
-            allowed: !!permission,
-            duration: Math.round(performance.now() - start),
-        })
+        if (strict) {
+            await fdm.insert(authZSchema.audit).values({
+                audit_id: createId(),
+                audit_origin: origin,
+                principal_id: principal_id,
+                target_resource: resource,
+                target_resource_id: resource_id,
+                granting_resource: granting_resource,
+                granting_resource_id: granting_resource_id,
+                action: action,
+                allowed: !!permission,
+                duration: Math.round(performance.now() - start),
+            })
 
-        if (!permission) {
-            throw new Error("Permission denied")
+            if (!permission) {
+                throw new Error("Permission denied")
+            }
         }
 
         return !!permission
@@ -200,53 +205,6 @@ export async function checkPermission(
             message =
                 "Principal does not have permission to perform this action"
         }
-        throw handleError(err, message, {
-            resource: resource,
-            action: action,
-            resource_id: resource_id,
-            principal_id: principal_id,
-        })
-    }
-}
-
-/**
- * Returns whether the principal has permission to perform the action in the given resource.
- *
- * If an action is actually going to be taken based on the result, you should use `checkPermission` instead.
- *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param resource - The type of resource being accessed.
- * @param action - The action the principal intends to perform.
- * @param resource_id - The unique identifier of the specific resource.
- * @param principal_id - The principal identifier(s); supports a single ID or an array.
- * @param options - Options to customize the behavior
- * @returns Resolves to true if the principal is permitted to perform the action.
- *   If an error occurs and `options.fallback` is provided, returns the fallback value; otherwise throws.
- */
-export async function hasPermission(
-    fdm: FdmType,
-    resource: Resource,
-    action: Action,
-    resource_id: string,
-    principal_id: PrincipalId,
-    options?: {
-        /** The value to return in case of error. Omit if you would like the return promise to be rejected instead. */
-        fallback?: boolean
-    },
-) {
-    try {
-        return !!(await getPermission(
-            fdm,
-            resource,
-            action,
-            resource_id,
-            principal_id,
-        ))
-    } catch (err) {
-        if (options && typeof options.fallback !== "undefined") {
-            return options.fallback
-        }
-        const message = "Exception for hasPermission"
         throw handleError(err, message, {
             resource: resource,
             action: action,

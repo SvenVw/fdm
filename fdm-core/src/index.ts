@@ -22,7 +22,7 @@ export {
     updateUserProfile,
 } from "./authentication"
 export type { FdmAuth } from "./authentication.d"
-export { checkPermission, hasPermission } from "./authorization"
+export { checkPermission } from "./authorization"
 export type { PrincipalId } from "./authorization.d"
 export {
     getCachedCalculation,
