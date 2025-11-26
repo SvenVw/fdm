@@ -835,7 +835,9 @@ describe("Authorization Functions", () => {
                 farm_id,
                 organization_member_id,
             )
-            expect(roles).toEqual(["owner", "researcher"])
+            expect(roles.length).toBe(2)
+            expect(roles).toContain("owner")
+            expect(roles).toContain("researcher")
         })
 
         it("should throw error with invalid resource", async () => {
