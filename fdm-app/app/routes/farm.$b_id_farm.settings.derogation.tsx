@@ -110,7 +110,7 @@ export default function DerogationSettings() {
                     <CardDescription>
                         {farmWritePermission
                             ? "Schakel derogatie in voor de jaren waarvoor dit bedrijf in aanmerking komt."
-                            : "Hieronder staan de jaren waarin dit bedrijf derogatie in aanmerking heeft."}{" "}
+                            : "Hieronder staan de jaren waarin dit bedrijf derogatie heeft."}{" "}
                         Dit heeft invloed op de berekening van je
                         gebruiksruimte.
                     </CardDescription>
