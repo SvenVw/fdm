@@ -48,7 +48,6 @@
         "@dotenvx/dotenvx": "catalog:",
         "@rollup/plugin-commonjs": "catalog:",
         "@rollup/plugin-node-resolve": "catalog:",
-        "@rollup/plugin-terser": "catalog:",
         "@svenvw/fdm-data": "workspace:^0.18.1",
         "@types/node": "^24.10.1",
         "@vitest/coverage-v8": "catalog:",

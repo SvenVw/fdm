@@ -10,7 +10,6 @@ catalog:
   '@rollup/plugin-commonjs': ^29.0.0
   '@rollup/plugin-json': ^6.1.0
   '@rollup/plugin-node-resolve': ^16.0.3
-  '@rollup/plugin-terser': ^0.4.4
   '@rollup/plugin-typescript': ^12.3.0
   '@vitest/coverage-v8': 4.0.13
   better-auth: ^1.4.1

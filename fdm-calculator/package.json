@@ -49,7 +49,6 @@
         "@dotenvx/dotenvx": "catalog:",
         "@rollup/plugin-commonjs": "catalog:",
         "@rollup/plugin-node-resolve": "catalog:",
-        "@rollup/plugin-terser": "catalog:",
         "@svenvw/fdm-core": "workspace:*",
         "@vitest/coverage-v8": "catalog:",
         "postgres": "^3.4.7",
