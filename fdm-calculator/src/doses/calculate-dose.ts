@@ -130,7 +130,7 @@ export function calculateDose({
         applicationDoses.push(currentDose)
         for (const key of Object.keys(totalDose) as (keyof Dose)[]) {
             if (key !== "p_app_id") {
-                totalDose[key] += currentDose[key]
+                ;(totalDose as any)[key] += (currentDose as any)[key]
             }
         }
     }

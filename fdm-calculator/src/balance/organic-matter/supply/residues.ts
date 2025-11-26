@@ -4,7 +4,7 @@ import type {
     CultivationDetail,
     FieldInput,
     OrganicMatterBalanceInput,
-} from "../types.d"
+} from "../types"
 
 /**
  * Calculates the supply of effective organic matter (EOM) from crop residues that are left on the field.

@@ -4,7 +4,7 @@ import type {
     FieldInput,
     CultivationDetail,
     SoilAnalysisPicked,
-} from "./types.d"
+} from "./types"
 import { addDays, differenceInDays } from "date-fns"
 
 /**
@@ -40,7 +40,7 @@ export function calculateOrganicMatterDegradation(
     }
 
     // Determine if the land use is grassland based on the crop rotation type of the cultivations.
-    const isGrassland = cultivations.some((c) => {
+    const isGrassland = cultivations.some((c: { b_lu_catalogue: string }) => {
         const b_lu_catalogue = c.b_lu_catalogue
         const b_lu_croprotation =
             cultivationDetailsMap.get(b_lu_catalogue)?.b_lu_croprotation
