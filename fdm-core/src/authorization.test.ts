@@ -30,6 +30,7 @@ describe("Authorization Functions", () => {
     let principal_id: string
     let farm_id: string
     let organization_id: string
+    let organization_member_email: string
     let organization_member_id: string
     let host: string
     let port: number
@@ -67,18 +68,6 @@ describe("Authorization Functions", () => {
             },
         })
         principal_id = principal.user.id
-        const organization_member = await fdmAuth.api.signUpEmail({
-            headers: undefined,
-            body: {
-                email: "organization-member@example.com",
-                name: "Organization Member",
-                firstname: "Organization",
-                surname: "Member",
-                username: "organizationmember",
-                password: "password",
-            },
-        })
-        organization_member_id = organization_member.user.id
     })
 
     beforeEach(async () => {
@@ -103,6 +92,21 @@ describe("Authorization Functions", () => {
             `test-${createId()}`,
             "This is an organization created for testing purposes.",
         )
+        const organization_member_username = `orgmember${createId(8).toLowerCase()}`
+        organization_member_email = `${organization_member_username}@example.com`
+        const organization_member = await fdmAuth.api.signUpEmail({
+            headers: undefined,
+            body: {
+                email: organization_member_email,
+                name: "Organization Member",
+                firstname: "Organization",
+                surname: "Member",
+                username: organization_member_username,
+                password: "password",
+            },
+        })
+        organization_member_id = organization_member.user.id
+        console.log(organization_member_email)
     })
 
     describe("checkPermission", () => {
@@ -138,7 +142,7 @@ describe("Authorization Functions", () => {
             const invitation_id = await inviteUserToOrganization(
                 fdm,
                 principal_id,
-                "organization-member@example.com",
+                organization_member_email,
                 "owner",
                 organization_id,
             )
@@ -173,7 +177,7 @@ describe("Authorization Functions", () => {
             const invitation_id = await inviteUserToOrganization(
                 fdm,
                 principal_id,
-                "organization-member@example.com",
+                organization_member_email,
                 "owner",
                 organization_id,
             )
@@ -559,7 +563,7 @@ describe("Authorization Functions", () => {
             const invitation_id = await inviteUserToOrganization(
                 fdm,
                 principal_id,
-                "organization-member@example.com",
+                organization_member_email,
                 "admin",
                 organization_id,
             )
@@ -711,7 +715,7 @@ describe("Authorization Functions", () => {
             const invitation_id = await inviteUserToOrganization(
                 fdm,
                 principal_id,
-                "organization-member@example.com",
+                organization_member_email,
                 "admin",
                 organization_id,
             )
@@ -737,7 +741,7 @@ describe("Authorization Functions", () => {
             const invitation_id = await inviteUserToOrganization(
                 fdm,
                 principal_id,
-                "organization-member@example.com",
+                organization_member_email,
                 "admin",
                 organization_id,
             )
