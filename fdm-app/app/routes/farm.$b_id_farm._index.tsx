@@ -1,11 +1,5 @@
 import { cowHead } from "@lucide/lab"
-import {
-    getFarm,
-    getFarms,
-    getFields,
-    hasPermission,
-    isAllowedToDeleteFarm,
-} from "@svenvw/fdm-core"
+import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
 import {
     ArrowRightLeft,
     BookOpenText,
@@ -109,25 +103,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
-        const farmSharePermission = hasPermission(
-            fdm,
-            "farm",
-            "share",
-            b_id_farm,
-            session.principal_id,
-            { fallback: true },
-        )
-        // Check if user is allowed to delete farm
-        let canDeleteFarm = await isAllowedToDeleteFarm(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-        )
-        // Add temporary workaround (until implemented in fdm-core) so that advisors are not able to delete a farm
-        if (canDeleteFarm && farm.roles.includes("advisor")) {
-            canDeleteFarm = false
-        }
-
         // Return the farm ID and session info
         return {
             b_id_farm: b_id_farm,
@@ -136,8 +111,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             farmArea: Math.round(farmArea),
             farmOptions: farmOptions,
             roles: farm.roles,
-            canDeleteFarm: canDeleteFarm,
-            farmSharePermission: await farmSharePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -476,30 +449,26 @@ export default function FarmDashboardIndex() {
                                                     Beweiding
                                                 </NavLink>
                                             </Button>
-                                            {loaderData.farmSharePermission && (
-                                                <Button
-                                                    variant="ghost"
-                                                    className="w-full justify-start"
-                                                    asChild
-                                                >
-                                                    <NavLink to="settings/access">
-                                                        <UserRoundCheck className="mr-2 h-4 w-4" />
-                                                        Toegang
-                                                    </NavLink>
-                                                </Button>
-                                            )}
-                                            {loaderData.canDeleteFarm && (
-                                                <Button
-                                                    variant="ghost"
-                                                    className="w-full justify-start"
-                                                    asChild
-                                                >
-                                                    <NavLink to="settings/delete">
-                                                        <Trash2 className="mr-2 h-4 w-4" />
-                                                        Verwijderen
-                                                    </NavLink>
-                                                </Button>
-                                            )}
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-start"
+                                                asChild
+                                            >
+                                                <NavLink to="settings/access">
+                                                    <UserRoundCheck className="mr-2 h-4 w-4" />
+                                                    Toegang
+                                                </NavLink>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-start"
+                                                asChild
+                                            >
+                                                <NavLink to="settings/delete">
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    Verwijderen
+                                                </NavLink>
+                                            </Button>
                                         </div>
                                     </CardContent>
                                 </Card>
