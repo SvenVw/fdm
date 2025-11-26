@@ -6,11 +6,13 @@ import packageJson from "./package.json" with { type: "json" }
 
 const isProd = process.env.NODE_ENV === "production"
 
-const external = [
+const dependencies = [
     ...Object.keys(packageJson.dependencies || {}),
     ...Object.keys(packageJson.peerDependencies || {}),
     "fs", "os", "net", "tls", "crypto", "stream"
 ]
+
+const external = (id) => dependencies.some(dep => id === dep || id.startsWith(`${dep}/`))
 
 export default {
     input: "src/index.ts",

@@ -20,7 +20,7 @@ import type {
     SoilAnalysisPicked,
 } from "./types"
 import { calculateNitrogenEmissionViaNitrate } from "./emission/nitrate"
-import { combineSoilAnalyses } from "balance/shared/soil"
+import { combineSoilAnalyses } from "../shared/soil"
 
 /**
  * Calculates the nitrogen balance for a set of fields, considering nitrogen supply, removal, and emission.
