@@ -561,7 +561,7 @@ export async function listResources(
             }
 
             return await tx
-                .select({
+                .selectDistinct({
                     resource_id: authZSchema.role.resource_id,
                 })
                 .from(authZSchema.role)

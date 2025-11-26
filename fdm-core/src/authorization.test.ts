@@ -579,6 +579,32 @@ describe("Authorization Functions", () => {
             expect(accessibleResources).toContain(farm_id2)
         })
 
+        it("should not list duplicates", async () => {
+            await grantRole(
+                fdm,
+                "farm",
+                "owner",
+                farm_id,
+                organization_member_id,
+            )
+            await grantRole(fdm, "farm", "advisor", farm_id, organization_id)
+            const invitation_id = await inviteUserToOrganization(
+                fdm,
+                principal_id,
+                organization_member_email,
+                "admin",
+                organization_id,
+            )
+            await acceptInvitation(fdm, invitation_id, organization_member_id)
+            const accessibleResources = await listResources(
+                fdm,
+                "farm",
+                "read",
+                organization_member_id,
+            )
+            expect(accessibleResources).toEqual([farm_id])
+        })
+
         it("should handle empty list", async () => {
             const principal_id_new = createId()
             const accessibleResources = await listResources(
