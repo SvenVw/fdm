@@ -1,4 +1,8 @@
-import { getGrazingIntentions, setGrazingIntention } from "@svenvw/fdm-core"
+import {
+    getGrazingIntentions,
+    hasPermission,
+    setGrazingIntention,
+} from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -39,7 +43,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session.principal_id,
             b_id_farm,
         )
-        return { b_id_farm, grazingIntentions }
+        const farmWritePermission = await hasPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+        )
+        return { b_id_farm, grazingIntentions, farmWritePermission }
     } catch (error) {
         throw handleLoaderError(error)
     }
@@ -78,7 +89,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function GrazingIntentionSettings() {
-    const { grazingIntentions } = useLoaderData<typeof loader>()
+    const { grazingIntentions, farmWritePermission } =
+        useLoaderData<typeof loader>()
     const fetcher = useFetcher<typeof action>()
 
     const currentYear = new Date().getFullYear()
@@ -92,9 +104,10 @@ export default function GrazingIntentionSettings() {
                 <CardHeader>
                     <CardTitle>Beweiding</CardTitle>
                     <CardDescription>
-                        Geef hier aan of je voor een bepaald jaar hebt beweid of
-                        van plan bent te gaan beweiden. Dit heeft invloed op de
-                        berekeningen.
+                        {farmWritePermission
+                            ? "Geef hier aan of je voor een bepaald jaar hebt beweid of van plan bent te gaan beweiden."
+                            : "Hieronder staan de jaren waarin beweiding gepland is of heeft plaatsgevonden."}{" "}
+                        Dit heeft invloed op de berekeningen.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -117,27 +130,37 @@ export default function GrazingIntentionSettings() {
                                     <TableRow key={year}>
                                         <TableCell>{year}</TableCell>
                                         <TableCell>
-                                            <fetcher.Form method="post">
+                                            {farmWritePermission ? (
+                                                <fetcher.Form method="post">
+                                                    <Switch
+                                                        checked={
+                                                            hasGrazingIntention
+                                                        }
+                                                        onCheckedChange={() => {
+                                                            fetcher.submit(
+                                                                {
+                                                                    year: String(
+                                                                        year,
+                                                                    ),
+                                                                    hasGrazingIntention:
+                                                                        String(
+                                                                            hasGrazingIntention,
+                                                                        ),
+                                                                },
+                                                                {
+                                                                    method: "post",
+                                                                },
+                                                            )
+                                                        }}
+                                                    />
+                                                </fetcher.Form>
+                                            ) : (
                                                 <Switch
                                                     checked={
                                                         hasGrazingIntention
                                                     }
-                                                    onCheckedChange={() => {
-                                                        fetcher.submit(
-                                                            {
-                                                                year: String(
-                                                                    year,
-                                                                ),
-                                                                hasGrazingIntention:
-                                                                    String(
-                                                                        hasGrazingIntention,
-                                                                    ),
-                                                            },
-                                                            { method: "post" },
-                                                        )
-                                                    }}
                                                 />
-                                            </fetcher.Form>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 )
