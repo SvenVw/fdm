@@ -5,69 +5,56 @@ import typescript from "@rollup/plugin-typescript"
 import { defineConfig } from "rollup"
 import packageJson from "./package.json" with { type: "json" }
 
+const isProd = process.env.NODE_ENV === "production"
+
 export default defineConfig({
-    input: "src/index.ts", // Your entry point
+    input: "src/index.ts",
     output: [
         {
-            file: "dist/fdm-calculator.esm.js", // Output for ES modules
+            file: "dist/fdm-calculator.esm.js",
             format: "esm",
-            sourcemap: process.env.NODE_ENV === "development",
+            sourcemap: isProd ? true : "inline",
         },
     ],
     plugins: [
         resolve(),
         commonjs(),
         typescript({
-            sourceMap: process.env.NODE_ENV === "development",
-            inlineSources: process.env.NODE_ENV === "development",
+            sourceMap: !isProd, // handled by rollup in prod, inline in dev
+            inlineSources: !isProd,
         }),
-        terser({
-            sourceMap:
-                process.env.NODE_ENV === "development"
-                    ? {
-                          filename: "dist/fdm-calculator.esm.js.map",
-                          url: "fdm-calculator.esm.js.map",
-                      }
-                    : false,
-        }), // Minifies the output
+        isProd &&
+            terser({
+                sourceMap: true,
+            }),
         {
             renderChunk: (code, map) => {
                 const replacement = `"fdm-calculator:${packageJson.version}"`
-
                 const placeholder = `"fdm-calculator:{FDM_CALCULATOR_VERSION}"`
-                const occurrences =
-                    code.match(
-                        new RegExp(
-                            placeholder.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&"),
-                            "g",
-                        ),
-                    ) || []
-
-                if (occurrences.length === 0) {
-                    console.warn(
-                        `⚠️ Version placeholder "${placeholder}" not found in bundle`,
-                    )
-                } else if (occurrences.length > 1) {
-                    console.warn(
-                        `⚠️ Version placeholder "${placeholder}" appears ${occurrences.length} times`,
-                    )
+                
+                if (!code.includes(placeholder)) {
+                    console.warn(`⚠️ Version placeholder "${placeholder}" not found in bundle`)
+                    return null
                 }
 
                 if (replacement.length > placeholder.length) {
                     console.warn(
-                        "⚠️ Replacement fdm-calculator version string ended up longer than the placeholder in package.ts. Source map will be broken.",
+                        "⚠️ Replacement fdm-calculator version string ended up longer than the placeholder. Source map will be broken.",
                     )
                 }
 
                 return {
                     code: code.replace(
                         placeholder,
-                        replacement.padEnd(placeholder.length, " "), // Pad to not break the source map
+                        replacement.padEnd(placeholder.length, " "),
                     ),
                     map,
                 }
             },
-        }, // Modifies bundled package.ts to contain the actual package version
+        },
     ],
-    external: ["@svenvw/fdm-core", "geotiff"],
+    external: [
+        ...Object.keys(packageJson.dependencies || {}),
+        ...Object.keys(packageJson.peerDependencies || {}),
+    ],
 })
