@@ -57,6 +57,9 @@
         "vitest": "catalog:"
     },
     "packageManager": "pnpm@10.23.0",
+    "engines": {
+        "node": ">=20.10"
+    },
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     },
