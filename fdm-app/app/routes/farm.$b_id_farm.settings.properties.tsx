@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { getFarm, updateFarm } from "@svenvw/fdm-core"
+import { getFarm, hasPermission, updateFarm } from "@svenvw/fdm-core"
 import { useEffect } from "react"
 import { Form } from "react-hook-form"
 import {
@@ -80,10 +80,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 statusText: "Farm is not found",
             })
         }
+        const farmWritePermission = await hasPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+            { fallback: true },
+        )
 
         // Return user information from loader
         return {
             farm: farm,
+            farmWritePermission: farmWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -145,7 +154,12 @@ export default function FarmSettingsPropertiesBlock() {
                     onSubmit={form.handleSubmit}
                     method="POST"
                 >
-                    <fieldset disabled={form.formState.isSubmitting}>
+                    <fieldset
+                        disabled={
+                            !loaderData.farmWritePermission ||
+                            form.formState.isSubmitting
+                        }
+                    >
                         <div className="grid grid-cols-2 w-full items-center gap-4">
                             <div className="flex flex-col space-y-1.5 col-span-2">
                                 <FormField
@@ -238,16 +252,20 @@ Wageningen"
                         </div>
                     </fieldset>
                     <br />
-                    <div className="ml-auto">
-                        <Button
-                            type="submit"
-                            disabled={form.formState.isSubmitting}
-                            className="m-auto"
-                        >
-                            {form.formState.isSubmitting && <LoadingSpinner />}
-                            Bijwerken
-                        </Button>
-                    </div>
+                    {loaderData.farmWritePermission && (
+                        <div className="ml-auto">
+                            <Button
+                                type="submit"
+                                disabled={form.formState.isSubmitting}
+                                className="m-auto"
+                            >
+                                {form.formState.isSubmitting && (
+                                    <LoadingSpinner />
+                                )}
+                                Bijwerken
+                            </Button>
+                        </div>
+                    )}
                 </Form>
             </RemixFormProvider>
         </div>
