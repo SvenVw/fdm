@@ -29,9 +29,13 @@ RUN addgroup --system --gid 1001 nodejs && \
 COPY --from=builder --chown=user:nodejs /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
 COPY --from=builder --chown=user:nodejs /app/fdm-app/package.json ./fdm-app/
 COPY --from=builder --chown=user:nodejs /app/fdm-core/package.json ./fdm-core/
+COPY --from=builder --chown=user:nodejs /app/fdm-data/package.json ./fdm-data/
+COPY --from=builder --chown=user:nodejs /app/fdm-calculator/package.json ./fdm-calculator/
 COPY --from=builder --chown=user:nodejs /app/fdm-app/build ./fdm-app/build
 COPY --from=builder --chown=user:nodejs /app/fdm-app/app ./fdm-app/app
 COPY --from=builder --chown=user:nodejs /app/fdm-core/dist ./fdm-core/dist
+COPY --from=builder --chown=user:nodejs /app/fdm-data/dist ./fdm-data/dist
+COPY --from=builder --chown=user:nodejs /app/fdm-calculator/dist ./fdm-calculator/dist
 
 # Install production dependencies
 RUN pnpm install --prod --frozen-lockfile
