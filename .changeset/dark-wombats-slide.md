@@ -2,4 +2,4 @@
 "@svenvw/fdm-core": minor
 ---
 
-Added the `hasPermission` function that returns if the principal has permission to perform a specific action on a resource without throwing exceptions or creating an audit log.
+Added the optional `strict` parameter to the `checkPermission` function, which, when specified as false, disables audit logging, and throwing an exception if the principal has no permission.
