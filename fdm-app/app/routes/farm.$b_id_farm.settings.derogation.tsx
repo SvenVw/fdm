@@ -1,6 +1,6 @@
 import {
     addDerogation,
-    hasPermission,
+    checkPermission,
     listDerogations,
     removeDerogation,
 } from "@svenvw/fdm-core"
@@ -41,13 +41,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session.principal_id,
             b_id_farm,
         )
-        const farmWritePermission = await hasPermission(
+        const farmWritePermission = await checkPermission(
             fdm,
             "farm",
             "write",
             b_id_farm,
             session.principal_id,
-            { fallback: true },
+            new URL(request.url).pathname,
+            false,
         )
         return { b_id_farm, derogations, farmWritePermission }
     } catch (error) {

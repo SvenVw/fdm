@@ -1,9 +1,9 @@
 import {
+    checkPermission,
     getCurrentSoilData,
     getField,
     getSoilAnalyses,
     getSoilParametersDescription,
-    hasPermission,
     removeSoilAnalysis,
 } from "@svenvw/fdm-core"
 import { Plus } from "lucide-react"
@@ -96,25 +96,28 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get soil parameter descriptions
         const soilParameterDescription = getSoilParametersDescription()
 
-        const fieldWritePermission = hasPermission(
+        const pathname = new URL(request.url).pathname
+        const fieldWritePermission = checkPermission(
             fdm,
             "field",
             "write",
             b_id,
             session.principal_id,
-            { fallback: true },
+            pathname,
+            false,
         )
 
         const soilAnalysisWritePermissionsEntries = await Promise.all(
             soilAnalyses.map(async (analysis) => [
                 analysis.a_id,
-                await hasPermission(
+                await checkPermission(
                     fdm,
                     "soil_analysis",
                     "write",
                     analysis.a_id,
                     session.principal_id,
-                    { fallback: true },
+                    pathname,
+                    false,
                 ),
             ]),
         )

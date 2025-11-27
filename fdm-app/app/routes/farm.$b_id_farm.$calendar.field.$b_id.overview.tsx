@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
+    checkPermission,
     getField,
-    hasPermission,
     listAvailableAcquiringMethods,
     updateField,
 } from "@svenvw/fdm-core"
@@ -88,13 +88,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        const fieldWritePermission = await hasPermission(
+        const fieldWritePermission = await checkPermission(
             fdm,
             "field",
             "write",
             b_id,
             session.principal_id,
-            { fallback: true },
+            new URL(request.url).pathname,
+            false,
         )
 
         // Return user information from loader

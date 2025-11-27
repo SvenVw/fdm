@@ -1,9 +1,9 @@
 import {
+    checkPermission,
     getFarm,
     getFarms,
     getFertilizerParametersDescription,
     getFertilizers,
-    hasPermission,
 } from "@svenvw/fdm-core"
 import {
     data,
@@ -103,13 +103,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })),
         )
 
-        const farmWritePermission = await hasPermission(
+        const farmWritePermission = await checkPermission(
             fdm,
             "farm",
             "write",
             b_id_farm,
             session.principal_id,
-            { fallback: true },
+            new URL(request.url).pathname,
+            false,
         )
 
         // Return user information from loader

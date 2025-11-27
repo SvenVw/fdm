@@ -1,8 +1,8 @@
 import {
+    checkPermission,
     getCultivation,
     getHarvest,
     getParametersForHarvestCat,
-    hasPermission,
     removeHarvest,
     updateHarvest,
 } from "@svenvw/fdm-core"
@@ -88,13 +88,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
         const calendar = getCalendar(params)
 
-        const harvestingWritePermission = hasPermission(
+        const harvestingWritePermission = checkPermission(
             fdm,
             "harvesting",
             "write",
             b_id_harvesting,
             session.principal_id,
-            { fallback: true },
+            new URL(request.url).pathname,
+            false,
         )
 
         // Get details of cultivation

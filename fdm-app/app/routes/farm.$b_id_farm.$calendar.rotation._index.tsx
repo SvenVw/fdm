@@ -1,5 +1,6 @@
 import {
     type CultivationCatalogue,
+    checkPermission,
     getCultivations,
     getCultivationsFromCatalogue,
     getCurrentSoilData,
@@ -8,7 +9,6 @@ import {
     getFertilizers,
     getFields,
     getHarvests,
-    hasPermission,
 } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -306,13 +306,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             cultivationCatalogue,        
         )
         
-        const farmWritePermission = await hasPermission(
+        const farmWritePermission = await checkPermission(
             fdm,
             "farm",
             "write",
             b_id_farm,
             session.principal_id,
-            { fallback: true },
+            new URL(request.url).pathname,
+            false,
         )
 
         // Return user information from loader

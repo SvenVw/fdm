@@ -1,8 +1,8 @@
 import {
+    checkPermission,
     getField,
     getSoilAnalysis,
     getSoilParametersDescription,
-    hasPermission,
     updateSoilAnalysis,
 } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
@@ -99,13 +99,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             (item: { parameter: string }) => soilAnalysis[item.parameter],
         )
 
-        const soilAnalysisWritePermission = await hasPermission(
+        const soilAnalysisWritePermission = await checkPermission(
             fdm,
             "soil_analysis",
             "write",
             a_id,
             session.principal_id,
-            { fallback: true },
+            new URL(request.url).pathname,
+            false,
         )
 
         // Return user information from loader

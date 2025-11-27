@@ -1,11 +1,11 @@
 import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
+    checkPermission,
     getFertilizerApplications,
     getFertilizerParametersDescription,
     getFertilizers,
     getField,
-    hasPermission,
     removeFertilizerApplication,
     updateFertilizerApplication,
 } from "@svenvw/fdm-core"
@@ -166,13 +166,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             calendar: getCalendar(params),
         }
 
-        const fieldWritePermission = hasPermission(
+        const pathname = new URL(request.url).pathname
+        const fieldWritePermission = checkPermission(
             fdm,
             "field",
             "write",
             b_id,
             session.principal_id,
-            { fallback: true },
+            pathname,
+            false,
         )
 
         const fertilizerApplicationWritePermissionsEntries = await Promise.all(
@@ -180,13 +182,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 async (app) =>
                     [
                         app.p_app_id,
-                        await hasPermission(
+                        await checkPermission(
                             fdm,
                             "fertilizer_application",
                             "write",
                             app.p_app_id,
                             session.principal_id,
-                            { fallback: true },
+                            pathname,
+                            false,
                         ),
                     ] as [string, boolean],
             ),

@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { getFarm, hasPermission, updateFarm } from "@svenvw/fdm-core"
+import { checkPermission, getFarm, updateFarm } from "@svenvw/fdm-core"
 import { useEffect } from "react"
 import { Form } from "react-hook-form"
 import {
@@ -80,13 +80,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 statusText: "Farm is not found",
             })
         }
-        const farmWritePermission = await hasPermission(
+        const farmWritePermission = await checkPermission(
             fdm,
             "farm",
             "write",
             b_id_farm,
             session.principal_id,
-            { fallback: true },
+            new URL(request.url).pathname,
+            false,
         )
 
         // Return user information from loader

@@ -1,11 +1,11 @@
 import {
+    checkPermission,
     type CultivationCatalogue,
     getCultivation,
     getCultivationsFromCatalogue,
     getField,
     getHarvests,
     getParametersForHarvestCat,
-    hasPermission,
     removeCultivation,
     updateCultivation,
 } from "@svenvw/fdm-core"
@@ -100,13 +100,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const timeframe = getTimeframe(params)
         const calendar = getCalendar(params)
 
-        const cultivationWritePermission = hasPermission(
+        const cultivationWritePermission = checkPermission(
             fdm,
             "cultivation",
             "write",
             b_lu,
             session.principal_id,
-            { fallback: true },
+            new URL(request.url).pathname,
+            false,
         )
 
         // Get details of field

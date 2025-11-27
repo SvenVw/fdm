@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addOrganicCertification,
-    hasPermission,
+    checkPermission,
     listOrganicCertifications,
     removeOrganicCertification,
 } from "@svenvw/fdm-core"
@@ -94,13 +94,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // For now we expect that a farm can have only 1 certification
         const organicCertification = organicCertifications[0]
 
-        const farmWritePermission = await hasPermission(
+        const farmWritePermission = await checkPermission(
             fdm,
             "farm",
             "write",
             b_id_farm,
             session.principal_id,
-            { fallback: true },
+            new URL(request.url).pathname,
+            false,
         )
 
         return { b_id_farm, organicCertification, farmWritePermission }

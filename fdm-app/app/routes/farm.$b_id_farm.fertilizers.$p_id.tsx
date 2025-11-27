@@ -1,11 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
+    checkPermission,
     getFarm,
     getFarms,
     getFertilizer,
     getFertilizerParametersDescription,
     getFertilizers,
-    hasPermission,
     updateFertilizerFromCatalogue,
 } from "@svenvw/fdm-core"
 import {
@@ -113,13 +113,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
         if (
             editable &&
-            !(await hasPermission(
+            !(await checkPermission(
                 fdm,
                 "farm",
                 "write",
                 b_id_farm,
                 session.principal_id,
-                { fallback: true },
+                new URL(request.url).pathname,
+                false,
             ))
         ) {
             editable = false

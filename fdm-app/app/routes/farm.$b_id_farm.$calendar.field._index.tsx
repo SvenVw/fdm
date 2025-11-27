@@ -1,11 +1,11 @@
 import {
+    checkPermission,
     getCultivations,
     getCurrentSoilData,
     getFarms,
     getFertilizerApplications,
     getFertilizers,
     getFields,
-    hasPermission,
 } from "@svenvw/fdm-core"
 import {
     data,
@@ -156,13 +156,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         (x) => x.parameter === "b_soiltype_agr",
                     )?.value ?? null
 
-                const has_write_permission = await hasPermission(
+                const has_write_permission = await checkPermission(
                     fdm,
                     "field",
                     "write",
                     field.b_id,
                     session.principal_id,
-                    { fallback: true },
+                    new URL(request.url).pathname,
+                    false,
                 )
                 return {
                     b_id: field.b_id,
@@ -178,13 +179,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }),
         )
 
-        const farmWritePermission = await hasPermission(
+        const farmWritePermission = await checkPermission(
             fdm,
             "farm",
             "write",
             b_id_farm,
             session.principal_id,
-            { fallback: true },
+            new URL(request.url).pathname,
+            false,
         )
 
         // Return user information from loader

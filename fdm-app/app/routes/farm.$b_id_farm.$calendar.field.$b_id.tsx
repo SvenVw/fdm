@@ -1,4 +1,9 @@
-import { getFarms, getField, getFields, hasPermission } from "@svenvw/fdm-core"
+import {
+    checkPermission,
+    getFarms,
+    getField,
+    getFields,
+} from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
@@ -152,13 +157,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             },
         ]
 
-        const fieldWritePermission = await hasPermission(
+        const fieldWritePermission = await checkPermission(
             fdm,
             "field",
             "write",
             b_id,
             session.principal_id,
-            { fallback: true },
+            new URL(request.url).pathname,
+            false,
         )
 
         if (fieldWritePermission) {

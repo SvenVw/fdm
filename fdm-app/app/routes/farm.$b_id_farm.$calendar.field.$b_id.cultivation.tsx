@@ -1,10 +1,10 @@
 import {
     addCultivation,
+    checkPermission,
     getCultivations,
     getCultivationsFromCatalogue,
     getField,
     getHarvests,
-    hasPermission,
     removeCultivation,
 } from "@svenvw/fdm-core"
 import {
@@ -79,13 +79,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get timeframe from calendar store
         const timeframe = getTimeframe(params)
 
-        const fieldWritePermission = await hasPermission(
+        const fieldWritePermission = await checkPermission(
             fdm,
             "field",
             "write",
             b_id,
             session.principal_id,
-            { fallback: true },
+            new URL(request.url).pathname,
+            false,
         )
 
         // Get details of field
