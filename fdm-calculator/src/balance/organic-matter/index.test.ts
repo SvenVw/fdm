@@ -1,20 +1,20 @@
-import { describe, it, expect, vi } from "vitest"
 import Decimal from "decimal.js"
+import { describe, expect, it, vi } from "vitest"
+import { convertOrganicMatterBalanceToNumeric } from "../shared/conversion"
+import * as shared from "../shared/soil"
+import * as degradation from "./degradation"
 import {
     calculateOrganicMatterBalanceField,
     calculateOrganicMatterBalancesFieldToFarm,
 } from "./index"
-import { convertOrganicMatterBalanceToNumeric } from "../shared/conversion"
 import * as supply from "./supply"
-import * as degradation from "./degradation"
-import * as shared from "../shared/soil"
 import type {
-    OrganicMatterBalanceInput,
-    FieldInput,
     CultivationDetail,
     FertilizerDetail,
+    FieldInput,
     OrganicMatterBalanceField,
     OrganicMatterBalanceFieldResult,
+    OrganicMatterBalanceInput,
 } from "./types.d"
 
 vi.mock("./supply")

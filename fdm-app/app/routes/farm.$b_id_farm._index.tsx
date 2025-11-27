@@ -22,9 +22,6 @@ import {
     NavLink,
     useLoaderData,
 } from "react-router"
-import { getSession } from "~/lib/auth.server"
-import { clientConfig } from "~/lib/config"
-import { handleLoaderError } from "~/lib/error"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
@@ -45,7 +42,10 @@ import {
     SelectValue,
 } from "~/components/ui/select"
 import { SidebarInset } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
 import { getCalendarSelection } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
 

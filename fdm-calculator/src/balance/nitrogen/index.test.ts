@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { calculateNitrogenBalance } from "."
-import type {
-    FieldInput,
-    NitrogenBalanceInput,
-    SoilAnalysisPicked,
-} from "./types"
+import type { NitrogenBalanceInput } from "./types"
 
 describe("calculateNitrogenBalance", () => {
     it("should calculate nitrogen balance correctly with mock input", async () => {

@@ -1,13 +1,13 @@
 import Decimal from "decimal.js"
 import type {
     NitrogenBalance,
-    NitrogenBalanceNumeric,
     NitrogenBalanceFieldNumeric,
+    NitrogenBalanceNumeric,
 } from "../nitrogen/types"
 import type {
     OrganicMatterBalance,
-    OrganicMatterBalanceNumeric,
     OrganicMatterBalanceFieldNumeric,
+    OrganicMatterBalanceNumeric,
 } from "../organic-matter/types"
 
 // Helper function to convert Decimal to number recursively

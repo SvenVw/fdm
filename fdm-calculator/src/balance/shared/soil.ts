@@ -1,10 +1,10 @@
+import type { SoilAnalysis } from "@svenvw/fdm-core"
 import {
     calculateBulkDensity,
     calculateCarbonNitrogenRatio,
     calculateOrganicCarbon,
     calculateOrganicMatter,
 } from "../../conversions/soil"
-import type { SoilAnalysis } from "@svenvw/fdm-core"
 import type { SoilAnalysisPicked as NitrogenSoilAnalysisPicked } from "../nitrogen/types"
 import type { SoilAnalysisPicked as OrganicMatterSoilAnalysisPicked } from "../organic-matter/types"
 

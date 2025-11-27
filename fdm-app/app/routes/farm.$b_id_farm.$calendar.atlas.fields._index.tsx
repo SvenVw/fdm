@@ -12,10 +12,7 @@ import { type LoaderFunctionArgs, useLoaderData } from "react-router"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
-import {
-    FieldsSourceAvailable,
-    FieldsSourceNotClickable,
-} from "~/components/blocks/atlas/atlas-sources"
+import { FieldsSourceAvailable } from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
@@ -120,10 +117,10 @@ export default function FarmAtlasFieldsBlock() {
 
     const id = "fieldsSaved"
     const fields = loaderData.savedFields
-    const fieldsSavedStyle = getFieldsStyle(id)
+    const _fieldsSavedStyle = getFieldsStyle(id)
     const fieldsAvailableId = "fieldsAvailable"
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
-    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
+    const _fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
     const initialViewState = getViewState(fields)
 
     // Create a sessionStorage to store the latest viewstate

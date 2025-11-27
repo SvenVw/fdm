@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest"
 import Decimal from "decimal.js"
-import { calculateOrganicMatterSupplyByFertilizers } from "./fertilizers"
+import { describe, expect, it } from "vitest"
 import type { FertilizerDetail, FieldInput } from "../types.d"
+import { calculateOrganicMatterSupplyByFertilizers } from "./fertilizers"
 
 describe("calculateOrganicMatterSupplyByFertilizers", () => {
     const fertilizerDetailsMap = new Map<string, FertilizerDetail>([
@@ -71,11 +71,19 @@ describe("calculateOrganicMatterSupplyByFertilizers", () => {
         const expectedManure = new Decimal(2000).times(20).dividedBy(1000) // 40
         const expectedCompost = new Decimal(1000).times(150).dividedBy(1000) // 150
         const expectedOther = new Decimal(500).times(5).dividedBy(1000) // 2.5
-        const expectedTotal = expectedManure.plus(expectedCompost).plus(expectedOther) // 192.5
+        const expectedTotal = expectedManure
+            .plus(expectedCompost)
+            .plus(expectedOther) // 192.5
 
-        expect(result.manure.total.toNumber()).toBeCloseTo(expectedManure.toNumber())
-        expect(result.compost.total.toNumber()).toBeCloseTo(expectedCompost.toNumber())
-        expect(result.other.total.toNumber()).toBeCloseTo(expectedOther.toNumber())
+        expect(result.manure.total.toNumber()).toBeCloseTo(
+            expectedManure.toNumber(),
+        )
+        expect(result.compost.total.toNumber()).toBeCloseTo(
+            expectedCompost.toNumber(),
+        )
+        expect(result.other.total.toNumber()).toBeCloseTo(
+            expectedOther.toNumber(),
+        )
         expect(result.total.toNumber()).toBeCloseTo(expectedTotal.toNumber())
     })
 

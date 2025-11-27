@@ -82,7 +82,9 @@ export function SoilAnalysesList({
                                         handleDelete(analysis.a_id)
                                     }}
                                     className={cn(
-                                        !canModifySoilAnalysis[analysis.a_id] ? "hidden" : "",
+                                        !canModifySoilAnalysis[analysis.a_id]
+                                            ? "hidden"
+                                            : "",
                                     )}
                                 >
                                     {fetcher.state === "submitting" ? (

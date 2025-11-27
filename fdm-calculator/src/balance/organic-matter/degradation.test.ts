@@ -1,10 +1,10 @@
-import { describe, it, expect } from "vitest"
 import Decimal from "decimal.js"
+import { describe, expect, it } from "vitest"
 import { calculateOrganicMatterDegradation } from "./degradation"
 import type {
-    SoilAnalysisPicked,
-    FieldInput,
     CultivationDetail,
+    FieldInput,
+    SoilAnalysisPicked,
 } from "./types.d"
 
 describe("calculateOrganicMatterDegradation", () => {

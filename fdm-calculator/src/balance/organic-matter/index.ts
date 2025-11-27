@@ -1,4 +1,4 @@
-import { Timeframe, withCalculationCache } from "@svenvw/fdm-core"
+import { type Timeframe, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../package"
 import { convertOrganicMatterBalanceToNumeric } from "../shared/conversion"
@@ -40,10 +40,16 @@ export async function calculateOrganicMatterBalance(
 
     // Pre-process catalogue details into Maps for efficient lookups within the calculation functions.
     const fertilizerDetailsMap = new Map<string, FertilizerDetail>(
-        fertilizerDetails.map((detail: FertilizerDetail) => [detail.p_id_catalogue, detail]),
+        fertilizerDetails.map((detail: FertilizerDetail) => [
+            detail.p_id_catalogue,
+            detail,
+        ]),
     )
     const cultivationDetailsMap = new Map<string, CultivationDetail>(
-        cultivationDetails.map((detail: CultivationDetail) => [detail.b_lu_catalogue, detail]),
+        cultivationDetails.map((detail: CultivationDetail) => [
+            detail.b_lu_catalogue,
+            detail,
+        ]),
     )
 
     // Process fields in batches to avoid overwhelming the system with concurrent promises,
@@ -207,7 +213,9 @@ export function calculateOrganicMatterBalancesFieldToFarm(
     // Filter out fields that have errors to ensure they are not included in the aggregation.
     const successfulFieldBalances = fieldsWithBalanceResults.filter(
         (result) => result.balance !== undefined,
-    ) as (OrganicMatterBalanceFieldResult & { balance: OrganicMatterBalanceField })[]
+    ) as (OrganicMatterBalanceFieldResult & {
+        balance: OrganicMatterBalanceField
+    })[]
 
     let totalFarmSupply = new Decimal(0)
     let totalFarmDegradation = new Decimal(0)
