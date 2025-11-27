@@ -10,4 +10,3 @@ Adds new parameters to the `harvestableAnalyses` table to provide a more detaile
 -   **`b_lu_moist`**: Moisture content of the harvested products (%). 
 -   **`b_lu_uww`**: Underwater weight of the fresh harvested products (g/5kg). This measurement is often used to estimate the starch content and dry matter content of potatoes and other root crops.
 -   **`b_lu_cp`**: Crude protein content (g CP/kg).
--   **`f_no3_td_asis`**: Nitrate content in fresh harvested products (g NO3/kg).
