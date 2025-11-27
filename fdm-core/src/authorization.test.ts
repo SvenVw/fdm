@@ -75,7 +75,7 @@ describe("Authorization Functions", () => {
             farmPostalCode,
             principal_id,
         )
-        const organization_owner_username = `orgowner${createId(8)}`
+        const organization_owner_username = `orgowner${createId(8).toLowerCase()}`
         const organization_owner = await fdmAuth.api.signUpEmail({
             headers: undefined,
             body: {
