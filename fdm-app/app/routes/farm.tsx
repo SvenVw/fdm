@@ -20,7 +20,7 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { useCalendarStore } from "~/store/calendar"
 import { useFarmStore } from "~/store/farm"
-import { fdm } from "../lib/fdm.server"
+import { fdm } from "~/lib/fdm.server"
 
 export const meta: MetaFunction = () => {
     return [

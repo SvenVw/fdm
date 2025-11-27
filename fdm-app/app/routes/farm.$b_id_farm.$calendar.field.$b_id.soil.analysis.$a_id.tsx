@@ -1,4 +1,5 @@
 import {
+    checkPermission,
     getField,
     getSoilAnalysis,
     getSoilParametersDescription,
@@ -98,11 +99,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             (item: { parameter: string }) => soilAnalysis[item.parameter],
         )
 
+        const soilAnalysisWritePermission = await checkPermission(
+            fdm,
+            "soil_analysis",
+            "write",
+            a_id,
+            session.principal_id,
+            new URL(request.url).pathname,
+            false,
+        )
+
         // Return user information from loader
         return {
             field: field,
             soilParameterDescription: soilParameterDescription,
             soilAnalysis: soilAnalysis,
+            soilAnalysisWritePermission: soilAnalysisWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -139,6 +151,7 @@ export default function FarmFieldSoilOverviewBlock() {
                 soilAnalysis={loaderData.soilAnalysis}
                 soilParameterDescription={loaderData.soilParameterDescription}
                 action="."
+                editable={loaderData.soilAnalysisWritePermission}
             />
         </div>
     )

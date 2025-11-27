@@ -15,6 +15,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "~/components/ui/dialog"
+import { cn } from "~/lib/utils"
 import { FertilizerApplicationForm } from "./form"
 import { FertilizerApplicationsList } from "./list"
 import type { FertilizerApplication, FertilizerOption } from "./types.d"
@@ -24,6 +25,8 @@ export function FertilizerApplicationCard({
     applicationMethodOptions,
     fertilizers,
     fertilizerOptions,
+    canCreateFertilizerApplication = true,
+    canModifyFertilizerApplication = {},
 }: {
     fertilizerApplications: FertilizerApplication[]
     applicationMethodOptions: {
@@ -34,6 +37,8 @@ export function FertilizerApplicationCard({
     fertilizerOptions: FertilizerOption[]
     dose: Dose
     className?: string
+    canCreateFertilizerApplication?: boolean
+    canModifyFertilizerApplication?: Record<string, boolean>
 }) {
     const fetcher = useFetcher()
     const location = useLocation()
@@ -108,14 +113,26 @@ export function FertilizerApplicationCard({
         if (savedFormValues && !isDialogOpen) {
             if (savedFormValues.p_app_id) {
                 // Do not open the form if there is a risk it will create a new application
-                if (applicationToEdit) {
+                if (
+                    applicationToEdit &&
+                    (canModifyFertilizerApplication[
+                        applicationToEdit.p_app_id
+                    ] ??
+                        true)
+                ) {
                     setIsDialogOpen(true)
                 }
-            } else {
+            } else if (canCreateFertilizerApplication) {
                 setIsDialogOpen(true)
             }
         }
-    }, [savedFormValues, applicationToEdit, isDialogOpen])
+    }, [
+        savedFormValues,
+        applicationToEdit,
+        isDialogOpen,
+        canCreateFertilizerApplication,
+        canModifyFertilizerApplication,
+    ])
 
     function handleDialogOpenChange(state: boolean) {
         if (!state && params.b_id_farm && b_id_or_b_lu_catalogue) {
@@ -143,7 +160,13 @@ export function FertilizerApplicationCard({
                     onOpenChange={handleDialogOpenChange}
                 >
                     <DialogTrigger asChild>
-                        <Button>
+                        <Button
+                            className={cn(
+                                !canCreateFertilizerApplication
+                                    ? "invisible"
+                                    : "",
+                            )}
+                        >
                             <Plus className="size-4" />
                             Toevoegen
                         </Button>
@@ -181,6 +204,9 @@ export function FertilizerApplicationCard({
                     fertilizers={fertilizers}
                     handleDelete={handleDelete}
                     handleEdit={handleEdit}
+                    canModifyFertilizerApplication={
+                        canModifyFertilizerApplication
+                    }
                 />
             </CardContent>
         </Card>

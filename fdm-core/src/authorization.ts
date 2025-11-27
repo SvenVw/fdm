@@ -142,7 +142,8 @@ export const permissions: Permission[] = [
  *
  * This function retrieves the valid roles for the specified action and resource, constructs the resource hierarchy,
  * and iterates through the chain to verify if any level grants the required permission for the principal(s). It records
- * the permission check details in the audit log and throws an error if the permission is denied.
+ * the permission check details in the audit log and throws an error if the permission is denied. `strict` may be
+ * specified as false in order to disable the exception.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param resource - The type of resource being accessed.
@@ -150,6 +151,7 @@ export const permissions: Permission[] = [
  * @param resource_id - The unique identifier of the specific resource.
  * @param principal_id - The principal identifier(s); supports a single ID or an array.
  * @param origin - The source origin used for audit logging the permission check.
+ * @param strict - When set to false, the function will not perform an audit log, or throw an exception if the user has no permission.
  * @returns Resolves to true if the principal is permitted to perform the action.
  *
  * @throws {Error} When the principal does not have the required permission.
@@ -161,86 +163,42 @@ export async function checkPermission(
     resource_id: string,
     principal_id: PrincipalId,
     origin: string,
-): Promise<boolean> {
+    strict = true,
+) {
     const start = performance.now()
-
-    let isAllowed = false
-    let granting_resource = ""
-    let granting_resource_id = ""
     try {
-        const roles = getRolesForAction(action, resource)
-        const chain = await getResourceChain(fdm, resource, resource_id)
+        const permission = await getPermission(
+            fdm,
+            resource,
+            action,
+            resource_id,
+            principal_id,
+        )
 
-        // Convert principal_id to array
-        const principal_ids = Array.isArray(principal_id)
-            ? principal_id
-            : [principal_id]
-
-        await fdm.transaction(async (tx: FdmType) => {
-            for (const bead of chain) {
-                const check = await tx
-                    .select({
-                        resource_id: authZSchema.role.resource_id,
-                    })
-                    .from(authZSchema.role)
-                    .leftJoin(
-                        authNSchema.member,
-                        eq(
-                            authZSchema.role.principal_id,
-                            authNSchema.member.organizationId,
-                        ),
-                    )
-                    .where(
-                        and(
-                            eq(authZSchema.role.resource, bead.resource),
-                            eq(authZSchema.role.resource_id, bead.resource_id),
-                            or(
-                                inArray(
-                                    authZSchema.role.principal_id,
-                                    principal_ids,
-                                ),
-                                and(
-                                    isNotNull(authNSchema.member.userId),
-                                    inArray(
-                                        authNSchema.member.userId,
-                                        principal_ids,
-                                    ),
-                                ),
-                            ),
-                            inArray(authZSchema.role.role, roles),
-                            isNull(authZSchema.role.deleted),
-                        ),
-                    )
-                    .limit(1)
-
-                if (check.length > 0) {
-                    isAllowed = true
-                    granting_resource = bead.resource
-                    granting_resource_id = bead.resource_id
-                    break
-                }
-            }
-        })
+        const granting_resource = permission?.granting_resource ?? ""
+        const granting_resource_id = permission?.granting_resource_id ?? ""
 
         // Store check in audit
-        await fdm.insert(authZSchema.audit).values({
-            audit_id: createId(),
-            audit_origin: origin,
-            principal_id: principal_id,
-            target_resource: resource,
-            target_resource_id: resource_id,
-            granting_resource: granting_resource,
-            granting_resource_id: granting_resource_id,
-            action: action,
-            allowed: isAllowed,
-            duration: Math.round(performance.now() - start),
-        })
+        if (strict) {
+            await fdm.insert(authZSchema.audit).values({
+                audit_id: createId(),
+                audit_origin: origin,
+                principal_id: principal_id,
+                target_resource: resource,
+                target_resource_id: resource_id,
+                granting_resource: granting_resource,
+                granting_resource_id: granting_resource_id,
+                action: action,
+                allowed: !!permission,
+                duration: Math.round(performance.now() - start),
+            })
 
-        if (!isAllowed) {
-            throw new Error("Permission denied")
+            if (!permission) {
+                throw new Error("Permission denied")
+            }
         }
 
-        return isAllowed
+        return !!permission
     } catch (err) {
         let message = "Exception for checkPermission"
         if (err instanceof Error && err.message === "Permission denied") {
@@ -254,6 +212,87 @@ export async function checkPermission(
             principal_id: principal_id,
         })
     }
+}
+
+/**
+ * Gets the granting resource type and ID if the principal has permission to perform the action in the given resource.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param resource - The type of resource being accessed.
+ * @param action - The action the principal intends to perform.
+ * @param resource_id - The unique identifier of the specific resource.
+ * @param principal_id - The principal identifier(s); supports a single ID or an array.
+ * @returns `granting_resource` is the resource type, `granting_resource_id` is the id of the specific granting resource.
+ * `null` is returned if the principal does not have the permission.
+ */
+async function getPermission(
+    fdm: FdmType,
+    resource: Resource,
+    action: Action,
+    resource_id: string,
+    principal_id: PrincipalId,
+): Promise<{
+    granting_resource: string
+    granting_resource_id: string
+} | null> {
+    let isAllowed = false
+    let granting_resource = ""
+    let granting_resource_id = ""
+    const roles = getRolesForAction(action, resource)
+    const chain = await getResourceChain(fdm, resource, resource_id)
+
+    // Convert principal_id to array
+    const principal_ids = Array.isArray(principal_id)
+        ? principal_id
+        : [principal_id]
+
+    await fdm.transaction(async (tx: FdmType) => {
+        for (const bead of chain) {
+            const check = await tx
+                .select({
+                    resource_id: authZSchema.role.resource_id,
+                })
+                .from(authZSchema.role)
+                .leftJoin(
+                    authNSchema.member,
+                    eq(
+                        authZSchema.role.principal_id,
+                        authNSchema.member.organizationId,
+                    ),
+                )
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, bead.resource),
+                        eq(authZSchema.role.resource_id, bead.resource_id),
+                        or(
+                            inArray(
+                                authZSchema.role.principal_id,
+                                principal_ids,
+                            ),
+                            and(
+                                isNotNull(authNSchema.member.userId),
+                                inArray(
+                                    authNSchema.member.userId,
+                                    principal_ids,
+                                ),
+                            ),
+                        ),
+                        inArray(authZSchema.role.role, roles),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+                .limit(1)
+
+            if (check.length > 0) {
+                isAllowed = true
+                granting_resource = bead.resource
+                granting_resource_id = bead.resource_id
+                break
+            }
+        }
+    })
+
+    return isAllowed ? { granting_resource, granting_resource_id } : null
 }
 
 /**

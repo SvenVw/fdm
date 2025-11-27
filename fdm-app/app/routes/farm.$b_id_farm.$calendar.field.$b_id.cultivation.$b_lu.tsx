@@ -1,4 +1,5 @@
 import {
+    checkPermission,
     type CultivationCatalogue,
     getCultivation,
     getCultivationsFromCatalogue,
@@ -59,6 +60,7 @@ export const meta: MetaFunction = () => {
  *   - harvests: The list of harvests related to the cultivation.
  *   - b_lu_harvestable: The harvestable type from the catalogue, or "none" if not applicable.
  *   - b_id_farm: The farm ID.
+ *   - cultivationWritePermission: A Boolean indicating if the user is able to edit or delete the cultivation or add harvests to it. Set to true if the information could not be obtained.
  *
  * @throws {Response} If the farm, field, or cultivation ID is missing (status 400) or if the field or cultivation cannot be found (status 404).
  */
@@ -97,6 +99,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get timeframe from calendar store
         const timeframe = getTimeframe(params)
         const calendar = getCalendar(params)
+
+        const cultivationWritePermission = checkPermission(
+            fdm,
+            "cultivation",
+            "write",
+            b_lu,
+            session.principal_id,
+            new URL(request.url).pathname,
+            false,
+        )
 
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)
@@ -177,6 +189,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_lu_variety_options: b_lu_variety_options,
             b_id_farm: b_id_farm,
             calendar: calendar,
+            cultivationWritePermission: await cultivationWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -198,11 +211,13 @@ export default function FarmFieldsOverviewBlock() {
                 harvests={loaderData.harvests}
                 b_lu_harvestable={loaderData.b_lu_harvestable}
                 b_lu_variety_options={loaderData.b_lu_variety_options}
+                editable={loaderData.cultivationWritePermission}
             />
             <CultivationHarvestsCard
                 harvests={loaderData.harvests}
                 b_lu_harvestable={loaderData.b_lu_harvestable}
                 harvestParameters={loaderData.harvestParameters}
+                editable={loaderData.cultivationWritePermission}
             />
             <Outlet />
         </div>
