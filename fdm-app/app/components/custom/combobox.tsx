@@ -121,8 +121,7 @@ export function Combobox({
                                                 value={option.label}
                                                 key={option.value}
                                                 disabled={disabled}
-                                                onSelect={(value) => {
-                                                    console.log(value)
+                                                onSelect={(value) => {                                      
                                                     form.setValue(
                                                         name,
                                                         option.value,
