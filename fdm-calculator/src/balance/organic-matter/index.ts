@@ -15,7 +15,7 @@ import type {
     OrganicMatterBalanceInput,
     OrganicMatterBalanceNumeric,
     SoilAnalysisPicked,
-} from "./types.d"
+} from "./types"
 
 /**
  * Calculates the organic matter balance for a farm, aggregating results from all its fields.
@@ -39,11 +39,11 @@ export async function calculateOrganicMatterBalance(
         organicMatterBalanceInput
 
     // Pre-process catalogue details into Maps for efficient lookups within the calculation functions.
-    const fertilizerDetailsMap = new Map(
-        fertilizerDetails.map((detail) => [detail.p_id_catalogue, detail]),
+    const fertilizerDetailsMap = new Map<string, FertilizerDetail>(
+        fertilizerDetails.map((detail: FertilizerDetail) => [detail.p_id_catalogue, detail]),
     )
-    const cultivationDetailsMap = new Map(
-        cultivationDetails.map((detail) => [detail.b_lu_catalogue, detail]),
+    const cultivationDetailsMap = new Map<string, CultivationDetail>(
+        cultivationDetails.map((detail: CultivationDetail) => [detail.b_lu_catalogue, detail]),
     )
 
     // Process fields in batches to avoid overwhelming the system with concurrent promises,

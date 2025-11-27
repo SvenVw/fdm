@@ -30,6 +30,7 @@ describe("Authorization Functions", () => {
     let principal_id: string
     let farm_id: string
     let organization_id: string
+    let organization_owner_id: string
     let organization_member_email: string
     let organization_member_id: string
     let host: string
@@ -56,18 +57,7 @@ describe("Authorization Functions", () => {
 
         fdm = createFdmServer(host, port, user, password, database, 10) // allow some connections
         fdmAuth = createFdmAuth(fdm, googleAuth, microsoftAuth, undefined, true)
-        const principal = await fdmAuth.api.signUpEmail({
-            headers: undefined,
-            body: {
-                email: "principal@example.com",
-                name: "Principal I",
-                firstname: "Principal",
-                surname: "I",
-                username: "principal",
-                password: "password",
-            },
-        })
-        principal_id = principal.user.id
+        principal_id = createId()
     })
 
     beforeEach(async () => {
@@ -85,9 +75,22 @@ describe("Authorization Functions", () => {
             farmPostalCode,
             principal_id,
         )
+        const organization_owner_username = `orgowner${createId(8).toLowerCase()}`
+        const organization_owner = await fdmAuth.api.signUpEmail({
+            headers: undefined,
+            body: {
+                email: `${organization_owner_username}@example.com`,
+                name: "Organization Owner",
+                firstname: "Organization",
+                surname: "Owner",
+                username: organization_owner_username,
+                password: "password",
+            },
+        })
+        organization_owner_id = organization_owner.user.id
         organization_id = await createOrganization(
             fdm,
-            principal_id,
+            organization_owner_id,
             "Test Organization",
             `test-${createId()}`,
             "This is an organization created for testing purposes.",
@@ -154,7 +157,7 @@ describe("Authorization Functions", () => {
             await grantRole(fdm, "farm", "owner", farm_id, organization_id)
             const invitation_id = await inviteUserToOrganization(
                 fdm,
-                principal_id,
+                organization_owner_id,
                 organization_member_email,
                 "owner",
                 organization_id,
@@ -189,7 +192,7 @@ describe("Authorization Functions", () => {
             await grantRole(fdm, "farm", "researcher", farm_id, organization_id)
             const invitation_id = await inviteUserToOrganization(
                 fdm,
-                principal_id,
+                organization_owner_id,
                 organization_member_email,
                 "owner",
                 organization_id,
@@ -598,7 +601,7 @@ describe("Authorization Functions", () => {
             await grantRole(fdm, "farm", "advisor", farm_id2, organization_id)
             const invitation_id = await inviteUserToOrganization(
                 fdm,
-                principal_id,
+                organization_owner_id,
                 organization_member_email,
                 "admin",
                 organization_id,
@@ -627,7 +630,7 @@ describe("Authorization Functions", () => {
             await grantRole(fdm, "farm", "advisor", farm_id, organization_id)
             const invitation_id = await inviteUserToOrganization(
                 fdm,
-                principal_id,
+                organization_owner_id,
                 organization_member_email,
                 "admin",
                 organization_id,
@@ -776,7 +779,7 @@ describe("Authorization Functions", () => {
             await grantRole(fdm, "farm", "researcher", farm_id, organization_id)
             const invitation_id = await inviteUserToOrganization(
                 fdm,
-                principal_id,
+                organization_owner_id,
                 organization_member_email,
                 "admin",
                 organization_id,
@@ -802,7 +805,7 @@ describe("Authorization Functions", () => {
             await grantRole(fdm, "farm", "owner", farm_id, organization_id)
             const invitation_id = await inviteUserToOrganization(
                 fdm,
-                principal_id,
+                organization_owner_id,
                 organization_member_email,
                 "admin",
                 organization_id,

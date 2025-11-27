@@ -47,10 +47,11 @@ export async function getDoseForField({
         const fertilizers = await getFertilizers(fdm, principal_id, farmId)
 
         // Calculate the dose per nutrient for this field
-        return calculateDose({ applications, fertilizers })
+        const result = calculateDose({ applications, fertilizers })
+        return result.dose
     } catch (error) {
         throw new Error(
-            `Failed to calculate dose for field ${b_id}: ${error.message}`,
+            `Failed to calculate dose for field ${b_id}: ${(error as Error).message}`,
         )
     }
 }

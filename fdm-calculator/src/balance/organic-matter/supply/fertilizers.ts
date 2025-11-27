@@ -3,7 +3,7 @@ import type {
     OrganicMatterSupplyFertilizers,
     FertilizerDetail,
     FieldInput,
-} from "../../types.d"
+} from "../types"
 
 /**
  * Calculates the total supply of effective organic matter (EOM) from various fertilizer applications.
@@ -34,7 +34,7 @@ export function calculateOrganicMatterSupplyByFertilizers(
 
     // Use reduce to iterate over all applications and aggregate the supply.
     const aggregatedSupply = fertilizerApplications.reduce(
-        (acc, application) => {
+        (acc: OrganicMatterSupplyFertilizers, application: FieldInput["fertilizerApplications"][number]) => {
             // Retrieve the details for the applied fertilizer from the map.
             const fertilizerDetail = fertilizerDetailsMap.get(
                 application.p_id_catalogue,
