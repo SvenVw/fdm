@@ -3,7 +3,6 @@ import Decimal from "decimal.js"
 import pkg from "../../package"
 import { getFdmPublicDataUrl } from "../../shared/public-data-url"
 import { convertNitrogenBalanceToNumeric } from "../shared/conversion"
-import { combineSoilAnalyses } from "../shared/soil"
 import { calculateNitrogenEmission } from "./emission"
 import { calculateNitrogenRemoval } from "./removal"
 import { calculateNitrogenSupply } from "./supply"
@@ -21,6 +20,7 @@ import type {
     SoilAnalysisPicked,
 } from "./types"
 import { calculateNitrogenEmissionViaNitrate } from "./emission/nitrate"
+import { combineSoilAnalyses } from "../shared/soil"
 
 /**
  * Calculates the nitrogen balance for a set of fields, considering nitrogen supply, removal, and emission.

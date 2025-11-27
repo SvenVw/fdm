@@ -3,7 +3,7 @@ import type {
     OrganicMatterSupplyCultivations,
     CultivationDetail,
     FieldInput,
-} from "../../types.d"
+} from "../types"
 
 /**
  * Calculates the supply of effective organic matter (EOM) from cultivations like main crops and green manures.

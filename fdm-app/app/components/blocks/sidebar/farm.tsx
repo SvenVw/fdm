@@ -117,7 +117,7 @@ export function SidebarFarm({
                         >
                             <NavLink to={farmLink}>
                                 <House />
-                                <span>{farmLinkDisplay}</span>
+                                <span className="truncate">{farmLinkDisplay}</span>
                                 {farmRole && (
                                     <Badge
                                         key={farmRole}
