@@ -324,7 +324,7 @@ export default function OrganicCertificationSettings() {
                             <EmptyDescription>
                                 {farmWritePermission
                                     ? "Als dit bedrijf wel een bio-certificaat heeft, kunt u deze toevoegen."
-                                    : "U hebt geen toestemming om een bio-certificaat voor dit bedrijf toe te voegen."}
+                                    : "U heeft geen toestemming om een bio-certificaat voor dit bedrijf toe te voegen."}
                             </EmptyDescription>
                         </EmptyHeader>
                         <EmptyContent>
