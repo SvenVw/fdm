@@ -6,6 +6,7 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { FormSchema } from "@/app/components/blocks/soil/formschema"
 import type { SoilAnalysis } from "@/app/components/blocks/soil/types"
+import { DatePicker } from "~/components/custom/date-picker"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
@@ -24,7 +25,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import { DatePicker } from "../../custom/date-picker"
+import { cn } from "~/lib/utils"
 
 export function SoilAnalysisForm(props: {
     soilAnalysis: SoilAnalysis | undefined
@@ -226,7 +227,12 @@ export function SoilAnalysisForm(props: {
                                 }
                             })}
                         </div>
-                        {editable && <div className="flex justify-end mt-4">
+                        <div
+                            className={cn(
+                                "flex justify-end mt-4",
+                                !editable ? "invisible" : "",
+                            )}
+                        >
                             <Button type="submit">
                                 {form.formState.isSubmitting ? (
                                     <div className="flex items-center space-x-2">
@@ -237,7 +243,7 @@ export function SoilAnalysisForm(props: {
                                     "Opslaan"
                                 )}
                             </Button>
-                        </div>}
+                        </div>
                     </div>
                 </fieldset>
             </Form>

@@ -22,6 +22,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import { cn } from "~/lib/utils"
 
 export interface FertilizerParameterDescriptionItem {
     parameter: FertilizerParameters
@@ -258,19 +259,20 @@ export function FertilizerForm({
                             </Card>
                         ))}
                     </div>
-                    {editable && (
-                        <div className="sticky bottom-0 left-0 right-0 border-t bg-background p-4">
-                            <Button
-                                type="submit"
-                                className="w-full"
-                                disabled={form.formState.isSubmitting}
-                            >
-                                {form.formState.isSubmitting
-                                    ? "Meststof opslaan..."
-                                    : "Meststof opslaan"}
-                            </Button>
-                        </div>
-                    )}
+                    <div className="sticky bottom-0 left-0 right-0 border-t bg-background p-4">
+                        <Button
+                            type="submit"
+                            className={cn(
+                                "w-full",
+                                !editable ? "invisible" : "",
+                            )}
+                            disabled={form.formState.isSubmitting}
+                        >
+                            {form.formState.isSubmitting
+                                ? "Meststof opslaan..."
+                                : "Meststof opslaan"}
+                        </Button>
+                    </div>
                 </fieldset>
             </Form>
         </RemixFormProvider>

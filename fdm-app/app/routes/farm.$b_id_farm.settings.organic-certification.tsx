@@ -64,6 +64,7 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { cn } from "~/lib/utils"
 
 export const meta: MetaFunction = () => {
     return [
@@ -321,16 +322,22 @@ export default function OrganicCertificationSettings() {
                                 Dit bedrijf heeft geen bio-certificaat
                             </EmptyTitle>
                             <EmptyDescription>
-                                {farmWritePermission ? "Als dit bedrijf wel een bio-certificaat heeft, kunt u deze toevoegen." : "U hebt geen toestemming om een bio-certificaat voor dit bedrijf toe te voegen."}
+                                {farmWritePermission
+                                    ? "Als dit bedrijf wel een bio-certificaat heeft, kunt u deze toevoegen."
+                                    : "U hebt geen toestemming om een bio-certificaat voor dit bedrijf toe te voegen."}
                             </EmptyDescription>
                         </EmptyHeader>
-                        {farmWritePermission && (
-                            <EmptyContent>
-                                <DialogTrigger asChild>
-                                    <Button>Voeg toe</Button>
-                                </DialogTrigger>
-                            </EmptyContent>
-                        )}
+                        <EmptyContent>
+                            <DialogTrigger asChild>
+                                <Button
+                                    className={cn(
+                                        !farmWritePermission ? "invisible" : "",
+                                    )}
+                                >
+                                    Voeg toe
+                                </Button>
+                            </DialogTrigger>
+                        </EmptyContent>
                     </Empty>
                     <DialogContent>
                         <RemixFormProvider {...form}>

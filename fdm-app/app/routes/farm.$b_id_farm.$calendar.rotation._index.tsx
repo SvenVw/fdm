@@ -34,6 +34,7 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { cn } from "~/lib/utils"
 
 export const meta: MetaFunction = () => {
     return [
@@ -382,13 +383,20 @@ export default function FarmRotationIndex() {
                                     :(
                                 </h1>
                             </div>
-                            {loaderData.farmWritePermission && (
-                                <div className="flex flex-col items-center relative">
+                            <div className="flex flex-col items-center relative">
+                                <Button
+                                    asChild
+                                    className={cn(
+                                        !loaderData.farmWritePermission
+                                            ? "invisible"
+                                            : "",
+                                    )}
+                                >
                                     <NavLink to="../field/new">
-                                        <Button>Maak een perceel</Button>
+                                        Maak een perceel
                                     </NavLink>
-                                </div>
-                            )}
+                                </Button>
+                            </div>
                         </div>
                     </>
                 ) : (

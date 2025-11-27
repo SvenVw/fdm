@@ -22,6 +22,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import { cn } from "~/lib/utils"
 import {
     CultivationDetailsFormSchema,
     type CultivationDetailsFormSchemaType,
@@ -203,27 +204,30 @@ export function CultivationDetailsCard({
                                     )}
                                 />
                             </div>
-                            {editable && (
-                                <div className="flex justify-end">
-                                    <Button
-                                        type="submit"
-                                        disabled={
-                                            form.formState.isSubmitting ||
-                                            fetcher.state === "submitting"
-                                        }
-                                    >
-                                        {form.formState.isSubmitting ||
-                                        fetcher.state === "submitting" ? (
-                                            <div className="flex items-center space-x-2">
-                                                <LoadingSpinner />{" "}
-                                                <p>Bijwerken...</p>
-                                            </div>
-                                        ) : (
-                                            "Bijwerken"
-                                        )}
-                                    </Button>
-                                </div>
-                            )}
+                            <div
+                                className={cn(
+                                    "flex justify-end",
+                                    !editable ? "invisible" : "",
+                                )}
+                            >
+                                <Button
+                                    type="submit"
+                                    disabled={
+                                        form.formState.isSubmitting ||
+                                        fetcher.state === "submitting"
+                                    }
+                                >
+                                    {form.formState.isSubmitting ||
+                                    fetcher.state === "submitting" ? (
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />{" "}
+                                            <p>Bijwerken...</p>
+                                        </div>
+                                    ) : (
+                                        "Bijwerken"
+                                    )}
+                                </Button>
+                            </div>
                         </fieldset>
                     </Form>
                 </RemixFormProvider>

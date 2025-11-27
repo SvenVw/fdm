@@ -4,6 +4,7 @@ import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import { Circle, Diamond, Square, Trash, Triangle } from "lucide-react"
 import { useFetcher } from "react-router"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
     Empty,
@@ -26,7 +27,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
-import { LoadingSpinner } from "../../custom/loadingspinner"
+import { cn } from "~/lib/utils"
 
 export function FertilizerApplicationsList({
     fertilizerApplications,
@@ -124,49 +125,49 @@ export function FertilizerApplicationsList({
                                             </p>
                                         </ItemDescription>
                                     </ItemContent>
-                                    {editable && (
-                                        <ItemActions>
-                                            <TooltipProvider>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Button
-                                                            variant="destructive"
-                                                            size="icon"
-                                                            disabled={
-                                                                fetcher.state ===
-                                                                "submitting"
+                                    <ItemActions
+                                        className={cn(
+                                            !editable ? "invisible" : "",
+                                        )}
+                                    >
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="icon"
+                                                        disabled={
+                                                            fetcher.state ===
+                                                            "submitting"
+                                                        }
+                                                        onClick={() => {
+                                                            if (
+                                                                application.p_app_ids
+                                                            ) {
+                                                                handleDelete(
+                                                                    application.p_app_ids,
+                                                                )
+                                                            } else {
+                                                                handleDelete([
+                                                                    application.p_app_id,
+                                                                ])
                                                             }
-                                                            onClick={() => {
-                                                                if (
-                                                                    application.p_app_ids
-                                                                ) {
-                                                                    handleDelete(
-                                                                        application.p_app_ids,
-                                                                    )
-                                                                } else {
-                                                                    handleDelete(
-                                                                        [
-                                                                            application.p_app_id,
-                                                                        ],
-                                                                    )
-                                                                }
-                                                            }}
-                                                        >
-                                                            {fetcher.state ===
-                                                            "submitting" ? (
-                                                                <LoadingSpinner />
-                                                            ) : (
-                                                                <Trash className="size-4" />
-                                                            )}
-                                                        </Button>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p>Verwijder</p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                        </ItemActions>
-                                    )}
+                                                        }}
+                                                    >
+                                                        {fetcher.state ===
+                                                        "submitting" ? (
+                                                            <LoadingSpinner />
+                                                        ) : (
+                                                            <Trash className="size-4" />
+                                                        )}
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>Verwijder</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                    </ItemActions>
                                 </Item>
                             </div>
                         )

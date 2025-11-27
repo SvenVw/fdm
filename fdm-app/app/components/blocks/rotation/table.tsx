@@ -278,81 +278,79 @@ export function DataTable<TData extends RotationExtended, TValue>({
                         </DropdownMenuContent>
                     </DropdownMenu>
                     <FieldFilterToggle />
-                    {canAddItem && (
-                        <>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <div>
-                                            {isFertilizerButtonDisabled ? (
-                                                <Button
-                                                    disabled={
-                                                        isFertilizerButtonDisabled
-                                                    }
-                                                >
-                                                    <Plus className="mr-2 h-4 w-4" />
-                                                    Bemesting
-                                                </Button>
-                                            ) : (
-                                                <NavLink
-                                                    to={`/farm/${b_id_farm}/${calendar}/rotation/fertilizer?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}`}
-                                                >
-                                                    <Button>
-                                                        <Plus className="mr-2 h-4 w-4" />
-                                                        Bemesting
-                                                    </Button>
-                                                </NavLink>
-                                            )}
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>{fertilizerTooltipContent}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <div>
-                                            {isHarvestButtonDisabled ? (
-                                                <Button
-                                                    disabled={
-                                                        isHarvestButtonDisabled
-                                                    }
-                                                >
-                                                    <Plus className="mr-2 h-4 w-4" />
-                                                    Oogst toevoegen
-                                                </Button>
-                                            ) : harvestErrorMessage ? (
-                                                <Button
-                                                    onClick={() =>
-                                                        notify.error(
-                                                            harvestErrorMessage,
-                                                        )
-                                                    }
-                                                >
-                                                    <Plus className="mr-2 h-4 w-4" />
-                                                    Oogst toevoegen
-                                                </Button>
-                                            ) : (
-                                                <NavLink
-                                                    to={`/farm/${b_id_farm}/${calendar}/rotation/harvest?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}`}
-                                                >
-                                                    <Button>
-                                                        <Plus className="mr-2 h-4 w-4" />
-                                                        Oogst toevoegen
-                                                    </Button>
-                                                </NavLink>
-                                            )}
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>{harvestTooltipContent}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        </>
-                    )}
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div
+                                    className={cn(!canAddItem ? "hidden" : "")}
+                                >
+                                    {isFertilizerButtonDisabled ? (
+                                        <Button
+                                            disabled={
+                                                isFertilizerButtonDisabled
+                                            }
+                                        >
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Bemesting
+                                        </Button>
+                                    ) : (
+                                        <NavLink
+                                            to={`/farm/${b_id_farm}/${calendar}/rotation/fertilizer?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}`}
+                                        >
+                                            <Button>
+                                                <Plus className="mr-2 h-4 w-4" />
+                                                Bemesting
+                                            </Button>
+                                        </NavLink>
+                                    )}
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{fertilizerTooltipContent}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div
+                                    className={cn(!canAddItem ? "hidden" : "")}
+                                >
+                                    {isHarvestButtonDisabled ? (
+                                        <Button
+                                            disabled={isHarvestButtonDisabled}
+                                        >
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Oogst toevoegen
+                                        </Button>
+                                    ) : harvestErrorMessage ? (
+                                        <Button
+                                            onClick={() =>
+                                                notify.error(
+                                                    harvestErrorMessage,
+                                                )
+                                            }
+                                        >
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Oogst toevoegen
+                                        </Button>
+                                    ) : (
+                                        <NavLink
+                                            to={`/farm/${b_id_farm}/${calendar}/rotation/harvest?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}`}
+                                        >
+                                            <Button>
+                                                <Plus className="mr-2 h-4 w-4" />
+                                                Oogst toevoegen
+                                            </Button>
+                                        </NavLink>
+                                    )}
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{harvestTooltipContent}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
             </div>
             <div className="rounded-md border grow relative overflow-x-auto">

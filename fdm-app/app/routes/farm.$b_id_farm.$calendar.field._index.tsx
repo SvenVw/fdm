@@ -30,6 +30,7 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useFieldFilterStore } from "~/store/field-filter"
+import { cn } from "~/lib/utils"
 
 export const meta: MetaFunction = () => {
     return [
@@ -263,13 +264,20 @@ export default function FarmFieldIndex() {
                                     :(
                                 </h1>
                             </div>
-                            {loaderData.farmWritePermission && (
-                                <div className="flex flex-col items-center relative">
+                            <div className="flex flex-col items-center relative">
+                                <Button
+                                    asChild
+                                    className={cn(
+                                        !loaderData.farmWritePermission
+                                            ? "invisible"
+                                            : "",
+                                    )}
+                                >
                                     <NavLink to="./new">
-                                        <Button>Maak een perceel</Button>
+                                        Maak een perceel
                                     </NavLink>
-                                </div>
-                            )}
+                                </Button>
+                            </div>
                             {/* <p className="px-8 text-center text-sm text-muted-foreground">
                             </p> */}
                         </div>

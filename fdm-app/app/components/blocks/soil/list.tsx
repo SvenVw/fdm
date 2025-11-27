@@ -72,28 +72,28 @@ export function SoilAnalysesList({
                                         Bewerk
                                     </Button>
                                 </NavLink>
-                                {(canModifySoilAnalysis[analysis.a_id] ??
-                                true) ? (
-                                    <Button
-                                        variant="destructive"
-                                        disabled={
-                                            fetcher.state === "submitting" ||
-                                            analysis.a_source === "nl-other-nmi"
-                                        }
-                                        onClick={() => {
-                                            handleDelete(analysis.a_id)
-                                        }}
-                                    >
-                                        {fetcher.state === "submitting" ? (
-                                            <div className="flex items-center space-x-2">
-                                                <LoadingSpinner />
-                                                <span>Verwijderen...</span>
-                                            </div>
-                                        ) : (
-                                            "Verwijder"
-                                        )}
-                                    </Button>
-                                ) : null}
+                                <Button
+                                    variant="destructive"
+                                    disabled={
+                                        fetcher.state === "submitting" ||
+                                        analysis.a_source === "nl-other-nmi"
+                                    }
+                                    onClick={() => {
+                                        handleDelete(analysis.a_id)
+                                    }}
+                                    className={cn(
+                                        !canModifySoilAnalysis[analysis.a_id] ? "hidden" : "",
+                                    )}
+                                >
+                                    {fetcher.state === "submitting" ? (
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />
+                                            <span>Verwijderen...</span>
+                                        </div>
+                                    ) : (
+                                        "Verwijder"
+                                    )}
+                                </Button>
                             </div>
                         </div>
                     </div>

@@ -25,6 +25,7 @@ import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { cn } from "~/lib/utils"
 
 /**
  * Loader function for the soil data page of a specific farm field.
@@ -165,14 +166,17 @@ export default function FarmFieldSoilOverviewBlock() {
                         <TabsTrigger value="parameters">Parameters</TabsTrigger>
                         <TabsTrigger value="analyses">Analyses</TabsTrigger>
                     </TabsList>
-                    {loaderData.fieldWritePermission && (
-                        <Button asChild>
-                            <NavLink to="./analysis/new">
-                                <Plus />
-                                Bodemanalyse toevoegen
-                            </NavLink>
-                        </Button>
-                    )}
+                    <Button
+                        asChild
+                        className={cn(
+                            !loaderData.fieldWritePermission ? "invisible" : "",
+                        )}
+                    >
+                        <NavLink to="./analysis/new">
+                            <Plus />
+                            Bodemanalyse toevoegen
+                        </NavLink>
+                    </Button>
                 </div>
             </div>
             <Separator />
@@ -189,13 +193,18 @@ export default function FarmFieldSoilOverviewBlock() {
                                     bodem bij te houden
                                 </p>
                             </div>
-                            {loaderData.fieldWritePermission && (
-                                <Button asChild>
-                                    <NavLink to="./analysis/new">
-                                        Bodemanalyse toevoegen
-                                    </NavLink>
-                                </Button>
-                            )}
+                            <Button
+                                asChild
+                                className={cn(
+                                    !loaderData.fieldWritePermission
+                                        ? "invisible"
+                                        : "",
+                                )}
+                            >
+                                <NavLink to="./analysis/new">
+                                    Bodemanalyse toevoegen
+                                </NavLink>
+                            </Button>
                         </div>
                     ) : (
                         <SoilDataCards

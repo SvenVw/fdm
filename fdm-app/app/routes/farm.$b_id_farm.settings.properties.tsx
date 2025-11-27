@@ -30,6 +30,7 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { cn } from "~/lib/utils"
 
 const { isPostalCode } = validator
 
@@ -253,20 +254,23 @@ Wageningen"
                         </div>
                     </fieldset>
                     <br />
-                    {loaderData.farmWritePermission && (
-                        <div className="ml-auto">
-                            <Button
-                                type="submit"
-                                disabled={form.formState.isSubmitting}
-                                className="m-auto"
-                            >
-                                {form.formState.isSubmitting && (
-                                    <LoadingSpinner />
-                                )}
-                                Bijwerken
-                            </Button>
-                        </div>
-                    )}
+                    <div className="ml-auto">
+                        <Button
+                            type="submit"
+                            disabled={form.formState.isSubmitting}
+                            className={cn(
+                                "m-auto",
+                                cn(
+                                    !loaderData.farmWritePermission
+                                        ? "invisible"
+                                        : "",
+                                ),
+                            )}
+                        >
+                            {form.formState.isSubmitting && <LoadingSpinner />}
+                            Bijwerken
+                        </Button>
+                    </div>
                 </Form>
             </RemixFormProvider>
         </div>

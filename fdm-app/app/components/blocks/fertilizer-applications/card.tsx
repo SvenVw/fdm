@@ -15,6 +15,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "~/components/ui/dialog"
+import { cn } from "~/lib/utils"
 import { FertilizerApplicationForm } from "./form"
 import { FertilizerApplicationsList } from "./list"
 import type { FertilizerApplication, FertilizerOption } from "./types.d"
@@ -158,14 +159,18 @@ export function FertilizerApplicationCard({
                     open={isDialogOpen}
                     onOpenChange={handleDialogOpenChange}
                 >
-                    {canCreateFertilizerApplication && (
-                        <DialogTrigger asChild>
-                            <Button>
-                                <Plus className="size-4" />
-                                Toevoegen
-                            </Button>
-                        </DialogTrigger>
-                    )}
+                    <DialogTrigger asChild>
+                        <Button
+                            className={cn(
+                                !canCreateFertilizerApplication
+                                    ? "invisible"
+                                    : "",
+                            )}
+                        >
+                            <Plus className="size-4" />
+                            Toevoegen
+                        </Button>
+                    </DialogTrigger>
                     <DialogContent className="sm:max-w-[800px]">
                         <DialogHeader>
                             <DialogTitle className="flex flex-row items-center justify-between mr-4">
