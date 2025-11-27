@@ -1,5 +1,6 @@
 import {
     type CultivationCatalogue,
+    checkPermission,
     getCultivations,
     getCultivationsFromCatalogue,
     getCurrentSoilData,
@@ -18,13 +19,13 @@ import {
 } from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
 import {
     columns,
     type RotationExtended,
 } from "~/components/blocks/rotation/columns"
 import { DataTable } from "~/components/blocks/rotation/table"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
 import { SidebarInset } from "~/components/ui/sidebar"
@@ -33,6 +34,7 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { cn } from "~/lib/utils"
 
 export const meta: MetaFunction = () => {
     return [
@@ -61,6 +63,7 @@ export const meta: MetaFunction = () => {
  * - farmOptions: An array of validated farm options.
  * - fieldOptions: A sorted array of processed field options.
  * - userName: The name of the current user.
+ * - farmWritePermission: A Boolean indicating if the user is able to add things to the farm. Set to true if the information could not be obtained.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -303,6 +306,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fieldsExtended,
             cultivationCatalogue,        
         )
+        
+        const farmWritePermission = await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+            new URL(request.url).pathname,
+            false,
+        )
 
         // Return user information from loader
         return {
@@ -311,6 +324,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fieldOptions: fieldOptions,
             rotationExtended: rotationExtended, // Return filtered data
             userName: session.userName,
+            farmWritePermission: farmWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -370,9 +384,18 @@ export default function FarmRotationIndex() {
                                 </h1>
                             </div>
                             <div className="flex flex-col items-center relative">
-                                <NavLink to="../field/new">
-                                    <Button>Maak een perceel</Button>
-                                </NavLink>
+                                <Button
+                                    asChild
+                                    className={cn(
+                                        !loaderData.farmWritePermission
+                                            ? "invisible"
+                                            : "",
+                                    )}
+                                >
+                                    <NavLink to="../field/new">
+                                        Maak een perceel
+                                    </NavLink>
+                                </Button>
                             </div>
                         </div>
                     </>
@@ -389,6 +412,7 @@ export default function FarmRotationIndex() {
                                 <DataTable
                                     columns={columns}
                                     data={loaderData.rotationExtended}
+                                    canAddItem={loaderData.farmWritePermission}
                                 />
                             </div>
                         </FarmContent>

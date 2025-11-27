@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { getFarm, updateFarm } from "@svenvw/fdm-core"
+import { checkPermission, getFarm, updateFarm } from "@svenvw/fdm-core"
 import { useEffect } from "react"
 import { Form } from "react-hook-form"
 import {
@@ -30,6 +30,7 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { cn } from "~/lib/utils"
 
 const { isPostalCode } = validator
 
@@ -80,10 +81,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 statusText: "Farm is not found",
             })
         }
+        const farmWritePermission = await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+            new URL(request.url).pathname,
+            false,
+        )
 
         // Return user information from loader
         return {
             farm: farm,
+            farmWritePermission: farmWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -145,7 +156,12 @@ export default function FarmSettingsPropertiesBlock() {
                     onSubmit={form.handleSubmit}
                     method="POST"
                 >
-                    <fieldset disabled={form.formState.isSubmitting}>
+                    <fieldset
+                        disabled={
+                            !loaderData.farmWritePermission ||
+                            form.formState.isSubmitting
+                        }
+                    >
                         <div className="grid grid-cols-2 w-full items-center gap-4">
                             <div className="flex flex-col space-y-1.5 col-span-2">
                                 <FormField
@@ -242,7 +258,14 @@ Wageningen"
                         <Button
                             type="submit"
                             disabled={form.formState.isSubmitting}
-                            className="m-auto"
+                            className={cn(
+                                "m-auto",
+                                cn(
+                                    !loaderData.farmWritePermission
+                                        ? "invisible"
+                                        : "",
+                                ),
+                            )}
                         >
                             {form.formState.isSubmitting && <LoadingSpinner />}
                             Bijwerken

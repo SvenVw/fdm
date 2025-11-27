@@ -51,11 +51,13 @@ import { useFieldFilterStore } from "@/app/store/field-filter"
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    canAddItem: boolean
 }
 
 export function DataTable<TData extends RotationExtended, TValue>({
     columns,
     data,
+    canAddItem,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -279,7 +281,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <div>
+                                <div
+                                    className={cn(!canAddItem ? "hidden" : "")}
+                                >
                                     {isFertilizerButtonDisabled ? (
                                         <Button
                                             disabled={
@@ -309,7 +313,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <div>
+                                <div
+                                    className={cn(!canAddItem ? "hidden" : "")}
+                                >
                                     {isHarvestButtonDisabled ? (
                                         <Button
                                             disabled={isHarvestButtonDisabled}

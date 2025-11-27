@@ -10,10 +10,12 @@ export function CultivationHarvestsCard({
     harvests,
     b_lu_harvestable,
     harvestParameters,
+    editable = true,
 }: {
     harvests: Harvest[]
     b_lu_harvestable: HarvestableType
     harvestParameters: HarvestParameters
+    editable?: boolean
 }) {
     let canAddHarvest = false
     if (b_lu_harvestable === "once" && harvests.length === 0) {
@@ -22,6 +24,7 @@ export function CultivationHarvestsCard({
     if (b_lu_harvestable === "multiple") {
         canAddHarvest = true
     }
+    canAddHarvest &&= editable
 
     return (
         <Card>
@@ -30,22 +33,25 @@ export function CultivationHarvestsCard({
                     {b_lu_harvestable === "multiple" ? "Oogsten" : "Oogst"}
                 </CardTitle>
                 <div className="flex justify-between">
-                    <NavLink
-                        to="./harvest/new"
-                        onClick={(e) => {
-                            if (!canAddHarvest) {
-                                e.preventDefault()
-                            }
-                        }}
-                        className={!canAddHarvest ? "cursor-not-allowed" : ""}
+                    <Button
+                        asChild
+                        variant="default"
+                        className={cn(!canAddHarvest ? "hidden" : "")}
                     >
-                        <Button
-                            variant="default"
-                            className={cn(!canAddHarvest ? "hidden" : "")}
+                        <NavLink
+                            to="./harvest/new"
+                            onClick={(e) => {
+                                if (!canAddHarvest) {
+                                    e.preventDefault()
+                                }
+                            }}
+                            className={
+                                !canAddHarvest ? "cursor-not-allowed" : ""
+                            }
                         >
                             Oogst toevoegen
-                        </Button>
-                    </NavLink>
+                        </NavLink>
+                    </Button>
                 </div>
             </CardHeader>
             <CardContent className="space-y-6">

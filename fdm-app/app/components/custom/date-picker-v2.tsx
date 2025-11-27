@@ -63,6 +63,12 @@ export function DatePicker({
         }
     }, [field.value])
 
+    useEffect(() => {
+        if (field.disabled && open) {
+            setOpen(false)
+        }
+    }, [field.disabled, open])
+
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value)
     }
@@ -115,6 +121,7 @@ export function DatePicker({
                             id="date-picker"
                             variant="ghost"
                             className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
+                            disabled={field.disabled}
                         >
                             <CalendarIcon className="size-3.5" />
                             <span className="sr-only">Kies een datum</span>

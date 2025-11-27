@@ -1,5 +1,6 @@
 import {
     addDerogation,
+    checkPermission,
     listDerogations,
     removeDerogation,
 } from "@svenvw/fdm-core"
@@ -40,7 +41,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session.principal_id,
             b_id_farm,
         )
-        return { b_id_farm, derogations }
+        const farmWritePermission = await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+            new URL(request.url).pathname,
+            false,
+        )
+        return { b_id_farm, derogations, farmWritePermission }
     } catch (error) {
         throw handleLoaderError(error)
     }
@@ -86,7 +96,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function DerogationSettings() {
-    const { derogations } = useLoaderData<typeof loader>()
+    const { derogations, farmWritePermission } = useLoaderData<typeof loader>()
     const fetcher = useFetcher<typeof action>()
 
     const years = getCalendarSelection()
@@ -99,9 +109,11 @@ export default function DerogationSettings() {
                 <CardHeader>
                     <CardTitle>Derogatie</CardTitle>
                     <CardDescription>
-                        Schakel derogatie in voor de jaren waarvoor dit bedrijf
-                        in aanmerking komt. Dit heeft invloed op de berekening
-                        van je gebruiksruimte.
+                        {farmWritePermission
+                            ? "Schakel derogatie in voor de jaren waarvoor dit bedrijf in aanmerking komt."
+                            : "Hieronder staan de jaren waarin dit bedrijf derogatie heeft."}{" "}
+                        Dit heeft invloed op de berekening van je
+                        gebruiksruimte.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -121,25 +133,33 @@ export default function DerogationSettings() {
                                     <TableRow key={year}>
                                         <TableCell>{year}</TableCell>
                                         <TableCell>
-                                            <fetcher.Form method="post">
+                                            {farmWritePermission ? (
+                                                <fetcher.Form method="post">
+                                                    <Switch
+                                                        checked={hasDerogation}
+                                                        onCheckedChange={() => {
+                                                            fetcher.submit(
+                                                                {
+                                                                    year: String(
+                                                                        year,
+                                                                    ),
+                                                                    hasDerogation:
+                                                                        String(
+                                                                            hasDerogation,
+                                                                        ),
+                                                                },
+                                                                {
+                                                                    method: "post",
+                                                                },
+                                                            )
+                                                        }}
+                                                    />
+                                                </fetcher.Form>
+                                            ) : (
                                                 <Switch
                                                     checked={hasDerogation}
-                                                    onCheckedChange={() => {
-                                                        fetcher.submit(
-                                                            {
-                                                                year: String(
-                                                                    year,
-                                                                ),
-                                                                hasDerogation:
-                                                                    String(
-                                                                        hasDerogation,
-                                                                    ),
-                                                            },
-                                                            { method: "post" },
-                                                        )
-                                                    }}
                                                 />
-                                            </fetcher.Form>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 )

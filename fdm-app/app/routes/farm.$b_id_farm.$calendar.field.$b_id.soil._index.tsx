@@ -1,4 +1,5 @@
 import {
+    checkPermission,
     getCurrentSoilData,
     getField,
     getSoilAnalyses,
@@ -24,6 +25,7 @@ import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { cn } from "~/lib/utils"
 
 /**
  * Loader function for the soil data page of a specific farm field.
@@ -95,12 +97,43 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get soil parameter descriptions
         const soilParameterDescription = getSoilParametersDescription()
 
+        const pathname = new URL(request.url).pathname
+        const fieldWritePermission = checkPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            session.principal_id,
+            pathname,
+            false,
+        )
+
+        const soilAnalysisWritePermissionsEntries = await Promise.all(
+            soilAnalyses.map(async (analysis) => [
+                analysis.a_id,
+                await checkPermission(
+                    fdm,
+                    "soil_analysis",
+                    "write",
+                    analysis.a_id,
+                    session.principal_id,
+                    pathname,
+                    false,
+                ),
+            ]),
+        )
+        const soilAnalysisWritePermissions = Object.fromEntries(
+            soilAnalysisWritePermissionsEntries,
+        )
+
         // Return user information from loader
         return {
             field: field,
+            fieldWritePermission: await fieldWritePermission,
             currentSoilData: currentSoilData,
             soilParameterDescription: soilParameterDescription,
             soilAnalyses: soilAnalyses,
+            soilAnalysisWritePermissions: soilAnalysisWritePermissions,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -133,7 +166,12 @@ export default function FarmFieldSoilOverviewBlock() {
                         <TabsTrigger value="parameters">Parameters</TabsTrigger>
                         <TabsTrigger value="analyses">Analyses</TabsTrigger>
                     </TabsList>
-                    <Button asChild>
+                    <Button
+                        asChild
+                        className={cn(
+                            !loaderData.fieldWritePermission ? "invisible" : "",
+                        )}
+                    >
                         <NavLink to="./analysis/new">
                             <Plus />
                             Bodemanalyse toevoegen
@@ -155,7 +193,14 @@ export default function FarmFieldSoilOverviewBlock() {
                                     bodem bij te houden
                                 </p>
                             </div>
-                            <Button asChild>
+                            <Button
+                                asChild
+                                className={cn(
+                                    !loaderData.fieldWritePermission
+                                        ? "invisible"
+                                        : "",
+                                )}
+                            >
                                 <NavLink to="./analysis/new">
                                     Bodemanalyse toevoegen
                                 </NavLink>
@@ -174,6 +219,9 @@ export default function FarmFieldSoilOverviewBlock() {
                     <SoilAnalysesList
                         soilAnalyses={loaderData.soilAnalyses}
                         fetcher={fetcher}
+                        canModifySoilAnalysis={
+                            loaderData.soilAnalysisWritePermissions
+                        }
                     />
                 </TabsContent>
             </div>

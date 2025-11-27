@@ -6,6 +6,7 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { FormSchema } from "@/app/components/blocks/soil/formschema"
 import type { SoilAnalysis } from "@/app/components/blocks/soil/types"
+import { DatePicker } from "~/components/custom/date-picker"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
@@ -24,14 +25,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import { DatePicker } from "../../custom/date-picker"
+import { cn } from "~/lib/utils"
 
 export function SoilAnalysisForm(props: {
     soilAnalysis: SoilAnalysis | undefined
     soilParameterDescription: SoilParameterDescription
     action: string
+    editable?: boolean
 }) {
-    const { soilAnalysis, soilParameterDescription } = props
+    const { soilAnalysis, soilParameterDescription, editable = true } = props
 
     const defaultValues: {
         [key: string]: string | number | Date | undefined | null
@@ -71,7 +73,7 @@ export function SoilAnalysisForm(props: {
                 onSubmit={form.handleSubmit}
                 method="post"
             >
-                <fieldset disabled={form.formState.isSubmitting}>
+                <fieldset disabled={!editable || form.formState.isSubmitting}>
                     <div className="space-y-6">
                         <p className="text-sm text-muted-foreground">
                             Vul de gegevens van de bodemanalyse in.
@@ -225,7 +227,12 @@ export function SoilAnalysisForm(props: {
                                 }
                             })}
                         </div>
-                        <div className="flex justify-end mt-4">
+                        <div
+                            className={cn(
+                                "flex justify-end mt-4",
+                                !editable ? "invisible" : "",
+                            )}
+                        >
                             <Button type="submit">
                                 {form.formState.isSubmitting ? (
                                     <div className="flex items-center space-x-2">
