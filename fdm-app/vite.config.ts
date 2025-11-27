@@ -29,6 +29,9 @@ export default defineConfig((env) => {
                     env,
                 ),
         ].filter(Boolean),
+        define: {
+            global: {},
+        },
         envPrefix: "PUBLIC_",
         ssr: {
             noExternal: ["posthog-js", "posthog-js/react"],
