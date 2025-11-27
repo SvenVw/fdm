@@ -210,9 +210,31 @@ export default function FarmDashboardIndex() {
                                 <h2 className="text-2xl font-semibold tracking-tight">
                                     Apps
                                 </h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <NavLink to={`${calendar}/balance`}>
-                                        <Card className="transition-all hover:shadow-md">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <NavLink to={`${calendar}/atlas`}>
+                                        <Card className="transition-all hover:shadow-md h-full">
+                                            <CardHeader>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="rounded-lg bg-muted p-3">
+                                                        <MapIcon className="h-6 w-6 text-primary" />
+                                                    </div>
+                                                    <div>
+                                                        <CardTitle>
+                                                            Atlas
+                                                        </CardTitle>
+                                                        <CardDescription>
+                                                            Gewaspercelen op de
+                                                            kaart.
+                                                        </CardDescription>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                        </Card>
+                                    </NavLink>
+                                    <NavLink
+                                        to={`${calendar}/balance/nitrogen`}
+                                    >
+                                        <Card className="transition-all hover:shadow-md h-full">
                                             <CardHeader>
                                                 <div className="flex items-center gap-4">
                                                     <div className="rounded-lg bg-muted p-3">
@@ -220,7 +242,7 @@ export default function FarmDashboardIndex() {
                                                     </div>
                                                     <div>
                                                         <CardTitle>
-                                                            Nutriëntenbalans
+                                                            Stikstofbalans
                                                         </CardTitle>
                                                         <CardDescription>
                                                             Aanvoer, afvoer en
@@ -232,8 +254,31 @@ export default function FarmDashboardIndex() {
                                             </CardHeader>
                                         </Card>
                                     </NavLink>
+                                    <NavLink
+                                        to={`${calendar}/balance/nitrogen`}
+                                    >
+                                        <Card className="transition-all hover:shadow-md h-full">
+                                            <CardHeader>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="rounded-lg bg-muted p-3">
+                                                        <ArrowRightLeft className="h-6 w-6 text-primary" />
+                                                    </div>
+                                                    <div>
+                                                        <CardTitle>
+                                                            OS Balans
+                                                        </CardTitle>
+                                                        <CardDescription>
+                                                            Aanvoer en afbraak
+                                                            van organische stof.
+                                                        </CardDescription>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                        </Card>
+                                    </NavLink>
+
                                     <NavLink to={`${calendar}/nutrient_advice`}>
-                                        <Card className="transition-all hover:shadow-md">
+                                        <Card className="transition-all hover:shadow-md h-full">
                                             <CardHeader>
                                                 <div className="flex items-center gap-4">
                                                     <div className="rounded-lg bg-muted p-3">
@@ -255,7 +300,7 @@ export default function FarmDashboardIndex() {
                                         </Card>
                                     </NavLink>
                                     <NavLink to={`${calendar}/norms`}>
-                                        <Card className="transition-all hover:shadow-md">
+                                        <Card className="transition-all hover:shadow-md h-full">
                                             <CardHeader>
                                                 <div className="flex items-center gap-4">
                                                     <div className="rounded-lg bg-muted p-3">
@@ -263,31 +308,11 @@ export default function FarmDashboardIndex() {
                                                     </div>
                                                     <div>
                                                         <CardTitle>
-                                                            Gebruiksnormen
+                                                            Gebruiksruimte
                                                         </CardTitle>
                                                         <CardDescription>
                                                             Normen op bedrijfs-
                                                             en perceelsniveau.
-                                                        </CardDescription>
-                                                    </div>
-                                                </div>
-                                            </CardHeader>
-                                        </Card>
-                                    </NavLink>
-                                    <NavLink to={`${calendar}/atlas`}>
-                                        <Card className="transition-all hover:shadow-md">
-                                            <CardHeader>
-                                                <div className="flex items-center gap-4">
-                                                    <div className="rounded-lg bg-muted p-3">
-                                                        <MapIcon className="h-6 w-6 text-primary" />
-                                                    </div>
-                                                    <div>
-                                                        <CardTitle>
-                                                            Atlas
-                                                        </CardTitle>
-                                                        <CardDescription>
-                                                            Gewaspercelen op de
-                                                            kaart.
                                                         </CardDescription>
                                                     </div>
                                                 </div>
@@ -389,11 +414,9 @@ export default function FarmDashboardIndex() {
                                                 className="w-full justify-start"
                                                 asChild
                                             >
-                                                <NavLink
-                                                    to={`${calendar}/field`}
-                                                >
-                                                    <Square className="mr-2 h-4 w-4" />
-                                                    Percelen
+                                                <NavLink to="settings">
+                                                    <Home className="mr-2 h-4 w-4" />
+                                                    Bedrijf
                                                 </NavLink>
                                             </Button>
                                             <Button
@@ -404,16 +427,6 @@ export default function FarmDashboardIndex() {
                                                 <NavLink to="fertilizers">
                                                     <Shapes className="mr-2 h-4 w-4" />
                                                     Meststoffen
-                                                </NavLink>
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                className="w-full justify-start"
-                                                asChild
-                                            >
-                                                <NavLink to="settings">
-                                                    <Home className="mr-2 h-4 w-4" />
-                                                    Bedrijf
                                                 </NavLink>
                                             </Button>
                                             <Button
