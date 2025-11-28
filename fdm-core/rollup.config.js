@@ -1,31 +1,41 @@
 import commonjs from "@rollup/plugin-commonjs"
 import resolve from "@rollup/plugin-node-resolve"
-import terser from "@rollup/plugin-terser"
-import typescript from "@rollup/plugin-typescript"
 import { copy } from "fs-extra"
+import esbuild from "rollup-plugin-esbuild"
+import packageJson from "./package.json" with { type: "json" }
+
+const isProd = process.env.NODE_ENV === "production"
+
+const dependencies = [
+    ...Object.keys(packageJson.dependencies || {}),
+    ...Object.keys(packageJson.peerDependencies || {}),
+    "fs",
+    "os",
+    "net",
+    "tls",
+    "crypto",
+    "stream",
+]
+
+const external = (id) =>
+    dependencies.some((dep) => id === dep || id.startsWith(`${dep}/`))
 
 export default {
     input: "src/index.ts",
     output: {
-        file: "dist/fdm-core.esm.js",
+        dir: "dist",
         format: "esm",
-        inlineDynamicImports: true,
+        preserveModules: true,
+        entryFileNames: "[name].js",
+        sourcemap: isProd ? true : "inline",
     },
     plugins: [
         resolve({ preferBuiltins: true }),
-        commonjs(), // Handles CommonJS modules
-        typescript({
-            tsconfig: "./tsconfig.json",
-        }), // Compiles TypeScript
-        terser({
-            sourceMap:
-                process.env.NODE_ENV === "production"
-                    ? {
-                          fileName: "dist/fdm-core.esm.js.map",
-                          url: "fdm-core.esm.js.map",
-                      }
-                    : false,
-        }), // Minifies the output
+        commonjs(),
+        esbuild({
+            minify: isProd, // Use esbuild's minifier in production
+            target: "node20",
+        }),
         {
             name: "copy-migrations-folder",
             closeBundle: () => {
@@ -41,15 +51,5 @@ export default {
             },
         },
     ],
-    external: [
-        "fs",
-        "os",
-        "net",
-        "tls",
-        "crypto",
-        "stream",
-        "postgres",
-        "better-auth",
-        "drizzle-orm",
-    ],
+    external,
 }

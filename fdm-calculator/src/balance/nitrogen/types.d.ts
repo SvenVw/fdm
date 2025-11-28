@@ -377,7 +377,11 @@ export type NitrogenBalance = {
     /**
      * The total nitrogen emission across all fields.
      */
-    emission: Decimal
+    emission: {
+        total: Decimal
+        ammonia: Decimal
+        nitrate: Decimal
+    }
     /**
      * The average target value for the nitrogen balance for all the fields
      */
@@ -601,7 +605,11 @@ export type NitrogenBalanceNumeric = {
     balance: number
     supply: number
     removal: number
-    emission: number
+    emission: {
+        total: number
+        ammonia: number
+        nitrate: number
+    }
     target: number
     fields: NitrogenBalanceFieldResultNumeric[]
     hasErrors: boolean

@@ -18,8 +18,7 @@
  * @property p_dose_mo - The dose of molybdenum (Mo) in kg/ha.
  * @property p_dose_b - The dose of boron (B) in kg/ha.
  */
-export interface Dose {
-    [key: string]: string | number | undefined
+export interface DoseProperties {
     p_app_id?: string
     p_dose_n: number
     p_dose_nw: number
@@ -37,3 +36,9 @@ export interface Dose {
     p_dose_mo: number
     p_dose_b: number
 }
+
+export interface Dose extends DoseProperties {
+    [key: string]: string | number | undefined
+}
+
+export type NumericDoseKeys = Exclude<keyof DoseProperties, "p_app_id">

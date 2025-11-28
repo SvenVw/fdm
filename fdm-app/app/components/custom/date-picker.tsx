@@ -1,3 +1,4 @@
+import * as chrono from "chrono-node"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import { CalendarIcon } from "lucide-react"
@@ -21,34 +22,17 @@ import {
 } from "~/components/ui/popover"
 
 function parseDateString(dateString: string): Date | undefined {
-    const parts = dateString.split(/[-./]/) // Split by -, ., or /
-    if (parts.length === 3) {
-        const day = Number.parseInt(parts[0], 10)
-        const month = Number.parseInt(parts[1], 10)
-        let year = Number.parseInt(parts[2], 10)
-
-        // Handle two-digit year (e.g., 24 for 2024)
-        if (year < 100) {
-            const currentYear = new Date().getFullYear()
-            if (year < currentYear + 20) {
-                // Assume 21st century if within 20 years of current year
-                year += 2000
-            } else {
-                // Otherwise assume 20th century
-                year += 1900
-            }
-        }
-
-        const date = new Date(year, month - 1, day) // Month is 0-indexed
-        if (
-            isValidDate(date) &&
-            date.getDate() === day &&
-            date.getMonth() === month - 1 &&
-            date.getFullYear() === year
-        ) {
-            return date
-        }
+    if (!dateString) {
+        return undefined
     }
+
+    // Attempt to parse using chrono-node (Dutch)
+    const referenceDate = new Date()
+    const parsedDate = chrono.nl.parseDate(dateString, referenceDate)
+    if (parsedDate) {
+        return parsedDate
+    }
+
     // Fallback to default Date parsing for other formats
     const defaultDate = new Date(dateString)
     return isValidDate(defaultDate) ? defaultDate : undefined
@@ -74,6 +58,7 @@ interface DatePickerProps<TFieldValues extends FieldValues> {
     name: Path<TFieldValues> // Use Path for better type inference with react-hook-form
     label: string
     description: string
+    disabled: boolean
 }
 
 export function DatePicker<TFieldValues extends FieldValues>({
@@ -81,6 +66,7 @@ export function DatePicker<TFieldValues extends FieldValues>({
     name,
     label,
     description,
+    disabled = false,
 }: DatePickerProps<TFieldValues>) {
     const [open, setOpen] = React.useState(false)
     const [date, setDate] = React.useState<Date | undefined>(
@@ -109,6 +95,12 @@ export function DatePicker<TFieldValues extends FieldValues>({
         }
     }, [form, name, date])
 
+    React.useEffect(() => {
+        if (disabled && open) {
+            setOpen(false)
+        }
+    }, [disabled, open])
+
     return (
         <FormField
             control={form.control}
@@ -123,24 +115,37 @@ export function DatePicker<TFieldValues extends FieldValues>({
                                 value={value}
                                 placeholder="Kies een datum"
                                 className="bg-background pr-10"
-                                onChange={(e) => {
-                                    const newDate = parseDateString(
-                                        e.target.value,
-                                    ) // Use parseDateString
+                                disabled={disabled}
+                                onChange={(e) => setValue(e.target.value)}
+                                onBlur={(e) => {
+                                    const text = e.target.value
+                                    if (text.trim() === "") {
+                                        setDate(undefined)
+                                        setValue("")
+                                        field.onChange(undefined)
+                                        setIsInputValid(true)
+                                        field.onBlur()
+                                        return
+                                    }
+
+                                    const newDate = parseDateString(text)
                                     if (newDate && isValidDate(newDate)) {
-                                        // Check if newDate is defined and valid
                                         setDate(newDate)
                                         setMonth(newDate)
-                                        setValue(formatDate(newDate)) // Set value to formatted date
+                                        setValue(formatDate(newDate))
                                         field.onChange(newDate)
-                                        setIsInputValid(true) // Set valid
+                                        setIsInputValid(true)
                                     } else {
-                                        setValue(e.target.value) // Keep invalid text for a moment
+                                        setIsInputValid(false)
                                         field.onChange(undefined)
-                                        setIsInputValid(false) // Set invalid
                                     }
+                                    field.onBlur()
                                 }}
                                 onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.preventDefault()
+                                        e.currentTarget.blur()
+                                    }
                                     if (e.key === "ArrowDown") {
                                         e.preventDefault()
                                         setOpen(true)
@@ -154,6 +159,7 @@ export function DatePicker<TFieldValues extends FieldValues>({
                                     id={`${field.name}-picker`}
                                     variant="ghost"
                                     className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
+                                    disabled={disabled}
                                 >
                                     <CalendarIcon className="size-3.5" />
                                     <span className="sr-only">

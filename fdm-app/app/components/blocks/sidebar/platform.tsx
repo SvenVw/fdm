@@ -7,7 +7,7 @@ import {
     User,
     Users,
 } from "lucide-react"
-import { NavLink } from "react-router"
+import { NavLink, useLocation } from "react-router"
 import { clientConfig } from "@/app/lib/config"
 import { Button } from "~/components/ui/button"
 import {
@@ -20,6 +20,7 @@ import {
 } from "~/components/ui/sidebar"
 
 export function SidebarPlatform() {
+    const location = useLocation()
     return (
         <>
             <SidebarGroup>
@@ -46,7 +47,10 @@ export function SidebarPlatform() {
                 <SidebarGroupContent>
                     <SidebarMenu>
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes("/user")}
+                            >
                                 <NavLink to={"/user"}>
                                     <User />
                                     <span>Profiel</span>
@@ -78,7 +82,17 @@ export function SidebarPlatform() {
                 <SidebarGroupContent>
                     <SidebarMenu>
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={
+                                    location.pathname.includes(
+                                        "/organization",
+                                    ) &&
+                                    !location.pathname.includes(
+                                        "/organization/invitations",
+                                    )
+                                }
+                            >
                                 <NavLink to={"/organization"}>
                                     <Users />
                                     <span>Overzicht</span>
@@ -86,7 +100,12 @@ export function SidebarPlatform() {
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    "/organization/invitations",
+                                )}
+                            >
                                 <NavLink to={"/organization/invitations"}>
                                     <Mail />
                                     <span>Uitnodigingen</span>
@@ -101,7 +120,12 @@ export function SidebarPlatform() {
                 <SidebarGroupContent>
                     <SidebarMenu>
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    "/about/whats-new",
+                                )}
+                            >
                                 <NavLink to={"/about/whats-new"}>
                                     <Sparkles />
                                     <span>Wat is er nieuw?</span>

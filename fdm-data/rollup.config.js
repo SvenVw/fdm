@@ -1,32 +1,33 @@
+import commonjs from "@rollup/plugin-commonjs"
 import json from "@rollup/plugin-json"
 import resolve from "@rollup/plugin-node-resolve"
-import terser from "@rollup/plugin-terser"
-import typescript from "@rollup/plugin-typescript"
-import { defineConfig } from "rollup"
+import esbuild from "rollup-plugin-esbuild"
+import packageJson from "./package.json" with { type: "json" }
 
-export default defineConfig({
-    input: "src/index.ts", // Your entry point
-    output: [
-        {
-            file: "dist/fdm-data.esm.js", // Output for ES modules
-            format: "esm",
-        },
-    ],
+const isProd = process.env.NODE_ENV === "production"
 
+const external = [
+    ...Object.keys(packageJson.dependencies || {}),
+    ...Object.keys(packageJson.peerDependencies || {}),
+]
+
+export default {
+    input: "src/index.ts",
+    output: {
+        dir: "dist",
+        format: "esm",
+        preserveModules: true,
+        entryFileNames: "[name].js",
+        sourcemap: isProd ? true : "inline",
+    },
     plugins: [
         resolve(),
-        typescript({
-            tsconfig: "./tsconfig.json",
-        }),
+        commonjs(),
         json(),
-        terser({
-            sourceMap:
-                process.env.NODE_ENV === "production"
-                    ? {
-                          fileName: "dist/fdm-data.esm.js.map",
-                          url: "fdm-data.esm.js.map",
-                      }
-                    : false,
-        }), // Minifies the output
+        esbuild({
+            minify: isProd, // Use esbuild's minifier in production
+            target: "node20.10",
+        }),
     ],
-})
+    external,
+}

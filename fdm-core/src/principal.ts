@@ -290,7 +290,7 @@ export async function lookupPrincipal(
             // Collect details of principals
             if (principals.length > 0) {
                 const principalsDetails = await Promise.all(
-                    principals.map(async (principal) => {
+                    principals.map(async (principal: { id: string }) => {
                         const details = await getPrincipal(tx, principal.id)
                         return details
                     }),

@@ -1,6 +1,7 @@
 import {
     getCultivationPlan,
     getHarvest,
+    getParametersForHarvestCat,
     removeHarvest,
     updateHarvest,
 } from "@svenvw/fdm-core"
@@ -10,23 +11,17 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
-    useNavigate,
 } from "react-router"
-import { redirectWithSuccess } from "remix-toast"
-import { HarvestForm } from "~/components/blocks/harvest/form"
+import { dataWithWarning, redirectWithSuccess } from "remix-toast"
 import { FormSchema } from "~/components/blocks/harvest/schema"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "~/components/ui/dialog"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { HarvestFormDialog } from "../components/blocks/harvest/form"
+import { getHarvestParameterLabel } from "../components/blocks/harvest/parameters"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -107,11 +102,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session.principal_id,
             b_id_harvesting,
         )
+        const harvestableAnalysis = harvest.harvestable.harvestable_analyses[0]
+        const harvestParameters = getParametersForHarvestCat(
+            cultivation.b_lu_harvestcat,
+        )
 
         // Return user information from loader
         return {
             cultivation: cultivation,
             harvest: harvest,
+            harvestableAnalysis: harvestableAnalysis,
+            harvestParameters: harvestParameters,
             b_id_farm: b_id_farm,
             calendar: calendar,
             b_lu_catalogue: b_lu_catalogue,
@@ -130,32 +131,28 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  *
  * @returns The JSX element representing the harvest overview block.
  */
-export default function FarmFieldsOverviewBlock() {
+export default function updateHarvestBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const navigate = useNavigate()
 
     return (
-        <Dialog open={true} onOpenChange={() => navigate("..")}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Oogst bijwerken</DialogTitle>
-                </DialogHeader>
-                <HarvestForm
-                    b_lu_yield={
-                        loaderData.harvest?.harvestable
-                            ?.harvestable_analyses?.[0]?.b_lu_yield
-                    }
-                    b_lu_n_harvestable={
-                        loaderData.harvest?.harvestable
-                            ?.harvestable_analyses?.[0]?.b_lu_n_harvestable
-                    }
-                    b_lu_harvest_date={loaderData.harvest?.b_lu_harvest_date}
-                    b_lu_start={loaderData.cultivation.b_lu_start}
-                    b_lu_end={loaderData.cultivation.b_lu_end}
-                    b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
-                />
-            </DialogContent>
-        </Dialog>
+        <HarvestFormDialog
+            harvestParameters={loaderData.harvestParameters}
+            b_lu_harvest_date={loaderData.harvest.b_lu_harvest_date}
+            b_lu_yield={loaderData.harvestableAnalysis.b_lu_yield}
+            b_lu_yield_fresh={loaderData.harvestableAnalysis.b_lu_yield_fresh}
+            b_lu_yield_bruto={loaderData.harvestableAnalysis.b_lu_yield_bruto}
+            b_lu_tarra={loaderData.harvestableAnalysis.b_lu_tarra}
+            b_lu_uww={loaderData.harvestableAnalysis.b_lu_uww}
+            b_lu_moist={loaderData.harvestableAnalysis.b_lu_moist}
+            b_lu_dm={loaderData.harvestableAnalysis.b_lu_dm}
+            b_lu_cp={loaderData.harvestableAnalysis.b_lu_cp}
+            b_lu_n_harvestable={
+                loaderData.harvestableAnalysis.b_lu_n_harvestable
+            }
+            b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
+            b_lu_start={loaderData.cultivation.b_lu_start}
+            b_lu_end={loaderData.cultivation.b_lu_end}
+        />
     )
 }
 
@@ -191,13 +188,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!b_id_harvesting) {
                 throw new Error("missing: b_id_harvesting")
             }
-            // Collect form entry
-            const formValues = await extractFormValuesFromRequest(
-                request,
-                FormSchema,
-            )
-            const { b_lu_yield, b_lu_n_harvestable, b_lu_harvest_date } =
-                formValues
 
             // Get all cultivation IDs associated with this catalogue
             const cultivationPlan = await getCultivationPlan(
@@ -212,6 +202,19 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!cultivation) {
                 throw new Error("Cultivation not found")
             }
+
+            const harvestOriginal = await getHarvest(
+                fdm,
+                session.principal_id,
+                b_id_harvesting,
+            )
+            const harvestDateOriginal = harvestOriginal.b_lu_harvest_date
+
+            // First, validate against the full FormSchema
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                FormSchema,
+            )
 
             // Update harvests for all cultivations that share the same harvest date for this cultivation
             const targetHarvests = cultivation.fields.flatMap(
@@ -228,12 +231,54 @@ export async function action({ request, params }: ActionFunctionArgs) {
                         }) => {
                             return (
                                 harvest.b_lu_harvest_date.getTime() ===
-                                b_lu_harvest_date.getTime()
+                                harvestDateOriginal.getTime()
                             )
                         },
                     )
                 },
             )
+
+            // Get required harvest parameters for the cultivation's harvest category
+            const requiredHarvestParameters = getParametersForHarvestCat(
+                cultivation.b_lu_harvestcat,
+            )
+
+            // Check if all required parameters are present
+            const missingParameters: string[] = []
+            for (const param of requiredHarvestParameters) {
+                if (
+                    (formValues as Record<string, any>)[param] === undefined ||
+                    (formValues as Record<string, any>)[param] === null
+                ) {
+                    missingParameters.push(param)
+                }
+            }
+            const missingParameterLabels = missingParameters.map((param) => {
+                return getHarvestParameterLabel(param)
+            })
+
+            if (missingParameters.length > 0) {
+                return dataWithWarning(
+                    {
+                        warning: `Missing required harvest parameters: ${missingParameters.join(
+                            ", ",
+                        )}`,
+                    },
+                    `Voor de volgende parameters ontbreekt een waarde: ${missingParameterLabels.join(
+                        ", ",
+                    )}`,
+                )
+            }
+
+            // Filter form values to include only required parameters for updateHarvest
+            const harvestProperties: Record<string, any> = {}
+            for (const param of requiredHarvestParameters) {
+                if ((formValues as Record<string, any>)[param] !== undefined) {
+                    harvestProperties[param] = (
+                        formValues as Record<string, any>
+                    )[param]
+                }
+            }
 
             await Promise.all(
                 targetHarvests.map(
@@ -242,9 +287,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                             fdm,
                             session.principal_id,
                             targetHarvest.b_id_harvesting,
-                            b_lu_harvest_date,
-                            b_lu_yield,
-                            b_lu_n_harvestable,
+                            formValues.b_lu_harvest_date,
+                            harvestProperties,
                         )
                     },
                 ),

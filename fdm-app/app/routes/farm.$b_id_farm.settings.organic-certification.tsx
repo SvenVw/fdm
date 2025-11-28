@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addOrganicCertification,
+    checkPermission,
     listOrganicCertifications,
     removeOrganicCertification,
 } from "@svenvw/fdm-core"
@@ -63,6 +64,7 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { cn } from "~/lib/utils"
 
 export const meta: MetaFunction = () => {
     return [
@@ -93,7 +95,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // For now we expect that a farm can have only 1 certification
         const organicCertification = organicCertifications[0]
 
-        return { b_id_farm, organicCertification }
+        const farmWritePermission = await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+            new URL(request.url).pathname,
+            false,
+        )
+
+        return { b_id_farm, organicCertification, farmWritePermission }
     } catch (error) {
         throw handleLoaderError(error)
     }
@@ -155,7 +167,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function OrganicCertificationSettings() {
-    const { organicCertification } = useLoaderData<typeof loader>()
+    const { organicCertification, farmWritePermission } =
+        useLoaderData<typeof loader>()
     const navigation = useNavigation()
 
     const isDeleting =
@@ -309,13 +322,20 @@ export default function OrganicCertificationSettings() {
                                 Dit bedrijf heeft geen bio-certificaat
                             </EmptyTitle>
                             <EmptyDescription>
-                                Als dit bedrijf wel een bio-certificaat heeft,
-                                kunt u deze toevoegen.
+                                {farmWritePermission
+                                    ? "Als dit bedrijf wel een bio-certificaat heeft, kunt u deze toevoegen."
+                                    : "U heeft geen toestemming om een bio-certificaat voor dit bedrijf toe te voegen."}
                             </EmptyDescription>
                         </EmptyHeader>
                         <EmptyContent>
                             <DialogTrigger asChild>
-                                <Button>Voeg toe</Button>
+                                <Button
+                                    className={cn(
+                                        !farmWritePermission ? "invisible" : "",
+                                    )}
+                                >
+                                    Voeg toe
+                                </Button>
                             </DialogTrigger>
                         </EmptyContent>
                     </Empty>

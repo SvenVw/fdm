@@ -125,6 +125,12 @@ export function Layout() {
                     content="width=device-width, initial-scale=1"
                 />
                 <Meta />
+                <script
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Polyfill for Mapbox and other libs expecting global
+                    dangerouslySetInnerHTML={{
+                        __html: "window.global = window;",
+                    }}
+                />
                 <Links />
             </head>
             <body>

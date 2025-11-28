@@ -82,7 +82,7 @@ export default function ChooseFieldImportMethod() {
                                     RVO Mijn Percelen te uploaden.
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="flex-grow flex flex-col justify-between">
+                            <CardContent className="grow flex flex-col justify-between">
                                 <Accordion
                                     type="single"
                                     collapsible
@@ -145,7 +145,7 @@ export default function ChooseFieldImportMethod() {
                                     Selecteer je percelen direct op de kaart.
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent className="flex-grow flex items-end justify-center">
+                            <CardContent className="grow flex items-end justify-center">
                                 <NavLink to="./atlas" className="w-full">
                                     <Button
                                         variant="outline"

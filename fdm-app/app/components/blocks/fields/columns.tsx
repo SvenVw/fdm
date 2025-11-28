@@ -1,5 +1,12 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpRightFromSquare, MoreHorizontal } from "lucide-react"
+import {
+    ArrowUpRightFromSquare,
+    Circle,
+    Diamond,
+    MoreHorizontal,
+    Square,
+    Triangle,
+} from "lucide-react"
 import { NavLink } from "react-router-dom"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
 import { Badge } from "~/components/ui/badge"
@@ -22,12 +29,15 @@ export type FieldExtended = {
         b_lu_croprotation: string
         b_lu_start: Date
     }[]
-    fertilizerApplications: {
+    fertilizers: {
         p_name_nl: string
+        p_id: string
+        p_type: string
     }[]
     a_som_loi: number
     b_soiltype_agr: string
     b_area: number
+    has_write_permission: boolean
 }
 
 export const columns: ColumnDef<FieldExtended>[] = [
@@ -118,10 +128,8 @@ export const columns: ColumnDef<FieldExtended>[] = [
         accessorKey: "fertilizerApplications",
         enableSorting: true,
         sortingFn: (rowA, rowB, _columnId) => {
-            const fertilizerA =
-                rowA.original.fertilizerApplications[0]?.p_name_nl || ""
-            const fertilizerB =
-                rowB.original.fertilizerApplications[0]?.p_name_nl || ""
+            const fertilizerA = rowA.original.fertilizers[0]?.p_name_nl || ""
+            const fertilizerB = rowB.original.fertilizers[0]?.p_name_nl || ""
             return fertilizerA.localeCompare(fertilizerB)
         },
         header: ({ column }) => {
@@ -130,18 +138,28 @@ export const columns: ColumnDef<FieldExtended>[] = [
             )
         },
         cell: ({ row }) => {
-            const field = row.original
-
-            const uniqueFertilizerNames = [...field.fertilizerApplications]
-                .map((app) => app.p_name_nl)
-                .filter((name, index, self) => self.indexOf(name) === index)
-                .sort((a, b) => a.localeCompare(b))
+            const fertilizers = row.original.fertilizers
 
             return (
                 <div className="flex items-start flex-col space-y-2">
-                    {uniqueFertilizerNames.map((fertilizer) => (
-                        <Badge key={fertilizer} variant="outline">
-                            {fertilizer}
+                    {fertilizers.map((fertilizer) => (
+                        <Badge
+                            key={fertilizer.p_id}
+                            variant="outline"
+                            className="text-muted-foreground gap-1"
+                        >
+                            <span>
+                                {fertilizer.p_type === "manure" ? (
+                                    <Square className="size-3 text-yellow-600 fill-yellow-600" />
+                                ) : fertilizer.p_type === "mineral" ? (
+                                    <Circle className="size-3 text-sky-600 fill-sky-600" />
+                                ) : fertilizer.p_type === "compost" ? (
+                                    <Triangle className="size-3 text-green-600 fill-green-600" />
+                                ) : (
+                                    <Diamond className="size-3 text-gray-600 fill-gray-600" />
+                                )}
+                            </span>
+                            {fertilizer.p_name_nl}
                         </Badge>
                     ))}
                 </div>
@@ -246,11 +264,13 @@ export const columns: ColumnDef<FieldExtended>[] = [
                                 Kaart
                             </NavLink>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <NavLink to={`./${field.b_id}/delete`}>
-                                Verwijderen
-                            </NavLink>
-                        </DropdownMenuItem>
+                        {field.has_write_permission && (
+                            <DropdownMenuItem>
+                                <NavLink to={`./${field.b_id}/delete`}>
+                                    Verwijderen
+                                </NavLink>
+                            </DropdownMenuItem>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             )

@@ -1,73 +1,57 @@
 import commonjs from "@rollup/plugin-commonjs"
 import resolve from "@rollup/plugin-node-resolve"
-import terser from "@rollup/plugin-terser"
-import typescript from "@rollup/plugin-typescript"
-import { defineConfig } from "rollup"
+import esbuild from "rollup-plugin-esbuild"
 import packageJson from "./package.json" with { type: "json" }
 
-export default defineConfig({
-    input: "src/index.ts", // Your entry point
-    output: [
-        {
-            file: "dist/fdm-calculator.esm.js", // Output for ES modules
-            format: "esm",
-            sourcemap: process.env.NODE_ENV === "development",
-        },
-    ],
+const isProd = process.env.NODE_ENV === "production"
+
+const external = [
+    ...Object.keys(packageJson.dependencies || {}),
+    ...Object.keys(packageJson.peerDependencies || {}),
+]
+
+export default {
+    input: "src/index.ts",
+    output: {
+        dir: "dist",
+        format: "esm",
+        preserveModules: true,
+        entryFileNames: "[name].js",
+        sourcemap: isProd ? true : "inline",
+    },
     plugins: [
         resolve(),
         commonjs(),
-        typescript({
-            sourceMap: process.env.NODE_ENV === "development",
-            inlineSources: process.env.NODE_ENV === "development",
+        esbuild({
+            minify: isProd, // Use esbuild's minifier in production
+            target: "node20",
         }),
-        terser({
-            sourceMap:
-                process.env.NODE_ENV === "development"
-                    ? {
-                          filename: "dist/fdm-calculator.esm.js.map",
-                          url: "fdm-calculator.esm.js.map",
-                      }
-                    : false,
-        }), // Minifies the output
+
         {
             renderChunk: (code, map) => {
                 const replacement = `"fdm-calculator:${packageJson.version}"`
-
                 const placeholder = `"fdm-calculator:{FDM_CALCULATOR_VERSION}"`
-                const occurrences =
-                    code.match(
-                        new RegExp(
-                            placeholder.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&"),
-                            "g",
-                        ),
-                    ) || []
 
-                if (occurrences.length === 0) {
-                    console.warn(
-                        `⚠️ Version placeholder "${placeholder}" not found in bundle`,
-                    )
-                } else if (occurrences.length > 1) {
-                    console.warn(
-                        `⚠️ Version placeholder "${placeholder}" appears ${occurrences.length} times`,
-                    )
+                if (!code.includes(placeholder)) {
+                    // Quietly return null if not found (expected for most files in preserveModules)
+                    return null
                 }
 
                 if (replacement.length > placeholder.length) {
                     console.warn(
-                        "⚠️ Replacement fdm-calculator version string ended up longer than the placeholder in package.ts. Source map will be broken.",
+                        "⚠️ Replacement fdm-calculator version string ended up longer than the placeholder. Source map will be broken.",
                     )
                 }
 
                 return {
                     code: code.replace(
                         placeholder,
-                        replacement.padEnd(placeholder.length, " "), // Pad to not break the source map
+                        replacement.padEnd(placeholder.length, " "),
                     ),
                     map,
                 }
             },
-        }, // Modifies bundled package.ts to contain the actual package version
+        },
     ],
-    external: ["@svenvw/fdm-core", "geotiff"],
-})
+    external,
+}

@@ -22,6 +22,7 @@ export {
     updateUserProfile,
 } from "./authentication"
 export type { FdmAuth } from "./authentication.d"
+export { checkPermission } from "./authorization"
 export type { PrincipalId } from "./authorization.d"
 export {
     getCachedCalculation,
@@ -117,8 +118,11 @@ export {
 } from "./grazing_intention"
 export {
     addHarvest,
+    getDefaultsForHarvestParameters,
     getHarvest,
+    getHarvestableTypeOfCultivation,
     getHarvests,
+    getParametersForHarvestCat,
     removeHarvest,
     updateHarvest,
 } from "./harvest"
@@ -126,6 +130,8 @@ export type {
     Harvest,
     Harvestable,
     HarvestableAnalysis,
+    HarvestParameters,
+    HarvestParametersDefault,
 } from "./harvest.d"
 export { runMigration } from "./migrate"
 export {

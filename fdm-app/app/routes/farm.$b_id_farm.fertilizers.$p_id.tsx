@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
+    checkPermission,
     getFarm,
     getFarms,
     getFertilizer,
@@ -109,6 +110,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         let editable = false
         if (fertilizer.p_source === b_id_farm) {
             editable = true
+        }
+        if (
+            editable &&
+            !(await checkPermission(
+                fdm,
+                "farm",
+                "write",
+                b_id_farm,
+                session.principal_id,
+                new URL(request.url).pathname,
+                false,
+            ))
+        ) {
+            editable = false
         }
 
         // Return user information from loader

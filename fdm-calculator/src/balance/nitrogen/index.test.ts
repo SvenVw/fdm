@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest"
-import { calculateNitrogenBalance, combineSoilAnalyses } from "."
-import type {
-    FieldInput,
-    NitrogenBalanceInput,
-    SoilAnalysisPicked,
-} from "./types"
+import { calculateNitrogenBalance } from "."
+import type { NitrogenBalanceInput } from "./types"
 
 describe("calculateNitrogenBalance", () => {
     it("should calculate nitrogen balance correctly with mock input", async () => {
@@ -99,7 +95,9 @@ describe("calculateNitrogenBalance", () => {
         expect(typeof result.balance).toBe("number")
         expect(typeof result.supply).toBe("number")
         expect(typeof result.removal).toBe("number")
-        expect(typeof result.emission).toBe("number")
+        expect(typeof result.emission.total).toBe("number")
+        expect(typeof result.emission.ammonia).toBe("number")
+        expect(typeof result.emission.nitrate).toBe("number")
         expect(typeof result.target).toBe("number")
         expect(Array.isArray(result.fields)).toBe(true)
     })
@@ -133,63 +131,5 @@ describe("calculateNitrogenBalance", () => {
 
         expect(result.hasErrors).toBe(true)
         expect(result.fieldErrorMessages.length).toBeGreaterThan(0)
-    })
-})
-
-describe("combineSoilAnalyses", () => {
-    it("should combine soil analyses correctly", () => {
-        const soilAnalyses: FieldInput["soilAnalyses"] = [
-            {
-                a_id: "soil1",
-                b_sampling_date: new Date("2023-01-01"),
-                a_c_of: 20,
-                a_cn_fr: 10,
-                a_density_sa: 1.2,
-                a_n_rt: 3000,
-                a_som_loi: 2,
-                b_soiltype_agr: "dekzand",
-                b_gwl_class: "II",
-            },
-            {
-                a_id: "soil2",
-                b_sampling_date: new Date("2023-01-05"),
-                a_c_of: 22,
-                a_cn_fr: 11,
-                a_density_sa: 1.3,
-                a_n_rt: 2000,
-                a_som_loi: 3,
-                b_soiltype_agr: "zeeklei",
-                b_gwl_class: "II",
-            },
-        ]
-
-        const result: SoilAnalysisPicked = combineSoilAnalyses(soilAnalyses)
-
-        expect(result).toBeDefined()
-        expect(result.a_c_of).toBe(22)
-        expect(result.a_cn_fr).toBe(11)
-        expect(result.a_density_sa).toBe(1.3)
-        expect(result.a_n_rt).toBe(2000)
-        expect(result.a_som_loi).toBe(3)
-        expect(result.b_soiltype_agr).toBe("zeeklei")
-    })
-
-    it("should throw an error if required soil parameters are missing", () => {
-        const soilAnalyses: FieldInput["soilAnalyses"] = [
-            {
-                a_id: "soil1",
-                b_sampling_date: new Date("2023-01-01"),
-                a_c_of: null,
-                a_cn_fr: 10,
-                a_density_sa: 1.2,
-                a_n_rt: 3000,
-                a_som_loi: 2,
-                b_soiltype_agr: "dekzand",
-                b_gwl_class: "II",
-            },
-        ]
-        soilAnalyses[0].a_n_rt = null
-
-        expect(() => combineSoilAnalyses(soilAnalyses)).toThrowError()
     })
 })

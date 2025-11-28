@@ -46,6 +46,23 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
               })()
             : cultivation.b_lu_croprotation
 
+        // Validate harvestcat
+        const harvestcat =
+            cultivation.b_lu_harvestcat !== "HC010" &&
+            cultivation.b_lu_harvestcat !== "HC020" &&
+            cultivation.b_lu_harvestcat !== "HC031" &&
+            cultivation.b_lu_harvestcat !== "HC040" &&
+            cultivation.b_lu_harvestcat !== "HC041" &&
+            cultivation.b_lu_harvestcat !== "HC042" &&
+            cultivation.b_lu_harvestcat !== "HC050" &&
+            cultivation.b_lu_harvestcat !== null
+                ? (() => {
+                      throw new Error(
+                          `Invalid value for b_lu_harvestcat: ${cultivation.b_lu_harvestcat}.`,
+                      )
+                  })()
+                : cultivation.b_lu_harvestcat
+
         // Transform to CatalogueCultivationItem
         const item: CatalogueCultivationItem = {
             b_lu_source: "brp",
@@ -56,8 +73,12 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
             b_lu_hcat3: cultivation.b_lu_hcat3,
             b_lu_hcat3_name: cultivation.b_lu_hcat3_name,
             b_lu_croprotation: cultivation.b_lu_croprotation,
+            b_lu_harvestcat: harvestcat,
             b_lu_yield: cultivation.b_lu_yield,
+            b_lu_dm: cultivation.b_lu_dm,
             b_lu_hi: cultivation.b_lu_hi,
+            b_lu_eom: cultivation.b_lu_eom,
+            b_lu_eom_residue: cultivation.b_lu_eom_residue,
             b_lu_n_harvestable: cultivation.b_lu_n_harvestable,
             b_lu_n_residue: cultivation.b_lu_n_residue,
             b_n_fixation: cultivation.b_n_fixation,

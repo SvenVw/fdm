@@ -7,8 +7,8 @@ export function CustomFertilizerButton() {
     return (
         <Link
             to={
-                searchParams.has("fieldIds")
-                    ? `custom?fieldIds=${searchParams.get("fieldIds")}`
+                searchParams.has("returnUrl")
+                    ? `custom?returnUrl=${encodeURIComponent(searchParams.get("returnUrl") ?? "")}`
                     : "custom"
             }
             className="block"
@@ -36,8 +36,8 @@ export function BasedOffFertilizerButton({
     return (
         <NavLink
             to={
-                searchParams.has("fieldIds")
-                    ? `${fertilizer.p_id}?fieldIds=${searchParams.get("fieldIds")}`
+                searchParams.has("returnUrl")
+                    ? `${fertilizer.p_id}?returnUrl=${encodeURIComponent(searchParams.get("returnUrl") ?? "")}`
                     : `${fertilizer.p_id}`
             }
             className="block"

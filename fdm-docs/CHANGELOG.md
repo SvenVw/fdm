@@ -1,5 +1,18 @@
 # fdm-docs
 
+## 0.9.0
+
+### Minor Changes
+
+- ec38fe3: Add an page to core concepts about how harvests work in FDM
+- b79086d: Add explanation of how the calculation for nitrate leaching works
+- 1da9360: Extend the pages about core-concepts of FDM, update schema description and reorganize the docs
+- 86c958a: Add page about the calculation of the organic matter balance
+
+### Patch Changes
+
+- 887ead3: Upgrade to Node.js v24
+
 ## 0.8.0
 
 ### Minor Changes

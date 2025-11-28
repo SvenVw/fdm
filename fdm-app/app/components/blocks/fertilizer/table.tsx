@@ -21,15 +21,18 @@ import {
     TableHeader,
     TableRow,
 } from "~/components/ui/table"
+import { cn } from "~/lib/utils"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    canAddItem: boolean
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
+    canAddItem,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -65,7 +68,7 @@ export function DataTable<TData, TValue>({
                     }
                     className="max-w-sm"
                 />
-                <div className="ml-auto">
+                <div className={cn("ml-auto", !canAddItem ? "invisible" : "")}>
                     <NavLink to={"./new"}>
                         <Button>
                             <Plus />

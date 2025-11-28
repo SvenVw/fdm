@@ -1,13 +1,15 @@
+import type { getFarm } from "@svenvw/fdm-core"
 import {
     Calendar,
     Check,
     ChevronRight,
     House,
     Shapes,
+    Sprout,
     Square,
 } from "lucide-react"
 import { useState } from "react"
-import { NavLink, useLocation } from "react-router"
+import { NavLink, useLocation, useSearchParams } from "react-router"
 import { getCalendarSelection } from "@/app/lib/calendar"
 import { useCalendarStore } from "@/app/store/calendar"
 import { useFarmStore } from "@/app/store/farm"
@@ -29,7 +31,22 @@ import {
     SidebarMenuSubItem,
 } from "~/components/ui/sidebar"
 
-export function SidebarFarm() {
+export function SidebarFarm({
+    farm,
+}: {
+    farm: Awaited<ReturnType<typeof getFarm>> | undefined
+}) {
+    function getSuperiorRole(allRoles: ("owner" | "advisor" | "researcher")[]) {
+        if (allRoles.length > 0) {
+            const ordering = ["owner", "advisor", "researcher"] as const
+            const sorted = [...allRoles].sort(
+                (a, b) => ordering.indexOf(a) - ordering.indexOf(b),
+            )
+            return sorted[0]
+        }
+        return null
+    }
+
     const farmId = useFarmStore((state) => state.farmId)
 
     const selectedCalendar = useCalendarStore((state) => state.calendar)
@@ -37,10 +54,13 @@ export function SidebarFarm() {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false)
     const calendarSelection = getCalendarSelection()
 
-    // Check if page contains `farm/create` in url
     const location = useLocation()
-    const isCreateFarmWizard = location.pathname.includes("farm/create")
-
+    const [searchParams] = useSearchParams()
+    // Check if the page or its return page contains `farm/create` in url
+    const isCreateFarmWizard =
+        location.pathname.includes("farm/create") ||
+        searchParams.get("returnUrl")?.includes("farm/create")
+    const farmRole = farm ? getSuperiorRole(farm.roles) : null
     // Set the farm link
     let farmLink: string
     let farmLinkDisplay: string
@@ -49,7 +69,7 @@ export function SidebarFarm() {
         farmLinkDisplay = "Terug naar bedrijven"
     } else if (farmId && farmId !== "undefined") {
         farmLink = `/farm/${farmId}`
-        farmLinkDisplay = "Bedrijf"
+        farmLinkDisplay = farm?.b_name_farm ? farm.b_name_farm : "Bedrijf"
     } else {
         farmLink = "/farm"
         farmLinkDisplay = "Overzicht bedrijven"
@@ -62,6 +82,15 @@ export function SidebarFarm() {
         fieldsLink = `/farm/${farmId}/${selectedCalendar}/field`
     } else {
         fieldsLink = undefined
+    }
+
+    let rotationLink: string | undefined
+    if (isCreateFarmWizard) {
+        rotationLink = undefined
+    } else if (farmId && farmId !== "undefined") {
+        rotationLink = `/farm/${farmId}/${selectedCalendar}/rotation`
+    } else {
+        rotationLink = undefined
     }
 
     let fertilizersLink: string | undefined
@@ -77,10 +106,35 @@ export function SidebarFarm() {
             <SidebarGroupContent>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
+                        <SidebarMenuButton
+                            asChild
+                            isActive={
+                                location.pathname === farmLink ||
+                                location.pathname.includes(
+                                    `/farm/${farmId}/settings`,
+                                )
+                            }
+                        >
                             <NavLink to={farmLink}>
                                 <House />
-                                <span>{farmLinkDisplay}</span>
+                                <span className="truncate">
+                                    {farmLinkDisplay}
+                                </span>
+                                {farmRole && (
+                                    <Badge
+                                        key={farmRole}
+                                        variant="outline"
+                                        className="ml-auto"
+                                    >
+                                        {farmRole === "owner"
+                                            ? "Eigenaar"
+                                            : farmRole === "advisor"
+                                              ? "Adviseur"
+                                              : farmRole === "researcher"
+                                                ? "Onderzoeker"
+                                                : "Onbekend"}
+                                    </Badge>
+                                )}
                             </NavLink>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -172,7 +226,12 @@ export function SidebarFarm() {
                     )}
                     <SidebarMenuItem>
                         {fieldsLink ? (
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    fieldsLink,
+                                )}
+                            >
                                 <NavLink to={fieldsLink}>
                                     <Square />
                                     <span>Percelen</span>
@@ -190,17 +249,39 @@ export function SidebarFarm() {
                             </SidebarMenuButton>
                         )}
                     </SidebarMenuItem>
-                    {/* <SidebarMenuItem>
-                                <SidebarMenuButton asChild>
-                                    <NavLink to="./cultivations">
-                                        <Sprout />
-                                        <span>Gewassen</span>
-                                    </NavLink>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem> */}
+                    <SidebarMenuItem>
+                        {rotationLink ? (
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    rotationLink,
+                                )}
+                            >
+                                <NavLink to={rotationLink}>
+                                    <Sprout />
+                                    <span>Bouwplan</span>
+                                </NavLink>
+                            </SidebarMenuButton>
+                        ) : (
+                            <SidebarMenuButton
+                                asChild
+                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                            >
+                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                    <Sprout />
+                                    <span>Bouwplan</span>
+                                </span>
+                            </SidebarMenuButton>
+                        )}
+                    </SidebarMenuItem>
                     <SidebarMenuItem>
                         {fertilizersLink ? (
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    fertilizersLink,
+                                )}
+                            >
                                 <NavLink to={fertilizersLink}>
                                     <Shapes />
                                     <span>Meststoffen</span>

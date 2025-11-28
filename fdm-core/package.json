@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-core",
     "private": false,
-    "version": "0.26.1",
+    "version": "0.27.0",
     "description": "Interface for the Farm Data Model",
     "license": "MIT",
     "homepage": "https://svenvw.github.io/fdm/",
@@ -16,14 +16,14 @@
         "url": "https://github.com/SvenVw"
     },
     "type": "module",
-    "main": "./dist/fdm-core.esm.js",
-    "module": "./dist/fdm-core.js",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
         ".": {
             "import": {
                 "types": "./dist/index.d.ts",
-                "default": "./dist/fdm-core.esm.js"
+                "default": "./dist/index.js"
             }
         }
     },
@@ -36,7 +36,7 @@
         "db:generate": "npx drizzle-kit generate",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
         "dotenvx": "dotenvx",
-        "build": "dotenvx run -- rollup -c",
+        "build": "dotenvx run -- rollup -c && tsc -p tsconfig.build.json",
         "check-types": "tsc --noEmit",
         "preinstall": "npx only-allow pnpm",
         "preview": "vite preview",
@@ -48,15 +48,14 @@
         "@dotenvx/dotenvx": "catalog:",
         "@rollup/plugin-commonjs": "catalog:",
         "@rollup/plugin-node-resolve": "catalog:",
-        "@rollup/plugin-terser": "catalog:",
-        "@rollup/plugin-typescript": "catalog:",
-        "@svenvw/fdm-data": "workspace:^0.18.1",
-        "@types/node": "^24.7.2",
+        "@svenvw/fdm-data": "workspace:^0.19.0",
+        "@types/node": "^24.10.1",
         "@vitest/coverage-v8": "catalog:",
         "drizzle-kit": "catalog:",
         "fs-extra": "^11.3.2",
-        "globals": "^16.4.0",
+        "globals": "^16.5.0",
         "rollup": "catalog:",
+        "rollup-plugin-esbuild": "catalog:",
         "rollup-plugin-polyfill-node": "catalog:",
         "typedoc": "catalog:",
         "typedoc-plugin-missing-exports": "catalog:",
@@ -64,17 +63,18 @@
         "vitest": "catalog:"
     },
     "dependencies": {
-        "@electric-sql/pglite": "^0.3.11",
+        "@electric-sql/pglite": "^0.3.14",
         "@svenvw/fdm-data": "workspace:*",
         "@types/geojson": "^7946.0.16",
         "better-auth": "catalog:",
+        "decimal.js": "^10.6.0",
         "drizzle-orm": "catalog:",
         "nanoid": "^5.1.6",
         "postgres": "^3.4.7",
         "safe-stable-stringify": "^2.5.0",
         "unique-username-generator": "^1.5.1"
     },
-    "packageManager": "pnpm@10.18.3",
+    "packageManager": "pnpm@10.23.0",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     }

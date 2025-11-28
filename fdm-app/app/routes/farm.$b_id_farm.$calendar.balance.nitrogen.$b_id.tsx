@@ -4,8 +4,9 @@ import {
 } from "@svenvw/fdm-calculator"
 import { getFarm, getField } from "@svenvw/fdm-core"
 import {
-    ArrowDownToLine,
+    ArrowDown,
     ArrowRight,
+    ArrowRightFromLine,
     ArrowRightLeft,
     ArrowUpFromLine,
     CircleAlert,
@@ -290,7 +291,7 @@ function NitrogenBalance({
 
     return (
         <>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
@@ -319,7 +320,7 @@ function NitrogenBalance({
                         <CardTitle className="text-sm font-medium">
                             Aanvoer
                         </CardTitle>
-                        <ArrowDownToLine className="text-xs text-muted-foreground" />
+                        <ArrowDown className="text-xs text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
@@ -349,13 +350,29 @@ function NitrogenBalance({
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Emissie
+                            Ammoniakemissie
                         </CardTitle>
                         <ArrowUpFromLine className="text-xs text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {result.emission.total}
+                            {result.emission.ammonia.total}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                            kg N / ha
+                        </p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">
+                            Nitraatemissie
+                        </CardTitle>
+                        <ArrowRightFromLine className="text-xs text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">
+                            {result.emission.nitrate.total}
                         </div>
                         <p className="text-xs text-muted-foreground">
                             kg N / ha
@@ -380,7 +397,7 @@ function NitrogenBalance({
                             balance={result.balance}
                             supply={result.supply.total}
                             removal={result.removal.total}
-                            emission={result.emission.total}
+                            emission={result.emission}
                         />
                     </CardContent>
                 </Card>

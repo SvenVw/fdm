@@ -1,4 +1,4 @@
-import { useLocation } from "react-router"
+import { useLocation, useSearchParams } from "react-router"
 import {
     BreadcrumbItem,
     BreadcrumbLink,
@@ -11,6 +11,7 @@ export function HeaderFarmCreate({
     b_name_farm: string | undefined | null
 }) {
     const location = useLocation()
+    const [searchParams] = useSearchParams()
     const currentPath = String(location.pathname)
 
     return (
@@ -65,10 +66,12 @@ export function HeaderFarmCreate({
                         <BreadcrumbLink>Bouwplan</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
-                    {currentPath.match(/manage/) ? (
+                    {currentPath.match(/new/) ? (
                         <>
                             <BreadcrumbItem className="hidden md:block">
-                                <BreadcrumbLink href="..">
+                                <BreadcrumbLink
+                                    href={searchParams.get("returnUrl") ?? "#"}
+                                >
                                     Bemesting
                                 </BreadcrumbLink>
                             </BreadcrumbItem>

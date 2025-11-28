@@ -1,6 +1,7 @@
 import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
+    checkPermission,
     getFertilizerApplications,
     getFertilizerParametersDescription,
     getFertilizers,
@@ -165,6 +166,39 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             calendar: getCalendar(params),
         }
 
+        const pathname = new URL(request.url).pathname
+        const fieldWritePermission = checkPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            session.principal_id,
+            pathname,
+            false,
+        )
+
+        const fertilizerApplicationWritePermissionsEntries = await Promise.all(
+            fertilizerApplications.map(
+                async (app) =>
+                    [
+                        app.p_app_id,
+                        await checkPermission(
+                            fdm,
+                            "fertilizer_application",
+                            "write",
+                            app.p_app_id,
+                            session.principal_id,
+                            pathname,
+                            false,
+                        ),
+                    ] as [string, boolean],
+            ),
+        )
+
+        const fertilizerApplicationWritePermissions = Object.fromEntries(
+            fertilizerApplicationWritePermissionsEntries,
+        )
+
         // Return user information from loader, including the promises
         return {
             field: field,
@@ -175,6 +209,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             applicationMethodOptions: applicationMethods.options,
             fertilizerApplicationMetricsData: fertilizerApplicationMetricsData,
             calendar: getCalendar(params),
+            fieldWritePermission: await fieldWritePermission,
+            fertilizerApplicationWritePermissions:
+                fertilizerApplicationWritePermissions,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -209,6 +246,12 @@ export default function FarmFieldsOverviewBlock() {
                         fertilizers={loaderData.fertilizers}
                         fertilizerOptions={loaderData.fertilizerOptions}
                         dose={loaderData.dose}
+                        canCreateFertilizerApplication={
+                            loaderData.fieldWritePermission
+                        }
+                        canModifyFertilizerApplication={
+                            loaderData.fertilizerApplicationWritePermissions
+                        }
                     />
                 </div>
                 <div className="md:col-span-1 lg:col-span-2">

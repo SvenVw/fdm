@@ -24,6 +24,21 @@ export const meta: MetaFunction = () => {
 
 export const changelogEntries: ChangelogEntry[] = [
     {
+        version: "v0.25.0",
+        date: "27 november 2025",
+        title: "Nieuw: Bouwplan & OS Balans. Oogstregistratie is verbeterd",
+        description:
+            "Deze update introduceert de Organische Stof Balans voor inzicht in bodemgezondheid, een nieuw Bouwplan pagina voor efficiënt gewasbeheer, en voegt nitraatuitspoeling toe aan de stikstofbalans.",
+        items: [
+            "Bouwplan & Bulkacties: De nieuwe bouwplanpagina biedt een centraal overzicht van alle teelten op uw bedrijf. U kunt hier niet alleen uw bouwplan inzien, maar ook direct acties uitvoeren voor meerdere percelen tegelijk, zoals het toevoegen van een bemesting of oogst voor alle percelen met hetzelfde gewas.",
+            "OS Balans: Met de nieuwe 'Organische Stof Balans' krijgt u inzicht in de aanvoer van effectieve organische stof (EOS) uit gewassen, gewasresten en meststoffen, en de afbraak van organische stof. Dit helpt u bij het maken van plannen voor een gezonde bodem op de lange termijn.",
+            "Verbeterde Oogstregistratie: Het registreren van oogsten is slimmer en nauwkeuriger geworden. Het formulier vraagt nu specifiek om de parameters die relevant zijn voor het gekozen gewas (zoals vers opbrengst, tarra, droge stof, etc.). Voor niet-oogstbare gewassen (zoals groene braak) wordt de optie om te oogsten verborgen.",
+            "Nitraatuitspoeling in Stikstofbalans: De stikstofbalans geeft nu een completer beeld door ook nitraatuitspoeling (NO3) inzichtelijk te maken, naast de al bestaande ammoniakemissie (NH3). De grafiek maakt nu ook onderscheid tussen deze twee emissiestromen.",
+            "Kaartlagen Beheren: Op de kaarten is een nieuwe knop toegevoegd waarmee u de perceelslaag eenvoudig kunt verbergen of tonen, zodat u de basiskaart eronder beter kunt zien als u dat wilt.",
+            "Verbeterde Zijbalk: De navigatie is verbeterd: de actieve pagina is nu duidelijk zichtbaar in de zijbalk, en u ziet direct welk bedrijf geselecteerd is en wat uw rol daarbij is.",
+        ],
+    },
+    {
         version: "v0.24.0",
         date: "3 november 2025",
         title: "Inzicht in bemesting, invulling van gebruiksruimte en meer",

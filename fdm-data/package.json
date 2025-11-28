@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-data",
     "private": false,
-    "version": "0.18.1",
+    "version": "0.19.0",
     "description": "Extend Farm Data Model with catalogue data",
     "license": "MIT",
     "homepage": "https://github.com/SvenVw/fdm",
@@ -16,14 +16,14 @@
         "url": "https://github.com/SvenVw"
     },
     "type": "module",
-    "main": "./dist/fdm-data.esm.js",
-    "module": "./dist/fdm-data.esm.js",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
         ".": {
             "import": {
                 "types": "./dist/index.d.ts",
-                "default": "./dist/fdm-data.esm.js"
+                "default": "./dist/index.js"
             }
         }
     },
@@ -34,7 +34,7 @@
         "dev": "vite",
         "db:generate": "npx drizzle-kit generate",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
-        "build": "dotenvx run -- rollup -c",
+        "build": "dotenvx run -- rollup -c && tsc -p tsconfig.build.json",
         "check-types": "tsc --noEmit",
         "preinstall": "npx only-allow pnpm",
         "preview": "vite preview",
@@ -47,17 +47,19 @@
         "@rollup/plugin-commonjs": "catalog:",
         "@rollup/plugin-json": "catalog:",
         "@rollup/plugin-node-resolve": "catalog:",
-        "@rollup/plugin-terser": "catalog:",
-        "@rollup/plugin-typescript": "catalog:",
         "@vitest/coverage-v8": "catalog:",
         "rollup": "catalog:",
+        "rollup-plugin-esbuild": "catalog:",
         "rollup-plugin-polyfill-node": "catalog:",
         "typedoc": "catalog:",
         "typedoc-plugin-missing-exports": "catalog:",
         "typescript": "catalog:",
         "vitest": "catalog:"
     },
-    "packageManager": "pnpm@10.18.3",
+    "packageManager": "pnpm@10.23.0",
+    "engines": {
+        "node": ">=20.10"
+    },
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     },

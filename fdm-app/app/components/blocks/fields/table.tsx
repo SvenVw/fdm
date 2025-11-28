@@ -46,11 +46,13 @@ import type { FieldExtended } from "./columns"
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    canAddItem: boolean
 }
 
 export function DataTable<TData extends FieldExtended, TValue>({
     columns,
     data,
+    canAddItem,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -117,7 +119,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
     const memoizedData = useMemo(() => {
         return data.map((item) => ({
             ...item,
-            searchTarget: `${item.b_name} ${item.cultivations.map((c) => c.b_lu_name).join(" ")} ${item.fertilizerApplications.map((f) => f.p_name_nl).join(" ")} ${item.b_soiltype_agr}`,
+            searchTarget: `${item.b_name} ${item.cultivations.map((c) => c.b_lu_name).join(" ")} ${item.fertilizers.map((f) => f.p_name_nl).join(" ")} ${item.b_soiltype_agr}`,
         }))
     }, [data])
 
@@ -215,7 +217,9 @@ export function DataTable<TData extends FieldExtended, TValue>({
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <div>
+                                <div
+                                    className={cn(!canAddItem ? "hidden" : "")}
+                                >
                                     {isFertilizerButtonDisabled ? (
                                         <Button
                                             disabled={
@@ -242,10 +246,14 @@ export function DataTable<TData extends FieldExtended, TValue>({
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
+
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <NavLink to={"./new"}>
+                                <NavLink
+                                    to={"./new"}
+                                    className={cn(!canAddItem ? "hidden" : "")}
+                                >
                                     <Button>
                                         <Plus className="mr-2 h-4 w-4" />
                                         Nieuw perceel
@@ -259,7 +267,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
                     </TooltipProvider>
                 </div>
             </div>
-            <div className="rounded-md border flex-grow relative overflow-x-auto">
+            <div className="rounded-md border grow relative overflow-x-auto">
                 <Table>
                     <TableHeader className="sticky top-0 z-10 bg-background">
                         {table.getHeaderGroups().map((headerGroup) => (
