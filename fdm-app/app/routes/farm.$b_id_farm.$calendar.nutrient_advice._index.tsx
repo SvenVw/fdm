@@ -1,4 +1,5 @@
-import { getFields } from "@svenvw/fdm-core"
+import { checkPermission, getFields } from "@svenvw/fdm-core"
+import { BookOpenText, Calendar, Icon, Square } from "lucide-react"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -6,11 +7,7 @@ import {
     redirect,
     useLoaderData,
 } from "react-router"
-import { getSession } from "~/lib/auth.server"
-import { getCalendar, getTimeframe } from "~/lib/calendar"
-import { clientConfig } from "~/lib/config"
-import { handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
+import { Button } from "~/components/ui/button"
 import {
     Empty,
     EmptyContent,
@@ -18,9 +15,13 @@ import {
     EmptyHeader,
     EmptyMedia,
     EmptyTitle,
-} from "../components/ui/empty"
-import { BookOpenText, Calendar, Icon, Square } from "lucide-react"
-import { Button } from "../components/ui/button"
+} from "~/components/ui/empty"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { cn } from "~/lib/utils"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -72,9 +73,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             return redirect(`./${fields[0].b_id}`)
         }
 
+        const farmWritePermission = await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+            new URL(request.url).pathname,
+            false,
+        )
+
         return {
             b_id_farm: b_id_farm,
             calendar: calendar,
+            farmWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -99,8 +111,16 @@ export default function FieldNutrientAdviceBlock() {
             </EmptyHeader>
             <EmptyContent>
                 <div className="flex gap-2">
-                    <Button variant="default" asChild>
-                        <NavLink to={`/farm/${b_id_farm}/${calendar}/field/new`}>
+                    <Button
+                        variant="default"
+                        className={cn(
+                            !loaderData.farmWritePermission ? "hidden" : "",
+                        )}
+                        asChild
+                    >
+                        <NavLink
+                            to={`/farm/${b_id_farm}/${calendar}/field/new`}
+                        >
                             Nieuw perceel
                         </NavLink>
                     </Button>
