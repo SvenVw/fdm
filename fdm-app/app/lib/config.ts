@@ -26,7 +26,9 @@ const initializeRuntimeEnvMap = (): RuntimeConfig => {
         "PUBLIC_FDM_NAME",
         "PUBLIC_FDM_PRIVACY_URL",
         "PUBLIC_FDM_DATASETS_URL",
-        "PUBLIC_MAPBOX_TOKEN",
+        "PUBLIC_FDM_DATASETS_URL",
+        "PUBLIC_MAP_PROVIDER",
+        "PUBLIC_MAPTILER_API_KEY",
         "PUBLIC_SENTRY_DSN",
         "PUBLIC_SENTRY_ORG",
         "PUBLIC_SENTRY_PROJECT",
@@ -49,7 +51,7 @@ const initializeRuntimeEnvMap = (): RuntimeConfig => {
         ) {
             env[key] = process.env[stringKey]
         } else if (import.meta.env[stringKey] !== undefined) {
-            env[key] = import.meta.env[stringKey]
+            env[key] = import.meta.env[stringKey] as any
         }
     }
 
@@ -121,8 +123,11 @@ export const clientConfig: ClientConfig = {
         posthog: posthogConfig,
     },
     integrations: {
-        mapbox: {
-            token: String(getConfigValue("PUBLIC_MAPBOX_TOKEN")),
+        map: {
+            provider: getConfigValue("PUBLIC_MAP_PROVIDER", "osm") as
+                | "maptiler"
+                | "osm",
+            maptilerKey: String(getConfigValue("PUBLIC_MAPTILER_API_KEY", "")),
         },
     },
 }

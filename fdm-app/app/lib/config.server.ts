@@ -32,8 +32,9 @@ export const serverConfig: ServerConfig = {
 
     // Integrations
     integrations: {
-        mapbox: {
-            token: String(process.env.PUBLIC_MAPBOX_TOKEN),
+        map: {
+            provider: (process.env.MAP_PROVIDER as "maptiler" | "osm") || "osm",
+            maptilerKey: String(process.env.MAPTILER_API_KEY),
         },
         nmi: {
             api_key: String(process.env.NMI_API_KEY),

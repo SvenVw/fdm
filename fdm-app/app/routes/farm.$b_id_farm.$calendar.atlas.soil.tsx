@@ -7,7 +7,6 @@ import {
     useLoaderData,
 } from "react-router"
 import { Button } from "~/components/ui/button"
-import { getMapboxToken } from "~/integrations/mapbox"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -79,11 +78,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             features: features,
         }
 
-        // Get the Mapbox token
-        const mapboxToken = getMapboxToken()
         // Return user information from loader
         return {
-            mapboxToken: mapboxToken,
             fields: featureCollection,
         }
     } catch (error) {
@@ -98,8 +94,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * linking to the field map.
  */
 export default function FarmAtlasSoilBlock() {
-    const _loaderData = useLoaderData<typeof loader>()
-
     return (
         <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
             <div className="flex flex-col space-y-2 text-center">

@@ -1,7 +1,8 @@
 import { getField } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { useEffect, useRef } from "react"
-import { Layer, Map as MapGL, type MapRef } from "react-map-gl/mapbox"
+import { Layer, Map as MapGL, type MapRef } from "react-map-gl/maplibre"
+import maplibregl from "maplibre-gl"
 import type { MetaFunction } from "react-router"
 import {
     type ActionFunctionArgs,
@@ -15,7 +16,7 @@ import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import { Separator } from "~/components/ui/separator"
 import { Skeleton } from "~/components/ui/skeleton"
-import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
+import { getMapStyle } from "~/integrations/map"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
@@ -63,7 +64,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
         const feature = {
-            type: "Feature",
+            type: "Feature" as const,
             properties: {
                 b_id: field.b_id,
                 b_name: field.b_name,
@@ -78,15 +79,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             features: [feature],
         }
 
-        // Get mapbox token and style
-        const mapboxToken = getMapboxToken()
-        const mapboxStyle = getMapboxStyle()
+        // Get map style
+        const mapStyle = getMapStyle("satellite")
 
         // Return user information from loader
         return {
             field: featureCollection,
-            mapboxToken: mapboxToken,
-            mapboxStyle: mapboxStyle,
+            mapStyle: mapStyle,
         }
     } catch (error) {
         throw handleActionError(error)
@@ -112,7 +111,10 @@ export default function FarmFieldAtlasBlock() {
     const mapRef = useRef<MapRef>(null)
 
     useEffect(() => {
-        mapRef.current?.fitBounds(viewState.bounds, viewState.fitBoundsOptions)
+        const vs = viewState as any
+        if (vs.bounds) {
+            mapRef.current?.fitBounds(vs.bounds, vs.fitBoundsOptions)
+        }
     }, [viewState])
 
     return (
@@ -137,8 +139,8 @@ export default function FarmFieldAtlasBlock() {
                                 position: "absolute",
                             }}
                             interactive={false}
-                            mapStyle={loaderData.mapboxStyle}
-                            mapboxAccessToken={loaderData.mapboxToken}
+                            mapStyle={loaderData.mapStyle}
+                            mapLib={maplibregl}
                             interactiveLayerIds={[id]}
                             ref={mapRef}
                         >

@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/react-router"
-import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
+import mapLibreStyle from "maplibre-gl/dist/maplibre-gl.css?url"
 import posthog from "posthog-js"
 import { useEffect } from "react"
 import type { LinksFunction, LoaderFunctionArgs } from "react-router"
@@ -27,7 +27,7 @@ import type { Route } from "./+types/root"
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: styles },
-    { rel: "stylesheet", href: mapBoxStyle },
+    { rel: "stylesheet", href: mapLibreStyle },
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
     {
         rel: "preconnect",

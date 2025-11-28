@@ -12,7 +12,8 @@ import {
 import type { FeatureCollection } from "geojson"
 import { Plus } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { Layer, Map as MapGL, type MapRef } from "react-map-gl/mapbox"
+import { Layer, Map as MapGL, type MapRef } from "react-map-gl/maplibre"
+import maplibregl from "maplibre-gl"
 import {
     type ActionFunctionArgs,
     data,
@@ -51,7 +52,7 @@ import {
 import { Input } from "~/components/ui/input"
 import { Separator } from "~/components/ui/separator"
 import { Skeleton } from "~/components/ui/skeleton"
-import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
+import { getMapStyle } from "~/integrations/map"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -193,9 +194,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         )
         const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
 
-        // Get Mapbox token and Style
-        const mapboxToken = getMapboxToken()
-        const mapboxStyle = getMapboxStyle()
+        // Get Map Style
+        const mapStyle = getMapStyle("satellite")
 
         return {
             b_id: b_id,
@@ -208,8 +208,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_area: field.b_area,
             featureCollection: featureCollection,
             cultivationOptions: cultivationOptions,
-            mapboxToken: mapboxToken,
-            mapboxStyle: mapboxStyle,
+            mapStyle: mapStyle,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -383,8 +382,8 @@ export default function Index() {
                                     borderRadius: "0.75rem",
                                 }}
                                 interactive={false}
-                                mapStyle={loaderData.mapboxStyle}
-                                mapboxAccessToken={loaderData.mapboxToken}
+                                mapStyle={loaderData.mapStyle}
+                                mapLib={maplibregl}
                                 interactiveLayerIds={[id]}
                                 ref={mapRef}
                             >

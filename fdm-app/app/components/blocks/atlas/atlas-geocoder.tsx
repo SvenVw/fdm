@@ -1,12 +1,13 @@
-import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder"
+import MaplibreGeocoder from "@maplibre/maplibre-gl-geocoder"
+import "@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css"
 import type {
     ControlPosition,
     GeoJSONFeature,
-    Map as MapboxMap,
-} from "mapbox-gl"
-import { type IControl, useControl } from "react-map-gl/mapbox"
-import { getMapboxToken } from "~/integrations/mapbox"
-import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css"
+    Map as MapLibreMap,
+} from "maplibre-gl"
+import maplibregl from "maplibre-gl"
+import { type IControl, useControl } from "react-map-gl/maplibre"
+import { clientConfig } from "~/lib/config"
 
 interface GeocoderResult extends GeoJSONFeature {
     center: [number, number]
@@ -25,17 +26,48 @@ type GeocoderControlProps = {
 }
 
 class GeocoderControlClass implements IControl {
-    _geocoder: MapboxGeocoder
-    _map: MapboxMap | undefined
+    _geocoder: MaplibreGeocoder
+    _map: MapLibreMap | undefined
     _container: HTMLElement | undefined
 
     constructor(props: GeocoderControlProps) {
-        this._geocoder = new MapboxGeocoder({
-            accessToken: getMapboxToken(),
+        const { provider, maptilerKey } = clientConfig.integrations.map
+
+        const geocoderApi = {
+            forwardGeocode: async (config: any) => {
+                const features: any[] = []
+                try {
+                    const query = config.query
+                    if (provider === "maptiler" && maptilerKey) {
+                        const url = `https://api.maptiler.com/geocoding/${encodeURIComponent(
+                            query,
+                        )}.json?key=${maptilerKey}&limit=${config.limit || 5}`
+                        const res = await fetch(url)
+                        const data = await res.json()
+                        return data
+                    }
+                    if (provider === "osm") {
+                        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+                            query,
+                        )}&format=geojson&addressdetails=1&limit=${
+                            config.limit || 5
+                        }`
+                        const res = await fetch(url)
+                        const data = await res.json()
+                        return data
+                    }
+                } catch (e) {
+                    console.error("Geocoding error:", e)
+                }
+                return { features }
+            },
+        }
+
+        this._geocoder = new MaplibreGeocoder(geocoderApi, {
+            maplibregl: maplibregl,
             marker: props.marker,
             collapsed: props.collapsed,
-            countries: "nl",
-            language: "nl",
+            showResultsWhileTyping: true,
         })
 
         this._geocoder.on("result", (e: { result: GeocoderResult }) => {
@@ -69,9 +101,9 @@ class GeocoderControlClass implements IControl {
         })
     }
 
-    onAdd(map: MapboxMap): HTMLElement {
+    onAdd(map: MapLibreMap): HTMLElement {
         this._map = map
-        this._container = this._geocoder.onAdd(map as any) // Cast to any to bypass type checking
+        this._container = this._geocoder.onAdd(map as any)
         return this._container
     }
 

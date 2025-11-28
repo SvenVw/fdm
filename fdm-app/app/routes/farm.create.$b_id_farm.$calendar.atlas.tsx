@@ -19,7 +19,8 @@ import {
     Map as MapGL,
     type ViewState,
     type ViewStateChangeEvent,
-} from "react-map-gl/mapbox"
+} from "react-map-gl/maplibre"
+import maplibregl from "maplibre-gl"
 import {
     type ActionFunctionArgs,
     data,
@@ -49,7 +50,7 @@ import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
-import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
+import { getMapStyle } from "~/integrations/map"
 import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
@@ -157,9 +158,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             features: features,
         }
 
-        // Get the Mapbox token and style
-        const mapboxToken = getMapboxToken()
-        const mapboxStyle = getMapboxStyle()
+        // Get Map Style
+        const mapStyle = getMapStyle("satellite")
 
         return {
             b_id_farm: farm.b_id_farm,
@@ -167,8 +167,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fieldsSaved: fieldsSaved,
             timeframe: timeframe,
             calendar: calendar,
-            mapboxToken: mapboxToken,
-            mapboxStyle: mapboxStyle,
+            mapStyle: mapStyle,
             continueTo: `/farm/create/${b_id_farm}/${calendar}/fields`,
         }
     } catch (error) {
@@ -260,8 +259,8 @@ export default function Index() {
                                     width: "100%",
                                 }}
                                 interactive={true}
-                                mapStyle={loaderData.mapboxStyle}
-                                mapboxAccessToken={loaderData.mapboxToken}
+                                mapStyle={loaderData.mapStyle}
+                                mapLib={maplibregl}
                                 interactiveLayerIds={[
                                     fieldsAvailableId,
                                     fieldsSelectedId,
