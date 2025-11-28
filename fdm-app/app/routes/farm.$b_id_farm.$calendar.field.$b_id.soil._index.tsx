@@ -218,6 +218,9 @@ export default function FarmFieldSoilOverviewBlock() {
                 <TabsContent value="analyses">
                     <SoilAnalysesList
                         soilAnalyses={loaderData.soilAnalyses}
+                        soilParameterDescription={
+                            loaderData.soilParameterDescription
+                        }
                         fetcher={fetcher}
                         canModifySoilAnalysis={
                             loaderData.soilAnalysisWritePermissions
