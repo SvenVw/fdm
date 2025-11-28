@@ -105,8 +105,10 @@ export default function FieldNutrientAdviceBlock() {
                 <EmptyTitle>Geen percelen gevonden</EmptyTitle>
                 <EmptyDescription>
                     Het lijkt erop dat er nog geen percelen zijn geregistreerd
-                    voor dit bedrijf. Voeg een nieuw perceel toe om
-                    bemestingsadvies te kunnen bekijken.
+                    voor dit bedrijf.
+                    {loaderData.farmWritePermission
+                        ? " Voeg een nieuw perceel toe om bemestingsadvies te kunnen bekijken."
+                        : null}
                 </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
