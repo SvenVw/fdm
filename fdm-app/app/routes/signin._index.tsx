@@ -34,6 +34,7 @@ import { auth } from "~/lib/auth.server"
 import { signIn } from "~/lib/auth-client"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
+import { modifySearchParams } from "~/lib/url-utils"
 import { cn } from "~/lib/utils"
 import { extractFormValuesFromRequest } from "../lib/form"
 
@@ -103,7 +104,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
  */
 export default function SignIn() {
     const [searchParams] = useSearchParams() // Get search params
-    const redirectTo = searchParams.get("redirectTo") || "/welcome" // Get redirectTo or default to /welcome
+    const redirectTo = searchParams.get("redirectTo") || "/farm" // Get redirectTo or default to /farm
+    const socialProviderNewUserCallbackUrl = modifySearchParams(
+        "/welcome",
+        (searchParams) => searchParams.set("redirectTo", redirectTo),
+    )
     const handleSignInError = (provider: string, error: unknown) => {
         toast(
             `Er is helaas iets misgegaan bij het aanmelden met ${provider}. Probeer het opnieuw.`,
@@ -250,6 +255,8 @@ export default function SignIn() {
                                                     await signIn.social({
                                                         provider: "microsoft",
                                                         callbackURL: redirectTo,
+                                                        newUserCallbackURL:
+                                                            socialProviderNewUserCallbackUrl,
                                                     })
                                                 } catch (error) {
                                                     handleSignInError(
@@ -297,6 +304,8 @@ export default function SignIn() {
                                                     await signIn.social({
                                                         provider: "google",
                                                         callbackURL: redirectTo,
+                                                        newUserCallbackURL:
+                                                            socialProviderNewUserCallbackUrl,
                                                     })
                                                 } catch (error) {
                                                     handleSignInError(
