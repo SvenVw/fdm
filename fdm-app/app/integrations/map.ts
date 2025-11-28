@@ -12,7 +12,7 @@ export function getMapStyle(variant: "satellite" | "standard"): string | StyleSp
         if (variant === "standard") {
             return `https://api.maptiler.com/maps/streets/style.json?key=${maptilerKey}`
         }
-        return `https://api.maptiler.com/maps/hybrid/style.json?key=${maptilerKey}`
+        return `https://api.maptiler.com/maps/019aca7b-e3d9-7dc7-9b70-84318d91dc9a/style.json?key=${maptilerKey}`
     }
 
     // OSM / Esri
