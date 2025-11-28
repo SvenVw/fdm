@@ -5,16 +5,20 @@ export function getMapStyle(variant: "satellite" | "standard"): string | StyleSp
     const { provider, maptilerKey } = clientConfig.integrations.map
 
     if (provider === "maptiler") {
-        if (!maptilerKey) {
-            console.warn("MAPTILER_API_KEY is missing")
+        if (maptilerKey) {
+            // MapTiler styles
+            if (variant === "standard") {
+                return `https://api.maptiler.com/maps/streets/style.json?key=${maptilerKey}`
+            }
+            return `https://api.maptiler.com/maps/019aca7b-e3d9-7dc7-9b70-84318d91dc9a/style.json?key=${maptilerKey}`
         }
-        // MapTiler styles
-        if (variant === "standard") {
-            return `https://api.maptiler.com/maps/streets/style.json?key=${maptilerKey}`
-        }
-        return `https://api.maptiler.com/maps/019aca7b-e3d9-7dc7-9b70-84318d91dc9a/style.json?key=${maptilerKey}`
+        console.warn("MAPTILER_API_KEY is missing, falling back to standard/satellite provider")
     }
 
+    return getFallbackStyle(variant)
+}
+
+function getFallbackStyle(variant: "satellite" | "standard"): StyleSpecification {
     // OSM / Esri
     if (variant === "standard") {
         return {
