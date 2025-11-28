@@ -1,5 +1,63 @@
 # Changelog fdm-app
 
+## 0.25.0
+
+### Minor Changes
+
+- e16b86d: Show sidebar item to be active when visiting the page of that item
+- b572a3e: Adds new parameters to the `harvestableAnalyses` table to provide a more detailed analysis of harvested crops:
+  - **`b_lu_yield_fresh`**: Mass of fresh harvested products (kg/ha). This parameter measures the total fresh weight of the harvested crop per hectare, providing a baseline for yield assessment.
+  - **`b_lu_yield_bruto`**: Mass of fresh harvested products, including tare (kg/ha). This represents the gross weight of the harvest before cleaning, accounting for soil and other debris.
+  - **`b_lu_tarra`**: Tare percentage of the fresh harvested product mass (%). This is the percentage of non-product material (e.g., soil, stones) in the gross harvest weight.
+  - **`b_lu_dm`**: Dry matter content of the harvested products (g/kg).
+  - **`b_lu_moist`**: Moisture content of the harvested products (%).
+  - **`b_lu_uww`**: Underwater weight of the fresh harvested products (g/5kg). This measurement is often used to estimate the starch content and dry matter content of potatoes and other root crops.
+  - **`b_lu_cp`**: Crude protein content (g CP/kg).
+- a50bb0f: Show fertilizer icon in the fields table for fertilizers
+- 43096b4: Add toggle to map controls to hide or show the field layers
+- 67b08bf: At the field nitrogen balance show the nitrate emission
+- ada7a6a: Add a rotation page that shows per cultivation the details in a table
+- d8dcd23: Various UI elements are now hidden or grayed out if the current logged-in user doesn't have permission to perform the actions that they represent.
+- 6f51ad5: In the sidebar, when a farm is selected, show the farm name and role that the user has.
+- 63756c2: Add the organic matter balance as a new app
+- 573930b: At the nitrogen balance show emissions with ammonia and nitrate separately in the chart and cards
+- 88ebf8a: Use a new form design for harvests, that requests the specific yield parameters, which can be use to calculate dry matter yield and nitrogen content of harvestable products
+- 391f85f: Improve design of the overview of harvests for a cultivation. Show now also the relevant harvest parameters for that cultivation
+- f9811eb: In case a cultivation cannot be harvested, hide the 'Oogst toevoegen' button instead of disabling it
+
+### Patch Changes
+
+- 887ead3: Upgrade to Node.js v24
+- 6e72706: Removed clutter from form-upload components by moving the drag-and-drop handlers into a new Dropzone component.
+- 43096b4: Fixes the geocoder bar being collapsed on mobile
+- 1feffff: The code for fertilizer management is made more maintainable by using only one route for all fertilizer application routes.
+- a4e4e15: Fixes date parsing in "old-style" date-picker
+- 9f8977c: Optimize Vite build configuration:
+  - Removed inefficient manual chunk splitting.
+  - Simplified Sentry plugin activation logic.
+  - Removed unnecessary `global` polyfill.
+  - Fixed `sentryReactRouter` argument passing.
+
+- Updated dependencies [d8dcd23]
+- Updated dependencies [7a8f5a9]
+- Updated dependencies [ca76b7d]
+- Updated dependencies [43d35b2]
+- Updated dependencies [cd8a771]
+- Updated dependencies [6f51ad5]
+- Updated dependencies [0268ecd]
+- Updated dependencies [dd3a6f1]
+- Updated dependencies [b24d2d1]
+- Updated dependencies [9283c86]
+- Updated dependencies [21a4cf9]
+- Updated dependencies [f51b412]
+- Updated dependencies [3b5cd55]
+- Updated dependencies [f51b412]
+- Updated dependencies [b24d2d1]
+- Updated dependencies [92fdf21]
+  - @svenvw/fdm-core@0.27.0
+  - @svenvw/fdm-calculator@0.9.0
+  - @svenvw/fdm-data@0.19.0
+
 ## 0.24.2
 
 ### Patch Changes
