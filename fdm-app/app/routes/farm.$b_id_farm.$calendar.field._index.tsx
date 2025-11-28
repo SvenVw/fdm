@@ -1,4 +1,5 @@
 import {
+    checkPermission,
     getCultivations,
     getCurrentSoilData,
     getFarms,
@@ -28,6 +29,7 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { cn } from "~/lib/utils"
 import { useFieldFilterStore } from "~/store/field-filter"
 
 export const meta: MetaFunction = () => {
@@ -57,6 +59,7 @@ export const meta: MetaFunction = () => {
  * - farmOptions: An array of validated farm options.
  * - fieldOptions: A sorted array of processed field options.
  * - userName: The name of the current user.
+ * - farmWritePermission: A Boolean indicating if the user is able to add fields to the farm. Set to true if the information could not be obtained.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -154,6 +157,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         (x) => x.parameter === "b_soiltype_agr",
                     )?.value ?? null
 
+                const has_write_permission = await checkPermission(
+                    fdm,
+                    "field",
+                    "write",
+                    field.b_id,
+                    session.principal_id,
+                    new URL(request.url).pathname,
+                    false,
+                )
                 return {
                     b_id: field.b_id,
                     b_name: field.b_name,
@@ -163,8 +175,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     b_soiltype_agr: b_soiltype_agr,
                     b_area: Math.round(field.b_area * 10) / 10,
                     b_isproductive: field.b_isproductive ?? true,
+                    has_write_permission: has_write_permission,
                 }
             }),
+        )
+
+        const farmWritePermission = await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+            new URL(request.url).pathname,
+            false,
         )
 
         // Return user information from loader
@@ -174,6 +197,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fieldOptions: fieldOptions,
             fieldsExtended: fieldsExtended,
             userName: session.userName,
+            farmWritePermission: farmWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -241,9 +265,18 @@ export default function FarmFieldIndex() {
                                 </h1>
                             </div>
                             <div className="flex flex-col items-center relative">
-                                <NavLink to="./new">
-                                    <Button>Maak een perceel</Button>
-                                </NavLink>
+                                <Button
+                                    asChild
+                                    className={cn(
+                                        !loaderData.farmWritePermission
+                                            ? "invisible"
+                                            : "",
+                                    )}
+                                >
+                                    <NavLink to="./new">
+                                        Maak een perceel
+                                    </NavLink>
+                                </Button>
                             </div>
                             {/* <p className="px-8 text-center text-sm text-muted-foreground">
                             </p> */}
@@ -262,6 +295,7 @@ export default function FarmFieldIndex() {
                                 <DataTable
                                     columns={columns}
                                     data={filteredFields}
+                                    canAddItem={loaderData.farmWritePermission}
                                 />
                             </div>
                         </FarmContent>

@@ -1,15 +1,15 @@
 import { Layers } from "lucide-react"
 import type { ControlPosition, Map as MapboxMap } from "mapbox-gl"
 import { useEffect } from "react"
-import { createRoot, type Root } from 'react-dom/client'
+import { createRoot, type Root } from "react-dom/client"
 import {
     GeolocateControl,
     type IControl,
     NavigationControl,
     useControl,
 } from "react-map-gl/mapbox"
-import { GeocoderControl } from "./atlas-geocoder"
 import { useIsMobile } from "~/hooks/use-mobile"
+import { GeocoderControl } from "./atlas-geocoder"
 
 type ControlsProps = {
     onViewportChange: (viewport: {
@@ -83,7 +83,7 @@ class CustomFieldsControl implements IControl {
         this._map = map
         this._container = document.createElement("div")
         this._container.className = "mapboxgl-ctrl mapboxgl-ctrl-group"
-        
+
         this._root = createRoot(this._container)
         this._render()
 
@@ -116,12 +116,18 @@ class CustomFieldsControl implements IControl {
     }
 }
 
-const CONTROL_OPTIONS = { position: 'top-right' as const }
+const CONTROL_OPTIONS = { position: "top-right" as const }
 
-function FieldsControl({ showFields, onToggle }: { showFields: boolean; onToggle: () => void }) {
+function FieldsControl({
+    showFields,
+    onToggle,
+}: {
+    showFields: boolean
+    onToggle: () => void
+}) {
     const control = useControl<CustomFieldsControl>(
         () => new CustomFieldsControl({ showFields, onToggle }),
-        CONTROL_OPTIONS
+        CONTROL_OPTIONS,
     )
 
     useEffect(() => {
@@ -130,5 +136,3 @@ function FieldsControl({ showFields, onToggle }: { showFields: boolean; onToggle
 
     return null
 }
-
-

@@ -1,4 +1,5 @@
 import {
+    checkPermission,
     getCultivation,
     getHarvest,
     getParametersForHarvestCat,
@@ -16,11 +17,11 @@ import { dataWithWarning, redirectWithSuccess } from "remix-toast"
 import { HarvestFormDialog } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import { getSession } from "~/lib/auth.server"
+import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { getCalendar } from "~/lib/calendar"
 import { getHarvestParameterLabel } from "../components/blocks/harvest/parameters"
 
 // Meta
@@ -87,6 +88,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
         const calendar = getCalendar(params)
 
+        const harvestingWritePermission = checkPermission(
+            fdm,
+            "harvesting",
+            "write",
+            b_id_harvesting,
+            session.principal_id,
+            new URL(request.url).pathname,
+            false,
+        )
+
         // Get details of cultivation
         const cultivation = await getCultivation(
             fdm,
@@ -120,6 +131,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm: b_id_farm,
             calendar: calendar,
             harvestParameters: harvestParameters,
+            harvestingWritePermission: await harvestingWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -156,6 +168,7 @@ export default function FarmFieldsOverviewBlock() {
             b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
             b_lu_start={loaderData.cultivation.b_lu_start}
             b_lu_end={loaderData.cultivation.b_lu_end}
+            editable={loaderData.harvestingWritePermission}
         />
     )
 }

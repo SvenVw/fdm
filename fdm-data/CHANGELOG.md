@@ -1,5 +1,23 @@
 # fdm-data
 
+## 0.19.0
+
+### Minor Changes
+
+- cd8a771: Add `b_lu_eom` and `b_lu_eom_residue` to brp catalogue with default values
+- 9283c86: Add `b_lu_dm` to brp catalogue as the default value for the dry matter content in the harvested product of the cultivation in g DM / kg fresh
+- b24d2d1: Add `b_lu_harvestcat` field to BRP catalogue entries, providing default harvest class assignment for cultivations
+
+### Patch Changes
+
+- 43d35b2: Fixes that nl_6794 (groene braak) has b_lu_harvestable set to 'none' and thus is not harvestable
+- 0268ecd: Optimize build configuration:
+  - Fix issue where dependencies could be accidentally bundled into the output.
+  - Improve development build performance by skipping minification.
+  - Standardize source map generation.
+
+- b24d2d1: Improve default yield values for some categories, especially nature, in brp catalogue
+
 ## 0.18.1
 
 ### Patch Changes

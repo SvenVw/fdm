@@ -4,6 +4,7 @@ import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import { Circle, Diamond, Square, Trash, Triangle } from "lucide-react"
 import { useFetcher } from "react-router"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
     Empty,
@@ -26,12 +27,13 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
-import { LoadingSpinner } from "../../custom/loadingspinner"
+import { cn } from "~/lib/utils"
 
 export function FertilizerApplicationsList({
     fertilizerApplications,
     applicationMethodOptions,
     fertilizers,
+    canModifyFertilizerApplication = {},
     handleDelete,
     handleEdit,
 }: {
@@ -41,6 +43,7 @@ export function FertilizerApplicationsList({
         label: string
     }[]
     fertilizers: Fertilizer[]
+    canModifyFertilizerApplication?: Record<string, boolean>
     handleDelete: (p_app_id: string | string[]) => void
     handleEdit: (fertilizerApplication: FertilizerApplication) => () => void
 }) {
@@ -57,6 +60,10 @@ export function FertilizerApplicationsList({
                         if (!fertilizer) {
                             return null
                         }
+                        const editable =
+                            canModifyFertilizerApplication[
+                                application.p_app_id
+                            ] ?? true
 
                         return (
                             <div key={application.p_app_id}>
@@ -82,8 +89,9 @@ export function FertilizerApplicationsList({
                                                 variant="link"
                                                 className="p-0 mt-0"
                                                 disabled={
+                                                    !editable ||
                                                     fetcher.state ===
-                                                    "submitting"
+                                                        "submitting"
                                                 }
                                                 onClick={handleEdit(
                                                     application,
@@ -117,7 +125,11 @@ export function FertilizerApplicationsList({
                                             </p>
                                         </ItemDescription>
                                     </ItemContent>
-                                    <ItemActions>
+                                    <ItemActions
+                                        className={cn(
+                                            !editable ? "invisible" : "",
+                                        )}
+                                    >
                                         <TooltipProvider>
                                             <Tooltip>
                                                 <TooltipTrigger asChild>

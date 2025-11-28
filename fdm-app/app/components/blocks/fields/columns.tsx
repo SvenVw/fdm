@@ -28,7 +28,7 @@ export type FieldExtended = {
         b_lu_name: string
         b_lu_croprotation: string
         b_lu_start: Date
-    }[]  
+    }[]
     fertilizers: {
         p_name_nl: string
         p_id: string
@@ -37,6 +37,7 @@ export type FieldExtended = {
     a_som_loi: number
     b_soiltype_agr: string
     b_area: number
+    has_write_permission: boolean
 }
 
 export const columns: ColumnDef<FieldExtended>[] = [
@@ -127,10 +128,8 @@ export const columns: ColumnDef<FieldExtended>[] = [
         accessorKey: "fertilizerApplications",
         enableSorting: true,
         sortingFn: (rowA, rowB, _columnId) => {
-            const fertilizerA =
-                rowA.original.fertilizers[0]?.p_name_nl || ""
-            const fertilizerB =
-                rowB.original.fertilizers[0]?.p_name_nl || ""
+            const fertilizerA = rowA.original.fertilizers[0]?.p_name_nl || ""
+            const fertilizerB = rowB.original.fertilizers[0]?.p_name_nl || ""
             return fertilizerA.localeCompare(fertilizerB)
         },
         header: ({ column }) => {
@@ -265,11 +264,13 @@ export const columns: ColumnDef<FieldExtended>[] = [
                                 Kaart
                             </NavLink>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <NavLink to={`./${field.b_id}/delete`}>
-                                Verwijderen
-                            </NavLink>
-                        </DropdownMenuItem>
+                        {field.has_write_permission && (
+                            <DropdownMenuItem>
+                                <NavLink to={`./${field.b_id}/delete`}>
+                                    Verwijderen
+                                </NavLink>
+                            </DropdownMenuItem>
+                        )}
                     </DropdownMenuContent>
                 </DropdownMenu>
             )

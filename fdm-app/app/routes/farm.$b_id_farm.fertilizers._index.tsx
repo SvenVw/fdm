@@ -1,4 +1,5 @@
 import {
+    checkPermission,
     getFarm,
     getFarms,
     getFertilizerParametersDescription,
@@ -102,12 +103,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })),
         )
 
+        const farmWritePermission = await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+            new URL(request.url).pathname,
+            false,
+        )
+
         // Return user information from loader
         return {
             farm: farm,
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
             fertilizers: fertilizers,
+            farmWritePermission: farmWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -143,6 +155,7 @@ export default function FarmFertilizersIndexPage({
                             <DataTable
                                 columns={columns}
                                 data={loaderData.fertilizers}
+                                canAddItem={loaderData.farmWritePermission}
                             />
                         </div>
                     </div>

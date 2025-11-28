@@ -1,8 +1,8 @@
 import Decimal from "decimal.js"
 import type {
-    OrganicMatterSupplyCultivations,
     CultivationDetail,
     FieldInput,
+    OrganicMatterSupplyCultivations,
 } from "../types"
 
 /**
@@ -30,15 +30,15 @@ export function calculateOrganicMatterSupplyByCultivations(
     for (const cult of cultivations) {
         // Get the detailed properties for this cultivation type from the map.
         const cultivationDetail = cultivationDetailsMap.get(cult.b_lu_catalogue)
-        
+
         // Check if the cultivation has a defined EOM supply value.
         if (cultivationDetail?.b_lu_eom) {
             // `b_lu_eom` is the annual EOM supply in kg/ha/year for this cultivation type.
             const omSupply = new Decimal(cultivationDetail.b_lu_eom)
-            
+
             // Add the supply from this cultivation to the total.
             total = total.plus(omSupply)
-            
+
             // Record the contribution for this specific cultivation instance.
             cultivationsSupply.push({ id: cult.b_lu, value: omSupply })
         }

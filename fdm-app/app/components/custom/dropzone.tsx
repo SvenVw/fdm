@@ -221,7 +221,6 @@ export const Dropzone = ({
                     disabled={disabled}
                 />
                 <label
-                    tabIndex={0}
                     className={cn(
                         "flex-col items-center justify-center w-full h-32 rounded-md border border-dashed border-muted-foreground/25 px-6 py-4 text-center transition-colors hover:bg-muted/25",
                         disabled ? "hidden" : "flex",

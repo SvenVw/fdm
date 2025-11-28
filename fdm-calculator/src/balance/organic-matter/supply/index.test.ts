@@ -1,15 +1,15 @@
-import { describe, it, expect, vi } from "vitest"
 import Decimal from "decimal.js"
-import { calculateOrganicMatterSupply } from "./index"
-import * as fertilizers from "./fertilizers"
-import * as cultivations from "./cultivation"
-import * as residues from "./residues"
+import { describe, expect, it, vi } from "vitest"
 import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
     OrganicMatterBalanceInput,
 } from "../types.d"
+import * as cultivations from "./cultivation"
+import * as fertilizers from "./fertilizers"
+import { calculateOrganicMatterSupply } from "./index"
+import * as residues from "./residues"
 
 vi.mock("./fertilizers")
 vi.mock("./cultivation")

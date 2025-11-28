@@ -14,10 +14,12 @@ export function CultivationListCard({
     cultivationsCatalogueOptions,
     cultivations,
     harvests,
+    editable = true,
 }: {
     cultivationsCatalogueOptions: CultivationOption[]
     cultivations: Cultivation[]
     harvests: Harvest[]
+    editable?: boolean
 }) {
     return (
         <Card>
@@ -25,7 +27,7 @@ export function CultivationListCard({
                 <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">
                     Gewassen
                 </CardTitle>
-                {cultivations.length !== 0 ? (
+                {cultivations.length !== 0 && editable ? (
                     <CultivationAddFormDialog
                         options={cultivationsCatalogueOptions}
                     />

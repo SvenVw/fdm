@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest"
 import Decimal from "decimal.js"
-import { calculateOrganicMatterSupplyByCultivations } from "./cultivation"
+import { describe, expect, it } from "vitest"
 import type { CultivationDetail, FieldInput } from "../types.d"
+import { calculateOrganicMatterSupplyByCultivations } from "./cultivation"
 
 describe("calculateOrganicMatterSupplyByCultivations", () => {
     const cultivationDetailsMap = new Map<string, CultivationDetail>([

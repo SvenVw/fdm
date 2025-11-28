@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest"
-import { combineSoilAnalyses } from "./soil"
 import type { SoilAnalysis } from "@svenvw/fdm-core"
+import { describe, expect, it } from "vitest"
 import type { SoilAnalysisPicked as NitrogenSoilAnalysisPicked } from "../nitrogen/types"
 import type { SoilAnalysisPicked as OrganicMatterSoilAnalysisPicked } from "../organic-matter/types.d"
+import { combineSoilAnalyses } from "./soil"
 
 describe("combineSoilAnalyses", () => {
     const soilAnalyses: Partial<SoilAnalysis>[] = [

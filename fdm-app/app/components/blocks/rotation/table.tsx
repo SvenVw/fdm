@@ -4,19 +4,23 @@ import {
     type FilterFn,
     flexRender,
     getCoreRowModel,
+    getFacetedRowModel,
     getFilteredRowModel,
     getSortedRowModel,
-    getFacetedRowModel,
     type Row,
     type RowSelectionState,
     type SortingState,
     useReactTable,
     type VisibilityState,
 } from "@tanstack/react-table"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale/nl"
 import fuzzysort from "fuzzysort"
 import { ChevronDown, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { NavLink, useParams } from "react-router-dom"
+import { toast as notify } from "sonner"
+import { useFieldFilterStore } from "@/app/store/field-filter"
 import { Button } from "~/components/ui/button"
 import {
     DropdownMenu,
@@ -43,19 +47,17 @@ import { useIsMobile } from "~/hooks/use-mobile"
 import { cn } from "~/lib/utils"
 import { FieldFilterToggle } from "../../custom/field-filter-toggle"
 import type { RotationExtended } from "./columns"
-import { format } from "date-fns"
-import { nl } from "date-fns/locale/nl"
-import { toast as notify } from "sonner"
-import { useFieldFilterStore } from "@/app/store/field-filter"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    canAddItem: boolean
 }
 
 export function DataTable<TData extends RotationExtended, TValue>({
     columns,
     data,
+    canAddItem,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -279,7 +281,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <div>
+                                <div
+                                    className={cn(!canAddItem ? "hidden" : "")}
+                                >
                                     {isFertilizerButtonDisabled ? (
                                         <Button
                                             disabled={
@@ -309,7 +313,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <div>
+                                <div
+                                    className={cn(!canAddItem ? "hidden" : "")}
+                                >
                                     {isHarvestButtonDisabled ? (
                                         <Button
                                             disabled={isHarvestButtonDisabled}

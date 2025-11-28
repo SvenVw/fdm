@@ -139,6 +139,20 @@ describe("Authorization Functions", () => {
             )
         })
 
+        it("should not throw an error in non-strict mode if principal does not have the required role", async () => {
+            await expect(
+                checkPermission(
+                    fdm,
+                    "farm",
+                    "read",
+                    farm_id,
+                    createId(),
+                    "test",
+                    false,
+                ),
+            ).resolves.toBe(false)
+        })
+
         it("should grant access through the organization", async () => {
             await grantRole(fdm, "farm", "owner", farm_id, organization_id)
             const invitation_id = await inviteUserToOrganization(
@@ -262,6 +276,29 @@ describe("Authorization Functions", () => {
             expect(auditLogs[0].target_resource_id).toBe(farm_id)
             expect(auditLogs[0].action).toBe("read")
             expect(auditLogs[0].allowed).toBe(false)
+        })
+
+        it("should not store the audit log if non-strict", async () => {
+            const principal_id_new = createId()
+
+            await expect(
+                checkPermission(
+                    fdm,
+                    "farm",
+                    "read",
+                    farm_id,
+                    principal_id_new,
+                    "test",
+                    false,
+                ),
+            ).resolves.toBe(false)
+
+            const auditLogs = await fdm
+                .select()
+                .from(authZSchema.audit)
+                .where(eq(authZSchema.audit.principal_id, principal_id_new))
+                .orderBy(desc(authZSchema.audit.audit_timestamp))
+            expect(auditLogs).toHaveLength(0)
         })
     })
 

@@ -22,6 +22,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import { cn } from "~/lib/utils"
 import {
     CultivationDetailsFormSchema,
     type CultivationDetailsFormSchemaType,
@@ -30,9 +31,11 @@ import {
 export function CultivationDetailsCard({
     cultivation,
     b_lu_variety_options,
+    editable = true,
 }: {
     cultivation: Cultivation
     b_lu_variety_options: { value: string; label: string }[]
+    editable?: boolean
 }) {
     const fetcher = useFetcher()
     const form = useRemixForm<CultivationDetailsFormSchemaType>({
@@ -72,7 +75,7 @@ export function CultivationDetailsCard({
                 <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">
                     {cultivation.b_lu_name}
                 </CardTitle>
-                {!isCreateWizard ? (
+                {!isCreateWizard && editable ? (
                     <div className="flex justify-between">
                         <Button
                             variant="destructive"
@@ -98,6 +101,7 @@ export function CultivationDetailsCard({
                     <Form onSubmit={form.handleSubmit} method="post">
                         <fieldset
                             disabled={
+                                !editable ||
                                 form.formState.isSubmitting ||
                                 fetcher.state === "submitting"
                             }
@@ -109,12 +113,14 @@ export function CultivationDetailsCard({
                                     name="b_lu_start"
                                     label="Zaaidatum"
                                     description=""
+                                    disabled={!editable}
                                 />
                                 <DatePicker
                                     form={form}
                                     name="b_lu_end"
                                     label="Einddatum"
                                     description=""
+                                    disabled={!editable}
                                 />
                             </div>
                             <div className="grid lg:grid-cols-2 gap-4 items-end">
@@ -132,6 +138,7 @@ export function CultivationDetailsCard({
                                                         field.onChange
                                                     }
                                                     disabled={
+                                                        !editable ||
                                                         form.formState
                                                             .isSubmitting ||
                                                         fetcher.state ===
@@ -158,8 +165,9 @@ export function CultivationDetailsCard({
                                                 onValueChange={field.onChange}
                                                 value={field.value ?? undefined}
                                                 disabled={
+                                                    !editable ||
                                                     b_lu_variety_options.length ===
-                                                    0
+                                                        0
                                                 }
                                             >
                                                 <FormControl>
@@ -196,7 +204,12 @@ export function CultivationDetailsCard({
                                     )}
                                 />
                             </div>
-                            <div className="flex justify-end">
+                            <div
+                                className={cn(
+                                    "flex justify-end",
+                                    !editable ? "invisible" : "",
+                                )}
+                            >
                                 <Button
                                     type="submit"
                                     disabled={

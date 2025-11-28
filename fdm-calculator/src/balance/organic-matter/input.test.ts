@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest"
 import * as fdmCore from "@svenvw/fdm-core"
+import { describe, expect, it, vi } from "vitest"
 import { collectInputForOrganicMatterBalance } from "./input"
 
 vi.mock("@svenvw/fdm-core", async () => {

@@ -1,11 +1,11 @@
+import { addDays, differenceInDays } from "date-fns"
 import Decimal from "decimal.js"
 import type {
-    OrganicMatterDegradation,
-    FieldInput,
     CultivationDetail,
+    FieldInput,
+    OrganicMatterDegradation,
     SoilAnalysisPicked,
 } from "./types"
-import { addDays, differenceInDays } from "date-fns"
 
 /**
  * Calculates the total degradation of soil organic matter (SOM) for a given period.
@@ -59,7 +59,9 @@ export function calculateOrganicMatterDegradation(
     )
 
     if (soilAnalysis.a_som_loi == null || soilAnalysis.a_density_sa == null) {
-        throw new Error(`"Soil analysis data (SOM or bulk density) is missing."`)
+        throw new Error(
+            `"Soil analysis data (SOM or bulk density) is missing."`,
+        )
     }
 
     // Extract soil properties from the analysis.

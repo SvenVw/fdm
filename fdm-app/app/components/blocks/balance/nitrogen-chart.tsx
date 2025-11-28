@@ -29,9 +29,13 @@ export function NitrogenBalanceChart({
             supply: supply,
             removal: removal === undefined ? undefined : Math.abs(removal),
             emissionAmmonia:
-                emission.ammonia === undefined ? undefined : Math.abs(emission.ammonia),
+                emission.ammonia === undefined
+                    ? undefined
+                    : Math.abs(emission.ammonia),
             emissionNitrate:
-                emission.nitrate === undefined ? undefined : Math.abs(emission.nitrate),
+                emission.nitrate === undefined
+                    ? undefined
+                    : Math.abs(emission.nitrate),
         },
     ]
 

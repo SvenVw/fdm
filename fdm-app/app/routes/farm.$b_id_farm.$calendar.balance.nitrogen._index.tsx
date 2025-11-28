@@ -6,7 +6,6 @@ import {
 import { getFarm, getFields } from "@svenvw/fdm-core"
 import {
     ArrowDown,
-    ArrowDownToLine,
     ArrowRight,
     ArrowRightFromLine,
     ArrowRightLeft,

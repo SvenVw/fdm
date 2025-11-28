@@ -1,5 +1,6 @@
 import {
     type CultivationCatalogue,
+    checkPermission,
     getCultivations,
     getCultivationsFromCatalogue,
     getCurrentSoilData,
@@ -18,13 +19,13 @@ import {
 } from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
 import {
     columns,
     type RotationExtended,
 } from "~/components/blocks/rotation/columns"
 import { DataTable } from "~/components/blocks/rotation/table"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
 import { SidebarInset } from "~/components/ui/sidebar"
@@ -33,6 +34,7 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { cn } from "~/lib/utils"
 
 export const meta: MetaFunction = () => {
     return [
@@ -61,6 +63,7 @@ export const meta: MetaFunction = () => {
  * - farmOptions: An array of validated farm options.
  * - fieldOptions: A sorted array of processed field options.
  * - userName: The name of the current user.
+ * - farmWritePermission: A Boolean indicating if the user is able to add things to the farm. Set to true if the information could not be obtained.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -130,9 +133,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         )
 
         function getHarvestabilityFromCatalogue(b_lu_catalogue: string) {
-            return cultivationCatalogue.find(
-                (item: { b_lu_catalogue: string }) => item.b_lu_catalogue === b_lu_catalogue,
-            )?.b_lu_harvestable ?? "once"
+            return (
+                cultivationCatalogue.find(
+                    (item: { b_lu_catalogue: string }) =>
+                        item.b_lu_catalogue === b_lu_catalogue,
+                )?.b_lu_harvestable ?? "once"
+            )
         }
 
         const fieldsExtended = await Promise.all(
@@ -146,7 +152,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
                 const harvests = await Promise.all(
                     cultivations.flatMap(async (cultivation) => {
-                        const b_lu_harvestable = getHarvestabilityFromCatalogue(cultivation.b_lu_catalogue)
+                        const b_lu_harvestable = getHarvestabilityFromCatalogue(
+                            cultivation.b_lu_catalogue,
+                        )
 
                         const harvests = await getHarvests(
                             fdm,
@@ -187,11 +195,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 )
                 const a_som_loi =
                     currentSoilData.find(
-                        (item: { parameter: string }) => item.parameter === "a_som_loi",
+                        (item: { parameter: string }) =>
+                            item.parameter === "a_som_loi",
                     )?.value ?? null
                 const b_soiltype_agr =
                     currentSoilData.find(
-                        (item: { parameter: string }) => item.parameter === "b_soiltype_agr",
+                        (item: { parameter: string }) =>
+                            item.parameter === "b_soiltype_agr",
                     )?.value ?? null
 
                 return {
@@ -211,15 +221,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         const transformFieldsToRotationExtended = (
             fieldsExtended: any[], // TODO: Define a proper type for fieldsExtended
-            cultivationCatalogue: CultivationCatalogue,
+            _cultivationCatalogue: CultivationCatalogue,
         ): RotationExtended[] => {
             const cultivationsInRotation: string[] = [
                 ...new Set(
-                    fieldsExtended.flatMap((field: { cultivations: { b_lu_catalogue: string }[] }) => {
-                        return field.cultivations.flatMap((cultivation) => {
-                            return cultivation.b_lu_catalogue
-                        })
-                    }),
+                    fieldsExtended.flatMap(
+                        (field: {
+                            cultivations: { b_lu_catalogue: string }[]
+                        }) => {
+                            return field.cultivations.flatMap((cultivation) => {
+                                return cultivation.b_lu_catalogue
+                            })
+                        },
+                    ),
                 ),
             ]
 
@@ -243,8 +257,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 // Get all unique b_lu_start of cultivation
                 const b_lu_start = [
                     ...new Set(
-                        cultivationsForCatalogue.map((cultivation: { b_lu_start: Date }) =>
-                            cultivation.b_lu_start.getTime(),
+                        cultivationsForCatalogue.map(
+                            (cultivation: { b_lu_start: Date }) =>
+                                cultivation.b_lu_start.getTime(),
                         ),
                     ),
                 ].map((timestamp) => new Date(timestamp))
@@ -252,8 +267,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 const b_lu_end = [
                     ...new Set(
                         cultivationsForCatalogue
-                            .filter((cultivation: { b_lu_end: Date | null }) => cultivation.b_lu_end)
-                            .map((cultivation: { b_lu_end: Date }) => cultivation.b_lu_end.getTime()),
+                            .filter(
+                                (cultivation: { b_lu_end: Date | null }) =>
+                                    cultivation.b_lu_end,
+                            )
+                            .map((cultivation: { b_lu_end: Date }) =>
+                                cultivation.b_lu_end.getTime(),
+                            ),
                     ),
                 ].map((timestamp) => new Date(timestamp))
 
@@ -267,11 +287,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     b_lu_name: cultivationsForCatalogue[0]?.b_lu_name ?? "",
                     b_lu_croprotation:
                         cultivationsForCatalogue[0]?.b_lu_croprotation ?? "",
-                    b_lu_harvestable: getHarvestabilityFromCatalogue(b_lu_catalogue),
+                    b_lu_harvestable:
+                        getHarvestabilityFromCatalogue(b_lu_catalogue),
                     b_lu_start: b_lu_start,
                     b_lu_end: b_lu_end,
                     calendar: calendar,
-                    fields: fieldsWithThisCultivation.map((field: any) => ({ // TODO: Define a proper type for field
+                    fields: fieldsWithThisCultivation.map((field: any) => ({
+                        // TODO: Define a proper type for field
                         b_id: field.b_id,
                         b_name: field.b_name,
                         b_area: field.b_area,
@@ -279,29 +301,55 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         a_som_loi: field.a_som_loi ?? 0,
                         b_soiltype_agr: field.b_soiltype_agr ?? "",
                         b_lu_harvest_date: field.harvests
-                            .filter((harvest: { b_lu: string }) => b_lu.includes(harvest.b_lu))
+                            .filter((harvest: { b_lu: string }) =>
+                                b_lu.includes(harvest.b_lu),
+                            )
                             .flatMap(
-                                (harvest: { b_lu_harvest_date: Date[] }) => harvest.b_lu_harvest_date,
+                                (harvest: { b_lu_harvest_date: Date[] }) =>
+                                    harvest.b_lu_harvest_date,
                             ),
                         fertilizerApplications:
-                            field.fertilizerApplications.map((app: { p_name_nl: string; p_id: string; p_type: string }) => ({
+                            field.fertilizerApplications.map(
+                                (app: {
+                                    p_name_nl: string
+                                    p_id: string
+                                    p_type: string
+                                }) => ({
+                                    p_name_nl: app.p_name_nl,
+                                    p_id: app.p_id,
+                                    p_type: app.p_type,
+                                }),
+                            ),
+                        fertilizers: field.fertilizers.map(
+                            (app: {
+                                p_name_nl: string
+                                p_id: string
+                                p_type: string
+                            }) => ({
                                 p_name_nl: app.p_name_nl,
                                 p_id: app.p_id,
                                 p_type: app.p_type,
-                            })),
-                        fertilizers: field.fertilizers.map((app: { p_name_nl: string; p_id: string; p_type: string }) => ({
-                            p_name_nl: app.p_name_nl,
-                            p_id: app.p_id,
-                            p_type: app.p_type,
-                        })),
+                            }),
+                        ),
                     })),
                 }
             })
         }
 
-        const rotationExtended: RotationExtended[] = transformFieldsToRotationExtended(
-            fieldsExtended,
-            cultivationCatalogue,        
+        const rotationExtended: RotationExtended[] =
+            transformFieldsToRotationExtended(
+                fieldsExtended,
+                cultivationCatalogue,
+            )
+
+        const farmWritePermission = await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+            new URL(request.url).pathname,
+            false,
         )
 
         // Return user information from loader
@@ -311,6 +359,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fieldOptions: fieldOptions,
             rotationExtended: rotationExtended, // Return filtered data
             userName: session.userName,
+            farmWritePermission: farmWritePermission,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -370,9 +419,18 @@ export default function FarmRotationIndex() {
                                 </h1>
                             </div>
                             <div className="flex flex-col items-center relative">
-                                <NavLink to="../field/new">
-                                    <Button>Maak een perceel</Button>
-                                </NavLink>
+                                <Button
+                                    asChild
+                                    className={cn(
+                                        !loaderData.farmWritePermission
+                                            ? "invisible"
+                                            : "",
+                                    )}
+                                >
+                                    <NavLink to="../field/new">
+                                        Maak een perceel
+                                    </NavLink>
+                                </Button>
                             </div>
                         </div>
                     </>
@@ -389,6 +447,7 @@ export default function FarmRotationIndex() {
                                 <DataTable
                                     columns={columns}
                                     data={loaderData.rotationExtended}
+                                    canAddItem={loaderData.farmWritePermission}
                                 />
                             </div>
                         </FarmContent>

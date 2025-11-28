@@ -75,7 +75,7 @@ export async function collectInputForOrganicMatterBalance(
                         principal_id,
                         field.b_id,
                         timeframe,
-                    )                   
+                    )
 
                     // Fetch all soil analysis records for the field.
                     const soilAnalyses = await getSoilAnalyses(

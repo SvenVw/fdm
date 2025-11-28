@@ -1,23 +1,22 @@
-import React from "react"
 import type { ColumnDef } from "@tanstack/react-table"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale/nl"
+import React from "react"
 import { NavLink } from "react-router-dom"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
 import { Badge } from "~/components/ui/badge"
-import { ScrollArea } from "~/components/ui/scroll-area"
 import { Button } from "~/components/ui/button"
+import { Checkbox } from "~/components/ui/checkbox"
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
+import { ScrollArea } from "~/components/ui/scroll-area"
 import { DataTableColumnHeader } from "./column-header"
-import { format } from "date-fns"
-import { nl } from "date-fns/locale/nl"
-import { Checkbox } from "~/components/ui/checkbox"
-import { HarvestDatesDisplay } from "./harvest-dates-display"
 import { FertilizerDisplay } from "./fertilizer-display"
-import { Row } from "@react-email/components"
+import { HarvestDatesDisplay } from "./harvest-dates-display"
 
 export type RotationExtended = {
     b_lu_catalogue: string

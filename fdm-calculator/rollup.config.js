@@ -31,7 +31,7 @@ export default {
             renderChunk: (code, map) => {
                 const replacement = `"fdm-calculator:${packageJson.version}"`
                 const placeholder = `"fdm-calculator:{FDM_CALCULATOR_VERSION}"`
-                
+
                 if (!code.includes(placeholder)) {
                     // Quietly return null if not found (expected for most files in preserveModules)
                     return null
