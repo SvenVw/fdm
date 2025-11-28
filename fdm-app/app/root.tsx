@@ -127,7 +127,7 @@ export function Layout() {
                 />
                 <Meta />
                 <script
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Polyfill for Mapbox and other libs expecting global
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Polyfill for Maplibre and other libs expecting global
                     dangerouslySetInnerHTML={{
                         __html: "window.global = window;",
                     }}

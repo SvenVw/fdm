@@ -41,7 +41,7 @@ The `fdm-app` is built with a technical stack that provides specific functionali
   * **@svenvw/fdm-core (Authorization module):** Manages role-based access control (RBAC) for various FDM resources.
 
 * **GIS & Mapping:**
-  * **Mapbox GL JS & React Map GL:** For interactive maps and geospatial data visualization.
+  * **MapLibre GL JS & React Map GL:** For interactive maps and geospatial data visualization.
   * **Turf.js:** A geospatial library for spatial analysis operations.
   * **Proj4:** A JavaScript library for coordinate transformation.
   * **Flatgeobuf:** An open format for publishing and consuming geospatial data.

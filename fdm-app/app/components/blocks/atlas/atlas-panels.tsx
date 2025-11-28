@@ -1,8 +1,9 @@
 import type { FeatureCollection } from "geojson"
 import throttle from "lodash.throttle"
 import { Check, Info } from "lucide-react"
+import type { MapLibreZoomEvent } from "maplibre-gl"
 import { useCallback, useEffect, useState } from "react"
-import type { MapLibreZoomEvent as MapBoxZoomEvent, MapLayerMouseEvent as MapMouseEvent } from "react-map-gl/maplibre"
+import type { MapLayerMouseEvent as MapMouseEvent } from "react-map-gl/maplibre"
 import { useMap } from "react-map-gl/maplibre"
 import { data, NavLink, useFetcher } from "react-router"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
@@ -33,7 +34,7 @@ export function FieldsPanelHover({
     const { current: map } = useMap()
     const [panel, setPanel] = useState<React.ReactNode | null>(null)
     useEffect(() => {
-        function updatePanel(evt: MapMouseEvent | MapBoxZoomEvent) {
+        function updatePanel(evt: MapMouseEvent | MapLibreZoomEvent) {
             if (map) {
                 // Set message about zoom level
                 const zoom = map.getZoom()

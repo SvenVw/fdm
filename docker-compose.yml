@@ -13,7 +13,8 @@ services:
       - POSTGRES_DB=fdm-app
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=YOUR_POSTGRES_PASSWORD # Replace with your actual PostgreSQL password
-      - MAPBOX_TOKEN=YOUR_MAPBOX_TOKEN # Replace with your actual Mapbox token
+      - PUBLIC_MAP_PROVIDER=osm # Options: "maptiler" | "osm"
+      - PUBLIC_MAPTILER_API_KEY=YOUR_MAPTILER_API_KEY # Replace with your actual MapTiler API key if using "maptiler"
       - BETTER_AUTH_SECRET=YOUR_BETTER_AUTH_SECRET # Replace with your Better Auth secret
       - BETTER_AUTH_URL=YOUR_DOMAIN # Replace with your domain
       - GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID # Replace with your Google Client ID

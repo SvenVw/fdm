@@ -36,7 +36,7 @@ The `fdm-app` is a React application providing a user-friendly interface for vis
     *   **Session:** A strong secret key (`FDM_SESSION_SECRET`).
     *   **Database:** Connection details for your PostgreSQL database.
     *   **Authentication:** Secrets and URLs for `better-auth` and optionally OAuth providers (Google, Microsoft).
-    *   **Mapbox:** API token for map rendering (`MAPBOX_TOKEN`).
+    *   **Map:** Map provider configuration (`PUBLIC_MAP_PROVIDER`) and API key if using MapTiler (`PUBLIC_MAPTILER_API_KEY`).
     *   **Data URLs:** Paths to external data files (`AVAILABLE_FIELDS_URL`).
     *   **Analytics (Optional):** Configuration for Sentry and/or PostHog. These services are disabled by default. To enable them, provide the relevant keys/DSNs as described in `.env.example`.
 
