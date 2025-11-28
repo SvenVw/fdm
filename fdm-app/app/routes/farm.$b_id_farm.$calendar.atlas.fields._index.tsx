@@ -44,8 +44,7 @@ export const meta: MetaFunction = () => {
  *
  * @returns An object containing:
  *  - savedFields: A GeoJSON FeatureCollection of the farm fields.
- *  - MaplibreToken: The Maplibre access token.
- *  - MaplibreStyle: The Maplibre style configuration.
+ *  - MapStyle: The Maplibre style configuration.
  *
  * @throws {Response} If the farm ID is missing or if an error occurs during data retrieval and processing.
  */
