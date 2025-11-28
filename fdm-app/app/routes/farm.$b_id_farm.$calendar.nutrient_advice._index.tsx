@@ -2,13 +2,25 @@ import { getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
+    NavLink,
     redirect,
+    useLoaderData,
 } from "react-router"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import {
+    Empty,
+    EmptyContent,
+    EmptyDescription,
+    EmptyHeader,
+    EmptyMedia,
+    EmptyTitle,
+} from "../components/ui/empty"
+import { BookOpenText, Calendar, Icon, Square } from "lucide-react"
+import { Button } from "../components/ui/button"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -47,18 +59,56 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get timeframe from calendar store
         const timeframe = getTimeframe(params)
+        const calendar = getCalendar(params)
 
+        // Get the fields of the farm
         const fields = await getFields(
             fdm,
             session.principal_id,
             b_id_farm,
             timeframe,
         )
-        if (!fields.length) {
-            throw new Error("No fields found for this farm")
+        if (fields.length > 0) {
+            return redirect(`./${fields[0].b_id}`)
         }
-        return redirect(`./${fields[0].b_id}`)
+
+        return {
+            b_id_farm: b_id_farm,
+            calendar: calendar,
+        }
     } catch (error) {
         throw handleLoaderError(error)
     }
+}
+
+export default function FieldNutrientAdviceBlock() {
+    const loaderData = useLoaderData<typeof loader>()
+    const { b_id_farm, calendar } = loaderData
+    return (
+        <Empty>
+            <EmptyHeader>
+                <EmptyMedia variant="icon">
+                    <BookOpenText />
+                </EmptyMedia>
+                <EmptyTitle>Geen percelen gevonden</EmptyTitle>
+                <EmptyDescription>
+                    Het lijkt erop dat er nog geen percelen zijn geregistreerd
+                    voor dit bedrijf. Voeg een nieuw perceel toe om
+                    bemestingsadvies te kunnen bekijken.
+                </EmptyDescription>
+            </EmptyHeader>
+            <EmptyContent>
+                <div className="flex gap-2">
+                    <Button variant="default" asChild>
+                        <NavLink to={`/farm/${b_id_farm}/${calendar}/field/new`}>
+                            Nieuw perceel
+                        </NavLink>
+                    </Button>
+                    <Button variant="outline" asChild>
+                        <NavLink to="../">Naar bedrijfsoverzicht</NavLink>
+                    </Button>
+                </div>
+            </EmptyContent>
+        </Empty>
+    )
 }
