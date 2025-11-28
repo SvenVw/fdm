@@ -49,12 +49,61 @@ class GeocoderControlClass implements IControl {
                     if (provider === "osm") {
                         const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
                             query,
-                        )}&format=geojson&addressdetails=1&limit=${
+                        )}&format=json&addressdetails=1&limit=${
                             config.limit || 5
-                        }`
+                        }&accept-language=nl`
                         const res = await fetch(url)
                         const data = await res.json()
-                        return data
+
+                        if (Array.isArray(data)) {
+                            const features = data.map((item: any) => {
+                                const bbox = item.boundingbox
+                                    ? [
+                                          Number.parseFloat(
+                                              item.boundingbox[2],
+                                          ), // minLon
+                                          Number.parseFloat(
+                                              item.boundingbox[0],
+                                          ), // minLat
+                                          Number.parseFloat(
+                                              item.boundingbox[3],
+                                          ), // maxLon
+                                          Number.parseFloat(
+                                              item.boundingbox[1],
+                                          ), // maxLat
+                                      ]
+                                    : undefined
+
+                                return {
+                                    id: item.place_id,
+                                    type: "Feature",
+                                    geometry: {
+                                        type: "Point",
+                                        coordinates: [
+                                            Number.parseFloat(item.lon),
+                                            Number.parseFloat(item.lat),
+                                        ],
+                                    },
+                                    properties: item,
+                                    place_name: item.display_name,
+                                    place_type: [item.type],
+                                    text:
+                                        item.display_name?.split(",")[0] ||
+                                        item.display_name,
+                                    center: [
+                                        Number.parseFloat(item.lon),
+                                        Number.parseFloat(item.lat),
+                                    ],
+                                    bbox: bbox,
+                                }
+                            })
+                            return { features }
+                        }
+                        console.warn(
+                            "Nominatim response is not an array:",
+                            data,
+                        )
+                        return { features: [] }
                     }
                 } catch (e) {
                     console.error("Geocoding error:", e)

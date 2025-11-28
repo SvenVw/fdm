@@ -171,3 +171,15 @@
     /* text-transform: uppercase; */
     /* outline: none; */
 }
+
+/* MapLibre Geocoder Fixes */
+.maplibregl-ctrl-geocoder--icon-close {
+    background-repeat: no-repeat !important;
+}
+.maplibregl-ctrl-geocoder--icon-close svg {
+    display: none !important;
+}
+.maplibregl-ctrl-geocoder--input::-webkit-search-cancel-button {
+    display: none !important;
+}
+
