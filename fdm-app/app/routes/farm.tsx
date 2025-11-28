@@ -55,9 +55,10 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
             return sessionCheckResponse
         }
 
-        const farm = params.b_id_farm
-            ? await getFarm(fdm, session.principal_id, params.b_id_farm)
-            : undefined
+        const farm =
+            params.b_id_farm && params.b_id_farm !== "undefined"
+                ? await getFarm(fdm, session.principal_id, params.b_id_farm)
+                : undefined
 
         // Return user information from loader
         return {

@@ -41,7 +41,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
-        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
+        const farm =
+            b_id_farm !== "undefined"
+                ? await getFarm(fdm, session.principal_id, b_id_farm)
+                : undefined
 
         // Return the farm ID and session info
         return {
