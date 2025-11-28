@@ -10,6 +10,11 @@ import { NavLink, useLocation, useSearchParams } from "react-router"
 import { useCalendarStore } from "@/app/store/calendar"
 import { useFarmStore } from "@/app/store/farm"
 import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "~/components/ui/collapsible"
+import {
     SidebarGroup,
     SidebarGroupContent,
     SidebarGroupLabel,
@@ -20,11 +25,6 @@ import {
     SidebarMenuSubButton,
     SidebarMenuSubItem,
 } from "~/components/ui/sidebar"
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "~/components/ui/collapsible"
 
 export function SidebarApps() {
     const farmId = useFarmStore((state) => state.farmId)

@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-core",
     "private": false,
-    "version": "0.26.1",
+    "version": "0.27.0",
     "description": "Interface for the Farm Data Model",
     "license": "MIT",
     "homepage": "https://svenvw.github.io/fdm/",
@@ -48,7 +48,7 @@
         "@dotenvx/dotenvx": "catalog:",
         "@rollup/plugin-commonjs": "catalog:",
         "@rollup/plugin-node-resolve": "catalog:",
-        "@svenvw/fdm-data": "workspace:^0.18.1",
+        "@svenvw/fdm-data": "workspace:^0.19.0",
         "@types/node": "^24.10.1",
         "@vitest/coverage-v8": "catalog:",
         "drizzle-kit": "catalog:",

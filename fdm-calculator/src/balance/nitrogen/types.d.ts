@@ -607,7 +607,7 @@ export type NitrogenBalanceNumeric = {
     removal: number
     emission: {
         total: number
-        ammonia: number,
+        ammonia: number
         nitrate: number
     }
     target: number

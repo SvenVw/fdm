@@ -1,5 +1,30 @@
 # fdm-calculator
 
+## 0.9.0
+
+### Minor Changes
+
+- ca76b7d: The output of nitrogen balance now includes for emission a distinction between ammonia and nitrate
+- 21a4cf9: Add `calculateOrganicMatterBalance` and `getOrganicMatterBalance` to calculate organic matter balances of a farm
+- 3b5cd55: Add calculation of nitrate emission in the nitrogen balance
+
+### Patch Changes
+
+- 0268ecd: Optimize build configuration:
+  - Fix issue where dependencies could be accidentally bundled into the output.
+  - Improve development build performance by skipping minification.
+  - Standardize source map generation.
+
+- Updated dependencies [d8dcd23]
+- Updated dependencies [7a8f5a9]
+- Updated dependencies [6f51ad5]
+- Updated dependencies [0268ecd]
+- Updated dependencies [dd3a6f1]
+- Updated dependencies [f51b412]
+- Updated dependencies [f51b412]
+- Updated dependencies [92fdf21]
+  - @svenvw/fdm-core@0.27.0
+
 ## 0.8.0
 
 ### Minor Changes

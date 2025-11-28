@@ -6,7 +6,6 @@ import {
     Outlet,
     useLoaderData,
 } from "react-router"
-import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { HeaderBalance } from "~/components/blocks/header/balance"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"

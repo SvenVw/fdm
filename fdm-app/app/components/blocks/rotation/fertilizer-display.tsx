@@ -1,11 +1,11 @@
-import React from "react"
 import { Circle, Diamond, Square, Triangle } from "lucide-react"
+import React from "react"
+import { Badge } from "~/components/ui/badge"
 import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
-import { Badge } from "~/components/ui/badge"
 import type { RotationExtended } from "./columns"
 
 type FertilizerDisplayProps = {
@@ -41,15 +41,15 @@ const fertilizerIconClassMap = {
             "300": "fill-gray-300",
         },
     },
-} as const;
+} as const
 
-export const FertilizerDisplay: React.FC<FertilizerDisplayProps> = ({ cultivation }) => {
+export const FertilizerDisplay: React.FC<FertilizerDisplayProps> = ({
+    cultivation,
+}) => {
     const uniqueFertilizers = React.useMemo(() => {
         const fields = cultivation.fields
         const fertilizers = fields.flatMap((field) => field.fertilizers)
-        return Array.from(
-            new Map(fertilizers.map((f) => [f.p_id, f])).values(),
-        )
+        return Array.from(new Map(fertilizers.map((f) => [f.p_id, f])).values())
     }, [cultivation.fields])
 
     const fertilizerDisplay = React.useMemo(() => {
@@ -80,13 +80,11 @@ export const FertilizerDisplay: React.FC<FertilizerDisplayProps> = ({ cultivatio
                                             <Square
                                                 className={`size-3 ${fertilizerIconClassMap.manure.text} ${fertilizerIconClassMap.manure.fill[fertilizerIconFillShade]}`}
                                             />
-                                        ) : fertilizer.p_type ===
-                                          "mineral" ? (
+                                        ) : fertilizer.p_type === "mineral" ? (
                                             <Circle
                                                 className={`size-3 ${fertilizerIconClassMap.mineral.text} ${fertilizerIconClassMap.mineral.fill[fertilizerIconFillShade]}`}
                                             />
-                                        ) : fertilizer.p_type ===
-                                          "compost" ? (
+                                        ) : fertilizer.p_type === "compost" ? (
                                             <Triangle
                                                 className={`size-3 ${fertilizerIconClassMap.compost.text} ${fertilizerIconClassMap.compost.fill[fertilizerIconFillShade]}`}
                                             />

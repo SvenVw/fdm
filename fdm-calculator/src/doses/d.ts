@@ -41,4 +41,4 @@ export interface Dose extends DoseProperties {
     [key: string]: string | number | undefined
 }
 
-export type NumericDoseKeys = Exclude<keyof DoseProperties, 'p_app_id'>
+export type NumericDoseKeys = Exclude<keyof DoseProperties, "p_app_id">

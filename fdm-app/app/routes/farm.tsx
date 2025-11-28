@@ -18,9 +18,9 @@ import {
 import { checkSession, getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
 import { useFarmStore } from "~/store/farm"
-import { fdm } from "~/lib/fdm.server"
 
 export const meta: MetaFunction = () => {
     return [
@@ -55,9 +55,10 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
             return sessionCheckResponse
         }
 
-        const farm = params.b_id_farm
-            ? await getFarm(fdm, session.principal_id, params.b_id_farm)
-            : undefined
+        const farm =
+            params.b_id_farm && params.b_id_farm !== "undefined"
+                ? await getFarm(fdm, session.principal_id, params.b_id_farm)
+                : undefined
 
         // Return user information from loader
         return {

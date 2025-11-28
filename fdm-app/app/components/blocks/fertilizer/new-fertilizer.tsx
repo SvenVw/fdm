@@ -1,4 +1,3 @@
-import { modifySearchParams } from "@/app/lib/url-utils"
 import type { Fertilizer } from "@svenvw/fdm-core"
 import { Link, NavLink, useSearchParams } from "react-router"
 import { Card, CardContent } from "~/components/ui/card"

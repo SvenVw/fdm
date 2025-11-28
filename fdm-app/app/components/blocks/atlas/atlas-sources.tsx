@@ -70,7 +70,7 @@ export function FieldsSourceSelected({
             const features = map.queryRenderedFeatures(evt.point, {
                 layers: [availableLayerId],
             })
-            console.log(features)
+            // console.log(features)
 
             if (
                 features.length > 0 &&

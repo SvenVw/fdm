@@ -397,7 +397,8 @@ export function FertilizerApplicationMetricsCard({
                                                                     asChild
                                                                 >
                                                                     <p className="whitespace-nowrap px-2">
-                                                                        Emissie (NH₃)
+                                                                        Emissie
+                                                                        (NH₃)
                                                                     </p>
                                                                 </TooltipTrigger>
                                                                 <TooltipContent>

@@ -5,8 +5,8 @@ import type {
     OrganicMatterBalanceInput,
     OrganicMatterSupply,
 } from "../types"
-import { calculateOrganicMatterSupplyByFertilizers } from "./fertilizers"
 import { calculateOrganicMatterSupplyByCultivations } from "./cultivation"
+import { calculateOrganicMatterSupplyByFertilizers } from "./fertilizers"
 import { calculateOrganicMatterSupplyByResidues } from "./residues"
 
 /**

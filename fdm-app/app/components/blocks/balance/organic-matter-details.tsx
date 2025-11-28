@@ -1,11 +1,11 @@
 import type {
     FieldInput,
     OrganicMatterBalanceNumeric,
-    OrganicMatterSupplyFertilizersNumeric,
-    OrganicMatterSupplyCultivationsNumeric,
-    OrganicMatterSupplyResiduesNumeric,
-    OrganicMatterSupplyNumeric,
     OrganicMatterDegradationNumeric,
+    OrganicMatterSupplyCultivationsNumeric,
+    OrganicMatterSupplyFertilizersNumeric,
+    OrganicMatterSupplyNumeric,
+    OrganicMatterSupplyResiduesNumeric,
 } from "@svenvw/fdm-calculator"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"

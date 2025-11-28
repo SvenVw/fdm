@@ -17,9 +17,7 @@ import {
 import { CultivationAddFormSchema } from "./schema"
 import type { CultivationsFormProps } from "./types"
 
-export function CultivationAddFormDialog({
-    options,
-}: CultivationsFormProps) {
+export function CultivationAddFormDialog({ options }: CultivationsFormProps) {
     const [isOpen, setIsOpen] = useState(false)
 
     return (

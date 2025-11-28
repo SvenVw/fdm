@@ -1,5 +1,32 @@
 # Changelog fdm-core
 
+## 0.27.0
+
+### Minor Changes
+
+- d8dcd23: Added the optional `strict` parameter to the `checkPermission` function, which, when specified as false, disables audit logging, and throwing an exception if the principal has no permission.
+- 7a8f5a9: Add dry matter content column (`b_lu_dm`) to cultivation catalogue for standardizing harvest parameter calculations
+- dd3a6f1: Add `b_lu_harvestcat` to cultivations_catalogue table to define which class of harvest parameters the cultivation uses
+- f51b412: When adding a cultivation with b_lu_harvestable is 'once' the harvest will get default values for the relevant harvest parameters
+- f51b412: Add getDefaultsForHarvestParameters to get default values for various relevant harvest parameters of a cultivation
+- 92fdf21: Add `b_lu_eom` and `b_lu_eom_residue` as new parameters in cultivation catalogue to list the input of effective organic matter content via the crop and the residue
+
+### Patch Changes
+
+- 6f51ad5: Members of an organization now inherit its roles on a farm properly.
+- 0268ecd: Optimize build configuration:
+  - Fix issue where dependencies could be accidentally bundled into the output.
+  - Improve development build performance by skipping minification.
+  - Standardize source map generation.
+
+- Updated dependencies [43d35b2]
+- Updated dependencies [cd8a771]
+- Updated dependencies [0268ecd]
+- Updated dependencies [b24d2d1]
+- Updated dependencies [9283c86]
+- Updated dependencies [b24d2d1]
+  - @svenvw/fdm-data@0.19.0
+
 ## 0.26.1
 
 ### Patch Changes

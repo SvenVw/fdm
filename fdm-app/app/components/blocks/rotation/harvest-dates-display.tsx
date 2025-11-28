@@ -1,13 +1,15 @@
-import React from "react"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
+import React from "react"
 import type { RotationExtended } from "./columns"
 
 type HarvestDatesDisplayProps = {
     cultivation: RotationExtended
 }
 
-export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({ cultivation }) => {
+export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
+    cultivation,
+}) => {
     const formattedHarvestDates = React.useMemo(() => {
         const b_lu_harvest_date = cultivation.fields.flatMap(
             (field) => field.b_lu_harvest_date,
@@ -29,9 +31,7 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({ cultiv
             )
             const firstDate = b_lu_harvest_date_sorted[0]
             const lastDate =
-                b_lu_harvest_date_sorted[
-                    b_lu_harvest_date_sorted.length - 1
-                ]
+                b_lu_harvest_date_sorted[b_lu_harvest_date_sorted.length - 1]
 
             return (
                 <p className="text-muted-foreground">
@@ -66,10 +66,7 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({ cultiv
                         // harvestDates are already sorted from the previous loop
                         if (harvestDates.length === 1) {
                             return (
-                                <p
-                                    key={idx}
-                                    className="text-muted-foreground"
-                                >
+                                <p key={idx} className="text-muted-foreground">
                                     {`${idx + 1}e ${cultivation.b_lu_croprotation === "grass" ? "snede" : "oogst"}: ${format(
                                         harvestDates[0],
                                         "PP",
@@ -79,10 +76,7 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({ cultiv
                             )
                         }
                         const firstDate = harvestDates[0]
-                        const lastDate =
-                            harvestDates[
-                                harvestDates.length - 1
-                            ]
+                        const lastDate = harvestDates[harvestDates.length - 1]
                         return (
                             <p key={idx} className="text-muted-foreground">
                                 {`${idx + 1}e ${cultivation.b_lu_croprotation === "grass" ? "snede" : "oogst"}: ${format(firstDate, "PP", { locale: nl })} - ${format(lastDate, "PP", { locale: nl })}`}
@@ -92,8 +86,12 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({ cultiv
                 </div>
             )
         }
-        return null; // Should not happen
-    }, [cultivation.fields, cultivation.b_lu_harvestable, cultivation.b_lu_croprotation])
+        return null // Should not happen
+    }, [
+        cultivation.fields,
+        cultivation.b_lu_harvestable,
+        cultivation.b_lu_croprotation,
+    ])
 
     return formattedHarvestDates
 }
