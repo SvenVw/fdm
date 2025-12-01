@@ -51,10 +51,10 @@ export const meta: MetaFunction = () => {
  * This loader function retrieves the farm ID from the route parameters and validates its presence. It then
  * fetches the farm details using the current session. Additionally, it loads the list of available fields
  * for the specified calendar year (or the current year if not provided) from an external source.
- * It also fetches available cultivation options from the catalogue and the Map style configuration from the environment.
+ * It also fetches available cultivation options from the catalogue.
  *
  * @param {LoaderFunctionArgs} args - The arguments for the loader function, including the request and parameters.
- * @returns {Promise<object>} An object containing farm details, the list of available fields, cultivation options, map style, and other related data.
+ * @returns {Promise<object>} An object containing farm details, the list of available fields, cultivation options, and other related data.
  * @throws {Response} If the farm ID is missing.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {

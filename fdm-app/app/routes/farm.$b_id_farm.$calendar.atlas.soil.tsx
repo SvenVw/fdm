@@ -25,16 +25,16 @@ export const meta: MetaFunction = () => {
 }
 
 /**
- * Loads farm fields as a GeoJSON FeatureCollection along with a map style configuration.
+ * Loads farm fields as a GeoJSON FeatureCollection.
  *
  * This function retrieves the farm ID from the route parameters and ensures it is present. It then accesses the
  * current session to fetch the fields associated with the farm for the specified timeframe. Each field is
  * transformed into a GeoJSON feature, with properties including its ID, name, and area rounded to the nearest
- * decimal place, assembles these features into a FeatureCollection, and obtains a map style configuration. The returned
- * object provides the necessary data for rendering the farm's soil atlas.
+ * decimal place, and assembles these features into a FeatureCollection. The returned object provides the
+ * necessary data for rendering the farm's soil atlas.
  *
  * @param {LoaderFunctionArgs} args - The arguments containing the request and route parameters.
- * @returns A promise that resolves to an object containing a map style configuration and a GeoJSON FeatureCollection of farm fields.
+ * @returns A promise that resolves to an object containing a GeoJSON FeatureCollection of farm fields.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {

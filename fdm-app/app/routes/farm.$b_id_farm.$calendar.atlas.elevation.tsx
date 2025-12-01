@@ -24,12 +24,11 @@ export const meta: MetaFunction = () => {
 }
 
 /**
- * Loads farm field data and a map style configuration for the elevation feature.
+ * Loads farm field data for the elevation feature.
  *
- * This asynchronous function checks for the presence of a farm ID in the route parameters. It retrieves the user session, fetches the fields associated with the specified farm, and maps them to a GeoJSON FeatureCollection. A map style configuration is also obtained to enable map rendering on the client side. Errors during these processes, such as a missing farm ID or data retrieval issues, are caught and rethrown.
- *
+ * This asynchronous function checks for the presence of a farm ID in the route parameters. It retrieves the user session, fetches the fields associated with the specified farm, and maps them to a GeoJSON FeatureCollection. Errors during these processes, such as a missing farm ID or data retrieval issues, are caught and rethrown.
  * @param {LoaderFunctionArgs} args - The arguments provided by the loader, including the request and parameters.
- * @returns An object containing the map style configuration and the GeoJSON FeatureCollection of farm fields.
+ * @returns An object containing the GeoJSON FeatureCollection of farm fields
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
