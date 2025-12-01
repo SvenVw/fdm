@@ -34,6 +34,7 @@ import { auth } from "~/lib/auth.server"
 import { signIn } from "~/lib/auth-client"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
+import { modifySearchParams } from "~/lib/url-utils"
 import { cn } from "~/lib/utils"
 import { extractFormValuesFromRequest } from "../lib/form"
 
@@ -92,6 +93,17 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
 }
 
+/**Normalizes the given address to be a safe redirect, or `/farm` by default.
+ *
+ * @param address address to check for safety, null if not specified
+ * @returns the normalized, safe redirect address
+ */
+function getSafeRedirect(address: string | null) {
+    return address?.startsWith("/") && !address.startsWith("//")
+        ? address
+        : "/farm"
+}
+
 /**
  * Renders the sign-in page with social authentication options.
  *
@@ -102,8 +114,25 @@ export async function loader({ request }: LoaderFunctionArgs) {
  * @returns A React element representing the sign-in page.
  */
 export default function SignIn() {
-    const [searchParams] = useSearchParams() // Get search params
-    const redirectTo = searchParams.get("redirectTo") || "/welcome" // Get redirectTo or default to /welcome
+    const [searchParams, setSearchParams] = useSearchParams() // Get search params
+
+    const rawRedirectTo = searchParams.get("redirectTo")
+    const redirectTo = getSafeRedirect(rawRedirectTo) // Validate redirectTo to prevent open redirect
+
+    useEffect(() => {
+        if (rawRedirectTo && rawRedirectTo !== redirectTo) {
+            setSearchParams((searchParams) => {
+                searchParams.delete("redirectTo")
+                return searchParams
+            })
+        }
+    }, [rawRedirectTo, redirectTo, setSearchParams])
+
+    const socialProviderNewUserCallbackUrl = modifySearchParams(
+        "/welcome",
+        (searchParams) => searchParams.set("redirectTo", redirectTo),
+    )
+
     const handleSignInError = (provider: string, error: unknown) => {
         toast(
             `Er is helaas iets misgegaan bij het aanmelden met ${provider}. Probeer het opnieuw.`,
@@ -250,6 +279,8 @@ export default function SignIn() {
                                                     await signIn.social({
                                                         provider: "microsoft",
                                                         callbackURL: redirectTo,
+                                                        newUserCallbackURL:
+                                                            socialProviderNewUserCallbackUrl,
                                                     })
                                                 } catch (error) {
                                                     handleSignInError(
@@ -297,6 +328,8 @@ export default function SignIn() {
                                                     await signIn.social({
                                                         provider: "google",
                                                         callbackURL: redirectTo,
+                                                        newUserCallbackURL:
+                                                            socialProviderNewUserCallbackUrl,
                                                     })
                                                 } catch (error) {
                                                     handleSignInError(
@@ -468,9 +501,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const url = new URL(request.url)
     const redirectTo = url.searchParams.get("redirectTo") || "/farm"
     // Validate redirectTo to prevent open redirect
-    const isValidRedirect =
-        redirectTo.startsWith("/") && !redirectTo.startsWith("//")
-    let safeRedirectTo = isValidRedirect ? redirectTo : "/farm"
+    let safeRedirectTo = getSafeRedirect(redirectTo)
 
     // Get form values
     const formValues = await extractFormValuesFromRequest(request, FormSchema)
