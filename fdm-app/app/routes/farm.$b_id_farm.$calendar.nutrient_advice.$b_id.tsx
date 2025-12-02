@@ -113,13 +113,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 const url = new URL(request.url)
                 const cultivationId = url.searchParams.get("cultivation")
 
-                let activeCultivation = cultivationId
+                const activeCultivation = cultivationId
                     ? cultivations.find((c) => c.b_lu === cultivationId)
-                    : getDefaultCultivation(cultivations, calendar)
-
-                if (!activeCultivation && cultivations.length > 0) {
-                    activeCultivation = cultivations[0]
-                }
+                    : (getDefaultCultivation(cultivations, calendar) ??
+                      cultivations[0])
 
                 if (!activeCultivation) {
                     throw handleLoaderError("missing: active cultivation")

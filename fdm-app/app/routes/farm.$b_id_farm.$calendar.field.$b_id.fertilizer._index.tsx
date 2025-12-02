@@ -241,7 +241,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             dose: dose.dose,
             applicationMethodOptions: applicationMethods.options,
             fertilizerApplicationMetricsData: fertilizerApplicationMetricsData,
-            calendar: getCalendar(params),
+            calendar: calendar,
             fieldWritePermission: await fieldWritePermission,
             fertilizerApplicationWritePermissions:
                 fertilizerApplicationWritePermissions,

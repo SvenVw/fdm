@@ -94,16 +94,12 @@ export function FertilizerApplicationMetricsCard({
     return (
         <Card>
             <CardHeader>
-                <div className="flex flex-row items-center justify-between gap-4">
-                    <div className="space-y-1.5">
-                        <CardTitle className="flex items-center gap-2">
-                            Bemestingsdashboard
-                        </CardTitle>
-                        <CardDescription>
-                            Krijg inzicht in de effecten van de bemesting.
-                        </CardDescription>
-                    </div>
-                </div>
+                <CardTitle className="flex items-center gap-2">
+                    Bemestingsdashboard
+                </CardTitle>
+                <CardDescription>
+                    Krijg inzicht in de effecten van de bemesting.
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -517,16 +513,16 @@ export function FertilizerApplicationMetricsCard({
                                         >
                                             Bemestingsadvies
                                         </NavLink>
-                                        {activeCultivation && (
-                                            <CultivationSelector
-                                                cultivations={cultivations}
-                                                selectedCultivationId={
-                                                    activeCultivation.b_lu
-                                                }
-                                                variant="icon"
-                                            />
-                                        )}
                                     </ItemTitle>
+                                    {activeCultivation && (
+                                        <CultivationSelector
+                                            cultivations={cultivations}
+                                            selectedCultivationId={
+                                                activeCultivation.b_lu
+                                            }
+                                            variant="icon"
+                                        />
+                                    )}
                                 </div>
                             </ItemContent>
                             <ItemDescription>
