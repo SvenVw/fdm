@@ -1,7 +1,9 @@
-import { calculateDose } from "@svenvw/fdm-calculator"
+import { calculateDose, getNutrientAdvice } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
     checkPermission,
+    getCultivations,
+    getCurrentSoilData,
     getFertilizerApplications,
     getFertilizerParametersDescription,
     getFertilizers,
@@ -30,10 +32,11 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { getNmiApiKey } from "~/integrations/nmi"
+import { getDefaultCultivation } from "~/lib/cultivation-helpers"
 import {
     getNitrogenBalanceforField,
     getNorms,
-    getNutrientAdviceForField,
 } from "../integrations/calculator"
 
 // Meta
@@ -140,6 +143,40 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fertilizers,
         })
 
+        const cultivations = await getCultivations(
+            fdm,
+            session.principal_id,
+            b_id,
+            timeframe,
+        )
+
+        const url = new URL(request.url)
+        const cultivationId = url.searchParams.get("cultivation")
+        const calendar = getCalendar(params)
+
+        let activeCultivation = cultivationId
+            ? cultivations.find((c) => c.b_lu === cultivationId)
+            : getDefaultCultivation(cultivations, calendar)
+
+        if (!activeCultivation && cultivations.length > 0) {
+            activeCultivation = cultivations[0]
+        }
+
+        const currentSoilData = await getCurrentSoilData(
+            fdm,
+            session.principal_id,
+            b_id,
+        )
+
+        const nmiApiKey = getNmiApiKey()
+
+        const nutrientAdvice = await getNutrientAdvice(fdm, {
+            b_lu_catalogue: activeCultivation?.b_lu_catalogue ?? null,
+            b_centroid: b_centroid,
+            currentSoilData: currentSoilData,
+            nmiApiKey: nmiApiKey,
+        })
+
         const fertilizerApplicationMetricsData = {
             norms: getNorms({
                 fdm,
@@ -153,17 +190,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 b_id,
                 timeframe,
             }),
-            nutrientAdvice: getNutrientAdviceForField({
-                fdm,
-                principal_id,
-                b_id,
-                b_centroid,
-                timeframe,
-            }),
+            nutrientAdvice: nutrientAdvice,
             dose: dose.dose,
             b_id: b_id,
             b_id_farm: b_id_farm,
-            calendar: getCalendar(params),
+            calendar: calendar,
+            cultivations,
+            activeCultivation,
         }
 
         const pathname = new URL(request.url).pathname

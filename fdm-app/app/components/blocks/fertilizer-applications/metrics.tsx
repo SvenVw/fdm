@@ -5,8 +5,10 @@ import type {
     NormFilling,
     NutrientAdvice,
 } from "@svenvw/fdm-calculator"
+import type { Cultivation } from "@svenvw/fdm-core"
 import { Suspense } from "react"
 import { Await, NavLink } from "react-router-dom"
+import { CultivationSelector } from "~/components/custom/cultivation-selector"
 import {
     Card,
     CardContent,
@@ -50,6 +52,8 @@ interface FertilizerApplicationMetricsData {
     b_id: string
     b_id_farm: string
     calendar: string
+    cultivations: Cultivation[]
+    activeCultivation: Cultivation | undefined
 }
 
 interface FertilizerApplicationMetricsCardProps {
@@ -83,17 +87,23 @@ export function FertilizerApplicationMetricsCard({
         b_id,
         b_id_farm,
         calendar,
+        cultivations,
+        activeCultivation,
     } = fertilizerApplicationMetricsData
 
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    Bemestingsdashboard
-                </CardTitle>
-                <CardDescription>
-                    Krijg inzicht in de effecten van de bemesting.
-                </CardDescription>
+                <div className="flex flex-row items-center justify-between gap-4">
+                    <div className="space-y-1.5">
+                        <CardTitle className="flex items-center gap-2">
+                            Bemestingsdashboard
+                        </CardTitle>
+                        <CardDescription>
+                            Krijg inzicht in de effecten van de bemesting.
+                        </CardDescription>
+                    </div>
+                </div>
             </CardHeader>
             <CardContent>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -500,13 +510,24 @@ export function FertilizerApplicationMetricsCard({
                         <ItemSeparator />
                         <Item>
                             <ItemContent>
-                                <ItemTitle className="hover:underline">
-                                    <NavLink
-                                        to={`/farm/${b_id_farm}/${calendar}/nutrient_advice/${b_id}`}
-                                    >
-                                        Bemestingsadvies
-                                    </NavLink>
-                                </ItemTitle>
+                                <div className="flex items-center justify-between w-full">
+                                    <ItemTitle className="hover:underline">
+                                        <NavLink
+                                            to={`/farm/${b_id_farm}/${calendar}/nutrient_advice/${b_id}`}
+                                        >
+                                            Bemestingsadvies
+                                        </NavLink>
+                                        {activeCultivation && (
+                                            <CultivationSelector
+                                                cultivations={cultivations}
+                                                selectedCultivationId={
+                                                    activeCultivation.b_lu
+                                                }
+                                                variant="icon"
+                                            />
+                                        )}
+                                    </ItemTitle>
+                                </div>
                             </ItemContent>
                             <ItemDescription>
                                 {isSubmitting ? (
