@@ -4,10 +4,8 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
-    useLoaderData,
 } from "react-router"
 import { Button } from "~/components/ui/button"
-import { getMapboxToken } from "~/integrations/mapbox"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -26,13 +24,11 @@ export const meta: MetaFunction = () => {
 }
 
 /**
- * Loads farm field data and a Mapbox token for the elevation feature.
+ * Loads farm field data for the elevation feature.
  *
- * This asynchronous function checks for the presence of a farm ID in the route parameters. It retrieves the user session, fetches the fields associated with the specified farm, and maps them to a GeoJSON FeatureCollection. A Mapbox token is also obtained to enable map rendering on the client side. Errors during these processes, such as a missing farm ID or data retrieval issues, are caught and rethrown.
- *
- * @throws {Error} If the farm ID is not provided (HTTP 400) or if an internal error occurs during data fetching.
- *
- * @returns An object containing the Mapbox token and the GeoJSON FeatureCollection of farm fields.
+ * This asynchronous function checks for the presence of a farm ID in the route parameters. It retrieves the user session, fetches the fields associated with the specified farm, and maps them to a GeoJSON FeatureCollection. Errors during these processes, such as a missing farm ID or data retrieval issues, are caught and rethrown.
+ * @param {LoaderFunctionArgs} args - The arguments provided by the loader, including the request and parameters.
+ * @returns An object containing the GeoJSON FeatureCollection of farm fields
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -76,12 +72,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             features: features,
         }
 
-        // Get the Mapbox token
-        const mapboxToken = getMapboxToken()
-
         // Return user information from loader
         return {
-            mapboxToken: mapboxToken,
             fields: featureCollection,
         }
     } catch (error) {
@@ -95,8 +87,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * This component displays a message informing the user that the elevation map is not yet available and provides a button that navigates to the field map.
  */
 export default function FarmAtlasElevationBlock() {
-    const _loaderData = useLoaderData<typeof loader>()
-
     return (
         <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
             <div className="flex flex-col space-y-2 text-center">

@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/react-router"
-import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
+import mapLibreStyle from "maplibre-gl/dist/maplibre-gl.css?url"
 import posthog from "posthog-js"
 import { useEffect } from "react"
 import type { LinksFunction, LoaderFunctionArgs } from "react-router"
@@ -27,7 +27,7 @@ import type { Route } from "./+types/root"
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: styles },
-    { rel: "stylesheet", href: mapBoxStyle },
+    { rel: "stylesheet", href: mapLibreStyle },
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
     {
         rel: "preconnect",
@@ -50,7 +50,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
             PUBLIC_FDM_NAME: process.env.PUBLIC_FDM_NAME,
             PUBLIC_FDM_PRIVACY_URL: process.env.PUBLIC_FDM_PRIVACY_URL,
             PUBLIC_FDM_DATASETS_URL: process.env.PUBLIC_FDM_DATASETS_URL,
-            PUBLIC_MAPBOX_TOKEN: process.env.PUBLIC_MAPBOX_TOKEN,
+            PUBLIC_MAP_PROVIDER: process.env.PUBLIC_MAP_PROVIDER,
+            PUBLIC_MAPTILER_API_KEY: process.env.PUBLIC_MAPTILER_API_KEY,
             PUBLIC_SENTRY_DSN: process.env.PUBLIC_SENTRY_DSN,
             PUBLIC_SENTRY_ORG: process.env.PUBLIC_SENTRY_ORG,
             PUBLIC_SENTRY_PROJECT: process.env.PUBLIC_SENTRY_PROJECT,
@@ -126,7 +127,7 @@ export function Layout() {
                 />
                 <Meta />
                 <script
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Polyfill for Mapbox and other libs expecting global
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: Polyfill for Maplibre and other libs expecting global
                     dangerouslySetInnerHTML={{
                         __html: "window.global = window;",
                     }}

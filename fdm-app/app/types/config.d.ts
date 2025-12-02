@@ -27,8 +27,9 @@ export interface ServerConfig {
         port: number
     }
     integrations: {
-        mapbox: {
-            token: string
+        map: {
+            provider: "maptiler" | "osm"
+            maptilerKey?: string
         }
         nmi?: {
             api_key: string
@@ -77,8 +78,9 @@ export interface ClientConfig {
         } | null
     }
     integrations: {
-        mapbox: {
-            token: string
+        map: {
+            provider: "maptiler" | "osm"
+            maptilerKey?: string
         }
     }
 }

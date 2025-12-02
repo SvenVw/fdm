@@ -1,5 +1,5 @@
-import type { ExpressionSpecification } from "mapbox-gl"
-import type { LayerProps } from "react-map-gl/mapbox"
+import type { ExpressionSpecification } from "maplibre-gl"
+import type { LayerProps } from "react-map-gl/maplibre"
 import {
     getCultivationColor,
     getCultivationTypesHavingColors,
@@ -20,7 +20,7 @@ function getFieldsStyleInner(layerId: string): LayerProps {
             getCultivationColor(k),
         ]),
         getCultivationColor("other"),
-    ]
+    ] as any
 
     const baseFillStyles = {}
 

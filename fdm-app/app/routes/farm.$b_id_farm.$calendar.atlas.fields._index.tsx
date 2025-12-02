@@ -6,7 +6,8 @@ import {
     Map as MapGL,
     type ViewState,
     type ViewStateChangeEvent,
-} from "react-map-gl/mapbox"
+} from "react-map-gl/maplibre"
+import maplibregl from "maplibre-gl"
 import type { MetaFunction } from "react-router"
 import { type LoaderFunctionArgs, useLoaderData } from "react-router"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
@@ -15,7 +16,7 @@ import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
 import { FieldsSourceAvailable } from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
-import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
+import { getMapStyle } from "~/integrations/map"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -34,17 +35,16 @@ export const meta: MetaFunction = () => {
 }
 
 /**
- * Loads and processes farm field data along with Mapbox configuration for rendering the farm atlas.
+ * Loads and processes farm field data along with Maplibre configuration for rendering the farm atlas.
  *
  * This loader function extracts the farm ID from the route parameters and validates its presence,
  * retrieves the current user session, and fetches fields associated with the specified farm.
  * It converts these fields into a GeoJSON FeatureCollection—rounding the field area values for precision—
- * and obtains the Mapbox access token and style configuration for map rendering.
+ * and obtains the Maplibre access token and style configuration for map rendering.
  *
  * @returns An object containing:
  *  - savedFields: A GeoJSON FeatureCollection of the farm fields.
- *  - mapboxToken: The Mapbox access token.
- *  - mapboxStyle: The Mapbox style configuration.
+ *  - MapStyle: The Maplibre style configuration.
  *
  * @throws {Response} If the farm ID is missing or if an error occurs during data retrieval and processing.
  */
@@ -90,16 +90,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         }
 
-        // Get the Mapbox token and style
-        const mapboxToken = getMapboxToken()
-        const mapboxStyle = getMapboxStyle()
+        // Get Map Style
+        const mapStyle = getMapStyle("satellite")
 
         // Return user information from loader
         return {
             calendar: calendar,
             savedFields: featureCollection,
-            mapboxToken: mapboxToken,
-            mapboxStyle: mapboxStyle,
+            mapStyle: mapStyle,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -107,7 +105,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders a Mapbox map displaying farm fields with interactive controls.
+ * Renders a Maplibre map displaying farm fields with interactive controls.
  *
  * This component consumes preloaded farm field data to compute the map's view state and stylize the field boundaries.
  * It integrates geolocation and navigation controls, wraps the field layer in a non-interactive source, and includes a panel for displaying additional field details on hover.
@@ -162,8 +160,8 @@ export default function FarmAtlasFieldsBlock() {
             {...viewState}
             style={{ height: "calc(100vh - 64px)", width: "100%" }}
             interactive={true}
-            mapStyle={loaderData.mapboxStyle}
-            mapboxAccessToken={loaderData.mapboxToken}
+            mapStyle={loaderData.mapStyle}
+            mapLib={maplibregl}
             interactiveLayerIds={[id, fieldsAvailableId]}
             onMove={onViewportChange}
         >
@@ -188,7 +186,9 @@ export default function FarmAtlasFieldsBlock() {
                 zoomLevelFields={ZOOM_LEVEL_FIELDS}
                 redirectToDetailsPage={true}
             >
-                <Layer {...fieldsAvailableStyle} layout={layerLayout} />
+                <Layer
+                    {...({ ...fieldsAvailableStyle, layout: layerLayout } as any)}
+                />
             </FieldsSourceAvailable>
 
             <div className="fields-panel grid gap-4 w-[350px]">

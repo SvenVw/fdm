@@ -1,7 +1,8 @@
 import { getField } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { useEffect, useRef } from "react"
-import { Layer, Map as MapGL, type MapRef } from "react-map-gl/mapbox"
+import { Layer, Map as MapGL, type MapRef } from "react-map-gl/maplibre"
+import maplibregl from "maplibre-gl"
 import type { MetaFunction } from "react-router"
 import {
     type ActionFunctionArgs,
@@ -15,7 +16,7 @@ import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import { Separator } from "~/components/ui/separator"
 import { Skeleton } from "~/components/ui/skeleton"
-import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
+import { getMapStyle } from "~/integrations/map"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
@@ -33,11 +34,11 @@ export const meta: MetaFunction = () => {
 }
 
 /**
- * Loads field data and Mapbox configuration for rendering a farm field on the map.
+ * Loads field data and map configuration for rendering a farm field on the map.
  *
- * This function retrieves a farm field's details using the field ID from the route parameters. It establishes a valid user session and uses it to fetch the corresponding field data. The retrieved field details are formatted into a GeoJSON FeatureCollection, and Mapbox configuration values (access token and style) are provided for map rendering.
+ * This function retrieves a farm field's details using the field ID from the route parameters. It establishes a valid user session and uses it to fetch the corresponding field data. The retrieved field details are formatted into a GeoJSON FeatureCollection, and map style configuration is provided for rendering.
  *
- * @returns An object containing the field's GeoJSON FeatureCollection, Mapbox access token, and Mapbox style.
+ * @returns An object containing the field's GeoJSON FeatureCollection and map style.
  *
  * @throws {Response} Thrown if the field ID is missing from the parameters or if the field is not found.
  */
@@ -63,7 +64,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
         const feature = {
-            type: "Feature",
+            type: "Feature" as const,
             properties: {
                 b_id: field.b_id,
                 b_name: field.b_name,
@@ -78,15 +79,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             features: [feature],
         }
 
-        // Get mapbox token and style
-        const mapboxToken = getMapboxToken()
-        const mapboxStyle = getMapboxStyle()
+        // Get map style
+        const mapStyle = getMapStyle("satellite")
 
         // Return user information from loader
         return {
             field: featureCollection,
-            mapboxToken: mapboxToken,
-            mapboxStyle: mapboxStyle,
+            mapStyle: mapStyle,
         }
     } catch (error) {
         throw handleActionError(error)
@@ -94,9 +93,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders a map view of a farm field.
+ * Renders a MapLibre map view of a farm field.
  *
- * This component uses data retrieved from the loader to display a non-interactive Mapbox map with the field overlaid as a styled layer. It computes the view state and field styles, then conditionally renders the map on the client side with a skeleton fallback.
+ *  This component uses data retrieved from the loader to display a non-interactive map with the field overlaid as a styled layer. It computes the view state and field styles, then conditionally renders the map on the client side with a skeleton fallback.
  *
  * @returns A JSX element displaying the field map.
  */
@@ -112,7 +111,10 @@ export default function FarmFieldAtlasBlock() {
     const mapRef = useRef<MapRef>(null)
 
     useEffect(() => {
-        mapRef.current?.fitBounds(viewState.bounds, viewState.fitBoundsOptions)
+        const vs = viewState as any
+        if (vs.bounds) {
+            mapRef.current?.fitBounds(vs.bounds, vs.fitBoundsOptions)
+        }
     }, [viewState])
 
     return (
@@ -137,8 +139,8 @@ export default function FarmFieldAtlasBlock() {
                                 position: "absolute",
                             }}
                             interactive={false}
-                            mapStyle={loaderData.mapboxStyle}
-                            mapboxAccessToken={loaderData.mapboxToken}
+                            mapStyle={loaderData.mapStyle}
+                            mapLib={maplibregl}
                             interactiveLayerIds={[id]}
                             ref={mapRef}
                         >

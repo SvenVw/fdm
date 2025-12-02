@@ -5,6 +5,7 @@ import {
 import centroid from "@turf/centroid"
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
+import type { MapLayerMouseEvent } from "maplibre-gl"
 import throttle from "lodash.throttle"
 import {
     type Dispatch,
@@ -15,7 +16,7 @@ import {
     useMemo,
     useState,
 } from "react"
-import { Source, useMap } from "react-map-gl/mapbox"
+import { Source, useMap } from "react-map-gl/maplibre"
 import { useNavigate } from "react-router"
 import { generateFeatureClass } from "./atlas-functions"
 import { getAvailableFieldsUrl } from "./atlas-url"
@@ -56,10 +57,11 @@ export function FieldsSourceSelected({
     const { current: map } = useMap()
 
     useEffect(() => {
-        function clickOnMap(evt) {
+        function clickOnMap(evt: MapLayerMouseEvent) {
             if (!map) return
 
             if (
+                excludedLayerId &&
                 map.queryRenderedFeatures(evt.point, {
                     layers: [excludedLayerId],
                 }).length
@@ -75,7 +77,8 @@ export function FieldsSourceSelected({
             if (
                 features.length > 0 &&
                 features[0].layer &&
-                features[0].layer !== excludedLayerId
+                features[0].layer.id !== excludedLayerId &&
+                setFieldsData
             ) {
                 handleFieldClick(features[0], setFieldsData)
             }
@@ -111,6 +114,8 @@ function handleFieldClick(
     setSelectedFieldsData((prevFieldsData) => {
         const isAlreadySelected = prevFieldsData.features.some(
             (f) =>
+                f.properties &&
+                fieldData.properties &&
                 f.properties.b_id_source === fieldData.properties.b_id_source,
         )
 
@@ -119,8 +124,10 @@ function handleFieldClick(
                 ...prevFieldsData,
                 features: prevFieldsData.features.filter(
                     (f) =>
+                        f.properties &&
+                        fieldData.properties &&
                         f.properties.b_id_source !==
-                        fieldData.properties.b_id_source,
+                            fieldData.properties.b_id_source,
                 ),
             }
         }

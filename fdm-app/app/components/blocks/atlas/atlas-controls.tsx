@@ -1,5 +1,5 @@
 import { Layers } from "lucide-react"
-import type { ControlPosition, Map as MapboxMap } from "mapbox-gl"
+import type { ControlPosition, Map as MapLibreMap } from "maplibre-gl"
 import { useEffect } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import {
@@ -7,7 +7,7 @@ import {
     type IControl,
     NavigationControl,
     useControl,
-} from "react-map-gl/mapbox"
+} from "react-map-gl/maplibre"
 import { useIsMobile } from "~/hooks/use-mobile"
 import { GeocoderControl } from "./atlas-geocoder"
 
@@ -54,7 +54,7 @@ function FieldsButton({ showFields, onToggle }: FieldsButtonProps) {
     return (
         <button
             type="button"
-            className="mapboxgl-ctrl-icon flex items-center justify-center p-0!"
+            className="maplibregl-ctrl-icon flex items-center justify-center p-0!"
             onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -70,7 +70,7 @@ function FieldsButton({ showFields, onToggle }: FieldsButtonProps) {
 }
 
 class CustomFieldsControl implements IControl {
-    _map: MapboxMap | undefined
+    _map: MapLibreMap | undefined
     _container: HTMLDivElement | undefined
     _root: Root | undefined
     _props: FieldsButtonProps
@@ -79,10 +79,10 @@ class CustomFieldsControl implements IControl {
         this._props = initialProps
     }
 
-    onAdd(map: MapboxMap): HTMLElement {
+    onAdd(map: MapLibreMap): HTMLElement {
         this._map = map
         this._container = document.createElement("div")
-        this._container.className = "mapboxgl-ctrl mapboxgl-ctrl-group"
+        this._container.className = "maplibregl-ctrl maplibregl-ctrl-group"
 
         this._root = createRoot(this._container)
         this._render()
