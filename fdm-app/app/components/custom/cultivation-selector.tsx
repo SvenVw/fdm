@@ -1,0 +1,90 @@
+import type { Cultivation } from "@svenvw/fdm-core"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+} from "~/components/ui/select"
+import { Badge } from "~/components/ui/badge"
+import { getCultivationColor } from "~/components/custom/cultivation-colors"
+import { useSearchParams } from "react-router"
+
+interface CultivationSelectorProps {
+    cultivations: Cultivation[]
+    selectedCultivationId: string
+}
+
+export function CultivationSelector({
+    cultivations,
+    selectedCultivationId,
+}: CultivationSelectorProps) {
+    const [searchParams, setSearchParams] = useSearchParams()
+
+    const handleValueChange = (value: string) => {
+        setSearchParams((prev) => {
+            const next = new URLSearchParams(prev)
+            next.set("cultivation", value)
+            return next
+        })
+    }
+
+    const selectedCultivation = cultivations.find(
+        (c) => c.b_lu === selectedCultivationId,
+    )
+
+    const sortedCultivations = [...cultivations].sort(
+        (a, b) =>
+            new Date(b.b_lu_start).getTime() - new Date(a.b_lu_start).getTime(),
+    )
+
+    return (
+        <Select value={selectedCultivationId} onValueChange={handleValueChange}>
+            <SelectTrigger className="w-auto h-auto gap-2 border-none bg-transparent p-0 hover:bg-transparent focus:ring-0 shadow-none text-foreground [&>span]:line-clamp-1">
+                {selectedCultivation ? (
+                    <Badge
+                        style={{
+                            backgroundColor: getCultivationColor(
+                                selectedCultivation.b_lu_croprotation,
+                            ),
+                        }}
+                        className="text-white hover:opacity-90 px-3 py-1 text-sm"
+                        variant="default"
+                    >
+                        {selectedCultivation.b_lu_name}
+                    </Badge>
+                ) : (
+                    <span className="text-muted-foreground italic">
+                        Selecteer gewas
+                    </span>
+                )}
+            </SelectTrigger>
+            <SelectContent>
+                {sortedCultivations.map((cultivation) => (
+                    <SelectItem key={cultivation.b_lu} value={cultivation.b_lu}>
+                        <div className="flex items-center gap-3 min-w-[200px]">
+                            <div
+                                className="w-3 h-3 rounded-full shrink-0"
+                                style={{
+                                    backgroundColor: getCultivationColor(
+                                        cultivation.b_lu_croprotation,
+                                    ),
+                                }}
+                            />
+                            <span className="font-medium">
+                                {cultivation.b_lu_name}
+                            </span>
+                            <span className="text-muted-foreground text-xs ml-auto pl-2">
+                                {new Date(
+                                    cultivation.b_lu_start,
+                                ).toLocaleDateString("nl-NL", {
+                                    day: "numeric",
+                                    month: "short",
+                                })}
+                            </span>
+                        </div>
+                    </SelectItem>
+                ))}
+            </SelectContent>
+        </Select>
+    )
+}
