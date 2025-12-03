@@ -1,3 +1,4 @@
+import { oxlint } from "vite-plugin-oxlint"
 import { reactRouter } from "@react-router/dev/vite"
 import { sentryReactRouter } from "@sentry/react-router"
 import tailwindcss from "@tailwindcss/vite"
@@ -13,6 +14,7 @@ export default defineConfig((env) => {
             reactRouter(),
             tsconfigPaths(),
             tailwindcss(),
+            oxlint(),
             enableSentry &&
                 sentryReactRouter(
                     {
