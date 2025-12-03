@@ -39,6 +39,9 @@ export function SoilAnalysesList({
                     )
                     const sourceLabel =
                         sourceOption?.label || analysis.a_source || "Onbekend"
+                    const isDisabled =
+                        fetcher.state === "submitting" ||
+                        analysis.a_source === "nl-other-nmi"
                     return (
                         <div
                             className="grid grid-cols-3 gap-x-3 items-center"
@@ -71,31 +74,25 @@ export function SoilAnalysesList({
                                 <div className="space-x-4">
                                     <Button
                                         variant="default"
-                                        disabled={
-                                            fetcher.state === "submitting" ||
-                                            analysis.a_source === "nl-other-nmi"
-                                        }
+                                        disabled={isDisabled}
                                         asChild
                                     >
                                         <NavLink
                                             to={`./analysis/${analysis.a_id}`}
                                             className={cn(
                                                 "pointer-events-auto",
-                                                analysis.a_source ===
-                                                    "nl-other-nmi"
+                                                isDisabled
                                                     ? "pointer-events-none"
                                                     : "",
                                             )}
+                                            aria-disabled={isDisabled}
                                         >
                                             Bewerk
                                         </NavLink>
                                     </Button>
                                     <Button
                                         variant="destructive"
-                                        disabled={
-                                            fetcher.state === "submitting" ||
-                                            analysis.a_source === "nl-other-nmi"
-                                        }
+                                        disabled={isDisabled}
                                         onClick={() => {
                                             handleDelete(analysis.a_id)
                                         }}
