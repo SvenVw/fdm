@@ -941,9 +941,10 @@ describe("Farm Data Model", () => {
                 fdm,
                 principal_id,
                 cultivationId,
-                new Date("2025-08-10"),
-                // @ts-expect-error
-                5000,
+                new Date("2025-08-10"),       
+                {
+                    b_lu_yield_fresh: 5000
+                },
             )
 
             await removeField(fdm, principal_id, fieldId)
