@@ -8,6 +8,8 @@ import { Button } from "~/components/ui/button"
 import { cn } from "~/lib/utils"
 import type { SoilAnalysis } from "./types"
 
+type SoilActionData = { message: string }
+
 export function SoilAnalysesList({
     soilAnalyses,
     soilParameterDescription,
@@ -16,7 +18,7 @@ export function SoilAnalysesList({
 }: {
     soilAnalyses: SoilAnalysis[]
     soilParameterDescription: SoilParameterDescription
-    fetcher: FetcherWithComponents<any>
+    fetcher: FetcherWithComponents<SoilActionData>
     canModifySoilAnalysis?: Record<string, boolean>
 }) {
     const handleDelete = (a_id: string) => {
