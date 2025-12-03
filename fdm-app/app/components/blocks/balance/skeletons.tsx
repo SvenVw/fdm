@@ -48,7 +48,7 @@ export function NitrogenBalanceFieldsSkeleton() {
             <CardContent>
                 <div className="space-y-8">
                     {/* oxlint-disable-next-line react/no-array-index-key */}
-                    {Array.from({length:4}).map((_, i) => (
+                    {Array.from({length: 4}).map((_, i) => (
                         <div
                             key={`field-balance-skeleton-${i}`}
                             className="flex items-center"
