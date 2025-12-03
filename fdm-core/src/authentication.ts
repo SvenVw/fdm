@@ -6,7 +6,7 @@ import { generateFromEmail } from "unique-username-generator"
 import * as authNSchema from "./db/schema-authn"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import { FdmAuth } from "./authentication.d"
+import type { FdmAuth } from "./authentication.d"
 
 /**
  * Initializes and configures the authentication system for the FDM application using Better Auth.
