@@ -151,11 +151,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 )
                 const a_som_loi =
                     currentSoilData.find(
-                        (x: any) => x.parameter === "a_som_loi",
+                        (x: { parameter: string }) => x.parameter === "a_som_loi",
                     )?.value ?? null
                 const b_soiltype_agr =
                     currentSoilData.find(
-                        (x: any) => x.parameter === "b_soiltype_agr",
+                        (x: { parameter: string }) => x.parameter === "b_soiltype_agr",
                     )?.value ?? null
 
                 const has_write_permission = await checkPermission(

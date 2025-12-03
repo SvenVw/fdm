@@ -244,6 +244,7 @@ export default function Index() {
             b_area: Math.round(loaderData.b_area * 10) / 10,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
         })
+    // oxlint-disable-next-line exhaustive-deps
     }, [loaderData, form.reset])
 
     //ref to refit the map when the selected field changes
@@ -252,7 +253,7 @@ export default function Index() {
     useEffect(() => {
         if ("bounds" in viewState) {
             mapRef.current?.fitBounds(
-                viewState.bounds as any,
+                viewState.bounds as [number, number, number, number],
                 viewState.fitBoundsOptions,
             )
         }

@@ -37,6 +37,7 @@ import { renderInvitationEmail, sendEmail } from "~/lib/email.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import type { ExtendedUser } from "../types/extended-user"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!params.slug) {
@@ -412,7 +413,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
             const invitationEmail = await renderInvitationEmail(
                 formValues.email,
-                session.user as any,
+                session.user as ExtendedUser,
                 organization.name,
                 invitationId,
             )
