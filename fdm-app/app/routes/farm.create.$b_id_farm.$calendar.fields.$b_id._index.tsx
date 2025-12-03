@@ -140,7 +140,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             properties: {
                 b_id: field.b_id,
                 b_name: field.b_name,
-                b_area: Math.round(field.b_area * 10) / 10,
+                b_area: Math.round((field.b_area ?? 0) * 10) / 10,
                 b_lu_name: field.b_lu_name,
                 b_id_source: field.b_id_source,
             },
@@ -233,7 +233,7 @@ export default function Index() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name: loaderData.b_name ?? "",
-            b_area: Math.round(loaderData.b_area * 10) / 10,
+            b_area: Math.round((loaderData.b_area ?? 0) * 10) / 10,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
         },
     })
@@ -241,7 +241,7 @@ export default function Index() {
     useEffect(() => {
         form.reset({
             b_name: loaderData.b_name ?? "",
-            b_area: Math.round(loaderData.b_area * 10) / 10,
+            b_area: Math.round((loaderData.b_area ?? 0) * 10) / 10,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
         })
     // oxlint-disable-next-line exhaustive-deps

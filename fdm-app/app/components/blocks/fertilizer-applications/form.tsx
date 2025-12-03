@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { FertilizerApplication } from "@svenvw/fdm-core"
 import { Plus } from "lucide-react"
 import type { MouseEvent } from "react"
 import { useEffect, useId } from "react"
@@ -58,7 +57,14 @@ export function FertilizerApplicationForm({
     navigation: Navigation
     b_id_farm: string
     b_id_or_b_lu_catalogue: string
-    fertilizerApplication?: FertilizerApplication
+    fertilizerApplication?: {
+        p_app_id?: string
+        p_app_ids?: string[]
+        p_id: string
+        p_app_method: string
+        p_app_amount: number
+        p_app_date: Date
+    }
 }) {
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
@@ -94,7 +100,7 @@ export function FertilizerApplicationForm({
         }
         // oxlint-disable-next-line react-hooks/exhaustive-deps -- form is stable from useRemixForm
     }, [p_id, fertilizerApplication, form.setValue])
-    
+
 
     const fieldFertilizerFormStore = useFieldFertilizerFormStore()
 
@@ -118,7 +124,7 @@ export function FertilizerApplicationForm({
                 }
             }
         }
-         // oxlint-disable-next-line react-hooks/exhaustive-deps -- form and fieldFertilizerFormStore are stable references
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- form and fieldFertilizerFormStore are stable references
     }, [
         b_id_farm,
         b_id_or_b_lu_catalogue,
@@ -146,7 +152,7 @@ export function FertilizerApplicationForm({
         if (form.formState.isSubmitSuccessful) {
             fieldFertilizerFormStore.delete(b_id_farm, b_id_or_b_lu_catalogue)
         }
-                // oxlint-disable-next-line react-hooks/exhaustive-deps -- fieldFertilizerFormStore is stable from Zustand
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- fieldFertilizerFormStore is stable from Zustand
     }, [
         form.formState.isSubmitSuccessful,
         b_id_farm,
@@ -256,12 +262,12 @@ export function FertilizerApplicationForm({
                                                 {...field}
                                                 value={
                                                     field.value === undefined ||
-                                                    field.value === null ||
-                                                    Number.isNaN(
-                                                        Number.parseFloat(
-                                                            String(field.value),
-                                                        ),
-                                                    )
+                                                        field.value === null ||
+                                                        Number.isNaN(
+                                                            Number.parseFloat(
+                                                                String(field.value),
+                                                            ),
+                                                        )
                                                         ? ""
                                                         : field.value
                                                 }

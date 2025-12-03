@@ -18,7 +18,7 @@ describe("calculateOrganicMatterSupplyByCultivations", () => {
             "grass",
             {
                 b_lu_catalogue: "grass",
-                b_lu_croprotation: "grassland",
+                b_lu_croprotation: "grass",
                 b_lu_eom: 1000,
                 b_lu_eom_residues: 200,
             },
