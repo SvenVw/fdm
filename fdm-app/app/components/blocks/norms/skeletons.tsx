@@ -52,8 +52,8 @@ export function FieldNormsSkeleton() {
                 aria-label="Loading field norms"
             />
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton list */}
-                {[...Array(3)].map((_, i) => (
+                {/* oxlint-disable-next-line react/no-array-index-key */}
+                {Array.from({ length: 3}).map((_, i) => (
                     <Card
                         key={`field-norm-skeleton-${i}`}
                         className="hover:shadow-md transition-shadow border-gray-200"
