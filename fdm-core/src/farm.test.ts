@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm"
 import { beforeAll, describe, expect, inject, it } from "vitest"
-import { type FdmAuth, createFdmAuth } from "./authentication"
+import { createFdmAuth } from "./authentication"
 import { listPrincipalsForResource } from "./authorization"
 import * as schema from "./db/schema"
 import {
@@ -34,7 +34,7 @@ describe("Farm Functions", () => {
     let farmBusinessId: string
     let farmAddress: string
     let farmPostalCode: string
-    let fdmAuth: FdmAuth
+    let fdmAuth: any
 
     beforeAll(async () => {
         const host = inject("host")
@@ -58,7 +58,6 @@ describe("Farm Functions", () => {
         // Create principal_id
         const user1 = await fdmAuth.api.signUpEmail({
             headers: undefined,
-            // @ts-expect-error
             body: {
                 email: "user10@example.com",
                 name: "user10",
@@ -72,7 +71,6 @@ describe("Farm Functions", () => {
         target_username = "user15"
         const target = await fdmAuth.api.signUpEmail({
             headers: undefined,
-            // @ts-expect-error
             body: {
                 email: "user15@example.com",
                 name: "user15",

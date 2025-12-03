@@ -23,11 +23,10 @@ import {
     createOrganization,
     inviteUserToOrganization,
 } from "./organization"
-import type { FdmAuth } from "./authentication.d"
 
 describe("Authorization Functions", () => {
     let fdm: FdmServerType
-    let fdmAuth: FdmAuth
+    let fdmAuth: any
     let principal_id: string
     let farm_id: string
     let organization_id: string
