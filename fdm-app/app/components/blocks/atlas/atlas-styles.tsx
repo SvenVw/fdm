@@ -20,7 +20,7 @@ function getFieldsStyleInner(layerId: string): LayerProps {
             getCultivationColor(k),
         ]),
         getCultivationColor("other"),
-    ] as any
+    ] as unknown as ExpressionSpecification
 
     const baseFillStyles = {}
 

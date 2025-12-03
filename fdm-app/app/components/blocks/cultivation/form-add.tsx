@@ -79,7 +79,7 @@ function CultivationAddForm({
                         <div className="col-span-1">
                             <Combobox
                                 options={options}
-                                form={form as any}
+                                form={form}
                                 name="b_lu_catalogue"
                                 label={
                                     <span>
@@ -92,13 +92,13 @@ function CultivationAddForm({
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <DatePicker
-                                form={form as any}
+                                form={form}
                                 name={"b_lu_start"}
                                 label={"Zaaidatum"}
                                 description={""}
                             />
                             <DatePicker
-                                form={form as any}
+                                form={form}
                                 name={"b_lu_end"}
                                 label={"Einddatum"}
                                 description={

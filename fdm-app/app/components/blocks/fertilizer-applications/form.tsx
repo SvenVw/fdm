@@ -107,9 +107,12 @@ export function FertilizerApplicationForm({
                     if (typeof v === "undefined" || v === null) continue
                     const hydrated =
                         k === "p_app_date" && v
-                            ? new Date(v as any)
-                            : (v as any)
-                    form.setValue(k as any, hydrated)
+                            ? new Date(v as string)
+                            : (v as FieldFertilizerFormValues[keyof FieldFertilizerFormValues])
+                    form.setValue(
+                        k as keyof FieldFertilizerFormValues,
+                        hydrated,
+                    )
                 }
             }
         }
@@ -159,7 +162,7 @@ export function FertilizerApplicationForm({
     }
 
     return (
-        <RemixFormProvider {...(form as any)}>
+        <RemixFormProvider {...form}>
             <Form
                 id={formId}
                 action={action}

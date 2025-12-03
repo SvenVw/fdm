@@ -81,7 +81,8 @@ export function HarvestsList({
                 {harvests.map((harvest) => {
                     const analyses =
                         harvest.harvestable?.harvestable_analyses?.[0]
-                    const summaryParams: { label: string; value: any }[] = []
+                    const summaryParams: { label: string; value: unknown }[] =
+                        []
                     if (analyses) {
                         for (const param of harvestParameters) {
                             const value = analyses[param]
@@ -116,7 +117,7 @@ export function HarvestsList({
                                                         {p.label}
                                                     </p>
                                                     <p className="text-sm font-semibold">
-                                                        {p.value}
+                                                        {String(p.value)}
                                                     </p>
                                                 </div>
                                             ))}

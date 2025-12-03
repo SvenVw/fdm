@@ -14,7 +14,7 @@ import type { NutrientDescription } from "./types"
  */
 export type NutrientKPICardForTotalApplicationsProps = {
     doses: {
-        dose: Record<string, number>
+        dose: Dose
         applications: Dose[]
     }
     fertilizerApplications: FertilizerApplication[]
@@ -31,7 +31,7 @@ export function NutrientKPICardForTotalApplications({
     const navigation = useNavigation()
     const numberOfFertilizerApplications = fertilizerApplications.length
     const numberOfNutrientsApplied = Object.values(doses.dose).filter(
-        (value) => value > 0,
+        (value) => typeof value === "number" && value > 0,
     ).length
     return (
         <Card className="border-l-4 border-l-primary">
@@ -77,7 +77,7 @@ export type NutrientKPICardForNutrientDeficitProps = {
     descriptions: NutrientDescription[]
     advices: Record<string, number>
     doses: {
-        dose: Record<string, number>
+        dose: Dose
         applications: Dose[]
     }
 }
@@ -99,7 +99,7 @@ export function NutrientKPICardForNutrientDeficit({
             const adviceParameter = nutrient.adviceParameter
             const doseParameter = nutrient.doseParameter
 
-            const dose = doses.dose[doseParameter]
+            const dose = (doses.dose[doseParameter] as number | undefined) ?? 0
             const advice = advices[adviceParameter]
 
             const percentage = advice ? (dose / advice) * 100 : 0
@@ -190,7 +190,7 @@ export type NutrientKPICardForNutrientExcessProps = {
     descriptions: NutrientDescription[]
     advices: Record<string, number>
     doses: {
-        dose: Record<string, number>
+        dose: Dose
         applications: Dose[]
     }
 }
@@ -212,7 +212,7 @@ export function NutrientKPICardForNutrientExcess({
             const adviceParameter = nutrient.adviceParameter
             const doseParameter = nutrient.doseParameter
 
-            const dose = doses.dose[doseParameter]
+            const dose = (doses.dose[doseParameter] as number | undefined) ?? 0
             const advice = advices[adviceParameter]
 
             const percentage = advice ? (dose / advice) * 100 : 0

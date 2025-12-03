@@ -47,6 +47,7 @@ export function NitrogenBalanceFieldsSkeleton() {
             </CardHeader>
             <CardContent>
                 <div className="space-y-8">
+                    {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton list */}
                     {[...Array(4)].map((_, i) => (
                         <div
                             key={`field-balance-skeleton-${i}`}

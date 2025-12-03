@@ -82,153 +82,158 @@ export function SoilAnalysisForm(props: {
                             Vul de gegevens van de bodemanalyse in.
                         </p>
                         <div className="grid md:grid-cols-2 gap-4">
-                            {soilParameterDescription.map((x: any) => {
-                                if (x.parameter === "a_id") {
-                                    return null
-                                }
-                                if (x.type === "numeric") {
-                                    return (
-                                        <FormField
-                                            control={form.control}
-                                            name={x.parameter}
-                                            key={x.parameter}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        {x.name}
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <div className="relative">
+                            {soilParameterDescription.map(
+                                (x: SoilParameterDescription[number]) => {
+                                    if (x.parameter === "a_id") {
+                                        return null
+                                    }
+                                    if (x.type === "numeric") {
+                                        return (
+                                            <FormField
+                                                control={form.control}
+                                                name={x.parameter}
+                                                key={x.parameter}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            {x.name}
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <div className="relative">
+                                                                <Input
+                                                                    {...field}
+                                                                    type="number"
+                                                                    value={
+                                                                        field.value
+                                                                    }
+                                                                    placeholder=""
+                                                                />
+                                                                {x.unit && (
+                                                                    <span className="absolute inset-y-0 right-8 pr-3 flex items-center pointer-events-none text-muted-foreground text-sm">
+                                                                        {x.unit}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </FormControl>
+                                                        <FormDescription>
+                                                            {x.description}
+                                                        </FormDescription>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        )
+                                    }
+
+                                    if (x.type === "enum") {
+                                        return (
+                                            <FormField
+                                                control={form.control}
+                                                name={x.parameter}
+                                                key={x.parameter}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            {x.name}
+                                                        </FormLabel>
+                                                        <Select
+                                                            onValueChange={
+                                                                field.onChange
+                                                            }
+                                                            value={field.value}
+                                                        >
+                                                            <SelectTrigger
+                                                                {...field}
+                                                            >
+                                                                <SelectValue placeholder="" />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {x.options?.map(
+                                                                    (option: {
+                                                                        value: string
+                                                                        label: string
+                                                                    }) => {
+                                                                        if (
+                                                                            option.value ===
+                                                                            "nl-other-nmi"
+                                                                        ) {
+                                                                            return null
+                                                                        }
+                                                                        return (
+                                                                            <SelectItem
+                                                                                key={
+                                                                                    option.value
+                                                                                }
+                                                                                value={
+                                                                                    option.value
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    option.label
+                                                                                }
+                                                                            </SelectItem>
+                                                                        )
+                                                                    },
+                                                                ) || null}
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormDescription>
+                                                            {x.description}
+                                                        </FormDescription>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        )
+                                    }
+
+                                    if (x.type === "date") {
+                                        return (
+                                            <DatePicker
+                                                key={x.parameter}
+                                                form={form}
+                                                name={x.parameter as any}
+                                                label={x.name}
+                                                description={x.description}
+                                            />
+                                        )
+                                    }
+
+                                    if (x.type === "text") {
+                                        return (
+                                            <FormField
+                                                control={form.control}
+                                                name={x.parameter}
+                                                key={x.parameter}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            {x.name}
+                                                        </FormLabel>
+                                                        <FormControl>
                                                             <Input
                                                                 {...field}
-                                                                type="number"
+                                                                type="text"
                                                                 value={
                                                                     field.value
                                                                 }
                                                                 placeholder=""
+                                                                aria-required="true"
+                                                                required
                                                             />
-                                                            {x.unit && (
-                                                                <span className="absolute inset-y-0 right-8 pr-3 flex items-center pointer-events-none text-muted-foreground text-sm">
-                                                                    {x.unit}
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    </FormControl>
-                                                    <FormDescription>
-                                                        {x.description}
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    )
-                                }
-
-                                if (x.type === "enum") {
-                                    return (
-                                        <FormField
-                                            control={form.control}
-                                            name={x.parameter}
-                                            key={x.parameter}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        {x.name}
-                                                    </FormLabel>
-                                                    <Select
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
-                                                        value={field.value}
-                                                    >
-                                                        <SelectTrigger
-                                                            {...field}
-                                                        >
-                                                            <SelectValue placeholder="" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {x.options?.map(
-                                                                (option: {
-                                                                    value: string
-                                                                    label: string
-                                                                }) => {
-                                                                    if (
-                                                                        option.value ===
-                                                                        "nl-other-nmi"
-                                                                    ) {
-                                                                        return null
-                                                                    }
-                                                                    return (
-                                                                        <SelectItem
-                                                                            key={
-                                                                                option.value
-                                                                            }
-                                                                            value={
-                                                                                option.value
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                option.label
-                                                                            }
-                                                                        </SelectItem>
-                                                                    )
-                                                                },
-                                                            ) || null}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormDescription>
-                                                        {x.description}
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    )
-                                }
-
-                                if (x.type === "date") {
-                                    return (
-                                        <DatePicker
-                                            key={x.parameter}
-                                            form={form}
-                                            name={x.parameter as any}
-                                            label={x.name}
-                                            description={x.description}
-                                        />
-                                    )
-                                }
-
-                                if (x.type === "text") {
-                                    return (
-                                        <FormField
-                                            control={form.control}
-                                            name={x.parameter}
-                                            key={x.parameter}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        {x.name}
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            {...field}
-                                                            type="text"
-                                                            value={field.value}
-                                                            placeholder=""
-                                                            aria-required="true"
-                                                            required
-                                                        />
-                                                    </FormControl>
-                                                    <FormDescription>
-                                                        {x.description}
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    )
-                                }
-                            })}
+                                                        </FormControl>
+                                                        <FormDescription>
+                                                            {x.description}
+                                                        </FormDescription>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        )
+                                    }
+                                    return null
+                                },
+                            )}
                         </div>
                         <div
                             className={cn(

@@ -10,12 +10,10 @@ import {
 } from "~/components/ui/chart"
 
 export function NitrogenBalanceChart({
-    balance,
     supply,
     removal,
     emission,
 }: {
-    balance: number
     supply: number
     removal: number | undefined
     emission: {

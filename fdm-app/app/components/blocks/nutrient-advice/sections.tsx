@@ -1,3 +1,4 @@
+import type { Dose } from "@svenvw/fdm-calculator"
 import type { Fertilizer, FertilizerApplication, Field } from "@svenvw/fdm-core"
 import { NutrientCard } from "./cards"
 import {
@@ -7,9 +8,8 @@ import {
 } from "./kpi"
 import type { NutrientDescription } from "./types"
 
-type Dose = any
 interface AsyncData {
-    nutrientAdvice: any
+    nutrientAdvice: Record<string, any>
     doses: { dose: Dose; applications: Dose[] }
     fertilizerApplications: FertilizerApplication[]
     fertilizers: Fertilizer[]

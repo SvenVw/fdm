@@ -7,13 +7,13 @@ import {
     enableFertilizerCatalogue,
     getFertilizersFromCatalogue,
 } from "@svenvw/fdm-core"
+import type { Resolver } from "react-hook-form"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
 import { Form, useLoaderData } from "react-router"
-import type { Resolver } from "react-hook-form"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"

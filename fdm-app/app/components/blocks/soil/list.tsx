@@ -1,3 +1,4 @@
+import type { SoilParameterDescription } from "@svenvw/fdm-core"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
 import type { FetcherWithComponents } from "react-router"
@@ -6,7 +7,6 @@ import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import { cn } from "~/lib/utils"
 import type { SoilAnalysis } from "./types"
-import type { SoilParameterDescription } from "@svenvw/fdm-core"
 
 export function SoilAnalysesList({
     soilAnalyses,

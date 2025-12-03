@@ -9,6 +9,7 @@ import {
     getFields,
 } from "@svenvw/fdm-core"
 import type { Feature, FeatureCollection, Polygon } from "geojson"
+import maplibregl from "maplibre-gl"
 import { useState } from "react"
 import {
     Layer,
@@ -16,7 +17,6 @@ import {
     type ViewState,
     type ViewStateChangeEvent,
 } from "react-map-gl/maplibre"
-import maplibregl from "maplibre-gl"
 import {
     type ActionFunctionArgs,
     data,

@@ -1,7 +1,6 @@
 import type {
     FieldInput,
     OrganicMatterBalanceFieldNumeric,
-    OrganicMatterBalanceNumeric,
     OrganicMatterDegradationNumeric,
     OrganicMatterSupplyCultivationsNumeric,
     OrganicMatterSupplyFertilizersNumeric,

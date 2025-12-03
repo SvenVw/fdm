@@ -163,8 +163,10 @@ export function DataTable<TData extends RotationExtended, TValue>({
         }
         return (
             searchTerms === "" ||
-            fuzzysort.go(searchTerms, [(row.original as any).searchTarget])
-                .length > 0
+            fuzzysort.go(searchTerms, [
+                (row.original as unknown as { searchTarget: string })
+                    .searchTarget,
+            ]).length > 0
         )
     }
 

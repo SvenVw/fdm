@@ -25,6 +25,20 @@ type GeocoderControlProps = {
     }) => void
 }
 
+interface ForwardGeocodeConfig {
+    query?: string | number[]
+    limit?: number
+}
+
+interface NominatimItem {
+    place_id: number
+    lon: string
+    lat: string
+    display_name: string
+    type: string
+    boundingbox?: [string, string, string, string]
+}
+
 class GeocoderControlClass implements IControl {
     _geocoder: MaplibreGeocoder
     _map: MapLibreMap | undefined
@@ -34,10 +48,10 @@ class GeocoderControlClass implements IControl {
         const { provider, maptilerKey } = clientConfig.integrations.map
 
         const geocoderApi = {
-            forwardGeocode: async (config: any) => {
-                const features: any[] = []
+            forwardGeocode: async (config: ForwardGeocodeConfig) => {
+                const features: GeocoderResult[] = []
                 try {
-                    const query = config.query
+                    const query = String(config.query ?? "")
                     if (provider === "maptiler" && maptilerKey) {
                         const url = `https://api.maptiler.com/geocoding/${encodeURIComponent(
                             query,
@@ -56,8 +70,10 @@ class GeocoderControlClass implements IControl {
                         const data = await res.json()
 
                         if (Array.isArray(data)) {
-                            const features = data.map((item: any) => {
-                                const bbox = item.boundingbox
+                            const features = data.map((item: NominatimItem) => {
+                                const bbox:
+                                    | [number, number, number, number]
+                                    | undefined = item.boundingbox
                                     ? [
                                           Number.parseFloat(
                                               item.boundingbox[2],
@@ -93,9 +109,9 @@ class GeocoderControlClass implements IControl {
                                     center: [
                                         Number.parseFloat(item.lon),
                                         Number.parseFloat(item.lat),
-                                    ],
+                                    ] as [number, number],
                                     bbox: bbox,
-                                }
+                                } as unknown as GeocoderResult
                             })
                             return { features }
                         }
@@ -152,7 +168,7 @@ class GeocoderControlClass implements IControl {
 
     onAdd(map: MapLibreMap): HTMLElement {
         this._map = map
-        this._container = this._geocoder.onAdd(map as any)
+        this._container = this._geocoder.onAdd(map as unknown as maplibregl.Map)
         return this._container
     }
 

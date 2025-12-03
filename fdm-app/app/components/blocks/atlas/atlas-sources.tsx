@@ -5,8 +5,8 @@ import {
 import centroid from "@turf/centroid"
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
-import type { MapLayerMouseEvent } from "maplibre-gl"
 import throttle from "lodash.throttle"
+import type { MapLayerMouseEvent } from "maplibre-gl"
 import {
     type Dispatch,
     type JSX,
@@ -177,7 +177,7 @@ export function FieldsSourceAvailable({
 
     useEffect(() => {
         if (map && redirectToDetailsPage) {
-            const handleClick = (e: any) => {
+            const handleClick = (e: MapLayerMouseEvent) => {
                 // Get the coordinates of the centroid of the clicked field
                 if (e.features) {
                     try {

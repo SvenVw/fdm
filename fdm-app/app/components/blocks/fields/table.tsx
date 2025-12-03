@@ -125,7 +125,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
 
     const fuzzyFilter: FilterFn<TData> = (row, _columnId, filterValue) => {
         const result = fuzzysort.go(filterValue, [
-            (row.original as any).searchTarget,
+            (row.original as unknown as { searchTarget: string }).searchTarget,
         ])
         return result.length > 0
     }

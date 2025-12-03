@@ -136,7 +136,7 @@ export function MijnPercelenUploadForm({
         if (dbfFile) {
             try {
                 const dbfBuffer = await dbfFile.arrayBuffer()
-                const dbfData = parseDbf(dbfBuffer) as any[]
+                const dbfData = parseDbf(dbfBuffer) as Record<string, any>[]
                 const names = dbfData.map((row) => row?.NAAM).filter(Boolean) // Remove null/undefined values
                 setFieldNames(names)
             } catch (error) {
