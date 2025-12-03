@@ -27,8 +27,3 @@ export function HeaderAtlas({ b_id_farm }: { b_id_farm: string | undefined }) {
         </>
     )
 }
-
-type HeaderAtlasLayerOption = {
-    atlasLayerId: string
-    atlasLayerName: string
-}

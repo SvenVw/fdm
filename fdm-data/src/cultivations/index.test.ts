@@ -11,6 +11,7 @@ describe("getCultivationCatalogue", () => {
 
     it("should throw an error when an invalid catalogueName is provided", async () => {
         await expect(
+            // @ts-expect-error
             getCultivationCatalogue("invalid-catalogue"),
         ).rejects.toThrowError("catalogue invalid-catalogue is not recognized")
     })

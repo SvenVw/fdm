@@ -1,10 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { checkPermission, getFarm, updateFarm } from "@svenvw/fdm-core"
 import { useEffect } from "react"
-import { Form } from "react-hook-form"
+import type { Resolver } from "react-hook-form"
 import {
     type ActionFunctionArgs,
     data,
+    Form,
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
@@ -111,9 +112,11 @@ export default function FarmSettingsPropertiesBlock() {
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(FormSchema),
+        resolver: zodResolver(FormSchema) as Resolver<
+            z.infer<typeof FormSchema>
+        >,
         defaultValues: {
-            b_name_farm: loaderData.farm.b_name_farm,
+            b_name_farm: loaderData.farm.b_name_farm ?? "",
             b_businessid_farm: loaderData.farm.b_businessid_farm
                 ? loaderData.farm.b_businessid_farm
                 : "",
@@ -128,7 +131,7 @@ export default function FarmSettingsPropertiesBlock() {
 
     useEffect(() => {
         form.reset({
-            b_name_farm: loaderData.farm.b_name_farm,
+            b_name_farm: loaderData.farm.b_name_farm ?? "",
             b_businessid_farm: loaderData.farm.b_businessid_farm
                 ? loaderData.farm.b_businessid_farm
                 : "",
@@ -154,7 +157,7 @@ export default function FarmSettingsPropertiesBlock() {
                 <Form
                     id="formFarmProperties"
                     onSubmit={form.handleSubmit}
-                    method="POST"
+                    method="post"
                 >
                     <fieldset
                         disabled={

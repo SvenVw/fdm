@@ -11,9 +11,9 @@ import {
 } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { Plus } from "lucide-react"
+import maplibregl from "maplibre-gl"
 import { useEffect, useRef, useState } from "react"
 import { Layer, Map as MapGL, type MapRef } from "react-map-gl/maplibre"
-import maplibregl from "maplibre-gl"
 import {
     type ActionFunctionArgs,
     data,
@@ -140,7 +140,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             properties: {
                 b_id: field.b_id,
                 b_name: field.b_name,
-                b_area: Math.round(field.b_area * 10) / 10,
+                b_area: Math.round((field.b_area ?? 0) * 10) / 10,
                 b_lu_name: field.b_lu_name,
                 b_id_source: field.b_id_source,
             },
@@ -233,7 +233,7 @@ export default function Index() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name: loaderData.b_name ?? "",
-            b_area: Math.round(loaderData.b_area * 10) / 10,
+            b_area: Math.round((loaderData.b_area ?? 0) * 10) / 10,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
         },
     })
@@ -241,16 +241,22 @@ export default function Index() {
     useEffect(() => {
         form.reset({
             b_name: loaderData.b_name ?? "",
-            b_area: Math.round(loaderData.b_area * 10) / 10,
+            b_area: Math.round((loaderData.b_area ?? 0) * 10) / 10,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
         })
+    // oxlint-disable-next-line exhaustive-deps
     }, [loaderData, form.reset])
 
     //ref to refit the map when the selected field changes
     const mapRef = useRef<MapRef>(null)
 
     useEffect(() => {
-        mapRef.current?.fitBounds(viewState.bounds, viewState.fitBoundsOptions)
+        if ("bounds" in viewState) {
+            mapRef.current?.fitBounds(
+                viewState.bounds as [number, number, number, number],
+                viewState.fitBoundsOptions,
+            )
+        }
     }, [viewState])
 
     //ref to check if map is rendered

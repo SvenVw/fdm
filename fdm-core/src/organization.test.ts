@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm"
 import { beforeAll, describe, expect, inject, it } from "vitest"
-import { type BetterAuth, createFdmAuth } from "./authentication"
+import { createFdmAuth } from "./authentication"
 import * as authNSchema from "./db/schema-authn"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
@@ -29,7 +29,7 @@ describe("Organization Data Model", () => {
     let user1_id: string
     let user2_id: string
     let user3_id: string
-    let fdmAuth: BetterAuth
+    let fdmAuth: any
 
     beforeAll(async () => {
         const host = inject("host")
@@ -842,7 +842,7 @@ describe("Organization Data Model", () => {
                     .limit(1)
 
                 expect(organization[0].name).toBe(updatedName)
-                const metadata = JSON.parse(organization[0].metadata)
+                const metadata = JSON.parse(String(organization[0].metadata))
                 expect(metadata.description).toBe(updatedDescription)
                 expect(organization[0].logo).toBe(oldLogo)
             })
@@ -931,7 +931,7 @@ describe("Organization Data Model", () => {
                     .from(authNSchema.organization)
                     .where(eq(authNSchema.organization.id, organization_id))
                     .limit(1)
-                const metadata = JSON.parse(organization[0].metadata)
+                const metadata = JSON.parse(String(organization[0].metadata))
                 expect(metadata.isVerified).toBe(updatedIsVerified)
             })
 

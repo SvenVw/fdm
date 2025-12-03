@@ -1,7 +1,7 @@
 import type {
     FieldInput,
     NitrogenBalanceNumeric,
-    NitrogenEmissionNumeric,
+    NitrogenEmissionAmmoniaNumeric,
     NitrogenRemovalHarvestsNumeric,
     NitrogenRemovalNumeric,
     NitrogenRemovalResiduesNumeric,
@@ -317,7 +317,9 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                             {format(
                                                 harvestDetails.b_lu_harvest_date,
                                                 "PP",
-                                                { locale: nl },
+                                                {
+                                                    locale: nl,
+                                                },
                                             )}
                                             : {harvest.value} kg N / ha
                                         </li>
@@ -375,7 +377,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
     }
 
     const renderAmmoniaEmissions = (
-        ammonia: NitrogenEmissionNumeric["ammonia"],
+        ammonia: NitrogenEmissionAmmoniaNumeric,
         fieldInput: FieldInput,
     ) => {
         const sectionKey = "ammonia"
@@ -402,7 +404,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
     }
 
     const renderNitrateEmissions = (
-        nitrate: NitrogenEmissionNumeric["nitrate"],
+        nitrate: NitrogenBalanceNumeric["emission"]["nitrate"],
     ) => {
         const sectionKey = "nitraat"
 
@@ -417,7 +419,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
     }
 
     const renderFertilizersEmission = (
-        fertilizers: NitrogenEmissionNumeric["ammonia"]["fertilizers"],
+        fertilizers: NitrogenEmissionAmmoniaNumeric["fertilizers"],
         fieldInput: FieldInput,
     ) => {
         const sectionKey = "emission.ammonia.fertilizers"
@@ -467,7 +469,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
     }
 
     const renderResiduesEmission = (
-        residues: NitrogenEmissionNumeric["ammonia"]["residues"],
+        residues: NitrogenEmissionAmmoniaNumeric["residues"],
         fieldInput: FieldInput,
     ) => {
         const sectionKey = "emission.ammonia.residues"
@@ -570,7 +572,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
     }
 
     const renderEmission = (
-        emission: NitrogenEmissionNumeric,
+        emission: NitrogenBalanceNumeric["emission"],
         fieldInput: FieldInput,
     ) => {
         const sectionKey = "emission"

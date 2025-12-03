@@ -109,7 +109,7 @@ export function MijnPercelenUploadForm({
             }, 3000)
             return () => clearTimeout(timer)
         }
-    }, [uploadState, form.reset])
+    }, [uploadState, form.reset, form])
 
     const selectedFiles = form.watch("shapefile")
 
@@ -124,7 +124,7 @@ export function MijnPercelenUploadForm({
         return () => {
             form.reset()
         }
-    }, [form.reset])
+    }, [form.reset, form])
 
     const handleFilesSet = async (validFiles: File[]) => {
         form.setValue("shapefile", validFiles)
@@ -136,7 +136,7 @@ export function MijnPercelenUploadForm({
         if (dbfFile) {
             try {
                 const dbfBuffer = await dbfFile.arrayBuffer()
-                const dbfData = parseDbf(dbfBuffer) as any[]
+                const dbfData = parseDbf(dbfBuffer) as Record<string, any>[]
                 const names = dbfData.map((row) => row?.NAAM).filter(Boolean) // Remove null/undefined values
                 setFieldNames(names)
             } catch (error) {

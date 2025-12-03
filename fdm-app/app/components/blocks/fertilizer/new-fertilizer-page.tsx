@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { Fertilizer } from "@svenvw/fdm-core"
+import type { Resolver } from "react-hook-form"
 import { useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import {
@@ -28,7 +29,9 @@ export function FarmNewFertilizerBlock({
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(FormSchema),
+        resolver: zodResolver(FormSchema) as Resolver<
+            z.infer<typeof FormSchema>
+        >,
         defaultValues: {
             p_name_nl: "",
             p_type_rvo: fertilizer.p_type_rvo,

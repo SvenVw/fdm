@@ -6,15 +6,14 @@ import {
     splitFullName,
     updateUserProfile,
 } from "./authentication"
-import type { FdmAuth } from "./authentication.d"
 import * as authNSchema from "./db/schema-authn"
-import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import { createId } from "./id"
+import type { FdmType } from "./fdm"
 
-describe("createFdmAuth", () => {
+describe("Authentication", () => {
     let fdm: FdmType
-    let fdmAuth: FdmAuth
+    let fdmAuth: any
     let googleAuth: { clientSecret: string; clientId: string }
     let microsoftAuth: { clientSecret: string; clientId: string }
 

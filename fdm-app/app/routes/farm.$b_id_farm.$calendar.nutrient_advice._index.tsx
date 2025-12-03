@@ -1,5 +1,5 @@
 import { checkPermission, getFields } from "@svenvw/fdm-core"
-import { BookOpenText, Calendar, Icon, Square } from "lucide-react"
+import { BookOpenText } from "lucide-react"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,

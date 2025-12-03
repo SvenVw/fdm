@@ -5,7 +5,7 @@ export interface FeatureFdm {
     geometry: FeatureCollection
     properties: {
         b_id_source: string
-        [key: string]: any
+        [key: string]: unknown
     }
 }
 

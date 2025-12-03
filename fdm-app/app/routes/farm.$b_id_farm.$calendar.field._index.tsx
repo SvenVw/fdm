@@ -150,11 +150,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     timeframe,
                 )
                 const a_som_loi =
-                    currentSoilData.find((x) => x.parameter === "a_som_loi")
-                        ?.value ?? null
+                    currentSoilData.find(
+                        (x: { parameter: string }) => x.parameter === "a_som_loi",
+                    )?.value ?? null
                 const b_soiltype_agr =
                     currentSoilData.find(
-                        (x) => x.parameter === "b_soiltype_agr",
+                        (x: { parameter: string }) => x.parameter === "b_soiltype_agr",
                     )?.value ?? null
 
                 const has_write_permission = await checkPermission(
@@ -173,7 +174,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     fertilizers: fertilizersFiltered,
                     a_som_loi: a_som_loi,
                     b_soiltype_agr: b_soiltype_agr,
-                    b_area: Math.round(field.b_area * 10) / 10,
+                    b_area: Math.round((field.b_area ?? 0 )* 10) / 10,
                     b_isproductive: field.b_isproductive ?? true,
                     has_write_permission: has_write_permission,
                 }

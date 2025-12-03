@@ -330,7 +330,6 @@ function FarmBalanceNitrogenOverview({
                     </CardHeader>
                     <CardContent className="pl-2">
                         <NitrogenBalanceChart
-                            balance={resolvedNitrogenBalanceResult.balance}
                             supply={resolvedNitrogenBalanceResult.supply}
                             removal={resolvedNitrogenBalanceResult.removal}
                             emission={resolvedNitrogenBalanceResult.emission}

@@ -4,6 +4,7 @@ import type {
     FertilizerParameterDescriptionItem,
 } from "@svenvw/fdm-core"
 import { useEffect } from "react"
+import type { Resolver } from "react-hook-form"
 import { useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { FormSchema } from "~/components/blocks/fertilizer/formschema"
@@ -27,10 +28,11 @@ export function FarmNewCustomFertilizerBlock({
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(FormSchema),
+        resolver: zodResolver(FormSchema) as Resolver<
+            z.infer<typeof FormSchema>
+        >,
         defaultValues: {
             p_name_nl: fertilizer.p_name_nl,
-            p_type: fertilizer.p_type,
             p_dm: fertilizer.p_dm,
             p_density: fertilizer.p_density,
             p_om: fertilizer.p_om,
@@ -80,7 +82,6 @@ export function FarmNewCustomFertilizerBlock({
     useEffect(() => {
         form.reset({
             p_name_nl: fertilizer.p_name_nl,
-            p_type: fertilizer.p_type,
             p_dm: fertilizer.p_dm,
             p_density: fertilizer.p_density,
             p_om: fertilizer.p_om,

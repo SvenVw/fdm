@@ -4,7 +4,6 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
-    useLoaderData,
 } from "react-router"
 import { Button } from "~/components/ui/button"
 import { getSession } from "~/lib/auth.server"

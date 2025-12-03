@@ -7,11 +7,8 @@ import {
     enableFertilizerCatalogue,
     getFertilizersFromCatalogue,
 } from "@svenvw/fdm-core"
-import type {
-    ActionFunctionArgs,
-    LoaderFunctionArgs,
-    MetaFunction,
-} from "react-router"
+import type { Resolver } from "react-hook-form"
+import type { ActionFunctionArgs, MetaFunction } from "react-router"
 import { Form, useLoaderData } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
@@ -88,7 +85,7 @@ const FormSchema = z.object({
 })
 
 // Loader
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader() {
     return {
         b_name_farm: null,
         year: new Date().getFullYear(),
@@ -105,7 +102,9 @@ export default function AddFarmPage() {
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(FormSchema),
+        resolver: zodResolver(FormSchema) as Resolver<
+            z.infer<typeof FormSchema>
+        >,
         defaultValues: {
             b_name_farm: loaderData.b_name_farm ?? "",
             year: loaderData.year,

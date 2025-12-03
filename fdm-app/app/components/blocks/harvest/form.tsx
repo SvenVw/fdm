@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import type { HarvestParameters } from "@svenvw/fdm-core"
 import { CircleQuestionMark } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Controller } from "react-hook-form"
+import { Controller, type Resolver } from "react-hook-form"
 import { Form, useFetcher, useNavigate } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
@@ -74,13 +74,13 @@ function useHarvestRemixForm({
 }: HarvestFormDialogProps) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
-        resolver: async (values, bypass, options) => {
+        resolver: (async (values: any, bypass: any, options: any) => {
             // Do the validation using Zod
-            const validation = await zodResolver(FormSchema)(
-                values,
-                bypass,
-                options,
-            )
+            const validation = await (
+                zodResolver(FormSchema) as unknown as Resolver<
+                    z.infer<typeof FormSchema>
+                >
+            )(values, bypass, options)
             // If there are validation errors anyways, just return them
             if (
                 validation.errors &&
@@ -98,7 +98,7 @@ function useHarvestRemixForm({
                 return { values: {}, errors: true }
             }
             return validation
-        },
+        }) as any,
         defaultValues: {
             b_lu_harvest_date: b_lu_harvest_date
                 ? new Date(b_lu_harvest_date)
@@ -146,7 +146,7 @@ function HarvestFields({
     className,
 }: HarvestFormDialogProps & {
     form: ReturnType<typeof useHarvestRemixForm>
-    className: React.ComponentProps<typeof FieldGroup>["className"]
+    className?: React.ComponentProps<typeof FieldGroup>["className"]
 }) {
     return (
         <FieldGroup className={cn("gap-5", className)}>

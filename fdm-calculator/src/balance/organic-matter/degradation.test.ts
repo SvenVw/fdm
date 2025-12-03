@@ -5,7 +5,7 @@ import type {
     CultivationDetail,
     FieldInput,
     SoilAnalysisPicked,
-} from "./types.d"
+} from "./types"
 
 describe("calculateOrganicMatterDegradation", () => {
     const mockTimeFrame = {
@@ -18,7 +18,7 @@ describe("calculateOrganicMatterDegradation", () => {
             "grass",
             {
                 b_lu_catalogue: "grass",
-                b_lu_croprotation: "grassland",
+                b_lu_croprotation: "grass",
                 b_lu_eom: 1000,
                 b_lu_eom_residues: 200,
             },
@@ -37,7 +37,8 @@ describe("calculateOrganicMatterDegradation", () => {
     it("should calculate degradation correctly for grassland", () => {
         const soilAnalysis: SoilAnalysisPicked = {
             a_som_loi: 4, // %
-            a_density_sa: 1.2, // g/cm³
+            a_density_sa: 1.2,
+            b_soiltype_agr: null
         }
         const cultivations: FieldInput["cultivations"] = [
             {
@@ -61,6 +62,7 @@ describe("calculateOrganicMatterDegradation", () => {
         const soilAnalysis: SoilAnalysisPicked = {
             a_som_loi: 2.5,
             a_density_sa: 1.5,
+            b_soiltype_agr: null
         }
         const cultivations: FieldInput["cultivations"] = [
             {
@@ -84,6 +86,7 @@ describe("calculateOrganicMatterDegradation", () => {
         const soilAnalysis: SoilAnalysisPicked = {
             a_som_loi: 100, // unrealistically high
             a_density_sa: 1.5,
+            b_soiltype_agr: null
         }
         const cultivations: FieldInput["cultivations"] = [
             {
@@ -105,6 +108,7 @@ describe("calculateOrganicMatterDegradation", () => {
         const soilAnalysis: SoilAnalysisPicked = {
             a_som_loi: 45,
             a_density_sa: 1.0,
+            b_soiltype_agr: null
         }
         const cultivations: FieldInput["cultivations"] = [
             {
@@ -130,6 +134,7 @@ describe("calculateOrganicMatterDegradation", () => {
         const soilAnalysis: SoilAnalysisPicked = {
             a_som_loi: 3,
             a_density_sa: 1.4,
+            b_soiltype_agr: null
         }
         const cultivations: FieldInput["cultivations"] = [
             {

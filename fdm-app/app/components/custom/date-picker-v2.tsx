@@ -61,7 +61,7 @@ export function DatePicker({
             setSelectedDate(undefined)
             setMonth(undefined)
         }
-    }, [field.value])
+    }, [field.value, field])
 
     useEffect(() => {
         if (field.disabled && open) {

@@ -35,12 +35,14 @@ describe("createFunctionsForNorms", () => {
     })
 
     it("should throw an error for an unsupported year", () => {
+        // @ts-expect-error
         expect(() => createFunctionsForNorms("NL", " 2024")).toThrow(
             "Year not supported",
         )
     })
 
     it("should throw an error for an unsupported region", () => {
+        // @ts-expect-error
         expect(() => createFunctionsForNorms("BE", "2025")).toThrow(
             "Region not supported",
         )
@@ -72,12 +74,14 @@ describe("createFunctionsForFertilizerApplicationFilling", () => {
 
     it("should throw an error for an unsupported year", () => {
         expect(() =>
+            // @ts-expect-error
             createFunctionsForFertilizerApplicationFilling("NL", "2024"),
         ).toThrow("Year not supported")
     })
 
     it("should throw an error for an unsupported region", () => {
         expect(() =>
+            // @ts-expect-error
             createFunctionsForFertilizerApplicationFilling("BE", "2025"),
         ).toThrow("Region not supported")
     })

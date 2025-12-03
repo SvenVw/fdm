@@ -80,7 +80,9 @@ export async function renderMagicLinkEmail(
     const emailTimestamp: string = format(
         timeZone ? TZDate.tz(timeZone) : new Date(),
         "Pp",
-        { locale: nl },
+        {
+            locale: nl,
+        },
     )
 
     const emailHtml = await render(

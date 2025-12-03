@@ -16,7 +16,6 @@ import {
 import { cn } from "~/lib/utils"
 
 function SoilDataCard({
-    title,
     shortname,
     value,
     label,
@@ -190,6 +189,7 @@ export function SoilDataCards({
                             />
                         )
                     }
+                    return null
                 },
             )}
         </div>
@@ -222,7 +222,7 @@ function constructSoilDataCards(
                 return null
             }
 
-            let label
+            let label: string | undefined
             if (description.type === "enum") {
                 label = description.options?.find(
                     (option: { value: string }) => option.value === item.value,

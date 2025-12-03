@@ -163,8 +163,10 @@ export function DataTable<TData extends RotationExtended, TValue>({
         }
         return (
             searchTerms === "" ||
-            fuzzysort.go(searchTerms, [(row.original as any).searchTarget])
-                .length > 0
+            fuzzysort.go(searchTerms, [
+                (row.original as unknown as { searchTarget: string })
+                    .searchTarget,
+            ]).length > 0
         )
     }
 
@@ -203,7 +205,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
         return table
             .getFilteredSelectedRowModel()
             .rows.map((row) => row.original)
-    }, [table, rowSelection])
+    }, [table])
 
     const selectedCultivationIds = selectedCultivations.map(
         (field) => field.b_lu_catalogue,

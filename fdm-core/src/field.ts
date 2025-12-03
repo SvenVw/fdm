@@ -78,16 +78,17 @@ export async function addField(
             await tx.insert(schema.fields).values(fieldData)
 
             // Validate b_acquiring_method is of the possible options, otherwise log an warning and insert 'unknown'
+            let validated_b_acquiring_method = b_acquiring_method
             if (
-                b_acquiring_method &&
+                validated_b_acquiring_method &&
                 !schema.acquiringMethodOptions
                     .map((option) => option.value)
-                    .includes(b_acquiring_method)
+                    .includes(validated_b_acquiring_method)
             ) {
                 console.warn(
-                    `Invalid b_acquiring_method: ${b_acquiring_method}. Inserting as 'unknown'.`,
+                    `Invalid b_acquiring_method: ${validated_b_acquiring_method}. Inserting as 'unknown'.`,
                 )
-                b_acquiring_method = "unknown"
+                validated_b_acquiring_method = "unknown"
             }
 
             // Insert relation between farm and field
@@ -95,7 +96,7 @@ export async function addField(
                 b_id,
                 b_id_farm,
                 b_start,
-                b_acquiring_method,
+                b_acquiring_method: validated_b_acquiring_method,
             }
             await tx.insert(schema.fieldAcquiring).values(fieldAcquiringData)
 

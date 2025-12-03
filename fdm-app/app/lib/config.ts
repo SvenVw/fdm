@@ -49,7 +49,7 @@ const initializeRuntimeEnvMap = (): RuntimeConfig => {
             process.env &&
             process.env[stringKey] !== undefined
         ) {
-            env[key] = process.env[stringKey]
+            env[key] = process.env[stringKey] as any
         } else if (import.meta.env[stringKey] !== undefined) {
             env[key] = import.meta.env[stringKey] as any
         }

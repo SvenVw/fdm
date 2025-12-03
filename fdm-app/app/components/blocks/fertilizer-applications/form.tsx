@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { FertilizerApplication } from "@svenvw/fdm-core"
 import { Plus } from "lucide-react"
 import type { MouseEvent } from "react"
 import { useEffect, useId } from "react"
+import type { Resolver } from "react-hook-form"
 import type { Navigation } from "react-router"
 import { Form, useNavigate, useSearchParams } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
@@ -57,7 +57,14 @@ export function FertilizerApplicationForm({
     navigation: Navigation
     b_id_farm: string
     b_id_or_b_lu_catalogue: string
-    fertilizerApplication: FertilizerApplication
+    fertilizerApplication?: {
+        p_app_id?: string
+        p_app_ids?: string[]
+        p_id: string
+        p_app_method: string
+        p_app_amount: number
+        p_app_date: Date
+    }
 }) {
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
@@ -66,7 +73,7 @@ export function FertilizerApplicationForm({
         mode: "onTouched",
         resolver: zodResolver(
             fertilizerApplication ? FormSchemaModify : FormSchema,
-        ),
+        ) as Resolver<FieldFertilizerFormValues>,
         defaultValues: {
             p_app_id: fertilizerApplication?.p_app_ids
                 ? fertilizerApplication.p_app_ids.join(",")
@@ -91,7 +98,9 @@ export function FertilizerApplicationForm({
         ) {
             form.setValue("p_app_method", "")
         }
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- form is stable from useRemixForm
     }, [p_id, fertilizerApplication, form.setValue])
+
 
     const fieldFertilizerFormStore = useFieldFertilizerFormStore()
 
@@ -106,12 +115,16 @@ export function FertilizerApplicationForm({
                     if (typeof v === "undefined" || v === null) continue
                     const hydrated =
                         k === "p_app_date" && v
-                            ? new Date(v as any)
-                            : (v as any)
-                    form.setValue(k as any, hydrated)
+                            ? new Date(v as string)
+                            : (v as FieldFertilizerFormValues[keyof FieldFertilizerFormValues])
+                    form.setValue(
+                        k as keyof FieldFertilizerFormValues,
+                        hydrated,
+                    )
                 }
             }
         }
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- form and fieldFertilizerFormStore are stable references
     }, [
         b_id_farm,
         b_id_or_b_lu_catalogue,
@@ -123,6 +136,7 @@ export function FertilizerApplicationForm({
         if (fertilizerApplication) {
             form.setValue("p_app_amount", fertilizerApplication.p_app_amount)
         }
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- form is stable from useRemixForm
     }, [fertilizerApplication, form.setValue])
 
     // Change fertilizer selection if the user has added a new fertilizer
@@ -131,12 +145,14 @@ export function FertilizerApplicationForm({
         if (new_p_id) {
             form.setValue("p_id", new_p_id)
         }
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- form is stable from useRemixForm
     }, [new_p_id, form.setValue])
 
     useEffect(() => {
         if (form.formState.isSubmitSuccessful) {
             fieldFertilizerFormStore.delete(b_id_farm, b_id_or_b_lu_catalogue)
         }
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- fieldFertilizerFormStore is stable from Zustand
     }, [
         form.formState.isSubmitSuccessful,
         b_id_farm,
@@ -158,7 +174,7 @@ export function FertilizerApplicationForm({
     }
 
     return (
-        <RemixFormProvider {...(form as any)}>
+        <RemixFormProvider {...form}>
             <Form
                 id={formId}
                 action={action}
@@ -246,12 +262,12 @@ export function FertilizerApplicationForm({
                                                 {...field}
                                                 value={
                                                     field.value === undefined ||
-                                                    field.value === null ||
-                                                    Number.isNaN(
-                                                        Number.parseFloat(
-                                                            String(field.value),
-                                                        ),
-                                                    )
+                                                        field.value === null ||
+                                                        Number.isNaN(
+                                                            Number.parseFloat(
+                                                                String(field.value),
+                                                            ),
+                                                        )
                                                         ? ""
                                                         : field.value
                                                 }

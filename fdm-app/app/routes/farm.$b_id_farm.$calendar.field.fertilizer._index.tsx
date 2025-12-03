@@ -141,20 +141,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fertilizerParameterDescription =
             getFertilizerParametersDescription()
         const applicationMethods = fertilizerParameterDescription.find(
-            (x) => x.parameter === "p_app_method_options",
+            (x: { parameter: string }) => x.parameter === "p_app_method_options",
         )
         if (!applicationMethods) throw new Error("Parameter metadata missing")
         // Map fertilizers to options for the combobox
         const fertilizerOptions = fertilizers.map((fertilizer) => {
             const applicationMethodOptions = fertilizer.p_app_method_options
-                .map((opt) => {
+                .map((opt: { value: string }) => {
                     const meta = applicationMethods.options.find(
-                        (x) => x.value === opt,
+                        (x: { value: { value: string } }) => x.value === opt,
                     )
                     return meta ? { value: opt, label: meta.label } : undefined
                 })
                 .filter(
-                    (option): option is { value: string; label: string } =>
+                    (option: undefined | { value: string; label: string }): option is { value: string; label: string } =>
                         option !== undefined,
                 )
             return {

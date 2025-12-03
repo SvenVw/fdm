@@ -155,9 +155,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         if (missingParameters.length > 0) {
             return dataWithWarning(
                 {
-                    warning: `Missing required harvest parameters: ${missingParameters.join(
-                        ", ",
-                    )}`,
+                    warning: `Missing required harvest parameters: ${missingParameters.join(", ")}`,
                 },
                 `Voor de volgende parameters ontbreekt een waarde: ${missingParameterLabels.join(
                     ", ",

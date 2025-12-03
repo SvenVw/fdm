@@ -13,6 +13,7 @@ import type {
     GeoJsonProperties,
     Polygon,
 } from "geojson"
+import maplibregl from "maplibre-gl"
 import { useCallback, useState } from "react"
 import {
     Layer,
@@ -20,7 +21,6 @@ import {
     type ViewState,
     type ViewStateChangeEvent,
 } from "react-map-gl/maplibre"
-import maplibregl from "maplibre-gl"
 import {
     type ActionFunctionArgs,
     data,

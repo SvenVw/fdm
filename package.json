@@ -20,13 +20,17 @@
         "watch": "turbo run watch",
         "changeset": "changeset",
         "prerelease": "turbo build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data --filter=@svenvw/fdm-calculator && changeset publish ",
-        "format-and-lint": "biome check .",
-        "format-and-lint:fix": "biome check . --write",
-        "format-and-lint:fix-unsafe": "biome check . --write --unsafe"
+        "lint": "oxlint -c .oxlintrc.json .",
+        "lint:fix": "oxlint -c .oxlintrc.json . --fix",
+        "format": "oxfmt .",
+        "format:check": "oxfmt --check .",
+        "check": "pnpm lint && pnpm format:check",
+        "fix": "pnpm lint:fix && pnpm format"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.3.7",
         "@changesets/cli": "^2.29.7",
+        "oxfmt": "^0.16.0",
+        "oxlint": "^1.31.0",
         "turbo": "^2.6.1"
     },
     "packageManager": "pnpm@10.23.0",

@@ -1,6 +1,6 @@
 import Decimal from "decimal.js"
 import { describe, expect, it } from "vitest"
-import type { CultivationDetail, FieldInput } from "../types.d"
+import type { CultivationDetail, FieldInput } from "../types"
 import { calculateOrganicMatterSupplyByCultivations } from "./cultivation"
 
 describe("calculateOrganicMatterSupplyByCultivations", () => {
@@ -18,7 +18,7 @@ describe("calculateOrganicMatterSupplyByCultivations", () => {
             "grass",
             {
                 b_lu_catalogue: "grass",
-                b_lu_croprotation: "grassland",
+                b_lu_croprotation: "grass",
                 b_lu_eom: 1000,
                 b_lu_eom_residues: 200,
             },

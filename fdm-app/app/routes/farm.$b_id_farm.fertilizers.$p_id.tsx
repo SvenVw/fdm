@@ -8,6 +8,7 @@ import {
     getFertilizers,
     updateFertilizerFromCatalogue,
 } from "@svenvw/fdm-core"
+import type { Resolver } from "react-hook-form"
 import {
     type ActionFunctionArgs,
     data,
@@ -154,7 +155,9 @@ export default function FarmFertilizerBlock() {
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(FormSchema),
+        resolver: zodResolver(FormSchema) as Resolver<
+            z.infer<typeof FormSchema>
+        >,
         defaultValues: {
             p_name_nl: fertilizer.p_name_nl,
             p_type_rvo: fertilizer.p_type_rvo,

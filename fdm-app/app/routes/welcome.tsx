@@ -296,6 +296,11 @@ export async function action({ request }: ActionFunctionArgs) {
             headers: request.headers,
         })
 
+        if (!session) {
+            // This should ideally not happen as the loader protects this route
+            return handleActionError(new Error("No session found"))
+        }
+
         // Update the user profile
         await updateUserProfile(fdm, session.user.id, firstname, surname)
 

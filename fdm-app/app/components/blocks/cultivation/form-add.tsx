@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useRef, useState } from "react"
+import type { Resolver } from "react-hook-form"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
@@ -45,7 +46,9 @@ function CultivationAddForm({
 }: CultivationsFormProps & { editable?: boolean; onSuccess?: () => void }) {
     const form = useRemixForm<z.infer<typeof CultivationAddFormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(CultivationAddFormSchema),
+        resolver: zodResolver(CultivationAddFormSchema) as Resolver<
+            z.infer<typeof CultivationAddFormSchema>
+        >,
         defaultValues: {
             b_lu_catalogue: "",
             b_lu_start: new Date(), // Initialize with a Date object
@@ -76,7 +79,7 @@ function CultivationAddForm({
                         <div className="col-span-1">
                             <Combobox
                                 options={options}
-                                form={form as any}
+                                form={form}
                                 name="b_lu_catalogue"
                                 label={
                                     <span>
@@ -89,13 +92,13 @@ function CultivationAddForm({
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <DatePicker
-                                form={form as any}
+                                form={form}
                                 name={"b_lu_start"}
                                 label={"Zaaidatum"}
                                 description={""}
                             />
                             <DatePicker
-                                form={form as any}
+                                form={form}
                                 name={"b_lu_end"}
                                 label={"Einddatum"}
                                 description={

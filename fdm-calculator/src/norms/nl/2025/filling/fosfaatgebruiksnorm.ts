@@ -132,7 +132,7 @@ export function calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNor
         p_app_id: string
         normFilling: number
         normFillingDetails?: string
-    }[] = new Array(applications.length)
+    }[] = Array.from({ length: applications.length })
 
     // Process standard applications first
     for (const { application, p_p_rt, p_app_amount } of standardApplications) {

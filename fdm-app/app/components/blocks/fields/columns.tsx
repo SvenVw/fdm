@@ -178,9 +178,7 @@ export const columns: ColumnDef<FieldExtended>[] = [
         cell: ({ row }) => {
             const field = row.original
             return (
-                <p className="text-muted-foreground">
-                    {`${field.a_som_loi.toFixed(2)} %`}
-                </p>
+                <p className="text-muted-foreground">{`${field.a_som_loi.toFixed(2)} %`}</p>
             )
         },
     },

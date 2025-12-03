@@ -65,7 +65,8 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
                     {harvestsByOrder.map((harvestDates, idx) => {
                         // harvestDates are already sorted from the previous loop
                         if (harvestDates.length === 1) {
-                            return (
+                            return (          
+                                // oxlint-disable-next-line react/no-array-index-key               
                                 <p key={idx} className="text-muted-foreground">
                                     {`${idx + 1}e ${cultivation.b_lu_croprotation === "grass" ? "snede" : "oogst"}: ${format(
                                         harvestDates[0],
@@ -77,7 +78,8 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
                         }
                         const firstDate = harvestDates[0]
                         const lastDate = harvestDates[harvestDates.length - 1]
-                        return (
+                        return (                
+                            // oxlint-disable-next-line react/no-array-index-key
                             <p key={idx} className="text-muted-foreground">
                                 {`${idx + 1}e ${cultivation.b_lu_croprotation === "grass" ? "snede" : "oogst"}: ${format(firstDate, "PP", { locale: nl })} - ${format(lastDate, "PP", { locale: nl })}`}
                             </p>

@@ -145,7 +145,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fieldWritePermission: fieldWritePermission,
         }
     } catch (error) {
-        return handleLoaderError(error)
+        throw handleLoaderError(error)
     }
 }
 

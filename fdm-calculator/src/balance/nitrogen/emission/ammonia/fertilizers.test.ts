@@ -35,7 +35,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         p_no3_rt: 50,
         p_nh4_rt: 50,
         p_s_rt: 10,
-        p_ef_nh3: undefined,
+        p_ef_nh3: null,
         // p_inhibitor: false,
     })
     mockFertilizerDetailsMap.set("mineral-fertilizer-2", {
@@ -55,7 +55,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         p_no3_rt: 0,
         p_nh4_rt: 20,
         p_s_rt: 0,
-        p_ef_nh3: undefined,
+        p_ef_nh3: null,
         // p_inhibitor: false,
     })
     mockFertilizerDetailsMap.set("compost-fertilizer", {
@@ -65,17 +65,17 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         p_no3_rt: 0,
         p_nh4_rt: 15,
         p_s_rt: 0,
-        p_ef_nh3: undefined,
+        p_ef_nh3: null,
         // p_inhibitor: false,
     })
     mockFertilizerDetailsMap.set("other-fertilizer", {
         p_id_catalogue: "other-fertilizer",
-        p_type: "other",
+        p_type: null,
         p_n_rt: 10,
         p_no3_rt: 0,
         p_nh4_rt: 10,
         p_s_rt: 0,
-        p_ef_nh3: undefined,
+        p_ef_nh3: null,
         // p_inhibitor: false,
     })
 
@@ -85,14 +85,14 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             b_lu_catalogue: "nl_265", // Referencing "grassland-cultivation"
             b_lu_start: new Date("2024-01-01"),
             b_lu_end: new Date("2024-02-29"), // Ends before cropland starts
-            m_cropresidue: undefined,
+            m_cropresidue: true,
         },
         {
             b_lu: "cult-2",
             b_lu_catalogue: "nl_2014", // Referencing "cropland-cultivation"
             b_lu_start: new Date("2024-03-01"),
             b_lu_end: new Date("2024-10-31"),
-            m_cropresidue: undefined,
+            m_cropresidue: false,
         },
     ]
 
@@ -329,7 +329,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
     //         p_no3_rt: 20,
     //         p_nh4_rt: 30,
     //         p_s_rt: 5,
-    //         p_ef_nh3: undefined,
+    //         p_ef_nh3: null,
     //         // p_inhibitor: true,
     //     })
 
@@ -368,7 +368,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             p_no3_rt: 20,
             p_nh4_rt: 30,
             p_s_rt: 5,
-            p_ef_nh3: undefined,
+            p_ef_nh3: null,
             // p_inhibitor: false,
         })
 
@@ -681,6 +681,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
                 p_app_date: new Date("2024-02-01"), // kg / harassland only
+                // @ts-expect-error
                 p_app_method: "unsupported-method",
                 p_name_nl: "Manure Unsupported",
                 p_id: "man-unsupported",
@@ -705,6 +706,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
                 p_app_date: new Date("2024-05-01"), // Cropland active
+                // @ts-expect-error
                 p_app_method: "unsupported-method",
                 p_name_nl: "Manure Unsupported",
                 p_id: "man-unsupported-crop",
@@ -729,6 +731,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
                 p_app_date: new Date("2025-01-01"), // Bare soil
+                // @ts-expect-error
                 p_app_method: "unsupported-method",
                 p_name_nl: "Manure Unsupported",
                 p_id: "man-unsupported-bare",

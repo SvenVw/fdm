@@ -1,7 +1,7 @@
 import type { FeatureCollection } from "geojson"
 import throttle from "lodash.throttle"
 import { Check, Info } from "lucide-react"
-import type { MapLibreZoomEvent } from "maplibre-gl"
+import type { MapLibreZoomEvent, PointLike } from "maplibre-gl"
 import { useCallback, useEffect, useState } from "react"
 import type { MapLayerMouseEvent as MapMouseEvent } from "react-map-gl/maplibre"
 import { useMap } from "react-map-gl/maplibre"
@@ -39,13 +39,23 @@ export function FieldsPanelHover({
                 // Set message about zoom level
                 const zoom = map.getZoom()
                 if (zoom && zoom > zoomLevelFields) {
-                    const features = map.queryRenderedFeatures(evt.point, {
+                    let point: PointLike | undefined
+                    if ("point" in evt) {
+                        point = evt.point
+                    }
+
+                    if (!point) {
+                        setPanel(null)
+                        return
+                    }
+
+                    const features = map.queryRenderedFeatures(point, {
                         layers: [layer],
                     })
 
                     if (layerExclude) {
                         const featuresExclude = map.queryRenderedFeatures(
-                            evt.point,
+                            point,
                             {
                                 layers: Array.isArray(layerExclude)
                                     ? layerExclude
@@ -63,17 +73,18 @@ export function FieldsPanelHover({
                         features.length > 0 &&
                         features[0].properties
                     ) {
+                        const properties = features[0].properties
                         setPanel(
                             <Card className={cn("w-full")}>
                                 <CardHeader>
                                     <CardTitle>
                                         {layer === "fieldsSaved"
-                                            ? features[0].properties.b_name
-                                            : features[0].properties.b_lu_name}
+                                            ? properties.b_name
+                                            : properties.b_lu_name}
                                     </CardTitle>
                                     <CardDescription>
                                         {layer === "fieldsSaved"
-                                            ? `${features[0].properties.b_area} ha`
+                                            ? `${properties.b_area} ha`
                                             : clickRedirectsToDetailsPage
                                               ? "Klik voor meer details over dit perceel"
                                               : layer === "fieldsAvailable"
@@ -222,18 +233,18 @@ export function FieldsPanelSelection({
                             feature,
                         ) => {
                             if (!feature.properties) return acc
+                            const properties = feature.properties
                             const existingCultivation = acc.find(
-                                (c) =>
-                                    c.b_lu_name ===
-                                    feature.properties.b_lu_name,
+                                (c) => c.b_lu_name === properties.b_lu_name,
                             )
                             if (existingCultivation) {
                                 existingCultivation.count++
                             } else {
                                 acc.push({
-                                    b_lu_name: feature.properties.b_lu_name,
+                                    b_lu_name:
+                                        properties.b_lu_name || "Onbekend",
                                     b_lu_croprotation:
-                                        feature.properties.b_lu_croprotation,
+                                        properties.b_lu_croprotation,
                                     count: 1,
                                 })
                             }

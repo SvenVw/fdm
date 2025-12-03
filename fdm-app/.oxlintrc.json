@@ -1,0 +1,8 @@
+{
+  "extends": "../../.oxlintrc.json",
+  "ignorePatterns": [
+    "build/**",
+    "dist/**",
+    "node_modules/**"
+  ]
+}

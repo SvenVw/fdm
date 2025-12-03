@@ -1,11 +1,14 @@
+import type { SoilParameterDescription } from "@svenvw/fdm-core"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
+import type { FetcherWithComponents } from "react-router"
 import { NavLink } from "react-router"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import { cn } from "~/lib/utils"
 import type { SoilAnalysis } from "./types"
-import type { SoilParameterDescription } from "@svenvw/fdm-core"
+
+type SoilActionData = { message: string }
 
 export function SoilAnalysesList({
     soilAnalyses,
@@ -15,10 +18,7 @@ export function SoilAnalysesList({
 }: {
     soilAnalyses: SoilAnalysis[]
     soilParameterDescription: SoilParameterDescription
-    fetcher: {
-        state: string
-        submit: (data: { a_id: string }, options: { method: string }) => void
-    }
+    fetcher: FetcherWithComponents<SoilActionData>
     canModifySoilAnalysis?: Record<string, boolean>
 }) {
     const handleDelete = (a_id: string) => {
@@ -39,6 +39,9 @@ export function SoilAnalysesList({
                     )
                     const sourceLabel =
                         sourceOption?.label || analysis.a_source || "Onbekend"
+                    const isDisabled =
+                        fetcher.state === "submitting" ||
+                        analysis.a_source === "nl-other-nmi"
                     return (
                         <div
                             className="grid grid-cols-3 gap-x-3 items-center"
@@ -69,34 +72,27 @@ export function SoilAnalysesList({
 
                             <div className="justify-self-end">
                                 <div className="space-x-4">
-                                    <NavLink
-                                        to={`./analysis/${analysis.a_id}`}
+                                    <Button
+                                        variant="default"
+                                        disabled={isDisabled}
                                         asChild
-                                        className={cn(
-                                            "pointer-events-auto",
-                                            analysis.a_source === "nl-other-nmi"
-                                                ? "pointer-events-none"
-                                                : "",
-                                        )}
                                     >
-                                        <Button
-                                            variant="default"
-                                            disabled={
-                                                fetcher.state ===
-                                                    "submitting" ||
-                                                analysis.a_source ===
-                                                    "nl-other-nmi"
-                                            }
+                                        <NavLink
+                                            to={`./analysis/${analysis.a_id}`}
+                                            className={cn(
+                                                "pointer-events-auto",
+                                                isDisabled
+                                                    ? "pointer-events-none"
+                                                    : "",
+                                            )}
+                                            aria-disabled={isDisabled}
                                         >
                                             Bewerk
-                                        </Button>
-                                    </NavLink>
+                                        </NavLink>
+                                    </Button>
                                     <Button
                                         variant="destructive"
-                                        disabled={
-                                            fetcher.state === "submitting" ||
-                                            analysis.a_source === "nl-other-nmi"
-                                        }
+                                        disabled={isDisabled}
                                         onClick={() => {
                                             handleDelete(analysis.a_id)
                                         }}

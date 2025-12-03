@@ -134,9 +134,7 @@ export function FieldNorms({ fieldNorms, fieldOptions }: FieldNormsProps) {
                                 <CardTitle className="text-lg">
                                     {getFieldName(field.b_id)}
                                 </CardTitle>
-                                <CardDescription>{`${field.b_area.toFixed(
-                                    2,
-                                )} ha`}</CardDescription>
+                                <CardDescription>{`${field.b_area.toFixed(2)} ha`}</CardDescription>
                             </CardHeader>
                             <CardContent className="flex-grow space-y-4">
                                 {field.errorMessage ? (

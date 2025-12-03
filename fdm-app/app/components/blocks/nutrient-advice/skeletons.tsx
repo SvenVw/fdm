@@ -29,6 +29,7 @@ export function NutrientCardSkeleton() {
                 <div className="space-y-2 mt-3">
                     <Separator />
                     <div className="space-y-3">
+                        {/* biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton list */}
                         {[...Array(2)].map((_, i) => (
                             <div
                                 key={`skeleton-detail-${i}`}
@@ -62,7 +63,7 @@ export function NutrientAdviceFallback() {
 }
 
 export function NutrientCardSkeletonRepeat({ count }: { count: number }) {
-    return [...new Array(count)].map((_, i) => (
+    return [Array.from({ length: count })].map((_, i) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: all items are the same
         <NutrientCardSkeleton key={i} />
     ))

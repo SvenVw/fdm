@@ -5,7 +5,7 @@ import type {
     FertilizerDetail,
     FieldInput,
     OrganicMatterBalanceInput,
-} from "../types.d"
+} from "../types"
 import * as cultivations from "./cultivation"
 import * as fertilizers from "./fertilizers"
 import { calculateOrganicMatterSupply } from "./index"

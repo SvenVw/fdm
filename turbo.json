@@ -17,11 +17,16 @@
         "check-types": {
             "dependsOn": ["^check-types"]
         },
-        "//#format-and-lint": {},
-        "//#format-and-lint:fix": {
+        "//#check": {},
+        "//#lint": {},
+        "//#format:check": {},
+        "//#fix": {
             "cache": false
         },
-        "//#format-and-lint:fix-unsafe": {
+        "//#lint:fix": {
+            "cache": false
+        },
+        "//#format": {
             "cache": false
         },
         "test-coverage": {

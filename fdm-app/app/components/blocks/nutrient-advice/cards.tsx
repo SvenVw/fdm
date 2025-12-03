@@ -35,7 +35,7 @@ export type NutrientCardProps = {
     description: NutrientDescription
     advice: number
     doses: {
-        dose: Record<string, number>
+        dose: Dose
         applications: Dose[]
     }
     fertilizerApplications: FertilizerApplication[]
