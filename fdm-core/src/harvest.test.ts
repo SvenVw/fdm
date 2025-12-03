@@ -104,6 +104,8 @@ describe("Harvest Data Model", () => {
             b_lu_variety_options: null,
             b_lu_start_default: "03-15",
             b_date_harvest_default: "09-15",
+            b_lu_eom: 100,
+            b_lu_eom_residues: 50,
         })
 
         await addCultivationToCatalogue(fdm, {
@@ -126,6 +128,8 @@ describe("Harvest Data Model", () => {
             b_lu_variety_options: ["Agria"],
             b_lu_start_default: "03-15",
             b_date_harvest_default: "09-15",
+            b_lu_eom: 100,
+            b_lu_eom_residues: 50,
         })
 
         b_lu_start = new Date("2024-01-01")
@@ -477,6 +481,7 @@ describe("getParametersForHarvestCat", () => {
     })
 
     it("should return an empty array for an unrecognized harvest category", () => {
+        // @ts-expect-error
         const params = getParametersForHarvestCat("UNKNOWN_CAT")
         expect(params).toEqual([])
     })
@@ -514,6 +519,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
             b_date_harvest_default: "12-31",
+            b_lu_eom: 100,
+            b_lu_eom_residues: 50,
             created: new Date(),
             updated: new Date(),
             hash: "test-hash-HC010",
@@ -538,6 +545,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
             b_date_harvest_default: "12-31",
+            b_lu_eom: 100,
+            b_lu_eom_residues: 50,
             created: new Date(),
             updated: new Date(),
             hash: "test-hash-HC020",
@@ -562,6 +571,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
             b_date_harvest_default: "12-31",
+            b_lu_eom: 100,
+            b_lu_eom_residues: 50,
             created: new Date(),
             updated: new Date(),
             hash: "test-hash-HC031",
@@ -586,6 +597,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
             b_date_harvest_default: "12-31",
+            b_lu_eom: 100,
+            b_lu_eom_residues: 50,
             created: new Date(),
             updated: new Date(),
             hash: "test-hash-HC040",
@@ -610,6 +623,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
             b_date_harvest_default: "12-31",
+            b_lu_eom: 100,
+            b_lu_eom_residues: 50,
             created: new Date(),
             updated: new Date(),
             hash: "test-hash-HC041",
@@ -634,6 +649,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
             b_date_harvest_default: "12-31",
+            b_lu_eom: 100,
+            b_lu_eom_residues: 50,
             created: new Date(),
             updated: new Date(),
             hash: "test-hash-HC042",
@@ -658,6 +675,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
             b_date_harvest_default: "12-31",
+            b_lu_eom: 100,
+            b_lu_eom_residues: 50,
             created: new Date(),
             updated: new Date(),
             hash: "test-hash-HC050",
@@ -682,6 +701,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
             b_date_harvest_default: "12-31",
+            b_lu_eom: 100,
+            b_lu_eom_residues: 50,
             created: new Date(),
             updated: new Date(),
             hash: "test-hash-UNKNOWN",

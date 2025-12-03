@@ -4,9 +4,7 @@ import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmLocalType } from "./fdm-local.d"
 
-export function createFdmLocal(
-    backend: "memory://" = "memory://",
-): FdmLocalType {
+export function createFdmLocal(backend = "memory://"): FdmLocalType {
     try {
         // Create drizzle instance
         const db = drizzle({

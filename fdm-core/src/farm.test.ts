@@ -1,7 +1,6 @@
 import { eq } from "drizzle-orm"
 import { beforeAll, describe, expect, inject, it } from "vitest"
-import { createFdmAuth } from "./authentication"
-import type { FdmAuth } from "./authentication.d"
+import { type FdmAuth, createFdmAuth } from "./authentication"
 import { listPrincipalsForResource } from "./authorization"
 import * as schema from "./db/schema"
 import {
@@ -59,6 +58,7 @@ describe("Farm Functions", () => {
         // Create principal_id
         const user1 = await fdmAuth.api.signUpEmail({
             headers: undefined,
+            // @ts-expect-error
             body: {
                 email: "user10@example.com",
                 name: "user10",
@@ -72,6 +72,7 @@ describe("Farm Functions", () => {
         target_username = "user15"
         const target = await fdmAuth.api.signUpEmail({
             headers: undefined,
+            // @ts-expect-error
             body: {
                 email: "user15@example.com",
                 name: "user15",
@@ -586,8 +587,6 @@ describe("Farm Functions", () => {
     describe("removeFarm", () => {
         let testFarmId: string
         let testPrincipalId: string
-        let _testFieldId: string
-        let _testFertilizerId: string
         let testFertilizerCatalogueId: string
 
         beforeAll(async () => {
@@ -614,7 +613,7 @@ describe("Farm Functions", () => {
             )
 
             // Add a field to the farm
-            _testFieldId = await addField(
+            await addField(
                 fdm,
                 testPrincipalId,
                 testFarmId,
@@ -649,7 +648,7 @@ describe("Farm Functions", () => {
             )
 
             // Add an acquired fertilizer to the farm
-            _testFertilizerId = await addFertilizer(
+            await addFertilizer(
                 fdm,
                 testPrincipalId,
                 testFertilizerCatalogueId,

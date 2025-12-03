@@ -461,6 +461,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_eom: 100,
+                b_lu_eom_residues: 50,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
@@ -537,6 +539,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_eom: 100,
+                b_lu_eom_residues: 50,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
@@ -585,6 +589,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 8,
                 b_lu_n_residue: 5,
                 b_n_fixation: 0,
+                b_lu_eom: 100,
+                b_lu_eom_residues: 50,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
@@ -835,6 +841,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_eom: 100,
+                b_lu_eom_residues: 50,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: b_lu_variety_options,
                 b_lu_start_default: "03-01",
@@ -876,6 +884,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_n_harvestable: 4,
                     b_lu_n_residue: 2,
                     b_n_fixation: 0,
+                    b_lu_eom: 100,
+                    b_lu_eom_residues: 50,
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: ["v1", "v2"],
                     b_lu_start_default: "2024-03-01", // Invalid format
@@ -903,6 +913,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_n_harvestable: 4,
                     b_lu_n_residue: 2,
                     b_n_fixation: 0,
+                    b_lu_eom: 100,
+                    b_lu_eom_residues: 50,
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: ["v1", "v2"],
                     b_lu_start_default: "03-01",
@@ -931,6 +943,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_n_harvestable: 4,
                     b_lu_n_residue: 2,
                     b_n_fixation: 0,
+                    b_lu_eom: 100,
+                    b_lu_eom_residues: 50,
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: ["v1", "v2"],
                     b_lu_start_default: "03-01",
@@ -959,6 +973,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_n_harvestable: 4,
                     b_lu_n_residue: 2,
                     b_n_fixation: 0,
+                    b_lu_eom: 100,
+                    b_lu_eom_residues: 50,
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: ["v1", "v2"],
                     b_lu_start_default: null,
@@ -1000,6 +1016,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_n_harvestable: 5,
                     b_lu_n_residue: 3,
                     b_n_fixation: 0,
+                    b_lu_eom: 100,
+                    b_lu_eom_residues: 50,
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: null,
                     b_lu_start_default: "10-15", // October 15th
@@ -1038,6 +1056,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_n_harvestable: 6,
                     b_lu_n_residue: 4,
                     b_n_fixation: 0,
+                    b_lu_eom: 100,
+                    b_lu_eom_residues: 50,
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: null,
                     b_lu_start_default: "04-01",
@@ -1076,6 +1096,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_n_harvestable: 0,
                     b_lu_n_residue: 0,
                     b_n_fixation: 0,
+                    b_lu_eom: 100,
+                    b_lu_eom_residues: 50,
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: null,
                     b_lu_start_default: "04-01",
@@ -1114,6 +1136,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_n_harvestable: 4,
                     b_lu_n_residue: 2,
                     b_n_fixation: 0,
+                    b_lu_eom: 100,
+                    b_lu_eom_residues: 50,
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: null,
                     b_lu_start_default: null,
@@ -1237,6 +1261,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_eom: 100,
+                b_lu_eom_residues: 50,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
@@ -1411,6 +1437,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_eom: 100,
+                b_lu_eom_residues: 50,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
@@ -1560,6 +1588,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_eom: 100,
+                b_lu_eom_residues: 50,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
@@ -1628,6 +1658,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_eom: 100,
+                b_lu_eom_residues: 50,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
@@ -1787,6 +1819,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_eom: 100,
+                b_lu_eom_residues: 50,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
@@ -1827,40 +1861,44 @@ describe("Cultivation Data Model", () => {
             expect(cultivationPlan.length).toBe(0)
         })
     })
-})
 
-describe("getCultivationsFromCatalogue error handling", () => {
-    const principal_id = "test-principal"
-    const b_id_farm = "test-farm"
+    describe("getCultivationsFromCatalogue error handling", () => {
+        const principal_id = "test-principal"
+        const b_id_farm = "test-farm"
 
-    it("should handle database errors", async () => {
-        // Create a custom fdm implementation that throws an error
-        const mockFdm = {
-            select: () => {
-                throw new Error("Database error")
-            },
-        } as any // Cast to any to satisfy the FdmServerType interface for mocking purposes
+        it("should handle database errors", async () => {
+            // Create a custom fdm implementation that throws an error
+            const mockFdm = {
+                select: () => {
+                    throw new Error("Database error")
+                },
+            } as any // Cast to any to satisfy the FdmServerType interface for mocking purposes
 
-        // Act & Assert
-        try {
-            await getCultivationsFromCatalogue(mockFdm, principal_id, b_id_farm)
-            // Should not reach here
-            expect.fail("Expected an error to be thrown")
-        } catch (err) {
-            type ErrorWithContext = Error & {
-                context: { principal_id: string; b_id_farm: string }
+            // Act & Assert
+            try {
+                await getCultivationsFromCatalogue(
+                    mockFdm,
+                    principal_id,
+                    b_id_farm,
+                )
+                // Should not reach here
+                expect.fail("Expected an error to be thrown")
+            } catch (err) {
+                type ErrorWithContext = Error & {
+                    context: { principal_id: string; b_id_farm: string }
+                }
+                const e = err as ErrorWithContext
+                // Check that error was handled correctly
+                expect(e).toBeDefined()
+                expect(e.message).toContain(
+                    "Exception for getCultivationsFromCatalogue",
+                )
+                expect(e.context).toEqual({
+                    principal_id,
+                    b_id_farm,
+                })
             }
-            const e = err as ErrorWithContext
-            // Check that error was handled correctly
-            expect(e).toBeDefined()
-            expect(e.message).toContain(
-                "Exception for getCultivationsFromCatalogue",
-            )
-            expect(e.context).toEqual({
-                principal_id,
-                b_id_farm,
-            })
-        }
+        })
     })
 })
 
@@ -1935,6 +1973,8 @@ describe("buildCultivationTimeframeCondition", () => {
             b_lu_n_harvestable: 4,
             b_lu_n_residue: 2,
             b_n_fixation: 0,
+            b_lu_eom: 100,
+            b_lu_eom_residues: 50,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
             b_lu_start_default: "03-01",

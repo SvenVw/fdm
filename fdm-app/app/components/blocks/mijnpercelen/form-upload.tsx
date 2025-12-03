@@ -109,7 +109,7 @@ export function MijnPercelenUploadForm({
             }, 3000)
             return () => clearTimeout(timer)
         }
-    }, [uploadState, form.reset])
+    }, [uploadState, form.reset, form])
 
     const selectedFiles = form.watch("shapefile")
 
@@ -124,7 +124,7 @@ export function MijnPercelenUploadForm({
         return () => {
             form.reset()
         }
-    }, [form.reset])
+    }, [form.reset, form])
 
     const handleFilesSet = async (validFiles: File[]) => {
         form.setValue("shapefile", validFiles)

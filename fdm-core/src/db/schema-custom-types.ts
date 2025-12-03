@@ -149,11 +149,12 @@ function readMultiPoint(
     if (offset + 4 > dataView.byteLength) {
         throw new Error("Buffer too small to read MultiPoint")
     }
-    const numPoints = dataView.getUint32(offset, littleEndian)
-    offset += 4
+    let localOffset = offset
+    const numPoints = dataView.getUint32(localOffset, littleEndian)
+    localOffset += 4
     const points: GeoJSON.Position[] = []
     for (let i = 0; i < numPoints; i++) {
-        points.push(readPoint(dataView, littleEndian, offset + i * 16))
+        points.push(readPoint(dataView, littleEndian, localOffset + i * 16))
     }
     return points
 }
@@ -181,18 +182,19 @@ function readPolygon(
     littleEndian: boolean,
     offset: number,
 ): GeoJSON.Position[][] {
-    const numRings = dataView.getUint32(offset, littleEndian)
-    offset += 4
+    let localOffset = offset
+    const numRings = dataView.getUint32(localOffset, littleEndian)
+    localOffset += 4
     const rings: GeoJSON.Position[][] = []
     for (let i = 0; i < numRings; i++) {
-        const numPoints = dataView.getUint32(offset, littleEndian)
-        offset += 4
+        const numPoints = dataView.getUint32(localOffset, littleEndian)
+        localOffset += 4
         const points: GeoJSON.Position[] = []
         for (let j = 0; j < numPoints; j++) {
-            const x = dataView.getFloat64(offset, littleEndian)
-            const y = dataView.getFloat64(offset + 8, littleEndian)
+            const x = dataView.getFloat64(localOffset, littleEndian)
+            const y = dataView.getFloat64(localOffset + 8, littleEndian)
             points.push([x, y])
-            offset += 16
+            localOffset += 16
         }
         rings.push(points)
     }

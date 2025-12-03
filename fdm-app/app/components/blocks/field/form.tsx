@@ -60,7 +60,7 @@ export default function FieldDetailsDialog({
         if (form.formState.isSubmitSuccessful || !open) {
             form.reset()
         }
-    }, [form.formState, form.reset, open])
+    }, [form.formState, form.reset, open, form])
 
     // Effect to update form values when the 'field' prop changes
     useEffect(() => {
@@ -68,7 +68,7 @@ export default function FieldDetailsDialog({
             b_name: fieldNameDefault,
             b_lu_catalogue: b_lu_catalogue,
         })
-    }, [fieldNameDefault, b_lu_catalogue, form.reset])
+    }, [fieldNameDefault, b_lu_catalogue, form.reset, form])
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

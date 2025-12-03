@@ -179,7 +179,7 @@ describe("Farm Data Model", () => {
                 // Add two fields to the farm
                 const field1Name = "Field 1"
                 const field1Source = "source1"
-                const field1Geometry = {
+                const field1Geometry: Polygon = {
                     type: "Polygon",
                     coordinates: [
                         [
@@ -206,7 +206,7 @@ describe("Farm Data Model", () => {
 
                 const field2Name = "Field 2"
                 const field2Source = "source2"
-                const field2Geometry = {
+                const field2Geometry: Polygon = {
                     type: "Polygon",
                     coordinates: [
                         [
@@ -255,7 +255,7 @@ describe("Farm Data Model", () => {
                 // Add two fields to the farm with different start dates
                 const field1Name = "Field 1"
                 const field1Source = "source1"
-                const field1Geometry = {
+                const field1Geometry: Polygon = {
                     type: "Polygon",
                     coordinates: [
                         [
@@ -284,7 +284,7 @@ describe("Farm Data Model", () => {
 
                 const field2Name = "Field 2"
                 const field2Source = "source2"
-                const field2Geometry = {
+                const field2Geometry: Polygon = {
                     type: "Polygon",
                     coordinates: [
                         [
@@ -310,7 +310,7 @@ describe("Farm Data Model", () => {
                 )
                 const field3Name = "Field 3"
                 const field3Source = "source3"
-                const field3Geometry = {
+                const field3Geometry: Polygon = {
                     type: "Polygon",
                     coordinates: [
                         [
@@ -338,7 +338,7 @@ describe("Farm Data Model", () => {
                 )
                 const field4Name = "Field 4"
                 const field4Source = "source4"
-                const field4Geometry = {
+                const field4Geometry: Polygon = {
                     type: "Polygon",
                     coordinates: [
                         [
@@ -767,6 +767,10 @@ describe("Farm Data Model", () => {
                 b_lu_variety_options: [], // Added missing property
                 b_lu_start_default: "03-15",
                 b_date_harvest_default: "10-15",
+                b_lu_harvestcat: "HC010",
+                b_lu_dm: 0.8,
+                b_lu_eom: 0,
+                b_lu_eom_residues: 0,
             })
         })
 
@@ -938,6 +942,7 @@ describe("Farm Data Model", () => {
                 principal_id,
                 cultivationId,
                 new Date("2025-08-10"),
+                // @ts-expect-error
                 5000,
             )
 

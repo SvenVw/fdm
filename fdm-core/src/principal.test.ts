@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm"
 import { beforeAll, describe, expect, inject, it } from "vitest"
-import { type BetterAuth, createFdmAuth } from "./authentication"
+import { createFdmAuth } from "./authentication"
 import * as authNSchema from "./db/schema-authn"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
@@ -16,7 +16,7 @@ describe("Principals", () => {
     let organizationName: string
     let organizationSlug: string
     let userEmail: string
-    let fdmAuth: BetterAuth
+    let fdmAuth: any
 
     beforeAll(async () => {
         const host = inject("host")

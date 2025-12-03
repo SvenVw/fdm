@@ -3,10 +3,10 @@ import { betterAuth } from "better-auth/minimal"
 import { magicLink, organization, username } from "better-auth/plugins"
 import { eq } from "drizzle-orm"
 import { generateFromEmail } from "unique-username-generator"
-import type { FdmAuth } from "./authentication.d"
 import * as authNSchema from "./db/schema-authn"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
+import { FdmAuth } from "./authentication.d"
 
 /**
  * Initializes and configures the authentication system for the FDM application using Better Auth.
@@ -86,7 +86,7 @@ export function createFdmAuth(
         }
     }
 
-    const auth: FdmAuth = betterAuth({
+    const auth = betterAuth({
         database: drizzleAdapter(fdm, {
             provider: "pg",
             schema: authNSchema,

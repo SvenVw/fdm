@@ -157,8 +157,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 parseShp(shpBuffer, shxBuffer),
                 parseDbf(dbfBuffer),
             ])) as FeatureCollection<Polygon, RvoProperties>
-        } catch (_error) {
-            return dataWithWarning({}, "Shapefile is ongeldig.")
+        } catch (error) {
+            return dataWithWarning(error, "Shapefile is ongeldig.")
         }
 
         if (shapefile.features.length === 0) {

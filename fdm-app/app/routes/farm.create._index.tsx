@@ -8,11 +8,7 @@ import {
     getFertilizersFromCatalogue,
 } from "@svenvw/fdm-core"
 import type { Resolver } from "react-hook-form"
-import type {
-    ActionFunctionArgs,
-    LoaderFunctionArgs,
-    MetaFunction,
-} from "react-router"
+import type { ActionFunctionArgs, MetaFunction } from "react-router"
 import { Form, useLoaderData } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
@@ -89,7 +85,7 @@ const FormSchema = z.object({
 })
 
 // Loader
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader() {
     return {
         b_name_farm: null,
         year: new Date().getFullYear(),

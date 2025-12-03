@@ -1,6 +1,6 @@
 import { and, desc, eq, isNotNull, isNull } from "drizzle-orm"
 import { beforeAll, beforeEach, describe, expect, inject, it } from "vitest"
-import { type BetterAuth, createFdmAuth } from "./authentication"
+import { createFdmAuth } from "./authentication"
 import {
     actions,
     checkPermission,
@@ -23,10 +23,11 @@ import {
     createOrganization,
     inviteUserToOrganization,
 } from "./organization"
+import type { FdmAuth } from "./authentication.d"
 
 describe("Authorization Functions", () => {
     let fdm: FdmServerType
-    let fdmAuth: BetterAuth
+    let fdmAuth: FdmAuth
     let principal_id: string
     let farm_id: string
     let organization_id: string

@@ -166,12 +166,11 @@ export default function FarmFieldAtlasBlock() {
  * ensuring the action has the required identifier. Any errors are caught and rethrown via the
  * error handling mechanism.
  *
- * @param request - The HTTP request associated with the action.
  * @param params - The route parameters, expected to include a valid field identifier (b_id).
  *
  * @throws {Error} When the field identifier is missing.
  */
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ params }: ActionFunctionArgs) {
     try {
         const b_id = params.b_id
 

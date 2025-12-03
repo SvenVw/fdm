@@ -63,7 +63,7 @@ export function NutrientAdviceFallback() {
 }
 
 export function NutrientCardSkeletonRepeat({ count }: { count: number }) {
-    return [...new Array(count)].map((_, i) => (
+    return [Array.from({ length: count })].map((_, i) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: all items are the same
         <NutrientCardSkeleton key={i} />
     ))
