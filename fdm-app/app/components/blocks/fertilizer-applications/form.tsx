@@ -92,7 +92,9 @@ export function FertilizerApplicationForm({
         ) {
             form.setValue("p_app_method", "")
         }
-    }, [p_id, fertilizerApplication, form.setValue, form])
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- form is stable from useRemixForm
+    }, [p_id, fertilizerApplication, form.setValue])
+    
 
     const fieldFertilizerFormStore = useFieldFertilizerFormStore()
 
@@ -116,20 +118,20 @@ export function FertilizerApplicationForm({
                 }
             }
         }
+         // oxlint-disable-next-line react-hooks/exhaustive-deps -- form and fieldFertilizerFormStore are stable references
     }, [
         b_id_farm,
         b_id_or_b_lu_catalogue,
         form.setValue,
         fieldFertilizerFormStore.load,
-        form,
-        fieldFertilizerFormStore,
     ])
 
     useEffect(() => {
         if (fertilizerApplication) {
             form.setValue("p_app_amount", fertilizerApplication.p_app_amount)
         }
-    }, [fertilizerApplication, form.setValue, form])
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- form is stable from useRemixForm
+    }, [fertilizerApplication, form.setValue])
 
     // Change fertilizer selection if the user has added a new fertilizer
     const new_p_id = searchParams.get("p_id")
@@ -137,18 +139,19 @@ export function FertilizerApplicationForm({
         if (new_p_id) {
             form.setValue("p_id", new_p_id)
         }
-    }, [new_p_id, form.setValue, form])
+        // oxlint-disable-next-line react-hooks/exhaustive-deps -- form is stable from useRemixForm
+    }, [new_p_id, form.setValue])
 
     useEffect(() => {
         if (form.formState.isSubmitSuccessful) {
             fieldFertilizerFormStore.delete(b_id_farm, b_id_or_b_lu_catalogue)
         }
+                // oxlint-disable-next-line react-hooks/exhaustive-deps -- fieldFertilizerFormStore is stable from Zustand
     }, [
         form.formState.isSubmitSuccessful,
         b_id_farm,
         b_id_or_b_lu_catalogue,
         fieldFertilizerFormStore.delete,
-        fieldFertilizerFormStore,
     ])
 
     function handleManageFertilizers(_e: MouseEvent<HTMLButtonElement>) {
