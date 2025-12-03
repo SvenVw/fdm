@@ -1,0 +1,65 @@
+name: Type Check
+on: push
+
+jobs:
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [24]
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Setup pnpm 10
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.23.0
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://npm.pkg.github.com'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm i
+
+      - name: Build fdm-data
+        run: pnpm build
+        working-directory: ./fdm-data
+
+      - name: Typecheck fdm-data
+        run: pnpm check-types
+        working-directory: ./fdm-data
+
+      - name: Build fdm-core
+        run: pnpm build
+        working-directory: ./fdm-core
+
+      - name: Typecheck fdm-core
+        run: pnpm check-types
+        working-directory: ./fdm-core
+
+      - name: Build fdm-calculator
+        run: pnpm build
+        working-directory: ./fdm-calculator
+
+      - name: Typecheck fdm-calculator
+        run: pnpm check-types
+        working-directory: ./fdm-calculator
+
+      - name: Typecheck fdm-app
+        run: pnpm typecheck
+        working-directory: ./fdm-app
