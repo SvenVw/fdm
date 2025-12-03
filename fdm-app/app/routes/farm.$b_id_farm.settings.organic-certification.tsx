@@ -242,7 +242,9 @@ export default function OrganicCertificationSettings() {
                                         organicCertification.b_organic_issued,
                                     ),
                                     "PP",
-                                    { locale: nl },
+                                    {
+                                        locale: nl,
+                                    },
                                 )}
                             </span>
                         </div>

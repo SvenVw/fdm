@@ -359,7 +359,10 @@ describe("Cultivation Data Model", () => {
                 fdm,
                 principal_id,
                 b_id,
-                { start: new Date("2024-02-01"), end: new Date("2024-05-03") },
+                {
+                    start: new Date("2024-02-01"),
+                    end: new Date("2024-05-03"),
+                },
             )
             expect(cultivations.length).toBe(3)
             expect(cultivations[0].b_lu_start).toEqual(new Date("2024-05-01"))
@@ -369,7 +372,10 @@ describe("Cultivation Data Model", () => {
                 fdm,
                 principal_id,
                 b_id,
-                { start: new Date("2024-04-01"), end: new Date("2024-08-01") },
+                {
+                    start: new Date("2024-04-01"),
+                    end: new Date("2024-08-01"),
+                },
             )
             expect(cultivations2.length).toBe(4)
             expect(cultivations2[0].b_lu_start).toEqual(new Date("2024-07-01"))
@@ -379,7 +385,10 @@ describe("Cultivation Data Model", () => {
                 fdm,
                 principal_id,
                 b_id,
-                { start: new Date("2024-06-01"), end: new Date("2024-06-01") },
+                {
+                    start: new Date("2024-06-01"),
+                    end: new Date("2024-06-01"),
+                },
             )
             expect(cultivations3.length).toBe(3)
             expect(cultivations3[0].b_lu_start).toEqual(new Date("2024-05-01"))

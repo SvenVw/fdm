@@ -224,10 +224,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                             fields.find((f) => f.b_id === field.b_id)?.b_name ||
                             `Perceel ${field.b_id}`
                         fieldErrorMessages.push(
-                            `${fieldName}: ${String(error).replace(
-                                "Error: ",
-                                "",
-                            )}`,
+                            `${fieldName}: ${String(error).replace("Error: ", "")}`,
                         )
                         return {
                             b_id: field.b_id,
@@ -251,10 +248,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         fields.find((f) => f.b_id === fallbackFieldId)
                             ?.b_name || `Perceel ${fallbackFieldId}`
                     fieldErrorMessages.push(
-                        `${fallbackFieldName}: ${String(result.reason).replace(
-                            "Error: ",
-                            "",
-                        )}`,
+                        `${fallbackFieldName}: ${String(result.reason).replace("Error: ", "")}`,
                     )
                     return {
                         b_id: fallbackFieldId, // Fallback ID

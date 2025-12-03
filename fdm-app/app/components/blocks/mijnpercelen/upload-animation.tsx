@@ -62,9 +62,7 @@ export function MijnPercelenUploadAnimation({
 
                             <p className="text-sm text-muted-foreground">
                                 {currentFieldIndex < fieldNames.length - 1
-                                    ? `Perceel ${currentFieldIndex + 1} van ${
-                                          fieldNames.length
-                                      }`
+                                    ? `Perceel ${currentFieldIndex + 1} van ${fieldNames.length}`
                                     : "Voltooid!"}
                             </p>
                         </div>

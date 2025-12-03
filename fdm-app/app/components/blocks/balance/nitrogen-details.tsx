@@ -317,7 +317,9 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                             {format(
                                                 harvestDetails.b_lu_harvest_date,
                                                 "PP",
-                                                { locale: nl },
+                                                {
+                                                    locale: nl,
+                                                },
                                             )}
                                             : {harvest.value} kg N / ha
                                         </li>
