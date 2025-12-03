@@ -4,7 +4,7 @@ import type {
     CultivationDetail,
     FieldInput,
     OrganicMatterBalanceInput,
-} from "../types.d"
+} from "../types"
 import { calculateOrganicMatterSupplyByResidues } from "./residues"
 
 describe("calculateOrganicMatterSupplyByResidues", () => {

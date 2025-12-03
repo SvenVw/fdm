@@ -1,6 +1,6 @@
 import Decimal from "decimal.js"
 import { describe, expect, it } from "vitest"
-import type { CultivationDetail, FieldInput } from "../types.d"
+import type { CultivationDetail, FieldInput } from "../types"
 import { calculateOrganicMatterSupplyByCultivations } from "./cultivation"
 
 describe("calculateOrganicMatterSupplyByCultivations", () => {
