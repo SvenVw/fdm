@@ -54,11 +54,11 @@ function isValidDate(date: Date | undefined) {
 }
 
 interface DatePickerProps<TFieldValues extends FieldValues> {
-    form: UseFormReturn<TFieldValues>
+    form: Pick<UseFormReturn<TFieldValues>, "control" | "getValues">
     name: Path<TFieldValues> // Use Path for better type inference with react-hook-form
     label: string
     description: string
-    disabled: boolean
+    disabled?: boolean
 }
 
 export function DatePicker<TFieldValues extends FieldValues>({

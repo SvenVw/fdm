@@ -3,6 +3,7 @@ import type { FertilizerApplication } from "@svenvw/fdm-core"
 import { Plus } from "lucide-react"
 import type { MouseEvent } from "react"
 import { useEffect, useId } from "react"
+import type { Resolver } from "react-hook-form"
 import type { Navigation } from "react-router"
 import { Form, useNavigate, useSearchParams } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
@@ -57,7 +58,7 @@ export function FertilizerApplicationForm({
     navigation: Navigation
     b_id_farm: string
     b_id_or_b_lu_catalogue: string
-    fertilizerApplication: FertilizerApplication
+    fertilizerApplication?: FertilizerApplication
 }) {
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
@@ -66,7 +67,7 @@ export function FertilizerApplicationForm({
         mode: "onTouched",
         resolver: zodResolver(
             fertilizerApplication ? FormSchemaModify : FormSchema,
-        ),
+        ) as Resolver<FieldFertilizerFormValues>,
         defaultValues: {
             p_app_id: fertilizerApplication?.p_app_ids
                 ? fertilizerApplication.p_app_ids.join(",")

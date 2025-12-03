@@ -102,7 +102,7 @@ export default function AddOrganizationPage() {
     useEffect(() => {
         const subscription = form.watch((value, { name }) => {
             if (name === "name") {
-                const slug = convertToSlug(value.name)
+                const slug = convertToSlug(value.name || "")
                 form.setValue("slug", slug, {
                     shouldDirty: true,
                     shouldValidate: true,

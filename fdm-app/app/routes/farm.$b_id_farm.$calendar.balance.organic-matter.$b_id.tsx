@@ -104,7 +104,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         userId: session.principal_id,
                     },
                 )
-                fieldResult = { ...fieldResult, errorId }
+                fieldResult = { ...fieldResult, errorId } as any
             }
             const inputForField = input.fields.find(
                 (field: { field: { b_id: string } }) =>
@@ -112,7 +112,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             )
 
             return {
-                fieldResult: fieldResult,
+                fieldResult: fieldResult as any,
                 fieldInput: inputForField,
             }
         })

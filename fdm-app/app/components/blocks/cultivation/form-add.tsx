@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useRef, useState } from "react"
+import type { Resolver } from "react-hook-form"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
@@ -45,7 +46,9 @@ function CultivationAddForm({
 }: CultivationsFormProps & { editable?: boolean; onSuccess?: () => void }) {
     const form = useRemixForm<z.infer<typeof CultivationAddFormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(CultivationAddFormSchema),
+        resolver: zodResolver(CultivationAddFormSchema) as Resolver<
+            z.infer<typeof CultivationAddFormSchema>
+        >,
         defaultValues: {
             b_lu_catalogue: "",
             b_lu_start: new Date(), // Initialize with a Date object

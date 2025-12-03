@@ -209,7 +209,13 @@ export const Dropzone = ({
                     }}
                     ref={(node) => {
                         inputRef.current = node
-                        ref?.(node)
+                        if (typeof ref === "function") {
+                            ref(node)
+                        } else if (ref) {
+                            ;(
+                                ref as React.MutableRefObject<HTMLInputElement | null>
+                            ).current = node
+                        }
                     }}
                     placeholder=""
                     className="hidden"
@@ -226,7 +232,6 @@ export const Dropzone = ({
                         disabled ? "hidden" : "flex",
                         className,
                     )}
-                    ref={ref}
                     htmlFor={labelId}
                     aria-label="Upload shapefile files by clicking or dragging and dropping"
                     onKeyDown={(e) => {

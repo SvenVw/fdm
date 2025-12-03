@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { SoilParameterDescription } from "@svenvw/fdm-core"
 import { useEffect } from "react"
+import type { Resolver } from "react-hook-form"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
@@ -56,7 +57,9 @@ export function SoilAnalysisForm(props: {
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(FormSchema),
+        resolver: zodResolver(FormSchema) as Resolver<
+            z.infer<typeof FormSchema>
+        >,
         defaultValues: defaultValues,
     })
 
@@ -79,7 +82,7 @@ export function SoilAnalysisForm(props: {
                             Vul de gegevens van de bodemanalyse in.
                         </p>
                         <div className="grid md:grid-cols-2 gap-4">
-                            {soilParameterDescription.map((x) => {
+                            {soilParameterDescription.map((x: any) => {
                                 if (x.parameter === "a_id") {
                                     return null
                                 }
@@ -188,7 +191,7 @@ export function SoilAnalysisForm(props: {
                                         <DatePicker
                                             key={x.parameter}
                                             form={form}
-                                            name={x.parameter}
+                                            name={x.parameter as any}
                                             label={x.name}
                                             description={x.description}
                                         />

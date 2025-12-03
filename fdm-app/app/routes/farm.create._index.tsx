@@ -13,6 +13,7 @@ import type {
     MetaFunction,
 } from "react-router"
 import { Form, useLoaderData } from "react-router"
+import type { Resolver } from "react-hook-form"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
@@ -105,7 +106,9 @@ export default function AddFarmPage() {
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(FormSchema),
+        resolver: zodResolver(FormSchema) as Resolver<
+            z.infer<typeof FormSchema>
+        >,
         defaultValues: {
             b_name_farm: loaderData.b_name_farm ?? "",
             year: loaderData.year,

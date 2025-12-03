@@ -1,5 +1,6 @@
 import type {
     FieldInput,
+    OrganicMatterBalanceFieldNumeric,
     OrganicMatterBalanceNumeric,
     OrganicMatterDegradationNumeric,
     OrganicMatterSupplyCultivationsNumeric,
@@ -20,7 +21,7 @@ import {
 } from "~/components/ui/accordion"
 
 interface OrganicMatterBalanceDetailsProps {
-    balanceData: OrganicMatterBalanceNumeric
+    balanceData: OrganicMatterBalanceFieldNumeric
     fieldInput: FieldInput
 }
 

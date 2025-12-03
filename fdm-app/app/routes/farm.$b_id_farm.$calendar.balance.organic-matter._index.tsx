@@ -139,7 +139,7 @@ function FarmBalanceOrganicMatterOverview({
     const { organicMatterBalanceResult } = use(asyncData)
     const { showProductiveOnly } = useFieldFilterStore()
 
-    if (organicMatterBalanceResult.errorMessage) {
+    if (organicMatterBalanceResult.hasErrors) {
         return (
             <div className="flex items-center justify-center">
                 <Card className="w-[350px]">
@@ -161,7 +161,9 @@ function FarmBalanceOrganicMatterOverview({
                                     {JSON.stringify(
                                         {
                                             message:
-                                                organicMatterBalanceResult.errorMessage,
+                                                organicMatterBalanceResult.fieldErrorMessages.join(
+                                                    ", ",
+                                                ),
                                             timestamp: new Date(),
                                         },
                                         null,

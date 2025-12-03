@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { Cultivation } from "@svenvw/fdm-core"
 import { useEffect } from "react"
+import type { Resolver } from "react-hook-form"
 import { Form, useFetcher, useLocation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { DatePicker } from "~/components/custom/date-picker"
@@ -39,7 +40,9 @@ export function CultivationDetailsCard({
 }) {
     const fetcher = useFetcher()
     const form = useRemixForm<CultivationDetailsFormSchemaType>({
-        resolver: zodResolver(CultivationDetailsFormSchema),
+        resolver: zodResolver(
+            CultivationDetailsFormSchema,
+        ) as Resolver<CultivationDetailsFormSchemaType>,
         mode: "onTouched",
         defaultValues: {
             b_lu_start: new Date(cultivation.b_lu_start),

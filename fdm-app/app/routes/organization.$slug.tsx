@@ -106,7 +106,6 @@ export default function OrganizationIndex() {
                                             key={member.username}
                                             member={member}
                                             permissions={permissions}
-                                            slug={organization.slug}
                                         />
                                     ))}
                                 </div>
@@ -146,7 +145,6 @@ export default function OrganizationIndex() {
                                                         invitation.invitation_id
                                                     }
                                                     invitation={invitation}
-                                                    permissions={permissions}
                                                 />
                                             ))}
                                         </div>
@@ -166,7 +164,6 @@ const MemberRow = ({
     permissions,
 }: {
     member: {
-        id: string
         firstname: string
         surname: string
         username: string
@@ -415,10 +412,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
             const invitationEmail = await renderInvitationEmail(
                 formValues.email,
-                {
-                    firstname: session.user.firstname,
-                    surname: session.user.surname,
-                },
+                session.user as any,
                 organization.name,
                 invitationId,
             )

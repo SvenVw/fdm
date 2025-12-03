@@ -9,6 +9,7 @@ import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import { ScrollText, Trash2 } from "lucide-react"
 import { useId } from "react"
+import type { Resolver } from "react-hook-form"
 import {
     type ActionFunctionArgs,
     Form,
@@ -176,7 +177,9 @@ export default function OrganicCertificationSettings() {
 
     const form = useRemixForm<z.infer<typeof formSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(formSchema),
+        resolver: zodResolver(formSchema) as Resolver<
+            z.infer<typeof formSchema>
+        >,
         defaultValues: {
             b_organic_traces: "",
             b_organic_skal: "",

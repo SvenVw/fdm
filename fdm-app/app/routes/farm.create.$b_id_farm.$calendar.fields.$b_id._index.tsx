@@ -250,7 +250,12 @@ export default function Index() {
     const mapRef = useRef<MapRef>(null)
 
     useEffect(() => {
-        mapRef.current?.fitBounds(viewState.bounds, viewState.fitBoundsOptions)
+        if ("bounds" in viewState) {
+            mapRef.current?.fitBounds(
+                viewState.bounds as any,
+                viewState.fitBoundsOptions,
+            )
+        }
     }, [viewState])
 
     //ref to check if map is rendered

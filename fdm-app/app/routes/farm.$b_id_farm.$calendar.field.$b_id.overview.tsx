@@ -6,6 +6,7 @@ import {
     updateField,
 } from "@svenvw/fdm-core"
 import { useEffect } from "react"
+import type { Resolver } from "react-hook-form"
 import type { MetaFunction } from "react-router"
 import {
     type ActionFunctionArgs,
@@ -121,7 +122,9 @@ export default function FarmFieldsOverviewBlock() {
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(FormSchema),
+        resolver: zodResolver(FormSchema) as Resolver<
+            z.infer<typeof FormSchema>
+        >,
         defaultValues: {
             b_name: loaderData.field.b_name,
             b_acquiring_method: loaderData.field.b_acquiring_method,

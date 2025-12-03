@@ -185,7 +185,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             } else {
                 // Otherwise, default to fields with the selected cultivation
                 selectedFields = allFieldsWithCultivations.filter((field) =>
-                    field.cultivations.some((c) => cultivationIds.includes(c)),
+                    field.cultivations.some((c: string) =>
+                        cultivationIds.includes(c),
+                    ),
                 )
             }
         } else {

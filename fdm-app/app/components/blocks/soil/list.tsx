@@ -1,5 +1,6 @@
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
+import type { FetcherWithComponents } from "react-router"
 import { NavLink } from "react-router"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
@@ -15,10 +16,7 @@ export function SoilAnalysesList({
 }: {
     soilAnalyses: SoilAnalysis[]
     soilParameterDescription: SoilParameterDescription
-    fetcher: {
-        state: string
-        submit: (data: { a_id: string }, options: { method: string }) => void
-    }
+    fetcher: FetcherWithComponents<any>
     canModifySoilAnalysis?: Record<string, boolean>
 }) {
     const handleDelete = (a_id: string) => {
@@ -69,28 +67,27 @@ export function SoilAnalysesList({
 
                             <div className="justify-self-end">
                                 <div className="space-x-4">
-                                    <NavLink
-                                        to={`./analysis/${analysis.a_id}`}
-                                        asChild
-                                        className={cn(
-                                            "pointer-events-auto",
+                                    <Button
+                                        variant="default"
+                                        disabled={
+                                            fetcher.state === "submitting" ||
                                             analysis.a_source === "nl-other-nmi"
-                                                ? "pointer-events-none"
-                                                : "",
-                                        )}
+                                        }
+                                        asChild
                                     >
-                                        <Button
-                                            variant="default"
-                                            disabled={
-                                                fetcher.state ===
-                                                    "submitting" ||
+                                        <NavLink
+                                            to={`./analysis/${analysis.a_id}`}
+                                            className={cn(
+                                                "pointer-events-auto",
                                                 analysis.a_source ===
                                                     "nl-other-nmi"
-                                            }
+                                                    ? "pointer-events-none"
+                                                    : "",
+                                            )}
                                         >
                                             Bewerk
-                                        </Button>
-                                    </NavLink>
+                                        </NavLink>
+                                    </Button>
                                     <Button
                                         variant="destructive"
                                         disabled={
