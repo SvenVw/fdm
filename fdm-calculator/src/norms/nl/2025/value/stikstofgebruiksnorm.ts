@@ -12,7 +12,7 @@ import type {
     NormsByRegion,
     RegionKey,
 } from "./types"
-import { GebruiksnormResult } from "norms/nl/types"
+import type { GebruiksnormResult } from "../../types"
 
 /**
  * Determines if a field is located within a met nutriënten verontreinigde gebied (NV-gebied) in the Netherlands.

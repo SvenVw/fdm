@@ -1,7 +1,7 @@
 import { withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
-import { determineNLHoofdteelt } from "norms/nl/2025/value/hoofdteelt"
+import { determineNLHoofdteelt } from "../../2025/value/hoofdteelt"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {
     NitrogenStandard,
@@ -10,11 +10,11 @@ import type {
     NormsByRegion,
     RegionKey,
 } from "./types"
-import type { GebruiksnormResult } from "norms/nl/types"
+import type { GebruiksnormResult } from "../../types"
 import {
     getRegion,
     isFieldInNVGebied,
-} from "norms/nl/2025/value/stikstofgebruiksnorm"
+} from "../../2025/value/stikstofgebruiksnorm"
 
 /**
  * Retrieves the appropriate set of nitrogen norms (`NormsByRegion`) for a given cultivation.

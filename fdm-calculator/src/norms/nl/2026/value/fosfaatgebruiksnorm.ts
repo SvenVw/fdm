@@ -4,8 +4,8 @@ import pkg from "../../../../package"
 import { fosfaatNormsData } from "./fosfaatgebruiksnorm-data"
 import { determineNLHoofdteelt } from "../../2025/value/hoofdteelt"
 import type { FosfaatKlasse, NL2026NormsInput } from "./types.d"
-import { FosfaatGebruiksnormResult } from "norms/nl/types"
-import { isCultivationGrasland } from "norms/nl/2025/value/fosfaatgebruiksnorm"
+import type { FosfaatGebruiksnormResult } from "../../types"
+import { isCultivationGrasland } from "../../2025/value/fosfaatgebruiksnorm"
 
 /**
  * Helper function to determine the phosphate class ('Arm', 'Laag', 'Neutraal', 'Ruim', 'Hoog')
