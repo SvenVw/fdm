@@ -306,6 +306,16 @@ export function calculateNitrogenBalancesFieldToFarm(
     let totalFarmSupply = new Decimal(0)
     let totalFarmRemoval = new Decimal(0)
     let totalFarmEmission = new Decimal(0)
+    const fertilizerTypes = ["mineral", "manure", "compost", "other"] as const
+    const ammoniaByFertilizerType = Object.fromEntries(
+        fertilizerTypes.reduce(
+            (arr, key) => {
+                arr.push([key, new Decimal(0)])
+                return arr
+            },
+            [] as [(typeof fertilizerTypes)[number], Decimal][],
+        ),
+    ) as Omit<NitrogenBalance["emission"]["ammonia"]["fertilizers"], "total">
     let totalFarmEmissionAmmonia = new Decimal(0)
     let totalFarmEmissionNitrate = new Decimal(0)
     let totalFarmTarget = new Decimal(0)
@@ -338,6 +348,16 @@ export function calculateNitrogenBalancesFieldToFarm(
         totalFarmEmissionNitrate = totalFarmEmissionNitrate.add(
             fieldResult.balance.emission.nitrate.total.times(fieldArea),
         )
+
+        for (const fertilizerType of fertilizerTypes) {
+            const fieldTotal =
+                fieldResult.balance.emission.ammonia.fertilizers[
+                    fertilizerType
+                ].total.mul(fieldArea)
+            ammoniaByFertilizerType[fertilizerType] =
+                ammoniaByFertilizerType[fertilizerType].add(fieldTotal)
+        }
+
         totalFarmTarget = totalFarmTarget.add(
             fieldResult.balance.target.times(fieldArea),
         )
@@ -362,6 +382,10 @@ export function calculateNitrogenBalancesFieldToFarm(
     const avgFarmTarget = totalFarmArea.isZero()
         ? new Decimal(0)
         : totalFarmTarget.dividedBy(totalFarmArea)
+    for (const fertilizerType of fertilizerTypes) {
+        ammoniaByFertilizerType[fertilizerType] =
+            ammoniaByFertilizerType[fertilizerType].dividedBy(totalFarmArea)
+    }
 
     // Calculate the average balance at farm level (Supply + Removal + Emission)
     const avgFarmBalance = avgFarmSupply
@@ -375,7 +399,13 @@ export function calculateNitrogenBalancesFieldToFarm(
         removal: avgFarmRemoval,
         emission: {
             total: avgFarmEmission,
-            ammonia: avgFarmEmissionAmmonia,
+            ammonia: {
+                total: avgFarmEmissionAmmonia,
+                fertilizers: {
+                    total: avgFarmEmissionAmmonia,
+                    ...ammoniaByFertilizerType,
+                },
+            },
             nitrate: avgFarmEmissionNitrate,
         },
         target: avgFarmTarget,
