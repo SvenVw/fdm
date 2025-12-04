@@ -7,9 +7,9 @@ import { table9 } from "./table-9"
 import { table11Mestcodes } from "./table-11-mestcodes"
 import type {
     NL2025NormsFillingInput,
-    NormFilling,
     WorkingCoefficientDetails,
 } from "./types"
+import type { NormFilling } from "norms/nl/types"
 
 /**
  * Calculates the nitrogen utilization norm filling for a set of fertilizer applications.

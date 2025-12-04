@@ -6,7 +6,8 @@ import {
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { table11Mestcodes } from "./table-11-mestcodes"
-import type { NL2025NormsFillingInput, NormFilling } from "./types"
+import type { NL2025NormsFillingInput} from "./types"
+import type { NormFilling } from "norms/nl/types"
 
 const rvoMestcodesOrganicRich25Percent = ["111", "112"] // Compost, Zeer schone compost
 const rvoMestcodesOrganicRich75Percent = ["110", "10", "61", "25", "56"] // Champost, Rundvee - Vaste mest, Geiten - Vaste mest, Paarden - Vaste mest, Schapen - Mest, alle systemen

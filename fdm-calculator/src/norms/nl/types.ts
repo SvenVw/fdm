@@ -54,3 +54,12 @@ export interface GebruiksnormResult {
      */
     normSource: string
 }
+
+export type NormFilling = {
+    normFilling: number
+    applicationFilling: {
+        p_app_id: string
+        normFilling: number
+        normFillingDetails?: string
+    }[]
+}
