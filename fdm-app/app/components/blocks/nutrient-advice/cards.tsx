@@ -91,7 +91,7 @@ export function NutrientCard({
                     </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 w-full">
                     <div className="flex justify-between text-sm">
                         <span>Bemestingsniveau</span>
                         <span>

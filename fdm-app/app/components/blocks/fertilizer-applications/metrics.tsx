@@ -5,8 +5,10 @@ import type {
     NormFilling,
     NutrientAdvice,
 } from "@svenvw/fdm-calculator"
+import type { Cultivation } from "@svenvw/fdm-core"
 import { Suspense } from "react"
 import { Await, NavLink } from "react-router-dom"
+import { CultivationSelector } from "~/components/custom/cultivation-selector"
 import {
     Card,
     CardContent,
@@ -50,6 +52,8 @@ interface FertilizerApplicationMetricsData {
     b_id: string
     b_id_farm: string
     calendar: string
+    cultivations: Cultivation[]
+    activeCultivation: Cultivation | undefined
 }
 
 interface FertilizerApplicationMetricsCardProps {
@@ -83,6 +87,8 @@ export function FertilizerApplicationMetricsCard({
         b_id,
         b_id_farm,
         calendar,
+        cultivations,
+        activeCultivation,
     } = fertilizerApplicationMetricsData
 
     return (
@@ -500,13 +506,24 @@ export function FertilizerApplicationMetricsCard({
                         <ItemSeparator />
                         <Item>
                             <ItemContent>
-                                <ItemTitle className="hover:underline">
-                                    <NavLink
-                                        to={`/farm/${b_id_farm}/${calendar}/nutrient_advice/${b_id}`}
-                                    >
-                                        Bemestingsadvies
-                                    </NavLink>
-                                </ItemTitle>
+                                <div className="flex items-center justify-between w-full">
+                                    <ItemTitle className="hover:underline">
+                                        <NavLink
+                                            to={`/farm/${b_id_farm}/${calendar}/nutrient_advice/${b_id}`}
+                                        >
+                                            Bemestingsadvies
+                                        </NavLink>
+                                    </ItemTitle>
+                                    {activeCultivation && (
+                                        <CultivationSelector
+                                            cultivations={cultivations}
+                                            selectedCultivationId={
+                                                activeCultivation.b_lu
+                                            }
+                                            variant="icon"
+                                        />
+                                    )}
+                                </div>
                             </ItemContent>
                             <ItemDescription>
                                 {isSubmitting ? (
