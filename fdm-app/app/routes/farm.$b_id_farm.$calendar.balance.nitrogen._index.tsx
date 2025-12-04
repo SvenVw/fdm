@@ -292,7 +292,10 @@ function FarmBalanceNitrogenOverview({
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {resolvedNitrogenBalanceResult.emission.ammonia}
+                            {
+                                resolvedNitrogenBalanceResult.emission.ammonia
+                                    .total
+                            }
                         </div>
                         <p className="text-xs text-muted-foreground">
                             kg N / ha
@@ -330,6 +333,7 @@ function FarmBalanceNitrogenOverview({
                     </CardHeader>
                     <CardContent className="pl-2">
                         <NitrogenBalanceChart
+                            type="farm"
                             balance={resolvedNitrogenBalanceResult.balance}
                             supply={resolvedNitrogenBalanceResult.supply}
                             removal={resolvedNitrogenBalanceResult.removal}

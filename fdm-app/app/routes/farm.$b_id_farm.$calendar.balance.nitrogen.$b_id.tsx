@@ -2,7 +2,7 @@ import {
     collectInputForNitrogenBalance,
     getNitrogenBalance,
 } from "@svenvw/fdm-calculator"
-import { getFarm, getField } from "@svenvw/fdm-core"
+import { getFarm, getFertilizers, getField } from "@svenvw/fdm-core"
 import {
     ArrowDown,
     ArrowRight,
@@ -99,6 +99,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             timeframe,
             b_id,
         ).then(async (input) => {
+            const fertilizerNames = (
+                input.fertilizerDetails as {
+                    p_id_catalogue: string
+                    p_name_nl: string
+                }[]
+            ).reduce(
+                (acc, fert) => {
+                    acc[fert.p_id_catalogue] = fert.p_name_nl
+                    return acc
+                },
+                {} as Record<string, string>,
+            )
             const nitrogenBalanceResult = await getNitrogenBalance(fdm, input)
             let fieldResult = nitrogenBalanceResult.fields.find(
                 (field: { b_id: string }) => field.b_id === b_id,
@@ -137,8 +149,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 (field: { field: { b_id: string } }) =>
                     field.field.b_id === b_id,
             )
+            console.log(fertilizerNames)
 
             return {
+                fertilizerNames: fertilizerNames,
                 fieldResult: fieldResult,
                 fieldInput: inputForField,
             }
@@ -183,7 +197,9 @@ function NitrogenBalance({
     field,
     nitrogenBalanceResult,
 }: Awaited<ReturnType<typeof loader>>) {
-    const { fieldResult, fieldInput } = use(nitrogenBalanceResult)
+    const { fieldResult, fieldInput, fertilizerNames } = use(
+        nitrogenBalanceResult,
+    )
 
     const location = useLocation()
     const page = location.pathname
@@ -394,10 +410,12 @@ function NitrogenBalance({
                     </CardHeader>
                     <CardContent className="pl-2">
                         <NitrogenBalanceChart
+                            type="field"
                             balance={result.balance}
                             supply={result.supply.total}
                             removal={result.removal.total}
                             emission={result.emission}
+                            fertilizerNames={fertilizerNames}
                         />
                     </CardContent>
                 </Card>
