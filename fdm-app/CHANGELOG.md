@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.25.1
+
+### Patch Changes
+
+- c9a37ab: Patch for CVE-2025-55182
+
 ## 0.25.0
 
 ### Minor Changes
