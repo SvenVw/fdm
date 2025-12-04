@@ -2,7 +2,7 @@ import { withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { fosfaatNormsData } from "./fosfaatgebruiksnorm-data"
-import { determineNL2025Hoofdteelt } from "./hoofdteelt"
+import { determineNLHoofdteelt } from "./hoofdteelt"
 import type {
     FosfaatGebruiksnormResult,
     FosfaatKlasse,
@@ -150,7 +150,7 @@ export async function calculateNL2025FosfaatGebruiksNorm(
         )
     }
 
-    const b_lu_catalogue = determineNL2025Hoofdteelt(cultivations)
+    const b_lu_catalogue = determineNLHoofdteelt(cultivations, 2025)
     const is_grasland = isCultivationGrasland(b_lu_catalogue)
 
     // Determine the phosphate class based on soil analysis values and land type.

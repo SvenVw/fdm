@@ -3,7 +3,7 @@ import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { getGeoTiffValue } from "../../../../shared/geotiff"
 import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
-import { determineNL2025Hoofdteelt } from "./hoofdteelt"
+import { determineNLHoofdteelt } from "./hoofdteelt"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {
     GebruiksnormResult,
@@ -318,7 +318,7 @@ function determineSubTypeOmschrijving(
     ]
 
     if (bladgewasRvoTable2s.includes(standard.cultivation_rvo_table2)) {
-        const hoofdteeltCatalogue = determineNL2025Hoofdteelt(cultivations)
+        const hoofdteeltCatalogue = determineNLHoofdteelt(cultivations, 2025)
         if (cultivation.b_lu_catalogue === hoofdteeltCatalogue) {
             return "1e teelt"
         }
@@ -363,8 +363,9 @@ function calculateKorting(
     }
 
     // Determine hoofdteelt for the current year (2025)
-    const hoofdteelt2025 = determineNL2025Hoofdteelt(
+    const hoofdteelt2025 = determineNLHoofdteelt(
         cultivations.filter((c) => c.b_lu_start.getFullYear() === currentYear),
+        2025
     )
     const hoofdteelt2025Standard = nitrogenStandardsData.find((ns) =>
         ns.b_lu_catalogue_match.includes(hoofdteelt2025),
@@ -478,7 +479,7 @@ function calculateKorting(
  * correct nitrogen norm:
  *
  * 1.  **Identify Main Crop (`hoofdteelt`)**:
- *     The `determineNL2025Hoofdteelt` function is called to identify the primary cultivation
+ *     The `determineNLHoofdteelt` function is called to identify the primary cultivation
  *     (`b_lu_catalogue`) for the field based on the provided `cultivations` array. This is
  *     the first step to narrow down the applicable nitrogen standards.
  *
@@ -540,7 +541,7 @@ export async function calculateNL2025StikstofGebruiksNorm(
     const cultivations = input.cultivations
 
     // Determine hoofdteelt
-    const b_lu_catalogue = determineNL2025Hoofdteelt(cultivations)
+    const b_lu_catalogue = determineNLHoofdteelt(cultivations, 2025)
     let cultivation = cultivations.find(
         (c) => c.b_lu_catalogue === b_lu_catalogue,
     )

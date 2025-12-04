@@ -1,7 +1,7 @@
 import type { NL2025NormsInputForCultivation } from "./types"
 
 /**
- * Determines the main cultivation ('hoofdteelt') for the NL 2025 norms based on the legal definition.
+ * Determines the main cultivation ('hoofdteelt') for the NL 2025  and 2026 norms based on the legal definition.
  * The main cultivation is the one that is present for the longest duration within the period
  * from May 15th to July 15th.
  *
@@ -13,14 +13,15 @@ import type { NL2025NormsInputForCultivation } from "./types"
  *   { cultivation: { b_lu_start: '2025-05-01', b_lu_end: '2025-06-10', b_lu_catalogue: 'cat_A' } },
  *   { cultivation: { b_lu_start: '2025-06-01', b_lu_end: '2025-07-20', b_lu_catalogue: 'cat_B' } }
  * ];
- * const hoofdteelt = await determineNL2025Hoofdteelt(cultivations);
+ * const hoofdteelt = await determineNLHoofdteelt(cultivations);
  * // returns 'cat_B'
  */
-export function determineNL2025Hoofdteelt(
+export function determineNLHoofdteelt(
     cultivations: NL2025NormsInputForCultivation[],
+    year: 2025 | 2026,
 ): string {
-    const HOOFDTEELT_START = new Date("2025-05-15")
-    const HOOFDTEELT_END = new Date("2025-07-15")
+    const HOOFDTEELT_START = new Date(`${year}-05-15`)
+    const HOOFDTEELT_END = new Date(`${year}-07-15`)
 
     let maxDuration = -1
     let hoofdteeltCatalogue: string | null = null
