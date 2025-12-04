@@ -170,12 +170,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         const nmiApiKey = getNmiApiKey()
 
-        const nutrientAdvice = await getNutrientAdvice(fdm, {
-            b_lu_catalogue: activeCultivation?.b_lu_catalogue ?? null,
-            b_centroid: b_centroid,
-            currentSoilData: currentSoilData,
-            nmiApiKey: nmiApiKey,
-        })
+        let nutrientAdvice = null
+        if (activeCultivation) {
+            nutrientAdvice = await getNutrientAdvice(fdm, {
+                b_lu_catalogue: activeCultivation.b_lu_catalogue,
+                b_centroid: b_centroid,
+                currentSoilData: currentSoilData,
+                nmiApiKey: nmiApiKey,
+            })
+        }
 
         const fertilizerApplicationMetricsData = {
             norms: getNorms({
