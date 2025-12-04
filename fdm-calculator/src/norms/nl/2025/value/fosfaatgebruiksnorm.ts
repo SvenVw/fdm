@@ -4,10 +4,10 @@ import pkg from "../../../../package"
 import { fosfaatNormsData } from "./fosfaatgebruiksnorm-data"
 import { determineNLHoofdteelt } from "./hoofdteelt"
 import type {
-    FosfaatGebruiksnormResult,
     FosfaatKlasse,
     NL2025NormsInput,
 } from "./types.d"
+import { FosfaatGebruiksnormResult } from "norms/nl/types"
 
 /**
  * Determines if a cultivation is a type of grassland based on its catalogue entry.
