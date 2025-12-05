@@ -339,11 +339,11 @@ function calculateKorting(
         kortingAmount = new Decimal(0)
         kortingDescription =
             ". Geen korting: vanggewas gezaaid uiterlijk 1 oktober"
-    } else if (sowDate > october1 && sowDate <= october15) {
+    } else if (sowDate > october1 && sowDate < october15) {
         kortingAmount = new Decimal(5)
         kortingDescription =
             ". Korting: 5kg N/ha, vanggewas gezaaid tussen 2 t/m 14 oktober"
-    } else if (sowDate > october15 && sowDate < november1) {
+    } else if (sowDate >= october15 && sowDate < november1) {
         kortingAmount = new Decimal(10)
         kortingDescription =
             ". Korting: 10kg N/ha, vanggewas gezaaid tussen 15 t/m 31 oktober"
