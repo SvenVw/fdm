@@ -3,11 +3,8 @@ import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { fosfaatNormsData } from "./fosfaatgebruiksnorm-data"
 import { determineNLHoofdteelt } from "./hoofdteelt"
-import type {
-    FosfaatKlasse,
-    NL2025NormsInput,
-} from "./types.d"
-import { FosfaatGebruiksnormResult } from "norms/nl/types"
+import type { FosfaatKlasse, NL2025NormsInput } from "./types.d"
+import type { FosfaatGebruiksnormResult } from "../../types"
 
 /**
  * Determines if a cultivation is a type of grassland based on its catalogue entry.
@@ -129,7 +126,7 @@ function getFosfaatKlasse(
  *     based on the provided `a_p_cc` and `a_p_al` values and whether it's grassland or arable land.
  *     This classification directly uses the lookup tables provided by RVO for 2025.
  * 2.  **Retrieve Base Norm**: The determined `fosfaatKlasse` is then used to look up the
- *     corresponding base phosphate norm from the `fosfaatNormsData.json` file.
+ *     corresponding base phosphate norm from the `fosfaatgebruiksnorm-data.ts` file.
  * 3.  **Apply Land Type**: The specific norm for either `grasland` or `bouwland` is selected
  *     from the base norm based on the `is_grasland` input parameter.
  * 4.  **Return Result**: The function returns the final `normValue` and the `fosfaatKlasse`.
@@ -157,7 +154,7 @@ export async function calculateNL2025FosfaatGebruiksNorm(
     const fosfaatKlasse = getFosfaatKlasse(a_p_cc, a_p_al, is_grasland)
 
     // Retrieve the base norms for the determined phosphate class.
-    const normsForKlasse = fosfaatNormsData[0][fosfaatKlasse]
+    const normsForKlasse = fosfaatNormsData[fosfaatKlasse]
 
     if (!normsForKlasse) {
         throw new Error(`No phosphate norms found for class ${fosfaatKlasse}.`)
