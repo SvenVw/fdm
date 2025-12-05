@@ -117,7 +117,8 @@ function getFosfaatKlasse(
  *   See {@link FosfaatGebruiksnormInput} for details.
  * @returns An object of type `FosfaatGebruiksnormResult` containing the determined
  *   phosphate usage standard (`normValue`) and the `fosfaatKlasse` (the phosphate
- *   class determined from the soil analysis). Returns `null` if a norm cannot be determined.
+ *   class determined from the soil analysis).
+ * @throws {Error} If soil analysis data is missing or no phosphate norms are found for the determined class.
  *
  * @remarks
  * The function operates as follows:

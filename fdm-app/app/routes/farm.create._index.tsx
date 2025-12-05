@@ -104,7 +104,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
  * @returns The JSX element representing the add farm page.
  */
 export default function AddFarmPage() {
-    const { year, yearSelection } = useLoaderData()
+    const { year, yearSelection } = useLoaderData<typeof loader>()
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -288,16 +288,18 @@ export default function AddFarmPage() {
                                                                 <SelectContent>
                                                                     {yearSelection.map(
                                                                         (
-                                                                            year: number,
+                                                                            yearOption: string,
                                                                         ) => (
                                                                             <SelectItem
                                                                                 key={
-                                                                                    year
+                                                                                    yearOption
                                                                                 }
-                                                                                value={year.toString()}
+                                                                                value={
+                                                                                    yearOption
+                                                                                }
                                                                             >
                                                                                 {
-                                                                                    year
+                                                                                    yearOption
                                                                                 }
                                                                             </SelectItem>
                                                                         ),
