@@ -16,6 +16,7 @@ import {
     type MapRef,
     type ViewState,
     type ViewStateChangeEvent,
+    type MapLayerMouseEvent
 } from "react-map-gl/maplibre"
 import {
     data,
@@ -75,6 +76,7 @@ interface ActiveTile {
     id: string
     url: string
     cogUrl: string | null
+    cogUrlHillshade: string | null
 }
 
 // Meta
@@ -146,10 +148,10 @@ export default function FarmAtlasElevationBlock() {
     // State
     const [indexData, setIndexData] = useState<FeatureCollection | null>(null)
     const [activeTiles, setActiveTiles] = useState<ActiveTile[]>([])
-    const [isLoadingCog, setIsLoadingCog] = useState(true)
     const [isUpdating, setIsUpdating] = useState(false)
     const [legendMin, setLegendMin] = useState<number>(-5)
     const [legendMax, setLegendMax] = useState<number>(50)
+    const [hoverElevation, setHoverElevation] = useState<number | null>(null)
 
     // ViewState logic
     const initialViewState = getViewState(fields)
@@ -208,9 +210,19 @@ export default function FarmAtlasElevationBlock() {
     const updateVisibleTiles = useCallback(async () => {
         if (!mapRef.current || !indexData) return
         
-        setIsUpdating(true)
-
         const bounds = mapRef.current.getBounds()
+        const zoom = mapRef.current.getZoom()
+
+        // If zoomed out, clear active tiles to save resources (WMS will take over)
+        if (zoom < 13) {
+            if (activeTiles.length > 0) {
+                setActiveTiles([])
+                setIsLoadingCog(false)
+            }
+            return
+        }
+
+        setIsUpdating(true)
         const sw = bounds.getSouthWest()
         const ne = bounds.getNorthEast()
         const nw = bounds.getNorthWest()
@@ -227,12 +239,12 @@ export default function FarmAtlasElevationBlock() {
             ] as [number, number][]
 
             // Find intersecting tiles
-            // Optimization: limit to e.g. 6 tiles to avoid overload
+            // Optimization: limit to e.g. 24 tiles to avoid overload
             const visibleFeatures = indexData.features.filter((f) => {
                 if (!f.geometry || f.geometry.type !== "Polygon") return false
                 const ring = (f.geometry as any).coordinates[0]
                 return polygonIntersectsPolygon(rdCoords, ring)
-            }).slice(0, 6)
+            }).slice(0, 24)
 
             // Calculate global min/max for the viewport by sampling
             const samplePoints: {lng: number, lat: number}[] = []
@@ -257,14 +269,14 @@ export default function FarmAtlasElevationBlock() {
                     const ring = (f.geometry as any).coordinates[0]
                     return isPointInPolygon(rdP, ring)
                 })
-                if (feature && feature.properties) {
+                if (feature?.properties) {
                      const url = feature.properties.url || feature.properties.href || feature.properties.download_url
                      if (url) {
                          try {
                              // Requesting location value
                              // Note: locationValues caches internal resources so it's efficient
                              const vals = await locationValues(url, { longitude: p.lng, latitude: p.lat })
-                             if (vals && vals.length > 0 && !isNaN(vals[0]) && vals[0] > -100 && vals[0] < 1000) {
+                             if (vals && vals.length > 0 && !Number.isNaN(vals[0]) && vals[0] > -100 && vals[0] < 1000) {
                                  return vals[0]
                              }
                          } catch {}
@@ -298,7 +310,8 @@ export default function FarmAtlasElevationBlock() {
             setLegendMax(max)
 
             // Format for color scale
-            const colorParam = `#color:BrewerSpectral11,${min},${max},-`
+            // Reverted to BrewerSpectral11 (Reversed, Continuous)
+            const colorParam = `#color:BrewerSpectral11,${min},${max},-c`
 
             const newTiles: ActiveTile[] = []
             for (const feature of visibleFeatures) {
@@ -311,10 +324,19 @@ export default function FarmAtlasElevationBlock() {
                 if (!url) continue
                 const id = feature.properties.kaartbladNr || url
                 
-                newTiles.push({ id, url, cogUrl: `cog://${url}${colorParam}` })
+                newTiles.push({ 
+                    id, 
+                    url, 
+                    cogUrl: `cog://${url}${colorParam}`,
+                    cogUrlHillshade: `cog://${url}#dem`
+                })
             }
 
             // Update state 
+            // Simple diff to see if we need to update (comparing URLs including color params)
+            // If colors change, we want to update all tiles
+            const keyNew = newTiles.map(t => t.cogUrl).sort().join("|")
+            
             setActiveTiles(newTiles)
             setIsLoadingCog(false)
             
@@ -327,16 +349,12 @@ export default function FarmAtlasElevationBlock() {
     }, [indexData, activeTiles])
 
     // Throttle updates
-    // const throttledUpdate = useMemo(() => throttle(updateVisibleTiles, 500), [updateVisibleTiles]) 
-    // Using throttle directly in render is tricky with deps.
-    // We will use a ref to store the latest updateVisibleTiles and throttle that.
-    
     const updateRef = useRef(updateVisibleTiles)
     useEffect(() => { updateRef.current = updateVisibleTiles }, [updateVisibleTiles])
     
     const throttledUpdate = useMemo(() => throttle(() => updateRef.current(), 500, { leading: true, trailing: true }), [])
 
-    // Initial update
+    // Initial update when map loads or index loads
     useEffect(() => {
         const timer = setTimeout(() => {
             throttledUpdate()
@@ -344,16 +362,52 @@ export default function FarmAtlasElevationBlock() {
         return () => clearTimeout(timer)
     }, [indexData])
 
+    // Handle hover to show elevation value
+    const handleMouseMove = useCallback(throttle(async (event: MapLayerMouseEvent) => {
+        // If zoomed out (WMS visible), don't fetch values
+        if (!mapRef.current || mapRef.current.getZoom() < 13) {
+            setHoverElevation(null)
+            return
+        }
+
+        if (!indexData || activeTiles.length === 0) return
+        
+        const { lng, lat } = event.lngLat
+        
+        try {
+            const rdP = proj4("EPSG:28992").forward([lng, lat]) as [number, number]
+            
+            // Find tile under mouse
+            // We check activeTiles first as they are already filtered
+            // But we need geometry. indexData has geometry.
+            // Find matching feature in indexData
+            const feature = indexData.features.find((f) => {
+                // Optimization: check if ID matches an active tile?
+                if (!f.geometry || f.geometry.type !== "Polygon") return false
+                const ring = (f.geometry as any).coordinates[0]
+                return isPointInPolygon(rdP, ring)
+            })
+
+            if (feature?.properties) {
+                const url = feature.properties.url || feature.properties.href || feature.properties.download_url
+                if (url) {
+                    // Use locationValues
+                    const values = await locationValues(url, { longitude: lng, latitude: lat })
+                    if (values && values.length > 0 && !Number.isNaN(values[0])) {
+                        setHoverElevation(values[0])
+                        return
+                    }
+                }
+            }
+            setHoverElevation(null)
+        } catch (e) {
+            // console.warn("Error fetching hover elevation", e)
+            setHoverElevation(null)
+        }
+    }, 100), [indexData, activeTiles])
+
     return (
-        <div className="relative h-full w-full">
-            {isLoadingCog && (
-                <div className="absolute top-4 left-1/2 z-10 -translate-x-1/2 rounded bg-background p-2 shadow">
-                    <div className="flex items-center gap-2">
-                        <LoadingSpinner />
-                        <span className="text-sm">Hoogtekaart laden...</span>
-                    </div>
-                </div>
-            )}
+        <div className="relative h-full w-full">           
 
             <MapGL
                 ref={mapRef}
@@ -365,6 +419,7 @@ export default function FarmAtlasElevationBlock() {
                 onMove={onViewportChange}
                 onMoveEnd={throttledUpdate} // Update on move end
                 onLoad={throttledUpdate}
+                onMouseMove={handleMouseMove}
             >
                 <Controls
                     onViewportChange={({ longitude, latitude, zoom }) =>
@@ -377,30 +432,73 @@ export default function FarmAtlasElevationBlock() {
                     }
                 />
 
-                {/* Render Active Tiles */}
-                {activeTiles.map((tile) => (
+                {/* WMS Overview Layer (Zoom < 13) */}
+                {viewState.zoom < 13 && (
                     <Source
-                        key={tile.id}
-                        id={`ahn-cog-${tile.id}`}
+                        id="ahn-wms"
                         type="raster"
-                        url={tile.cogUrl!}
+                        tiles={[
+                            "https://service.pdok.nl/rws/ahn/wms/v1_0?service=WMS&request=GetMap&layers=dtm_05m&styles=&format=image/png&transparent=true&version=1.3.0&width=256&height=256&crs=EPSG:3857&bbox={bbox-epsg-3857}"
+                        ]}
                         tileSize={256}
-                        bounds={[3.3, 50.7, 7.2, 53.7]}
-                        minzoom={0}
-                        maxzoom={24}
                     >
                         <Layer 
-                            id={`ahn-layer-${tile.id}`} 
+                            id="ahn-wms-layer" 
                             type="raster" 
-                            paint={{ "raster-opacity": 1 }}
+                            paint={{ "raster-opacity": 0.8 }}
                         />
                     </Source>
+                )}
+
+                {/* Render Active Tiles (Zoom >= 13) */}
+                {activeTiles.map((tile) => (
+                    <>
+                        <Source
+                            key={`color-${tile.id}`}
+                            id={`ahn-cog-${tile.id}`}
+                            type="raster"
+                            url={tile.cogUrl!}
+                            tileSize={256}
+                            bounds={[3.3, 50.7, 7.2, 53.7]}
+                            minzoom={0}
+                            maxzoom={24}
+                        >
+                            <Layer 
+                                id={`ahn-layer-${tile.id}`} 
+                                type="raster" 
+                                paint={{ "raster-opacity": 1 }}
+                            />
+                        </Source>
+                        <Source
+                            key={`dem-${tile.id}`}
+                            id={`ahn-dem-${tile.id}`}
+                            type="raster-dem"
+                            url={tile.cogUrlHillshade!}
+                            tileSize={256}
+                            bounds={[3.3, 50.7, 7.2, 53.7]}
+                            minzoom={0}
+                            maxzoom={16}
+                        >
+                            <Layer 
+                                id={`ahn-hillshade-${tile.id}`} 
+                                type="hillshade" 
+                                paint={{ 
+                                    "hillshade-exaggeration": 0.3,
+                                    "hillshade-shadow-color": "#000000",
+                                    "hillshade-highlight-color": "#ffffff",
+                                    "hillshade-accent-color": "#000000"
+                                }}
+                            />
+                        </Source>
+                    </>
                 ))}
 
                 <ElevationLegend 
                     min={legendMin} 
                     max={legendMax} 
                     loading={isUpdating}
+                    hoverValue={hoverElevation}
+                    showScale={viewState.zoom >= 13}
                 />
             </MapGL>
         </div>
