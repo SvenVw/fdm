@@ -8,17 +8,15 @@ import type { DierlijkeMestGebruiksnormResult } from "norms/nl/types"
  *
  * This function implements the rules and norms specified by the RVO for 2026.
  *
- * @param input - An object containing all necessary parameters for the calculation.
- *   See {@link DierlijkeMestGebruiksnormInput} for details.
  * @returns An object of type `DierlijkeMestGebruiksnormResult` containing the determined
  *   nitrogen usage standard (`normValue`) and a `normSource` string explaining the rule applied.
  *
  * @remarks
  * The rules for 2026 are as follows:
  * - **Standard Norm**: The norm is 170 kg N/ha from animal manure.
+ * - **No Derogation**: Derogation rules do not apply for 2026.
  */
 export async function calculateNL2026DierlijkeMestGebruiksNorm(): Promise<DierlijkeMestGebruiksnormResult> {
-
     const normValue = 170
     const normSource = "Standaard - geen derogatie"
 

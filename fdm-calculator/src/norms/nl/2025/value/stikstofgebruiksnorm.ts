@@ -393,7 +393,7 @@ function calculateKorting(
             prevCultivation.b_lu_start.getTime() <
                 new Date(currentYear, 1, 1).getTime() &&
             prevCultivation.b_lu_start.getTime() >
-                new Date(previousYear, 6, 15).getTime() // Vanggewas should be sown between July 15th, 2025 and February 1st 2026 (exclusive)
+                new Date(previousYear, 6, 15).getTime() // Vanggewas should be sown between July 15th, 2024 and February 1st 2025 (exclusive)
         return matchingStandard?.is_vanggewas === true && matchingYear === true
     })
     if (vanggewassen2024.length === 0) {
