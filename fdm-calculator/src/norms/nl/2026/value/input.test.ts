@@ -43,7 +43,7 @@ describe("collectNL2026InputForNorms", () => {
         }
 
         const timeframeCultivation = {
-            start: new Date(2024, 0, 1),
+            start: new Date(2025, 0, 1),
             end: new Date(2026, 11, 31),
         }
 

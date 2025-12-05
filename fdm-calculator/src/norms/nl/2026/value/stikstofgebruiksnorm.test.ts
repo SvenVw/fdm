@@ -114,7 +114,7 @@ describe(" calculateNL2026StikstofGebruiksNorm", () => {
                 } as Partial<NL2026NormsInputForCultivation>,
                 {
                     b_lu_catalogue: "nl_428", // Gele mosterd (is_vanggewas: true)
-                    b_lu_start: new Date(2024, 9, 1), // Oct 1st, 2024
+                    b_lu_start: new Date(2025, 9, 1), // Oct 1st, 2025
                     b_lu_end: new Date(2026, 1, 31),
                 } as Partial<NL2026NormsInputForCultivation>,
             ] as NL2026NormsInputForCultivation[],
@@ -144,7 +144,7 @@ describe(" calculateNL2026StikstofGebruiksNorm", () => {
                 } as Partial<NL2026NormsInputForCultivation>,
                 {
                     b_lu_catalogue: "nl_428", // Gele mosterd (is_vanggewas: true)
-                    b_lu_start: new Date(2024, 9, 5), // Oct 5th, 2024
+                    b_lu_start: new Date(2025, 9, 5), // Oct 5th, 2025
                     b_lu_end: new Date(2026, 1, 31),
                 } as Partial<NL2026NormsInputForCultivation>,
             ] as NL2026NormsInputForCultivation[],
@@ -174,7 +174,7 @@ describe(" calculateNL2026StikstofGebruiksNorm", () => {
                 } as Partial<NL2026NormsInputForCultivation>,
                 {
                     b_lu_catalogue: "nl_428", // Gele mosterd (is_vanggewas: true)
-                    b_lu_start: new Date(2024, 9, 20), // Oct 20th, 2024
+                    b_lu_start: new Date(2025, 9, 20), // Oct 20th, 2025
                     b_lu_end: new Date(2026, 1, 31),
                 } as Partial<NL2026NormsInputForCultivation>,
             ] as NL2026NormsInputForCultivation[],
@@ -204,7 +204,7 @@ describe(" calculateNL2026StikstofGebruiksNorm", () => {
                 } as Partial<NL2026NormsInputForCultivation>,
                 {
                     b_lu_catalogue: "nl_428", // Gele mosterd (is_vanggewas: true)
-                    b_lu_start: new Date(2024, 10, 1), // Nov 1st, 2024
+                    b_lu_start: new Date(2025, 10, 1), // Nov 1st, 2025
                     b_lu_end: new Date(2026, 1, 31),
                 } as Partial<NL2026NormsInputForCultivation>,
             ] as NL2026NormsInputForCultivation[],

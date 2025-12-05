@@ -3,7 +3,7 @@ import type {
     Fertilizer,
     FertilizerApplication,
 } from "@svenvw/fdm-core"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { getRegion } from "../../2025/value/stikstofgebruiksnorm"
 import type { RegionKey } from "../value/types"
 import {
@@ -14,9 +14,18 @@ import {
 import type { NL2026NormsFillingInput } from "./types"
 
 // Mock getRegion
-vi.mock("../../2025/value/stikstofgebruiksnorm", () => ({
-    getRegion: vi.fn(),
-}))
+vi.mock("../../2025/value/stikstofgebruiksnorm", async (importOriginal) => {
+    const actual = await importOriginal<typeof import("../../2025/value/stikstofgebruiksnorm")>()
+    return {
+        ...actual,
+        getRegion: vi.fn(actual.getRegion),
+    }
+})
+
+// Default mock implementation for getRegion
+beforeEach(() => {
+    vi.mocked(getRegion).mockResolvedValue("zand_nwc")
+})
 
 describe("isBouwland", () => {
     it("should return true if cultivation is not in non-bouwland codes", () => {
