@@ -280,7 +280,7 @@ export default function FarmAtlasElevationBlock() {
                     const ring = (f.geometry as any).coordinates[0]
                     return isPointInPolygon(rdP, ring)
                 })
-                if (feature && feature.properties) {
+                if (feature?.properties) {
                      const url = feature.properties.url || feature.properties.href || feature.properties.download_url
                      if (url) {
                          try {
@@ -386,7 +386,7 @@ export default function FarmAtlasElevationBlock() {
                 return isPointInPolygon(rdP, ring)
             })
 
-            if (feature && feature.properties) {
+            if (feature?.properties) {
                 const url = feature.properties.url || feature.properties.href || feature.properties.download_url
                 if (url) {
                     const values = await locationValues(url, { longitude: lng, latitude: lat })
@@ -441,6 +441,7 @@ export default function FarmAtlasElevationBlock() {
                             "https://service.pdok.nl/rws/ahn/wms/v1_0?service=WMS&request=GetMap&layers=dtm_05m&styles=&format=image/png&transparent=true&version=1.3.0&width=256&height=256&crs=EPSG:3857&bbox={bbox-epsg-3857}"
                         ]}
                         tileSize={256}
+                        attribution="&copy; <a href='https://www.pdok.nl/'>PDOK</a>, <a href='https://www.ahn.nl/'>AHN</a>"
                     >
                         <Layer 
                             id="ahn-wms-layer" 
@@ -462,6 +463,7 @@ export default function FarmAtlasElevationBlock() {
                             bounds={[3.3, 50.7, 7.2, 53.7]}
                             minzoom={0}
                             maxzoom={24}
+                            attribution="&copy; <a href='https://www.pdok.nl/'>PDOK</a>, <a href='https://www.ahn.nl/'>AHN</a>"
                         >
                             <Layer 
                                 id={`ahn-layer-${tile.id}`} 
