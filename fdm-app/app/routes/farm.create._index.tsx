@@ -214,7 +214,7 @@ export default function AddFarmPage() {
                                                                             field.onChange
                                                                         }
                                                                         defaultValue={String(
-                                                                            new Date().getFullYear(),
+                                                                            field.value,
                                                                         )}
                                                                     >
                                                                         <FormControl>
