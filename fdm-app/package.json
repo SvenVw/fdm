@@ -1,6 +1,6 @@
 {
     "name": "@svenvw/fdm-app",
-    "version": "0.25.1",
+    "version": "0.25.2",
     "private": true,
     "sideEffects": false,
     "type": "module",
