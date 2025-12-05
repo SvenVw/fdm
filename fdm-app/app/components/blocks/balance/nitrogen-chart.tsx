@@ -1,5 +1,5 @@
 import { format } from "date-fns/format"
-import { type JSX, useState } from "react"
+import { useMemo, useState } from "react"
 import { nl } from "react-day-picker/locale"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
 import { cn } from "@/app/lib/utils"
@@ -49,19 +49,26 @@ type FieldBalanceData = {
     supply: { total: number }
 }
 
-export function NitrogenBalanceChart({
+type ApplicationChartConfigItem = {
+    label: string
+    color: string
+    unit?: string
+    detail?: string
+}
+
+function buildChartDataAndLegend({
     type,
     balanceData,
-    fertilizerNames,
-}: { balanceData: { balance: number; removal: number } } & (
-    | { type: "farm"; balanceData: FarmBalanceData; fertilizerNames?: unknown }
+    fieldInput,
+}:
+    | { type: "farm"; balanceData: FarmBalanceData; fieldInput: unknown }
     | {
           type: "field"
           balanceData: FieldBalanceData
-          fertilizerNames: Record<string, string>
-      }
-)): JSX.Element {
-    const [tooltipFocus, setTooltipFocus] = useState<Set<string>>(new Set())
+          fieldInput: {
+              fertilizerApplications: { p_app_id: string; p_name_nl: string }[]
+          }
+      }) {
     const fertilizerTypes = ["mineral", "manure", "compost", "other"] as const
     const nitrateEmission =
         type === "farm"
@@ -82,13 +89,6 @@ export function NitrogenBalanceChart({
             nitrateEmission === undefined
                 ? undefined
                 : Math.abs(nitrateEmission),
-    }
-
-    type ApplicationChartConfig = {
-        label: string
-        color: string
-        unit?: string
-        detail?: string
     }
 
     const legend = {
@@ -147,7 +147,7 @@ export function NitrogenBalanceChart({
     }
     const chartConfig: Record<
         keyof typeof _chartConfig,
-        ApplicationChartConfig
+        ApplicationChartConfigItem
     > = _chartConfig
 
     if (type === "farm") {
@@ -160,22 +160,53 @@ export function NitrogenBalanceChart({
 
     if (type === "field") {
         fertilizerTypes.forEach((p_type) => {
+            chartData[`${p_type}FertilizerAmmonia`] = Math.abs(
+                balanceData.emission.ammonia.fertilizers[p_type].total,
+            )
             balanceData.emission.ammonia.fertilizers[
                 p_type
             ].applications.forEach((app) => {
                 const dataKey = `${p_type}FertilizerAmmonia_${app.id}`
                 chartData[dataKey] = Math.abs(app.value)
-                ;(chartConfig as Record<string, ApplicationChartConfig>)[
+                ;(chartConfig as Record<string, ApplicationChartConfigItem>)[
                     dataKey
                 ] = {
                     ...chartConfig[`${p_type}FertilizerAmmonia`],
                     label: format(app.p_app_date, "PP", { locale: nl }),
-                    unit: "kg N / ha ammoniak",
-                    detail: fertilizerNames[app.p_id_catalogue],
+                    unit: "kg N / ha ammoniakemissie",
+                    detail: fieldInput.fertilizerApplications.find(
+                        (fa: { p_app_id: string }) => fa.p_app_id === app.id,
+                    )?.p_name_nl,
                 }
             })
         })
     }
+
+    return { legend, chartData, chartConfig }
+}
+export function NitrogenBalanceChart(
+    props: { balanceData: { balance: number; removal: number } } & (
+        | { type: "farm"; balanceData: FarmBalanceData; fieldInput: unknown }
+        | {
+              type: "field"
+              balanceData: FieldBalanceData
+              fieldInput: {
+                  fertilizerApplications: {
+                      p_app_id: string
+                      p_name_nl: string
+                  }[]
+              }
+          }
+    ),
+) {
+    const { type, balanceData, fieldInput } = props
+    const fertilizerTypes = ["mineral", "manure", "compost", "other"] as const
+    const [tooltipFocus, setTooltipFocus] = useState<Set<string>>(new Set())
+    // biome-ignore lint/correctness/useExhaustiveDependencies: each value in props is passed separately
+    const { legend, chartData, chartConfig } = useMemo(
+        () => buildChartDataAndLegend(props),
+        [type, balanceData, fieldInput],
+    )
 
     type ChartMouseEvent = {
         tooltipPayload: { dataKey: string }[]
@@ -336,7 +367,7 @@ export function NitrogenBalanceChart({
                                       fill={`var(--color-${p_type}FertilizerAmmonia)`}
                                       stroke={
                                           tooltipFocus.has(dataKey)
-                                              ? "var(--color-stroke)"
+                                              ? "black"
                                               : "none"
                                       }
                                       strokeWidth={2}

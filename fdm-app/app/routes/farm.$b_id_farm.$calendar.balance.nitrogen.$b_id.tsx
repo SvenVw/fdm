@@ -2,7 +2,7 @@ import {
     collectInputForNitrogenBalance,
     getNitrogenBalance,
 } from "@svenvw/fdm-calculator"
-import { getFarm, getFertilizers, getField } from "@svenvw/fdm-core"
+import { getFarm, getField } from "@svenvw/fdm-core"
 import {
     ArrowDown,
     ArrowRight,
@@ -99,18 +99,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             timeframe,
             b_id,
         ).then(async (input) => {
-            const fertilizerNames = (
-                input.fertilizerDetails as {
-                    p_id_catalogue: string
-                    p_name_nl: string
-                }[]
-            ).reduce(
-                (acc, fert) => {
-                    acc[fert.p_id_catalogue] = fert.p_name_nl
-                    return acc
-                },
-                {} as Record<string, string>,
-            )
             const nitrogenBalanceResult = await getNitrogenBalance(fdm, input)
             let fieldResult = nitrogenBalanceResult.fields.find(
                 (field: { b_id: string }) => field.b_id === b_id,
@@ -151,7 +139,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             )
 
             return {
-                fertilizerNames: fertilizerNames,
                 fieldResult: fieldResult,
                 fieldInput: inputForField,
             }
@@ -196,9 +183,7 @@ function NitrogenBalance({
     field,
     nitrogenBalanceResult,
 }: Awaited<ReturnType<typeof loader>>) {
-    const { fieldResult, fieldInput, fertilizerNames } = use(
-        nitrogenBalanceResult,
-    )
+    const { fieldResult, fieldInput } = use(nitrogenBalanceResult)
 
     const location = useLocation()
     const page = location.pathname
@@ -411,7 +396,7 @@ function NitrogenBalance({
                         <NitrogenBalanceChart
                             type="field"
                             balanceData={result}
-                            fertilizerNames={fertilizerNames}
+                            fieldInput={fieldInput}
                         />
                     </CardContent>
                 </Card>
