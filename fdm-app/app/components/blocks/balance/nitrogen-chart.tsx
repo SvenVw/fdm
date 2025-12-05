@@ -130,23 +130,19 @@ export function NitrogenBalanceChart({
         ...legend,
         mineralFertilizerAmmonia: {
             ...legend.mineralFertilizer,
-            label: "Totaal ammoniakemissie door kunstmest",
-            unit: "kg N / ha ammoniak",
+            label: "Ammoniakemissie door kunstmest",
         },
         manureFertilizerAmmonia: {
             ...legend.manureFertilizer,
-            label: "Totaal ammoniakemissie door dierlijke mesten",
-            unit: "kg N / ha ammoniak",
+            label: "Ammoniakemissie door dierlijke mesten",
         },
         compostFertilizerAmmonia: {
             ...legend.compostFertilizer,
-            label: "Totaal ammoniakemissie door compost",
-            unit: "kg N / ha ammoniak",
+            label: "Ammoniakemissie door compost",
         },
         otherFertilizerAmmonia: {
             ...legend.otherFertilizer,
-            label: "Totaal ammoniakemissie door overige meststoffen",
-            unit: "kg N / ha ammoniak",
+            label: "Ammoniakemissie door overige meststoffen",
         },
     }
     const chartConfig: Record<
@@ -174,6 +170,7 @@ export function NitrogenBalanceChart({
                 ] = {
                     ...chartConfig[`${p_type}FertilizerAmmonia`],
                     label: format(app.p_app_date, "PP", { locale: nl }),
+                    unit: "kg N / ha ammoniak",
                     detail: fertilizerNames[app.p_id_catalogue],
                 }
             })
