@@ -149,7 +149,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 (field: { field: { b_id: string } }) =>
                     field.field.b_id === b_id,
             )
-            console.log(fertilizerNames)
 
             return {
                 fertilizerNames: fertilizerNames,
@@ -411,10 +410,7 @@ function NitrogenBalance({
                     <CardContent className="pl-2">
                         <NitrogenBalanceChart
                             type="field"
-                            balance={result.balance}
-                            supply={result.supply.total}
-                            removal={result.removal.total}
-                            emission={result.emission}
+                            balanceData={result}
                             fertilizerNames={fertilizerNames}
                         />
                     </CardContent>

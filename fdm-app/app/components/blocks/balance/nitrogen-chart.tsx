@@ -11,8 +11,7 @@ import {
 
 type FertilizerTypes = "mineral" | "manure" | "compost" | "other"
 
-type FarmModel = {
-    type: "farm"
+type FarmBalanceData = {
     emission: {
         total: number
         ammonia: {
@@ -21,11 +20,11 @@ type FarmModel = {
         }
         nitrate: number
     }
-    fertilizerNames: unknown
+    removal: number
+    supply: number
 }
 
-type FieldModel = {
-    type: "field"
+type FieldBalanceData = {
     emission: {
         total: number
         ammonia: {
@@ -46,38 +45,43 @@ type FieldModel = {
         }
         nitrate: { total: number }
     }
-    fertilizerNames: Record<string, string>
+    removal: { total: number }
+    supply: { total: number }
 }
 
 export function NitrogenBalanceChart({
     type,
-    supply,
-    removal,
-    emission,
+    balanceData,
     fertilizerNames,
-}: {
-    balance: number
-    supply: number
-    removal: number | undefined
-} & (FarmModel | FieldModel)): JSX.Element {
+}: { balanceData: { balance: number; removal: number } } & (
+    | { type: "farm"; balanceData: FarmBalanceData; fertilizerNames?: unknown }
+    | {
+          type: "field"
+          balanceData: FieldBalanceData
+          fertilizerNames: Record<string, string>
+      }
+)): JSX.Element {
     const [tooltipFocus, setTooltipFocus] = useState<Set<string>>(new Set())
     const fertilizerTypes = ["mineral", "manure", "compost", "other"] as const
-
+    const nitrateEmission =
+        type === "farm"
+            ? balanceData.emission.nitrate
+            : balanceData.emission.nitrate.total
+    const removal =
+        type === "farm" ? balanceData.removal : balanceData.removal.total
     const chartData: Record<string, number | undefined> = {
-        supply: supply,
+        supply: Math.abs(
+            type === "farm" ? balanceData.supply : balanceData.supply.total,
+        ),
         removal: removal === undefined ? undefined : Math.abs(removal),
         emissionAmmonia:
-            emission.ammonia === undefined
+            balanceData.emission.ammonia.total === undefined
                 ? undefined
-                : Math.abs(emission.ammonia.total),
+                : Math.abs(balanceData.emission.ammonia.total),
         emissionNitrate:
-            emission.nitrate === undefined
+            nitrateEmission === undefined
                 ? undefined
-                : Math.abs(
-                      type === "farm"
-                          ? emission.nitrate
-                          : emission.nitrate.total,
-                  ),
+                : Math.abs(nitrateEmission),
     }
 
     type ApplicationChartConfig = {
@@ -153,15 +157,16 @@ export function NitrogenBalanceChart({
     if (type === "farm") {
         fertilizerTypes.forEach((p_type) => {
             chartData[`${p_type}FertilizerAmmonia`] = Math.abs(
-                emission.ammonia.fertilizers[p_type],
+                balanceData.emission.ammonia.fertilizers[p_type],
             )
         })
     }
 
     if (type === "field") {
         fertilizerTypes.forEach((p_type) => {
-            emission.ammonia.fertilizers[p_type].applications.forEach((app) => {
-                console.log(app.p_id_catalogue)
+            balanceData.emission.ammonia.fertilizers[
+                p_type
+            ].applications.forEach((app) => {
                 const dataKey = `${p_type}FertilizerAmmonia_${app.id}`
                 chartData[dataKey] = Math.abs(app.value)
                 ;(chartConfig as Record<string, ApplicationChartConfig>)[
@@ -323,22 +328,28 @@ export function NitrogenBalanceChart({
                           )
                       })
                     : fertilizerTypes.flatMap((p_type) =>
-                          emission.ammonia.fertilizers[p_type].applications.map(
-                              (app) => {
-                                  const dataKey = `${p_type}FertilizerAmmonia_${app.id}`
-                                  return (
-                                      <Bar
-                                          key={dataKey}
-                                          dataKey={dataKey}
-                                          fill={`var(--color-${p_type}FertilizerAmmonia)`}
-                                          radius={5}
-                                          stackId={"b"}
-                                          onMouseEnter={onTooltipFocus}
-                                          onMouseLeave={onTooltipBlur}
-                                      />
-                                  )
-                              },
-                          ),
+                          balanceData.emission.ammonia.fertilizers[
+                              p_type
+                          ].applications.map((app) => {
+                              const dataKey = `${p_type}FertilizerAmmonia_${app.id}`
+                              return (
+                                  <Bar
+                                      key={dataKey}
+                                      dataKey={dataKey}
+                                      fill={`var(--color-${p_type}FertilizerAmmonia)`}
+                                      stroke={
+                                          tooltipFocus.has(dataKey)
+                                              ? "var(--color-stroke)"
+                                              : "none"
+                                      }
+                                      strokeWidth={2}
+                                      radius={5}
+                                      stackId={"b"}
+                                      onMouseEnter={onTooltipFocus}
+                                      onMouseLeave={onTooltipBlur}
+                                  />
+                              )
+                          }),
                       )}
                 <Bar
                     dataKey="emissionNitrate"
