@@ -11,7 +11,7 @@ interface ElevationLegendProps {
 
 export function ElevationLegend({ min, max, loading, hoverValue, showScale = true }: ElevationLegendProps) {
     return (
-        <div className="absolute top-4 left-4 z-10 w-45">
+        <div className="w-40">
             <Card className="bg-background/90 backdrop-blur-sm shadow-sm">
                 <CardContent className="p-3">
                     <div className="flex items-center justify-between mb-2">

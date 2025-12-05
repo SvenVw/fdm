@@ -1,4 +1,4 @@
-import { Layers } from "lucide-react"
+import { Layers, Mountain } from "lucide-react"
 import type { ControlPosition, Map as MapLibreMap } from "maplibre-gl"
 import { useEffect } from "react"
 import { createRoot, type Root } from "react-dom/client"
@@ -19,6 +19,8 @@ type ControlsProps = {
     }) => void
     showFields?: boolean
     onToggleFields?: () => void
+    showElevation?: boolean
+    onToggleElevation?: () => void
 }
 
 export function Controls(props: ControlsProps) {
@@ -36,6 +38,12 @@ export function Controls(props: ControlsProps) {
                     onToggle={props.onToggleFields}
                 />
             )}
+            {props.showElevation !== undefined && props.onToggleElevation && (
+                <ElevationControl
+                    showElevation={props.showElevation}
+                    onToggle={props.onToggleElevation}
+                />
+            )}
             <GeolocateControl
                 positionOptions={{ enableHighAccuracy: true }}
                 trackUserLocation={true}
@@ -45,12 +53,15 @@ export function Controls(props: ControlsProps) {
     )
 }
 
-interface FieldsButtonProps {
-    showFields: boolean
+interface ButtonProps {
+    active: boolean
     onToggle: () => void
+    labelActive: string
+    labelInactive: string
+    Icon: React.ElementType
 }
 
-function FieldsButton({ showFields, onToggle }: FieldsButtonProps) {
+function ControlButton({ active, onToggle, labelActive, labelInactive, Icon }: ButtonProps) {
     return (
         <button
             type="button"
@@ -60,22 +71,22 @@ function FieldsButton({ showFields, onToggle }: FieldsButtonProps) {
                 e.stopPropagation()
                 onToggle()
             }}
-            title={showFields ? "Verberg percelen" : "Toon percelen"}
+            title={active ? labelActive : labelInactive}
         >
-            <Layers
-                className={`h-5 w-full ${showFields ? "opacity-100" : "opacity-40"}`}
+            <Icon
+                className={`h-5 w-full ${active ? "opacity-100" : "opacity-40"}`}
             />
         </button>
     )
 }
 
-class CustomFieldsControl implements IControl {
+class CustomControl implements IControl {
     _map: MapLibreMap | undefined
     _container: HTMLDivElement | undefined
     _root: Root | undefined
-    _props: FieldsButtonProps
+    _props: ButtonProps
 
-    constructor(initialProps: FieldsButtonProps) {
+    constructor(initialProps: ButtonProps) {
         this._props = initialProps
     }
 
@@ -104,14 +115,14 @@ class CustomFieldsControl implements IControl {
         return "top-right"
     }
 
-    updateProps(newProps: FieldsButtonProps) {
+    updateProps(newProps: ButtonProps) {
         this._props = newProps
         this._render()
     }
 
     _render() {
         if (this._root) {
-            this._root.render(<FieldsButton {...this._props} />)
+            this._root.render(<ControlButton {...this._props} />)
         }
     }
 }
@@ -125,14 +136,57 @@ function FieldsControl({
     showFields: boolean
     onToggle: () => void
 }) {
-    const control = useControl<CustomFieldsControl>(
-        () => new CustomFieldsControl({ showFields, onToggle }),
+    const control = useControl<CustomControl>(
+        () => new CustomControl({ 
+            active: showFields, 
+            onToggle, 
+            labelActive: "Verberg percelen", 
+            labelInactive: "Toon percelen",
+            Icon: Layers
+        }),
         CONTROL_OPTIONS,
     )
 
     useEffect(() => {
-        control.updateProps({ showFields, onToggle })
+        control.updateProps({ 
+            active: showFields, 
+            onToggle, 
+            labelActive: "Verberg percelen", 
+            labelInactive: "Toon percelen",
+            Icon: Layers
+        })
     }, [control, showFields, onToggle])
+
+    return null
+}
+
+function ElevationControl({
+    showElevation,
+    onToggle,
+}: {
+    showElevation: boolean
+    onToggle: () => void
+}) {
+    const control = useControl<CustomControl>(
+        () => new CustomControl({ 
+            active: showElevation, 
+            onToggle, 
+            labelActive: "Verberg hoogtekaart", 
+            labelInactive: "Toon hoogtekaart",
+            Icon: Mountain
+        }),
+        CONTROL_OPTIONS,
+    )
+
+    useEffect(() => {
+        control.updateProps({ 
+            active: showElevation, 
+            onToggle, 
+            labelActive: "Verberg hoogtekaart", 
+            labelInactive: "Toon hoogtekaart",
+            Icon: Mountain
+        })
+    }, [control, showElevation, onToggle])
 
     return null
 }

@@ -26,6 +26,9 @@ import {
 } from "react-router"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { ElevationLegend } from "~/components/blocks/atlas/atlas-legend"
+import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
+import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
+import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { getMapStyle } from "~/integrations/map"
@@ -152,19 +155,29 @@ export default function FarmAtlasElevationBlock() {
     const [legendMin, setLegendMin] = useState<number>(-5)
     const [legendMax, setLegendMax] = useState<number>(50)
     const [hoverElevation, setHoverElevation] = useState<number | null>(null)
+    const [showFields, setShowFields] = useState(true)
+    const [showElevation, setShowElevation] = useState(true)
+
+    const fieldsSavedId = "fieldsSaved"
+    const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
+    const layerLayout = { visibility: showFields ? "visible" : "none" } as const
+
+    const onToggleElevation = useCallback(() => {
+        setShowElevation((prev) => !prev)
+    }, [])
 
     // ViewState logic
     const initialViewState = getViewState(fields)
     const [viewState, setViewState] = useState<ViewState>(() => {
         if (typeof window !== "undefined") {
             const savedViewState = sessionStorage.getItem(
-                "mapViewStateElevation",
+                "mapViewState",
             )
             if (savedViewState) {
                 try {
                     return JSON.parse(savedViewState)
                 } catch {
-                    sessionStorage.removeItem("mapViewStateElevation")
+                    sessionStorage.removeItem("mapViewState")
                 }
             }
         }
@@ -183,7 +196,7 @@ export default function FarmAtlasElevationBlock() {
             return
         }
         sessionStorage.setItem(
-            "mapViewStateElevation",
+            "mapViewState",
             JSON.stringify(viewState),
         )
     }, [viewState])
@@ -200,7 +213,6 @@ export default function FarmAtlasElevationBlock() {
                 setIndexData(data)
             } catch (e) {
                 console.error("Error fetching COG index:", e)
-                setIsLoadingCog(false)
             }
         }
         fetchIndex()
@@ -209,7 +221,7 @@ export default function FarmAtlasElevationBlock() {
     // Function to update visible tiles
     const updateVisibleTiles = useCallback(async () => {
         if (!mapRef.current || !indexData) return
-        
+
         const bounds = mapRef.current.getBounds()
         const zoom = mapRef.current.getZoom()
 
@@ -217,7 +229,6 @@ export default function FarmAtlasElevationBlock() {
         if (zoom < 13) {
             if (activeTiles.length > 0) {
                 setActiveTiles([])
-                setIsLoadingCog(false)
             }
             return
         }
@@ -269,14 +280,13 @@ export default function FarmAtlasElevationBlock() {
                     const ring = (f.geometry as any).coordinates[0]
                     return isPointInPolygon(rdP, ring)
                 })
-                if (feature?.properties) {
+                if (feature && feature.properties) {
                      const url = feature.properties.url || feature.properties.href || feature.properties.download_url
                      if (url) {
                          try {
                              // Requesting location value
-                             // Note: locationValues caches internal resources so it's efficient
                              const vals = await locationValues(url, { longitude: p.lng, latitude: p.lat })
-                             if (vals && vals.length > 0 && !Number.isNaN(vals[0]) && vals[0] > -100 && vals[0] < 1000) {
+                             if (vals && vals.length > 0 && !isNaN(vals[0]) && vals[0] > -100 && vals[0] < 1000) {
                                  return vals[0]
                              }
                          } catch {}
@@ -290,7 +300,6 @@ export default function FarmAtlasElevationBlock() {
                 min = Math.min(...validValues)
                 max = Math.max(...validValues)
             } else {
-                // Fallback if no data found (e.g. outside coverage or error)
                 min = -5
                 max = 50
             }
@@ -310,7 +319,6 @@ export default function FarmAtlasElevationBlock() {
             setLegendMax(max)
 
             // Format for color scale
-            // Reverted to BrewerSpectral11 (Reversed, Continuous)
             const colorParam = `#color:BrewerSpectral11,${min},${max},-c`
 
             const newTiles: ActiveTile[] = []
@@ -332,13 +340,9 @@ export default function FarmAtlasElevationBlock() {
                 })
             }
 
-            // Update state 
-            // Simple diff to see if we need to update (comparing URLs including color params)
-            // If colors change, we want to update all tiles
             const keyNew = newTiles.map(t => t.cogUrl).sort().join("|")
             
             setActiveTiles(newTiles)
-            setIsLoadingCog(false)
             
         } catch (e) {
             console.error("Error updating visible tiles:", e)
@@ -360,11 +364,10 @@ export default function FarmAtlasElevationBlock() {
             throttledUpdate()
         }, 1000)
         return () => clearTimeout(timer)
-    }, [indexData])
+    }, [throttledUpdate])
 
     // Handle hover to show elevation value
     const handleMouseMove = useCallback(throttle(async (event: MapLayerMouseEvent) => {
-        // If zoomed out (WMS visible), don't fetch values
         if (!mapRef.current || mapRef.current.getZoom() < 13) {
             setHoverElevation(null)
             return
@@ -377,23 +380,17 @@ export default function FarmAtlasElevationBlock() {
         try {
             const rdP = proj4("EPSG:28992").forward([lng, lat]) as [number, number]
             
-            // Find tile under mouse
-            // We check activeTiles first as they are already filtered
-            // But we need geometry. indexData has geometry.
-            // Find matching feature in indexData
             const feature = indexData.features.find((f) => {
-                // Optimization: check if ID matches an active tile?
                 if (!f.geometry || f.geometry.type !== "Polygon") return false
                 const ring = (f.geometry as any).coordinates[0]
                 return isPointInPolygon(rdP, ring)
             })
 
-            if (feature?.properties) {
+            if (feature && feature.properties) {
                 const url = feature.properties.url || feature.properties.href || feature.properties.download_url
                 if (url) {
-                    // Use locationValues
                     const values = await locationValues(url, { longitude: lng, latitude: lat })
-                    if (values && values.length > 0 && !Number.isNaN(values[0])) {
+                    if (values && values.length > 0 && !isNaN(values[0])) {
                         setHoverElevation(values[0])
                         return
                     }
@@ -401,13 +398,12 @@ export default function FarmAtlasElevationBlock() {
             }
             setHoverElevation(null)
         } catch (e) {
-            // console.warn("Error fetching hover elevation", e)
             setHoverElevation(null)
         }
-    }, 100), [indexData, activeTiles])
+    }, 100), [])
 
     return (
-        <div className="relative h-full w-full">           
+        <div className="relative h-full w-full">        
 
             <MapGL
                 ref={mapRef}
@@ -417,9 +413,9 @@ export default function FarmAtlasElevationBlock() {
                 mapStyle={mapStyle}
                 mapLib={maplibregl}
                 onMove={onViewportChange}
-                onMoveEnd={throttledUpdate} // Update on move end
+                onMoveEnd={throttledUpdate}
                 onLoad={throttledUpdate}
-                onMouseMove={handleMouseMove}
+                onMouseMove={showElevation ? handleMouseMove : undefined}
             >
                 <Controls
                     onViewportChange={({ longitude, latitude, zoom }) =>
@@ -430,10 +426,14 @@ export default function FarmAtlasElevationBlock() {
                             zoom,
                         }))
                     }
+                    showFields={showFields}
+                    onToggleFields={() => setShowFields(!showFields)}
+                    showElevation={showElevation}
+                    onToggleElevation={onToggleElevation}
                 />
 
                 {/* WMS Overview Layer (Zoom < 13) */}
-                {viewState.zoom < 13 && (
+                {viewState.zoom < 13 && showElevation && (
                     <Source
                         id="ahn-wms"
                         type="raster"
@@ -451,7 +451,7 @@ export default function FarmAtlasElevationBlock() {
                 )}
 
                 {/* Render Active Tiles (Zoom >= 13) */}
-                {activeTiles.map((tile) => (
+                {viewState.zoom >= 13 && showElevation && activeTiles.map((tile) => (
                     <>
                         <Source
                             key={`color-${tile.id}`}
@@ -493,13 +493,34 @@ export default function FarmAtlasElevationBlock() {
                     </>
                 ))}
 
-                <ElevationLegend 
-                    min={legendMin} 
-                    max={legendMax} 
-                    loading={isUpdating}
-                    hoverValue={hoverElevation}
-                    showScale={viewState.zoom >= 13}
-                />
+                {/* Fields Overlay (Saved Fields) */}
+                {fields && (
+                    <Source
+                        id={fieldsSavedId}
+                        type="geojson"
+                        data={fields}
+                    >
+                        <Layer
+                            {...({ ...fieldsSavedStyle, layout: layerLayout } as any)}
+                        />
+                    </Source>
+                )}
+
+                <div className="absolute top-4 left-4 z-10 flex flex-col gap-4">
+                    <ElevationLegend 
+                        min={legendMin} 
+                        max={legendMax} 
+                        loading={isUpdating}
+                        hoverValue={hoverElevation}
+                        showScale={viewState.zoom >= 13 && showElevation}
+                    />
+                    <div className="grid gap-4 w-[350px]">
+                        <FieldsPanelHover
+                            zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                            layer={fieldsSavedId}
+                        />
+                    </div>
+                </div>
             </MapGL>
         </div>
     )

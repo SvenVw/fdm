@@ -41,6 +41,7 @@
         "@tailwindcss/vite": "^4.1.17",
         "@tanstack/react-table": "^8.21.3",
         "@turf/centroid": "^7.3.1",
+        "@turf/boolean-intersects": "^7.3.1",
         "@turf/turf": "^7.3.1",
         "better-auth": "catalog:",
         "chrono-node": "^2.9.0",
