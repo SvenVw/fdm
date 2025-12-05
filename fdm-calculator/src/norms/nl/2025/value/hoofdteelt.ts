@@ -13,7 +13,7 @@ import type { NL2025NormsInputForCultivation } from "./types"
  *   { cultivation: { b_lu_start: '2025-05-01', b_lu_end: '2025-06-10', b_lu_catalogue: 'cat_A' } },
  *   { cultivation: { b_lu_start: '2025-06-01', b_lu_end: '2025-07-20', b_lu_catalogue: 'cat_B' } }
  * ];
- * const hoofdteelt = await determineNLHoofdteelt(cultivations);
+ * const hoofdteelt = await determineNLHoofdteelt(cultivations, 2025);
  * // returns 'cat_B'
  */
 export function determineNLHoofdteelt(

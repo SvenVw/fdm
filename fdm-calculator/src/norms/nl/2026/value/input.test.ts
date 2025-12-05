@@ -52,7 +52,6 @@ describe("collectNL2026InputForNorms", () => {
         vi.mocked(fdmCore.getCurrentSoilData).mockResolvedValue(
             mockSoilAnalysis as unknown as SoilAnalysis[],
         )
-        vi.mocked(fdmCore.isDerogationGrantedForYear).mockResolvedValue(false)
         vi.mocked(fdmCore.getGrazingIntention).mockResolvedValue(false)
 
         const result = await collectNL2026InputForNorms(
@@ -69,12 +68,6 @@ describe("collectNL2026InputForNorms", () => {
             mockFdm,
             mockPrincipalId,
             mockFieldId,
-        )
-        expect(fdmCore.isDerogationGrantedForYear).toHaveBeenCalledWith(
-            mockFdm,
-            mockPrincipalId,
-            "farm-1",
-            2026,
         )
         expect(fdmCore.getGrazingIntention).toHaveBeenCalledWith(
             mockFdm,

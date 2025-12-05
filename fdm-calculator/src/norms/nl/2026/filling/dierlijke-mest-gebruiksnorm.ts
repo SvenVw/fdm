@@ -3,7 +3,7 @@ import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { table11Mestcodes } from "./table-11-mestcodes"
 import type { NL2026NormsFillingInput } from "./types"
-import type { NormFilling } from "norms/nl/types"
+import type { NormFilling } from "../../types"
 
 /**
  * Calculates the nitrogen usage from animal manure for a list of fertilizer applications.

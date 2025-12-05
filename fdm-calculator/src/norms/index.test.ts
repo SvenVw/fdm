@@ -97,7 +97,7 @@ describe("createFunctionsForFertilizerApplicationFilling", () => {
         )
     })
 
-    it("should return the correct functions for NL region and year 2025", () => {
+    it("should return the correct functions for NL region and year 2026", () => {
         const functions = createFunctionsForFertilizerApplicationFilling(
             "NL",
             "2026",

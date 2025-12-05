@@ -14,7 +14,7 @@ import {
 import type { NL2026NormsFillingInput } from "./types"
 
 // Mock getRegion
-vi.mock("../value/stikstofgebruiksnorm", () => ({
+vi.mock("../../2025/value/stikstofgebruiksnorm", () => ({
     getRegion: vi.fn(),
 }))
 
@@ -647,6 +647,7 @@ describe("calculateNL2026FertilizerApplicationFillingForStikstofGebruiksNorm", (
     })
 
     it("should throw an error if fertilizer cannot be found", async () => {
+        vi.mocked(getRegion).mockResolvedValue("klei")
         const applications: FertilizerApplication[] = [
             {
                 p_app_id: "app1",

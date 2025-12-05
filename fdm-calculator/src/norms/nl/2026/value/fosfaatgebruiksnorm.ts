@@ -166,7 +166,8 @@ export async function calculateNL2026FosfaatGebruiksNorm(
  * @param {NL2026NormsInput} input - An object containing all necessary parameters for the calculation.
  * @returns {Promise<FosfaatGebruiksnormResult>} An object of type `FosfaatGebruiksnormResult` containing the determined
  *   phosphate usage standard (`normValue`) and the `fosfaatKlasse` (the phosphate
- *   class determined from the soil analysis). Returns `null` if a norm cannot be determined.
+ *   class determined from the soil analysis).
+ * @throws {Error} If soil analysis data is missing or no phosphate norms are found for the determined class.
  */
 export const getNL2026FosfaatGebruiksNorm = withCalculationCache(
     calculateNL2026FosfaatGebruiksNorm,
