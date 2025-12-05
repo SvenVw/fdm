@@ -123,8 +123,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         )
 
         const asyncData = (async () => {
-            // Currently only 2025 is supported
-            if (calendar !== "2025") {
+            // Currently only 2025 and 2026 are supported
+            if (calendar !== "2025" && calendar !== "2026") {
                 return {}
             }
 
@@ -453,7 +453,7 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
                 </h1>
                 <p className="text-sm text-muted-foreground">
                     Op dit moment kunnen we alleen nog de gebruiksnormen voor
-                    2025 berekenen en weergeven.
+                    2025 en 2026 berekenen en weergeven.
                 </p>
                 <NavLink to={`/farm/${loaderData.b_id_farm}/2025/norms`}>
                     <Button>Ga naar 2025</Button>

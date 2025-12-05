@@ -6,8 +6,8 @@ import type {
     Field,
 } from "@svenvw/fdm-core"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { collectNL2025InputForFertilizerApplicationFilling } from "./input"
-import type { NL2025NormsFillingInput } from "./types"
+import { collectNL2026InputForFertilizerApplicationFilling } from "./input"
+import type { NL2026NormsFillingInput } from "./types"
 
 // Mock the entire @svenvw/fdm-core module
 vi.mock("@svenvw/fdm-core", () => ({
@@ -29,7 +29,7 @@ import {
     isOrganicCertificationValid,
 } from "@svenvw/fdm-core"
 
-describe("collectNL2025InputForFertilizerApplicationFilling", () => {
+describe("collectNL2026InputForFertilizerApplicationFilling", () => {
     const mockFdm = {} as FdmType
     const mockPrincipalId = "principal123"
     const mockFieldId = "field456"
@@ -51,8 +51,8 @@ describe("collectNL2025InputForFertilizerApplicationFilling", () => {
         vi.mocked(getCultivations).mockResolvedValue([
             {
                 b_lu: "cult1",
-                b_lu_start: new Date(2025, 0, 1),
-                b_lu_end: new Date(2025, 5, 1),
+                b_lu_start: new Date(2026, 0, 1),
+                b_lu_end: new Date(2026, 5, 1),
                 b_lu_catalogue: "nl_2014",
             },
         ] as unknown as Cultivation[])
@@ -69,8 +69,8 @@ describe("collectNL2025InputForFertilizerApplicationFilling", () => {
         const expectedCultivations = [
             {
                 b_lu: "cult1",
-                b_lu_start: new Date(2025, 0, 1),
-                b_lu_end: new Date(2025, 5, 1),
+                b_lu_start: new Date(2026, 0, 1),
+                b_lu_end: new Date(2026, 5, 1),
                 b_lu_catalogue: "nl_2014",
             },
         ]
@@ -81,7 +81,7 @@ describe("collectNL2025InputForFertilizerApplicationFilling", () => {
             { p_id_catalogue: "fert1", p_n_rt: 5, p_type_rvo: "115" },
         ]
 
-        const result = await collectNL2025InputForFertilizerApplicationFilling(
+        const result = await collectNL2026InputForFertilizerApplicationFilling(
             mockFdm,
             mockPrincipalId,
             mockFieldId,
@@ -98,21 +98,21 @@ describe("collectNL2025InputForFertilizerApplicationFilling", () => {
             mockFdm,
             mockPrincipalId,
             "farm789",
-            2025,
+            2026,
         )
         expect(isOrganicCertificationValid).toHaveBeenCalledWith(
             mockFdm,
             mockPrincipalId,
             "farm789",
-            new Date(2025, 4, 15),
+            new Date(2026, 4, 15),
         )
         expect(getCultivations).toHaveBeenCalledWith(
             mockFdm,
             mockPrincipalId,
             mockFieldId,
             {
-                start: new Date(2025, 0, 1),
-                end: new Date(2025, 11, 31, 23, 59, 59, 999),
+                start: new Date(2026, 0, 1),
+                end: new Date(2026, 11, 31, 23, 59, 59, 999),
             },
         )
         expect(getFertilizerApplications).toHaveBeenCalledWith(
@@ -120,8 +120,8 @@ describe("collectNL2025InputForFertilizerApplicationFilling", () => {
             mockPrincipalId,
             "field456",
             {
-                start: new Date(2025, 0, 1),
-                end: new Date(2025, 11, 31, 23, 59, 59, 999),
+                start: new Date(2026, 0, 1),
+                end: new Date(2026, 11, 31, 23, 59, 59, 999),
             },
         )
         expect(getFertilizers).toHaveBeenCalledWith(
@@ -130,7 +130,7 @@ describe("collectNL2025InputForFertilizerApplicationFilling", () => {
             "farm789",
         )
 
-        // Assert the structure and content of the returned NL2025NormsFillingInput object
+        // Assert the structure and content of the returned NL2026NormsFillingInput object
         expect(result).toEqual({
             cultivations: expectedCultivations,
             applications: expectedApplications,
@@ -139,14 +139,14 @@ describe("collectNL2025InputForFertilizerApplicationFilling", () => {
             has_grazing_intention: true,
             fosfaatgebruiksnorm: mockFosfaatgebruiksnorm,
             b_centroid: expectedB_centroid,
-        } as NL2025NormsFillingInput)
+        } as NL2026NormsFillingInput)
     })
 
     it("should throw an error if the field is not found", async () => {
         vi.mocked(getField).mockResolvedValue(null) // Simulate field not found
 
         await expect(
-            collectNL2025InputForFertilizerApplicationFilling(
+            collectNL2026InputForFertilizerApplicationFilling(
                 mockFdm,
                 mockPrincipalId,
                 mockFieldId,

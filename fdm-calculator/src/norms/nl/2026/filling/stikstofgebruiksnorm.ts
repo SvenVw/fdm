@@ -1,12 +1,12 @@
 import { type Cultivation, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
-import { getRegion } from "../value/stikstofgebruiksnorm"
+import { getRegion } from "../../2025/value/stikstofgebruiksnorm"
 import type { RegionKey } from "../value/types"
 import { table9 } from "./table-9"
 import { table11Mestcodes } from "./table-11-mestcodes"
 import type {
-    NL2025NormsFillingInput,
+    NL2026NormsFillingInput,
     WorkingCoefficientDetails,
 } from "./types"
 import type { NormFilling } from "norms/nl/types"
@@ -17,11 +17,11 @@ import type { NormFilling } from "norms/nl/types"
  * fertilizer type, nitrogen content, working coefficients, soil type, grazing intention,
  * and land use (bouwland/arable land).
  *
- * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
+ * @param {NL2026NormsFillingInput} input - The standardized input object containing all necessary data.
  * @returns {Promise<NormFilling>} An object containing the total norm filling and details for each application.
  */
-export async function calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm(
-    input: NL2025NormsFillingInput,
+export async function calculateNL2026FertilizerApplicationFillingForStikstofGebruiksNorm(
+    input: NL2026NormsFillingInput,
 ): Promise<NormFilling> {
     const {
         applications,
@@ -203,7 +203,6 @@ export function getWorkingCoefficient(
 
                     if (subType.applicationPeriod) {
                         const appMonth = p_app_date.getMonth() // 0-11 (Jan is 0, Dec is 11)
-                        const appDay = p_app_date.getDate()
 
                         if (
                             subType.applicationPeriod ===
@@ -213,7 +212,7 @@ export function getWorkingCoefficient(
                             if (
                                 !(
                                     (appMonth >= 8 && appMonth <= 11) ||
-                                    (appMonth === 0 && appDay <= 31)
+                                    appMonth === 0
                                 )
                             ) {
                                 return false
@@ -244,17 +243,17 @@ export function getWorkingCoefficient(
 }
 
 /**
- * Memoized version of {@link calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm}.
+ * Memoized version of {@link calculateNL2026FertilizerApplicationFillingForStikstofGebruiksNorm}.
  *
  * This function is wrapped with `withCalculationCache` to optimize performance by caching
  * results based on the input and the current calculator version.
  *
- * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
+ * @param {NL2026NormsFillingInput} input - The standardized input object containing all necessary data.
  * @returns {Promise<NormFilling>} An object containing the total norm filling and details for each application.
  */
-export const getNL2025FertilizerApplicationFillingForStikstofGebruiksNorm =
+export const getNL2026FertilizerApplicationFillingForStikstofGebruiksNorm =
     withCalculationCache(
-        calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm,
-        "calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm",
+        calculateNL2026FertilizerApplicationFillingForStikstofGebruiksNorm,
+        "calculateNL2026FertilizerApplicationFillingForStikstofGebruiksNorm",
         pkg.calculatorVersion,
     )

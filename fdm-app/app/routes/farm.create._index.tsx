@@ -51,6 +51,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { getCalendarSelection } from "../lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -89,9 +90,11 @@ const FormSchema = z.object({
 
 // Loader
 export async function loader({ request }: LoaderFunctionArgs) {
+    const yearSelection = getCalendarSelection()
+
     return {
-        b_name_farm: null,
         year: new Date().getFullYear(),
+        yearSelection: yearSelection,
     }
 }
 
@@ -101,24 +104,18 @@ export async function loader({ request }: LoaderFunctionArgs) {
  * @returns The JSX element representing the add farm page.
  */
 export default function AddFarmPage() {
-    const loaderData = useLoaderData<typeof loader>()
+    const { year, yearSelection } = useLoaderData<typeof loader>()
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            b_name_farm: loaderData.b_name_farm ?? "",
-            year: loaderData.year,
+            b_name_farm: "",
+            year: year,
             has_derogation: false,
-            derogation_start_year: loaderData.year,
+            derogation_start_year: 2025,
         },
     })
-
-    const currentYear = new Date().getFullYear()
-    const years = Array.from(
-        { length: currentYear - 2020 + 1 },
-        (_, i) => currentYear - i,
-    )
 
     return (
         <SidebarInset>
@@ -217,7 +214,7 @@ export default function AddFarmPage() {
                                                                             field.onChange
                                                                         }
                                                                         defaultValue={String(
-                                                                            new Date().getFullYear(),
+                                                                            field.value,
                                                                         )}
                                                                     >
                                                                         <FormControl>
@@ -289,18 +286,20 @@ export default function AddFarmPage() {
                                                                     </SelectTrigger>
                                                                 </FormControl>
                                                                 <SelectContent>
-                                                                    {years.map(
+                                                                    {yearSelection.map(
                                                                         (
-                                                                            year,
+                                                                            yearOption: string,
                                                                         ) => (
                                                                             <SelectItem
                                                                                 key={
-                                                                                    year
+                                                                                    yearOption
                                                                                 }
-                                                                                value={year.toString()}
+                                                                                value={
+                                                                                    yearOption
+                                                                                }
                                                                             >
                                                                                 {
-                                                                                    year
+                                                                                    yearOption
                                                                                 }
                                                                             </SelectItem>
                                                                         ),
