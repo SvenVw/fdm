@@ -33,7 +33,7 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
     }
 
     const aggregatedEmissions = fertilizerApplications.reduce(
-        (acc, application) => {
+        (acc: NitrogenEmissionAmmoniaFertilizers, application) => {
             const fertilizerDetail = fertilizerDetailsMap.get(
                 application.p_id_catalogue,
             )
@@ -76,6 +76,9 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
                     acc.mineral.total = acc.mineral.total.add(applicationValue)
                     acc.mineral.applications.push({
                         id: application.p_app_id,
+                        p_id_catalogue: application.p_id_catalogue,
+                        p_type: application.p_type,
+                        p_app_date: application.p_app_date,
                         value: applicationValue,
                     })
                     break
@@ -101,6 +104,9 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
                             acc.manure.total.add(applicationValue)
                         acc.manure.applications.push({
                             id: application.p_app_id,
+                            p_id_catalogue: application.p_id_catalogue,
+                            p_type: application.p_type,
+                            p_app_date: application.p_app_date,
                             value: applicationValue,
                         })
                     } else if (fertilizerDetail.p_type === "compost") {
@@ -108,6 +114,9 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
                             acc.compost.total.add(applicationValue)
                         acc.compost.applications.push({
                             id: application.p_app_id,
+                            p_id_catalogue: application.p_id_catalogue,
+                            p_type: application.p_type,
+                            p_app_date: application.p_app_date,
                             value: applicationValue,
                         })
                     } else {
@@ -115,6 +124,9 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
                         acc.other.total = acc.other.total.add(applicationValue)
                         acc.other.applications.push({
                             id: application.p_app_id,
+                            p_id_catalogue: application.p_id_catalogue,
+                            p_type: application.p_type,
+                            p_app_date: application.p_app_date,
                             value: applicationValue,
                         })
                     }
@@ -125,6 +137,16 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
         },
         initialEmissions,
     )
+
+    const compareDates = (
+        a: FertilizerApplication,
+        b: FertilizerApplication,
+    ) =>
+        a.p_app_date < b.p_app_date ? -1 : a.p_app_date > b.p_app_date ? 1 : 0
+    aggregatedEmissions.mineral.applications.sort(compareDates)
+    aggregatedEmissions.manure.applications.sort(compareDates)
+    aggregatedEmissions.compost.applications.sort(compareDates)
+    aggregatedEmissions.other.applications.sort(compareDates)
 
     aggregatedEmissions.total = aggregatedEmissions.mineral.total
         .add(aggregatedEmissions.manure.total)

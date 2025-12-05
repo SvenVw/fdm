@@ -183,6 +183,24 @@ export type NitrogenRemoval = {
     residues: NitrogenRemovalResidues
 }
 
+export type NitrogenEmissionFertilizer = {
+    /**
+     * The total amount of nitrogen emission from fertilizers.
+     */
+    total: Decimal
+    /**
+     * A detailed list of individual fertilizer applications.
+     * Each entry includes the application's unique identifier (`id`) and the amount of nitrogen emitted (`value`).
+     */
+    applications: {
+        id: string
+        p_id_catalogue: string
+        p_type: string
+        p_app_date: string
+        value: Decimal
+    }[]
+}
+
 /**
  * Represents the ammonia nitrogen emissions from various fertilizer sources.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
@@ -195,59 +213,42 @@ export type NitrogenEmissionAmmoniaFertilizers = {
     /**
      * Ammonia nitrogen emissions specifically from mineral fertilizers.
      */
-    mineral: {
-        /**
-         * The total amount of ammonia nitrogen emitted from mineral fertilizers.
-         */
-        total: Decimal
-        /**
-         * A detailed list of individual mineral fertilizer applications.
-         * Each entry includes the application's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
-         */
-        applications: { id: string; value: Decimal }[]
-    }
+    mineral: NitrogenEmissionFertilizer
     /**
      * Ammonia nitrogen emissions specifically from manure.
      */
-    manure: {
-        /**
-         * The total amount of ammonia nitrogen emitted from manure.
-         */
-        total: Decimal
-        /**
-         * A detailed list of individual manure applications.
-         * Each entry includes the application's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
-         */
-        applications: { id: string; value: Decimal }[]
-    }
+    manure: NitrogenEmissionFertilizer
     /**
      * Ammonia nitrogen emissions specifically from compost.
      */
-    compost: {
-        /**
-         * The total amount of ammonia nitrogen emitted from compost.
-         */
-        total: Decimal
-        /**
-         * A detailed list of individual compost applications.
-         * Each entry includes the application's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
-         */
-        applications: { id: string; value: Decimal }[]
-    }
+    compost: NitrogenEmissionFertilizer
     /**
      * Ammonia nitrogen emissions specifically from other.
      */
-    other: {
-        /**
-         * The total amount of ammonia nitrogen emitted from other.
-         */
-        total: Decimal
-        /**
-         * A detailed list of individual other applications.
-         * Each entry includes the application's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
-         */
-        applications: { id: string; value: Decimal }[]
-    }
+    other: NitrogenEmissionFertilizer
+}
+
+export type NitrogenEmissionAmmoniaFertilizersTotal = {
+    /**
+     * The total amount of ammonia nitrogen emitted from all fertilizer sources.
+     */
+    total: Decimal
+    /**
+     * The total amount of ammonia nitrogen specifically from mineral fertilizers.
+     */
+    mineral: Decimal
+    /**
+     * The total amount of ammonia nitrogen specifically from manure.
+     */
+    manure: Decimal
+    /**
+     * The total amount of ammonia nitrogen specifically from compost.
+     */
+    compost: Decimal
+    /**
+     * The total amount of ammonia nitrogen specifically from other.
+     */
+    other: Decimal
 }
 
 /**
@@ -379,7 +380,10 @@ export type NitrogenBalance = {
      */
     emission: {
         total: Decimal
-        ammonia: Decimal
+        ammonia: {
+            total: Decimal
+            fertilizers: NitrogenEmissionAmmoniaFertilizersTotal
+        }
         nitrate: Decimal
     }
     /**
