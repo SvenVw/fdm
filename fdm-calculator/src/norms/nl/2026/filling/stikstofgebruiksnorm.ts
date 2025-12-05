@@ -203,7 +203,6 @@ export function getWorkingCoefficient(
 
                     if (subType.applicationPeriod) {
                         const appMonth = p_app_date.getMonth() // 0-11 (Jan is 0, Dec is 11)
-                        const appDay = p_app_date.getDate()
 
                         if (
                             subType.applicationPeriod ===
@@ -213,7 +212,7 @@ export function getWorkingCoefficient(
                             if (
                                 !(
                                     (appMonth >= 8 && appMonth <= 11) ||
-                                    (appMonth === 0)
+                                    appMonth === 0
                                 )
                             ) {
                                 return false
