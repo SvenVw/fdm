@@ -213,7 +213,7 @@ export function getWorkingCoefficient(
                             if (
                                 !(
                                     (appMonth >= 8 && appMonth <= 11) ||
-                                    (appMonth === 0 && appDay <= 31)
+                                    (appMonth === 0)
                                 )
                             ) {
                                 return false

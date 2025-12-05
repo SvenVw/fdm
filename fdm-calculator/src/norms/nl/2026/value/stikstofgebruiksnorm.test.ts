@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import { calculateNL2026StikstofGebruiksNorm } from "./stikstofgebruiksnorm"
 import type { NL2026NormsInput, NL2026NormsInputForCultivation } from "./types"
 
-describe(" calculateNL2026StikstofGebruiksNorm", () => {
+describe("calculateNL2026StikstofGebruiksNorm", () => {
     it("should return the correct norm for grasland (beweiden)", async () => {
         const mockInput: NL2026NormsInput = {
             farm: { has_grazing_intention: true },

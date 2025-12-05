@@ -18,11 +18,9 @@ import type { DierlijkeMestGebruiksnormResult } from "norms/nl/types"
  * - **Standard Norm**: The norm is 170 kg N/ha from animal manure.
  */
 export async function calculateNL2026DierlijkeMestGebruiksNorm(): Promise<DierlijkeMestGebruiksnormResult> {
-    let normValue: number
-    let normSource: string
 
-    normValue = 170
-    normSource = "Standaard - geen derogatie"
+    const normValue = 170
+    const normSource = "Standaard - geen derogatie"
 
     return { normValue, normSource }
 }
@@ -33,7 +31,6 @@ export async function calculateNL2026DierlijkeMestGebruiksNorm(): Promise<Dierli
  * This function is wrapped with `withCalculationCache` to optimize performance by caching
  * results based on the input and the current calculator version.
  *
- * @param {NL2026NormsInput} input - An object containing all necessary parameters for the calculation.
  * @returns {Promise<DierlijkeMestGebruiksnormResult>} An object of type `DierlijkeMestGebruiksnormResult` containing the determined
  *   nitrogen usage standard (`normValue`) and a `normSource` string explaining the rule applied.
  */

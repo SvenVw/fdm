@@ -49,7 +49,7 @@ export interface GebruiksnormResult {
      */
     normValue: number
     /**
-     * The cultivation name according to RVO's "Tabel 2 Stikstof landbouwgrond 2025"
+     * The cultivation name according to RVO's "Tabel 2 Stikstof landbouwgrond"
      * that was used to determine the legal limit.
      */
     normSource: string

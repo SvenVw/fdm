@@ -55,7 +55,7 @@ export async function collectNL2026InputForNorms(
         timeframe2026Cultivation,
     )
 
-    // 5. Get the details of the soil analyses
+    // 4. Get the details of the soil analyses
     const soilAnalysis = await getCurrentSoilData(
         fdm,
         principal_id,
