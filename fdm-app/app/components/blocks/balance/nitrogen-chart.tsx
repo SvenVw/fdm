@@ -1,5 +1,5 @@
 import { format } from "date-fns/format"
-import { useMemo, useState } from "react"
+import { ReactElement, Ref, useId, useMemo, useState } from "react"
 import { nl } from "react-day-picker/locale"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
 import { cn } from "@/app/lib/utils"
@@ -52,6 +52,8 @@ type FieldBalanceData = {
 type ApplicationChartConfigItem = {
     label: string
     color: string
+    styleId?: string
+    dotted?: boolean
     unit?: string
     detail?: string
 }
@@ -111,18 +113,22 @@ function buildChartDataAndLegend({
         mineralFertilizer: {
             label: "Kunstmest",
             color: "var(--color-sky-600)",
+            styleId: "mineralFertilizer",
         },
         manureFertilizer: {
             label: "Dierlijke Mest",
             color: "yellow",
+            styleId: "manureFertilizer",
         },
         compostFertilizer: {
             label: "Compost",
             color: "green",
+            styleId: "compostFertilizer",
         },
         otherFertilizer: {
             label: "Overige Meststoffen",
             color: "gray",
+            styleId: "otherFertilizer",
         },
     }
 
@@ -184,6 +190,82 @@ function buildChartDataAndLegend({
 
     return { legend, chartData, chartConfig }
 }
+
+function DottedPatternDef({
+    id,
+    spacing = 1.5,
+    darkness = 0.02,
+    color = "black",
+    bg,
+    rotate,
+}: {
+    id: string
+    color: string
+    spacing?: number
+    darkness?: number
+    bg?: string
+    /** Rotation in degrees *without unit* */
+    rotate?: number
+}) {
+    const radius = spacing * Math.sqrt((4 / Math.PI) * darkness)
+    const worldSpaceTransform = "translate(0,0) scale(10,10)"
+    return (
+        <pattern
+            id={id}
+            patternUnits="userSpaceOnUse"
+            width={spacing}
+            height={spacing}
+            patternTransform={
+                rotate
+                    ? `rotate(${rotate}) ${worldSpaceTransform}`
+                    : worldSpaceTransform
+            }
+            preserveAspectRatio="xMidYMid"
+        >
+            <circle cx={radius} cy={radius} r={radius} fill={color} />
+        </pattern>
+        // <pattern id={id} viewBox="0,0,10,10" width="10%" height="10%">
+        //     <polygon points="0,0 2,5 0,10 5,8 10,10 8,5 10,0 5,2" />
+        // </pattern>
+    )
+}
+
+function buildPatternId(id: string, dataKey: string) {
+    return `${id}_${dataKey}`
+}
+
+function PatternDefinitions({
+    ref,
+    id: baseId,
+    chartConfig,
+}: {
+    ref?: Ref<SVGDefsElement>
+    id: string
+    chartConfig: Record<string, ApplicationChartConfigItem>
+}) {
+    return (
+        <defs ref={ref}>
+            {Object.entries(chartConfig).reduce(
+                (pats, [dataKey, itemConfig]) => {
+                    if (itemConfig.dotted) {
+                        const id = buildPatternId(baseId, dataKey)
+                        pats.push(
+                            <DottedPatternDef
+                                key={id}
+                                id={id}
+                                color={itemConfig.color}
+                                rotate={30}
+                            />,
+                        )
+                    }
+                    return pats
+                },
+                [] as ReactElement[],
+            )}
+        </defs>
+    )
+}
+
 export function NitrogenBalanceChart(
     props: { balanceData: { balance: number; removal: number } } & (
         | { type: "farm"; balanceData: FarmBalanceData; fieldInput: unknown }
@@ -207,6 +289,7 @@ export function NitrogenBalanceChart(
         () => buildChartDataAndLegend(props),
         [type, balanceData, fieldInput],
     )
+    const patternId = useId()
 
     type ChartMouseEvent = {
         tooltipPayload: { dataKey: string }[]
@@ -230,6 +313,37 @@ export function NitrogenBalanceChart(
             })
     }
 
+    function getBarStyle(dataKey: string) {
+        const itemConfig = chartConfig[dataKey as keyof typeof chartConfig]
+        if (!itemConfig) return {}
+
+        if (itemConfig.dotted) {
+            return {
+                style: {
+                    fill: `url(#${buildPatternId(patternId, itemConfig.styleId ? itemConfig.styleId : dataKey)})`,
+                },
+                stroke: itemConfig.color,
+                strokeWidth: "var(--spacing-2)",
+            }
+        }
+
+        return { fill: itemConfig.color }
+    }
+
+    const barRadius = 5
+    const barRadiusStart: [number, number, number, number] = [
+        barRadius,
+        0,
+        0,
+        barRadius,
+    ]
+    const barRadiusEnd: [number, number, number, number] = [
+        0,
+        barRadius,
+        barRadius,
+        0,
+    ]
+
     return (
         <ChartContainer config={chartConfig}>
             <BarChart
@@ -240,6 +354,10 @@ export function NitrogenBalanceChart(
                     left: -20,
                 }}
             >
+                {PatternDefinitions({
+                    id: patternId,
+                    chartConfig: legend,
+                })}
                 <XAxis type="number" />
                 <YAxis
                     dataKey="primary"
@@ -326,17 +444,17 @@ export function NitrogenBalanceChart(
                 />
                 <Bar
                     dataKey="supply"
-                    fill="var(--color-supply)"
                     radius={5}
                     stackId={"a"}
+                    {...getBarStyle("supply")}
                     onMouseEnter={onTooltipFocus}
                     onMouseLeave={onTooltipBlur}
                 />
                 <Bar
                     dataKey="removal"
-                    fill="var(--color-removal)"
                     radius={5}
                     stackId={"b"}
+                    {...getBarStyle("removal")}
                     onMouseEnter={onTooltipFocus}
                     onMouseLeave={onTooltipBlur}
                 />
@@ -347,9 +465,9 @@ export function NitrogenBalanceChart(
                               <Bar
                                   key={dataKey}
                                   dataKey={dataKey}
-                                  fill={`var(--color-${p_type}FertilizerAmmonia)`}
                                   radius={5}
                                   stackId={"b"}
+                                  {...getBarStyle(dataKey)}
                                   onMouseEnter={onTooltipFocus}
                                   onMouseLeave={onTooltipBlur}
                               />
@@ -358,21 +476,28 @@ export function NitrogenBalanceChart(
                     : fertilizerTypes.flatMap((p_type) =>
                           balanceData.emission.ammonia.fertilizers[
                               p_type
-                          ].applications.map((app) => {
+                          ].applications.map((app, i, apps) => {
                               const dataKey = `${p_type}FertilizerAmmonia_${app.id}`
+                              const barStyle = getBarStyle(dataKey)
                               return (
                                   <Bar
                                       key={dataKey}
                                       dataKey={dataKey}
-                                      fill={`var(--color-${p_type}FertilizerAmmonia)`}
+                                      strokeWidth={2}
+                                      radius={
+                                          i === 0
+                                              ? barRadiusStart
+                                              : i === apps.length - 1
+                                                ? barRadiusEnd
+                                                : barRadius
+                                      }
+                                      stackId={"b"}
+                                      {...barStyle}
                                       stroke={
                                           tooltipFocus.has(dataKey)
                                               ? "black"
-                                              : "none"
+                                              : barStyle.stroke
                                       }
-                                      strokeWidth={2}
-                                      radius={5}
-                                      stackId={"b"}
                                       onMouseEnter={onTooltipFocus}
                                       onMouseLeave={onTooltipBlur}
                                   />
@@ -384,6 +509,7 @@ export function NitrogenBalanceChart(
                     fill="var(--color-emissionNitrate)"
                     radius={5}
                     stackId={"b"}
+                    {...getBarStyle("emissionNitrate")}
                     onMouseEnter={onTooltipFocus}
                     onMouseLeave={onTooltipBlur}
                 />
