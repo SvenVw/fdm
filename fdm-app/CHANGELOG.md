@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.25.2
+
+### Patch Changes
+
+- f443234: Fixes that saved fields of the farm are visible again with a colored outline
+
 ## 0.25.1
 
 ### Patch Changes
