@@ -103,7 +103,10 @@ class CustomControl implements IControl {
 
     onRemove(): void {
         if (this._root) {
-            this._root.unmount()
+            const root = this._root
+            setTimeout(() => {
+                root.unmount()
+            }, 0)
             this._root = undefined
         }
         this._container?.parentNode?.removeChild(this._container)

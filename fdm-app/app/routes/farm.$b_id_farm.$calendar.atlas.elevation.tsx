@@ -8,7 +8,7 @@ import { getFields } from "@svenvw/fdm-core"
 import throttle from "lodash.throttle"
 import type { FeatureCollection } from "geojson"
 import maplibregl from "maplibre-gl"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState, Fragment } from "react"
 import {
     Layer,
     Map as MapGL,
@@ -273,24 +273,26 @@ export default function FarmAtlasElevationBlock() {
             
             // Gather values for samples
             const values = await Promise.all(samplePoints.map(async (p) => {
-                const rdP = proj4("EPSG:28992").forward([p.lng, p.lat]) as [number, number]
-                // Find which tile contains this point
-                const feature = visibleFeatures.find(f => {
-                    if (!f.geometry || f.geometry.type !== "Polygon") return false
-                    const ring = (f.geometry as any).coordinates[0]
-                    return isPointInPolygon(rdP, ring)
-                })
-                if (feature?.properties) {
-                     const url = feature.properties.url || feature.properties.href || feature.properties.download_url
-                     if (url) {
-                         try {
-                             // Requesting location value
-                             const vals = await locationValues(url, { longitude: p.lng, latitude: p.lat })
-                             if (vals && vals.length > 0 && !isNaN(vals[0]) && vals[0] > -100 && vals[0] < 1000) {
-                                 return vals[0]
-                             }
-                         } catch {}
-                     }
+                try {
+                    const rdP = proj4("EPSG:28992").forward([p.lng, p.lat]) as [number, number]
+                    // Find which tile contains this point
+                    const feature = visibleFeatures.find(f => {
+                        if (!f.geometry || f.geometry.type !== "Polygon") return false
+                        const ring = (f.geometry as any).coordinates[0]
+                        return isPointInPolygon(rdP, ring)
+                    })
+                    if (feature?.properties) {
+                        const url = feature.properties.url || feature.properties.href || feature.properties.download_url
+                        if (url) {
+                            // Requesting location value
+                            const vals = await locationValues(url, { longitude: p.lng, latitude: p.lat })
+                            if (vals && vals.length > 0 && !isNaN(vals[0]) && vals[0] > -100 && vals[0] < 1000) {
+                                return vals[0]
+                            }
+                        }
+                    }
+                } catch {
+                    // Ignore errors for individual points
                 }
                 return null
             }))
@@ -366,8 +368,16 @@ export default function FarmAtlasElevationBlock() {
         return () => clearTimeout(timer)
     }, [throttledUpdate])
 
+    // Refs for state accessible in throttled functions
+    const stateRef = useRef({ indexData, activeTiles })
+    useEffect(() => {
+        stateRef.current = { indexData, activeTiles }
+    }, [indexData, activeTiles])
+
     // Handle hover to show elevation value
-    const handleMouseMove = useCallback(throttle(async (event: MapLayerMouseEvent) => {
+    const handleMouseMove = useMemo(() => throttle(async (event: MapLayerMouseEvent) => {
+        const { indexData, activeTiles } = stateRef.current
+        
         if (!mapRef.current || mapRef.current.getZoom() < 13) {
             setHoverElevation(null)
             return
@@ -453,9 +463,8 @@ export default function FarmAtlasElevationBlock() {
 
                 {/* Render Active Tiles (Zoom >= 13) */}
                 {viewState.zoom >= 13 && showElevation && activeTiles.map((tile) => (
-                    <>
+                    <Fragment key={tile.id}>
                         <Source
-                            key={`color-${tile.id}`}
                             id={`ahn-cog-${tile.id}`}
                             type="raster"
                             url={tile.cogUrl!}
@@ -472,7 +481,6 @@ export default function FarmAtlasElevationBlock() {
                             />
                         </Source>
                         <Source
-                            key={`dem-${tile.id}`}
                             id={`ahn-dem-${tile.id}`}
                             type="raster-dem"
                             url={tile.cogUrlHillshade!}
@@ -492,7 +500,7 @@ export default function FarmAtlasElevationBlock() {
                                 }}
                             />
                         </Source>
-                    </>
+                    </Fragment>
                 ))}
 
                 {/* Fields Overlay (Saved Fields) */}
