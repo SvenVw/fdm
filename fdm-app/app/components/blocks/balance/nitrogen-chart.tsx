@@ -36,6 +36,7 @@ type FarmBalanceData = {
         ammonia: {
             total: number
             fertilizers: Record<"total" | FertilizerTypes, number>
+            residues: number
         }
         nitrate: number
     }
@@ -58,6 +59,10 @@ type FieldBalanceData = {
         total: number
         ammonia: {
             total: number
+            residues: {
+                total: number
+                cultivations: { id: string; value: number }[]
+            }
             fertilizers: Record<
                 FertilizerTypes,
                 {
@@ -135,6 +140,7 @@ function buildChartDataAndLegend({
     const fertilizerSupplyBar: BarDataType = []
     const removalBar: BarDataType = []
     const fertilizerAmmoniaBar: BarDataType = []
+    const residueAmmoniaBar: BarDataType = []
 
     const nitrateEmission =
         type === "farm"
@@ -265,6 +271,9 @@ function buildChartDataAndLegend({
 
     if (type === "farm") {
         chartData.fixation = Math.abs(balanceData.supply.fixation)
+        chartData.residueAmmonia = Math.abs(
+            balanceData.emission.ammonia.residues,
+        )
         chartData.removalHarvest = Math.abs(balanceData.removal.harvests)
         chartData.removalResidue = Math.abs(balanceData.removal.residues)
         fertilizerTypes.forEach((p_type) => {
@@ -379,9 +388,9 @@ function buildChartDataAndLegend({
 
         const fixationStyles: Record<string, ApplicationChartConfigItem> = {
             "": {
+                ...legend.supply,
                 label: "onbekend",
                 color: "gray",
-                fillPattern: "dotted",
             },
         }
 
@@ -431,9 +440,9 @@ function buildChartDataAndLegend({
 
         const removalStyles: Record<string, ApplicationChartConfigItem> = {
             "": {
+                ...legend.removal,
                 label: "onbekend",
                 color: "gray",
-                fillPattern: "dotted",
             },
         }
 
@@ -451,6 +460,29 @@ function buildChartDataAndLegend({
         )
 
         Object.assign(chartConfig, removalStyles)
+
+        const residueAmmoniaStyles: Record<string, ApplicationChartConfigItem> =
+            {
+                "": {
+                    ...legend.emission,
+                    label: "onbekend",
+                    color: "gray",
+                },
+            }
+        balanceData.emission.ammonia.residues.cultivations.forEach(
+            (cultivationResult) => {
+                addCultivation(
+                    fieldInput,
+                    "residueAmmonia",
+                    cultivationResult,
+                    "kg N / ha ammoniakemissie",
+                    residueAmmoniaStyles,
+                    residueAmmoniaBar,
+                )
+            },
+        )
+
+        Object.assign(chartConfig, residueAmmoniaStyles)
     }
 
     // Bar Graph Layout
@@ -463,6 +495,7 @@ function buildChartDataAndLegend({
     const allRemovalBar = [
         ...removalBar,
         ...fertilizerAmmoniaBar,
+        ...residueAmmoniaBar,
         "emissionNitrate",
     ]
 
