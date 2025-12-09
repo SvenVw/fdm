@@ -167,6 +167,9 @@ export default function FarmAtlasElevationBlock() {
     const [hoverElevation, setHoverElevation] = useState<number | null>(null)
     const [showFields, setShowFields] = useState(true)
     const [showElevation, setShowElevation] = useState(true)
+    const [networkStatus, setNetworkStatus] = useState<
+        "idle" | "loading" | "slow" | "error"
+    >("idle")
 
     const fieldsSavedId = "fieldsSaved"
     const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
@@ -210,19 +213,53 @@ export default function FarmAtlasElevationBlock() {
     // Fetch COG Index once
     useEffect(() => {
         async function fetchIndex() {
+            const cacheKey = "ahn_kaartbladindex_v1"
             try {
+                // Try cache
+                if (typeof localStorage !== "undefined") {
+                    const cached = localStorage.getItem(cacheKey)
+                    if (cached) {
+                        try {
+                            const { timestamp, data } = JSON.parse(cached)
+                            // Cache for 7 days
+                            if (
+                                Date.now() - timestamp <
+                                7 * 24 * 60 * 60 * 1000
+                            ) {
+                                setIndexData(data)
+                                return
+                            }
+                        } catch {
+                            localStorage.removeItem(cacheKey)
+                        }
+                    }
+                }
+
                 const response = await fetch(
                     "https://service.pdok.nl/rws/ahn/atom/downloads/dtm_05m/kaartbladindex.json",
                 )
                 if (!response.ok) throw new Error("Failed to fetch COG index")
                 const data = (await response.json()) as FeatureCollection
                 setIndexData(data)
+
+                if (typeof localStorage !== "undefined") {
+                    try {
+                        localStorage.setItem(
+                            cacheKey,
+                            JSON.stringify({ timestamp: Date.now(), data }),
+                        )
+                    } catch (e) {
+                        console.warn("Cache storage failed", e)
+                    }
+                }
             } catch (e) {
                 console.error("Error fetching COG index:", e)
             }
         }
         fetchIndex()
     }, [])
+
+    const updateId = useRef(0)
 
     // Function to update visible tiles
     const updateVisibleTiles = useCallback(async () => {
@@ -239,7 +276,17 @@ export default function FarmAtlasElevationBlock() {
             return
         }
 
+        const currentId = ++updateId.current
         setIsUpdating(true)
+        setNetworkStatus("loading")
+
+        // Detect slow network
+        const slowTimer = setTimeout(() => {
+            if (updateId.current === currentId) {
+                setNetworkStatus("slow")
+            }
+        }, 2000)
+
         const sw = bounds.getSouthWest()
         const ne = bounds.getNorthEast()
         const nw = bounds.getNorthWest()
@@ -268,7 +315,7 @@ export default function FarmAtlasElevationBlock() {
 
             // Calculate global min/max for the viewport by sampling
             const samplePoints: { lng: number; lat: number }[] = []
-            const gridSize = 4 // 4x4 = 16 points
+            const gridSize = 3
             for (let i = 0; i <= gridSize; i++) {
                 for (let j = 0; j <= gridSize; j++) {
                     const lng = sw.lng + (ne.lng - sw.lng) * (i / gridSize)
@@ -309,7 +356,7 @@ export default function FarmAtlasElevationBlock() {
                                 if (
                                     vals &&
                                     vals.length > 0 &&
-                                    !isNaN(vals[0]) &&
+                                    !Number.isNaN(vals[0]) &&
                                     vals[0] > -100 &&
                                     vals[0] < 1000
                                 ) {
@@ -323,6 +370,8 @@ export default function FarmAtlasElevationBlock() {
                     return null
                 }),
             )
+
+            if (updateId.current !== currentId) return
 
             const validValues = values.filter((v) => v !== null) as number[]
             if (validValues.length > 0) {
@@ -369,16 +418,18 @@ export default function FarmAtlasElevationBlock() {
                 })
             }
 
-            const keyNew = newTiles
-                .map((t) => t.cogUrl)
-                .sort()
-                .join("|")
-
             setActiveTiles(newTiles)
+            setNetworkStatus("idle")
         } catch (e) {
             console.error("Error updating visible tiles:", e)
+            if (updateId.current === currentId) {
+                setNetworkStatus("error")
+            }
         } finally {
-            setIsUpdating(false)
+            if (updateId.current === currentId) {
+                setIsUpdating(false)
+            }
+            clearTimeout(slowTimer)
         }
     }, [indexData, activeTiles])
 
@@ -463,7 +514,7 @@ export default function FarmAtlasElevationBlock() {
                 } catch (e) {
                     setHoverElevation(null)
                 }
-            }, 100),
+            }, 200),
         [],
     )
 
@@ -589,6 +640,7 @@ export default function FarmAtlasElevationBlock() {
                         loading={isUpdating}
                         hoverValue={hoverElevation}
                         showScale={viewState.zoom >= 13 && showElevation}
+                        networkStatus={networkStatus}
                     />
                     <div className="grid gap-4 w-[350px]">
                         <FieldsPanelHover

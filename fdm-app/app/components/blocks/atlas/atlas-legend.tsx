@@ -7,9 +7,10 @@ interface ElevationLegendProps {
     loading?: boolean
     hoverValue?: number | null
     showScale?: boolean
+    networkStatus?: "idle" | "loading" | "slow" | "error"
 }
 
-export function ElevationLegend({ min, max, loading, hoverValue, showScale = true }: ElevationLegendProps) {
+export function ElevationLegend({ min, max, loading, hoverValue, showScale = true, networkStatus }: ElevationLegendProps) {
     return (
         <div className="w-40">
             <Card className="bg-background/90 backdrop-blur-sm shadow-sm">
@@ -20,6 +21,18 @@ export function ElevationLegend({ min, max, loading, hoverValue, showScale = tru
                         </h4>
                         {loading && <LoadingSpinner className="h-3 w-3" />}
                     </div>
+                    
+                    {networkStatus === "slow" && (
+                        <div className="mb-2 text-xs font-medium text-orange-600">
+                            Trage verbinding...
+                        </div>
+                    )}
+
+                    {networkStatus === "error" && (
+                        <div className="mb-2 text-xs font-medium text-destructive">
+                            Fout bij laden
+                        </div>
+                    )}
                     
                     {showScale && (
                         <div className="flex flex-col gap-1">
