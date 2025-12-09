@@ -386,7 +386,11 @@ export type NitrogenBalance = {
     /**
      * The total nitrogen removal across all fields.
      */
-    removal: Decimal
+    removal: {
+        total: Decimal
+        harvests: Decimal
+        residues: Decimal
+    }
     /**
      * The total nitrogen emission across all fields.
      */
@@ -619,8 +623,24 @@ export type NitrogenBalanceFieldResultNumeric = {
 // Numeric version of NitrogenBalance
 export type NitrogenBalanceNumeric = {
     balance: number
-    supply: number
-    removal: number
+    supply: {
+        total: number
+        deposition: number
+        fixation: number
+        mineralization: number
+        fertilizers: {
+            total: number
+            mineral: number
+            manure: number
+            compost: number
+            other: number
+        }
+    }
+    removal: {
+        total: number
+        harvests: number
+        residues: number
+    }
     emission: {
         total: number
         ammonia: number

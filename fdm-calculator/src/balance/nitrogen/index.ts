@@ -318,6 +318,9 @@ export function calculateNitrogenBalancesFieldToFarm(
         ),
     ) as Omit<NitrogenBalance["supply"]["fertilizers"], "total">
     let totalFarmRemoval = new Decimal(0)
+    let totalFarmRemovalHarvest = new Decimal(0)
+    let totalFarmRemovalResidue = new Decimal(0)
+
     let totalFarmEmission = new Decimal(0)
     const ammoniaByFertilizerType = Object.fromEntries(
         fertilizerTypes.reduce(
@@ -367,6 +370,12 @@ export function calculateNitrogenBalancesFieldToFarm(
 
         totalFarmRemoval = totalFarmRemoval.add(
             fieldResult.balance.removal.total.times(fieldArea),
+        )
+        totalFarmRemovalHarvest = totalFarmRemovalHarvest.add(
+            fieldResult.balance.removal.harvests.total,
+        )
+        totalFarmRemovalResidue = totalFarmRemovalHarvest.add(
+            fieldResult.balance.removal.residues.total,
         )
         totalFarmEmission = totalFarmEmission.add(
             fieldResult.balance.emission.total.times(fieldArea),
@@ -419,6 +428,12 @@ export function calculateNitrogenBalancesFieldToFarm(
     const avgFarmRemoval = totalFarmArea.isZero()
         ? new Decimal(0)
         : totalFarmRemoval.dividedBy(totalFarmArea)
+    const avgFarmRemovalHarvest = totalFarmArea.isZero()
+        ? new Decimal(0)
+        : totalFarmRemovalHarvest.dividedBy(totalFarmArea)
+    const avgFarmRemovalResidue = totalFarmArea.isZero()
+        ? new Decimal(0)
+        : totalFarmRemovalResidue.dividedBy(totalFarmArea)
     const avgFarmEmission = totalFarmArea.isZero()
         ? new Decimal(0)
         : totalFarmEmission.dividedBy(totalFarmArea)
@@ -454,7 +469,11 @@ export function calculateNitrogenBalancesFieldToFarm(
                 total: totalFarmSupplyFertilizersTotal,
             },
         },
-        removal: avgFarmRemoval,
+        removal: {
+            total: avgFarmRemoval,
+            harvests: avgFarmRemovalHarvest,
+            residues: avgFarmRemovalResidue,
+        },
         emission: {
             total: avgFarmEmission,
             ammonia: {
