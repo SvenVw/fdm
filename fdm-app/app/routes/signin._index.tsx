@@ -433,13 +433,14 @@ export default function SignIn() {
                                     </p>
                                 </CardFooter>
                             </Card>
-                            <div className="text-center text-sm">
+                            <div className="text-center">
                                 <Button
-                                    variant={"outline"}
+                                    variant="ghost"
                                     onClick={scrollToMoreInfo}
+                                    className="group text-muted-foreground hover:text-foreground hover:bg-transparent"
                                 >
-                                    {`Lees meer over ${clientConfig.name}`}{" "}
-                                    <MoveDown className="ml-2 h-4 w-4" />
+                                    Ontdek wat {clientConfig.name} kan doen
+                                    <MoveDown className="ml-2 h-4 w-4 transition-transform group-hover:translate-y-1" />
                                 </Button>
                             </div>
                         </div>
