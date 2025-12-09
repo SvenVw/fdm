@@ -18,6 +18,15 @@ type FieldInput = {
         b_lu_name: string
         b_lu_croprotation: string
     }[]
+    harvests: {
+        b_id_harvesting: string
+        b_lu_harvest_date: Date
+        b_lu: string
+        harvestable: {
+            b_id_harvestable: string
+            harvestable_analyses: unknown[]
+        }
+    }[]
     fertilizerApplications: { p_app_id: string; p_name_nl: string }[]
 }
 
@@ -30,7 +39,11 @@ type FarmBalanceData = {
         }
         nitrate: number
     }
-    removal: number
+    removal: {
+        total: number
+        harvests: number
+        residues: number
+    }
     supply: {
         total: number
         deposition: number
@@ -61,7 +74,17 @@ type FieldBalanceData = {
         }
         nitrate: { total: number }
     }
-    removal: { total: number }
+    removal: {
+        total: number
+        harvests: {
+            total: number
+            harvests: { id: string; value: number }[]
+        }
+        residues: {
+            total: number
+            cultivations: { id: string; value: number }[]
+        }
+    }
     supply: {
         total: number
         fixation: {
@@ -110,6 +133,7 @@ function buildChartDataAndLegend({
     type BarDataType = (string | string[])[]
     const fixationBar: BarDataType = []
     const fertilizerSupplyBar: BarDataType = []
+    const removalBar: BarDataType = []
     const fertilizerAmmoniaBar: BarDataType = []
 
     const nitrateEmission =
@@ -141,11 +165,6 @@ function buildChartDataAndLegend({
     }
 
     const legend = {
-        supply: {
-            label: "Aanvoer",
-            color: "black",
-            fillPattern: "dotted",
-        },
         deposition: {
             label: "Depositie",
             color: "black",
@@ -157,18 +176,6 @@ function buildChartDataAndLegend({
         mineralization: {
             label: "Mineralisatie",
             color: "lime",
-        },
-        removal: {
-            label: "Afvoer",
-            color: "hsl(var(--chart-2))",
-        },
-        emissionAmmonia: {
-            label: "Ammoniakemissie",
-            color: "hsl(var(--chart-3))",
-        },
-        emissionNitrate: {
-            label: "Nitraatemissie",
-            color: "hsl(var(--chart-4))",
         },
         mineralFertilizer: {
             label: "Kunstmest",
@@ -184,12 +191,53 @@ function buildChartDataAndLegend({
         },
         otherFertilizer: {
             label: "Overige Meststoffen",
-            color: "gray",
+            color: "#bbb",
+        },
+        supply: {
+            label: "Aanvoer",
+            color: "black",
+            fillPattern: "dotted",
+        },
+        removal: {
+            label: "Afvoer",
+            color: "black",
+            fillPattern: "striped",
+        },
+        emission: {
+            label: "Emissie",
+            color: "white",
         },
     } as const
 
     const chartConfig: Record<string, ApplicationChartConfigItem> = {
         ...legend,
+        deposition: {
+            ...legend.supply,
+            ...legend.deposition,
+        },
+        fixation: {
+            ...legend.supply,
+            ...legend.fixation,
+        },
+        mineralization: {
+            ...legend.supply,
+            ...legend.mineralization,
+        },
+        removalHarvest: {
+            ...legend.removal,
+            label: "Afvoer door Oogsten",
+            color: "var(--color-teal-700)",
+        },
+        removalResidue: {
+            ...legend.removal,
+            label: "Afvoer door Gewasresten",
+            color: "var(--color-brown-300)",
+        },
+        emissionNitrate: {
+            ...legend.emission,
+            label: "Nitraatemissie",
+            color: "hsl(var(--chart-4))",
+        },
     }
 
     const langNL = {
@@ -203,36 +251,32 @@ function buildChartDataAndLegend({
         // These styles are inherited by individual fertilizer applications too
         const style = legend[`${fertilizerType}Fertilizer`]
         chartConfig[`${fertilizerType}FertilizerSupply`] = {
+            ...legend.supply,
             ...style,
             fillPattern: "dotted",
             label: `Aanvoer door ${langNL[fertilizerType]}`,
         }
         chartConfig[`${fertilizerType}FertilizerAmmonia`] = {
+            ...legend.emission,
             ...style,
             label: `Ammoniakemissie door ${langNL[fertilizerType]}`,
-        }
-
-        if (type === "farm") {
-            fertilizerSupplyBar.push(`${fertilizerType}FertilizerSupply`)
-            chartData[`${fertilizerType}FertilizerSupply`] = Math.abs(
-                balanceData.supply.fertilizers[fertilizerType],
-            )
-
-            fertilizerAmmoniaBar.push(`${fertilizerType}FertilizerAmmonia`)
-            chartData[`${fertilizerType}FertilizerAmmonia`] = Math.abs(
-                balanceData.emission.ammonia.fertilizers[fertilizerType],
-            )
         }
     }
 
     if (type === "farm") {
         chartData.fixation = Math.abs(balanceData.supply.fixation)
-
+        chartData.removalHarvest = Math.abs(balanceData.removal.harvests)
+        chartData.removalResidue = Math.abs(balanceData.removal.residues)
         fertilizerTypes.forEach((p_type) => {
+            fertilizerSupplyBar.push(`${p_type}FertilizerSupply`)
+            chartData[`${p_type}FertilizerSupply`] = Math.abs(
+                balanceData.supply.fertilizers[p_type],
+            )
+
+            fertilizerAmmoniaBar.push(`${p_type}FertilizerAmmonia`)
             chartData[`${p_type}FertilizerAmmonia`] = Math.abs(
                 balanceData.emission.ammonia.fertilizers[p_type],
             )
-            fertilizerAmmoniaBar.push()
         })
     }
 
@@ -240,10 +284,11 @@ function buildChartDataAndLegend({
         type ExtendedChartConfig = Record<string, ApplicationChartConfigItem>
 
         function addFertilizerApplication(
+            fieldInput: FieldInput,
             dataKeyPrefix: string,
             applicationResult: { id: string; value: number },
             unit: string,
-            bar: string[],
+            bar: BarDataType,
         ) {
             const dataKey = `${dataKeyPrefix}_${applicationResult.id}`
             const application = fieldInput.fertilizerApplications.find(
@@ -251,7 +296,7 @@ function buildChartDataAndLegend({
                     fa.p_app_id === applicationResult.id,
             )
             chartData[dataKey] = Math.abs(applicationResult.value)
-            ;(chartConfig as ExtendedChartConfig)[dataKey] = applicationResult
+            ;(chartConfig as ExtendedChartConfig)[dataKey] = application
                 ? {
                       styleId: dataKeyPrefix,
                       label: format(application.p_app_date, "PP", {
@@ -267,12 +312,46 @@ function buildChartDataAndLegend({
                   }
             bar.push(dataKey)
         }
+
+        function addCultivation(
+            fieldInput: FieldInput,
+            dataKeyPrefix: string,
+            cultivationResult: { id: string; value: number },
+            unit: string,
+            styles: Record<string, ApplicationChartConfigItem>,
+            bar: BarDataType,
+        ) {
+            const dataKey = `${dataKeyPrefix}_${cultivationResult.id}`
+            const cultivation = fieldInput.cultivations.find(
+                (lu) => lu.b_lu === cultivationResult.id,
+            ) ?? {
+                b_lu: "",
+                b_lu_name: "onbekend",
+                b_lu_croprotation: "",
+            }
+
+            const styleId = `${dataKeyPrefix}_${cultivation.b_lu_croprotation}`
+            if (!styles[styleId]) {
+                styles[styleId] = {
+                    ...styles[""],
+                    color: getCultivationColor(cultivation.b_lu_croprotation),
+                }
+            }
+            chartData[dataKey] = Math.abs(cultivationResult.value)
+            ;(chartConfig as ExtendedChartConfig)[dataKey] = {
+                label: cultivation.b_lu_name,
+                unit: unit,
+                styleId: styleId,
+            }
+            bar.push(dataKey)
+        }
         fertilizerTypes.forEach((p_type) => {
             // Fertilizer Supply
             const fertilizerTypeSupplyBar: string[] = []
             balanceData.supply.fertilizers[p_type].applications.forEach(
                 (app) => {
                     addFertilizerApplication(
+                        fieldInput,
                         `${p_type}FertilizerSupply`,
                         app,
                         "kg N / ha aanvoer",
@@ -288,6 +367,7 @@ function buildChartDataAndLegend({
                 p_type
             ].applications.forEach((app) => {
                 addFertilizerApplication(
+                    fieldInput,
                     `${p_type}FertilizerAmmonia`,
                     app,
                     "kg N / ha ammoniakemissie",
@@ -307,35 +387,70 @@ function buildChartDataAndLegend({
 
         balanceData.supply.fixation.cultivations.forEach(
             (cultivationResult) => {
-                const dataKey = `fixation_${cultivationResult.id}`
-                const cultivation = fieldInput.cultivations.find(
-                    (lu) => lu.b_lu === cultivationResult.id,
-                ) ?? {
-                    b_lu: "",
-                    b_lu_name: "onbekend",
-                    b_lu_croprotation: "",
-                }
-
-                const styleId = `fixation_${cultivation.b_lu_croprotation}`
-                if (!fixationStyles[styleId]) {
-                    fixationStyles[styleId] = {
-                        ...fixationStyles[""],
-                        color: getCultivationColor(
-                            cultivation.b_lu_croprotation,
-                        ),
-                    }
-                }
-                chartData[dataKey] = cultivationResult.value
-                ;(chartConfig as ExtendedChartConfig)[dataKey] = {
-                    label: cultivation.b_lu_name,
-                    unit: "kg N / ha fixatie",
-                    styleId: styleId,
-                }
-                fixationBar.push(dataKey)
+                addCultivation(
+                    fieldInput,
+                    "fixation",
+                    cultivationResult,
+                    "kg N / ha fixatie",
+                    fixationStyles,
+                    fixationBar,
+                )
             },
         )
 
         Object.assign(chartConfig, fixationStyles)
+
+        balanceData.removal.harvests.harvests.forEach((harvestResult) => {
+            const dataKey = `removalHarvest_${harvestResult.id}`
+            const harvestDetails = fieldInput.harvests.find(
+                (harvesting) => harvesting.b_id_harvesting === harvestResult.id,
+            )
+            const cultivationDetails = harvestDetails
+                ? fieldInput.cultivations.find(
+                      (lu) => lu.b_lu === harvestDetails.b_lu,
+                  )
+                : undefined
+
+            chartData[dataKey] = Math.abs(harvestResult.value)
+            ;(chartConfig as ExtendedChartConfig)[dataKey] = harvestDetails
+                ? {
+                      label: format(harvestDetails.b_lu_harvest_date, "PP", {
+                          locale: nl,
+                      }),
+                      styleId: "removalHarvest",
+                      detail: cultivationDetails
+                          ? cultivationDetails.b_lu_name
+                          : undefined,
+                  }
+                : {
+                      label: "onbekend oogst",
+                      styleId: "removalHarvest",
+                  }
+            removalBar.push(dataKey)
+        })
+
+        const removalStyles: Record<string, ApplicationChartConfigItem> = {
+            "": {
+                label: "onbekend",
+                color: "gray",
+                fillPattern: "dotted",
+            },
+        }
+
+        balanceData.removal.residues.cultivations.forEach(
+            (cultivationResult) => {
+                addCultivation(
+                    fieldInput,
+                    "removalResidue",
+                    cultivationResult,
+                    "kg N / ha afvoer",
+                    removalStyles,
+                    removalBar,
+                )
+            },
+        )
+
+        Object.assign(chartConfig, removalStyles)
     }
 
     // Bar Graph Layout
@@ -345,10 +460,19 @@ function buildChartDataAndLegend({
         "mineralization",
         ...fertilizerSupplyBar,
     ]
-    const removalBar = [...fertilizerAmmoniaBar, "emissionNitrate"]
-    console.log(supplyBar)
+    const allRemovalBar = [
+        ...removalBar,
+        ...fertilizerAmmoniaBar,
+        "emissionNitrate",
+    ]
 
-    return { legend, chartData, chartConfig, supplyBar, removalBar }
+    return {
+        legend,
+        chartData,
+        chartConfig,
+        supplyBar,
+        removalBar: allRemovalBar,
+    }
 }
 
 function DottedPatternDef({
@@ -357,7 +481,7 @@ function DottedPatternDef({
     darkness = 0.05,
     color = "black",
     bg,
-    bgOpacity = 0.3,
+    bgOpacity = 0.2,
     rotate,
 }: {
     id: string
@@ -406,7 +530,7 @@ function StripedPatternDef({
     darkness = 0.1,
     color = "black",
     bg,
-    bgOpacity,
+    bgOpacity = 0.2,
     rotate,
 }: {
     id: string
@@ -486,6 +610,7 @@ function PatternDefinitions({
                                     key={id}
                                     id={id}
                                     color={itemConfig.color}
+                                    bg={itemConfig.color}
                                     rotate={45}
                                 />
                             )
@@ -718,13 +843,51 @@ export function NitrogenBalanceChart(
                                                 "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
                                             )}
                                         >
-                                            <div
-                                                className="h-2 w-2 shrink-0 rounded-[2px]"
-                                                style={{
-                                                    backgroundColor:
-                                                        itemConfig.color,
-                                                }}
-                                            />
+                                            {itemConfig.fillPattern ||
+                                            itemConfig.color === "white" ? (
+                                                <svg
+                                                    role="img"
+                                                    aria-label={
+                                                        itemConfig.label
+                                                    }
+                                                    viewBox="0 0 10 10"
+                                                    className="h-6 w-6 border shrink-0 rounded-[2px]"
+                                                    style={{
+                                                        borderColor:
+                                                            itemConfig.color ===
+                                                            "white"
+                                                                ? "black"
+                                                                : itemConfig.color,
+                                                    }}
+                                                >
+                                                    <rect
+                                                        x={0}
+                                                        y={0}
+                                                        width={10}
+                                                        height={10}
+                                                        fill={
+                                                            itemConfig.color ===
+                                                            "white"
+                                                                ? "black"
+                                                                : `url(#${buildPatternId(patternId, dataKey)})`
+                                                        }
+                                                        fillOpacity={
+                                                            itemConfig.color ===
+                                                            "white"
+                                                                ? 0.2
+                                                                : 1
+                                                        }
+                                                    />
+                                                </svg>
+                                            ) : (
+                                                <div
+                                                    className="h-2 w-2 shrink-0 rounded-[2px]"
+                                                    style={{
+                                                        backgroundColor:
+                                                            itemConfig.color,
+                                                    }}
+                                                />
+                                            )}
                                             {itemConfig.label}
                                         </div>
                                     )

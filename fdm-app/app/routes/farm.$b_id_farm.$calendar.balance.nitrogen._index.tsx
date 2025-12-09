@@ -276,7 +276,7 @@ function FarmBalanceNitrogenOverview({
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {resolvedNitrogenBalanceResult.removal}
+                            {resolvedNitrogenBalanceResult.removal.total}
                         </div>
                         <p className="text-xs text-muted-foreground">
                             kg N / ha
