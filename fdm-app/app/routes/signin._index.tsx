@@ -1,25 +1,51 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
+    AlertTriangle,
+    ArrowRight,
+    BadgeCheck,
+    BookOpen,
     Calculator,
     CheckCircle2,
-    Cookie,
+    Droplets,
+    ExternalLink,
+    FileUp,
+    FlaskConical,
+    Github,
+    History,
     Layers,
+    LineChart,
+    Map,
+    MousePointerClick,
     MoveDown,
+    Scale,
+    ScanText,
+    ShieldCheck,
     Sprout,
+    Table2,
     Target,
+    Tractor,
+    Users,
+    Wheat,
+    Wind,
 } from "lucide-react"
 import { useEffect, useRef } from "react"
+import { FormProvider } from "react-hook-form"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
-import { Form, redirect, useSearchParams } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { Form, Link, NavLink, redirect, useSearchParams } from "react-router"
+import { useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
-import { toast } from "sonner"
 import { z } from "zod"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "~/components/ui/accordion"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -142,7 +168,8 @@ export default function SignIn() {
     )
 
     const handleSignInError = (provider: string, error: unknown) => {
-        toast(
+        dataWithError(
+            null,
             `Er is helaas iets misgegaan bij het aanmelden met ${provider}. Probeer het opnieuw.`,
         )
         console.error("Social sign-in failed:", error)
@@ -316,7 +343,7 @@ export default function SignIn() {
                                             </span>
                                         </div>
                                     </div>
-                                    <RemixFormProvider {...form}>
+                                    <FormProvider {...form}>
                                         <Form
                                             id="formSigninMagicLink"
                                             onSubmit={form.handleSubmit}
@@ -388,7 +415,7 @@ export default function SignIn() {
                                                 </div>
                                             </fieldset>
                                         </Form>
-                                    </RemixFormProvider>
+                                    </FormProvider>
                                 </CardContent>
                                 <CardFooter className="flex justify-center">
                                     <p className="text-sm font-medium text-muted-foreground text-center">
@@ -417,16 +444,6 @@ export default function SignIn() {
                             </div>
                         </div>
                     </div>
-                    <div className="flex items-center justify-between p-6 text-xs text-muted-foreground">
-                        <Button
-                            variant="link"
-                            className="h-auto p-0 text-muted-foreground hover:text-foreground flex items-center gap-1"
-                            onClick={onOpenCookieSettings}
-                        >
-                            <Cookie className="h-3 w-3" />
-                            <span>Cookie instellingen</span>
-                        </Button>
-                    </div>
                 </div>
                 <div className="hidden bg-muted lg:block">
                     <img
@@ -439,184 +456,869 @@ export default function SignIn() {
                     />
                 </div>
             </div>
-            <div ref={moreInfoRef} className="bg-muted/10 py-24">
-                <div className="container mx-auto max-w-6xl px-4 lg:px-8">
-                    <div className="mb-24 grid items-center gap-12 lg:grid-cols-2">
-                        <div>
-                            <div className="mb-6 inline-flex items-center rounded-full border border-green-100 bg-green-200 px-3 py-1 text-sm font-medium text-green-800">
-                                <span className="mr-2 flex h-2 w-2 rounded-full bg-green-500"></span>
-                                Innovatie in de praktijk
+            <div ref={moreInfoRef}>
+                <div className="bg-muted/10 py-24">
+                    <div className="container mx-auto max-w-6xl px-4 lg:px-8">
+                        <div className="mb-24 grid items-center gap-12 lg:grid-cols-2">
+                            <div>
+                                <div className="mb-6 inline-flex items-center rounded-full border border-green-100 bg-green-200 px-3 py-1 text-sm font-medium text-green-800">
+                                    <span className="mr-2 flex h-2 w-2 rounded-full bg-green-500"></span>
+                                    Innovatie in de praktijk
+                                </div>
+                                <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                                    Samen leren en innoveren
+                                </h2>
+                                <div className="mb-8 space-y-4 text-lg leading-relaxed text-muted-foreground">
+                                    <p>
+                                        {clientConfig.name} is een initiatief
+                                        van het Nutriënten Management Instituut
+                                        (NMI). Het platform is volop in
+                                        ontwikkeling, maar nu al inzetbaar voor
+                                        uw bedrijf. {clientConfig.name} is
+                                        bovendien een open-source platform. Dit
+                                        betekent transparantie en de
+                                        mogelijkheid voor derden om bij te
+                                        dragen aan de doorontwikkeling. Door
+                                        twee innovatieve projecten samen te
+                                        brengen, faciliteren we kennisdeling en
+                                        versnellen we de transitie naar een
+                                        duurzamere landbouw:
+                                    </p>
+                                    <ul className="space-y-3">
+                                        <li className="flex gap-2">
+                                            <span className="mt-2 flex h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                                            <span>
+                                                <strong className="text-foreground">
+                                                    Doelsturing:
+                                                </strong>{" "}
+                                                In samenwerking met LTO Noord,
+                                                ZLTO, LVVN, NVWA en RVO testen
+                                                we hoe doelsturing werkt in de
+                                                praktijk, met de Stikstofbalans
+                                                als basis.
+                                            </span>
+                                        </li>
+                                        <li className="flex gap-2">
+                                            <span className="mt-2 flex h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                                            <span>
+                                                <strong className="text-foreground">
+                                                    PPS BAAT:
+                                                </strong>{" "}
+                                                Samen met Wageningen University
+                                                maken we bemestingsadvies
+                                                toegankelijker. Krijg inzicht in
+                                                zowel opbrengst als
+                                                milieu-impact voor een bewuste
+                                                meststofkeuze.
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="border-t border-border pt-6">
+                                    <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                        Partners
+                                    </p>
+                                    <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium text-foreground/80">
+                                        <span>LTO Noord</span>•<span>ZLTO</span>
+                                        •<span>Wageningen University</span>•
+                                        <span>LVVN</span>•<span>NVWA</span>•
+                                        <span>RVO</span>
+                                    </div>
+                                </div>
                             </div>
+
+                            <div className="relative">
+                                <div className="absolute -inset-4 -z-10 rounded-3xl bg-linear-to-tr from-primary/20 to-blue-500/20 blur-2xl opacity-70" />
+
+                                <Card className="border-muted/40 bg-background shadow-xl">
+                                    <CardHeader>
+                                        <CardTitle className="flex items-center gap-2 text-xl">
+                                            <Target className="h-5 w-5 text-primary" />
+                                            Uitgangspunten
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="grid gap-6">
+                                        <div className="flex items-start gap-4">
+                                            <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+                                                <CheckCircle2 className="h-5 w-5" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-semibold">
+                                                    Praktijktoets
+                                                </h4>
+                                                <p className="mt-1 text-sm text-muted-foreground">
+                                                    Leren en ontdekken hoe
+                                                    doelsturing werkt in de
+                                                    echte wereld.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start gap-4">
+                                            <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+                                                <CheckCircle2 className="h-5 w-5" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-semibold">
+                                                    Transparant & Deelbaar
+                                                </h4>
+                                                <p className="mt-1 text-sm text-muted-foreground">
+                                                    Als open-source platform
+                                                    faciliteren we kennisdeling
+                                                    en versnellen we innovatie.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start gap-4">
+                                            <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+                                                <CheckCircle2 className="h-5 w-5" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-semibold">
+                                                    In ontwikkeling
+                                                </h4>
+                                                <p className="mt-1 text-sm text-muted-foreground">
+                                                    Een groeiend platform dat
+                                                    continu wordt verbeterd op
+                                                    basis van uw feedback.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-background py-24">
+                    <div className="container mx-auto max-w-6xl px-4 lg:px-8">
+                        <div className="mx-auto mb-20 max-w-3xl text-center">
                             <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                                Samen leren en innoveren
+                                Doelsturing: Kansen en Uitdagingen
                             </h2>
-                            <div className="mb-8 space-y-4 text-lg leading-relaxed text-muted-foreground">
-                                <p>
-                                    {clientConfig.name} is een initiatief van
-                                    het Nutriënten Management Instituut (NMI).
-                                    Het platform is volop in ontwikkeling, maar
-                                    nu al inzetbaar voor uw bedrijf. FDM is
-                                    bovendien een open-source platform. Dit
-                                    betekent transparantie en de mogelijkheid
-                                    voor derden om bij te dragen aan de
-                                    doorontwikkeling. Door twee innovatieve
-                                    projecten samen te brengen, faciliteren we
-                                    kennisdeling en versnellen we de transitie
-                                    naar een duurzamere landbouw:
-                                </p>
-                                <ul className="space-y-3">
-                                    <li className="flex gap-2">
-                                        <span className="mt-2 flex h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                                        <span>
-                                            <strong className="text-foreground">
-                                                Doelsturing:
-                                            </strong>{" "}
-                                            In samenwerking met LTO Noord, ZLTO,
-                                            LVVN, NVWA en RVO testen we hoe
-                                            doelsturing werkt in de praktijk,
-                                            met de Stikstofbalans als basis.
-                                        </span>
-                                    </li>
-                                    <li className="flex gap-2">
-                                        <span className="mt-2 flex h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                                        <span>
-                                            <strong className="text-foreground">
-                                                PPS BAAT:
-                                            </strong>{" "}
-                                            Samen met Wageningen University
-                                            maken we bemestingsadvies
-                                            toegankelijker. Krijg inzicht in
-                                            zowel opbrengst als milieu-impact
-                                            voor een bewuste meststofkeuze.
-                                        </span>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div className="border-t border-border pt-6">
-                                <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                                    Partners
-                                </p>
-                                <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium text-foreground/80">
-                                    <span>LTO Noord</span>•
-                                    <span>ZLTO</span>•
-                                    <span>Wageningen University</span>•
-                                    <span>LVVN</span>•<span>NVWA</span>•
-                                    <span>RVO</span>
+                            <p className="text-lg leading-relaxed text-muted-foreground">
+                                Doelsturing kan een effectieve methode zijn om
+                                de waterkwaliteit te verbeteren en
+                                ammoniakemissies te verminderen, doordat u als
+                                ondernemer zelf de maatregelen kiest. De
+                                keerzijde is dat dit vraagt om veel en
+                                gedetailleerde data. {clientConfig.name} streeft
+                                ernaar om deze complexe berekening zo eenvoudig
+                                mogelijk te maken, zonder in te leveren op
+                                nauwkeurigheid.
+                            </p>
+                        </div>
+
+                        <div className="relative">
+                            {/* Connecting line for desktop */}
+                            <div className="absolute top-1/2 left-0 hidden w-full -translate-y-1/2 border-t-2 border-dashed border-muted lg:block" />
+
+                            <div className="grid gap-8 lg:grid-cols-4 relative z-10">
+                                {/* Step 1: Supply */}
+                                <div className="group rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
+                                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+                                        <Tractor className="h-7 w-7" />
+                                    </div>
+                                    <h3 className="mb-2 text-lg font-semibold">
+                                        Aanvoer
+                                    </h3>
+                                    <ul className="text-sm text-muted-foreground space-y-1">
+                                        <li>• Kunstmest</li>
+                                        <li>• Dierlijke mest</li>
+                                        <li>• Compost</li>
+                                        <li>• Overige meststoffen</li>
+                                        <li>• Bodemlevering</li>
+                                        <li>• Depositie</li>
+                                    </ul>
+                                </div>
+
+                                {/* Step 2: Removal & Ammonia */}
+                                <div className="group rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
+                                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                                        <Wheat className="h-7 w-7" />
+                                    </div>
+                                    <h3 className="mb-2 text-lg font-semibold">
+                                        Afvoer & Emissie
+                                    </h3>
+                                    <ul className="text-sm text-muted-foreground space-y-1">
+                                        <li>• Oogst </li>
+                                        <li>• Gewasresten </li>
+                                        <li>• Ammoniak (Vervluchtiging)</li>
+                                    </ul>
+                                </div>
+
+                                {/* Step 3: Surplus */}
+                                <div className="group rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
+                                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                        <Scale className="h-7 w-7" />
+                                    </div>
+                                    <h3 className="mb-2 text-lg font-semibold">
+                                        Stikstofoverschot
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Het resultaat van Aanvoer min Afvoer en
+                                        Ammoniak.
+                                    </p>
+                                </div>
+
+                                {/* Step 4: Leaching */}
+                                <div className="group rounded-xl border border-blue-200 bg-blue-50/50 p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
+                                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+                                        <Droplets className="h-7 w-7" />
+                                    </div>
+                                    <h3 className="mb-2 text-lg font-semibold">
+                                        Waterkwaliteit
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Nitraatuitspoeling berekend als fractie
+                                        van het overschot.
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="relative">
-                            <div className="absolute -inset-4 -z-10 rounded-3xl bg-linear-to-tr from-primary/20 to-blue-500/20 blur-2xl opacity-70" />
+                        <div className="mx-auto mt-16 max-w-2xl text-center">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-muted bg-muted/50 px-4 py-1.5 text-sm text-muted-foreground">
+                                <span className="font-semibold text-foreground">
+                                    Scope:
+                                </span>
+                                Focus op percelen (stalbalans volgt later).
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                            <Card className="border-muted/40 bg-background shadow-xl">
+                <div className="bg-muted/10 py-24">
+                    <div className="container mx-auto max-w-6xl px-4 lg:px-8">
+                        <div className="mb-20 mx-auto max-w-3xl text-center">
+                            <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                                Bemestingsadviezen: Kennis binnen handbereik
+                            </h2>
+                            <p className="text-lg leading-relaxed text-muted-foreground">
+                                Bij NMI hebben we jarenlange kennis van
+                                bemesting en bodemvruchtbaarheid omgezet in
+                                digitale adviezen, direct beschikbaar in{" "}
+                                {clientConfig.name}.
+                            </p>
+                        </div>
+
+                        <div className="grid gap-12 lg:grid-cols-2 items-center">
+                            {/* Left: Text with Benefits */}
+                            <div>
+                                <h3 className="text-2xl font-semibold mb-6">
+                                    Altijd het juiste advies voor uw gewas
+                                </h3>
+                                <div className="space-y-6">
+                                    <div className="flex items-start gap-4">
+                                        <BookOpen className="h-6 w-6 text-primary shrink-0 mt-1" />
+                                        <div>
+                                            <h4 className="font-semibold">
+                                                Gebundelde expertise
+                                            </h4>
+                                            <p className="text-muted-foreground">
+                                                We hebben de complete
+                                                bemestingsadviezen uit de
+                                                bekende{" "}
+                                                <strong className="text-foreground">
+                                                    CBGV (Bemestingsadvies)
+                                                </strong>{" "}
+                                                en{" "}
+                                                <strong className="text-foreground">
+                                                    CBAV (Handboek Bodem en
+                                                    Bemesting)
+                                                </strong>{" "}
+                                                volledig gedigitaliseerd voor
+                                                vrijwel alle teelten in
+                                                Nederland.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <Sprout className="h-6 w-6 text-primary shrink-0 mt-1" />
+                                        <div>
+                                            <h4 className="font-semibold">
+                                                Compleet Overzicht Nutriënten
+                                            </h4>
+                                            <p className="text-muted-foreground">
+                                                Adviezen omvatten primaire (N,
+                                                P, K), organische stof,
+                                                secundaire en micronutriënten,
+                                                specifiek voor uw situatie.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <LineChart className="h-6 w-6 text-primary shrink-0 mt-1" />
+                                        <div>
+                                            <h4 className="font-semibold">
+                                                Inzicht in Uw Bemesting
+                                            </h4>
+                                            <p className="text-muted-foreground">
+                                                Naast de aanbevelingen tonen we
+                                                per nutriënt ook hoeveel u
+                                                daadwerkelijk heeft gegeven,
+                                                gebaseerd op uw ingevoerde
+                                                bemestingsplannen.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right: Emphasize Importance */}
+                            <Card className="shadow-xl border-primary/20 bg-background">
                                 <CardHeader>
-                                    <CardTitle className="flex items-center gap-2 text-xl">
-                                        <Target className="h-5 w-5 text-primary" />
-                                        Uitgangspunten
+                                    <CardTitle className="flex items-center gap-2">
+                                        <FlaskConical className="h-6 w-6 text-primary" />
+                                        Waarom advies essentieel is
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent className="grid gap-6">
-                                    <div className="flex items-start gap-4">
-                                        <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
-                                            <CheckCircle2 className="h-5 w-5" />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-semibold">
-                                                Praktijktoets
-                                            </h4>
-                                            <p className="mt-1 text-sm text-muted-foreground">
-                                                Leren en ontdekken hoe
-                                                doelsturing werkt in de echte
-                                                wereld.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start gap-4">
-                                        <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
-                                            <CheckCircle2 className="h-5 w-5" />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-semibold">
-                                                Transparant & Deelbaar
-                                            </h4>
-                                            <p className="mt-1 text-sm text-muted-foreground">
-                                                Als open-source platform
-                                                faciliteren we kennisdeling en
-                                                versnellen we innovatie.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start gap-4">
-                                        <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
-                                            <CheckCircle2 className="h-5 w-5" />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-semibold">
-                                                In ontwikkeling
-                                            </h4>
-                                            <p className="mt-1 text-sm text-muted-foreground">
-                                                Een groeiend platform dat
-                                                continu wordt verbeterd op basis
-                                                van uw feedback.
-                                            </p>
-                                        </div>
-                                    </div>
+                                <CardContent className="space-y-4">
+                                    <p className="text-muted-foreground leading-relaxed">
+                                        Bemestingsadviezen gaan verder dan enkel
+                                        de wettelijke
+                                        <strong className="text-foreground">
+                                            {" "}
+                                            gebruiksnormen
+                                        </strong>
+                                        . Ze zijn cruciaal voor:
+                                    </p>
+                                    <ul className="space-y-2 text-muted-foreground">
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+                                            <span>
+                                                Optimale groei en opbrengst van
+                                                uw gewassen.
+                                            </span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+                                            <span>
+                                                Het behouden en verbeteren van
+                                                bodemvruchtbaarheid op lange
+                                                termijn.
+                                            </span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+                                            <span>
+                                                Efficiënt gebruik van
+                                                nutriënten, ter voorkoming van
+                                                overbemesting en verliezen.
+                                            </span>
+                                        </li>
+                                    </ul>
                                 </CardContent>
                             </Card>
                         </div>
                     </div>
+                </div>
+                {/* END OF NEW BEMESTINGSADVIEZEN SECTION */}
+                <div className="bg-background py-24">
+                    <div className="container mx-auto max-w-6xl px-4 lg:px-8">
+                        <div className="mb-20 mx-auto max-w-3xl text-center">
+                            <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                                Gebruiksruimte: Binnen de kaders, met inzicht
+                            </h2>
+                            <p className="text-lg leading-relaxed text-muted-foreground">
+                                Naast advies is ook de wettelijke ruimte
+                                cruciaal. {clientConfig.name} berekent uw
+                                gebruiksruimte zodat u bij het optimaliseren van
+                                uw bemesting altijd binnen de wettelijke kaders
+                                blijft.
+                            </p>
+                        </div>
 
-                    <div className="grid gap-8 md:grid-cols-3">
-                        <Card className="border-none bg-background shadow-md transition-all hover:shadow-lg">
-                            <CardHeader>
-                                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-green-100 text-green-700">
-                                    <Sprout className="h-6 w-6" />
+                        <div className="grid gap-12 lg:grid-cols-2 items-start">
+                            {/* Left: Features */}
+                            <div className="space-y-8">
+                                <div className="flex gap-4">
+                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                        <BadgeCheck className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-semibold mb-2">
+                                            Blijf binnen de normen
+                                        </h3>
+                                        <p className="text-muted-foreground leading-relaxed">
+                                            We berekenen de gebruiksruimte voor
+                                            stikstof (N), fosfaat (P2O5) en
+                                            dierlijke mest op basis van uw
+                                            percelen en gewassen en tellen die
+                                            op naar bedrijfsniveau. Zo ziet u
+                                            direct of uw plannen haalbaar zijn.
+                                        </p>
+                                    </div>
                                 </div>
-                                <CardTitle>Nutriëntenbalans</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="leading-relaxed text-muted-foreground">
-                                    Real-time inzicht in de aanvoer en afvoer
-                                    van nutriënten op bedrijfsniveau. Stuur op
-                                    efficiëntie en minimaliseer verliezen naar
-                                    het milieu.
-                                </p>
-                            </CardContent>
-                        </Card>
+                                <div className="flex gap-4">
+                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                        <LineChart className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-semibold mb-2">
+                                            Diepgaand inzicht
+                                        </h3>
+                                        <p className="text-muted-foreground leading-relaxed">
+                                            Geen zwarte doos: we geven inzicht
+                                            in de opbouw van de berekening,
+                                            inclusief alle correcties en normen
+                                            die voor uw specifieke situatie
+                                            gelden.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <Card className="border-none bg-background shadow-md transition-all hover:shadow-lg">
-                            <CardHeader>
-                                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
-                                    <Layers className="h-6 w-6" />
+                            {/* Right: Disclaimer Box */}
+                            <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-8 shadow-xs">
+                                <div className="flex items-center gap-3 mb-4 text-amber-800">
+                                    <AlertTriangle className="h-6 w-6" />
+                                    <h3 className="font-semibold text-lg">
+                                        Belangrijke Disclaimer
+                                    </h3>
                                 </div>
-                                <CardTitle>Bodemkwaliteit & OS</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="leading-relaxed text-muted-foreground">
-                                    Monitor de ontwikkeling van organische stof
-                                    per perceel. Werk aan een weerbare bodem die
-                                    basis biedt voor een duurzame teelt.
+                                <p className="text-amber-900/80 leading-relaxed mb-6">
+                                    De berekeningen in {clientConfig.name} zijn
+                                    bedoeld als{" "}
+                                    <strong>ondersteunende indicatie</strong>.
+                                    Hoewel we de grootst mogelijke
+                                    zorgvuldigheid betrachten en gedetailleerde
+                                    rekenregels hanteren, kunnen er verschillen
+                                    zijn met de officiële vaststelling.
                                 </p>
-                            </CardContent>
-                        </Card>
+                                <p className="text-amber-900/80 leading-relaxed text-sm">
+                                    Raadpleeg voor definitieve beslissingen en
+                                    de wettelijke verantwoording altijd een
+                                    erkend adviseur of de officiële tools van de
+                                    overheid (RVO).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-muted/10 py-24">
+                    <div className="container mx-auto max-w-6xl px-4 lg:px-8">
+                        <div className="mb-20 mx-auto max-w-3xl text-center">
+                            <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                                Atlas: Alles in kaart gebracht
+                            </h2>
+                            <p className="text-lg leading-relaxed text-muted-foreground">
+                                Verken agrarisch Nederland met de interactieve
+                                Atlas. Navigeer door de jaren heen en krijg
+                                direct inzicht in perceelshistorie en
+                                gebiedskenmerken.
+                            </p>
+                        </div>
 
-                        <Card className="border-none bg-background shadow-md transition-all hover:shadow-lg">
-                            <CardHeader>
-                                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 text-blue-700">
-                                    <Calculator className="h-6 w-6" />
+                        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
+                                <CardHeader>
+                                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                        <History className="h-6 w-6" />
+                                    </div>
+                                    <CardTitle className="text-lg">
+                                        Visuele Teelthistorie
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        Bekijk percelen terug tot 2020. De kaart
+                                        kleurt mee met de gewascategorie, zodat
+                                        u in één oogopslag de rotatie ziet.
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
+                                <CardHeader>
+                                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                        <MousePointerClick className="h-6 w-6" />
+                                    </div>
+                                    <CardTitle className="text-lg">
+                                        Interactief & Gedetailleerd
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        Klik op een perceel voor alle details:
+                                        van exacte oppervlakte en grenzen tot de
+                                        historie van geteelde gewassen tot en
+                                        met 2009.
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
+                                <CardHeader>
+                                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                        <Map className="h-6 w-6" />
+                                    </div>
+                                    <CardTitle className="text-lg">
+                                        Gebiedsgerichte normen
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        Zie direct welke mestwetgeving van
+                                        toepassing is. De kaart toont relevante
+                                        regio's zoals NV-gebieden.
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
+                                <CardHeader>
+                                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                        <Layers className="h-6 w-6" />
+                                    </div>
+                                    <CardTitle className="text-lg">
+                                        Bodem & Water
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        Combineer perceelsdata met kaarten voor
+                                        grondsoorten en grondwatertrappen voor
+                                        een compleet beeld van de
+                                        bodemgesteldheid.
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-background py-24">
+                    <div className="container mx-auto max-w-6xl px-4 lg:px-8">
+                        <div className="mb-20 mx-auto max-w-3xl text-center">
+                            <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                                Slimmer werken, niet harder
+                            </h2>
+                            <p className="text-lg leading-relaxed text-muted-foreground">
+                                We maken databeheer zo eenvoudig mogelijk. Van
+                                slimme imports tot samenwerken met uw adviseur:
+                                {clientConfig.name} bespaart u tijd en gedoe.
+                            </p>
+                        </div>
+
+                        <div className="grid gap-12 lg:grid-cols-3">
+                            {/* Feature 1: Import */}
+                            <div className="flex flex-col items-center space-y-4 text-center">
+                                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100 text-blue-700">
+                                    <FileUp className="h-8 w-8" />
                                 </div>
-                                <CardTitle>Bemestingsadvies</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="leading-relaxed text-muted-foreground">
-                                    Integraal advies dat productiedoelen
-                                    verenigt met milieurandvoorwaarden.
-                                    Gebaseerd op de laatste wetenschappelijke
-                                    richtlijnen (PPS BAAT).
+                                <h3 className="text-xl font-semibold">
+                                    RVO Import
+                                </h3>
+                                <p className="text-muted-foreground">
+                                    Start direct door uw percelen in te lezen
+                                    via een RVO shapefile. Uw percelen staan
+                                    binnen enkele seconden correct op de kaart.
                                 </p>
-                            </CardContent>
-                        </Card>
+                            </div>
+
+                            {/* Feature 2: PDF Parsing */}
+                            <div className="flex flex-col items-center space-y-4 text-center">
+                                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+                                    <ScanText className="h-8 w-8" />
+                                </div>
+                                <h3 className="text-xl font-semibold">
+                                    Bodemanalyses
+                                </h3>
+                                <p className="text-muted-foreground">
+                                    Geen handmatig overtypwerk meer. Upload de
+                                    PDF van uw laboratorium en{" "}
+                                    {clientConfig.name} haalt automatisch de
+                                    juiste waarden op.
+                                </p>
+                            </div>
+
+                            {/* Feature 3: Bulk Actions */}
+                            <div className="flex flex-col items-center space-y-4 text-center">
+                                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-green-100 text-green-700">
+                                    <Table2 className="h-8 w-8" />
+                                </div>
+                                <h3 className="text-xl font-semibold">
+                                    Slimme Tabellen
+                                </h3>
+                                <p className="text-muted-foreground">
+                                    Beheer uw bouwplan, bemesting en oogst in
+                                    overzichtelijke tabellen. Voer acties uit
+                                    voor meerdere percelen of gewassen tegelijk.
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Collaboration Section */}
+                        <div className="mt-20 rounded-3xl bg-muted/30 p-8 lg:p-12">
+                            <div className="flex flex-col items-center gap-12 lg:flex-row">
+                                <div className="space-y-6 lg:w-1/2">
+                                    <div className="inline-flex items-center gap-2 rounded-full bg-background px-4 py-1.5 text-sm font-medium text-foreground shadow-sm">
+                                        <Users className="h-4 w-4 text-primary" />
+                                        Samenwerking
+                                    </div>
+                                    <h3 className="text-2xl font-bold lg:text-3xl">
+                                        Deel kennis, behoud controle
+                                    </h3>
+                                    <p className="leading-relaxed text-muted-foreground">
+                                        {clientConfig.name} is gebouwd voor
+                                        samenwerking. Geef uw adviseur of
+                                        organisatie toegang om mee te kijken of
+                                        advies te geven.
+                                    </p>
+                                    <ul className="space-y-3">
+                                        <li className="flex items-center gap-3">
+                                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary">
+                                                <CheckCircle2 className="h-4 w-4" />
+                                            </div>
+                                            <span className="font-medium">
+                                                Nodig adviseurs uit per mail
+                                            </span>
+                                        </li>
+                                        <li className="flex items-center gap-3">
+                                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary">
+                                                <CheckCircle2 className="h-4 w-4" />
+                                            </div>
+                                            <span className="font-medium">
+                                                Deel met uw organisatie
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div className="flex justify-center lg:w-1/2">
+                                    <Card className="w-full max-w-sm border-primary/10 bg-background shadow-xl">
+                                        <CardContent className="space-y-6 p-8 text-center">
+                                            <ShieldCheck className="mx-auto h-16 w-16 text-primary" />
+                                            <div>
+                                                <h4 className="mb-2 text-lg font-bold">
+                                                    Veilig & Vertrouwd
+                                                </h4>
+                                                <p className="text-sm text-muted-foreground">
+                                                    U blijft eigenaar van uw
+                                                    data. Delen gebeurt alleen
+                                                    met uw expliciete
+                                                    toestemming en kan op elk
+                                                    moment worden ingetrokken.
+                                                </p>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-primary py-24 text-primary-foreground">
+                    <div className="container mx-auto max-w-4xl px-4 lg:px-8 text-center">
+                        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-6">
+                            Nieuwsgierig naar de mogelijkheden?
+                        </h2>
+                        <p className="text-primary-foreground/80 text-lg mb-10 max-w-2xl mx-auto">
+                            Probeer {clientConfig.name} vrijblijvend uit. Ontdek
+                            hoe inzicht in uw data bijdraagt aan een duurzame
+                            bedrijfsvoering.
+                        </p>
+                        <Button
+                            size="lg"
+                            variant="secondary"
+                            className="font-semibold text-primary"
+                            onClick={() =>
+                                window.scrollTo({ top: 0, behavior: "smooth" })
+                            }
+                        >
+                            Probeer het uit
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="bg-muted/10 py-24">
+                    <div className="container mx-auto max-w-3xl px-4 lg:px-8">
+                        <div className="text-center mb-16">
+                            <h2 className="text-3xl font-bold tracking-tight mb-4">
+                                Veelgestelde Vragen
+                            </h2>
+                            <p className="text-muted-foreground">
+                                Antwoorden op de meest voorkomende vragen over{" "}
+                                {clientConfig.name}.
+                            </p>
+                        </div>
+
+                        <Accordion
+                            type="single"
+                            collapsible
+                            className="w-full space-y-4"
+                        >
+                            <AccordionItem
+                                value="item-1"
+                                className="border-none rounded-lg bg-background px-6 shadow-sm"
+                            >
+                                <AccordionTrigger className="text-lg hover:no-underline font-medium">
+                                    Wat kost het gebruik van {clientConfig.name}
+                                    ?
+                                </AccordionTrigger>
+                                <AccordionContent className="text-muted-foreground">
+                                    {clientConfig.name} is een open-source
+                                    initiatief en momenteel gratis te gebruiken
+                                    tijdens de pilotfase. Ons doel is om een
+                                    toegankelijke standaard te zetten voor de
+                                    sector.
+                                </AccordionContent>
+                            </AccordionItem>
+
+                            <AccordionItem
+                                value="item-2"
+                                className="border-none rounded-lg bg-background px-6 shadow-sm"
+                            >
+                                <AccordionTrigger className="text-lg hover:no-underline font-medium">
+                                    Wat heb ik nodig om te starten?
+                                </AccordionTrigger>
+                                <AccordionContent className="text-muted-foreground">
+                                    Om optimaal gebruik te maken van{" "}
+                                    {clientConfig.name} heeft u uw perceelsdata
+                                    (RVO shapefile) en recente bodemanalyses
+                                    (PDF) nodig. U kunt deze eenvoudig
+                                    importeren.
+                                </AccordionContent>
+                            </AccordionItem>
+
+                            <AccordionItem
+                                value="item-3"
+                                className="border-none rounded-lg bg-background px-6 shadow-sm"
+                            >
+                                <AccordionTrigger className="text-lg hover:no-underline font-medium">
+                                    Is mijn data veilig?
+                                </AccordionTrigger>
+                                <AccordionContent className="text-muted-foreground">
+                                    Ja. Uw data wordt versleuteld opgeslagen en
+                                    is alleen toegankelijk voor u. U bepaalt
+                                    zelf of en met wie (bijv. uw adviseur) u
+                                    gegevens deelt.
+                                </AccordionContent>
+                            </AccordionItem>
+
+                            <AccordionItem
+                                value="item-4"
+                                className="border-none rounded-lg bg-background px-6 shadow-sm"
+                            >
+                                <AccordionTrigger className="text-lg hover:no-underline font-medium">
+                                    Kan ik samenwerken met mijn adviseur?
+                                </AccordionTrigger>
+                                <AccordionContent className="text-muted-foreground">
+                                    Zeker. U kunt uw adviseur of andere
+                                    betrokkenen uitnodigen voor uw bedrijf. U
+                                    bepaalt welke rechten zij krijgen.
+                                </AccordionContent>
+                            </AccordionItem>
+
+                            <AccordionItem
+                                value="item-5"
+                                className="border-none rounded-lg bg-background px-6 shadow-sm"
+                            >
+                                <AccordionTrigger className="text-lg hover:no-underline font-medium">
+                                    Is {clientConfig.name} een officieel
+                                    overheidsinstrument?
+                                </AccordionTrigger>
+                                <AccordionContent className="text-muted-foreground">
+                                    Nee, {clientConfig.name} is ontwikkeld door
+                                    NMI als ondersteunend instrument voor de
+                                    sector. Hoewel we nauw samenwerken met
+                                    partners zoals LTO en WUR, dient het als
+                                    inzicht- en adviestool, niet voor wettelijke
+                                    aangifte.
+                                </AccordionContent>
+                            </AccordionItem>
+
+                            <AccordionItem
+                                value="item-6"
+                                className="border-none rounded-lg bg-background px-6 shadow-sm"
+                            >
+                                <AccordionTrigger className="text-lg hover:no-underline font-medium">
+                                    Waar kan ik terecht voor ondersteuning?
+                                </AccordionTrigger>
+                                <AccordionContent className="text-muted-foreground">
+                                    Voor technische vragen of feedback kunt u
+                                    contact opnemen met het supportteam van NMI.
+                                    We horen graag uw bevindingen om het
+                                    platform te verbeteren.
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </div>
+                </div>
+
+                <div className="border-t bg-background py-12">
+                    <div className="container mx-auto px-4 lg:px-8">
+                        <div className="grid gap-8 md:grid-cols-3 mb-8">
+                            <div className="col-span-2">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-[#122023]">
+                                        <img
+                                            className="size-6"
+                                            src={clientConfig.logomark}
+                                            alt={clientConfig.name}
+                                        />
+                                    </div>
+                                    <span className="font-semibold text-lg">
+                                        {clientConfig.name}
+                                    </span>
+                                </div>
+                                <p className="text-sm text-muted-foreground max-w-xs">
+                                    Innovatieve software voor een duurzame
+                                    landbouw. Een initiatief van het NMI in
+                                    samenwerking met de sector.
+                                </p>
+                            </div>
+
+                            <div>
+                                <h4 className="font-semibold mb-4">Links</h4>
+                                <ul className="space-y-2 text-sm text-muted-foreground">
+                                    <li>
+                                        <NavLink
+                                            to="https://www.nmi-agro.nl"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="hover:text-primary flex items-center gap-2"
+                                        >
+                                            Over NMI{" "}
+                                            <ExternalLink className="h-3 w-3" />
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            to="https://github.com/SvenVw/fdm"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="hover:text-primary flex items-center gap-2"
+                                        >
+                                            GitHub Repository{" "}
+                                            <Github className="h-3 w-3" />
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink
+                                            to={clientConfig.privacy_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="hover:text-primary"
+                                        >
+                                            Privacybeleid
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            to="#"
+                                            onClick={onOpenCookieSettings}
+                                            className="hover:text-primary text-left"
+                                        >
+                                            Cookie instellingen
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div className="border-t pt-8 text-center text-sm text-muted-foreground">
+                            Ontwikkeld door het Nutriënten Management Instituut.
+                            Gelicentieerd onder de MIT-licentie.
+                        </div>
                     </div>
                 </div>
             </div>
