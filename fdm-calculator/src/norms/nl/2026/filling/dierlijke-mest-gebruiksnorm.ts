@@ -2,8 +2,8 @@ import { withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { table11Mestcodes } from "./table-11-mestcodes"
-import type { NL2025NormsFillingInput } from "./types"
-import type { NormFilling } from "norms/nl/types"
+import type { NL2026NormsFillingInput } from "./types"
+import type { NormFilling } from "../../types"
 
 /**
  * Calculates the nitrogen usage from animal manure for a list of fertilizer applications.
@@ -12,12 +12,12 @@ import type { NormFilling } from "norms/nl/types"
  * based on the type of manure used. It uses predefined values from `table11Mestcodes` to identify
  * which fertilizers are considered animal manure and to find their nitrogen content.
  *
- * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
+ * @param {NL2026NormsFillingInput} input - The standardized input object containing all necessary data.
  * @returns {NormFilling} An object containing the total nitrogen usage (`normFilling`) and a detailed breakdown per application (`applicationFilling`).
  * @throws {Error} Throws an error if a fertilizer or its RVO type is not found, ensuring data integrity.
  */
-export function calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm(
-    input: NL2025NormsFillingInput,
+export function calculateNL2026FertilizerApplicationFillingForDierlijkeMestGebruiksNorm(
+    input: NL2026NormsFillingInput,
 ): NormFilling {
     const { applications, fertilizers } = input
 
@@ -100,17 +100,17 @@ export function calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebru
 }
 
 /**
- * Memoized version of {@link calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm}.
+ * Memoized version of {@link calculateNL2026FertilizerApplicationFillingForDierlijkeMestGebruiksNorm}.
  *
  * This function is wrapped with `withCalculationCache` to optimize performance by caching
  * results based on the input and the current calculator version.
  *
- * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
+ * @param {NL2026NormsFillingInput} input - The standardized input object containing all necessary data.
  * @returns {NormFilling} An object containing the total nitrogen usage (`normFilling`) and a detailed breakdown per application (`applicationFilling`).
  */
-export const getNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm =
+export const getNL2026FertilizerApplicationFillingForDierlijkeMestGebruiksNorm =
     withCalculationCache(
-        calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm,
-        "calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm",
+        calculateNL2026FertilizerApplicationFillingForDierlijkeMestGebruiksNorm,
+        "calculateNL2026FertilizerApplicationFillingForDierlijkeMestGebruiksNorm",
         pkg.calculatorVersion,
     )

@@ -2,7 +2,7 @@ import type { Timeframe } from "@svenvw/fdm-core"
 import type { Params } from "react-router"
 
 const yearStart = 2020
-const yearEnd = new Date().getFullYear()
+const yearEnd = new Date().getFullYear() + 1
 
 export function getCalendar(params: Params): string {
     const calendar = params.calendar as string
@@ -37,7 +37,7 @@ export function getTimeframe(params: Params): Timeframe {
 }
 
 export function getCalendarSelection(): string[] {
-    // Create array of years from 2020 to current year
+    // Create array of years from 2020 to next year
     const years = []
     for (let i = yearStart; i <= yearEnd; i++) {
         years.push(i.toString())

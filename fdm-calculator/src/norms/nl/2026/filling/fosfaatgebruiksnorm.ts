@@ -6,8 +6,8 @@ import {
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { table11Mestcodes } from "./table-11-mestcodes"
-import type { NL2025NormsFillingInput} from "./types"
-import type { NormFilling } from "norms/nl/types"
+import type { NL2026NormsFillingInput} from "./types"
+import type { NormFilling } from "../../types"
 
 const rvoMestcodesOrganicRich25Percent = ["111", "112"] // Compost, Zeer schone compost
 const rvoMestcodesOrganicRich75Percent = ["110", "10", "61", "25", "56"] // Champost, Rundvee - Vaste mest, Geiten - Vaste mest, Paarden - Vaste mest, Schapen - Mest, alle systemen
@@ -34,11 +34,11 @@ const rvoMestcodesOrganicRich75PercentOrganic = ["40"] // Varkens - Vaste mest (
  *     with a 75% contribution factor (e.g., strorijke vaste mest).
  *     This has been acknowledged by RVO to be possible in personal communication with Sven.
  *
- * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
+ * @param {NL2026NormsFillingInput} input - The standardized input object containing all necessary data.
  * @returns {NormFilling} An object containing the total norm filling and a breakdown per application.
  */
-export function calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm(
-    input: NL2025NormsFillingInput,
+export function calculateNL2026FertilizerApplicationFillingForFosfaatGebruiksNorm(
+    input: NL2026NormsFillingInput,
 ): NormFilling {
     const {
         applications,
@@ -288,17 +288,17 @@ function determineCondition1StimuleringOrganischeStofrijkeMeststoffen(
 }
 
 /**
- * Memoized version of {@link calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm}.
+ * Memoized version of {@link calculateNL2026FertilizerApplicationFillingForFosfaatGebruiksNorm}.
  *
  * This function is wrapped with `withCalculationCache` to optimize performance by caching
  * results based on the input and the current calculator version.
  *
- * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
+ * @param {NL2026NormsFillingInput} input - The standardized input object containing all necessary data.
  * @returns {NormFilling} An object containing the total norm filling and a breakdown per application.
  */
-export const getNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm =
+export const getNL2026FertilizerApplicationFillingForFosfaatGebruiksNorm =
     withCalculationCache(
-        calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm,
-        "calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNorm",
+        calculateNL2026FertilizerApplicationFillingForFosfaatGebruiksNorm,
+        "calculateNL2026FertilizerApplicationFillingForFosfaatGebruiksNorm",
         pkg.calculatorVersion,
     )
