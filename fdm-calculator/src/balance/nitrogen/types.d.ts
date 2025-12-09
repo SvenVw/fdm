@@ -399,6 +399,7 @@ export type NitrogenBalance = {
         ammonia: {
             total: Decimal
             fertilizers: NitrogenEmissionAmmoniaFertilizersTotal
+            residues: Decimal
         }
         nitrate: Decimal
     }
@@ -643,7 +644,17 @@ export type NitrogenBalanceNumeric = {
     }
     emission: {
         total: number
-        ammonia: number
+        ammonia: {
+            total: number
+            fertilizers: {
+                total: number
+                mineral: number
+                manure: number
+                compost: number
+                other: number
+            }
+            residues: number
+        }
         nitrate: number
     }
     target: number
