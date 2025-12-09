@@ -1,5 +1,5 @@
 import { format } from "date-fns/format"
-import { ReactElement, Ref, useId, useMemo, useState } from "react"
+import { type ReactElement, type Ref, useId, useMemo, useState } from "react"
 import { nl } from "react-day-picker/locale"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
 import { cn } from "@/app/lib/utils"
@@ -64,7 +64,10 @@ type FieldBalanceData = {
     removal: { total: number }
     supply: {
         total: number
-        fixation: { cultivations: { id: string; value: number }[] }
+        fixation: {
+            total: number
+            cultivations: { id: string; value: number }[]
+        }
         deposition: { total: number }
         mineralization: { total: number }
         fertilizers: Record<
@@ -104,6 +107,11 @@ function buildChartDataAndLegend({
           fieldInput: FieldInput
       }) {
     const fertilizerTypes = ["mineral", "manure", "compost", "other"] as const
+    type BarDataType = (string | string[])[]
+    const fixationBar: BarDataType = []
+    const fertilizerSupplyBar: BarDataType = []
+    const fertilizerAmmoniaBar: BarDataType = []
+
     const nitrateEmission =
         type === "farm"
             ? balanceData.emission.nitrate
@@ -111,11 +119,15 @@ function buildChartDataAndLegend({
     const removal =
         type === "farm" ? balanceData.removal : balanceData.removal.total
     const chartData: Record<string, number | undefined> = {
-        supply: Math.abs(balanceData.supply.total),
         deposition: Math.abs(
             type === "farm"
                 ? balanceData.supply.deposition
                 : balanceData.supply.deposition.total,
+        ),
+        mineralization: Math.abs(
+            type === "farm"
+                ? balanceData.supply.fixation
+                : balanceData.supply.fixation.total,
         ),
         removal: removal === undefined ? undefined : Math.abs(removal),
         emissionAmmonia:
@@ -131,7 +143,8 @@ function buildChartDataAndLegend({
     const legend = {
         supply: {
             label: "Aanvoer",
-            color: "hsl(var(--chart-1))",
+            color: "black",
+            fillPattern: "dotted",
         },
         deposition: {
             label: "Depositie",
@@ -187,33 +200,50 @@ function buildChartDataAndLegend({
     }
 
     for (const fertilizerType of fertilizerTypes) {
+        // These styles are inherited by individual fertilizer applications too
+        const style = legend[`${fertilizerType}Fertilizer`]
         chartConfig[`${fertilizerType}FertilizerSupply`] = {
-            ...legend.mineralFertilizer,
+            ...style,
             fillPattern: "dotted",
             label: `Aanvoer door ${langNL[fertilizerType]}`,
         }
         chartConfig[`${fertilizerType}FertilizerAmmonia`] = {
-            ...legend.mineralFertilizer,
+            ...style,
             label: `Ammoniakemissie door ${langNL[fertilizerType]}`,
+        }
+
+        if (type === "farm") {
+            fertilizerSupplyBar.push(`${fertilizerType}FertilizerSupply`)
+            chartData[`${fertilizerType}FertilizerSupply`] = Math.abs(
+                balanceData.supply.fertilizers[fertilizerType],
+            )
+
+            fertilizerAmmoniaBar.push(`${fertilizerType}FertilizerAmmonia`)
+            chartData[`${fertilizerType}FertilizerAmmonia`] = Math.abs(
+                balanceData.emission.ammonia.fertilizers[fertilizerType],
+            )
         }
     }
 
     if (type === "farm") {
+        chartData.fixation = Math.abs(balanceData.supply.fixation)
+
         fertilizerTypes.forEach((p_type) => {
-            chartData[`${p_type}FertilizerSupply`] = Math.abs(
-                balanceData.supply.fertilizers[p_type],
-            )
             chartData[`${p_type}FertilizerAmmonia`] = Math.abs(
                 balanceData.emission.ammonia.fertilizers[p_type],
             )
+            fertilizerAmmoniaBar.push()
         })
     }
 
     if (type === "field") {
+        type ExtendedChartConfig = Record<string, ApplicationChartConfigItem>
+
         function addFertilizerApplication(
             dataKeyPrefix: string,
             applicationResult: { id: string; value: number },
             unit: string,
+            bar: string[],
         ) {
             const dataKey = `${dataKeyPrefix}_${applicationResult.id}`
             const application = fieldInput.fertilizerApplications.find(
@@ -235,24 +265,25 @@ function buildChartDataAndLegend({
                       label: "onbekend",
                       unit: unit,
                   }
+            bar.push(dataKey)
         }
-        type ExtendedChartConfig = Record<string, ApplicationChartConfigItem>
         fertilizerTypes.forEach((p_type) => {
             // Fertilizer Supply
+            const fertilizerTypeSupplyBar: string[] = []
             balanceData.supply.fertilizers[p_type].applications.forEach(
                 (app) => {
                     addFertilizerApplication(
                         `${p_type}FertilizerSupply`,
                         app,
                         "kg N / ha aanvoer",
+                        fertilizerTypeSupplyBar,
                     )
                 },
             )
+            fertilizerSupplyBar.push(fertilizerTypeSupplyBar)
 
-            // FertilizerAmmoniaEmission
-            chartData[`${p_type}FertilizerAmmonia`] = Math.abs(
-                balanceData.emission.ammonia.fertilizers[p_type].total,
-            )
+            // Fertilizer Ammonia Emission
+            const fertilizerTypeAmmoniaBar: string[] = []
             balanceData.emission.ammonia.fertilizers[
                 p_type
             ].applications.forEach((app) => {
@@ -260,8 +291,10 @@ function buildChartDataAndLegend({
                     `${p_type}FertilizerAmmonia`,
                     app,
                     "kg N / ha ammoniakemissie",
+                    fertilizerTypeAmmoniaBar,
                 )
             })
+            fertilizerAmmoniaBar.push(fertilizerTypeAmmoniaBar)
         })
 
         const fixationStyles: Record<string, ApplicationChartConfigItem> = {
@@ -298,13 +331,24 @@ function buildChartDataAndLegend({
                     unit: "kg N / ha fixatie",
                     styleId: styleId,
                 }
+                fixationBar.push(dataKey)
             },
         )
 
         Object.assign(chartConfig, fixationStyles)
     }
 
-    return { legend, chartData, chartConfig }
+    // Bar Graph Layout
+    const supplyBar = [
+        "deposition",
+        ...fixationBar,
+        "mineralization",
+        ...fertilizerSupplyBar,
+    ]
+    const removalBar = [...fertilizerAmmoniaBar, "emissionNitrate"]
+    console.log(supplyBar)
+
+    return { legend, chartData, chartConfig, supplyBar, removalBar }
 }
 
 function DottedPatternDef({
@@ -313,6 +357,7 @@ function DottedPatternDef({
     darkness = 0.05,
     color = "black",
     bg,
+    bgOpacity = 0.3,
     rotate,
 }: {
     id: string
@@ -320,6 +365,7 @@ function DottedPatternDef({
     spacing?: number
     darkness?: number
     bg?: string
+    bgOpacity?: number
     /** Rotation in degrees *without unit* */
     rotate?: number
 }) {
@@ -339,17 +385,17 @@ function DottedPatternDef({
             preserveAspectRatio="xMidYMid"
             viewBox="0 0 1 1"
         >
-            <circle cx={radius} cy={radius} r={radius} fill={color} />
             {bg && (
                 <rect
                     x={0}
                     y={0}
                     width={1}
                     height={1}
-                    fill={color}
-                    fillOpacity={0.5}
+                    fill={bg}
+                    fillOpacity={bgOpacity}
                 />
             )}
+            <circle cx={radius} cy={radius} r={radius} fill={color} />
         </pattern>
     )
 }
@@ -360,6 +406,7 @@ function StripedPatternDef({
     darkness = 0.1,
     color = "black",
     bg,
+    bgOpacity,
     rotate,
 }: {
     id: string
@@ -367,6 +414,7 @@ function StripedPatternDef({
     spacing?: number
     darkness?: number
     bg?: string
+    bgOpacity?: number
     /** Rotation in degrees *without unit* */
     rotate?: number
 }) {
@@ -385,6 +433,16 @@ function StripedPatternDef({
             }
             preserveAspectRatio="xMidYMid"
         >
+            {bg && (
+                <rect
+                    x={0}
+                    y={0}
+                    width={1}
+                    height={1}
+                    fill={bg}
+                    fillOpacity={bgOpacity}
+                />
+            )}
             <rect x={0} y={0} width={darkness} height={1} fill={color} />
         </pattern>
     )
@@ -452,10 +510,9 @@ export function NitrogenBalanceChart(
     ),
 ) {
     const { type, balanceData, fieldInput } = props
-    const fertilizerTypes = ["mineral", "manure", "compost", "other"] as const
     const [tooltipFocus, setTooltipFocus] = useState<Set<string>>(new Set())
     // biome-ignore lint/correctness/useExhaustiveDependencies: each value in props is passed separately
-    const { legend, chartData, chartConfig } = useMemo(
+    const { legend, chartData, chartConfig, supplyBar, removalBar } = useMemo(
         () => buildChartDataAndLegend(props),
         [type, balanceData, fieldInput],
     )
@@ -520,6 +577,55 @@ export function NitrogenBalanceChart(
         if (i === 0) return barRadiusStart
         if (i === arr.length - 1) return barRadiusEnd
         return undefined
+    }
+
+    /**
+     * Renders a list of data keys and data key arrays as an array of <Bar />
+     * @param stackId stack id to use for this set of data keys
+     * @param bar an array where each item is
+     *   - a data key: it will display as a standalone bar rectangle with rounded corners
+     *   - an array of data keys: it will display as a list of rectangle bars where only the outer corners are rounded.
+     *     Hovering over each rectangle will make it show a black outline for clarity.
+     * @returns
+     */
+    function renderBar(stackId: string, bar: (string | string[])[]) {
+        return bar.flatMap((barItem) => {
+            if (Array.isArray(barItem)) {
+                return barItem.map((dataKey, i) => {
+                    const barStyle = getBarStyle(dataKey)
+                    return (
+                        <Bar
+                            key={dataKey}
+                            dataKey={dataKey}
+                            radius={pickBarRadius(i, barItem)}
+                            stackId={stackId}
+                            {...barStyle}
+                            stroke={
+                                tooltipFocus.has(dataKey)
+                                    ? "black"
+                                    : barStyle.stroke
+                            }
+                            onMouseEnter={onTooltipFocus}
+                            onMouseLeave={onTooltipBlur}
+                        />
+                    )
+                })
+            }
+
+            const dataKey = barItem
+
+            return (
+                <Bar
+                    key={dataKey}
+                    dataKey={dataKey}
+                    radius={barRadius}
+                    stackId={stackId}
+                    {...getBarStyle(dataKey)}
+                    onMouseEnter={onTooltipFocus}
+                    onMouseLeave={onTooltipBlur}
+                />
+            )
+        })
     }
 
     return (
@@ -627,152 +733,8 @@ export function NitrogenBalanceChart(
                         </div>
                     }
                 />
-                <Bar
-                    key="deposition"
-                    dataKey="deposition"
-                    radius={barRadius}
-                    stackId={"a"}
-                    {...getBarStyle("deposition")}
-                    onMouseEnter={onTooltipFocus}
-                    onMouseLeave={onTooltipBlur}
-                />
-                ,
-                {type === "farm" ? (
-                    <Bar
-                        key="fixation"
-                        dataKey="fixation"
-                        radius={barRadius}
-                        stackId={"a"}
-                        {...getBarStyle("fixation")}
-                        onMouseEnter={onTooltipFocus}
-                        onMouseLeave={onTooltipBlur}
-                    />
-                ) : (
-                    balanceData.supply.fixation.cultivations.map(
-                        (cultivationResult, i, arr) => {
-                            const dataKey = `fixation_${cultivationResult.id}`
-                            const barStyle = getBarStyle(dataKey)
-                            return (
-                                <Bar
-                                    key={dataKey}
-                                    dataKey={dataKey}
-                                    radius={pickBarRadius(i, arr)}
-                                    stackId={"a"}
-                                    {...barStyle}
-                                    stroke={
-                                        tooltipFocus.has(dataKey)
-                                            ? "black"
-                                            : barStyle.stroke
-                                    }
-                                    onMouseEnter={onTooltipFocus}
-                                    onMouseLeave={onTooltipBlur}
-                                />
-                            )
-                        },
-                    )
-                )}
-                <Bar
-                    key={"mineralization"}
-                    dataKey={"mineralization"}
-                    radius={barRadius}
-                    stackId={"a"}
-                    {...getBarStyle("mineralization")}
-                    onMouseEnter={onTooltipFocus}
-                    onMouseLeave={onTooltipBlur}
-                />
-                {fertilizerTypes.flatMap((p_type) =>
-                    type === "farm" ? (
-                        <Bar
-                            key={`${p_type}FertilizerSupply`}
-                            dataKey={`${p_type}FertilizerSupply`}
-                            radius={barRadius}
-                            stackId={"a"}
-                            {...getBarStyle(`${p_type}FertilizerSupply`)}
-                            onMouseEnter={onTooltipFocus}
-                            onMouseLeave={onTooltipBlur}
-                        />
-                    ) : (
-                        balanceData.supply.fertilizers[p_type].applications.map(
-                            (fertilizerResult, i, arr) => {
-                                const dataKey = `${p_type}FertilizerSupply_${fertilizerResult.id}`
-                                const barStyle = getBarStyle(dataKey)
-                                return (
-                                    <Bar
-                                        key={dataKey}
-                                        dataKey={dataKey}
-                                        radius={pickBarRadius(i, arr)}
-                                        stackId={"a"}
-                                        {...barStyle}
-                                        stroke={
-                                            tooltipFocus.has(dataKey)
-                                                ? "black"
-                                                : barStyle.stroke
-                                        }
-                                        onMouseEnter={onTooltipFocus}
-                                        onMouseLeave={onTooltipBlur}
-                                    />
-                                )
-                            },
-                        )
-                    ),
-                )}
-                <Bar
-                    dataKey="removal"
-                    radius={5}
-                    stackId={"b"}
-                    {...getBarStyle("removal")}
-                    onMouseEnter={onTooltipFocus}
-                    onMouseLeave={onTooltipBlur}
-                />
-                {type === "farm"
-                    ? fertilizerTypes.map((p_type) => {
-                          const dataKey = `${p_type}FertilizerAmmonia`
-                          return (
-                              <Bar
-                                  key={dataKey}
-                                  dataKey={dataKey}
-                                  radius={5}
-                                  stackId={"b"}
-                                  {...getBarStyle(dataKey)}
-                                  onMouseEnter={onTooltipFocus}
-                                  onMouseLeave={onTooltipBlur}
-                              />
-                          )
-                      })
-                    : fertilizerTypes.flatMap((p_type) =>
-                          balanceData.emission.ammonia.fertilizers[
-                              p_type
-                          ].applications.map((app, i, apps) => {
-                              const dataKey = `${p_type}FertilizerAmmonia_${app.id}`
-                              const barStyle = getBarStyle(dataKey)
-                              return (
-                                  <Bar
-                                      key={dataKey}
-                                      dataKey={dataKey}
-                                      strokeWidth={2}
-                                      radius={pickBarRadius(i, apps)}
-                                      stackId={"b"}
-                                      {...barStyle}
-                                      stroke={
-                                          tooltipFocus.has(dataKey)
-                                              ? "black"
-                                              : barStyle.stroke
-                                      }
-                                      onMouseEnter={onTooltipFocus}
-                                      onMouseLeave={onTooltipBlur}
-                                  />
-                              )
-                          }),
-                      )}
-                <Bar
-                    dataKey="emissionNitrate"
-                    fill="var(--color-emissionNitrate)"
-                    radius={5}
-                    stackId={"b"}
-                    {...getBarStyle("emissionNitrate")}
-                    onMouseEnter={onTooltipFocus}
-                    onMouseLeave={onTooltipBlur}
-                />
+                {renderBar("a", supplyBar)}
+                {renderBar("b", removalBar)}
             </BarChart>
         </ChartContainer>
     )
