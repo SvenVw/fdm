@@ -303,10 +303,22 @@ export function calculateNitrogenBalancesFieldToFarm(
     ) as (NitrogenBalanceFieldResult & { balance: NitrogenBalanceField })[]
 
     // Calculate total weighted supply, removal, and emission across the farm
+    const fertilizerTypes = ["mineral", "manure", "compost", "other"] as const
     let totalFarmSupply = new Decimal(0)
+    let totalFarmSupplyDeposition = new Decimal(0)
+    let totalFarmSupplyFixation = new Decimal(0)
+    let totalFarmSupplyMineralization = new Decimal(0)
+    const totalFarmSupplyFertilizers = Object.fromEntries(
+        fertilizerTypes.reduce(
+            (arr, key) => {
+                arr.push([key, new Decimal(0)])
+                return arr
+            },
+            [] as [(typeof fertilizerTypes)[number], Decimal][],
+        ),
+    ) as Omit<NitrogenBalance["supply"]["fertilizers"], "total">
     let totalFarmRemoval = new Decimal(0)
     let totalFarmEmission = new Decimal(0)
-    const fertilizerTypes = ["mineral", "manure", "compost", "other"] as const
     const ammoniaByFertilizerType = Object.fromEntries(
         fertilizerTypes.reduce(
             (arr, key) => {
@@ -336,6 +348,23 @@ export function calculateNitrogenBalancesFieldToFarm(
         totalFarmSupply = totalFarmSupply.add(
             fieldResult.balance.supply.total.times(fieldArea),
         )
+        totalFarmSupplyDeposition = totalFarmSupplyDeposition.add(
+            fieldResult.balance.supply.deposition.total.times(fieldArea),
+        )
+        totalFarmSupplyFixation = totalFarmSupplyFixation.add(
+            fieldResult.balance.supply.fixation.total.times(fieldArea),
+        )
+        totalFarmSupplyMineralization = totalFarmSupplyMineralization.add(
+            fieldResult.balance.supply.mineralisation.total.times(fieldArea),
+        )
+        for (const fertilizerType of fertilizerTypes) {
+            totalFarmSupplyFertilizers[fertilizerType] =
+                totalFarmSupplyFertilizers[fertilizerType].add(
+                    fieldResult.balance.supply.fertilizers[fertilizerType]
+                        .total,
+                )
+        }
+
         totalFarmRemoval = totalFarmRemoval.add(
             fieldResult.balance.removal.total.times(fieldArea),
         )
@@ -367,6 +396,26 @@ export function calculateNitrogenBalancesFieldToFarm(
     const avgFarmSupply = totalFarmArea.isZero()
         ? new Decimal(0)
         : totalFarmSupply.dividedBy(totalFarmArea)
+    const avgFarmSupplyDeposition = totalFarmArea.isZero()
+        ? new Decimal(0)
+        : totalFarmSupplyDeposition.dividedBy(totalFarmArea)
+    const avgFarmSupplyFixation = totalFarmArea.isZero()
+        ? new Decimal(0)
+        : totalFarmSupplyFixation.dividedBy(totalFarmArea)
+    const avgFarmSupplyMineralization = totalFarmArea.isZero()
+        ? new Decimal(0)
+        : totalFarmSupplyMineralization.dividedBy(totalFarmArea)
+    let totalFarmSupplyFertilizersTotal = new Decimal(0)
+    for (const fertilizerType of fertilizerTypes) {
+        const value = totalFarmSupplyFertilizers[fertilizerType]
+        totalFarmSupplyFertilizers[fertilizerType] = totalFarmArea.isZero()
+            ? new Decimal(0)
+            : value.dividedBy(totalFarmArea)
+        totalFarmSupplyFertilizersTotal =
+            totalFarmSupplyFertilizersTotal.add(value)
+    }
+    totalFarmSupplyFertilizersTotal =
+        totalFarmSupplyFertilizersTotal.dividedBy(totalFarmArea)
     const avgFarmRemoval = totalFarmArea.isZero()
         ? new Decimal(0)
         : totalFarmRemoval.dividedBy(totalFarmArea)
@@ -395,7 +444,16 @@ export function calculateNitrogenBalancesFieldToFarm(
     // Return the farm with average balances per hectare
     const farmWithBalance: NitrogenBalance = {
         balance: avgFarmBalance,
-        supply: avgFarmSupply,
+        supply: {
+            total: avgFarmSupply,
+            deposition: avgFarmSupplyDeposition,
+            fixation: avgFarmSupplyFixation,
+            mineralization: avgFarmSupplyMineralization,
+            fertilizers: {
+                ...totalFarmSupplyFertilizers,
+                total: totalFarmSupplyFertilizersTotal,
+            },
+        },
         removal: avgFarmRemoval,
         emission: {
             total: avgFarmEmission,

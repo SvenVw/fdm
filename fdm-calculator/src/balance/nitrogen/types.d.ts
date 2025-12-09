@@ -370,7 +370,19 @@ export type NitrogenBalance = {
     /**
      * The total nitrogen supply across all fields.
      */
-    supply: Decimal
+    supply: {
+        total: Decimal
+        deposition: Decimal
+        fixation: Decimal
+        mineralization: Decimal
+        fertilizers: {
+            total: Decimal
+            mineral: Decimal
+            manure: Decimal
+            compost: Decimal
+            other: Decimal
+        }
+    }
     /**
      * The total nitrogen removal across all fields.
      */
