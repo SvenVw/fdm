@@ -116,7 +116,7 @@ export function isBouwland(
     cultivations: Cultivation[],
     p_app_date: Date,
 ): boolean {
-    const nonBouwlandCodes = ["nl_265", "nl_266", "nl_331", "nl_332"]
+    const nonBouwlandCodes = ["nl_265", "nl_266", "nl_331", "nl_332", "nl_335"]
 
     const activeCultivation = cultivations.find((c) => {
         const startDate = new Date(c.b_start)
