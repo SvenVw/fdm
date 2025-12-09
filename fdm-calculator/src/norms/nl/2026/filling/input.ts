@@ -7,34 +7,34 @@ import {
     getGrazingIntention,
     isOrganicCertificationValid,
 } from "@svenvw/fdm-core"
-import type { NL2025NormsFillingInput } from "./types"
+import type { NL2026NormsFillingInput } from "./types"
 
 /**
- * Collects all necessary input data from fdm-core functions for the NL 2025 norms filling calculations.
+ * Collects all necessary input data from fdm-core functions for the NL 2026 norms filling calculations.
  * This function standardizes the data collection process, ensuring all calculation functions
- * receive a unified input object (NL2025NormsFillingInput).
+ * receive a unified input object (NL2026NormsFillingInput).
  *
  * @param {FdmType} fdm - The FdmType instance for interacting with the Farm Data Model.
  * @param {string} principal_id - The ID of the principal (user or organization) performing the calculation.
  * @param {string} b_id - The ID of the field for which the norms are being calculated.
  * @param {number} fosfaatgebruiksnorm - The phosphate usage norm in kg/ha for the current calculation.
- * @returns {Promise<NL2025NormsFillingInput>} A promise that resolves to a standardized input object
+ * @returns {Promise<NL2026NormsFillingInput>} A promise that resolves to a standardized input object
  *   containing cultivations, fertilizer applications, fertilizers, organic certification status,
  *   grazing intention status, the phosphate usage norm, and the field's centroid.
  * @throws {Error} Throws an error if the specified field cannot be found.
  */
-export async function collectNL2025InputForFertilizerApplicationFilling(
+export async function collectNL2026InputForFertilizerApplicationFilling(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id: string,
     fosfaatgebruiksnorm: number,
-): Promise<NL2025NormsFillingInput> {
+): Promise<NL2026NormsFillingInput> {
     // Define the calendar year for the norms calculation.
-    const year = 2025
+    const year = 2026
     // Define the timeframe for data collection for the current year.
     const startOfYear = new Date(year, 0, 1) // January 1st of the specified year
     const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999) // December 31st of the specified year, including December 31st
-    const timeframe2025: Timeframe = { start: startOfYear, end: endOfYear }
+    const timeframe2026: Timeframe = { start: startOfYear, end: endOfYear }
 
     // 1. Retrieve field details using the field ID.
     // This is crucial for obtaining the farm ID and the field's geographical centroid.
@@ -72,7 +72,7 @@ export async function collectNL2025InputForFertilizerApplicationFilling(
         fdm,
         principal_id,
         b_id,
-        timeframe2025,
+        timeframe2026,
     )
 
     // 5. Retrieve all fertilizer applications for the farm within the current year's timeframe.
@@ -80,12 +80,12 @@ export async function collectNL2025InputForFertilizerApplicationFilling(
         fdm,
         principal_id,
         b_id,
-        timeframe2025,
+        timeframe2026,
     )
     // 6. Retrieve details of all fertilizers used on the farm.
     const fertilizers = await getFertilizers(fdm, principal_id, b_id_farm)
 
-    // Assemble all collected data into the standardized NL2025NormsFillingInput object.
+    // Assemble all collected data into the standardized NL2026NormsFillingInput object.
     return {
         cultivations: cultivations,
         applications: applications,

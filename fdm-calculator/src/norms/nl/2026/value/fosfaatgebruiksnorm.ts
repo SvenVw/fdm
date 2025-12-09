@@ -2,26 +2,17 @@ import { withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { fosfaatNormsData } from "./fosfaatgebruiksnorm-data"
-import { determineNLHoofdteelt } from "./hoofdteelt"
-import type { FosfaatKlasse, NL2025NormsInput } from "./types.d"
+import { determineNLHoofdteelt } from "../../2025/value/hoofdteelt"
+import type { FosfaatKlasse, NL2026NormsInput } from "./types.d"
 import type { FosfaatGebruiksnormResult } from "../../types"
-
-/**
- * Determines if a cultivation is a type of grassland based on its catalogue entry.
- * @param b_lu_catalogue - The cultivation catalogue code.
- * @returns `true` if the catalogue code represents a grassland cultivation, otherwise `false`.
- */
-export function isCultivationGrasland(b_lu_catalogue: string): boolean {
-    const graslandCodes = ["nl_265", "nl_266", "nl_331", "nl_332", "nl_335"]
-    return graslandCodes.includes(b_lu_catalogue)
-}
+import { isCultivationGrasland } from "../../2025/value/fosfaatgebruiksnorm"
 
 /**
  * Helper function to determine the phosphate class ('Arm', 'Laag', 'Neutraal', 'Ruim', 'Hoog')
  * based on P-CaCl2 and P-Al soil analysis values and land type (grasland/bouwland).
  *
  * This logic is derived directly from "Tabel 1: Grasland (P-CaCl2/P-Al getal)" and
- * "Tabel 2: Bouwland (P-CaCl2/P-Al getal)" in the RVO documentation for 2025.
+ * "Tabel 2: Bouwland (P-CaCl2/P-Al getal)" in the RVO documentation for 2026.
  *
  * @param a_p_cc - The P-CaCl2 (P-PAE) value from soil analysis.
  * @param a_p_al - The P-Al value from soil analysis.
@@ -105,22 +96,21 @@ function getFosfaatKlasse(
  * based on its land type (grasland/bouwland) and soil phosphate condition,
  * derived from P-CaCl2 and P-Al soil analysis values.
  *
- * This function implements the "Tabel Fosfaatgebruiksnormen 2025" and the
- * "Differentiatie fosfaatgebruiksnorm 2025" rules from RVO.
+ * This function implements the "Tabel Fosfaatgebruiksnormen 2026" and the
+ * "Differentiatie fosfaatgebruiksnorm 2026" rules from RVO.
  *
  * @param input - An object containing all necessary parameters for the calculation.
  *   See {@link FosfaatGebruiksnormInput} for details.
  * @returns An object of type `FosfaatGebruiksnormResult` containing the determined
  *   phosphate usage standard (`normValue`) and the `fosfaatKlasse` (the phosphate
- *   class determined from the soil analysis).
- * @throws {Error} If soil analysis data is missing or no phosphate norms are found for the determined class.
+ *   class determined from the soil analysis). Returns `null` if a norm cannot be determined.
  *
  * @remarks
  * The function operates as follows:
  * 1.  **Determine Phosphate Class**: The `getFosfaatKlasse` helper function is used
  *     to classify the soil's phosphate condition ('Arm', 'Laag', 'Neutraal', 'Ruim', 'Hoog')
  *     based on the provided `a_p_cc` and `a_p_al` values and whether it's grassland or arable land.
- *     This classification directly uses the lookup tables provided by RVO for 2025.
+ *     This classification directly uses the lookup tables provided by RVO for 2026.
  * 2.  **Retrieve Base Norm**: The determined `fosfaatKlasse` is then used to look up the
  *     corresponding base phosphate norm from the `fosfaatgebruiksnorm-data.ts` file.
  * 3.  **Apply Land Type**: The specific norm for either `grasland` or `bouwland` is selected
@@ -128,10 +118,10 @@ function getFosfaatKlasse(
  * 4.  **Return Result**: The function returns the final `normValue` and the `fosfaatKlasse`.
  *
  * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond | RVO Fosfaat landbouwgrond (official page)}
- * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond/differentiatie | RVO Fosfaatdifferentiatie (official page, including tables for 2025)}
+ * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond/differentiatie | RVO Fosfaatdifferentiatie (official page, including tables for 2026)}
  */
-export async function calculateNL2025FosfaatGebruiksNorm(
-    input: NL2025NormsInput,
+export async function calculateNL2026FosfaatGebruiksNorm(
+    input: NL2026NormsInput,
 ): Promise<FosfaatGebruiksnormResult> {
     const cultivations = input.cultivations
     const a_p_cc = input.soilAnalysis.a_p_cc
@@ -139,11 +129,11 @@ export async function calculateNL2025FosfaatGebruiksNorm(
 
     if (!a_p_al || !a_p_cc) {
         throw new Error(
-            "Missing soil analysis data for NL 2025 Fosfaatgebruiksnorm",
+            "Missing soil analysis data for NL 2026 Fosfaatgebruiksnorm",
         )
     }
 
-    const b_lu_catalogue = determineNLHoofdteelt(cultivations, 2025)
+    const b_lu_catalogue = determineNLHoofdteelt(cultivations, 2026)
     const is_grasland = isCultivationGrasland(b_lu_catalogue)
 
     // Determine the phosphate class based on soil analysis values and land type.
@@ -168,18 +158,19 @@ export async function calculateNL2025FosfaatGebruiksNorm(
 }
 
 /**
- * Memoized version of {@link calculateNL2025FosfaatGebruiksNorm}.
+ * Memoized version of {@link calculateNL2026FosfaatGebruiksNorm}.
  *
  * This function is wrapped with `withCalculationCache` to optimize performance by caching
  * results based on the input and the current calculator version.
  *
- * @param {NL2025NormsInput} input - An object containing all necessary parameters for the calculation.
+ * @param {NL2026NormsInput} input - An object containing all necessary parameters for the calculation.
  * @returns {Promise<FosfaatGebruiksnormResult>} An object of type `FosfaatGebruiksnormResult` containing the determined
  *   phosphate usage standard (`normValue`) and the `fosfaatKlasse` (the phosphate
- *   class determined from the soil analysis). Returns `null` if a norm cannot be determined.
+ *   class determined from the soil analysis).
+ * @throws {Error} If soil analysis data is missing or no phosphate norms are found for the determined class.
  */
-export const getNL2025FosfaatGebruiksNorm = withCalculationCache(
-    calculateNL2025FosfaatGebruiksNorm,
-    "calculateNL2025FosfaatGebruiksNorm",
+export const getNL2026FosfaatGebruiksNorm = withCalculationCache(
+    calculateNL2026FosfaatGebruiksNorm,
+    "calculateNL2026FosfaatGebruiksNorm",
     pkg.calculatorVersion,
 )

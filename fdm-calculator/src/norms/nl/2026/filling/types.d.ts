@@ -35,7 +35,7 @@ export type WorkingCoefficientDetails = {
     subTypeDescription?: string
 }
 
-export type NL2025NormsFillingInput = {
+export type NL2026NormsFillingInput = {
     cultivations: Cultivation[]
     applications: FertilizerApplication[]
     fertilizers: Fertilizer[]
