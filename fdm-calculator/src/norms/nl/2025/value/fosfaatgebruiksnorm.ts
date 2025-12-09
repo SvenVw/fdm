@@ -9,16 +9,11 @@ import type { FosfaatGebruiksnormResult } from "../../types"
 /**
  * Determines if a cultivation is a type of grassland based on its catalogue entry.
  * @param b_lu_catalogue - The cultivation catalogue code.
- * @returns A promise that resolves to a boolean.
+ * @returns `true` if the catalogue code represents a grassland cultivation, otherwise `false`.
  */
 export function isCultivationGrasland(b_lu_catalogue: string): boolean {
     const graslandCodes = ["nl_265", "nl_266", "nl_331", "nl_332", "nl_335"]
-
-    if (graslandCodes.includes(b_lu_catalogue)) {
-        return true
-    }
-
-    return false
+    return graslandCodes.includes(b_lu_catalogue)
 }
 
 /**

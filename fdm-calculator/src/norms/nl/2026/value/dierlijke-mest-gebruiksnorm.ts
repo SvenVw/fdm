@@ -27,7 +27,7 @@ export async function calculateNL2026DierlijkeMestGebruiksNorm(): Promise<Dierli
  * Memoized version of {@link calculateNL2026DierlijkeMestGebruiksNorm}.
  *
  * This function is wrapped with `withCalculationCache` to optimize performance by caching
- * results based on the input and the current calculator version.
+ * results based on the function name and the current calculator version.
  *
  * @returns {Promise<DierlijkeMestGebruiksnormResult>} An object of type `DierlijkeMestGebruiksnormResult` containing the determined
  *   nitrogen usage standard (`normValue`) and a `normSource` string explaining the rule applied.
