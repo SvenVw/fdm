@@ -8,7 +8,14 @@ import { getFields } from "@svenvw/fdm-core"
 import throttle from "lodash.throttle"
 import type { FeatureCollection } from "geojson"
 import maplibregl from "maplibre-gl"
-import { useCallback, useEffect, useMemo, useRef, useState, Fragment } from "react"
+import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    Fragment,
+} from "react"
 import {
     Layer,
     Map as MapGL,
@@ -16,7 +23,7 @@ import {
     type MapRef,
     type ViewState,
     type ViewStateChangeEvent,
-    type MapLayerMouseEvent
+    type MapLayerMouseEvent,
 } from "react-map-gl/maplibre"
 import {
     data,
@@ -67,7 +74,10 @@ function isPointInPolygon(point: [number, number], vs: [number, number][]) {
 // Helper: Check if polygon intersects polygon (simple AABB check for index speed, then detail?)
 // For now, we just check if any point of tile is in view or view in tile?
 // Simpler: Convert Viewport to RD Polygon, check intersection with Tile Polygon (also RD).
-function polygonIntersectsPolygon(poly1: [number, number][], poly2: [number, number][]) {
+function polygonIntersectsPolygon(
+    poly1: [number, number][],
+    poly2: [number, number][],
+) {
     // Simplified: Check if any point of poly1 is in poly2 OR any point of poly2 is in poly1
     // This is not 100% robust for crossing polygons but good enough for tiles
     for (const p of poly1) if (isPointInPolygon(p, poly2)) return true
@@ -160,6 +170,7 @@ export default function FarmAtlasElevationBlock() {
 
     const fieldsSavedId = "fieldsSaved"
     const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
+    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
     const layerLayout = { visibility: showFields ? "visible" : "none" } as const
 
     const onToggleElevation = useCallback(() => {
@@ -170,9 +181,7 @@ export default function FarmAtlasElevationBlock() {
     const initialViewState = getViewState(fields)
     const [viewState, setViewState] = useState<ViewState>(() => {
         if (typeof window !== "undefined") {
-            const savedViewState = sessionStorage.getItem(
-                "mapViewState",
-            )
+            const savedViewState = sessionStorage.getItem("mapViewState")
             if (savedViewState) {
                 try {
                     return JSON.parse(savedViewState)
@@ -195,10 +204,7 @@ export default function FarmAtlasElevationBlock() {
             isFirstRender.current = false
             return
         }
-        sessionStorage.setItem(
-            "mapViewState",
-            JSON.stringify(viewState),
-        )
+        sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
     }, [viewState])
 
     // Fetch COG Index once
@@ -251,14 +257,17 @@ export default function FarmAtlasElevationBlock() {
 
             // Find intersecting tiles
             // Optimization: limit to e.g. 24 tiles to avoid overload
-            const visibleFeatures = indexData.features.filter((f) => {
-                if (!f.geometry || f.geometry.type !== "Polygon") return false
-                const ring = (f.geometry as any).coordinates[0]
-                return polygonIntersectsPolygon(rdCoords, ring)
-            }).slice(0, 24)
+            const visibleFeatures = indexData.features
+                .filter((f) => {
+                    if (!f.geometry || f.geometry.type !== "Polygon")
+                        return false
+                    const ring = (f.geometry as any).coordinates[0]
+                    return polygonIntersectsPolygon(rdCoords, ring)
+                })
+                .slice(0, 24)
 
             // Calculate global min/max for the viewport by sampling
-            const samplePoints: {lng: number, lat: number}[] = []
+            const samplePoints: { lng: number; lat: number }[] = []
             const gridSize = 4 // 4x4 = 16 points
             for (let i = 0; i <= gridSize; i++) {
                 for (let j = 0; j <= gridSize; j++) {
@@ -270,34 +279,52 @@ export default function FarmAtlasElevationBlock() {
 
             let min = 1000
             let max = -1000
-            
+
             // Gather values for samples
-            const values = await Promise.all(samplePoints.map(async (p) => {
-                try {
-                    const rdP = proj4("EPSG:28992").forward([p.lng, p.lat]) as [number, number]
-                    // Find which tile contains this point
-                    const feature = visibleFeatures.find(f => {
-                        if (!f.geometry || f.geometry.type !== "Polygon") return false
-                        const ring = (f.geometry as any).coordinates[0]
-                        return isPointInPolygon(rdP, ring)
-                    })
-                    if (feature?.properties) {
-                        const url = feature.properties.url || feature.properties.href || feature.properties.download_url
-                        if (url) {
-                            // Requesting location value
-                            const vals = await locationValues(url, { longitude: p.lng, latitude: p.lat })
-                            if (vals && vals.length > 0 && !isNaN(vals[0]) && vals[0] > -100 && vals[0] < 1000) {
-                                return vals[0]
+            const values = await Promise.all(
+                samplePoints.map(async (p) => {
+                    try {
+                        const rdP = proj4("EPSG:28992").forward([
+                            p.lng,
+                            p.lat,
+                        ]) as [number, number]
+                        // Find which tile contains this point
+                        const feature = visibleFeatures.find((f) => {
+                            if (!f.geometry || f.geometry.type !== "Polygon")
+                                return false
+                            const ring = (f.geometry as any).coordinates[0]
+                            return isPointInPolygon(rdP, ring)
+                        })
+                        if (feature?.properties) {
+                            const url =
+                                feature.properties.url ||
+                                feature.properties.href ||
+                                feature.properties.download_url
+                            if (url) {
+                                // Requesting location value
+                                const vals = await locationValues(url, {
+                                    longitude: p.lng,
+                                    latitude: p.lat,
+                                })
+                                if (
+                                    vals &&
+                                    vals.length > 0 &&
+                                    !isNaN(vals[0]) &&
+                                    vals[0] > -100 &&
+                                    vals[0] < 1000
+                                ) {
+                                    return vals[0]
+                                }
                             }
                         }
+                    } catch {
+                        // Ignore errors for individual points
                     }
-                } catch {
-                    // Ignore errors for individual points
-                }
-                return null
-            }))
+                    return null
+                }),
+            )
 
-            const validValues = values.filter(v => v !== null) as number[]
+            const validValues = values.filter((v) => v !== null) as number[]
             if (validValues.length > 0) {
                 min = Math.min(...validValues)
                 max = Math.max(...validValues)
@@ -311,12 +338,12 @@ export default function FarmAtlasElevationBlock() {
                 min -= 0.5
                 max += 0.5
             }
-            
+
             // Pad range slightly
             const range = max - min
             min -= range * 0.05
             max += range * 0.05
-            
+
             setLegendMin(min)
             setLegendMax(max)
 
@@ -330,35 +357,45 @@ export default function FarmAtlasElevationBlock() {
                     feature.properties.url ||
                     feature.properties.href ||
                     feature.properties.download_url
-                
+
                 if (!url) continue
                 const id = feature.properties.kaartbladNr || url
-                
-                newTiles.push({ 
-                    id, 
-                    url, 
+
+                newTiles.push({
+                    id,
+                    url,
                     cogUrl: `cog://${url}${colorParam}`,
-                    cogUrlHillshade: `cog://${url}#dem`
+                    cogUrlHillshade: `cog://${url}#dem`,
                 })
             }
 
-            const keyNew = newTiles.map(t => t.cogUrl).sort().join("|")
-            
+            const keyNew = newTiles
+                .map((t) => t.cogUrl)
+                .sort()
+                .join("|")
+
             setActiveTiles(newTiles)
-            
         } catch (e) {
             console.error("Error updating visible tiles:", e)
         } finally {
             setIsUpdating(false)
         }
-        
     }, [indexData, activeTiles])
 
     // Throttle updates
     const updateRef = useRef(updateVisibleTiles)
-    useEffect(() => { updateRef.current = updateVisibleTiles }, [updateVisibleTiles])
-    
-    const throttledUpdate = useMemo(() => throttle(() => updateRef.current(), 500, { leading: true, trailing: true }), [])
+    useEffect(() => {
+        updateRef.current = updateVisibleTiles
+    }, [updateVisibleTiles])
+
+    const throttledUpdate = useMemo(
+        () =>
+            throttle(() => updateRef.current(), 500, {
+                leading: true,
+                trailing: true,
+            }),
+        [],
+    )
 
     // Initial update when map loads or index loads
     useEffect(() => {
@@ -375,46 +412,63 @@ export default function FarmAtlasElevationBlock() {
     }, [indexData, activeTiles])
 
     // Handle hover to show elevation value
-    const handleMouseMove = useMemo(() => throttle(async (event: MapLayerMouseEvent) => {
-        const { indexData, activeTiles } = stateRef.current
-        
-        if (!mapRef.current || mapRef.current.getZoom() < 13) {
-            setHoverElevation(null)
-            return
-        }
+    const handleMouseMove = useMemo(
+        () =>
+            throttle(async (event: MapLayerMouseEvent) => {
+                const { indexData, activeTiles } = stateRef.current
 
-        if (!indexData || activeTiles.length === 0) return
-        
-        const { lng, lat } = event.lngLat
-        
-        try {
-            const rdP = proj4("EPSG:28992").forward([lng, lat]) as [number, number]
-            
-            const feature = indexData.features.find((f) => {
-                if (!f.geometry || f.geometry.type !== "Polygon") return false
-                const ring = (f.geometry as any).coordinates[0]
-                return isPointInPolygon(rdP, ring)
-            })
-
-            if (feature?.properties) {
-                const url = feature.properties.url || feature.properties.href || feature.properties.download_url
-                if (url) {
-                    const values = await locationValues(url, { longitude: lng, latitude: lat })
-                    if (values && values.length > 0 && !isNaN(values[0])) {
-                        setHoverElevation(values[0])
-                        return
-                    }
+                if (!mapRef.current || mapRef.current.getZoom() < 13) {
+                    setHoverElevation(null)
+                    return
                 }
-            }
-            setHoverElevation(null)
-        } catch (e) {
-            setHoverElevation(null)
-        }
-    }, 100), [])
+
+                if (!indexData || activeTiles.length === 0) return
+
+                const { lng, lat } = event.lngLat
+
+                try {
+                    const rdP = proj4("EPSG:28992").forward([lng, lat]) as [
+                        number,
+                        number,
+                    ]
+
+                    const feature = indexData.features.find((f) => {
+                        if (!f.geometry || f.geometry.type !== "Polygon")
+                            return false
+                        const ring = (f.geometry as any).coordinates[0]
+                        return isPointInPolygon(rdP, ring)
+                    })
+
+                    if (feature?.properties) {
+                        const url =
+                            feature.properties.url ||
+                            feature.properties.href ||
+                            feature.properties.download_url
+                        if (url) {
+                            const values = await locationValues(url, {
+                                longitude: lng,
+                                latitude: lat,
+                            })
+                            if (
+                                values &&
+                                values.length > 0 &&
+                                !isNaN(values[0])
+                            ) {
+                                setHoverElevation(values[0])
+                                return
+                            }
+                        }
+                    }
+                    setHoverElevation(null)
+                } catch (e) {
+                    setHoverElevation(null)
+                }
+            }, 100),
+        [],
+    )
 
     return (
-        <div className="relative h-full w-full">        
-
+        <div className="relative h-full w-full">
             <MapGL
                 ref={mapRef}
                 {...viewState}
@@ -448,78 +502,90 @@ export default function FarmAtlasElevationBlock() {
                         id="ahn-wms"
                         type="raster"
                         tiles={[
-                            "https://service.pdok.nl/rws/ahn/wms/v1_0?service=WMS&request=GetMap&layers=dtm_05m&styles=&format=image/png&transparent=true&version=1.3.0&width=256&height=256&crs=EPSG:3857&bbox={bbox-epsg-3857}"
+                            "https://service.pdok.nl/rws/ahn/wms/v1_0?service=WMS&request=GetMap&layers=dtm_05m&styles=&format=image/png&transparent=true&version=1.3.0&width=256&height=256&crs=EPSG:3857&bbox={bbox-epsg-3857}",
                         ]}
                         tileSize={256}
                         attribution="&copy; <a href='https://www.pdok.nl/'>PDOK</a>, <a href='https://www.ahn.nl/'>AHN</a>"
                     >
-                        <Layer 
-                            id="ahn-wms-layer" 
-                            type="raster" 
+                        <Layer
+                            id="ahn-wms-layer"
+                            type="raster"
                             paint={{ "raster-opacity": 0.8 }}
+                            beforeId="fieldsSavedOutline"
                         />
                     </Source>
                 )}
 
                 {/* Render Active Tiles (Zoom >= 13) */}
-                {viewState.zoom >= 13 && showElevation && activeTiles.map((tile) => (
-                    <Fragment key={tile.id}>
-                        <Source
-                            id={`ahn-cog-${tile.id}`}
-                            type="raster"
-                            url={tile.cogUrl!}
-                            tileSize={256}
-                            bounds={[3.3, 50.7, 7.2, 53.7]}
-                            minzoom={0}
-                            maxzoom={24}
-                            attribution="&copy; <a href='https://www.pdok.nl/'>PDOK</a>, <a href='https://www.ahn.nl/'>AHN</a>"
-                        >
-                            <Layer 
-                                id={`ahn-layer-${tile.id}`} 
-                                type="raster" 
-                                paint={{ "raster-opacity": 1 }}
-                            />
-                        </Source>
-                        <Source
-                            id={`ahn-dem-${tile.id}`}
-                            type="raster-dem"
-                            url={tile.cogUrlHillshade!}
-                            tileSize={256}
-                            bounds={[3.3, 50.7, 7.2, 53.7]}
-                            minzoom={0}
-                            maxzoom={16}
-                        >
-                            <Layer 
-                                id={`ahn-hillshade-${tile.id}`} 
-                                type="hillshade" 
-                                paint={{ 
-                                    "hillshade-exaggeration": 0.3,
-                                    "hillshade-shadow-color": "#000000",
-                                    "hillshade-highlight-color": "#ffffff",
-                                    "hillshade-accent-color": "#000000"
-                                }}
-                            />
-                        </Source>
-                    </Fragment>
-                ))}
+                {viewState.zoom >= 13 &&
+                    showElevation &&
+                    activeTiles.map((tile) => (
+                        <Fragment key={tile.id}>
+                            <Source
+                                id={`ahn-cog-${tile.id}`}
+                                type="raster"
+                                url={tile.cogUrl!}
+                                tileSize={256}
+                                bounds={[3.3, 50.7, 7.2, 53.7]}
+                                minzoom={0}
+                                maxzoom={24}
+                                attribution="&copy; <a href='https://www.pdok.nl/'>PDOK</a>, <a href='https://www.ahn.nl/'>AHN</a>"
+                            >
+                                <Layer
+                                    id={`ahn-layer-${tile.id}`}
+                                    type="raster"
+                                    paint={{ "raster-opacity": 1 }}
+                                    beforeId="fieldsSavedOutline"
+                                />
+                            </Source>
+                            <Source
+                                id={`ahn-dem-${tile.id}`}
+                                type="raster-dem"
+                                url={tile.cogUrlHillshade!}
+                                tileSize={256}
+                                bounds={[3.3, 50.7, 7.2, 53.7]}
+                                minzoom={0}
+                                maxzoom={16}
+                            >
+                                <Layer
+                                    id={`ahn-hillshade-${tile.id}`}
+                                    type="hillshade"
+                                    paint={{
+                                        "hillshade-exaggeration": 0.3,
+                                        "hillshade-shadow-color": "#000000",
+                                        "hillshade-highlight-color": "#ffffff",
+                                        "hillshade-accent-color": "#000000",
+                                    }}
+                                    beforeId="fieldsSavedOutline"
+                                />
+                            </Source>
+                        </Fragment>
+                    ))}
 
                 {/* Fields Overlay (Saved Fields) */}
                 {fields && (
-                    <Source
-                        id={fieldsSavedId}
-                        type="geojson"
-                        data={fields}
-                    >
+                    <Source id={fieldsSavedId} type="geojson" data={fields}>
+                        {/* Outline Layer - Visual */}
                         <Layer
-                            {...({ ...fieldsSavedStyle, layout: layerLayout } as any)}
+                            {...({
+                                ...fieldsSavedOutlineStyle,
+                                layout: layerLayout,
+                            } as any)}
+                        />
+                        {/* Fill Layer - Invisible but Clickable/Hoverable */}
+                        <Layer
+                            {...({
+                                ...fieldsSavedStyle,
+                                layout: layerLayout,
+                            } as any)}
                         />
                     </Source>
                 )}
 
                 <div className="absolute top-4 left-4 z-10 flex flex-col gap-4">
-                    <ElevationLegend 
-                        min={legendMin} 
-                        max={legendMax} 
+                    <ElevationLegend
+                        min={legendMin}
+                        max={legendMax}
                         loading={isUpdating}
                         hoverValue={hoverElevation}
                         showScale={viewState.zoom >= 13 && showElevation}
