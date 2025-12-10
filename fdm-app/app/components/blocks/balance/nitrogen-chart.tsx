@@ -24,7 +24,6 @@ type ApplicationChartConfigItem = {
     label: string
     color?: string
     styleId?: string
-    fillPattern?: "dotted" | "striped"
     unit?: string
     detail?: string[]
 }
@@ -395,155 +394,6 @@ function buildChartDataAndLegend({
     }
 }
 
-function DottedPatternDef({
-    id,
-    spacing = 0.5,
-    darkness = 0.05,
-    color = "black",
-    bg,
-    bgOpacity = 0.2,
-    rotate,
-}: {
-    id: string
-    color?: string
-    spacing?: number
-    darkness?: number
-    bg?: string
-    bgOpacity?: number
-    /** Rotation in degrees *without unit* */
-    rotate?: number
-}) {
-    const radius = spacing * Math.sqrt((4 / Math.PI) * darkness)
-    const worldSpaceTransform = "translate(0,0) scale(10,10)"
-    return (
-        <pattern
-            id={id}
-            patternUnits="userSpaceOnUse"
-            width={spacing}
-            height={spacing}
-            patternTransform={
-                rotate
-                    ? `rotate(${rotate}) ${worldSpaceTransform}`
-                    : worldSpaceTransform
-            }
-            preserveAspectRatio="xMidYMid"
-            viewBox="0 0 1 1"
-        >
-            {bg && (
-                <rect
-                    x={0}
-                    y={0}
-                    width={1}
-                    height={1}
-                    fill={bg}
-                    fillOpacity={bgOpacity}
-                />
-            )}
-            <circle cx={radius} cy={radius} r={radius} fill={color} />
-        </pattern>
-    )
-}
-
-function StripedPatternDef({
-    id,
-    spacing = 0.5,
-    darkness = 0.1,
-    color = "black",
-    bg,
-    bgOpacity = 0.2,
-    rotate,
-}: {
-    id: string
-    color?: string
-    spacing?: number
-    darkness?: number
-    bg?: string
-    bgOpacity?: number
-    /** Rotation in degrees *without unit* */
-    rotate?: number
-}) {
-    const worldSpaceTransform = "translate(0,0) scale(10,10)"
-    return (
-        <pattern
-            id={id}
-            patternUnits="userSpaceOnUse"
-            viewBox="0 0 1 1"
-            width={spacing}
-            height={spacing}
-            patternTransform={
-                rotate
-                    ? `rotate(${rotate}) ${worldSpaceTransform}`
-                    : worldSpaceTransform
-            }
-            preserveAspectRatio="xMidYMid"
-        >
-            {bg && (
-                <rect
-                    x={0}
-                    y={0}
-                    width={1}
-                    height={1}
-                    fill={bg}
-                    fillOpacity={bgOpacity}
-                />
-            )}
-            <rect x={0} y={0} width={darkness} height={1} fill={color} />
-        </pattern>
-    )
-}
-
-function buildPatternId(id: string, dataKey: string) {
-    return `${id}_${dataKey}`
-}
-
-function PatternDefinitions({
-    ref,
-    id: baseId,
-    chartConfig,
-}: {
-    ref?: Ref<SVGDefsElement>
-    id: string
-    chartConfig: Record<string, ApplicationChartConfigItem>
-}) {
-    return (
-        <defs ref={ref}>
-            {Object.values(
-                Object.entries(chartConfig).reduce(
-                    (pats, [dataKey, itemConfig]) => {
-                        const id = buildPatternId(baseId, dataKey)
-                        const styleId = itemConfig.styleId ?? dataKey
-                        if (pats[styleId]) return pats
-                        if (itemConfig.fillPattern === "dotted") {
-                            pats[styleId] = (
-                                <DottedPatternDef
-                                    key={id}
-                                    id={id}
-                                    color={itemConfig.color}
-                                    bg={itemConfig.color}
-                                    rotate={30}
-                                />
-                            )
-                        }
-                        if (itemConfig.fillPattern === "striped") {
-                            pats[styleId] = (
-                                <StripedPatternDef
-                                    key={id}
-                                    id={id}
-                                    color={itemConfig.color}
-                                    bg={itemConfig.color}
-                                    rotate={45}
-                                />
-                            )
-                        }
-                        return pats
-                    },
-                    {} as Record<string, ReactElement>,
-                ),
-            )}
-        </defs>
-    )
-}
-
 export function NitrogenBalanceChart(
     props: { balanceData: { balance: number; removal: number } } & (
         | { type: "farm"; balanceData: FarmBalanceData; fieldInput: unknown }
@@ -592,25 +442,6 @@ export function NitrogenBalanceChart(
         })
     }
 
-    function getBarStyle(dataKey: string) {
-        const styleId =
-            chartConfig[dataKey as keyof typeof chartConfig]?.styleId ?? dataKey
-        const itemConfig = styleId && chartConfig[styleId]
-        if (!itemConfig) return {}
-
-        if (itemConfig.fillPattern) {
-            return {
-                style: {
-                    fill: `url(#${buildPatternId(patternId, styleId ?? dataKey)})`,
-                },
-                stroke: itemConfig.color,
-                strokeWidth: "var(--spacing-2)",
-            }
-        }
-
-        return { fill: itemConfig.color }
-    }
-
     const barRadius = 5
     const barRadiusStart: [number, number, number, number] = [
         barRadius,
@@ -644,18 +475,17 @@ export function NitrogenBalanceChart(
         return bar.flatMap((barItem) => {
             if (Array.isArray(barItem)) {
                 return barItem.map((dataKey, i) => {
-                    const barStyle = getBarStyle(dataKey)
+                    const styleId = chartConfig[dataKey]?.styleId ?? dataKey
+                    const barStyle = chartConfig[styleId] ?? {}
                     return (
                         <Bar
                             key={dataKey}
                             dataKey={dataKey}
                             radius={pickBarRadius(i, barItem)}
                             stackId={stackId}
-                            {...barStyle}
+                            fill={barStyle.color}
                             stroke={
-                                tooltipFocus.has(dataKey)
-                                    ? "black"
-                                    : barStyle.stroke
+                                tooltipFocus.has(dataKey) ? "black" : undefined
                             }
                             onMouseEnter={onTooltipFocus}
                             onMouseLeave={onTooltipBlur}
@@ -665,6 +495,8 @@ export function NitrogenBalanceChart(
             }
 
             const dataKey = barItem
+            const styleId = chartConfig[dataKey]?.styleId ?? dataKey
+            const barStyle = chartConfig[styleId] ?? {}
 
             return (
                 <Bar
@@ -672,7 +504,7 @@ export function NitrogenBalanceChart(
                     dataKey={dataKey}
                     radius={barRadius}
                     stackId={stackId}
-                    {...getBarStyle(dataKey)}
+                    fill={barStyle.color}
                     onMouseEnter={onTooltipFocus}
                     onMouseLeave={onTooltipBlur}
                 />
@@ -690,13 +522,6 @@ export function NitrogenBalanceChart(
                     left: -20,
                 }}
             >
-                {/** Needs to be inside a <g> tag so Recharts actually renders it */}
-                <g>
-                    <PatternDefinitions
-                        id={patternId}
-                        chartConfig={chartConfig}
-                    />
-                </g>
                 <XAxis type="number" />
                 <YAxis
                     dataKey="primary"
@@ -769,51 +594,13 @@ export function NitrogenBalanceChart(
                                                 "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
                                             )}
                                         >
-                                            {itemConfig.fillPattern ||
-                                            itemConfig.color === "white" ? (
-                                                <svg
-                                                    role="img"
-                                                    aria-label={
-                                                        itemConfig.label
-                                                    }
-                                                    viewBox="0 0 10 10"
-                                                    className="h-6 w-6 border shrink-0 rounded-[2px]"
-                                                    style={{
-                                                        borderColor:
-                                                            itemConfig.color ===
-                                                            "white"
-                                                                ? "black"
-                                                                : itemConfig.color,
-                                                    }}
-                                                >
-                                                    <rect
-                                                        x={0}
-                                                        y={0}
-                                                        width={10}
-                                                        height={10}
-                                                        fill={
-                                                            itemConfig.color ===
-                                                            "white"
-                                                                ? "black"
-                                                                : `url(#${buildPatternId(patternId, dataKey)})`
-                                                        }
-                                                        fillOpacity={
-                                                            itemConfig.color ===
-                                                            "white"
-                                                                ? 0.2
-                                                                : 1
-                                                        }
-                                                    />
-                                                </svg>
-                                            ) : (
-                                                <div
-                                                    className="h-2 w-2 shrink-0 rounded-[2px]"
-                                                    style={{
-                                                        backgroundColor:
-                                                            itemConfig.color,
-                                                    }}
-                                                />
-                                            )}
+                                            <div
+                                                className="h-2 w-2 shrink-0 rounded-[2px]"
+                                                style={{
+                                                    backgroundColor:
+                                                        itemConfig.color,
+                                                }}
+                                            />
                                             {itemConfig.label}
                                         </div>
                                     )
