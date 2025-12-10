@@ -1,119 +1,24 @@
+import type {
+    collectInputForNitrogenBalance,
+    getNitrogenBalance,
+    NitrogenBalanceFieldResultNumeric,
+} from "@svenvw/fdm-calculator"
 import { format } from "date-fns/format"
 import { type ReactElement, type Ref, useId, useMemo, useState } from "react"
 import { nl } from "react-day-picker/locale"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
 import { cn } from "@/app/lib/utils"
+import { getCultivationColor } from "~/components/custom/cultivation-colors"
+import { Card, CardContent, CardHeader } from "~/components/ui/card"
 import {
     ChartContainer,
     ChartLegend,
     ChartTooltip,
 } from "~/components/ui/chart"
-import { getCultivationColor } from "~/components/custom/cultivation-colors"
-import { Card, CardContent, CardHeader } from "~/components/ui/card"
 
-type FertilizerTypes = "mineral" | "manure" | "compost" | "other"
-
-type FieldInput = {
-    cultivations: {
-        b_lu: string
-        b_lu_name: string
-        b_lu_croprotation: string
-    }[]
-    harvests: {
-        b_id_harvesting: string
-        b_lu_harvest_date: Date
-        b_lu: string
-        harvestable: {
-            b_id_harvestable: string
-            harvestable_analyses: unknown[]
-        }
-    }[]
-    fertilizerApplications: { p_app_id: string; p_name_nl: string }[]
-}
-
-type FarmBalanceData = {
-    emission: {
-        total: number
-        ammonia: {
-            total: number
-            fertilizers: Record<"total" | FertilizerTypes, number>
-            residues: number
-        }
-        nitrate: number
-    }
-    removal: {
-        total: number
-        harvests: number
-        residues: number
-    }
-    supply: {
-        total: number
-        deposition: number
-        fixation: number
-        mineralization: number
-        fertilizers: Record<FertilizerTypes, number>
-    }
-}
-
-type FieldBalanceData = {
-    emission: {
-        total: number
-        ammonia: {
-            total: number
-            residues: {
-                total: number
-                cultivations: { id: string; value: number }[]
-            }
-            fertilizers: Record<
-                FertilizerTypes,
-                {
-                    total: number
-                    applications: {
-                        id: string
-                        p_id_catalogue: string
-                        p_type: FertilizerTypes
-                        p_app_date: string
-                        value: number
-                    }[]
-                }
-            >
-        }
-        nitrate: { total: number }
-    }
-    removal: {
-        total: number
-        harvests: {
-            total: number
-            harvests: { id: string; value: number }[]
-        }
-        residues: {
-            total: number
-            cultivations: { id: string; value: number }[]
-        }
-    }
-    supply: {
-        total: number
-        fixation: {
-            total: number
-            cultivations: { id: string; value: number }[]
-        }
-        deposition: { total: number }
-        mineralization: { total: number }
-        fertilizers: Record<
-            FertilizerTypes,
-            {
-                total: number
-                applications: {
-                    id: string
-                    p_id_catalogue: string
-                    p_type: FertilizerTypes
-                    p_app_date: string
-                    value: number
-                }[]
-            }
-        >
-    }
-}
+type FieldInput = Awaited<ReturnType<typeof collectInputForNitrogenBalance>>
+type FarmBalanceData = Awaited<ReturnType<typeof getNitrogenBalance>>
+type FieldBalanceData = NitrogenBalanceFieldResultNumeric
 
 type ApplicationChartConfigItem = {
     label: string
