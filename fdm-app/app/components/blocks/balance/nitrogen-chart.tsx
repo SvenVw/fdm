@@ -121,7 +121,7 @@ type ApplicationChartConfigItem = {
     styleId?: string
     fillPattern?: "dotted" | "striped"
     unit?: string
-    detail?: string
+    detail?: string[]
 }
 
 function buildChartDataAndLegend({
@@ -296,6 +296,7 @@ function buildChartDataAndLegend({
         function addFertilizerApplication(
             fieldInput: FieldInput,
             dataKeyPrefix: string,
+            label: string,
             applicationResult: { id: string; value: number },
             unit: string,
             bar: BarDataType,
@@ -309,16 +310,20 @@ function buildChartDataAndLegend({
             ;(chartConfig as ExtendedChartConfig)[dataKey] = application
                 ? {
                       styleId: dataKeyPrefix,
-                      label: format(application.p_app_date, "PP", {
-                          locale: nl,
-                      }),
+                      label: label,
                       unit: unit,
-                      detail: application.p_name_nl,
+                      detail: [
+                          application.p_name_nl,
+                          format(application.p_app_date, "PP", {
+                              locale: nl,
+                          }),
+                      ],
                   }
                 : {
                       styleId: dataKeyPrefix,
-                      label: "onbekend",
+                      label: label,
                       unit: unit,
+                      detail: ["onbekend"],
                   }
             bar.push(dataKey)
         }
@@ -326,6 +331,7 @@ function buildChartDataAndLegend({
         function addCultivation(
             fieldInput: FieldInput,
             dataKeyPrefix: string,
+            label: string,
             cultivationResult: { id: string; value: number },
             unit: string,
             styles: Record<string, ApplicationChartConfigItem>,
@@ -349,8 +355,9 @@ function buildChartDataAndLegend({
             }
             chartData[dataKey] = Math.abs(cultivationResult.value)
             ;(chartConfig as ExtendedChartConfig)[dataKey] = {
-                label: cultivation.b_lu_name,
+                label: label,
                 unit: unit,
+                detail: [cultivation.b_lu_name],
                 styleId: styleId,
             }
             bar.push(dataKey)
@@ -363,8 +370,9 @@ function buildChartDataAndLegend({
                     addFertilizerApplication(
                         fieldInput,
                         `${p_type}FertilizerSupply`,
+                        "Aanvoer",
                         app,
-                        "kg N / ha aanvoer",
+                        "kg N / ha",
                         fertilizerTypeSupplyBar,
                     )
                 },
@@ -379,8 +387,9 @@ function buildChartDataAndLegend({
                 addFertilizerApplication(
                     fieldInput,
                     `${p_type}FertilizerAmmonia`,
+                    "Ammoniakemissie",
                     app,
-                    "kg N / ha ammoniakemissie",
+                    "kg N / ha",
                     fertilizerTypeAmmoniaBar,
                 )
             })
@@ -400,8 +409,9 @@ function buildChartDataAndLegend({
                 addCultivation(
                     fieldInput,
                     "fixation",
+                    "Fixatie",
                     cultivationResult,
-                    "kg N / ha fixatie",
+                    "kg N / ha",
                     fixationStyles,
                     fixationBar,
                 )
@@ -424,17 +434,21 @@ function buildChartDataAndLegend({
             chartData[dataKey] = Math.abs(harvestResult.value)
             ;(chartConfig as ExtendedChartConfig)[dataKey] = harvestDetails
                 ? {
-                      label: format(harvestDetails.b_lu_harvest_date, "PP", {
-                          locale: nl,
-                      }),
+                      label: "Afvoer",
                       styleId: "removalHarvest",
                       detail: cultivationDetails
-                          ? cultivationDetails.b_lu_name
-                          : undefined,
+                          ? [
+                                cultivationDetails.b_lu_name,
+                                format(harvestDetails.b_lu_harvest_date, "PP", {
+                                    locale: nl,
+                                }),
+                            ]
+                          : [],
                   }
                 : {
-                      label: "onbekend oogst",
+                      label: "Afvoer",
                       styleId: "removalHarvest",
+                      detail: ["onbekend oogst"],
                   }
             removalBar.push(dataKey)
         })
@@ -452,8 +466,9 @@ function buildChartDataAndLegend({
                 addCultivation(
                     fieldInput,
                     "removalResidue",
+                    "Afvoer",
                     cultivationResult,
-                    "kg N / ha afvoer",
+                    "kg N / ha",
                     removalStyles,
                     removalBar,
                 )
@@ -475,8 +490,9 @@ function buildChartDataAndLegend({
                 addCultivation(
                     fieldInput,
                     "residueAmmonia",
+                    "Ammoniakemissie",
                     cultivationResult,
-                    "kg N / ha ammoniakemissie",
+                    "kg N / ha",
                     residueAmmoniaStyles,
                     residueAmmoniaBar,
                 )
@@ -699,6 +715,13 @@ export function NitrogenBalanceChart(
             })
     }
 
+    const clearTooltipFocus = () => {
+        setTooltipFocus((tooltipFocus) => {
+            tooltipFocus.clear()
+            return new Set(tooltipFocus)
+        })
+    }
+
     function getBarStyle(dataKey: string) {
         const styleId =
             chartConfig[dataKey as keyof typeof chartConfig]?.styleId ?? dataKey
@@ -788,7 +811,7 @@ export function NitrogenBalanceChart(
     }
 
     return (
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={chartConfig} onMouseLeave={clearTooltipFocus}>
             <BarChart
                 accessibilityLayer
                 data={[chartData]}
@@ -839,15 +862,16 @@ export function NitrogenBalanceChart(
                                             />
                                             {itemConfig.label}
                                         </div>
-                                        {itemConfig.detail && (
-                                            <div>
+                                        {itemConfig.detail?.map((detail, i) => (
+                                            // biome-ignore lint/suspicious/noArrayIndexKey: detail is constant
+                                            <div key={i}>
                                                 <div className="inline-block me-2 h-2 w-2 rounded-[2px]" />
-                                                {itemConfig.detail}
+                                                {detail}
                                             </div>
-                                        )}
+                                        ))}
                                     </CardHeader>
                                     <CardContent className="p-4">
-                                        <div>
+                                        <div className="font-bold">
                                             <div className="inline-block me-2 h-2 w-2 rounded-[2px]" />
                                             {chartData[dataKey]}{" "}
                                             {itemConfig.unit ?? "kg N / ha"}
