@@ -6,8 +6,8 @@ import { feature, featureCollection } from "@turf/helpers"
 import type { Field } from "@svenvw/fdm-core"
 import {
     type RvoField,
-    ReconciliationStatus,
-    type ReconciliationItem,
+    RvoImportReviewStatus,
+    type RvoImportReviewItem,
     type FieldDiff,
 } from "./types"
 
@@ -71,7 +71,7 @@ function bboxOverlap(bbox1: number[], bbox2: number[]): boolean {
 }
 
 /**
- * Compares a list of local fields against a list of RVO fields to determine their reconciliation status.
+ * Compares a list of local fields against a list of RVO fields to determine their import status.
  *
  * The matching strategy operates in two tiers:
  * 1. **Tier 1: ID Match**: Checks if `localField.b_id_source` matches `rvoField.CropFieldID`.
@@ -81,13 +81,13 @@ function bboxOverlap(bbox1: number[], bbox2: number[]): boolean {
  *
  * @param localFields - Array of fields currently in the local database.
  * @param rvoFields - Array of fields retrieved from the RVO webservice.
- * @returns An array of `ReconciliationItem` objects, each representing a field and its status (MATCH, CONFLICT, NEW_REMOTE, NEW_LOCAL).
+ * @returns An array of `RvoImportReviewItem` objects, each representing a field and its status (MATCH, CONFLICT, NEW_REMOTE, NEW_LOCAL).
  */
 export function compareFields(
     localFields: Field[],
     rvoFields: RvoField[],
-): ReconciliationItem<Field>[] {
-    const results: ReconciliationItem<Field>[] = []
+): RvoImportReviewItem<Field>[] {
+    const results: RvoImportReviewItem<Field>[] = []
     const matchedRvoIds = new Set<string>()
     const matchedLocalIds = new Set<string>()
 
@@ -109,8 +109,8 @@ export function compareFields(
                 results.push({
                     status:
                         diffs.length > 0
-                            ? ReconciliationStatus.CONFLICT
-                            : ReconciliationStatus.MATCH,
+                            ? RvoImportReviewStatus.CONFLICT
+                            : RvoImportReviewStatus.MATCH,
                     localField: local,
                     rvoField: rvoMatch,
                     diffs,
@@ -163,8 +163,8 @@ export function compareFields(
             results.push({
                 status:
                     diffs.length > 0
-                        ? ReconciliationStatus.CONFLICT
-                        : ReconciliationStatus.MATCH,
+                        ? RvoImportReviewStatus.CONFLICT
+                        : RvoImportReviewStatus.MATCH,
                 localField: bestMatch,
                 rvoField: rvo,
                 diffs,
@@ -172,7 +172,7 @@ export function compareFields(
         } else {
             // No match found -> This is a NEW field from RVO
             results.push({
-                status: ReconciliationStatus.NEW_REMOTE,
+                status: RvoImportReviewStatus.NEW_REMOTE,
                 rvoField: rvo,
                 diffs: [],
             })
@@ -185,7 +185,7 @@ export function compareFields(
     for (const local of localFields) {
         if (!matchedLocalIds.has(local.b_id)) {
             results.push({
-                status: ReconciliationStatus.NEW_LOCAL,
+                status: RvoImportReviewStatus.NEW_LOCAL,
                 localField: local,
                 diffs: [],
             })

@@ -13,7 +13,7 @@
  *     authorization codes for access tokens using the `RvoClient`.
  * -   **Field Data Fetching**: Retrieves agricultural field data from RVO, with GeoJSON
  *     parsing and validation against `RvoFieldSchema`.
- * -   **Field Reconciliation Engine**:
+ * -   **Field RVO Import Review Engine**:
  *     -   Compares local FDM fields (`@svenvw/fdm-core`'s `Field` type) against RVO fields.
  *     -   Utilizes a two-tier matching strategy: ID-based matching followed by spatial
  *         (IoU) matching.

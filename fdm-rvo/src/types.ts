@@ -55,9 +55,9 @@ export const RvoFieldSchema = z.object({
 export type RvoField = z.infer<typeof RvoFieldSchema>
 
 /**
- * Status of a field during the reconciliation process between local data and RVO data.
+ * Status of a field during the RVO Import Review process between local data and RVO data.
  */
-export enum ReconciliationStatus {
+export enum RvoImportReviewStatus {
     /** The field exists in both systems and is identical (no conflicts). */
     MATCH = "MATCH",
     /** The field exists in RVO but is missing locally. Suggests adding it to the local system. */
@@ -80,9 +80,9 @@ export type FieldDiff =
     | "b_acquiring_method" // Method of acquisition difference (implied)
 
 /**
- * Represents the explicit decision made by the user for a reconciliation item.
+ * Represents the explicit decision made by the user for a RVO Import Review item.
  */
-export enum UserReconciliationDecision {
+export enum UserRvoImportReviewDecision {
     /** Use the RVO field's data (for CONFLICT, NEW_REMOTE) */
     USE_RVO = "USE_RVO",
     /** Keep the local field's data (for CONFLICT, NEW_LOCAL) */
@@ -91,7 +91,7 @@ export enum UserReconciliationDecision {
     ADD = "ADD",
     /** Explicitly remove a local field */
     REMOVE = "REMOVE",
-    /** Ignore this reconciliation item (take no action) */
+    /** Ignore this RVO Import Review item (take no action) */
     IGNORE = "IGNORE",
 }
 
@@ -100,9 +100,9 @@ export enum UserReconciliationDecision {
  *
  * @template TLocal - The type of the local field object (defaults to `any` if not specified, typically `Field` from fdm-core).
  */
-export interface ReconciliationItem<TLocal> {
-    /** The reconciliation status (Match, New, Conflict, etc.) */
-    status: ReconciliationStatus
+export interface RvoImportReviewItem<TLocal> {
+    /** The RVO Import Review status (Match, New, Conflict, etc.) */
+    status: RvoImportReviewStatus
     /** The local field object, if it exists (undefined for NEW_REMOTE) */
     localField?: TLocal
     /** The RVO field object, if it exists (undefined for NEW_LOCAL) */

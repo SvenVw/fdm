@@ -8,7 +8,7 @@ This package provides the core logic for synchronizing agricultural field data w
 
 - **RVO Authentication Flow**: Helpers for generating authorization URLs and exchanging authorization codes for access tokens using the `RvoClient`.
 - **Field Data Fetching**: Retrieves agricultural field data from RVO, with GeoJSON parsing and validation.
-- **Field Reconciliation Engine**:
+- **RVO Import Review Engine**:
   - Compares local FDM fields (`@svenvw/fdm-core`'s `Field` type) against RVO fields.
   - Utilizes a two-tier matching strategy: ID-based matching followed by spatial (IoU) matching.
   - Detects and categorizes fields as `MATCH`, `NEW_REMOTE` (in RVO but not local), `NEW_LOCAL` (in local but not RVO), or `CONFLICT` (different properties in both).
@@ -99,8 +99,8 @@ const processRvoData = async (accessToken: string, farmId: string, principalId: 
   // Fetch local fields from your backend API
   const localFields = await fetchLocalFieldsApi(farmId, principalId);
 
-  const reconciliationResults = compareFields(localFields, rvoFields);
-  return reconciliationResults;
+  const rvoImportReviewResults = compareFields(localFields, rvoFields);
+  return rvoImportReviewResults;
 };
 
 // To apply changes, you would send the user's decisions to a backend API endpoint
