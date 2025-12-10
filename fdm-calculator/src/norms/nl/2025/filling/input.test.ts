@@ -6,7 +6,7 @@ import type {
     Field,
 } from "@svenvw/fdm-core"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { collectInputForFertilizerApplicationFilling } from "./input"
+import { collectNL2025InputForFertilizerApplicationFilling } from "./input"
 import type { NL2025NormsFillingInput } from "./types"
 
 // Mock the entire @svenvw/fdm-core module
@@ -29,7 +29,7 @@ import {
     isOrganicCertificationValid,
 } from "@svenvw/fdm-core"
 
-describe("collectInputForFertilizerApplicationFilling", () => {
+describe("collectNL2025InputForFertilizerApplicationFilling", () => {
     const mockFdm = {} as FdmType
     const mockPrincipalId = "principal123"
     const mockFieldId = "field456"
@@ -81,7 +81,7 @@ describe("collectInputForFertilizerApplicationFilling", () => {
             { p_id_catalogue: "fert1", p_n_rt: 5, p_type_rvo: "115" },
         ]
 
-        const result = await collectInputForFertilizerApplicationFilling(
+        const result = await collectNL2025InputForFertilizerApplicationFilling(
             mockFdm,
             mockPrincipalId,
             mockFieldId,
@@ -146,7 +146,7 @@ describe("collectInputForFertilizerApplicationFilling", () => {
         vi.mocked(getField).mockResolvedValue(null) // Simulate field not found
 
         await expect(
-            collectInputForFertilizerApplicationFilling(
+            collectNL2025InputForFertilizerApplicationFilling(
                 mockFdm,
                 mockPrincipalId,
                 mockFieldId,

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { determineNL2025Hoofdteelt } from "./hoofdteelt"
+import { determineNLHoofdteelt } from "./hoofdteelt"
 import type { NL2025NormsInputForCultivation } from "./types"
 
-describe("determineNL2025Hoofdteelt", () => {
+describe("determineNLHoofdteelt", () => {
     it("should return the cultivation with the longest duration in the period", async () => {
         const cultivations: NL2025NormsInputForCultivation[] = [
             {
@@ -20,7 +20,7 @@ describe("determineNL2025Hoofdteelt", () => {
                 b_lu_variety: null,
             },
         ]
-        const result = await determineNL2025Hoofdteelt(cultivations)
+        const result = await determineNLHoofdteelt(cultivations, 2025)
         expect(result).toBe("cat_B")
     })
 
@@ -41,7 +41,7 @@ describe("determineNL2025Hoofdteelt", () => {
                 b_lu_variety: null,
             },
         ]
-        const result = await determineNL2025Hoofdteelt(cultivations)
+        const result = await determineNLHoofdteelt(cultivations, 2025)
         expect(result).toBe("cat_C")
     })
 
@@ -55,7 +55,7 @@ describe("determineNL2025Hoofdteelt", () => {
                 b_lu_variety: null,
             },
         ]
-        const result = await determineNL2025Hoofdteelt(cultivations)
+        const result = await determineNLHoofdteelt(cultivations , 2025)
         expect(result).toBe("nl_6794")
     })
 
@@ -76,13 +76,13 @@ describe("determineNL2025Hoofdteelt", () => {
                 b_lu_variety: null,
             },
         ]
-        const result = await determineNL2025Hoofdteelt(cultivations)
+        const result = await determineNLHoofdteelt(cultivations, 2025)
         expect(result).toBe("cat_F")
     })
 
     it("should handle an empty array of cultivations by returning nl_6794", async () => {
         const cultivations: NL2025NormsInputForCultivation[] = []
-        const result = await determineNL2025Hoofdteelt(cultivations)
+        const result = await determineNLHoofdteelt(cultivations, 2025)
         expect(result).toBe("nl_6794")
     })
 
@@ -96,7 +96,7 @@ describe("determineNL2025Hoofdteelt", () => {
                 b_lu_variety: null,
             },
         ]
-        const result = await determineNL2025Hoofdteelt(cultivations)
+        const result = await determineNLHoofdteelt(cultivations, 2025)
         expect(result).toBe("cat_H")
     })
 })

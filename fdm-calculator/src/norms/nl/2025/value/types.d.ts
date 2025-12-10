@@ -26,51 +26,10 @@ export type NL2025NormsInput = {
 }
 
 /**
- * The result object returned by the `getNL2025DierlijkeMestGebruiksNorm` function,
- * containing the determined animal manure nitrogen usage norm and its source.
- */
-export interface DierlijkeMestGebruiksnormResult {
-    /**
-     * The determined usage standard for nitrogen from animal manure in kg N per hectare.
-     */
-    normValue: number
-    /**
-     * A descriptive string indicating which rule or category was applied to determine the norm.
-     * Examples: "Standaard", "Derogatie - NV Gebied", "Derogatie - Buiten NV Gebied".
-     */
-    normSource: string
-}
-
-/**
- * Represents the phosphate usage norm values for a specific phosphate class,
- * differentiated by grassland and arable land.
- */
-export interface FosfaatNorm {
-    grasland: number
-    bouwland: number
-}
-
-/**
  * Defines the possible phosphate classes based on RVO's "Tabel Fosfaatgebruiksnormen 2025".
  * These classes are determined by P-CaCl2 and P-Al soil analysis values.
  */
 export type FosfaatKlasse = "Arm" | "Laag" | "Neutraal" | "Ruim" | "Hoog"
-
-/**
- * The result object returned by the `getNL2025FosfaatGebruiksNorm` function,
- * containing the determined phosphate usage norm and the corresponding phosphate class.
- */
-export interface FosfaatGebruiksnormResult {
-    /**
-     * The determined phosphate usage standard in kg P2O5 per hectare.
-     */
-    normValue: number
-    /**
-     * The cultivation and phosphate class ('Arm', 'Laag', 'Neutraal', 'Ruim', 'Hoog')
-     * that was determined from the soil analysis values and used to derive the norm.
-     */
-    normSource: string
-}
 
 /**
  * Defines the structure for a single nitrogen standard entry,
@@ -153,18 +112,3 @@ export type NormsByRegion = {
     [key in RegionKey]: { standard: number; nv_area: number }
 }
 
-/**
- * The result object returned by the `getNL2025StikstofGebruiksNorm` function,
- * containing the calculated norm value and the name of the cultivation used for the calculation.
- */
-export interface GebruiksnormResult {
-    /**
-     * The determined nitrogen usage standard in kg N per hectare.
-     */
-    normValue: number
-    /**
-     * The cultivation name according to RVO's "Tabel 2 Stikstof landbouwgrond 2025"
-     * that was used to determine the legal limit.
-     */
-    normSource: string
-}
