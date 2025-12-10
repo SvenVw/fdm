@@ -8,7 +8,8 @@ import {
     ChartLegend,
     ChartTooltip,
 } from "~/components/ui/chart"
-import { getCultivationColor } from "../../custom/cultivation-colors"
+import { getCultivationColor } from "~/components/custom/cultivation-colors"
+import { Card, CardContent, CardHeader } from "~/components/ui/card"
 
 type FertilizerTypes = "mineral" | "manure" | "compost" | "other"
 
@@ -821,40 +822,38 @@ export function NitrogenBalanceChart(
                             const itemConfig = chartConfig[dataKey]
 
                             return (
-                                <div className="flex min-w-32 items-center gap-2 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl">
-                                    <div
-                                        className="h-2 w-2 shrink-0 rounded-[2px]"
-                                        style={{
-                                            backgroundColor: itemConfig.styleId
-                                                ? chartConfig[
-                                                      itemConfig.styleId
-                                                  ].color
-                                                : itemConfig.color,
-                                        }}
-                                    />
-                                    <div
-                                        className={cn(
-                                            "flex flex-col items-start [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
-                                        )}
-                                    >
-                                        <p className="flex flex-row">
-                                            <div>{itemConfig.label}</div>
-                                            <div className="ms-2">
-                                                {chartData[dataKey]}{" "}
-                                                {itemConfig.unit ?? "kg N / ha"}
-                                            </div>
-                                        </p>
+                                <Card>
+                                    <CardHeader className="p-4 pb-0">
+                                        <div>
+                                            <div
+                                                className="inline-block me-2 h-2 w-2 rounded-[2px]"
+                                                style={{
+                                                    backgroundColor:
+                                                        itemConfig.styleId
+                                                            ? chartConfig[
+                                                                  itemConfig
+                                                                      .styleId
+                                                              ].color
+                                                            : itemConfig.color,
+                                                }}
+                                            />
+                                            {itemConfig.label}
+                                        </div>
                                         {itemConfig.detail && (
-                                            <p
-                                                className={cn(
-                                                    "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
-                                                )}
-                                            >
+                                            <div>
+                                                <div className="inline-block me-2 h-2 w-2 rounded-[2px]" />
                                                 {itemConfig.detail}
-                                            </p>
+                                            </div>
                                         )}
-                                    </div>
-                                </div>
+                                    </CardHeader>
+                                    <CardContent className="p-4">
+                                        <div>
+                                            <div className="inline-block me-2 h-2 w-2 rounded-[2px]" />
+                                            {chartData[dataKey]}{" "}
+                                            {itemConfig.unit ?? "kg N / ha"}
+                                        </div>
+                                    </CardContent>
+                                </Card>
                             )
                         }
                         return null
