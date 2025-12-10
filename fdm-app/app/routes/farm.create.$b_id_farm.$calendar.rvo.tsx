@@ -17,16 +17,17 @@ import {
     fetchRvoFields,
     compareFields,
     createRvoClient,
-    type RvoImportReviewItem,
 } from "~/lib/rvo.server"
 import { serverConfig } from "~/lib/config.server"
 import {
+    type RvoImportReviewItem,
     type ImportReviewAction,
-    RvoImportReviewTable,
     type UserChoiceMap,
+    processRvoImport,
     getItemId,
-} from "~/components/blocks/rvo/import-review-table"
-import { addField, getFarm } from "@svenvw/fdm-core"
+} from "@svenvw/fdm-rvo"
+import { RvoImportReviewTable } from "~/components/blocks/rvo/import-review-table"
+import { getFarm } from "@svenvw/fdm-core"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import { Loader2, AlertTriangle, FlaskConical } from "lucide-react"
@@ -502,27 +503,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 String(userChoicesJson),
             )
 
-            for (const item of RvoImportReviewData) {
-                const id = getItemId(item)
-                const action = userChoices[id]
-
-                if (action === "ADD_REMOTE" && item.rvoField) {
-                    await addField(
-                        fdm,
-                        session.principal_id,
-                        b_id_farm,
-                        item.rvoField.properties.CropFieldDesignator ||
-                            `RVO Perceel ${item.rvoField.properties.CropFieldID}`,
-                        item.rvoField.properties.CropFieldID,
-                        item.rvoField.geometry,
-                        new Date(item.rvoField.properties.BeginDate),
-                        "rvo_import",
-                        item.rvoField.properties.EndDate
-                            ? new Date(item.rvoField.properties.EndDate)
-                            : undefined,
-                    )
-                }
-            }
+            await processRvoImport(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+                RvoImportReviewData,
+                userChoices,
+            )
             return redirect(`/farm/create/${b_id_farm}/${calendar}/fields`)
         } catch (e: any) {
             console.error("Error at saving RVO fields: ", e)

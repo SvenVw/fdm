@@ -110,3 +110,21 @@ export interface RvoImportReviewItem<TLocal> {
     /** List of specific properties that differ (empty for MATCH, NEW_REMOTE, NEW_LOCAL) */
     diffs: FieldDiff[]
 }
+
+/**
+ * Action to be taken for a specific review item during the import process.
+ */
+export type ImportReviewAction =
+    | "ADD_REMOTE" // Add the remote field to the local database
+    | "UPDATE_FROM_REMOTE" // Update the local field with remote data
+    | "KEEP_LOCAL" // Keep the local version, ignoring the remote conflict
+    | "REMOVE_LOCAL" // Remove the local field
+    | "IGNORE" // Do nothing for this item
+    | "NO_ACTION" // No specific action selected
+
+/**
+ * A map of user choices, keyed by the item ID (see `getItemId`).
+ *
+ * Each entry represents the action selected by the user for a specific review item.
+ */
+export type UserChoiceMap = Record<string, ImportReviewAction>

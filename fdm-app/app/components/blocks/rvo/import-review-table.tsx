@@ -4,7 +4,12 @@ import {
     getCoreRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-import type { RvoImportReviewItem } from "@svenvw/fdm-rvo/types"
+import {
+    type RvoImportReviewItem,
+    type ImportReviewAction,
+    type UserChoiceMap,
+    getItemId,
+} from "@svenvw/fdm-rvo"
 import {
     Table,
     TableBody,
@@ -23,29 +28,10 @@ import {
     SelectValue,
 } from "~/components/ui/select"
 
-export type ImportReviewAction =
-    | "ADD_REMOTE"
-    | "UPDATE_FROM_REMOTE"
-    | "KEEP_LOCAL"
-    | "REMOVE_LOCAL"
-    | "IGNORE"
-    | "NO_ACTION"
-
-export type UserChoiceMap = Record<string, ImportReviewAction>
-
 interface RvoImportReviewTableProps {
     data: RvoImportReviewItem<any>[]
     userChoices: UserChoiceMap
     onChoiceChange: (id: string, action: ImportReviewAction) => void
-}
-
-// Helper to derive a stable ID for the row
-export function getItemId(item: RvoImportReviewItem<any>): string {
-    return (
-        item.localField?.b_id ||
-        item.rvoField?.properties.CropFieldID ||
-        "unknown"
-    )
 }
 
 export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [

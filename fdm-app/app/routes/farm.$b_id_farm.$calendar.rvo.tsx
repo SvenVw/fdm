@@ -21,22 +21,14 @@ import {
 import {
     type RvoImportReviewItem,
     RvoImportReviewStatus,
-} from "@svenvw/fdm-rvo/types"
-import { serverConfig } from "~/lib/config.server"
-import {
-    ImportReviewAction,
-    RvoImportReviewTable,
     type UserChoiceMap,
+    type ImportReviewAction,
     getItemId,
-} from "~/components/blocks/rvo/import-review-table"
-import {
-    getFields,
-    addField,
-    updateField,
-    removeField,
-    getFarm,
-    getFarms,
-} from "@svenvw/fdm-core"
+    processRvoImport,
+} from "@svenvw/fdm-rvo"
+import { serverConfig } from "~/lib/config.server"
+import { RvoImportReviewTable } from "~/components/blocks/rvo/import-review-table"
+import { getFields, getFarm, getFarms } from "@svenvw/fdm-core"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import {
@@ -531,63 +523,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 String(userChoicesJson),
             )
 
-            for (const item of rvoImportReviewData) {
-                const id = getItemId(item)
-                const action = userChoices[id]
-
-                if (!action || action === "IGNORE" || action === "NO_ACTION") {
-                    continue
-                }
-
-                switch (action) {
-                    case "ADD_REMOTE":
-                        if (item.rvoField) {
-                            await addField(
-                                fdm,
-                                session.principal_id,
-                                b_id_farm,
-                                item.rvoField.properties.CropFieldDesignator ||
-                                    `RVO Perceel ${item.rvoField.properties.CropFieldID}`,
-                                item.rvoField.properties.CropFieldID,
-                                item.rvoField.geometry,
-                                new Date(item.rvoField.properties.BeginDate),
-                                "rvo_import",
-                                item.rvoField.properties.EndDate
-                                    ? new Date(item.rvoField.properties.EndDate)
-                                    : undefined,
-                            )
-                        }
-                        break
-                    case "UPDATE_FROM_REMOTE":
-                        if (item.localField && item.rvoField) {
-                            await updateField(
-                                fdm,
-                                session.principal_id,
-                                item.localField.b_id,
-                                item.rvoField.properties.CropFieldDesignator ||
-                                    item.localField.b_name,
-                                item.rvoField.properties.CropFieldID,
-                                item.rvoField.geometry,
-                                new Date(item.rvoField.properties.BeginDate),
-                                "rvo_import",
-                                item.rvoField.properties.EndDate
-                                    ? new Date(item.rvoField.properties.EndDate)
-                                    : undefined,
-                            )
-                        }
-                        break
-                    case "KEEP_LOCAL": // Keep Local for Conflict
-                    case "REMOVE_LOCAL":
-                        if (item.localField) {
-                            await removeField(
-                                fdm,
-                                session.principal_id,
-                                item.localField.b_id,
-                            )
-                        }
-                        break
-                }
-            }
+            await processRvoImport(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+                rvoImportReviewData,
+                userChoices,
+            )
             return redirect(`/farm/${b_id_farm}/overview`)
         } catch (e: any) {
             console.error("Error with processing RVO import: ", e)

@@ -222,6 +222,8 @@ function detectDiffs(local: Field, rvo: RvoField): FieldDiff[] {
 
     // 2. Geometry
     // We use a very strict IoU (0.99) to detect if the shape has been modified, even slightly.
+    // If IoU is less than this threshold, we flag it as a geometry difference.
+    // We don't require 1.0 because of potential minor floating point differences in coordinates.
     const iou = calculateIoU(local.b_geometry, rvo.geometry)
     if (iou < IOU_THRESHOLD) {
         diffs.push("b_geometry")
