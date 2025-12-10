@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Extended the nitrogen chart balance with further breakdown of harvest, fixed vs crop residues, and dfferent fertilizer types.
+Extended the nitrogen chart balance with breakdown into fixation, deposition, mineralization. Splitted removal into removal from harvests and crop residues. Added emission and supply breakdown for different fertilizer types.
