@@ -110,7 +110,7 @@ describe("calculateNitrogenBalance", () => {
         expect(typeof result.supply.total).toBe("number")
         expect(typeof result.supply.deposition).toBe("number")
         expect(typeof result.supply.fixation).toBe("number")
-        expect(typeof result.supply.mineralization).toBe("number")
+        expect(typeof result.supply.mineralisation).toBe("number")
         expect(result.supply.fertilizers).toBeDefined()
         assertValidFertilizerBreakdown(result.supply.fertilizers)
         expect(typeof result.emission.total).toBe("number")

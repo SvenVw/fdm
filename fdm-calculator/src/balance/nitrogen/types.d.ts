@@ -374,7 +374,7 @@ export type NitrogenBalance = {
         total: Decimal
         deposition: Decimal
         fixation: Decimal
-        mineralization: Decimal
+        mineralisation: Decimal
         fertilizers: {
             total: Decimal
             mineral: Decimal
@@ -628,7 +628,7 @@ export type NitrogenBalanceNumeric = {
         total: number
         deposition: number
         fixation: number
-        mineralization: number
+        mineralisation: number
         fertilizers: {
             total: number
             mineral: number
