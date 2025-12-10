@@ -190,15 +190,15 @@ function buildChartDataAndLegend({
         },
         manureFertilizer: {
             label: "Dierlijke Mest",
-            color: "yellow",
+            color: "var(--color-yellow-600)",
         },
         compostFertilizer: {
             label: "Compost",
-            color: "green",
+            color: "var(--color-green-600)",
         },
         otherFertilizer: {
             label: "Overige Meststoffen",
-            color: "#bbb",
+            color: "var(--color-gray-600)",
         },
         supply: {
             label: "Aanvoer",
