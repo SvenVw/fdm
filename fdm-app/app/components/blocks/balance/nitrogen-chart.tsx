@@ -105,48 +105,19 @@ function buildChartDataAndLegend({
             label: "Overige Meststoffen",
             color: "var(--color-gray-600)",
         },
-        supply: {
-            label: "Aanvoer",
-            color: "black",
-            fillPattern: "dotted",
-        },
-        removal: {
-            label: "Afvoer",
-            color: "black",
-            fillPattern: "striped",
-        },
-        emission: {
-            label: "Emissie",
-            color: "white",
-        },
     } as const
 
     const chartConfig: Record<string, ApplicationChartConfigItem> = {
         ...legend,
-        deposition: {
-            ...legend.supply,
-            ...legend.deposition,
-        },
-        fixation: {
-            ...legend.supply,
-            ...legend.fixation,
-        },
-        mineralization: {
-            ...legend.supply,
-            ...legend.mineralization,
-        },
         removalHarvest: {
-            ...legend.removal,
             label: "Afvoer door Oogsten",
             color: "var(--color-teal-700)",
         },
         removalResidue: {
-            ...legend.removal,
             label: "Afvoer door Gewasresten",
             color: "var(--color-brown-300)",
         },
         emissionNitrate: {
-            ...legend.emission,
             label: "Nitraatemissie",
             color: "hsl(var(--chart-4))",
         },
@@ -163,13 +134,10 @@ function buildChartDataAndLegend({
         // These styles are inherited by individual fertilizer applications too
         const style = legend[`${fertilizerType}Fertilizer`]
         chartConfig[`${fertilizerType}FertilizerSupply`] = {
-            ...legend.supply,
             ...style,
-            fillPattern: "dotted",
             label: `Aanvoer door ${langNL[fertilizerType]}`,
         }
         chartConfig[`${fertilizerType}FertilizerAmmonia`] = {
-            ...legend.emission,
             ...style,
             label: `Ammoniakemissie door ${langNL[fertilizerType]}`,
         }
@@ -303,7 +271,6 @@ function buildChartDataAndLegend({
 
         const fixationStyles: Record<string, ApplicationChartConfigItem> = {
             "": {
-                ...legend.supply,
                 label: "onbekend",
                 color: "gray",
             },
@@ -360,7 +327,6 @@ function buildChartDataAndLegend({
 
         const removalStyles: Record<string, ApplicationChartConfigItem> = {
             "": {
-                ...legend.removal,
                 label: "onbekend",
                 color: "gray",
             },
@@ -385,7 +351,6 @@ function buildChartDataAndLegend({
         const residueAmmoniaStyles: Record<string, ApplicationChartConfigItem> =
             {
                 "": {
-                    ...legend.emission,
                     label: "onbekend",
                     color: "gray",
                 },
