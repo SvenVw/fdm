@@ -365,8 +365,9 @@ export function calculateNitrogenBalancesFieldToFarm(
         for (const fertilizerType of fertilizerTypes) {
             totalFarmSupplyFertilizers[fertilizerType] =
                 totalFarmSupplyFertilizers[fertilizerType].add(
-                    fieldResult.balance.supply.fertilizers[fertilizerType]
-                        .total,
+                    fieldResult.balance.supply.fertilizers[
+                        fertilizerType
+                    ].total.times(fieldArea),
                 )
         }
 
