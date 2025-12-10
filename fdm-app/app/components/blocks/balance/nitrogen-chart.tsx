@@ -438,26 +438,23 @@ export function NitrogenBalanceChart(
     const onTooltipFocus = (e: ChartMouseEvent) => {
         const dataKey = e.tooltipPayload[0].dataKey
         if (!tooltipFocus.has(dataKey))
-            setTooltipFocus((tooltipFocus) => {
-                tooltipFocus.add(dataKey)
-                return new Set(tooltipFocus)
-            })
+            setTooltipFocus(
+                (tooltipFocus) => new Set([...tooltipFocus, dataKey]),
+            )
     }
 
     const onTooltipBlur = (e: ChartMouseEvent) => {
         const dataKey = e.tooltipPayload[0].dataKey
         if (tooltipFocus.has(dataKey))
             setTooltipFocus((tooltipFocus) => {
-                tooltipFocus.delete(dataKey)
-                return new Set(tooltipFocus)
+                const newTooltipFocus = new Set(tooltipFocus)
+                newTooltipFocus.delete(dataKey)
+                return newTooltipFocus
             })
     }
 
     const clearTooltipFocus = () => {
-        setTooltipFocus((tooltipFocus) => {
-            tooltipFocus.clear()
-            return new Set(tooltipFocus)
-        })
+        setTooltipFocus(new Set())
     }
 
     const barRadius = 5
