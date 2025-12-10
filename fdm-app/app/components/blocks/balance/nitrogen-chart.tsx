@@ -4,7 +4,7 @@ import type {
     NitrogenBalanceFieldResultNumeric,
 } from "@svenvw/fdm-calculator"
 import { format } from "date-fns/format"
-import { type ReactElement, type Ref, useId, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { nl } from "react-day-picker/locale"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
 import { cn } from "@/app/lib/utils"
@@ -51,8 +51,6 @@ function buildChartDataAndLegend({
         type === "farm"
             ? balanceData.emission.nitrate
             : balanceData.emission.nitrate.total
-    const removal =
-        type === "farm" ? balanceData.removal : balanceData.removal.total
     const chartData: Record<string, number | undefined> = {
         deposition: Math.abs(
             type === "farm"
@@ -61,10 +59,9 @@ function buildChartDataAndLegend({
         ),
         mineralization: Math.abs(
             type === "farm"
-                ? balanceData.supply.fixation
-                : balanceData.supply.fixation.total,
+                ? balanceData.supply.mineralisation
+                : balanceData.supply.mineralisation.total,
         ),
-        removal: removal === undefined ? undefined : Math.abs(removal),
         emissionAmmonia:
             balanceData.emission.ammonia.total === undefined
                 ? undefined
@@ -75,15 +72,30 @@ function buildChartDataAndLegend({
                 : Math.abs(nitrateEmission),
     }
 
+    const farmFixationLegend = {
+        fixation: {
+            label: "Fixatie",
+            color: "#f08",
+        },
+    }
+
+    const farmRemovalLegend = {
+        harvest: {
+            label: "Oogsten",
+            color: "var(--color-teal-700)",
+        },
+        residue: {
+            label: "Gewasresten",
+            color: "var(--color-pink-800)",
+        },
+    }
+
     const legend = {
         deposition: {
             label: "Depositie",
             color: "black",
         },
-        fixation: {
-            label: "Fixatie",
-            color: "#f08",
-        },
+        ...(type === "farm" ? farmFixationLegend : {}),
         mineralization: {
             label: "Mineralisatie",
             color: "lime",
@@ -104,17 +116,20 @@ function buildChartDataAndLegend({
             label: "Overige Meststoffen",
             color: "var(--color-gray-600)",
         },
-    } as const
+        ...(type === "farm" ? farmRemovalLegend : {}),
+    }
 
     const chartConfig: Record<string, ApplicationChartConfigItem> = {
+        ...farmFixationLegend,
+        ...farmRemovalLegend,
         ...legend,
         removalHarvest: {
+            ...farmRemovalLegend.harvest,
             label: "Afvoer door Oogsten",
-            color: "var(--color-teal-700)",
         },
         removalResidue: {
+            ...farmRemovalLegend.residue,
             label: "Afvoer door Gewasresten",
-            color: "var(--color-brown-300)",
         },
         emissionNitrate: {
             label: "Nitraatemissie",
@@ -144,11 +159,15 @@ function buildChartDataAndLegend({
 
     if (type === "farm") {
         chartData.fixation = Math.abs(balanceData.supply.fixation)
+        fixationBar.push("fixation")
         chartData.residueAmmonia = Math.abs(
             balanceData.emission.ammonia.residues,
         )
+        residueAmmoniaBar.push("residueAmmonia")
         chartData.removalHarvest = Math.abs(balanceData.removal.harvests)
+        removalBar.push("removalHarvest")
         chartData.removalResidue = Math.abs(balanceData.removal.residues)
+        removalBar.push("removalResidue")
         fertilizerTypes.forEach((p_type) => {
             fertilizerSupplyBar.push(`${p_type}FertilizerSupply`)
             chartData[`${p_type}FertilizerSupply`] = Math.abs(
@@ -305,7 +324,7 @@ function buildChartDataAndLegend({
             chartData[dataKey] = Math.abs(harvestResult.value)
             ;(chartConfig as ExtendedChartConfig)[dataKey] = harvestDetails
                 ? {
-                      label: "Afvoer",
+                      label: "Afvoer door Oogst",
                       styleId: "removalHarvest",
                       detail: cultivationDetails
                           ? [
@@ -317,7 +336,7 @@ function buildChartDataAndLegend({
                           : [],
                   }
                 : {
-                      label: "Afvoer",
+                      label: "Afvoer door Oogst",
                       styleId: "removalHarvest",
                       detail: ["onbekend oogst"],
                   }
@@ -336,7 +355,7 @@ function buildChartDataAndLegend({
                 addCultivation(
                     fieldInput,
                     "removalResidue",
-                    "Afvoer",
+                    "Afvoer door Gewasresten",
                     cultivationResult,
                     "kg N / ha",
                     removalStyles,
@@ -411,7 +430,6 @@ export function NitrogenBalanceChart(
         () => buildChartDataAndLegend(props),
         [type, balanceData, fieldInput],
     )
-    const patternId = useId()
 
     type ChartMouseEvent = {
         tooltipPayload: { dataKey: string }[]
