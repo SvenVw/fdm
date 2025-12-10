@@ -18,6 +18,12 @@ export interface ServerConfig {
                   clientSecret: string
               }
             | undefined
+        rvo: {
+            clientId: string
+            clientSecret: string
+            redirectUri: string
+            clientName: string
+        }
     }
     database: {
         password: string

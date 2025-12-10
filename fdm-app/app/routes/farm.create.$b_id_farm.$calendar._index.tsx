@@ -72,7 +72,54 @@ export default function ChooseFieldImportMethod() {
                     <p className="text-muted-foreground text-center mb-8">
                         Hoe wil je de percelen van je bedrijf importeren?
                     </p>
-                    <div className="grid md:grid-cols-2 gap-8">
+                    <div className="grid md:grid-cols-3 gap-8">
+                        <Card className="flex flex-col">
+                            <CardHeader className="items-center text-center">
+                                <UploadCloud className="w-12 h-12 mb-4" />
+                                <CardTitle>Importeren vanuit RVO</CardTitle>
+                                <CardDescription>
+                                      Importeer je percelen door via EHerkenning toestemming te geven.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="grow flex flex-col justify-between">
+                                <Accordion
+                                    type="single"
+                                    collapsible
+                                    className="w-full"
+                                >
+                                    <AccordionItem value="item-1">
+                                        <AccordionTrigger>
+                                            Wat heb ik nodig om percelen te
+                                            importeren vanuit RVO?
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                            <ol className="list-decimal list-inside space-y-2">
+                                                <li>
+                                                    U heeft een geldig
+                                                    KvK-nummer gekoppeld aan uw
+                                                    account.
+                                                </li>
+                                                <li>
+                                                    U heeft een eHerkenning
+                                                    account met machtiging voor
+                                                    dit KvK-nummer.
+                                                </li>
+                                                <li>
+                                                    U geeft ons toestemming om
+                                                    perceelsgegevens op te
+                                                    halen.
+                                                </li>
+                                            </ol>
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                </Accordion>
+                                <NavLink to="./rvo" className="w-full mt-4">
+                                    <Button className="w-full">
+                                        Importeren vanuit RVO
+                                    </Button>
+                                </NavLink>
+                            </CardContent>
+                        </Card>
                         <Card className="flex flex-col">
                             <CardHeader className="items-center text-center">
                                 <UploadCloud className="w-12 h-12 mb-4" />
