@@ -279,19 +279,6 @@ export default function FarmFieldIndex() {
                                         Maak een perceel
                                     </NavLink>
                                 </Button>
-                                <Alert className="mb-4">
-                                    <Info className="h-4 w-4" />
-                                    <AlertTitle>Percelen ophalen bij RVO</AlertTitle>
-                                    <AlertDescription>
-                                        Importeer percelen direct vanuit RVO.
-                                    </AlertDescription>
-                                    <NavLink
-                                        to={`/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rvo-fields`}
-                                        className="mt-4 inline-block"
-                                    >
-                                        <Button variant="outline" className="w-full">Ophalen bij RVO</Button>
-                                    </NavLink>
-                                </Alert>
                             </div>
                             {/* <p className="px-8 text-center text-sm text-muted-foreground">
                             </p> */}
@@ -304,11 +291,6 @@ export default function FarmFieldIndex() {
                                 title={`Percelen van ${currentFarmName}`}
                                 description="Selecteer een perceel voor details of voeg een nieuw perceel toe."
                             />
-                            <NavLink
-                                to={`/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rvo-fields`}
-                            >
-                                <Button variant="outline">Ophalen bij RVO</Button>
-                            </NavLink>
                         </div>
                         <FarmContent>
                             <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">

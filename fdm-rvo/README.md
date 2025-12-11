@@ -47,7 +47,7 @@ import { serverConfig } from '~/lib/config.client'; // Example client-side confi
 
 // To initiate authentication (e.g., from a button click handler)
 const handleAuthInitiation = () => {
-  const { clientId, redirectUri, pkioPrivateKey, environment } = serverConfig.auth.rvo;
+  const { clientId, redirectUri, pkioPrivateKey, environment } = serverConfig.integrations.rvo;
   const clientName = serverConfig.name; // Use your app's name
   
   const rvoClient = createRvoClient(clientId, clientName, redirectUri, pkioPrivateKey, environment);
@@ -61,7 +61,7 @@ const handleAuthInitiation = () => {
 
 // To handle the RVO callback in a component rendered at the redirectUri
 const handleRvoCallback = async (code: string, state: string) => {
-  const { clientId, clientSecret, redirectUri, pkioPrivateKey, environment } = serverConfig.auth.rvo;
+  const { clientId, clientSecret, redirectUri, pkioPrivateKey, environment } = serverConfig.integrations.rvo;
   const clientName = serverConfig.name;
 
   // Validate state to prevent CSRF
@@ -88,7 +88,7 @@ const fetchLocalFieldsApi = async (farmId: string, principalId: string) => {
 };
 
 const processRvoData = async (accessToken: string, farmId: string, principalId: string, year: number, kvkNumber: string) => {
-  const { clientId, clientSecret, redirectUri, pkioPrivateKey, environment } = serverConfig.auth.rvo;
+  const { clientId, clientSecret, redirectUri, pkioPrivateKey, environment } = serverConfig.integrations.rvo;
   const clientName = serverConfig.name;
 
   const rvoClient = createRvoClient(clientId, clientName, redirectUri, pkioPrivateKey, environment);

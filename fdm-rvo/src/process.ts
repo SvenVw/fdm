@@ -26,6 +26,7 @@ export async function processRvoImport(
     b_id_farm: string,
     rvoImportReviewData: RvoImportReviewItem<any>[],
     userChoices: UserChoiceMap,
+    onFieldAdded?: (b_id: string, geometry: any) => Promise<void>,
 ) {
     for (const item of rvoImportReviewData) {
         const id = getItemId(item)
@@ -38,7 +39,7 @@ export async function processRvoImport(
         switch (action) {
             case "ADD_REMOTE":
                 if (item.rvoField) {
-                    await addField(
+                    const b_id = await addField(
                         fdm,
                         principal_id,
                         b_id_farm,
@@ -47,11 +48,14 @@ export async function processRvoImport(
                         item.rvoField.properties.CropFieldID,
                         item.rvoField.geometry,
                         new Date(item.rvoField.properties.BeginDate),
-                        "rvo_import",
+                        `nl_${item.rvoField.properties.UseTitleCode}` as any,
                         item.rvoField.properties.EndDate
                             ? new Date(item.rvoField.properties.EndDate)
                             : undefined,
                     )
+                    if (onFieldAdded) {
+                        await onFieldAdded(b_id, item.rvoField.geometry)
+                    }
                 }
                 break
             case "UPDATE_FROM_REMOTE":
@@ -65,7 +69,7 @@ export async function processRvoImport(
                         item.rvoField.properties.CropFieldID,
                         item.rvoField.geometry,
                         new Date(item.rvoField.properties.BeginDate),
-                        "rvo_import",
+                        `nl_${item.rvoField.properties.UseTitleCode}` as any,
                         item.rvoField.properties.EndDate
                             ? new Date(item.rvoField.properties.EndDate)
                             : undefined,
@@ -73,6 +77,7 @@ export async function processRvoImport(
                 }
                 break
             case "KEEP_LOCAL": // Keep Local for Conflict
+                break
             case "REMOVE_LOCAL":
                 if (item.localField) {
                     await removeField(fdm, principal_id, item.localField.b_id)

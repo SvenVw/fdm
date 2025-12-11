@@ -19,12 +19,6 @@ export const serverConfig: ServerConfig = {
             clientId: String(process.env.MS_CLIENT_ID),
             clientSecret: String(process.env.MS_CLIENT_SECRET),
         },
-        rvo: {
-            clientId: String(process.env.RVO_CLIENT_ID),
-            clientSecret: String(process.env.RVO_CLIENT_SECRET),
-            redirectUri: String(process.env.RVO_REDIRECT_URI),
-            clientName: String(process.env.RVO_CLIENT_NAME),
-        },
     },
 
     // Database
@@ -44,6 +38,12 @@ export const serverConfig: ServerConfig = {
         },
         nmi: {
             api_key: String(process.env.NMI_API_KEY),
+        },
+        rvo: {
+            clientId: String(process.env.RVO_CLIENT_ID),
+            clientSecret: String(process.env.RVO_CLIENT_SECRET),
+            redirectUri: String(process.env.RVO_REDIRECT_URI),
+            clientName: String(process.env.RVO_CLIENT_NAME),
         },
     },
 

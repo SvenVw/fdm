@@ -2,6 +2,7 @@ import { cowHead } from "@lucide/lab"
 import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
 import {
     ArrowRightLeft,
+    ArrowDownToLine,
     BookOpenText,
     ChevronUp,
     Home,
@@ -396,6 +397,16 @@ export default function FarmDashboardIndex() {
                                                     </SelectContent>
                                                 </Select>
                                             </div>
+                                            <Button
+                                                className="w-full"
+                                                variant="outline"
+                                                asChild
+                                            >
+                                                <NavLink to={`${calendar}/rvo`}>
+                                                    <ArrowDownToLine className="mr-2 h-4 w-4" />
+                                                    Ophalen bij RVO
+                                                </NavLink>
+                                            </Button>
                                         </div>
                                     </CardContent>
                                 </Card>

@@ -8,8 +8,8 @@ import {
     type RvoImportReviewItem,
     type ImportReviewAction,
     type UserChoiceMap,
-    getItemId,
-} from "@svenvw/fdm-rvo"
+} from "@svenvw/fdm-rvo/types"
+import { getItemId } from "@svenvw/fdm-rvo/utils"
 import {
     Table,
     TableBody,
@@ -27,6 +27,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "~/components/ui/tooltip"
+import { area } from "@turf/turf"
+import { format } from "date-fns"
+import { cn } from "~/lib/utils"
+import { acquiringMethodOptions } from "~/lib/constants"
 
 interface RvoImportReviewTableProps {
     data: RvoImportReviewItem<any>[]
@@ -34,10 +44,142 @@ interface RvoImportReviewTableProps {
     onChoiceChange: (id: string, action: ImportReviewAction) => void
 }
 
+const USE_TITLE_MAP: Record<string, string> = {
+    "01": "Eigendom",
+    "02": "Pacht",
+    "03": "Erfpacht",
+    "04": "Bruikleen",
+}
+
+function formatDate(dateString?: string | Date) {
+    if (!dateString) return "-"
+    try {
+        return format(new Date(dateString), "dd-MM-yyyy")
+    } catch {
+        return dateString.toString()
+    }
+}
+
+function formatArea(geometry: any) {
+    if (!geometry) return "-"
+    const a = area(geometry)
+    return (a / 10000).toFixed(2) + " ha"
+}
+
+// Helper to render diff cells
+const DiffCell = ({
+    local,
+    remote,
+    status,
+    action,
+    formatter = (v: any) => v,
+}: {
+    local?: any
+    remote?: any
+    status: string
+    action: ImportReviewAction
+    formatter?: (v: any) => React.ReactNode
+}) => {
+    // If MATCH, just show one value
+    if (status === "MATCH") {
+        return <span className="text-sm text-foreground">{formatter(local)}</span>
+    }
+
+    // NEW REMOTE -> Show remote without badge
+    if (status === "NEW_REMOTE") {
+        return (
+            <span className="text-sm font-medium text-blue-700">
+                {formatter(remote)}
+            </span>
+        )
+    }
+
+    // NEW LOCAL -> Show local without badge
+    if (status === "NEW_LOCAL") {
+        return (
+            <span className="text-sm font-medium text-yellow-700">
+                {formatter(local)}
+            </span>
+        )
+    }
+
+    // CONFLICT
+    if (status === "CONFLICT") {
+        // If values are effectively equal (loose check), show one
+        if (local == remote) {
+            return <span className="text-sm text-foreground">{formatter(local)}</span>
+        }
+
+        const useRemote =
+            action === "UPDATE_FROM_REMOTE" || action === "ADD_REMOTE"
+        const useLocal = action === "KEEP_LOCAL"
+
+        return (
+            <div className="flex flex-col gap-1.5">
+                {local !== undefined && (
+                    <div
+                        className={cn(
+                            "flex items-center gap-2",
+                            useRemote && "opacity-50 grayscale",
+                        )}
+                    >
+                        <Badge
+                            variant="outline"
+                            className="h-5 px-1 text-[10px] text-muted-foreground border-border min-w-[45px] justify-center"
+                        >
+                            Lokaal
+                        </Badge>
+                        <span
+                            className={cn(
+                                "text-sm",
+                                useRemote && "line-through decoration-muted-foreground/50",
+                            )}
+                        >
+                            {formatter(local)}
+                        </span>
+                    </div>
+                )}
+                {remote !== undefined && (
+                    <div
+                        className={cn(
+                            "flex items-center gap-2",
+                            useLocal && "opacity-50 grayscale",
+                        )}
+                    >
+                        <Badge
+                            variant="outline"
+                            className="h-5 px-1 text-[10px] text-blue-700 bg-blue-50 border-blue-200 min-w-[45px] justify-center"
+                        >
+                            RVO
+                        </Badge>
+                        <span
+                            className={cn(
+                                "text-sm",
+                                useLocal && "line-through decoration-muted-foreground/50",
+                            )}
+                        >
+                            {formatter(remote)}
+                        </span>
+                    </div>
+                )}
+            </div>
+        )
+    }
+
+    return null
+}
+
 export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
     {
         accessorKey: "status",
-        header: "Status",
+        header: () => (
+            <Tooltip>
+                <TooltipTrigger>Status</TooltipTrigger>
+                <TooltipContent>
+                    Geeft de vergelijkingsstatus weer tussen lokaal en RVO.
+                </TooltipContent>
+            </Tooltip>
+        ),
         cell: ({ row }) => {
             const status = row.getValue("status") as string
             switch (status) {
@@ -47,7 +189,12 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                             variant="outline"
                             className="bg-green-50 text-green-700 border-green-200"
                         >
-                            Gelijk
+                            <Tooltip>
+                                <TooltipTrigger>Gelijk</TooltipTrigger>
+                                <TooltipContent>
+                                    Lokaal en RVO perceel komen volledig overeen.
+                                </TooltipContent>
+                            </Tooltip>
                         </Badge>
                     )
                 case "NEW_REMOTE":
@@ -56,7 +203,12 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                             variant="outline"
                             className="bg-blue-50 text-blue-700 border-blue-200"
                         >
-                            Nieuw (RVO)
+                            <Tooltip>
+                                <TooltipTrigger>Nieuw (RVO)</TooltipTrigger>
+                                <TooltipContent>
+                                    Perceel bestaat in RVO, maar niet lokaal.
+                                </TooltipContent>
+                            </Tooltip>
                         </Badge>
                     )
                 case "NEW_LOCAL":
@@ -65,7 +217,12 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                             variant="outline"
                             className="bg-yellow-50 text-yellow-700 border-yellow-200"
                         >
-                            Nieuw (Lokaal)
+                            <Tooltip>
+                                <TooltipTrigger>Nieuw (Lokaal)</TooltipTrigger>
+                                <TooltipContent>
+                                    Perceel bestaat lokaal, maar niet in RVO.
+                                </TooltipContent>
+                            </Tooltip>
                         </Badge>
                     )
                 case "CONFLICT":
@@ -74,7 +231,13 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                             variant="destructive"
                             className="bg-red-50 text-red-700 border-red-200"
                         >
-                            Conflict
+                            <Tooltip>
+                                <TooltipTrigger>Conflict</TooltipTrigger>
+                                <TooltipContent>
+                                    Perceel bestaat in beide, maar met
+                                    verschillende gegevens.
+                                </TooltipContent>
+                            </Tooltip>
                         </Badge>
                     )
                 default:
@@ -83,71 +246,183 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
         },
     },
     {
-        header: "Lokaal Perceel",
-        cell: ({ row }) => {
-            const local = row.original.localField
-            if (!local)
-                return (
-                    <span className="text-muted-foreground italic text-sm">
-                        Geen
-                    </span>
-                )
+        id: "perceel",
+        header: () => (
+            <Tooltip>
+                <TooltipTrigger>Perceel</TooltipTrigger>
+                <TooltipContent>
+                    De naam en het bron-ID van het perceel.
+                </TooltipContent>
+            </Tooltip>
+        ),
+        cell: ({ row, table }) => {
+            const item = row.original
+            const id = getItemId(item)
+            // @ts-ignore
+            const { userChoices } = table.options.meta as any
+            const action = userChoices[id] as ImportReviewAction
+
             return (
-                <div className="flex flex-col">
-                    <span className="font-medium text-sm">{local.b_name}</span>
-                    <span className="text-[10px] text-muted-foreground font-mono">
-                        {local.b_id_source || "Geen Bron ID"}
-                    </span>
-                </div>
+                <DiffCell
+                    local={item.localField?.b_name}
+                    remote={item.rvoField?.properties.CropFieldDesignator}
+                    status={item.status}
+                    action={action}
+                    formatter={(val) => (
+                        <span className="font-medium">{val || "Naamloos"}</span>
+                    )}
+                />
             )
         },
     },
     {
-        header: "RVO Perceel",
-        cell: ({ row }) => {
-            const remote = row.original.rvoField
-            if (!remote)
-                return (
-                    <span className="text-muted-foreground italic text-sm">
-                        Geen
-                    </span>
-                )
+        id: "oppervlakte",
+        header: () => (
+            <Tooltip>
+                <TooltipTrigger>Oppervlakte</TooltipTrigger>
+                <TooltipContent>
+                    De oppervlakte van het perceel in hectaren.
+                </TooltipContent>
+            </Tooltip>
+        ),
+        cell: ({ row, table }) => {
+            const item = row.original
+            const id = getItemId(item)
+            // @ts-ignore
+            const { userChoices } = table.options.meta as any
+            const action = userChoices[id] as ImportReviewAction
+
+            const localArea = item.localField
+                ? `${item.localField.b_area.toFixed(2)} ha`
+                : undefined
+            const remoteArea = item.rvoField
+                ? formatArea(item.rvoField.geometry)
+                : undefined
+
             return (
-                <div className="flex flex-col">
-                    <span className="font-medium text-sm">
-                        {remote.properties.CropFieldDesignator || "Naamloos"}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground font-mono">
-                        {remote.properties.CropFieldID}
-                    </span>
-                </div>
+                <DiffCell
+                    local={localArea}
+                    remote={remoteArea}
+                    status={item.status}
+                    action={action}
+                />
             )
         },
     },
     {
-        header: "Verschillen",
-        cell: ({ row }) => {
-            const diffs = row.original.diffs
-            if (!diffs || diffs.length === 0)
-                return <span className="text-muted-foreground text-sm">-</span>
+        id: "ingangsdatum",
+        header: () => (
+            <Tooltip>
+                <TooltipTrigger>Ingangsdatum</TooltipTrigger>
+                <TooltipContent>
+                    De datum vanaf wanneer het perceel actief is.
+                </TooltipContent>
+            </Tooltip>
+        ),
+        cell: ({ row, table }) => {
+            const item = row.original
+            const id = getItemId(item)
+            // @ts-ignore
+            const { userChoices } = table.options.meta as any
+            const action = userChoices[id] as ImportReviewAction
+
             return (
-                <div className="flex flex-wrap gap-1">
-                    {diffs.map((diff) => (
-                        <Badge
-                            key={diff}
-                            variant="secondary"
-                            className="text-[10px] px-1 py-0 h-5"
-                        >
-                            {diff}
-                        </Badge>
-                    ))}
-                </div>
+                <DiffCell
+                    local={formatDate(item.localField?.b_start)}
+                    remote={formatDate(item.rvoField?.properties.BeginDate)}
+                    status={item.status}
+                    action={action}
+                />
+            )
+        },
+    },
+    {
+        id: "einddatum",
+        header: () => (
+            <Tooltip>
+                <TooltipTrigger>Einddatum</TooltipTrigger>
+                <TooltipContent>
+                    De datum waarop het perceel niet meer actief is.
+                </TooltipContent>
+            </Tooltip>
+        ),
+        cell: ({ row, table }) => {
+            const item = row.original
+            const id = getItemId(item)
+            // @ts-ignore
+            const { userChoices } = table.options.meta as any
+            const action = userChoices[id] as ImportReviewAction
+
+            return (
+                <DiffCell
+                    local={
+                        item.localField?.b_end
+                            ? formatDate(item.localField.b_end)
+                            : undefined
+                    }
+                    remote={
+                        item.rvoField?.properties.EndDate
+                            ? formatDate(item.rvoField.properties.EndDate)
+                            : undefined
+                    }
+                    status={item.status}
+                    action={action}
+                    formatter={(val) => val || "-"}
+                />
+            )
+        },
+    },
+    {
+        id: "recht",
+        header: () => (
+            <Tooltip>
+                <TooltipTrigger>Recht</TooltipTrigger>
+                <TooltipContent>
+                    De vorm van gebruiksrecht (bv. eigendom, pacht).
+                </TooltipContent>
+            </Tooltip>
+        ),
+        cell: ({ row, table }) => {
+            const item = row.original
+            const id = getItemId(item)
+            // @ts-ignore
+            const { userChoices } = table.options.meta as any
+            const action = userChoices[id] as ImportReviewAction
+
+            // Map RVO code to label
+            const rvoCode = item.rvoField?.properties.UseTitleCode
+            const rvoLabel = rvoCode
+                ? USE_TITLE_MAP[rvoCode] || rvoCode
+                : undefined
+
+            // Map local acquiring method to label (simplified)
+            const localMethod = item.localField?.b_acquiring_method
+            // Assuming localMethod is english enum like 'purchase', 'lease'. Map to NL for consistency
+            const localLabel = acquiringMethodOptions.find(
+                (opt) => opt.value === localMethod,
+            )?.label || localMethod
+
+            return (
+                <DiffCell
+                    local={localLabel}
+                    remote={rvoLabel}
+                    status={item.status}
+                    action={action}
+                    formatter={(val) => val || "-"}
+                />
             )
         },
     },
     {
         id: "actions",
-        header: "Actie",
+        header: () => (
+            <Tooltip>
+                <TooltipTrigger>Actie</TooltipTrigger>
+                <TooltipContent>
+                    Kies welke actie moet worden uitgevoerd voor dit perceel.
+                </TooltipContent>
+            </Tooltip>
+        ),
         cell: ({ row, table }) => {
             const item = row.original
             const id = getItemId(item)
@@ -171,7 +446,7 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                         onChoiceChange(id, val as ImportReviewAction)
                     }
                 >
-                    <SelectTrigger className="w-[180px] h-8 text-xs">
+                    <SelectTrigger className="w-[180px] h-8 text-xs z-10">
                         <SelectValue placeholder="Kies actie" />
                     </SelectTrigger>
                     <SelectContent>
@@ -191,15 +466,15 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                         )}
                         {item.status === "NEW_LOCAL" && (
                             <>
-                                <SelectItem value="KEEP_LOCAL">
-                                    <div className="flex items-center gap-2">
-                                        <Check className="h-3 w-3" /> Behouden
-                                    </div>
-                                </SelectItem>
                                 <SelectItem value="REMOVE_LOCAL">
                                     <div className="flex items-center gap-2 text-destructive">
                                         <Trash2 className="h-3 w-3" />{" "}
                                         Verwijderen
+                                    </div>
+                                </SelectItem>
+                                <SelectItem value="KEEP_LOCAL">
+                                    <div className="flex items-center gap-2">
+                                        <Check className="h-3 w-3" /> Behouden
                                     </div>
                                 </SelectItem>
                             </>
@@ -227,13 +502,30 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
     },
 ]
 
+import { useMemo } from "react"
+
 export function RvoImportReviewTable({
     data,
     userChoices,
     onChoiceChange,
 }: RvoImportReviewTableProps) {
+    const sortedData = useMemo(() => {
+        return [...data].sort((a, b) => {
+            const getArea = (item: typeof a) => {
+                if (item.rvoField?.geometry) {
+                    return area(item.rvoField.geometry) / 10000 // Convert m2 to ha
+                }
+                if (item.localField) {
+                    return item.localField.b_area
+                }
+                return 0
+            }
+            return getArea(b) - getArea(a)
+        })
+    }, [data])
+
     const table = useReactTable({
-        data,
+        data: sortedData,
         columns,
         getCoreRowModel: getCoreRowModel(),
         meta: {
@@ -243,9 +535,10 @@ export function RvoImportReviewTable({
     })
 
     return (
-        <div className="rounded-md border bg-white">
-            <Table>
-                <TableHeader>
+        <TooltipProvider>
+            <div className="rounded-md border bg-white">
+                <Table>
+                    <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => {
@@ -294,5 +587,6 @@ export function RvoImportReviewTable({
                 </TableBody>
             </Table>
         </div>
+        </TooltipProvider>
     )
 }

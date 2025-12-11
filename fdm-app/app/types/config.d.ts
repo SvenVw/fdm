@@ -18,12 +18,6 @@ export interface ServerConfig {
                   clientSecret: string
               }
             | undefined
-        rvo: {
-            clientId: string
-            clientSecret: string
-            redirectUri: string
-            clientName: string
-        }
     }
     database: {
         password: string
@@ -39,6 +33,12 @@ export interface ServerConfig {
         }
         nmi?: {
             api_key: string
+        }
+        rvo: {
+            clientId: string
+            clientSecret: string
+            redirectUri: string
+            clientName: string
         }
     }
     analytics: {

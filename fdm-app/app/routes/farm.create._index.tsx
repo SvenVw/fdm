@@ -149,12 +149,12 @@ export default function AddFarmPage() {
                                     <CardHeader>
                                         <CardTitle>Bedrijf</CardTitle>
                                         <CardDescription>
-                                            Wat voor soort bedrijf heb je?
+                                            Vul de gegevens over het bedrijf in om te beginnen?
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
                                         <div className="grid w-full items-center gap-4">
-                                            <div className="flex flex-col space-y-1.5">
+                                            <div className="flex flex-col space-y-3">
                                                 <FormField
                                                     control={form.control}
                                                     name="b_name_farm"
@@ -181,7 +181,7 @@ export default function AddFarmPage() {
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>
-                                                                Kvk nummer
+                                                                KvK nummer
                                                             </FormLabel>
                                                             <FormControl>
                                                                 <Input
@@ -191,8 +191,9 @@ export default function AddFarmPage() {
                                                             </FormControl>
                                                             <FormDescription>
                                                                 Optioneel,
-                                                                vereist voor RVO
-                                                                synchronisatie.
+                                                                vereist voor
+                                                                percelen ophalen
+                                                                uit RVO.
                                                             </FormDescription>
                                                             <FormMessage />
                                                         </FormItem>

@@ -16,7 +16,7 @@ import {
     type PrincipalId,
     type Timeframe,
 } from "@svenvw/fdm-core"
-import { getNmiApiKey } from "./nmi"
+import { getNmiApiKey } from "./nmi.server"
 
 // Get nitrogen balance for the field
 export async function getNitrogenBalanceforField({

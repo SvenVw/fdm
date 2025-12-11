@@ -1,5 +1,5 @@
 import { getFarm } from "@svenvw/fdm-core"
-import { Map as MapIcon, UploadCloud } from "lucide-react"
+import { DownloadCloud, Map as MapIcon, UploadCloud } from "lucide-react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
 import { data, NavLink, useLoaderData } from "react-router"
 import { Header } from "~/components/blocks/header/base"
@@ -21,7 +21,9 @@ import {
 import { SidebarInset } from "~/components/ui/sidebar"
 import { clientConfig } from "~/lib/config"
 import { getSession } from "../lib/auth.server"
-import { fdm } from "../lib/fdm.server"
+import { fdm } from "~/lib/fdm.server"
+import { getRvoCredentials } from "~/integrations/rvo"
+import { cn } from "~/lib/utils"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -53,11 +55,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
-    return { farm }
+    // Check if RVO import is available
+    const isRvoConfigured = getRvoCredentials() !== undefined
+
+    return { farm, isRvoConfigured }
 }
 
 export default function ChooseFieldImportMethod() {
-    const { farm } = useLoaderData<typeof loader>()
+    const { farm, isRvoConfigured } = useLoaderData<typeof loader>()
 
     return (
         <SidebarInset>
@@ -72,13 +77,26 @@ export default function ChooseFieldImportMethod() {
                     <p className="text-muted-foreground text-center mb-8">
                         Hoe wil je de percelen van je bedrijf importeren?
                     </p>
-                    <div className="grid md:grid-cols-3 gap-8">
-                        <Card className="flex flex-col">
+                    <div
+                        className={cn(
+                            "grid gap-8",
+                            isRvoConfigured
+                                ? "md:grid-cols-3"
+                                : "md:grid-cols-2",
+                        )}
+                    >
+                        <Card
+                            className={cn(
+                                "flex flex-col",
+                                isRvoConfigured ? "" : "hidden",
+                            )}
+                        >
                             <CardHeader className="items-center text-center">
-                                <UploadCloud className="w-12 h-12 mb-4" />
+                                <DownloadCloud className="w-12 h-12 mb-4" />
                                 <CardTitle>Importeren vanuit RVO</CardTitle>
                                 <CardDescription>
-                                      Importeer je percelen door via EHerkenning toestemming te geven.
+                                    Importeer je percelen door via eHerkenning
+                                    toestemming te geven.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="grow flex flex-col justify-between">
