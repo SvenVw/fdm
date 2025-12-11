@@ -489,13 +489,11 @@ export function NitrogenBalanceChart(
                     return (
                         <Bar
                             key={dataKey}
+                            id={`BarRectangle_${dataKey}`}
                             dataKey={dataKey}
                             radius={pickBarRadius(i, barItem)}
                             stackId={stackId}
                             fill={barStyle.color}
-                            stroke={
-                                tooltipFocus === dataKey ? "black" : undefined
-                            }
                             onMouseEnter={onTooltipFocus}
                             onMouseLeave={onTooltipBlur}
                         />
@@ -620,6 +618,15 @@ export function NitrogenBalanceChart(
                 />
                 {renderBar("a", supplyBar)}
                 {renderBar("b", removalBar)}
+                {tooltipFocus && (
+                    <use
+                        href={`#BarRectangle_${tooltipFocus}`}
+                        fill="none"
+                        stroke="black"
+                        strokeWidth={5}
+                        style={{ pointerEvents: "none" }}
+                    />
+                )}
             </BarChart>
         </ChartContainer>
     )
