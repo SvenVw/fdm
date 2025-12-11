@@ -44,13 +44,6 @@ interface RvoImportReviewTableProps {
     onChoiceChange: (id: string, action: ImportReviewAction) => void
 }
 
-const USE_TITLE_MAP: Record<string, string> = {
-    "01": "Eigendom",
-    "02": "Pacht",
-    "03": "Erfpacht",
-    "04": "Bruikleen",
-}
-
 function formatDate(dateString?: string | Date) {
     if (!dateString) return "-"
     try {
@@ -82,13 +75,15 @@ const DiffCell = ({
 }) => {
     // If MATCH, just show one value
     if (status === "MATCH") {
-        return <span className="text-sm text-foreground">{formatter(local)}</span>
+        return (
+            <span className="text-sm text-foreground">{formatter(local)}</span>
+        )
     }
 
     // NEW REMOTE -> Show remote without badge
     if (status === "NEW_REMOTE") {
         return (
-            <span className="text-sm font-medium text-blue-700">
+            <span className="text-sm font-medium text-muted-foreground">
                 {formatter(remote)}
             </span>
         )
@@ -97,7 +92,7 @@ const DiffCell = ({
     // NEW LOCAL -> Show local without badge
     if (status === "NEW_LOCAL") {
         return (
-            <span className="text-sm font-medium text-yellow-700">
+            <span className="text-sm font-medium text-muted-foreground">
                 {formatter(local)}
             </span>
         )
@@ -106,8 +101,12 @@ const DiffCell = ({
     // CONFLICT
     if (status === "CONFLICT") {
         // If values are effectively equal (loose check), show one
-        if (local == remote) {
-            return <span className="text-sm text-foreground">{formatter(local)}</span>
+        if (local === remote) {
+            return (
+                <span className="text-sm text-foreground">
+                    {formatter(local)}
+                </span>
+            )
         }
 
         const useRemote =
@@ -120,6 +119,7 @@ const DiffCell = ({
                     <div
                         className={cn(
                             "flex items-center gap-2",
+
                             useRemote && "opacity-50 grayscale",
                         )}
                     >
@@ -129,20 +129,27 @@ const DiffCell = ({
                         >
                             Lokaal
                         </Badge>
+
                         <span
                             className={cn(
                                 "text-sm",
-                                useRemote && "line-through decoration-muted-foreground/50",
+
+                                useRemote &&
+                                    "line-through decoration-muted-foreground/50",
+
+                                useLocal && "font-bold",
                             )}
                         >
                             {formatter(local)}
                         </span>
                     </div>
                 )}
+
                 {remote !== undefined && (
                     <div
                         className={cn(
                             "flex items-center gap-2",
+
                             useLocal && "opacity-50 grayscale",
                         )}
                     >
@@ -152,10 +159,15 @@ const DiffCell = ({
                         >
                             RVO
                         </Badge>
+
                         <span
                             className={cn(
                                 "text-sm",
-                                useLocal && "line-through decoration-muted-foreground/50",
+
+                                useLocal &&
+                                    "line-through decoration-muted-foreground/50",
+
+                                useRemote && "font-bold",
                             )}
                         >
                             {formatter(remote)}
@@ -192,7 +204,8 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                             <Tooltip>
                                 <TooltipTrigger>Gelijk</TooltipTrigger>
                                 <TooltipContent>
-                                    Lokaal en RVO perceel komen volledig overeen.
+                                    Lokaal en RVO perceel komen volledig
+                                    overeen.
                                 </TooltipContent>
                             </Tooltip>
                         </Badge>
@@ -251,7 +264,7 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
             <Tooltip>
                 <TooltipTrigger>Perceel</TooltipTrigger>
                 <TooltipContent>
-                    De naam en het bron-ID van het perceel.
+                    De naam en het RVO ID van het perceel.
                 </TooltipContent>
             </Tooltip>
         ),
@@ -305,6 +318,34 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                     remote={remoteArea}
                     status={item.status}
                     action={action}
+                />
+            )
+        },
+    },
+    {
+        id: "gewas",
+        header: () => (
+            <Tooltip>
+                <TooltipTrigger>Gewas</TooltipTrigger>
+                <TooltipContent>
+                    Het gewas dat op 15 mei wordt geteeld.
+                </TooltipContent>
+            </Tooltip>
+        ),
+        cell: ({ row, table }) => {
+            const item = row.original
+            const id = getItemId(item)
+            // @ts-ignore
+            const { userChoices } = table.options.meta as any
+            const action = userChoices[id] as ImportReviewAction
+
+            return (
+                <DiffCell
+                    local={item.localCultivation?.b_lu_name}
+                    remote={item.rvoCultivation?.b_lu_name}
+                    status={item.status}
+                    action={action}
+                    formatter={(val) => val || "-"}
                 />
             )
         },
@@ -389,18 +430,20 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
             const { userChoices } = table.options.meta as any
             const action = userChoices[id] as ImportReviewAction
 
-            // Map RVO code to label
+            // Map RVO code to label using FDM dictionary
             const rvoCode = item.rvoField?.properties.UseTitleCode
             const rvoLabel = rvoCode
-                ? USE_TITLE_MAP[rvoCode] || rvoCode
+                ? acquiringMethodOptions.find(
+                      (opt) => opt.value === `nl_${rvoCode}`,
+                  )?.label || rvoCode
                 : undefined
 
             // Map local acquiring method to label (simplified)
             const localMethod = item.localField?.b_acquiring_method
             // Assuming localMethod is english enum like 'purchase', 'lease'. Map to NL for consistency
-            const localLabel = acquiringMethodOptions.find(
-                (opt) => opt.value === localMethod,
-            )?.label || localMethod
+            const localLabel =
+                acquiringMethodOptions.find((opt) => opt.value === localMethod)
+                    ?.label || localMethod
 
             return (
                 <DiffCell
@@ -539,54 +582,56 @@ export function RvoImportReviewTable({
             <div className="rounded-md border bg-white">
                 <Table>
                     <TableHeader>
-                    {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map((header) => {
-                                return (
-                                    <TableHead key={header.id}>
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext(),
-                                              )}
-                                    </TableHead>
-                                )
-                            })}
-                        </TableRow>
-                    ))}
-                </TableHeader>
-                <TableBody>
-                    {table.getRowModel().rows?.length ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow
-                                key={row.id}
-                                data-state={row.getIsSelected() && "selected"}
-                            >
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id}>
-                                        {flexRender(
-                                            cell.column.columnDef.cell,
-                                            cell.getContext(),
-                                        )}
-                                    </TableCell>
-                                ))}
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableHead key={header.id}>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                      header.column.columnDef
+                                                          .header,
+                                                      header.getContext(),
+                                                  )}
+                                        </TableHead>
+                                    )
+                                })}
                             </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell
-                                colSpan={columns.length}
-                                className="h-24 text-center"
-                            >
-                                Geen resultaten.
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-        </div>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows?.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    data-state={
+                                        row.getIsSelected() && "selected"
+                                    }
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext(),
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="h-24 text-center"
+                                >
+                                    Geen resultaten.
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
         </TooltipProvider>
     )
 }

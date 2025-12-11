@@ -50,7 +50,7 @@ import { getRvoCredentials } from "../integrations/rvo"
 import { get } from "proj4/dist/lib/projections"
 import { RvoErrorAlert } from "~/components/blocks/rvo/rvo-error-alert"
 import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi.server"
-import { addSoilAnalysis, getCultivations, type Cultivation } from "@svenvw/fdm-core"
+import { addSoilAnalysis, getCultivations, type Cultivation, getCultivationsFromCatalogue } from "@svenvw/fdm-core"
 import { RvoConnectCard } from "~/components/blocks/rvo/connect-card"
 import { getCalendar } from "../lib/calendar"
 
@@ -143,10 +143,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     return { ...field, cultivations }
                 }),
             )
+
+            const cultivationsCatalogue = await getCultivationsFromCatalogue(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+            )
+
             rvoImportReviewData = compareFields(
                 localFieldsExtended,
                 rvoFields,
                 year,
+                cultivationsCatalogue,
             )
         } catch (e: any) {
             console.error("Error with importing from RVO:", e)
@@ -433,6 +441,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const rvoImportReviewDataJson = formData.get("rvoImportReviewDataJson")
         const userChoicesJson = formData.get("userChoices")
 
+        let rvoImportReviewData: RvoImportReviewItem<any>[] = []
+        let userChoices: UserChoiceMap = {}
+
         if (!rvoImportReviewDataJson || !userChoicesJson) {
             return {
                 success: false,
@@ -442,12 +453,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
 
         try {
-            const rvoImportReviewData: RvoImportReviewItem<any>[] = JSON.parse(
-                String(rvoImportReviewDataJson),
-            )
-            const userChoices: UserChoiceMap = JSON.parse(
-                String(userChoicesJson),
-            )
+            rvoImportReviewData = JSON.parse(String(rvoImportReviewDataJson))
+            userChoices = JSON.parse(String(userChoicesJson))
 
             const onFieldAdded = async (b_id: string, geometry: any) => {
                 const nmiApiKey = getNmiApiKey()

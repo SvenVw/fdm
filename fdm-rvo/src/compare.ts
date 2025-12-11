@@ -3,7 +3,7 @@ import intersect from "@turf/intersect"
 import union from "@turf/union"
 import area from "@turf/area"
 import { feature, featureCollection } from "@turf/helpers"
-import type { Field, Cultivation } from "@svenvw/fdm-core"
+import type { Field, Cultivation, CultivationCatalogue } from "@svenvw/fdm-core"
 import {
     type RvoField,
     RvoImportReviewStatus,
@@ -99,12 +99,16 @@ export function compareFields(
     localFields: (Field & { cultivations?: Cultivation[] })[],
     rvoFields: RvoField[],
     calendar = new Date().getFullYear(),
+    cultivationsCatalogue: CultivationCatalogue[] = [],
 ): RvoImportReviewItem<Field>[] {
     const results: RvoImportReviewItem<Field>[] = []
     const matchedRvoIds = new Set<string>()
     const matchedLocalIds = new Set<string>()
 
-    const processMatch = (local: Field & { cultivations?: Cultivation[] }, rvo: RvoField) => {
+    const processMatch = (
+        local: Field & { cultivations?: Cultivation[] },
+        rvo: RvoField,
+    ) => {
         // Detect property differences
         const diffs = detectDiffs(local, rvo)
 
@@ -112,21 +116,38 @@ export function compareFields(
         const localCultivation = local.cultivations
             ? findActiveCultivation(local.cultivations, calendar)
             : undefined
-        const rvoCode = `nl_${rvo.properties.CropTypeCode}`
+        const rvoCode = rvo.properties.CropTypeCode
+            ? `nl_${rvo.properties.CropTypeCode}`
+            : undefined
 
-        let rvoCultivationInfo
-        let localCultivationInfo
+        let rvoCultivationInfo:
+            | { b_lu_catalogue: string; b_lu_name: string }
+            | undefined
+        let localCultivationInfo:
+            | {
+                  b_lu_catalogue: string
+                  b_lu: string
+                  b_lu_name: string
+              }
+            | undefined
 
         if (localCultivation) {
             localCultivationInfo = {
                 b_lu_catalogue: localCultivation.b_lu_catalogue,
                 b_lu: localCultivation.b_lu,
+                b_lu_name: localCultivation.b_lu_name,
             }
         }
 
         if (rvoCode) {
+            const rvoCatalogueEntry = cultivationsCatalogue.find(
+                (c) => c.b_lu_catalogue === rvoCode,
+            )
             rvoCultivationInfo = {
                 b_lu_catalogue: rvoCode,
+                b_lu_name: rvoCatalogueEntry
+                    ? rvoCatalogueEntry.b_lu_name
+                    : rvoCode,
             }
         }
 
@@ -206,11 +227,18 @@ export function compareFields(
             results.push(processMatch(bestMatch, rvo))
         } else {
             // No match found -> This is a NEW field from RVO
+            const rvoCode = `nl_${rvo.properties.CropTypeCode}`
+            const rvoCatalogueEntry = cultivationsCatalogue.find(
+                (c) => c.b_lu_catalogue === rvoCode,
+            )
             results.push({
                 status: RvoImportReviewStatus.NEW_REMOTE,
                 rvoField: rvo,
                 rvoCultivation: {
-                    b_lu_catalogue: `nl_${rvo.properties.CropTypeCode}`,
+                    b_lu_catalogue: rvoCode,
+                    b_lu_name: rvoCatalogueEntry
+                        ? rvoCatalogueEntry.b_lu_name
+                        : rvoCode,
                 },
                 diffs: [],
             })
@@ -232,6 +260,7 @@ export function compareFields(
                     ? {
                           b_lu_catalogue: localCultivation.b_lu_catalogue,
                           b_lu: localCultivation.b_lu,
+                          b_lu_name: localCultivation.b_lu_name,
                       }
                     : undefined,
                 diffs: [],

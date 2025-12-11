@@ -51,11 +51,8 @@ import {
 } from "~/components/ui/breadcrumb"
 import { getRvoCredentials } from "../integrations/rvo"
 import { RvoErrorAlert } from "~/components/blocks/rvo/rvo-error-alert"
-import {
-    getNmiApiKey,
-    getSoilParameterEstimates,
-} from "~/integrations/nmi.server"
-import { addSoilAnalysis } from "@svenvw/fdm-core"
+import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi.server"
+import { addSoilAnalysis, getCultivationsFromCatalogue } from "@svenvw/fdm-core"
 import { RvoConnectCard } from "~/components/blocks/rvo/connect-card"
 import { getCalendar } from "../lib/calendar"
 
@@ -128,8 +125,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
             const rvoFields = await fetchRvoFields(
                 rvoClient,
-                yearString, // Pass yearString here
+                yearString,
                 farm.b_businessid_farm,
+            )
+
+            const cultivationsCatalogue = await getCultivationsFromCatalogue(
+                fdm,
+                session.principal_id,
+                b_id_farm,
             )
 
             const localFieldsExtended: (Field & { cultivations: Cultivation[] })[] = [] // No existing fields to compare against yet in create wizard, so localFields is empty
@@ -137,7 +140,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 localFieldsExtended,
                 rvoFields,
                 year,
-            ) // Pass year here
+                cultivationsCatalogue,
+            )
         } catch (e: any) {
             console.error("RVO Import Fout:", e)
             error = e.message
@@ -409,6 +413,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const RvoImportReviewDataJson = formData.get("RvoImportReviewDataJson")
         const userChoicesJson = formData.get("userChoices")
 
+        let RvoImportReviewData: RvoImportReviewItem<any>[] = []
+        let userChoices: UserChoiceMap = {}
+
         if (!RvoImportReviewDataJson || !userChoicesJson) {
             return {
                 success: false,
@@ -418,12 +425,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
 
         try {
-            const RvoImportReviewData: RvoImportReviewItem<any>[] = JSON.parse(
-                String(formData.get("RvoImportReviewDataJson")),
-            )
-            const userChoices: UserChoiceMap = JSON.parse(
-                String(userChoicesJson),
-            )
+            RvoImportReviewData = JSON.parse(String(RvoImportReviewDataJson))
+            userChoices = JSON.parse(String(userChoicesJson))
+
 
             const onFieldAdded = async (b_id: string, geometry: any) => {
                 const nmiApiKey = getNmiApiKey()
@@ -459,10 +463,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 b_id_farm,
                 RvoImportReviewData,
                 userChoices,
-                Number(calendar),
+                year,
                 onFieldAdded,
             )
-            return redirect(`/farm/create/${b_id_farm}/${calendar}/fields`)
+            return redirect(`/farm/create/${b_id_farm}/${yearString}/fields`)
         } catch (e: any) {
             console.error("Error at saving RVO fields: ", e)
             return {

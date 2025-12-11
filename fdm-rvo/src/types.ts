@@ -109,9 +109,13 @@ export interface RvoImportReviewItem<TLocal> {
     /** The RVO field object, if it exists (undefined for NEW_LOCAL) */
     rvoField?: RvoField
     /** The local cultivation on May 15th */
-    localCultivation?: { b_lu_catalogue: string; b_lu: string }
+    localCultivation?: {
+        b_lu_catalogue: string
+        b_lu: string
+        b_lu_name?: string
+    }
     /** The RVO cultivation based on CropTypeCode */
-    rvoCultivation?: { b_lu_catalogue: string }
+    rvoCultivation?: { b_lu_catalogue: string; b_lu_name?: string }
     /** List of specific properties that differ (empty for MATCH, NEW_REMOTE, NEW_LOCAL) */
     diffs: FieldDiff[]
 }
