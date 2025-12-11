@@ -75,7 +75,7 @@ function buildChartDataAndLegend({
     const farmFixationLegend = {
         fixation: {
             label: "Fixatie",
-            color: "var(--color-slate-400",
+            color: "var(--color-slate-400)",
         },
     }
 
