@@ -75,37 +75,37 @@ function buildChartDataAndLegend({
     const farmFixationLegend = {
         fixation: {
             label: "Fixatie",
-            color: "#f08",
+            color: "var(--color-slate-400",
         },
     }
 
     const farmRemovalLegend = {
         harvest: {
             label: "Oogsten",
-            color: "var(--color-teal-700)",
+            color: "var(--color-teal-600)",
         },
         residue: {
             label: "Gewasresten",
-            color: "var(--color-pink-800)",
+            color: "var(--color-pink-600)",
         },
     }
 
     const legend = {
         deposition: {
             label: "Depositie",
-            color: "black",
+            color: "var(--color-yellow-400)",
         },
         ...(type === "farm" ? farmFixationLegend : {}),
         mineralization: {
             label: "Mineralisatie",
-            color: "lime",
+            color: "var(--color-lime-400)",
         },
         mineralFertilizer: {
             label: "Kunstmest",
             color: "var(--color-sky-600)",
         },
         manureFertilizer: {
-            label: "Dierlijke Mest",
+            label: "Dierlijke mest",
             color: "var(--color-yellow-600)",
         },
         compostFertilizer: {
@@ -113,7 +113,7 @@ function buildChartDataAndLegend({
             color: "var(--color-green-600)",
         },
         otherFertilizer: {
-            label: "Overige Meststoffen",
+            label: "Overige meststoffen",
             color: "var(--color-gray-600)",
         },
         ...(type === "farm" ? farmRemovalLegend : {}),
@@ -125,21 +125,23 @@ function buildChartDataAndLegend({
         ...legend,
         removalHarvest: {
             ...farmRemovalLegend.harvest,
-            label: "Afvoer door Oogsten",
+            label: "Afvoer via oogst",
+             color: "var(--color-teal-600)",
         },
         removalResidue: {
             ...farmRemovalLegend.residue,
-            label: "Afvoer door Gewasresten",
+            label: "Afvoer via gewasresten",
+             color: "var(--color-emerald-600)",
         },
         emissionNitrate: {
-            label: "Nitraatemissie",
-            color: "hsl(var(--chart-4))",
+            label: "Nitraatuitspoeling",
+            color: "var(--color-red-400)",
         },
     }
 
     const langNL = {
         mineral: "kunstmest",
-        manure: "dierlijke mesten",
+        manure: "dierlijke mest",
         compost: "compost",
         other: "overige meststoffen",
     }
@@ -149,7 +151,7 @@ function buildChartDataAndLegend({
         const style = legend[`${fertilizerType}Fertilizer`]
         chartConfig[`${fertilizerType}FertilizerSupply`] = {
             ...style,
-            label: `Aanvoer door ${langNL[fertilizerType]}`,
+            label: `Aanvoer met ${langNL[fertilizerType]}`,
         }
         chartConfig[`${fertilizerType}FertilizerAmmonia`] = {
             ...style,
@@ -324,7 +326,7 @@ function buildChartDataAndLegend({
             chartData[dataKey] = Math.abs(harvestResult.value)
             ;(chartConfig as ExtendedChartConfig)[dataKey] = harvestDetails
                 ? {
-                      label: "Afvoer door Oogst",
+                      label: "Afvoer met oogst",
                       styleId: "removalHarvest",
                       detail: cultivationDetails
                           ? [
@@ -336,9 +338,9 @@ function buildChartDataAndLegend({
                           : [],
                   }
                 : {
-                      label: "Afvoer door Oogst",
+                      label: "Afvoer met oogst",
                       styleId: "removalHarvest",
-                      detail: ["onbekend oogst"],
+                      detail: ["onbekende oogst"],
                   }
             removalBar.push(dataKey)
         })
@@ -355,7 +357,7 @@ function buildChartDataAndLegend({
                 addCultivation(
                     fieldInput,
                     "removalResidue",
-                    "Afvoer door Gewasresten",
+                    "Afvoer via gewasresten",
                     cultivationResult,
                     "kg N / ha",
                     removalStyles,
