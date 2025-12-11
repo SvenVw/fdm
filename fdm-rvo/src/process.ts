@@ -2,6 +2,9 @@ import {
     addField,
     updateField,
     removeField,
+    addCultivation,
+    removeCultivation,
+    getDefaultDatesOfCultivation,
     type FdmType,
 } from "@svenvw/fdm-core"
 import type { RvoImportReviewItem, UserChoiceMap } from "./types"
@@ -18,6 +21,7 @@ import { getItemId } from "./utils"
  * @param b_id_farm - The ID of the farm the fields belong to.
  * @param rvoImportReviewData - The list of review items resulting from the comparison.
  * @param userChoices - A map where keys are item IDs and values are the chosen `ImportReviewAction`.
+ * @param year - The calendar year for the import context.
  * @returns A promise that resolves when all actions have been processed.
  */
 export async function processRvoImport(
@@ -26,6 +30,7 @@ export async function processRvoImport(
     b_id_farm: string,
     rvoImportReviewData: RvoImportReviewItem<any>[],
     userChoices: UserChoiceMap,
+    year: number,
     onFieldAdded?: (b_id: string, geometry: any) => Promise<void>,
 ) {
     for (const item of rvoImportReviewData) {
@@ -53,6 +58,26 @@ export async function processRvoImport(
                             ? new Date(item.rvoField.properties.EndDate)
                             : undefined,
                     )
+
+                    // Add cultivation from RVO
+                    const b_lu_catalogue = `nl_${item.rvoField.properties.CropTypeCode}`
+                    const defaultDates = await getDefaultDatesOfCultivation(
+                        fdm,
+                        principal_id,
+                        b_id_farm,
+                        b_lu_catalogue,
+                        year,
+                    )
+
+                    await addCultivation(
+                        fdm,
+                        principal_id,
+                        b_lu_catalogue,
+                        b_id,
+                        defaultDates.b_lu_start,
+                        defaultDates.b_lu_end,
+                    )
+
                     if (onFieldAdded) {
                         await onFieldAdded(b_id, item.rvoField.geometry)
                     }
@@ -74,6 +99,39 @@ export async function processRvoImport(
                             ? new Date(item.rvoField.properties.EndDate)
                             : undefined,
                     )
+
+                    // Update cultivation if different
+                    if (
+                        item.localCultivation &&
+                        item.localCultivation.b_lu_catalogue !==
+                            `nl_${item.rvoField.properties.CropTypeCode}`
+                    ) {
+                        // Remove old cultivation
+                        await removeCultivation(
+                            fdm,
+                            principal_id,
+                            item.localCultivation.b_lu,
+                        )
+
+                        // Add new RVO cultivation
+                        const b_lu_catalogue = `nl_${item.rvoField.properties.CropTypeCode}`
+                        const defaultDates = await getDefaultDatesOfCultivation(
+                            fdm,
+                            principal_id,
+                            b_id_farm,
+                            b_lu_catalogue,
+                            year,
+                        )
+
+                        await addCultivation(
+                            fdm,
+                            principal_id,
+                            b_lu_catalogue,
+                            item.localField.b_id,
+                            defaultDates.b_lu_start,
+                            defaultDates.b_lu_end,
+                        )
+                    }
                 }
                 break
             case "KEEP_LOCAL": // Keep Local for Conflict

@@ -134,7 +134,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 session.principal_id,
                 b_id_farm,
             )
-            rvoImportReviewData = compareFields(localFields, rvoFields)
+            const localFieldsExtended = await Promise.all(
+                localFields.map(async (field) => {
+                    const cultivations = await getCultivations(
+                        fdm,
+                        session.principal_id,
+                        field.b_id,
+                        {
+                            start: new Date(`${yearString}-01-01`),
+                            end: new Date(`${yearString}-12-31`),
+                        },
+                    )
+                    return { ...field, cultivations }
+                }),
+            )
+            rvoImportReviewData = compareFields(
+                localFieldsExtended,
+                rvoFields,
+                year,
+            )
         } catch (e: any) {
             console.error("Error with importing from RVO:", e)
             error = e.message

@@ -3,7 +3,7 @@ import intersect from "@turf/intersect"
 import union from "@turf/union"
 import area from "@turf/area"
 import { feature, featureCollection } from "@turf/helpers"
-import type { Field } from "@svenvw/fdm-core"
+import type { Field, Cultivation } from "@svenvw/fdm-core"
 import {
     type RvoField,
     RvoImportReviewStatus,
@@ -70,6 +70,18 @@ function bboxOverlap(bbox1: number[], bbox2: number[]): boolean {
     )
 }
 
+function findActiveCultivation(
+    cultivations: Cultivation[],
+    calendar: number,
+): Cultivation | undefined {
+    const referenceDate = new Date(`${calendar}-05-15`).getTime()
+    return cultivations.find((c) => {
+        const start = c.b_lu_start.getTime()
+        const end = c.b_lu_end ? c.b_lu_end.getTime() : Number.POSITIVE_INFINITY
+        return start <= referenceDate && end >= referenceDate
+    })
+}
+
 /**
  * Compares a list of local fields against a list of RVO fields to determine their import status.
  *
@@ -84,12 +96,57 @@ function bboxOverlap(bbox1: number[], bbox2: number[]): boolean {
  * @returns An array of `RvoImportReviewItem` objects, each representing a field and its status (MATCH, CONFLICT, NEW_REMOTE, NEW_LOCAL).
  */
 export function compareFields(
-    localFields: Field[],
+    localFields: (Field & { cultivations?: Cultivation[] })[],
     rvoFields: RvoField[],
+    calendar = new Date().getFullYear(),
 ): RvoImportReviewItem<Field>[] {
     const results: RvoImportReviewItem<Field>[] = []
     const matchedRvoIds = new Set<string>()
     const matchedLocalIds = new Set<string>()
+
+    const processMatch = (local: Field & { cultivations?: Cultivation[] }, rvo: RvoField) => {
+        // Detect property differences
+        const diffs = detectDiffs(local, rvo)
+
+        // Check for cultivation differences
+        const localCultivation = local.cultivations
+            ? findActiveCultivation(local.cultivations, calendar)
+            : undefined
+        const rvoCode = `nl_${rvo.properties.CropTypeCode}`
+
+        let rvoCultivationInfo
+        let localCultivationInfo
+
+        if (localCultivation) {
+            localCultivationInfo = {
+                b_lu_catalogue: localCultivation.b_lu_catalogue,
+                b_lu: localCultivation.b_lu,
+            }
+        }
+
+        if (rvoCode) {
+            rvoCultivationInfo = {
+                b_lu_catalogue: rvoCode,
+            }
+        }
+
+        // If local has active cultivation and it differs from RVO, flag it
+        if (localCultivation && localCultivation.b_lu_catalogue !== rvoCode) {
+            diffs.push("b_lu_catalogue")
+        }
+
+        return {
+            status:
+                diffs.length > 0
+                    ? RvoImportReviewStatus.CONFLICT
+                    : RvoImportReviewStatus.MATCH,
+            localField: local,
+            rvoField: rvo,
+            localCultivation: localCultivationInfo,
+            rvoCultivation: rvoCultivationInfo,
+            diffs,
+        }
+    }
 
     // ---------------------------------------------------------
     // Tier 1: Match by Source ID (CropFieldID)
@@ -100,21 +157,9 @@ export function compareFields(
                 (r) => r.properties.CropFieldID === local.b_id_source,
             )
             if (rvoMatch) {
-                // Mark as matched to prevent re-matching in Tier 2
                 matchedLocalIds.add(local.b_id)
                 matchedRvoIds.add(rvoMatch.properties.CropFieldID)
-
-                // Detect any property differences (geometry, name, dates)
-                const diffs = detectDiffs(local, rvoMatch)
-                results.push({
-                    status:
-                        diffs.length > 0
-                            ? RvoImportReviewStatus.CONFLICT
-                            : RvoImportReviewStatus.MATCH,
-                    localField: local,
-                    rvoField: rvoMatch,
-                    diffs,
-                })
+                results.push(processMatch(local, rvoMatch))
             }
         }
     }
@@ -137,7 +182,7 @@ export function compareFields(
         if (matchedRvoIds.has(rvo.properties.CropFieldID)) continue
 
         const rvoBbox = bbox(rvo.geometry)
-        let bestMatch: Field | null = null
+        let bestMatch: (Field & { cultivations?: Cultivation[] }) | null = null
         let bestIoU = 0
 
         // Optimization: Fast BBox overlap check before accurate IoU
@@ -158,22 +203,15 @@ export function compareFields(
         if (bestMatch && bestIoU > IOU_THRESHOLD) {
             matchedRvoIds.add(rvo.properties.CropFieldID)
             matchedLocalIds.add(bestMatch.b_id)
-
-            const diffs = detectDiffs(bestMatch, rvo)
-            results.push({
-                status:
-                    diffs.length > 0
-                        ? RvoImportReviewStatus.CONFLICT
-                        : RvoImportReviewStatus.MATCH,
-                localField: bestMatch,
-                rvoField: rvo,
-                diffs,
-            })
+            results.push(processMatch(bestMatch, rvo))
         } else {
             // No match found -> This is a NEW field from RVO
             results.push({
                 status: RvoImportReviewStatus.NEW_REMOTE,
                 rvoField: rvo,
+                rvoCultivation: {
+                    b_lu_catalogue: `nl_${rvo.properties.CropTypeCode}`,
+                },
                 diffs: [],
             })
         }
@@ -184,9 +222,18 @@ export function compareFields(
     // ---------------------------------------------------------
     for (const local of localFields) {
         if (!matchedLocalIds.has(local.b_id)) {
+            const localCultivation = local.cultivations
+                ? findActiveCultivation(local.cultivations, calendar)
+                : undefined
             results.push({
                 status: RvoImportReviewStatus.NEW_LOCAL,
                 localField: local,
+                localCultivation: localCultivation
+                    ? {
+                          b_lu_catalogue: localCultivation.b_lu_catalogue,
+                          b_lu: localCultivation.b_lu,
+                      }
+                    : undefined,
                 diffs: [],
             })
         }

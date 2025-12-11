@@ -135,8 +135,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 farm.b_businessid_farm,
             )
 
-            const localFields: any[] = [] // No existing fields to compare against yet
-            RvoImportReviewData = compareFields(localFields, rvoFields)
+            const localFieldsExtended: (Field & { cultivations: Cultivation[] })[] = [] // No existing fields to compare against yet in create wizard, so localFields is empty
+            RvoImportReviewData = compareFields(
+                localFieldsExtended,
+                rvoFields,
+                year,
+            ) // Pass year here
         } catch (e: any) {
             console.error("RVO Import Fout:", e)
             error = e.message

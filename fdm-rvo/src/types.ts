@@ -78,6 +78,7 @@ export type FieldDiff =
     | "b_start" // Start date difference
     | "b_end" // End date difference
     | "b_acquiring_method" // Method of acquisition difference (implied)
+    | "b_lu_catalogue" // Cultivation difference
 
 /**
  * Represents the explicit decision made by the user for a RVO Import Review item.
@@ -107,6 +108,10 @@ export interface RvoImportReviewItem<TLocal> {
     localField?: TLocal
     /** The RVO field object, if it exists (undefined for NEW_LOCAL) */
     rvoField?: RvoField
+    /** The local cultivation on May 15th */
+    localCultivation?: { b_lu_catalogue: string; b_lu: string }
+    /** The RVO cultivation based on CropTypeCode */
+    rvoCultivation?: { b_lu_catalogue: string }
     /** List of specific properties that differ (empty for MATCH, NEW_REMOTE, NEW_LOCAL) */
     diffs: FieldDiff[]
 }
