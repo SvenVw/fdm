@@ -50,7 +50,7 @@ import { getRvoCredentials } from "../integrations/rvo"
 import { get } from "proj4/dist/lib/projections"
 import { RvoErrorAlert } from "~/components/blocks/rvo/rvo-error-alert"
 import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi.server"
-import { addSoilAnalysis } from "@svenvw/fdm-core"
+import { addSoilAnalysis, getCultivations, type Cultivation } from "@svenvw/fdm-core"
 import { RvoConnectCard } from "~/components/blocks/rvo/connect-card"
 import { getCalendar } from "../lib/calendar"
 
@@ -59,16 +59,16 @@ export const meta: MetaFunction = ({ params }) => {
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    const { b_id_farm } = params
+    const { b_id_farm, calendar: yearString } = params
     if (!b_id_farm) {
         throw new Response("Farm ID is required", { status: 400 })
     }
+    const year = Number(yearString)
 
     const session = await getSession(request)
     const url = new URL(request.url)
     const code = url.searchParams.get("code")
     const state = url.searchParams.get("state")
-    const calendar = params.calendar
 
     let rvoImportReviewData: RvoImportReviewItem<any>[] = []
     let error: string | null = null
@@ -118,14 +118,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             )
             await exchangeToken(rvoClient, code)
 
-            const calendar = getCalendar(params)
-            if (!calendar) {
-                throw new Response("Calendar not found", { status: 404 })
-            }
-
             const rvoFields = await fetchRvoFields(
                 rvoClient,
-                calendar,
+                yearString,
                 farm.b_businessid_farm,
             )
 
@@ -179,7 +174,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         isRvoConfigured,
         farms,
         b_name_farm,
-        calendar,
+        calendar: yearString,
     }
 }
 
@@ -402,10 +397,11 @@ export default function RvoImportReviewPage() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    const { b_id_farm } = params
-    if (!b_id_farm) {
+    const { b_id_farm, calendar: yearString } = params
+    if (!b_id_farm || !yearString) {
         throw new Response("Farm ID is required", { status: 400 })
     }
+    const year = Number(yearString)
 
     const session = await getSession(request)
     const formData = await request.formData()
@@ -487,6 +483,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 b_id_farm,
                 rvoImportReviewData,
                 userChoices,
+                year,
                 onFieldAdded,
             )
             return redirect(`/farm/${b_id_farm}`)

@@ -8,7 +8,7 @@ import { z } from "zod"
  * This function retrieves the fields in GeoJSON format and validates them against the `RvoFieldSchema`.
  *
  * @param rvoClient - An authenticated instance of `RvoClient` (must have a valid access token).
- * @param calendar - The calendar year for which to retrieve the fields (e.g., 2024).
+ * @param year - The calendar year for which to retrieve the fields (e.g., 2024).
  * @param kvkNumber - The Chamber of Commerce (KvK) number of the farm/organization. This acts as the identifier for the data request.
  * @returns A promise that resolves to an array of validated `RvoField` objects.
  * @throws Will throw a ZodError if the response from RVO does not match the expected schema.
@@ -16,14 +16,14 @@ import { z } from "zod"
  */
 export async function fetchRvoFields(
     rvoClient: RvoClient,
-    calendar: string,
+    year: string,
     kvkNumber: string,
 ): Promise<RvoField[]> {
     // Request fields from RVO API
     // We request the full calendar year period
     const fieldsRaw = await rvoClient.opvragenBedrijfspercelen({
-        periodBeginDate: `${calendar}-01-01`,
-        periodEndDate: `${calendar}-12-31`,
+        periodBeginDate: `${year}-01-01`,
+        periodEndDate: `${year}-12-31`,
         farmId: kvkNumber,
         outputFormat: "geojson",
     })

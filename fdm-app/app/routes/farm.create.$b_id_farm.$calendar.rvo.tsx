@@ -65,12 +65,13 @@ export const meta: MetaFunction = ({ params }) => {
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    const { b_id_farm, calendar } = params
-    if (!b_id_farm || !calendar) {
+    const { b_id_farm, calendar: yearString } = params
+    if (!b_id_farm || !yearString) {
         throw new Response("Farm ID en Kalender zijn verplicht", {
             status: 400,
         })
     }
+    const year = Number(yearString)
 
     const session = await getSession(request)
     const url = new URL(request.url)
@@ -125,13 +126,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             ) // Instantiate RvoClient
             await exchangeToken(rvoClient, code)
 
-            const calendar = getCalendar(params)
-            if (!calendar) {
-                throw new Response("Calendar not found", { status: 404 })
-            }
             const rvoFields = await fetchRvoFields(
                 rvoClient,
-                calendar,
+                yearString, // Pass yearString here
                 farm.b_businessid_farm,
             )
 
@@ -149,7 +146,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         return {
             b_id_farm,
             b_businessid_farm,
-            calendar,
+            calendar: yearString,
             RvoImportReviewData: [],
             error: null,
             showImportButton: true,
@@ -161,7 +158,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return {
         b_id_farm,
         b_businessid_farm,
-        calendar,
+        calendar: yearString,
         RvoImportReviewData,
         error,
         showImportButton: false,
@@ -374,12 +371,13 @@ export default function RvoImportCreatePage() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    const { b_id_farm, calendar } = params
-    if (!b_id_farm || !calendar) {
+    const { b_id_farm, calendar: yearString } = params
+    if (!b_id_farm || !yearString) {
         throw new Response("b_id_farm and calendar are required", {
             status: 400,
         })
     }
+    const year = Number(yearString)
 
     const session = await getSession(request)
     const formData = await request.formData()
@@ -461,6 +459,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 b_id_farm,
                 RvoImportReviewData,
                 userChoices,
+                Number(calendar),
                 onFieldAdded,
             )
             return redirect(`/farm/create/${b_id_farm}/${calendar}/fields`)
