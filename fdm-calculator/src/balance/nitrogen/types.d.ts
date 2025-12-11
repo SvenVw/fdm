@@ -194,9 +194,6 @@ export type NitrogenEmissionFertilizer = {
      */
     applications: {
         id: string
-        p_id_catalogue: string
-        p_type: string
-        p_app_date: string
         value: Decimal
     }[]
 }
