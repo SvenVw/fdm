@@ -52,6 +52,7 @@ import { RvoErrorAlert } from "~/components/blocks/rvo/rvo-error-alert"
 import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi.server"
 import { addSoilAnalysis } from "@svenvw/fdm-core"
 import { RvoConnectCard } from "~/components/blocks/rvo/connect-card"
+import { getCalendar } from "../lib/calendar"
 
 export const meta: MetaFunction = ({ params }) => {
     return [{ title: `RVO Koppeling - Bedrijf ${params.b_id_farm}` }]
@@ -117,9 +118,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             )
             await exchangeToken(rvoClient, code)
 
+            const calendar = getCalendar(params)
+            if (!calendar) {
+                throw new Response("Calendar not found", { status: 404 })
+            }
+
             const rvoFields = await fetchRvoFields(
                 rvoClient,
-                new Date().getFullYear(),
+                calendar,
                 farm.b_businessid_farm,
             )
 
@@ -168,7 +174,7 @@ export default function RvoImportReviewPage() {
         isRvoConfigured,
         farms,
         calendar,
-        showimportButton,
+        showimportButton = false,
     } = useLoaderData<typeof loader>()
     const actionData = useActionData<typeof action>()
     const navigation = useNavigation()

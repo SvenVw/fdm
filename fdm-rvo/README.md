@@ -87,7 +87,7 @@ const fetchLocalFieldsApi = async (farmId: string, principalId: string) => {
   return response.json();
 };
 
-const processRvoData = async (accessToken: string, farmId: string, principalId: string, year: number, kvkNumber: string) => {
+const processRvoData = async (accessToken: string, farmId: string, principalId: string, year: string, kvkNumber: string) => {
   const { clientId, clientSecret, redirectUri, pkioPrivateKey, environment } = serverConfig.integrations.rvo;
   const clientName = serverConfig.name;
 
