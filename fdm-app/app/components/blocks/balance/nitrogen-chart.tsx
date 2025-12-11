@@ -126,12 +126,12 @@ function buildChartDataAndLegend({
         removalHarvest: {
             ...farmRemovalLegend.harvest,
             label: "Afvoer via oogst",
-             color: "var(--color-teal-600)",
+            color: "var(--color-teal-600)",
         },
         removalResidue: {
             ...farmRemovalLegend.residue,
             label: "Afvoer via gewasresten",
-             color: "var(--color-emerald-600)",
+            color: "var(--color-emerald-600)",
         },
         emissionNitrate: {
             label: "Nitraatuitspoeling",
@@ -426,7 +426,7 @@ export function NitrogenBalanceChart(
     ),
 ) {
     const { type, balanceData, fieldInput } = props
-    const [tooltipFocus, setTooltipFocus] = useState<Set<string>>(new Set())
+    const [tooltipFocus, setTooltipFocus] = useState<string>()
     // biome-ignore lint/correctness/useExhaustiveDependencies: each value in props is passed separately
     const { legend, chartData, chartConfig, supplyBar, removalBar } = useMemo(
         () => buildChartDataAndLegend(props),
@@ -439,24 +439,16 @@ export function NitrogenBalanceChart(
 
     const onTooltipFocus = (e: ChartMouseEvent) => {
         const dataKey = e.tooltipPayload[0].dataKey
-        if (!tooltipFocus.has(dataKey))
-            setTooltipFocus(
-                (tooltipFocus) => new Set([...tooltipFocus, dataKey]),
-            )
+        if (tooltipFocus !== dataKey) setTooltipFocus(dataKey)
     }
 
     const onTooltipBlur = (e: ChartMouseEvent) => {
         const dataKey = e.tooltipPayload[0].dataKey
-        if (tooltipFocus.has(dataKey))
-            setTooltipFocus((tooltipFocus) => {
-                const newTooltipFocus = new Set(tooltipFocus)
-                newTooltipFocus.delete(dataKey)
-                return newTooltipFocus
-            })
+        if (tooltipFocus === dataKey) setTooltipFocus(undefined)
     }
 
     const clearTooltipFocus = () => {
-        setTooltipFocus(new Set())
+        setTooltipFocus(undefined)
     }
 
     const barRadius = 5
@@ -502,7 +494,7 @@ export function NitrogenBalanceChart(
                             stackId={stackId}
                             fill={barStyle.color}
                             stroke={
-                                tooltipFocus.has(dataKey) ? "black" : undefined
+                                tooltipFocus === dataKey ? "black" : undefined
                             }
                             onMouseEnter={onTooltipFocus}
                             onMouseLeave={onTooltipBlur}
@@ -551,9 +543,9 @@ export function NitrogenBalanceChart(
                 <ChartTooltip
                     cursor={false}
                     content={({ active }) => {
-                        if (active && tooltipFocus.size > 0) {
-                            const dataKey = tooltipFocus.values().next()
-                                .value as keyof typeof chartConfig
+                        if (active && tooltipFocus) {
+                            const dataKey =
+                                tooltipFocus as keyof typeof chartConfig
                             const itemConfig = chartConfig[dataKey]
 
                             return (
