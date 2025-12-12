@@ -253,8 +253,35 @@ export function compareFields(
             const localCultivation = local.cultivations
                 ? findActiveCultivation(local.cultivations, calendar)
                 : undefined
+
+            // Check if this field should be considered "expired" (closed) instead of just new local
+            // Conditions:
+            // 1. Started before the current import year
+            // 2. Currently open (no end date) or ends in/after this year (though if it ends in this year, it might be a match? No, if it was unmatched, it means RVO doesn't have it)
+            //    Actually, if it ends *after* the start of this year, it's considered "active" in this year.
+            //    If RVO doesn't have it, we should close it effectively ending it before this year starts.
+            const localStart =
+                local.b_start instanceof Date
+                    ? local.b_start
+                    : new Date(local.b_start)
+            const importYearStart = new Date(calendar, 0, 1) // Jan 1st of import year
+            const isStartedBeforeYear = localStart < importYearStart
+
+            const localEnd = local.b_end
+                ? local.b_end instanceof Date
+                    ? local.b_end
+                    : new Date(local.b_end)
+                : null
+            // If it has no end date, OR the end date is after the start of the import year
+            const isOpenOrEndsInYear = !localEnd || localEnd >= importYearStart
+
+            const status =
+                isStartedBeforeYear && isOpenOrEndsInYear
+                    ? RvoImportReviewStatus.EXPIRED_LOCAL
+                    : RvoImportReviewStatus.NEW_LOCAL
+
             results.push({
-                status: RvoImportReviewStatus.NEW_LOCAL,
+                status,
                 localField: local,
                 localCultivation: localCultivation
                     ? {

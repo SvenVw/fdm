@@ -223,6 +223,9 @@ export default function RvoImportReviewPage() {
                 case RvoImportReviewStatus.NEW_LOCAL:
                     defaultAction = "REMOVE_LOCAL"
                     break
+                case RvoImportReviewStatus.EXPIRED_LOCAL:
+                    defaultAction = "CLOSE_LOCAL"
+                    break
                 case RvoImportReviewStatus.CONFLICT:
                     defaultAction = "UPDATE_FROM_REMOTE"
                     break

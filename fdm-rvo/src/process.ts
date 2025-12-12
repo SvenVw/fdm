@@ -141,6 +141,25 @@ export async function processRvoImport(
                     await removeField(fdm, principal_id, item.localField.b_id)
                 }
                 break
+            case "CLOSE_LOCAL":
+                if (item.localField) {
+                    // Close the field on Dec 31st of the previous year
+                    const closeDate = new Date(year - 1, 11, 31)
+                    await updateField(
+                        fdm,
+                        principal_id,
+                        item.localField.b_id,
+                        item.localField.b_name,
+                        item.localField.b_id_source,
+                        item.localField.b_geometry,
+                        item.localField.b_start instanceof Date
+                            ? item.localField.b_start
+                            : new Date(item.localField.b_start),
+                        item.localField.b_acquiring_method,
+                        closeDate,
+                    )
+                }
+                break
         }
     }
 }

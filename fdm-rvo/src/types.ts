@@ -66,6 +66,8 @@ export enum RvoImportReviewStatus {
     NEW_LOCAL = "NEW_LOCAL",
     /** The field exists in both systems but has differing properties (e.g., geometry, name). */
     CONFLICT = "CONFLICT",
+    /** The field exists locally, started before the import year, and is missing in RVO for the import year. Suggests closing it. */
+    EXPIRED_LOCAL = "EXPIRED_LOCAL",
 }
 
 /**
@@ -92,6 +94,8 @@ export enum UserRvoImportReviewDecision {
     ADD = "ADD",
     /** Explicitly remove a local field */
     REMOVE = "REMOVE",
+    /** Explicitly close a local field (set end date) */
+    CLOSE = "CLOSE",
     /** Ignore this RVO Import Review item (take no action) */
     IGNORE = "IGNORE",
 }
@@ -128,6 +132,7 @@ export type ImportReviewAction =
     | "UPDATE_FROM_REMOTE" // Update the local field with remote data
     | "KEEP_LOCAL" // Keep the local version, ignoring the remote conflict
     | "REMOVE_LOCAL" // Remove the local field
+    | "CLOSE_LOCAL" // Close the local field (set end date)
     | "IGNORE" // Do nothing for this item
     | "NO_ACTION" // No specific action selected
 

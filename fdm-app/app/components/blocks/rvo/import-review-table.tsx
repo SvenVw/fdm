@@ -19,7 +19,7 @@ import {
     TableRow,
 } from "~/components/ui/table"
 import { Badge } from "~/components/ui/badge"
-import { Check, Plus, Trash2, ArrowLeftRight, X } from "lucide-react"
+import { Check, Plus, Trash2, ArrowLeftRight, X, Archive } from "lucide-react"
 import {
     Select,
     SelectContent,
@@ -90,7 +90,7 @@ const DiffCell = ({
     }
 
     // NEW LOCAL -> Show local without badge
-    if (status === "NEW_LOCAL") {
+    if (status === "NEW_LOCAL" || status === "EXPIRED_LOCAL") {
         return (
             <span className="text-sm font-medium text-muted-foreground">
                 {formatter(local)}
@@ -234,6 +234,21 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                                 <TooltipTrigger>Nieuw (Lokaal)</TooltipTrigger>
                                 <TooltipContent>
                                     Perceel bestaat lokaal, maar niet in RVO.
+                                </TooltipContent>
+                            </Tooltip>
+                        </Badge>
+                    )
+                case "EXPIRED_LOCAL":
+                    return (
+                        <Badge
+                            variant="outline"
+                            className="bg-orange-50 text-orange-700 border-orange-200"
+                        >
+                            <Tooltip>
+                                <TooltipTrigger>Verlopen</TooltipTrigger>
+                                <TooltipContent>
+                                    Perceel is lokaal actief, maar niet meer in
+                                    RVO.
                                 </TooltipContent>
                             </Tooltip>
                         </Badge>
@@ -513,6 +528,21 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                                     <div className="flex items-center gap-2 text-destructive">
                                         <Trash2 className="h-3 w-3" />{" "}
                                         Verwijderen
+                                    </div>
+                                </SelectItem>
+                                <SelectItem value="KEEP_LOCAL">
+                                    <div className="flex items-center gap-2">
+                                        <Check className="h-3 w-3" /> Behouden
+                                    </div>
+                                </SelectItem>
+                            </>
+                        )}
+                        {item.status === "EXPIRED_LOCAL" && (
+                            <>
+                                <SelectItem value="CLOSE_LOCAL">
+                                    <div className="flex items-center gap-2 text-orange-700">
+                                        <Archive className="h-3 w-3" />{" "}
+                                        Afsluiten
                                     </div>
                                 </SelectItem>
                                 <SelectItem value="KEEP_LOCAL">
