@@ -10,10 +10,12 @@ type HarvestDatesDisplayProps = {
 export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
     cultivation,
 }) => {
+    const resolved_b_lu_harvest_date =
+        cultivation.type === "field" ? cultivation.b_lu_harvest_date : null
     const formattedHarvestDates = React.useMemo(() => {
-        const b_lu_harvest_date = cultivation.fields.flatMap(
-            (field) => field.b_lu_harvest_date,
-        )
+        const b_lu_harvest_date =
+            resolved_b_lu_harvest_date ??
+            cultivation.fields.flatMap((field) => field.b_lu_harvest_date)
         if (b_lu_harvest_date.length === 1) {
             return (
                 <p className="text-muted-foreground">
@@ -88,6 +90,7 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
         }
         return null // Should not happen
     }, [
+        resolved_b_lu_harvest_date,
         cultivation.fields,
         cultivation.b_lu_harvestable,
         cultivation.b_lu_croprotation,

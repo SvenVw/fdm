@@ -4,6 +4,7 @@ import {
     type FilterFn,
     flexRender,
     getCoreRowModel,
+    getExpandedRowModel,
     getFacetedRowModel,
     getFilteredRowModel,
     getSortedRowModel,
@@ -182,6 +183,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
         getFacetedRowModel: getFacetedRowModel(),
+        getExpandedRowModel: getExpandedRowModel(),
+        getSubRows: (row) =>
+            row.type === "crop" ? (row.fields as TData[]) : undefined,
         onColumnVisibilityChange: setColumnVisibility,
         onGlobalFilterChange: (globalFilter) => {
             if (globalFilter?.searchTerms ?? "" !== searchTerms)
