@@ -250,6 +250,29 @@ export type NitrogenEmissionAmmoniaFertilizers = {
     }
 }
 
+export type NitrogenEmissionAmmoniaFertilizersTotal = {
+    /**
+     * The total amount of ammonia nitrogen emitted from all fertilizer sources.
+     */
+    total: Decimal
+    /**
+     * The total amount of ammonia nitrogen specifically from mineral fertilizers.
+     */
+    mineral: Decimal
+    /**
+     * The total amount of ammonia nitrogen specifically from manure.
+     */
+    manure: Decimal
+    /**
+     * The total amount of ammonia nitrogen specifically from compost.
+     */
+    compost: Decimal
+    /**
+     * The total amount of ammonia nitrogen specifically from other.
+     */
+    other: Decimal
+}
+
 /**
  * Represents the ammonia nitrogen emissions specifically from crop residues.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
@@ -369,17 +392,37 @@ export type NitrogenBalance = {
     /**
      * The total nitrogen supply across all fields.
      */
-    supply: Decimal
+    supply: {
+        total: Decimal
+        deposition: Decimal
+        fixation: Decimal
+        mineralisation: Decimal
+        fertilizers: {
+            total: Decimal
+            mineral: Decimal
+            manure: Decimal
+            compost: Decimal
+            other: Decimal
+        }
+    }
     /**
      * The total nitrogen removal across all fields.
      */
-    removal: Decimal
+    removal: {
+        total: Decimal
+        harvests: Decimal
+        residues: Decimal
+    }
     /**
      * The total nitrogen emission across all fields.
      */
     emission: {
         total: Decimal
-        ammonia: Decimal
+        ammonia: {
+            total: Decimal
+            fertilizers: NitrogenEmissionAmmoniaFertilizersTotal
+            residues: Decimal
+        }
         nitrate: Decimal
     }
     /**
@@ -603,11 +646,37 @@ export type NitrogenBalanceFieldResultNumeric = {
 // Numeric version of NitrogenBalance
 export type NitrogenBalanceNumeric = {
     balance: number
-    supply: number
-    removal: number
+    supply: {
+        total: number
+        deposition: number
+        fixation: number
+        mineralisation: number
+        fertilizers: {
+            total: number
+            mineral: number
+            manure: number
+            compost: number
+            other: number
+        }
+    }
+    removal: {
+        total: number
+        harvests: number
+        residues: number
+    }
     emission: {
         total: number
-        ammonia: number
+        ammonia: {
+            total: number
+            fertilizers: {
+                total: number
+                mineral: number
+                manure: number
+                compost: number
+                other: number
+            }
+            residues: number
+        }
         nitrate: number
     }
     target: number
