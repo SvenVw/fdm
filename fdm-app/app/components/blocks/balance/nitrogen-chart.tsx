@@ -478,7 +478,6 @@ export function NitrogenBalanceChart(
      * @param bar an array where each item is
      *   - a data key: it will display as a standalone bar rectangle with rounded corners
      *   - an array of data keys: it will display as a list of rectangle bars where only the outer corners are rounded.
-     *     Hovering over each rectangle will make it show a black outline for clarity.
      * @returns
      */
     function renderBar(stackId: string, bar: (string | string[])[]) {
