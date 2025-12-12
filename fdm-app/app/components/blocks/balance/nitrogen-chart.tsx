@@ -4,7 +4,7 @@ import type {
     NitrogenBalanceFieldResultNumeric,
 } from "@svenvw/fdm-calculator"
 import { format } from "date-fns/format"
-import { useMemo, useState } from "react"
+import { useId, useMemo, useState } from "react"
 import { nl } from "react-day-picker/locale"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
 import { cn } from "@/app/lib/utils"
@@ -432,6 +432,7 @@ export function NitrogenBalanceChart(
         () => buildChartDataAndLegend(props),
         [type, balanceData, fieldInput],
     )
+    const svgId = useId()
 
     type ChartMouseEvent = {
         tooltipPayload: { dataKey: string }[]
@@ -489,7 +490,7 @@ export function NitrogenBalanceChart(
                     return (
                         <Bar
                             key={dataKey}
-                            id={`BarRectangle_${dataKey}`}
+                            id={`${svgId}_${dataKey}`}
                             dataKey={dataKey}
                             radius={pickBarRadius(i, barItem)}
                             stackId={stackId}
@@ -508,6 +509,7 @@ export function NitrogenBalanceChart(
             return (
                 <Bar
                     key={dataKey}
+                    id={`${svgId}_${dataKey}`}
                     dataKey={dataKey}
                     radius={barRadius}
                     stackId={stackId}
@@ -620,7 +622,7 @@ export function NitrogenBalanceChart(
                 {renderBar("b", removalBar)}
                 {tooltipFocus && (
                     <use
-                        href={`#BarRectangle_${tooltipFocus}`}
+                        href={`#${svgId}_${tooltipFocus}`}
                         fill="none"
                         stroke="black"
                         strokeWidth={5}
