@@ -4,7 +4,6 @@ import {
     ArrowRight,
     BadgeCheck,
     BookOpen,
-    Calculator,
     CheckCircle2,
     Droplets,
     ExternalLink,
@@ -14,7 +13,7 @@ import {
     History,
     Layers,
     LineChart,
-    Map,
+    MapIcon,
     MousePointerClick,
     MoveDown,
     Scale,
@@ -26,7 +25,6 @@ import {
     Tractor,
     Users,
     Wheat,
-    Wind,
 } from "lucide-react"
 import { useEffect, useRef } from "react"
 import { FormProvider } from "react-hook-form"
@@ -37,7 +35,7 @@ import type {
 } from "react-router"
 import { Form, Link, NavLink, redirect, useSearchParams } from "react-router"
 import { useRemixForm } from "remix-hook-form"
-import { redirectWithSuccess } from "remix-toast"
+import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
@@ -447,9 +445,10 @@ export default function SignIn() {
                     </div>
                 </div>
                 <div className="hidden bg-muted lg:block">
+                    {/* Photo by <a href="https://unsplash.com/@tombelgium?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Tom De Decker</a> on <a href="https://unsplash.com/photos/a-tractor-plowing-a-field-at-sunset-_dnc3j1oVlk?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a> */}
                     <img
                         src="https://images.unsplash.com/photo-1717702576954-c07131c54169?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                        alt='Photo by <a href="https://unsplash.com/@tombelgium?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Tom De Decker</a> on <a href="https://unsplash.com/photos/a-tractor-plowing-a-field-at-sunset-_dnc3j1oVlk?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>'
+                        alt="A tractor plowing a field at sunset"
                         width="1920"
                         height="1080"
                         loading="lazy"
@@ -463,7 +462,7 @@ export default function SignIn() {
                         <div className="mb-24 grid items-center gap-12 lg:grid-cols-2">
                             <div>
                                 <div className="mb-6 inline-flex items-center rounded-full border border-green-100 bg-green-200 px-3 py-1 text-sm font-medium text-green-800">
-                                    <span className="mr-2 flex h-2 w-2 rounded-full bg-green-500"></span>
+                                    <span className="mr-2 flex h-2 w-2 rounded-full bg-green-500" />
                                     Innovatie in de praktijk
                                 </div>
                                 <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -951,7 +950,7 @@ export default function SignIn() {
                             <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <Map className="h-6 w-6" />
+                                        <MapIcon className="h-6 w-6" />
                                     </div>
                                     <CardTitle className="text-lg">
                                         Gebiedsgerichte normen
