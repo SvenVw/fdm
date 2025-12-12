@@ -183,13 +183,13 @@ export function Banner() {
                                     <>
                                         <Button
                                             onClick={handleAcceptCookies}
-                                            className="w-full"
+                                            className="w-1/2"
                                         >
                                             Accepteren
                                         </Button>
                                         <Button
                                             onClick={handleDeclineCookies}
-                                            className="w-full"
+                                            className="w-1/2"
                                             variant="secondary"
                                         >
                                             Weigeren
