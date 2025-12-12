@@ -86,6 +86,18 @@ const FormSchema = z.object({
             message: "Startjaar mag maximaal 2025 zijn",
         })
         .optional(),
+    b_businessid_farm: z
+        .string()
+        .optional()
+        .refine(
+            (val) => {
+                if (val === undefined || val === "") return true // Optional, so allow empty
+                return /^[0-9]{8}$/.test(val)
+            },
+            {
+                message: "KvK nummer must be exactly 8 digits",
+            },
+        ),
 })
 
 // Loader
@@ -137,12 +149,12 @@ export default function AddFarmPage() {
                                     <CardHeader>
                                         <CardTitle>Bedrijf</CardTitle>
                                         <CardDescription>
-                                            Wat voor soort bedrijf heb je?
+                                            Vul de gegevens over het bedrijf in om te beginnen?
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
                                         <div className="grid w-full items-center gap-4">
-                                            <div className="flex flex-col space-y-1.5">
+                                            <div className="flex flex-col space-y-3">
                                                 <FormField
                                                     control={form.control}
                                                     name="b_name_farm"
@@ -159,6 +171,30 @@ export default function AddFarmPage() {
                                                                 />
                                                             </FormControl>
                                                             <FormDescription />
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="b_businessid_farm"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>
+                                                                KvK nummer
+                                                            </FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    placeholder="Bv. 12345678"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormDescription>
+                                                                Optioneel,
+                                                                vereist voor
+                                                                percelen ophalen
+                                                                uit RVO.
+                                                            </FormDescription>
                                                             <FormMessage />
                                                         </FormItem>
                                                     )}
@@ -364,14 +400,19 @@ export async function action({ request }: ActionFunctionArgs) {
             request,
             FormSchema,
         )
-        const { b_name_farm, year, has_derogation, derogation_start_year } =
-            formValues
+        const {
+            b_name_farm,
+            year,
+            has_derogation,
+            derogation_start_year,
+            b_businessid_farm,
+        } = formValues
 
         const b_id_farm = await addFarm(
             fdm,
             session.principal_id,
             b_name_farm,
-            null,
+            b_businessid_farm || null,
             null,
             null,
         )
