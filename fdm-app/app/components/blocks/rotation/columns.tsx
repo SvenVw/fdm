@@ -1,6 +1,8 @@
 import type { ColumnDef } from "@tanstack/react-table"
+import { ChevronRight } from "lucide-react"
 import React from "react"
 import { NavLink } from "react-router-dom"
+import { cn } from "@/app/lib/utils"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
@@ -13,11 +15,9 @@ import {
 } from "~/components/ui/dropdown-menu"
 import { ScrollArea } from "~/components/ui/scroll-area"
 import { DataTableColumnHeader } from "./column-header"
+import { DateRangeDisplay } from "./date-range-display"
 import { FertilizerDisplay } from "./fertilizer-display"
 import { HarvestDatesDisplay } from "./harvest-dates-display"
-import { DateRangeDisplay } from "./date-range-display"
-import { ChevronRight } from "lucide-react"
-import { cn } from "@/app/lib/utils"
 
 export type CropRow = {
     type: "crop"
@@ -61,7 +61,7 @@ export type FieldRow = {
         p_id: string
         p_type: string
     }[]
-    fields: FieldRow[]
+    fields: undefined
 }
 
 export type RotationExtended = CropRow | FieldRow
@@ -138,9 +138,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
     },
     {
         id: "name",
-        accessorFn: (row) => {
-            row.type === "crop" ? row.b_lu_name : row.b_name
-        },
+        accessorFn: (row) => (row.type === "crop" ? row.b_lu_name : row.b_name),
         enableSorting: true,
         header: ({ column }) => {
             return <DataTableColumnHeader column={column} title="Gewas" />
@@ -214,8 +212,8 @@ export const columns: ColumnDef<RotationExtended>[] = [
         accessorKey: "b_name",
         enableSorting: true,
         sortingFn: (rowA, rowB, _columnId) => {
-            const fieldA = rowA.original.fields.length
-            const fieldB = rowB.original.fields.length
+            const fieldA = rowA.original.fields?.length ?? 0
+            const fieldB = rowB.original.fields?.length ?? 0
             return fieldA - fieldB
         },
         enableHiding: true, // Enable hiding for mobile
@@ -226,8 +224,8 @@ export const columns: ColumnDef<RotationExtended>[] = [
             const cultivation = row.original
 
             const fieldsDisplay = React.useMemo(() => {
-                const fieldsSorted = [...cultivation.fields].sort((a, b) =>
-                    a.b_name.localeCompare(b.b_name),
+                const fieldsSorted = [...(cultivation.fields ?? [])].sort(
+                    (a, b) => a.b_name.localeCompare(b.b_name),
                 )
                 return (
                     cultivation.type === "crop" && (
@@ -266,7 +264,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
                         </DropdownMenu>
                     )
                 )
-            }, [cultivation.calendar, cultivation.fields])
+            }, [cultivation.type, cultivation.calendar, cultivation.fields])
 
             return fieldsDisplay
         },
@@ -275,14 +273,20 @@ export const columns: ColumnDef<RotationExtended>[] = [
         accessorKey: "b_area",
         enableSorting: true,
         sortingFn: (rowA, rowB, _columnId) => {
-            const areaA = rowA.original.fields.reduce(
-                (acc, field) => acc + field.b_area,
-                0,
-            )
-            const areaB = rowB.original.fields.reduce(
-                (acc, field) => acc + field.b_area,
-                0,
-            )
+            const areaA =
+                rowA.original.type === "field"
+                    ? rowA.original.b_area
+                    : rowA.original.fields.reduce(
+                          (acc, field) => acc + field.b_area,
+                          0,
+                      )
+            const areaB =
+                rowB.original.type === "field"
+                    ? rowB.original.b_area
+                    : rowB.original.fields.reduce(
+                          (acc, field) => acc + field.b_area,
+                          0,
+                      )
             return areaA - areaB
         },
         header: ({ column }) => {
@@ -296,14 +300,15 @@ export const columns: ColumnDef<RotationExtended>[] = [
                 cultivation.type === "field" ? cultivation.b_area : null
             const formattedArea = React.useMemo(() => {
                 const b_area =
-                    provided_b_area ??
-                    cultivation.fields.reduce(
-                        (acc, field) => acc + field.b_area,
-                        0,
-                    )
+                    cultivation.type === "field"
+                        ? (provided_b_area ?? 0)
+                        : cultivation.fields.reduce(
+                              (acc, field) => acc + field.b_area,
+                              0,
+                          )
 
                 return b_area < 0.1 ? "< 0.1 ha" : `${b_area.toFixed(1)} ha`
-            }, [provided_b_area, cultivation.fields])
+            }, [cultivation.type, provided_b_area, cultivation.fields])
 
             return <p className="text-muted-foreground">{formattedArea}</p>
         },

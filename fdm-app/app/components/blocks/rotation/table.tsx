@@ -221,7 +221,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
             const dateTermsArr = (dates: Date[]) =>
                 [...new Set(dates.map(formatDate))].join(" ")
 
-            const fields = item.fields.map((field) => {
+            const fields = (item as CropRow).fields.map((field) => {
                 field.b_lu_start.map((v) => crop_b_lu_start.add(formatDate(v)))
                 field.b_lu_end.map((v) => crop_b_lu_end.add(formatDate(v)))
                 field.b_lu_harvest_date.map((v) =>
@@ -250,7 +250,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
     ) => {
         if (
             showProductiveOnly &&
-            !row.original.fields.some((field) => field.b_isproductive)
+            !(row.original.type === "crop"
+                ? row.original.fields.some((field) => field.b_isproductive)
+                : row.original.b_isproductive)
         ) {
             return false
         }
