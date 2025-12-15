@@ -434,12 +434,12 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
         },
     },
     {
-        id: "recht",
+        id: "gebruikstitel",
         header: () => (
             <Tooltip>
-                <TooltipTrigger>Recht</TooltipTrigger>
+                <TooltipTrigger>Gebruikstitel</TooltipTrigger>
                 <TooltipContent>
-                    De vorm van gebruiksrecht (bv. eigendom, pacht).
+                    De vorm van gebruikstitel (bv. eigendom, pacht).
                 </TooltipContent>
             </Tooltip>
         ),
