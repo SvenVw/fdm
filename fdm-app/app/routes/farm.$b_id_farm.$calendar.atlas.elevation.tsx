@@ -1,6 +1,5 @@
 import {
     cogProtocol,
-    getCogMetadata,
     locationValues,
     proj4,
 } from "@geomatico/maplibre-cog-protocol"
@@ -26,7 +25,6 @@ import {
     type MapLayerMouseEvent,
 } from "react-map-gl/maplibre"
 import {
-    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
@@ -37,7 +35,6 @@ import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { getMapStyle } from "~/integrations/map"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
@@ -109,34 +106,39 @@ export const meta: MetaFunction = () => {
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         const b_id_farm = params.b_id_farm
-        if (!b_id_farm) {
-            throw data("Farm ID is required", {
-                status: 400,
-                statusText: "Farm ID is required",
-            })
-        }
 
         const session = await getSession(request)
         const calendar = getCalendar(params)
         const timeframe = getTimeframe(params)
 
-        const fields = await getFields(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            timeframe,
-        )
-        const featureCollection: FeatureCollection = {
-            type: "FeatureCollection",
-            features: fields.map((field) => ({
-                type: "Feature",
-                properties: {
-                    b_id: field.b_id,
-                    b_name: field.b_name,
-                    b_area: Math.round(field.b_area * 10) / 10,
-                },
-                geometry: field.b_geometry,
-            })),
+        // Get the fields of the farm
+        let featureCollection: FeatureCollection | undefined
+        if (b_id_farm && b_id_farm !== "undefined") {
+            const fields = await getFields(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+                timeframe,
+            )
+            const features = fields.map((field) => {
+                const feature = {
+                    type: "Feature" as const,
+                    properties: {
+                        b_id: field.b_id,
+                        b_name: field.b_name,
+                        b_area: Math.round(field.b_area * 10) / 10,
+                        b_lu_name: field.b_lu_name,
+                        b_id_source: field.b_id_source,
+                    },
+                    geometry: field.b_geometry,
+                }
+                return feature
+            })
+
+            featureCollection = {
+                type: "FeatureCollection",
+                features: features,
+            }
         }
 
         const mapStyle = getMapStyle("satellite")
@@ -503,7 +505,7 @@ export default function FarmAtlasElevationBlock() {
                             if (
                                 values &&
                                 values.length > 0 &&
-                                !isNaN(values[0])
+                                !Number.isNaN(values[0])
                             ) {
                                 setHoverElevation(values[0])
                                 return
@@ -562,7 +564,7 @@ export default function FarmAtlasElevationBlock() {
                             id="ahn-wms-layer"
                             type="raster"
                             paint={{ "raster-opacity": 0.8 }}
-                            beforeId="fieldsSavedOutline"
+                            beforeId={fields ? "fieldsSavedOutline" : undefined}
                         />
                     </Source>
                 )}
@@ -586,7 +588,11 @@ export default function FarmAtlasElevationBlock() {
                                     id={`ahn-layer-${tile.id}`}
                                     type="raster"
                                     paint={{ "raster-opacity": 1 }}
-                                    beforeId="fieldsSavedOutline"
+                                    beforeId={
+                                        fields
+                                            ? "fieldsSavedOutline"
+                                            : undefined
+                                    }
                                 />
                             </Source>
                             <Source
@@ -607,7 +613,11 @@ export default function FarmAtlasElevationBlock() {
                                         "hillshade-highlight-color": "#ffffff",
                                         "hillshade-accent-color": "#000000",
                                     }}
-                                    beforeId="fieldsSavedOutline"
+                                    beforeId={
+                                        fields
+                                            ? "fieldsSavedOutline"
+                                            : undefined
+                                    }
                                 />
                             </Source>
                         </Fragment>
