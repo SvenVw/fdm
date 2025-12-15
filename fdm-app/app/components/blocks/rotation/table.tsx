@@ -70,7 +70,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
             : {},
     )
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-    const lastSelectedRowIndex = useRef<number | null>(null)
+    const lastSelectedRowIndex = useRef<string | null>(null)
 
     useEffect(() => {
         setColumnVisibility(
@@ -102,24 +102,111 @@ export function DataTable<TData extends RotationExtended, TValue>({
         }
 
         if (event.shiftKey && lastSelectedRowIndex.current !== null) {
-            const currentIndex = row.index
-            const start = Math.min(currentIndex, lastSelectedRowIndex.current)
-            const end = Math.max(currentIndex, lastSelectedRowIndex.current)
+            document.getSelection()?.removeAllRanges()
 
-            const rowsToSelect = table
-                .getRowModel()
-                .rows.slice(start, end + 1)
-                .map((r) => r.id)
+            const parentRowModel = table.getFilteredRowModel()
+            const lastSelectedRowId = lastSelectedRowIndex.current
+            lastSelectedRowIndex.current = null
+            const lastSelectedRow = table.getRow(lastSelectedRowId)
+            if (lastSelectedRow) {
+                const mode = lastSelectedRow.getIsSelected()
+                const currentSelectedParentIndex =
+                    row.getParentRow()?.index ?? row.index
+                const lastSelectedParentIndex =
+                    lastSelectedRow.getParentRow()?.index ??
+                    lastSelectedRow.index
+                const startRow =
+                    currentSelectedParentIndex < lastSelectedParentIndex
+                        ? row
+                        : currentSelectedParentIndex > lastSelectedParentIndex
+                          ? lastSelectedRow
+                          : row.index < lastSelectedRow.index
+                            ? row
+                            : lastSelectedRow
+                const endRow =
+                    lastSelectedRow.id !== startRow.id ? lastSelectedRow : row
+                const parentRowStart = startRow.getParentRow() ?? startRow
+                const parentRowEnd = endRow.getParentRow() ?? endRow
 
-            const newRowSelection = { ...rowSelection }
-            rowsToSelect.forEach((id) => {
-                newRowSelection[id] = true
-            })
-            setRowSelection(newRowSelection)
+                const newRowSelection = { ...rowSelection }
+                // Select-deselect all rows in between
+                for (
+                    let i = parentRowStart.index + 1;
+                    i < parentRowEnd.index;
+                    i++
+                ) {
+                    const row = parentRowModel.rows[i]
+                    newRowSelection[row.id] = mode
+                    row.subRows.forEach((subRow) => {
+                        newRowSelection[subRow.id] = mode
+                    })
+                }
+                if (parentRowStart.id === parentRowEnd.id) {
+                    // Select within one parent row
+                    const cutoffStart = startRow.getParentRow()
+                        ? startRow.index
+                        : 0
+                    const cutoffEnd = endRow.getParentRow()
+                        ? endRow.index
+                        : endRow.subRows.length - 1
+                    for (let i = cutoffStart; i <= cutoffEnd; i++) {
+                        const row = parentRowStart.subRows[i]
+                        newRowSelection[row.id] = mode
+                    }
+                    newRowSelection[parentRowStart.id] =
+                        parentRowStart.subRows.every(
+                            (row) => newRowSelection[row.id],
+                        )
+                } else {
+                    // For the start row, select only ones greater than the index
+                    const cutoffStart = startRow.getParentRow()
+                        ? startRow.index
+                        : 0
+                    for (
+                        let i = cutoffStart;
+                        i < parentRowStart.subRows.length;
+                        i++
+                    ) {
+                        const row = parentRowStart.subRows[i]
+                        newRowSelection[row.id] = mode
+                    }
+                    newRowSelection[parentRowStart.id] =
+                        parentRowStart.subRows.every(
+                            (row) => newRowSelection[row.id],
+                        )
+                    // For the end row, select only ones greater than the index
+                    const cutoffEnd = endRow.getParentRow()
+                        ? endRow.index
+                        : endRow.subRows.length - 1
+                    for (let i = 0; i <= cutoffEnd; i++) {
+                        const row = parentRowEnd.subRows[i]
+                        newRowSelection[row.id] = mode
+                    }
+                    newRowSelection[parentRowEnd.id] =
+                        parentRowEnd.subRows.every(
+                            (row) => newRowSelection[row.id],
+                        )
+                }
+                setRowSelection(newRowSelection)
+            }
         } else {
-            row.toggleSelected()
+            const newIsSelected = !row.getIsSelected()
+            row.toggleSelected(newIsSelected)
+            const parentRow = row.getParentRow()
+            if (parentRow) {
+                const wantedValue = parentRow?.subRows.every((otherRow) =>
+                    otherRow.id === row.id
+                        ? newIsSelected
+                        : otherRow.getIsSelected(),
+                )
+                if (parentRow.getIsSelected() !== wantedValue) {
+                    parentRow.toggleSelected(wantedValue, {
+                        selectChildren: false,
+                    })
+                }
+            }
+            lastSelectedRowIndex.current = row.id
         }
-        lastSelectedRowIndex.current = row.index
     }
 
     const memoizedData = useMemo(() => {

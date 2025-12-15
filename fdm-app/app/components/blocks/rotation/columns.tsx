@@ -1,6 +1,4 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { format } from "date-fns"
-import { nl } from "date-fns/locale/nl"
 import React from "react"
 import { NavLink } from "react-router-dom"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
