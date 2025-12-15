@@ -80,8 +80,8 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1
       '@geomatico/maplibre-cog-protocol':
-        specifier: file:C:/Users/sven.verweij/Applications/packages/maplibre-cog-protocol
-        version: file:../packages/maplibre-cog-protocol(maplibre-gl@5.13.0)
+        specifier: github:SvenVw/maplibre-cog-protocol#add-prepare
+        version: https://codeload.github.com/SvenVw/maplibre-cog-protocol/tar.gz/fdb1f2505071f6bd3dc94fe07024d3ddfe826904(maplibre-gl@5.13.0)
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.68.0(react@19.2.1))
@@ -2230,8 +2230,9 @@ packages:
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
 
-  '@geomatico/maplibre-cog-protocol@file:../packages/maplibre-cog-protocol':
-    resolution: {directory: ../packages/maplibre-cog-protocol, type: directory}
+  '@geomatico/maplibre-cog-protocol@https://codeload.github.com/SvenVw/maplibre-cog-protocol/tar.gz/fdb1f2505071f6bd3dc94fe07024d3ddfe826904':
+    resolution: {tarball: https://codeload.github.com/SvenVw/maplibre-cog-protocol/tar.gz/fdb1f2505071f6bd3dc94fe07024d3ddfe826904}
+    version: 0.8.0
     peerDependencies:
       maplibre-gl: ^4.5.0 || ^5.0.0
 
@@ -12977,7 +12978,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.10': {}
 
-  '@geomatico/maplibre-cog-protocol@file:../packages/maplibre-cog-protocol(maplibre-gl@5.13.0)':
+  '@geomatico/maplibre-cog-protocol@https://codeload.github.com/SvenVw/maplibre-cog-protocol/tar.gz/fdb1f2505071f6bd3dc94fe07024d3ddfe826904(maplibre-gl@5.13.0)':
     dependencies:
       '@mapbox/sphericalmercator': 1.2.0
       d3-scale: 4.0.2
