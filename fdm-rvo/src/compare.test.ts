@@ -233,15 +233,14 @@ describe("compareFields", () => {
             expect(result[0].status).toBe(RvoImportReviewStatus.EXPIRED_LOCAL)
         })
 
-        it("should identify a field as NEW_LOCAL if it ends BEFORE the import year", () => {
+        it("should IGNORE a field if it ends BEFORE the import year", () => {
             const local = createLocalField({
                 b_start: new Date("2024-01-01"),
                 b_end: new Date("2024-12-31"),
                 b_id_source: "local-only",
             })
             const result = compareFields([local], [], calendar)
-            expect(result).toHaveLength(1)
-            expect(result[0].status).toBe(RvoImportReviewStatus.NEW_LOCAL)
+            expect(result).toHaveLength(0)
         })
     })
 

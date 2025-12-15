@@ -275,6 +275,12 @@ export function compareFields(
             // If it has no end date, OR the end date is after the start of the import year
             const isOpenOrEndsInYear = !localEnd || localEnd >= importYearStart
 
+            // If the field ended before the import year, it's a historical field that is already closed.
+            // We should ignore it.
+            if (!isOpenOrEndsInYear) {
+                continue
+            }
+
             const status =
                 isStartedBeforeYear && isOpenOrEndsInYear
                     ? RvoImportReviewStatus.EXPIRED_LOCAL
