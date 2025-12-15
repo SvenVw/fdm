@@ -422,11 +422,16 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                 <TableRow
                                     key={row.id}
                                     data-state={
-                                        row.getIsSelected() && "selected"
+                                        row.getIsSelected()
+                                            ? "selected"
+                                            : row.original.type === "crop" &&
+                                              row.getIsSomeSelected() &&
+                                              "indeterminate"
                                     }
                                     onClick={(event) =>
                                         handleRowClick(row, event)
                                     }
+                                    className="data-[state=selected]:bg-muted data-[state=indeterminate]:bg-muted/50"
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell

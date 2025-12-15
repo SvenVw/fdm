@@ -18,7 +18,7 @@ import { DataTableColumnHeader } from "./column-header"
 import { FertilizerDisplay } from "./fertilizer-display"
 import { HarvestDatesDisplay } from "./harvest-dates-display"
 import { DateRangeDisplay } from "./date-range-display"
-import { ChevronDown, ChevronRight } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 import { cn } from "@/app/lib/utils"
 
 export type CropRow = {
