@@ -16,9 +16,6 @@ export function DateRangeDisplay({
         const sorted = [...range].sort((a, b) => a.getTime() - b.getTime())
         const start = sorted[0]
         const end = sorted[sorted.length - 1]
-        if (start.getTime() === end.getTime()) {
-            return formatter(start)
-        }
         return `${formatter(start)} - ${formatter(end)}`
     }, [range, emptyContent])
     return <p className="text-muted-foreground">{formattedDateRange}</p>
