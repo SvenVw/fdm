@@ -394,10 +394,9 @@ function NitrogenBalance({
                     </CardHeader>
                     <CardContent className="pl-2">
                         <NitrogenBalanceChart
-                            balance={result.balance}
-                            supply={result.supply.total}
-                            removal={result.removal.total}
-                            emission={result.emission}
+                            type="field"
+                            balanceData={result}
+                            fieldInput={fieldInput}
                         />
                     </CardContent>
                 </Card>
