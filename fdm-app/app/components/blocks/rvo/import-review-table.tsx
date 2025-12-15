@@ -4,10 +4,10 @@ import {
     getCoreRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-import {
-    type RvoImportReviewItem,
-    type ImportReviewAction,
-    type UserChoiceMap,
+import type {
+    RvoImportReviewItem,
+    ImportReviewAction,
+    UserChoiceMap,
 } from "@svenvw/fdm-rvo/types"
 import { getItemId } from "@svenvw/fdm-rvo/utils"
 import {
@@ -127,7 +127,7 @@ const DiffCell = ({
                             variant="outline"
                             className="h-5 px-1 text-[10px] text-muted-foreground border-border min-w-[45px] justify-center"
                         >
-                            Lokaal
+                            {clientConfig.name}
                         </Badge>
 
                         <span
@@ -188,7 +188,8 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
             <Tooltip>
                 <TooltipTrigger>Status</TooltipTrigger>
                 <TooltipContent>
-                    Geeft de vergelijkingsstatus weer tussen lokaal en RVO.
+                    Geeft de vergelijkingsstatus weer tussen {clientConfig.name}{" "}
+                    en RVO.
                 </TooltipContent>
             </Tooltip>
         ),
@@ -204,8 +205,8 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                             <Tooltip>
                                 <TooltipTrigger>Gelijk</TooltipTrigger>
                                 <TooltipContent>
-                                    Lokaal en RVO perceel komen volledig
-                                    overeen.
+                                    {clientConfig.name} en RVO perceel komen
+                                    volledig overeen.
                                 </TooltipContent>
                             </Tooltip>
                         </Badge>
@@ -219,7 +220,8 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                             <Tooltip>
                                 <TooltipTrigger>Nieuw (RVO)</TooltipTrigger>
                                 <TooltipContent>
-                                    Perceel bestaat in RVO, maar niet lokaal.
+                                    Perceel bestaat bij RVO, maar niet in{" "}
+                                    {clientConfig.name}.
                                 </TooltipContent>
                             </Tooltip>
                         </Badge>
@@ -231,9 +233,12 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                             className="bg-yellow-50 text-yellow-700 border-yellow-200"
                         >
                             <Tooltip>
-                                <TooltipTrigger>Nieuw (Lokaal)</TooltipTrigger>
+                                <TooltipTrigger>
+                                    Nieuw ( {clientConfig.name})
+                                </TooltipTrigger>
                                 <TooltipContent>
-                                    Perceel bestaat lokaal, maar niet in RVO.
+                                    Perceel bestaat in {clientConfig.name}, maar
+                                    niet bij RVO.
                                 </TooltipContent>
                             </Tooltip>
                         </Badge>
@@ -247,8 +252,8 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                             <Tooltip>
                                 <TooltipTrigger>Verlopen</TooltipTrigger>
                                 <TooltipContent>
-                                    Perceel is lokaal actief, maar niet meer in
-                                    RVO.
+                                    Perceel is in {clientConfig.name} actief,
+                                    maar niet meer bij RVO.
                                 </TooltipContent>
                             </Tooltip>
                         </Badge>
@@ -260,7 +265,7 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                             className="bg-red-50 text-red-700 border-red-200"
                         >
                             <Tooltip>
-                                <TooltipTrigger>Conflict</TooltipTrigger>
+                                <TooltipTrigger>Verschil</TooltipTrigger>
                                 <TooltipContent>
                                     Perceel bestaat in beide, maar met
                                     verschillende gegevens.
@@ -492,7 +497,7 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                 return (
                     <div className="flex items-center gap-2 text-green-600 text-sm">
                         <Check className="h-4 w-4" />
-                        <span>Geimporteerd</span>
+                        <span>Aanwezig</span>
                     </div>
                 )
             }
@@ -563,7 +568,7 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                                 <SelectItem value="KEEP_LOCAL">
                                     <div className="flex items-center gap-2">
                                         <Check className="h-3 w-3" /> Gebruik
-                                        Lokaal
+                                        {clientConfig.name}
                                     </div>
                                 </SelectItem>
                             </>
@@ -576,6 +581,7 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
 ]
 
 import { useMemo } from "react"
+import { clientConfig } from "@/app/lib/config"
 
 export function RvoImportReviewTable({
     data,

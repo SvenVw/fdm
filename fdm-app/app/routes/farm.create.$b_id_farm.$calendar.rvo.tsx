@@ -3,13 +3,10 @@ import {
     Form,
     type LoaderFunctionArgs,
     type MetaFunction,
-    NavLink,
     redirect,
     useActionData,
     useLoaderData,
     useNavigation,
-    useParams,
-    useNavigate,
     useLocation,
 } from "react-router"
 import { getSession } from "~/lib/auth.server"
@@ -21,15 +18,15 @@ import {
     createRvoClient,
     exchangeToken,
 } from "~/lib/rvo.server"
-import {
-    type RvoImportReviewItem,
-    type ImportReviewAction,
-    type UserChoiceMap,
+import type {
+    RvoImportReviewItem,
+    ImportReviewAction,
+    UserChoiceMap,
 } from "@svenvw/fdm-rvo/types"
 import { getItemId } from "@svenvw/fdm-rvo/utils"
 import { processRvoImport } from "@svenvw/fdm-rvo"
 import { RvoImportReviewTable } from "~/components/blocks/rvo/import-review-table"
-import { getFarm } from "@svenvw/fdm-core"
+import { Cultivation, Field, getFarm } from "@svenvw/fdm-core"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import { AlertTriangle, Loader2 } from "lucide-react"
@@ -44,17 +41,14 @@ import {
     BreadcrumbSeparator,
     BreadcrumbLink,
 } from "~/components/ui/breadcrumb"
-import {
-    BreadcrumbItem,
-    BreadcrumbSeparator,
-    BreadcrumbLink,
-} from "~/components/ui/breadcrumb"
 import { getRvoCredentials } from "../integrations/rvo"
 import { RvoErrorAlert } from "~/components/blocks/rvo/rvo-error-alert"
-import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi.server"
+import {
+    getNmiApiKey,
+    getSoilParameterEstimates,
+} from "~/integrations/nmi.server"
 import { addSoilAnalysis, getCultivationsFromCatalogue } from "@svenvw/fdm-core"
 import { RvoConnectCard } from "~/components/blocks/rvo/connect-card"
-import { getCalendar } from "../lib/calendar"
 
 export const meta: MetaFunction = ({ params }) => {
     const b_id_farm = params.b_id_farm
@@ -135,7 +129,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 b_id_farm,
             )
 
-            const localFieldsExtended: (Field & { cultivations: Cultivation[] })[] = [] // No existing fields to compare against yet in create wizard, so localFields is empty
+            const localFieldsExtended: (Field & {
+                cultivations: Cultivation[]
+            })[] = [] // No existing fields to compare against yet in create wizard, so localFields is empty
             RvoImportReviewData = compareFields(
                 localFieldsExtended,
                 rvoFields,
@@ -235,8 +231,8 @@ export default function RvoImportCreatePage() {
                 <main className="flex-1 overflow-auto">
                     <div className="flex items-center justify-between">
                         <FarmTitle
-                            title="Fout bij RVO Import"
-                            description="Er is iets misgegaan bij het ophalen van gegevens."
+                            title="Fout bij ophalen percelen bij RVO"
+                            description="Er is iets misgegaan bij het ophalen van de gegevens."
                         />
                     </div>
                     <FarmContent>
@@ -289,7 +285,7 @@ export default function RvoImportCreatePage() {
                         >
                             <AlertTitle className="flex items-center gap-2">
                                 <AlertTriangle className="h-4 w-4" />
-                                Importen vanuit RVO is niet beschikbaar
+                                Percelen ophalen bij RVO is niet beschikbaar
                             </AlertTitle>
                             <AlertDescription>
                                 De RVO koppeling is nog niet ingesteld op deze
@@ -427,7 +423,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
         try {
             RvoImportReviewData = JSON.parse(String(RvoImportReviewDataJson))
             userChoices = JSON.parse(String(userChoicesJson))
-
 
             const onFieldAdded = async (b_id: string, geometry: any) => {
                 const nmiApiKey = getNmiApiKey()

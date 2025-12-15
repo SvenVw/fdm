@@ -29,7 +29,6 @@ import {
 } from "@svenvw/fdm-rvo/types"
 import { getItemId } from "@svenvw/fdm-rvo/utils"
 import { processRvoImport } from "@svenvw/fdm-rvo"
-import { serverConfig } from "~/lib/config.server"
 import { RvoImportReviewTable } from "~/components/blocks/rvo/import-review-table"
 import { getFields, getFarm, getFarms } from "@svenvw/fdm-core"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
@@ -44,15 +43,13 @@ import { SidebarInset } from "~/components/ui/sidebar"
 import {
     BreadcrumbItem,
     BreadcrumbSeparator,
-    BreadcrumbLink,
 } from "~/components/ui/breadcrumb"
 import { getRvoCredentials } from "../integrations/rvo"
-import { get } from "proj4/dist/lib/projections"
 import { RvoErrorAlert } from "~/components/blocks/rvo/rvo-error-alert"
 import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi.server"
-import { addSoilAnalysis, getCultivations, type Cultivation, getCultivationsFromCatalogue } from "@svenvw/fdm-core"
+import { addSoilAnalysis, getCultivations, getCultivationsFromCatalogue } from "@svenvw/fdm-core"
 import { RvoConnectCard } from "~/components/blocks/rvo/connect-card"
-import { getCalendar } from "../lib/calendar"
+import { clientConfig } from "../lib/config"
 
 export const meta: MetaFunction = ({ params }) => {
     return [{ title: `RVO Koppeling - Bedrijf ${params.b_id_farm}` }]
@@ -264,7 +261,7 @@ export default function RvoImportReviewPage() {
                 <main>
                     <div className="flex items-center justify-between">
                         <FarmTitle
-                            title="Fout bij RVO Import"
+                            title="Fout bij ophalen percelen bij RVO"
                             description="Er is iets misgegaan bij het ophalen van gegevens."
                         />
                     </div>
@@ -325,7 +322,7 @@ export default function RvoImportReviewPage() {
                         >
                             <AlertTitle className="flex items-center gap-2">
                                 <AlertTriangle className="h-4 w-4" />
-                                RVO import is niet beschikbaar
+                                Perceleh ophalen bij RVO is niet beschikbaar
                             </AlertTitle>
                             <AlertDescription>
                                 De RVO koppeling is nog niet ingesteld op deze
@@ -352,7 +349,7 @@ export default function RvoImportReviewPage() {
                         <div className="flex items-center justify-between">
                             <FarmTitle
                                 title={`RVO Resultaten voor ${currentFarmName}`}
-                                description="Beoordeel de verschillen tussen uw lokale gegevens en de RVO registratie."
+                                description={`Beoordeel de verschillen tussen de percelen in ${clientConfig.name} en bij RVO.`}
                             />
                             <div className="flex items-center gap-4 px-8 pt-6">
                                 <Form
@@ -383,7 +380,7 @@ export default function RvoImportReviewPage() {
                                                 Verwerken...
                                             </>
                                         ) : (
-                                            "Wijzigingen Toepassen"
+                                            "Wijzigingen toepassen"
                                         )}
                                     </Button>
                                 </Form>
@@ -451,7 +448,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             return {
                 success: false,
                 message:
-                    "Geen data gevonden om te verwerken. Start de RVO importhronisatie opnieuw.",
+                    "Geen data gevonden om te verwerken. Start 'percelehn ophalen bij RVO' opnieuw.",
             }
         }
 
