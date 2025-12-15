@@ -304,12 +304,24 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         b_isproductive: field.b_isproductive,
                         a_som_loi: field.a_som_loi ?? 0,
                         b_soiltype_agr: field.b_soiltype_agr ?? "",
-                        b_lu_start: field.cultivations.map(
-                            (cultivation) => cultivation.b_lu_start,
-                        ),
-                        b_lu_end: field.cultivations.flatMap((cultivation) =>
-                            cultivation.b_lu_end ? [cultivation.b_lu_end] : [],
-                        ),
+                        b_lu_start: field.cultivations
+                            .filter(
+                                (cultivation) =>
+                                    cultivation.b_lu_catalogue ===
+                                    b_lu_catalogue,
+                            )
+                            .map((cultivation) => cultivation.b_lu_start),
+                        b_lu_end: field.cultivations
+                            .filter(
+                                (cultivation) =>
+                                    cultivation.b_lu_catalogue ===
+                                    b_lu_catalogue,
+                            )
+                            .flatMap((cultivation) =>
+                                cultivation.b_lu_end
+                                    ? [cultivation.b_lu_end]
+                                    : [],
+                            ),
                         b_lu_harvest_date: field.harvests
                             .filter((harvest: { b_lu: string }) =>
                                 b_lu.includes(harvest.b_lu),
