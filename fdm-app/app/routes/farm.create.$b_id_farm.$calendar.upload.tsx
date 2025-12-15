@@ -89,7 +89,7 @@ export default function UploadMijnPercelenPage() {
 }
 
 interface RvoProperties {
-    SECTORID: number
+    SECTORID: string
     SECTORVER: number
     NEN3610ID: string
     VOLGNR: number
@@ -225,13 +225,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
             const b_end = EINDDAT === 253402297199 ? null : new Date(EINDDAT)
             const b_lu_catalogue = `nl_${GEWASCODE}`
             const b_acquiring_method = `nl_${TITEL}`
+            const b_id_source = SECTORID
 
             const fieldId = await addField(
                 fdm,
                 session.principal_id,
                 b_id_farm,
                 b_name,
-                null,
+                b_id_source,
                 b_geometry.geometry,
                 b_start,
                 b_acquiring_method,

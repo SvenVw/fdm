@@ -91,12 +91,34 @@ describe("calculateNitrogenBalance", () => {
 
         const result = await calculateNitrogenBalance(mockNitrogenBalanceInput)
 
+        function assertValidFertilizerBreakdown(
+            obj: { total: number } & Record<
+                "mineral" | "manure" | "compost" | "other",
+                number
+            >,
+        ) {
+            expect(typeof obj.total).toBe("number")
+            expect(typeof obj.mineral).toBe("number")
+            expect(typeof obj.manure).toBe("number")
+            expect(typeof obj.compost).toBe("number")
+            expect(typeof obj.other).toBe("number")
+        }
         expect(result).toBeDefined()
         expect(typeof result.balance).toBe("number")
-        expect(typeof result.supply).toBe("number")
-        expect(typeof result.removal).toBe("number")
+
+        expect(result.supply).toBeDefined()
+        expect(typeof result.supply.total).toBe("number")
+        expect(typeof result.supply.deposition).toBe("number")
+        expect(typeof result.supply.fixation).toBe("number")
+        expect(typeof result.supply.mineralisation).toBe("number")
+        expect(result.supply.fertilizers).toBeDefined()
+        assertValidFertilizerBreakdown(result.supply.fertilizers)
         expect(typeof result.emission.total).toBe("number")
-        expect(typeof result.emission.ammonia).toBe("number")
+        expect(result.emission.ammonia).toBeDefined()
+        expect(typeof result.emission.ammonia.total).toBe("number")
+        expect(result.emission.ammonia.fertilizers).toBeDefined()
+        assertValidFertilizerBreakdown(result.emission.ammonia.fertilizers)
+        expect(typeof result.emission.ammonia.residues).toBe("number")
         expect(typeof result.emission.nitrate).toBe("number")
         expect(typeof result.target).toBe("number")
         expect(Array.isArray(result.fields)).toBe(true)

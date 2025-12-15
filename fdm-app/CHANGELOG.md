@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.25.3
+
+### Patch Changes
+
+- 598a3b6: At RVO MijnPercelen shapefile upload store SECTORID as b_id_source for the field
+
 ## 0.25.2
 
 ### Patch Changes

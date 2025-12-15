@@ -7,9 +7,9 @@ import { table9 } from "./table-9"
 import { table11Mestcodes } from "./table-11-mestcodes"
 import type {
     NL2025NormsFillingInput,
-    NormFilling,
     WorkingCoefficientDetails,
 } from "./types"
+import type { NormFilling } from "norms/nl/types"
 
 /**
  * Calculates the nitrogen utilization norm filling for a set of fertilizer applications.
@@ -116,7 +116,7 @@ export function isBouwland(
     cultivations: Cultivation[],
     p_app_date: Date,
 ): boolean {
-    const nonBouwlandCodes = ["nl_265", "nl_266", "nl_331", "nl_332"]
+    const nonBouwlandCodes = ["nl_265", "nl_266", "nl_331", "nl_332", "nl_335"]
 
     const activeCultivation = cultivations.find((c) => {
         const startDate = new Date(c.b_start)

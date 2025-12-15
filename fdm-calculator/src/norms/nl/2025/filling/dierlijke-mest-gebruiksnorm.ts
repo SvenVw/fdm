@@ -2,7 +2,8 @@ import { withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { table11Mestcodes } from "./table-11-mestcodes"
-import type { NL2025NormsFillingInput, NormFilling } from "./types"
+import type { NL2025NormsFillingInput } from "./types"
+import type { NormFilling } from "norms/nl/types"
 
 /**
  * Calculates the nitrogen usage from animal manure for a list of fertilizer applications.

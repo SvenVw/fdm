@@ -4,9 +4,9 @@ import { getGeoTiffValue } from "../../../../shared/geotiff"
 import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
 import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
 import type {
-    DierlijkeMestGebruiksnormResult,
     NL2025NormsInput,
 } from "./types.d"
+import { DierlijkeMestGebruiksnormResult } from "norms/nl/types"
 
 /**
  * Determines if a field is located within a grondwaterbeschermingsgebied (GWBG) in the Netherlands.
