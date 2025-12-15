@@ -124,7 +124,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
 
     const memoizedData = useMemo(() => {
         return data.map((item) => {
-            const commonTerms = item.b_lu_name
+            const commonTerms = (item as CropRow).b_lu_name
             const crop_b_lu_start = new Set<string>()
             const crop_b_lu_end = new Set<string>()
             const crop_b_lu_harvest_date = new Set<string>()
@@ -154,6 +154,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
             }
         })
     }, [data])
+    type MemoizedTData = (typeof memoizedData)[number]
 
     const fuzzySearchAndProductivityFilter: FilterFn<TData> = (
         row,
@@ -169,8 +170,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
 
         return (
             searchTerms === "" ||
-            fuzzysort.go(searchTerms, [(row.original as any).searchTarget])
-                .length > 0
+            fuzzysort.go(searchTerms, [
+                (row.original as MemoizedTData).searchTarget,
+            ]).length > 0
         )
     }
 
