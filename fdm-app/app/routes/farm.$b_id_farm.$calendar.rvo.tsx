@@ -33,6 +33,16 @@ import { RvoImportReviewTable } from "~/components/blocks/rvo/import-review-tabl
 import { getFields, getFarm, getFarms } from "@svenvw/fdm-core"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose,
+} from "~/components/ui/dialog"
 import { AlertTriangle, Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
@@ -242,6 +252,18 @@ export default function RvoImportReviewPage() {
     const currentFarmName =
         farms.find((farm) => farm.b_id_farm === b_id_farm)?.b_name_farm ?? ""
 
+    const changes = Object.values(userChoices).reduce(
+        (acc, action) => {
+            if (action === "ADD_REMOTE") acc.add++
+            if (action === "REMOVE_LOCAL") acc.remove++
+            if (action === "UPDATE_FROM_REMOTE") acc.update++
+            if (action === "CLOSE_LOCAL") acc.close++
+            return acc
+        },
+        { add: 0, remove: 0, update: 0, close: 0 },
+    )
+    const hasChanges = Object.values(changes).some((count) => count > 0)
+
     if (error) {
         return (
             <SidebarInset>
@@ -352,38 +374,95 @@ export default function RvoImportReviewPage() {
                                 description={`Beoordeel de verschillen tussen de percelen in ${clientConfig.name} en bij RVO.`}
                             />
                             <div className="flex items-center gap-4 px-8 pt-6">
-                                <Form
-                                    method="post"
-                                    action={`/farm/${b_id_farm}/${calendar}/rvo`}
-                                >
-                                    <input
-                                        type="hidden"
-                                        name="intent"
-                                        value="apply_changes"
-                                    />
-                                    <input
-                                        type="hidden"
-                                        name="userChoices"
-                                        value={JSON.stringify(userChoices)}
-                                    />
-                                    <input
-                                        type="hidden"
-                                        name="rvoImportReviewDataJson"
-                                        value={JSON.stringify(
-                                            rvoImportReviewData,
-                                        )}
-                                    />
-                                    <Button type="submit" disabled={isApplying}>
-                                        {isApplying ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                Verwerken...
-                                            </>
-                                        ) : (
-                                            "Wijzigingen toepassen"
-                                        )}
-                                    </Button>
-                                </Form>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button disabled={isApplying || !hasChanges}>
+                                            {isApplying ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    Verwerken...
+                                                </>
+                                            ) : (
+                                                "Wijzigingen toepassen"
+                                            )}
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Wijzigingen toepassen</DialogTitle>
+                                            <DialogDescription>
+                                                U staat op het punt de volgende wijzigingen door te voeren:
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="py-4">
+                                            <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+                                                {changes.add > 0 && (
+                                                    <li>
+                                                        {changes.add}{" "}
+                                                        perceel
+                                                        {changes.add !== 1 && "en"}{" "}
+                                                        toevoegen
+                                                    </li>
+                                                )}
+                                                {changes.remove > 0 && (
+                                                    <li>
+                                                        {changes.remove}{" "}
+                                                        perceel
+                                                        {changes.remove !== 1 && "en"}{" "}
+                                                        verwijderen
+                                                    </li>
+                                                )}
+                                                {changes.update > 0 && (
+                                                    <li>
+                                                        {changes.update}{" "}
+                                                        perceel
+                                                        {changes.update !== 1 && "en"}{" "}
+                                                        bijwerken
+                                                    </li>
+                                                )}
+                                                {changes.close > 0 && (
+                                                    <li>
+                                                        {changes.close}{" "}
+                                                        perceel
+                                                        {changes.close !== 1 && "en"}{" "}
+                                                        afsluiten
+                                                    </li>
+                                                )}
+                                            </ul>
+                                            {!hasChanges && <p>Geen wijzigingen geselecteerd.</p>}
+                                        </div>
+                                        <DialogFooter>
+                                            <DialogClose asChild>
+                                                <Button variant="outline">Annuleren</Button>
+                                            </DialogClose>
+                                            <Form
+                                                method="post"
+                                                action={`/farm/${b_id_farm}/${calendar}/rvo`}
+                                            >
+                                                <input
+                                                    type="hidden"
+                                                    name="intent"
+                                                    value="apply_changes"
+                                                />
+                                                <input
+                                                    type="hidden"
+                                                    name="userChoices"
+                                                    value={JSON.stringify(userChoices)}
+                                                />
+                                                <input
+                                                    type="hidden"
+                                                    name="rvoImportReviewDataJson"
+                                                    value={JSON.stringify(
+                                                        rvoImportReviewData,
+                                                    )}
+                                                />
+                                                <Button type="submit" disabled={isApplying}>
+                                                    Bevestigen
+                                                </Button>
+                                            </Form>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                         </div>
                         <FarmContent>
