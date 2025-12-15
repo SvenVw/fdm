@@ -370,20 +370,22 @@ export default function RvoImportReviewPage() {
                     <>
                         <div className="flex items-center justify-between">
                             <FarmTitle
-                                title={`RVO Resultaten voor ${currentFarmName}`}
+                                title={`Percelen opgehaald bij RVO voor ${currentFarmName}`}
                                 description={`Beoordeel de verschillen tussen de percelen in ${clientConfig.name} en bij RVO.`}
                             />
                             <div className="flex items-center gap-4 px-8 pt-6">
                                 <Dialog>
                                     <DialogTrigger asChild>
-                                        <Button disabled={isApplying || !hasChanges}>
+                                        <Button disabled={isApplying}>
                                             {isApplying ? (
                                                 <>
                                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                                     Verwerken...
                                                 </>
-                                            ) : (
+                                            ) : hasChanges ? (
                                                 "Wijzigingen toepassen"
+                                            ) : (
+                                                "Doorgaan"
                                             )}
                                         </Button>
                                     </DialogTrigger>
