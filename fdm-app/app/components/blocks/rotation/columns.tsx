@@ -80,7 +80,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
                 >
                     <ChevronRight
                         className={cn(
-                            "transition-transform duration-200 ease-out",
+                            "transition-transform duration-300",
                             row.getIsExpanded()
                                 ? "rotate-90"
                                 : "transform-none",
@@ -108,8 +108,30 @@ export const columns: ColumnDef<RotationExtended>[] = [
         ),
         cell: ({ row }) => (
             <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                checked={
+                    row.getIsSelected()
+                        ? true
+                        : row.getIsSomeSelected()
+                          ? "indeterminate"
+                          : false
+                }
+                onCheckedChange={(value) => {
+                    row.toggleSelected(!!value)
+                    const parentRow = row.getParentRow()
+                    if (parentRow) {
+                        const wantedValue = parentRow.subRows.every(
+                            (childRow) =>
+                                childRow.id === row.id
+                                    ? value
+                                    : childRow.getIsSelected(),
+                        )
+                        if (parentRow.getIsSelected() !== wantedValue) {
+                            parentRow.toggleSelected(wantedValue, {
+                                selectChildren: false,
+                            })
+                        }
+                    }
+                }}
                 aria-label="Selecteer deze rij"
             />
         ),

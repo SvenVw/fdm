@@ -47,7 +47,7 @@ import {
 import { useIsMobile } from "~/hooks/use-mobile"
 import { cn } from "~/lib/utils"
 import { FieldFilterToggle } from "../../custom/field-filter-toggle"
-import type { RotationExtended } from "./columns"
+import type { CropRow, FieldRow, RotationExtended } from "./columns"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -123,32 +123,36 @@ export function DataTable<TData extends RotationExtended, TValue>({
     }
 
     const memoizedData = useMemo(() => {
-        return data.map((item) => ({
-            ...item,
-            searchTarget: `${item.b_lu_name} ${[
-                ...new Set(
-                    item.b_lu_start.map((date: Date) =>
-                        format(date, "d MMMM yyy", { locale: nl }),
-                    ),
-                ),
-            ].join(" ")} ${[
-                ...new Set(
-                    item.fields.flatMap((field) =>
-                        field.b_lu_harvest_date.map((date: Date) =>
-                            format(date, "d MMMM yyy", { locale: nl }),
-                        ),
-                    ),
-                ),
-            ].join(" ")} ${[
-                ...new Set(
-                    item.fields.flatMap((field) =>
-                        field.fertilizers.map(
-                            (fertilizer) => fertilizer.p_name_nl,
-                        ),
-                    ),
-                ),
-            ].join(" ")}`,
-        }))
+        return data.map((item) => {
+            const commonTerms = item.b_lu_name
+            const crop_b_lu_start = new Set<string>()
+            const crop_b_lu_end = new Set<string>()
+            const crop_b_lu_harvest_date = new Set<string>()
+
+            const formatDate = (date: Date) =>
+                format(date, "d MMMM yyy", { locale: nl })
+            const dateTermsArr = (dates: Date[]) =>
+                [...new Set(dates.map(formatDate))].join(" ")
+
+            const fields = item.fields.map((field) => {
+                field.b_lu_start.map((v) => crop_b_lu_start.add(formatDate(v)))
+                field.b_lu_end.map((v) => crop_b_lu_end.add(formatDate(v)))
+                field.b_lu_harvest_date.map((v) =>
+                    crop_b_lu_harvest_date.add(formatDate(v)),
+                )
+
+                return {
+                    ...field,
+                    searchTarget: `${field.b_name} ${commonTerms} ${dateTermsArr(field.b_lu_start)} ${dateTermsArr(field.b_lu_end)} ${dateTermsArr(field.b_lu_harvest_date)}`,
+                }
+            })
+
+            return {
+                ...item,
+                fields: fields,
+                searchTarget: `${commonTerms} ${[...crop_b_lu_start].join(" ")} ${[...crop_b_lu_end].join(" ")} ${[...crop_b_lu_harvest_date].join(" ")}`,
+            }
+        })
     }, [data])
 
     const fuzzySearchAndProductivityFilter: FilterFn<TData> = (
@@ -162,6 +166,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
         ) {
             return false
         }
+
         return (
             searchTerms === "" ||
             fuzzysort.go(searchTerms, [(row.original as any).searchTarget])
@@ -193,6 +198,11 @@ export function DataTable<TData extends RotationExtended, TValue>({
         },
         onRowSelectionChange: setRowSelection,
         globalFilterFn: fuzzySearchAndProductivityFilter,
+        // There are nulls in the columns which can cause false assumptions if this is not provided
+        // The global filter checks the searchTarget field anyways
+        // Filter only one of the columns to gain performance
+        getColumnCanGlobalFilter: (column) => column.id === "name",
+        filterFromLeafRows: true,
         state: {
             sorting,
             columnFilters,
@@ -202,18 +212,36 @@ export function DataTable<TData extends RotationExtended, TValue>({
         },
     })
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Bemesting button activation
+    // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Oogst button activation
     const selectedCultivations = useMemo(() => {
-        return table
-            .getFilteredSelectedRowModel()
-            .rows.map((row) => row.original)
+        return (
+            table
+                .getFilteredRowModel()
+                .rows.filter(
+                    (row) =>
+                        row.original.type === "crop" &&
+                        (row.getIsSelected() || row.getIsSomeSelected()),
+                ) as Row<CropRow>[]
+        ).map((row) => row.original)
+    }, [table, rowSelection])
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Bemesting button activation
+    const selectedFields = useMemo(() => {
+        return (
+            table
+                .getFilteredSelectedRowModel()
+                .flatRows.filter(
+                    (row) => row.original.type === "field",
+                ) as Row<FieldRow>[]
+        ).map((row) => row.original)
     }, [table, rowSelection])
 
     const selectedCultivationIds = selectedCultivations.map(
-        (field) => field.b_lu_catalogue,
+        (cultivation) => cultivation.b_lu_catalogue,
     )
+    const selectedFieldIds = selectedFields.map((field) => field.b_id)
 
-    const isFertilizerButtonDisabled = selectedCultivationIds.length === 0
+    const isFertilizerButtonDisabled = selectedFieldIds.length === 0
     const fertilizerTooltipContent = isFertilizerButtonDisabled
         ? "Selecteer één of meerdere gewassen om bemesting toe te voegen"
         : "Bemesting toevoegen aan geselecteerd gewas"
@@ -299,7 +327,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                         </Button>
                                     ) : (
                                         <NavLink
-                                            to={`/farm/${b_id_farm}/${calendar}/rotation/fertilizer?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}`}
+                                            to={`/farm/${b_id_farm}/${calendar}/rotation/fertilizer?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}&fieldIds=${selectedFieldIds.join(",")}`}
                                         >
                                             <Button>
                                                 <Plus className="mr-2 h-4 w-4" />
@@ -340,7 +368,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                         </Button>
                                     ) : (
                                         <NavLink
-                                            to={`/farm/${b_id_farm}/${calendar}/rotation/harvest?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}`}
+                                            to={`/farm/${b_id_farm}/${calendar}/rotation/harvest?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}&fieldIds=${selectedFieldIds.join(",")}`}
                                         >
                                             <Button>
                                                 <Plus className="mr-2 h-4 w-4" />
