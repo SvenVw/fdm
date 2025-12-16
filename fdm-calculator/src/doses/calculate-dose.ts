@@ -61,11 +61,15 @@ export function calculateDose({
         "p_mo_rt",
         "p_b_rt",
     ]
+    const getNutrientRate = (fert: Fertilizer, rate: string): number | null => {
+        return fert[rate as keyof Fertilizer] as number | null
+    }
     if (
         fertilizers.some((fert) =>
-            nutrientRates.some((rate) =>
-                (fert as any)[rate] ? (fert as any)[rate] < 0 : false,
-            ),
+            nutrientRates.some((rate) => {
+                const value = getNutrientRate(fert, rate)
+                return value !== null && value < 0
+            }),
         )
     ) {
         throw new Error("Nutrient rates must be non-negative")

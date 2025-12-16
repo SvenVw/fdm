@@ -368,7 +368,9 @@ function calculateKorting(
 
     // Determine hoofdteelt for the current year (2025)
     const hoofdteelt2025 = determineNLHoofdteelt(
-        cultivations.filter((c) => c.b_lu_start && c.b_lu_start.getFullYear() === currentYear),
+        cultivations.filter(
+            (c) => c.b_lu_start && c.b_lu_start.getFullYear() === currentYear,
+        ),
         2025,
     )
     const hoofdteelt2025Standard = nitrogenStandardsData.find((ns) =>
@@ -414,7 +416,8 @@ function calculateKorting(
             return (
                 prevCultivation.b_lu_end === null ||
                 (prevCultivation.b_lu_end &&
-                    prevCultivation.b_lu_end.getTime() >= new Date(currentYear, 1).getTime()) // Month 1 is February
+                    prevCultivation.b_lu_end.getTime() >=
+                        new Date(currentYear, 1).getTime()) // Month 1 is February
             )
         },
     )
@@ -426,15 +429,22 @@ function calculateKorting(
         }
     }
     // If multiple vanggewassen are completed to February 1st select the vangewas that was first sown
-    const sortedVanggewassen = vanggewassenCompleted2024.sort((a, b) => {
-        if (!a.b_lu_start || !b.b_lu_start) return 0
-        return a.b_lu_start.getTime() - b.b_lu_start.getTime()
-    })
+    const sortedVanggewassen = vanggewassenCompleted2024
+        .filter((v) => v.b_lu_start !== undefined)
+        .sort((a, b) => {
+            if (!a.b_lu_start || !b.b_lu_start) {
+                return 0
+            }
+            return a.b_lu_start.getTime() - b.b_lu_start.getTime()
+        })
     const vanggewas2024 = sortedVanggewassen[0]
 
     const sowDate = vanggewas2024.b_lu_start
     if (!sowDate) {
-        return { amount: new Decimal(20), description: ". Korting: 20kg N/ha, geen zaaidatum bekend" }
+        return {
+            amount: new Decimal(20),
+            description: ". Korting: 20kg N/ha, geen zaaidatum bekend",
+        }
     }
 
     const october1 = new Date(previousYear, 9, 1) // October 1st

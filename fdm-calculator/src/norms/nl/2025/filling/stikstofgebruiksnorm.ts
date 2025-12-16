@@ -119,7 +119,7 @@ export function isBouwland(
     const nonBouwlandCodes = ["nl_265", "nl_266", "nl_331", "nl_332", "nl_335"]
 
     const activeCultivation = cultivations.find((c) => {
-        if (!c.b_lu_start) return false // Ensure b_start exists
+        if (!c.b_lu_start) return false // Ensure b_lu_start exists
         const startDate = new Date(c.b_lu_start)
         const endDate = c.b_lu_end ? new Date(c.b_lu_end) : undefined
         return (

@@ -45,10 +45,7 @@ export async function calculateNitrogenBalance(
 
     // Pre-process details into Maps for efficient lookups
     const fertilizerDetailsMap = new Map<string, FertilizerDetail>(
-        fertilizerDetails.map((detail) => [
-            detail.p_id as string,
-            detail,
-        ]),
+        fertilizerDetails.map((detail) => [detail.p_id as string, detail]),
     )
     const cultivationDetailsMap = new Map(
         cultivationDetails.map((detail) => [detail.b_lu_catalogue, detail]),
@@ -173,7 +170,7 @@ export function calculateNitrogenBalanceField(
 ): NitrogenBalanceFieldResult {
     try {
         if (!timeFrame.start || !timeFrame.end) {
-            throw new Error("Timeframe start and end dates must be provided.");
+            throw new Error("Timeframe start and end dates must be provided.")
         }
         // Get the details of the field
         const fieldDetails = field
@@ -194,11 +191,15 @@ export function calculateNitrogenBalanceField(
         )
 
         // Use a field-local timeframe (intersection with input timeframe)
-        const timeFrameStartTime = timeFrame.start.getTime();
-        const timeFrameEndTime = timeFrame.end.getTime();
+        const timeFrameStartTime = timeFrame.start.getTime()
+        const timeFrameEndTime = timeFrame.end.getTime()
 
-        const fieldStartTime = field.b_start ? field.b_start.getTime() : -Infinity;
-        const fieldEndTime = field.b_end ? field.b_end.getTime() : Infinity;
+        const fieldStartTime = field.b_start
+            ? field.b_start.getTime()
+            : Number.NEGATIVE_INFINITY
+        const fieldEndTime = field.b_end
+            ? field.b_end.getTime()
+            : Number.POSITIVE_INFINITY
 
         const timeFrameField = {
             start: new Date(Math.max(fieldStartTime, timeFrameStartTime)),

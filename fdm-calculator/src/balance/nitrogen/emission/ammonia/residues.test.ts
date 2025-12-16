@@ -79,7 +79,20 @@ describe("calculateNitrogenEmissionViaAmmoniaByResidues", () => {
                         {
                             b_lu_yield: 1000,
                             b_lu_n_harvestable: 20,
-                        } as any,
+                            b_id_harvestable_analysis: "",
+                            b_lu_yield_fresh: null,
+                            b_lu_yield_bruto: null,
+                            b_lu_tarra: null,
+                            b_lu_dm: null,
+                            b_lu_moist: null,
+                            b_lu_uww: null,
+                            b_lu_cp: null,
+                            b_lu_n_residue: null,
+                            b_lu_p_harvestable: null,
+                            b_lu_p_residue: null,
+                            b_lu_k_harvestable: null,
+                            b_lu_k_residue: null,
+                        },
                     ],
                 },
             },
@@ -173,14 +186,14 @@ describe("calculateNitrogenEmissionViaAmmoniaByResidues", () => {
             { id: "cultivation1", value: new Decimal(0) },
         ])
     })
-    it("should handle undefined m_cropresidue as false", () => {
+    it("should handle null m_cropresidue as false", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
                 b_lu_start: new Date("2022-01-01"),
                 b_lu_end: new Date("2022-12-31"),
-                m_cropresidue: null, // Undefined residue handling
+                m_cropresidue: null, // null residue handling
             },
         ]
         const harvests: FieldInput["harvests"] = []

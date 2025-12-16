@@ -559,7 +559,9 @@ export async function getCurrentSoilData(
                     a_source: analysis.a_source,
                 }
             })
-            .filter((item) => item !== null)
+            .filter(
+                (item): item is NonNullable<typeof item> => item !== undefined,
+            )
 
         return currentSoilData
     } catch (err) {

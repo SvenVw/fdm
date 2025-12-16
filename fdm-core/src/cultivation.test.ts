@@ -1129,10 +1129,11 @@ describe("Cultivation Data Model", () => {
                     b_n_fixation: 0,
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: null,
-                                    b_lu_start_default: null,
-                                    b_lu_eom: null,
-                                    b_lu_eom_residues: null,
-                                    b_date_harvest_default: "09-15",                })
+                    b_lu_start_default: null,
+                    b_lu_eom: null,
+                    b_lu_eom_residues: null,
+                    b_date_harvest_default: "09-15",
+                })
 
                 const year = 2024
                 const defaultDates = await getDefaultDatesOfCultivation(
