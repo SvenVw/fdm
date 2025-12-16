@@ -193,6 +193,7 @@ function determineManureAmmoniaEmissionFactor(
     const p_app_method = fertilizerApplication.p_app_method
 
     const activeCultivations = cultivations.filter((cultivation) => {
+        if (!cultivation.b_lu_start) return false
         if (cultivation.b_lu_end) {
             return (
                 cultivation.b_lu_start.getTime() <= p_app_date.getTime() &&

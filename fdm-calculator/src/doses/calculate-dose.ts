@@ -41,7 +41,7 @@ export function calculateDose({
     applications: FertilizerApplication[]
     fertilizers: Fertilizer[]
 }): { dose: Dose; applications: Dose[] } {
-    if (applications.some((app) => app.p_app_amount < 0)) {
+    if (applications.some((app) => (app.p_app_amount ?? 0) < 0)) {
         throw new Error("Application amounts must be non-negative")
     }
 
@@ -63,7 +63,9 @@ export function calculateDose({
     ]
     if (
         fertilizers.some((fert) =>
-            nutrientRates.some((rate) => (fert[rate] ? fert[rate] < 0 : false)),
+            nutrientRates.some((rate) =>
+                (fert as any)[rate] ? (fert as any)[rate] < 0 : false,
+            ),
         )
     ) {
         throw new Error("Nutrient rates must be non-negative")
@@ -92,17 +94,17 @@ export function calculateDose({
 
     for (const application of applications) {
         const fertilizer = fertilizers.find(
-            (f) => f.p_id_catalogue === application.p_id_catalogue,
+            (f) => f.p_id === application.p_id,
         )
         if (!fertilizer) {
             throw new Error(
-                `Fertilizer ${application.p_id_catalogue} not found for application ${application.p_app_id}`,
+                `Fertilizer ${application.p_id} not found for application ${application.p_app_id}`,
             )
         }
         const currentDose = { ...initialDose, p_app_id: application.p_app_id }
 
         if (fertilizer) {
-            const amount = application.p_app_amount
+            const amount = application.p_app_amount ?? 0
             currentDose.p_dose_n = amount * ((fertilizer.p_n_rt ?? 0) / 1000)
             currentDose.p_dose_nw =
                 currentDose.p_dose_n * (fertilizer.p_n_wc ?? 1)

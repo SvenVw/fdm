@@ -14,6 +14,7 @@
         "noEmit": false,
         "emitDeclarationOnly": true,
         "outDir": "./dist",
+        "types": ["vitest/globals"],
 
         "strict": true,
         "noUnusedLocals": true,
@@ -25,5 +26,5 @@
             "@svenvw/fdm-data": ["../fdm-data/src/index.ts"]
         }
     },
-    "include": ["src"]
+    "include": ["src", "src/**/*.test.ts"]
 }

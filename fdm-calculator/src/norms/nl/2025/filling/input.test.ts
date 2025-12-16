@@ -60,8 +60,8 @@ describe("collectNL2025InputForFertilizerApplicationFilling", () => {
             { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 1000 },
         ] as FertilizerApplication[])
         vi.mocked(getFertilizers).mockResolvedValue([
-            { p_id_catalogue: "fert1", p_n_rt: 5, p_type_rvo: "115" },
-        ] as Fertilizer[])
+            { p_id: "fert1", p_n_rt: 5, p_type_rvo: "115" },
+        ] as unknown as Fertilizer[])
     })
 
     it("should successfully collect all input data for a valid scenario", async () => {
@@ -75,11 +75,19 @@ describe("collectNL2025InputForFertilizerApplicationFilling", () => {
             },
         ]
         const expectedApplications: FertilizerApplication[] = [
-            { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 1000 },
+            {
+                p_app_id: "app1",
+                p_id_catalogue: "fert1",
+                p_app_amount: 1000,
+                p_id: "",
+                p_name_nl: null,
+                p_app_method: null,
+                p_app_date: new Date("2025-03-15"),
+            },
         ]
         const expectedFertilizers: Fertilizer[] = [
-            { p_id_catalogue: "fert1", p_n_rt: 5, p_type_rvo: "115" },
-        ]
+            { p_id: "fert1", p_n_rt: 5, p_type_rvo: "115" },
+        ] as unknown as Fertilizer[]
 
         const result = await collectNL2025InputForFertilizerApplicationFilling(
             mockFdm,
@@ -143,7 +151,7 @@ describe("collectNL2025InputForFertilizerApplicationFilling", () => {
     })
 
     it("should throw an error if the field is not found", async () => {
-        vi.mocked(getField).mockResolvedValue(null) // Simulate field not found
+        vi.mocked(getField).mockResolvedValue(null as unknown as Field) // Simulate field not found
 
         await expect(
             collectNL2025InputForFertilizerApplicationFilling(

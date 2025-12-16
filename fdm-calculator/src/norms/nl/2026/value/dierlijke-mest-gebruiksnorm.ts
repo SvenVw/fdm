@@ -1,6 +1,6 @@
 import { withCalculationCache } from "@svenvw/fdm-core"
 import pkg from "../../../../package"
-import type { DierlijkeMestGebruiksnormResult } from "norms/nl/types"
+import type { DierlijkeMestGebruiksnormResult } from "../../types"
 
 /**
  * Determines the 'gebruiksnorm' (usage standard) for nitrogen from animal manure

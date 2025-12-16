@@ -20,79 +20,76 @@ vi.mock("../value/stikstofgebruiksnorm", () => ({
 
 describe("isBouwland", () => {
     it("should return true if cultivation is not in non-bouwland codes", () => {
-        const cultivations: Cultivation[] = [
+        const cultivations = [
             {
                 b_lu: "cult1",
-                b_start: "2025-01-01",
+                b_lu_start: new Date("2025-01-01"),
                 b_lu_catalogue: "nl_2014", // A generic bouwland code
             },
-        ]
+        ] as unknown as Cultivation[]
         const applicationDate = new Date("2025-06-15")
-        expect(isBouwland(cultivations, applicationDate)).toBe(true)
+        expect(isBouwland(cultivations as unknown as Cultivation[], applicationDate)).toBe(true)
     })
 
     it("should return false if cultivation is in non-bouwland codes", () => {
-        const cultivations: Cultivation[] = [
+        const cultivations = [
             {
                 b_lu: "cult1",
-                b_start: "2025-01-01",
+                b_lu_start: new Date("2025-01-01"),
                 b_lu_catalogue: "nl_265", // Grasland
             },
-        ]
+        ] as unknown as Cultivation[]
         const applicationDate = new Date("2025-06-15")
-        expect(isBouwland(cultivations, applicationDate)).toBe(false)
+        expect(isBouwland(cultivations as unknown as Cultivation[], applicationDate)).toBe(false)
     })
 
     it("should return false if no active cultivation exists", () => {
-        const cultivations: Cultivation[] = [
+        const cultivations = [
             {
                 b_lu: "cult1",
-                b_start: "2024-01-01",
-                b_end: "2024-12-31",
+                b_lu_start: new Date("2024-01-01"),
+                b_lu_end: new Date("2024-12-31"),
                 b_lu_catalogue: "nl_2014",
             },
-        ]
+        ] as unknown as Cultivation[]
         const applicationDate = new Date("2025-06-15")
-        expect(isBouwland(cultivations, applicationDate)).toBe(false)
+        expect(isBouwland(cultivations as unknown as Cultivation[], applicationDate)).toBe(false)
     })
 
     it("should return true for a cultivation spanning the application date", () => {
-        const cultivations: Cultivation[] = [
+        const cultivations = [
             {
                 b_lu: "cult1",
-                b_start: "2025-01-01",
-                b_end: "2025-12-31",
                 b_lu_catalogue: "nl_2014",
-            },
-        ]
+            }
+        ] as unknown as Cultivation[]
         const applicationDate = new Date("2025-07-01")
-        expect(isBouwland(cultivations, applicationDate)).toBe(true)
+        expect(isBouwland(cultivations as unknown as Cultivation[], applicationDate)).toBe(true)
     })
 
     it("should return false for a cultivation ending before the application date", () => {
-        const cultivations: Cultivation[] = [
+        const cultivations = [
             {
                 b_lu: "cult1",
-                b_start: "2025-01-01",
-                b_end: "2025-06-30",
+                b_lu_start: new Date("2025-01-01"),
                 b_lu_catalogue: "nl_2014",
             },
-        ]
+        ] as unknown as Cultivation[]
         const applicationDate = new Date("2025-07-01")
-        expect(isBouwland(cultivations, applicationDate)).toBe(false)
+        expect(isBouwland(cultivations as unknown as Cultivation[], applicationDate)).toBe(false)
     })
 
     it("should return false for a cultivation starting after the application date", () => {
-        const cultivations: Cultivation[] = [
+        const cultivations = [
             {
                 b_lu: "cult1",
-                b_start: "2025-08-01",
-                b_end: "2025-12-31",
+                b_lu_start: new Date("2025-08-01"),
+                b_lu_end: new Date("2025-12-31"),
                 b_lu_catalogue: "nl_2014",
             },
-        ]
+        ] as unknown as Cultivation[]
         const applicationDate = new Date("2025-07-01")
-        expect(isBouwland(cultivations, applicationDate)).toBe(false)
+        expect(isBouwland(cultivations as unknown as Cultivation[], applicationDate)).toBe(false)
     })
 })
 
@@ -503,25 +500,25 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
     })
 
     it("should calculate norm filling correctly for a single application with known nitrogen content", async () => {
-        const applications: FertilizerApplication[] = [
+        const applications = [
             {
                 p_app_id: "app1",
-                b_id: "field1",
-                p_app_date: "2025-05-01",
+                p_id: "app1", // Added p_id
+                p_app_date: new Date("2025-05-01"),
                 p_app_amount: 1000,
                 p_id_catalogue: "fert1",
             },
-        ]
-        const fertilizers: Fertilizer[] = [
+        ] as unknown as FertilizerApplication[]
+        const fertilizers = [
             {
-                p_id_catalogue: "fert1",
+                p_id: "fert1",
                 p_n_rt: 5, // 5 kg N per ton
                 p_type_rvo: "115", // Kunstmest (working coefficient 1.0)
             },
-        ]
+        ] as unknown as Fertilizer[]
         const b_centroid: [number, number] = [0, 0]
         const has_grazing_intention = false
-        const cultivations: Cultivation[] = []
+        const cultivations = [] as unknown as Cultivation[]
 
         const result =
             await calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm(
@@ -545,37 +542,37 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
     })
 
     it("should calculate norm filling correctly for multiple applications", async () => {
-        const applications: FertilizerApplication[] = [
+        const applications = [
             {
                 p_app_id: "app1",
-                b_id: "field1",
-                p_app_date: "2025-05-01",
+                p_id: "app1",
+                p_app_date: new Date("2025-05-01"),
                 p_app_amount: 1000,
                 p_id_catalogue: "fert1",
             },
             {
                 p_app_id: "app2",
-                b_id: "field1",
-                p_app_date: "2025-03-15",
+                p_id: "app2",
+                p_app_date: new Date("2025-03-15"),
                 p_app_amount: 500,
                 p_id_catalogue: "fert2",
             },
-        ]
-        const fertilizers: Fertilizer[] = [
+        ] as unknown as FertilizerApplication[]
+        const fertilizers = [
             {
-                p_id_catalogue: "fert1",
+                p_id: "fert1",
                 p_n_rt: 5, // 5 kg N per ton
                 p_type_rvo: "115", // Kunstmest (working coefficient 1.0)
             },
             {
-                p_id_catalogue: "fert2",
+                p_id: "fert2",
                 p_n_rt: 10, // 10 kg N per ton
                 p_type_rvo: "111", // Compost (working coefficient 0.1)
             },
-        ]
+        ] as unknown as Fertilizer[]
         const b_centroid: [number, number] = [0, 0]
         const has_grazing_intention = false
-        const cultivations: Cultivation[] = []
+        const cultivations = [] as unknown as Cultivation[]
 
         const result =
             await calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm(
@@ -605,25 +602,25 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
     })
 
     it("should use table11Mestcodes for nitrogen content if p_n_rt is 0", async () => {
-        const applications: FertilizerApplication[] = [
+        const applications = [
             {
                 p_app_id: "app1",
-                b_id: "field1",
-                p_app_date: "2025-05-01",
+                p_id: "app1",
+                p_app_date: new Date("2025-05-01"),
                 p_app_amount: 1000,
                 p_id_catalogue: "fert1",
             },
-        ]
-        const fertilizers: Fertilizer[] = [
+        ] as unknown as FertilizerApplication[]
+        const fertilizers = [
             {
-                p_id_catalogue: "fert1",
+                p_id: "fert1",
                 p_n_rt: 0, // Nitrogen content not directly known
                 p_type_rvo: "14", // Drijfmest rundvee (Table 11: 4.0 kg N/ton)
             },
-        ]
+        ] as unknown as Fertilizer[]
         const b_centroid: [number, number] = [0, 0]
         const has_grazing_intention = true // Drijfmest graasdieren, met beweiding -> 0.45
-        const cultivations: Cultivation[] = []
+        const cultivations = [] as unknown as Cultivation[]
 
         const result =
             await calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm(
@@ -647,19 +644,19 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
     })
 
     it("should throw an error if fertilizer cannot be found", async () => {
-        const applications: FertilizerApplication[] = [
+        const applications = [
             {
                 p_app_id: "app1",
-                b_id: "field1",
-                p_app_date: "2025-05-01",
+                p_id: "app1",
+                p_app_date: new Date("2025-05-01"),
                 p_app_amount: 1000,
                 p_id_catalogue: "nonExistentFert",
             },
-        ]
-        const fertilizers: Fertilizer[] = [] // Empty fertilizers array
+        ] as unknown as FertilizerApplication[]
+        const fertilizers = [] as unknown as Fertilizer[] // Empty fertilizers array
         const b_centroid: [number, number] = [0, 0]
         const has_grazing_intention = false
-        const cultivations: Cultivation[] = []
+        const cultivations = [] as unknown as Cultivation[]
 
         await expect(
             calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm({
@@ -678,25 +675,25 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
 
     it("should treat onFarmProduced as false when has_grazing_intention is false for drijfmest", async () => {
         vi.mocked(getRegion).mockResolvedValue("zand_nwc")
-        const applications: FertilizerApplication[] = [
+        const applications = [
             {
                 p_app_id: "app1",
-                b_id: "field1",
-                p_app_date: "2025-05-01",
+                p_id: "app1",
+                p_app_date: new Date("2025-05-01"),
                 p_app_amount: 1000,
                 p_id_catalogue: "fert1",
             },
-        ]
-        const fertilizers: Fertilizer[] = [
+        ] as unknown as FertilizerApplication[]
+        const fertilizers = [
             {
-                p_id_catalogue: "fert1",
+                p_id: "fert1",
                 p_n_rt: 0, // Nitrogen content not directly known
                 p_type_rvo: "14", // Drijfmest rundvee (Table 11: 4.0 kg N/ton)
             },
-        ]
+        ] as unknown as Fertilizer[]
         const b_centroid: [number, number] = [0, 0]
         const has_grazing_intention = false // No grazing intention, so onFarmProduced should be false
-        const cultivations: Cultivation[] = []
+        const cultivations = [] as unknown as Cultivation[]
 
         const result =
             await calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm(
@@ -723,32 +720,33 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
 
     it("should correctly apply bouwland logic for working coefficient", async () => {
         vi.mocked(getRegion).mockResolvedValue("klei") // Soil type for bouwland rule
-        const applications: FertilizerApplication[] = [
+        const applications = [
             {
                 p_app_id: "app1",
+                p_id: "app1",
                 b_id: "field1",
-                p_app_date: "2025-10-15", // Sep 1 to Jan 31 period
+                p_app_date: new Date("2025-10-15"), // Sep 1 to Jan 31 period
                 p_app_amount: 1000,
                 p_id_catalogue: "fert1",
             },
-        ]
-        const fertilizers: Fertilizer[] = [
+        ] as unknown as FertilizerApplication[]
+        const fertilizers = [
             {
-                p_id_catalogue: "fert1",
+                p_id: "fert1",
                 p_n_rt: 10, // 10 kg N per ton
                 p_type_rvo: "10",
             },
-        ]
+        ] as unknown as Fertilizer[]
         const b_centroid: [number, number] = [0, 0]
         const has_grazing_intention = false
-        const cultivations: Cultivation[] = [
+        const cultivations = [
             {
                 b_lu: "cult1",
-                b_start: "2025-01-01",
-                b_end: "2025-12-31",
+                b_lu_start: new Date("2025-01-01"),
+                b_lu_end: new Date("2025-12-31"),
                 b_lu_catalogue: "nl_2014", // Bouwland
             },
-        ]
+        ] as unknown as Cultivation[]
 
         const result =
             await calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm(

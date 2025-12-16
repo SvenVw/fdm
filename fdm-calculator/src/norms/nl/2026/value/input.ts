@@ -64,13 +64,13 @@ export async function collectNL2026InputForNorms(
     )
     const soilAnalysisPicked = {
         a_p_cc:
-            soilAnalysis.find(
+            (soilAnalysis.find(
                 (x: { parameter: string }) => x.parameter === "a_p_cc",
-            )?.value ?? null,
+            )?.value as number | null) ?? null,
         a_p_al:
-            soilAnalysis.find(
+            (soilAnalysis.find(
                 (x: { parameter: string }) => x.parameter === "a_p_al",
-            )?.value ?? null,
+            )?.value as number | null) ?? null,
     }
 
     return {

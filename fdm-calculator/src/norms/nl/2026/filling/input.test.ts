@@ -60,7 +60,7 @@ describe("collectNL2026InputForFertilizerApplicationFilling", () => {
             { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 1000 },
         ] as FertilizerApplication[])
         vi.mocked(getFertilizers).mockResolvedValue([
-            { p_id_catalogue: "fert1", p_n_rt: 5, p_type_rvo: "115" },
+            { p_id: "fert1", p_n_rt: 5, p_type_rvo: "115" },
         ] as Fertilizer[])
     })
 
@@ -75,10 +75,62 @@ describe("collectNL2026InputForFertilizerApplicationFilling", () => {
             },
         ]
         const expectedApplications: FertilizerApplication[] = [
-            { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 1000 },
+            {
+                p_app_id: "app1",
+                p_id_catalogue: "fert1",
+                p_app_amount: 1000,
+                p_id: "",
+                p_name_nl: null,
+                p_app_method: null,
+                p_app_date: new Date("2025-03-15"),
+            },
         ]
         const expectedFertilizers: Fertilizer[] = [
-            { p_id_catalogue: "fert1", p_n_rt: 5, p_type_rvo: "115" },
+            {
+                p_id: "fert1",
+                p_n_rt: 5,
+                p_type_rvo: "115",
+                p_name_nl: null,
+                p_name_en: null,
+                p_description: null,
+                p_app_method_options: null,
+                p_app_amount: null,
+                p_date_acquiring: null,
+                p_picking_date: null,
+                p_n_if: null,
+                p_n_of: null,
+                p_n_wc: null,
+                p_no3_rt: null,
+                p_nh4_rt: null,
+                p_p_rt: null,
+                p_k_rt: null,
+                p_eom: null,
+                p_eoc: null,
+                p_mg_rt: null,
+                p_ca_rt: null,
+                p_ne: null,
+                p_s_rt: null,
+                p_s_wc: null,
+                p_cu_rt: null,
+                p_zn_rt: null,
+                p_na_rt: null,
+                p_si_rt: null,
+                p_b_rt: null,
+                p_mn_rt: null,
+                p_ni_rt: null,
+                p_fe_rt: null,
+                p_mo_rt: null,
+                p_co_rt: null,
+                p_as_rt: null,
+                p_cd_rt: null,
+                p_cr_rt: null,
+                p_cr_vi: null,
+                p_pb_rt: null,
+                p_hg_rt: null,
+                p_cl_rt: null,
+                p_ef_nh3: null,
+                p_type: null,
+            },
         ]
 
         const result = await collectNL2026InputForFertilizerApplicationFilling(
@@ -143,6 +195,7 @@ describe("collectNL2026InputForFertilizerApplicationFilling", () => {
     })
 
     it("should throw an error if the field is not found", async () => {
+        // @ts-expect-error
         vi.mocked(getField).mockResolvedValue(null) // Simulate field not found
 
         await expect(
@@ -157,11 +210,4 @@ describe("collectNL2026InputForFertilizerApplicationFilling", () => {
         )
     })
 
-    // Add more tests for edge cases and different scenarios as needed
-    // For example:
-    // - No cultivations
-    // - No applications
-    // - No fertilizers
-    // - Different grazing intention / organic certification status
-    // - Empty b_centroid (if getField returns a field without centroid, though current mock ensures it has one)
 })

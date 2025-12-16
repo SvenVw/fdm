@@ -13,9 +13,33 @@ import type { NutrientAdviceInputs, NutrientAdviceResponse } from "./types"
 
 // Mock data for CurrentSoilData
 const mockCurrentSoilData: CurrentSoilData = [
-    { parameter: "a_nmin_cc", a_depth_lower: 30, value: 50 },
-    { parameter: "a_nmin_cc", a_depth_lower: 60, value: 70 },
-    { parameter: "a_som_loi", a_depth_lower: 0, value: 10 },
+    {
+        parameter: "a_nmin_cc",
+        a_depth_lower: 30,
+        value: 50,
+        a_id: "",
+        b_sampling_date: null,
+        a_depth_upper: 0,
+        a_source: null,
+    },
+    {
+        parameter: "a_nmin_cc",
+        a_depth_lower: 60,
+        value: 70,
+        a_id: "",
+        b_sampling_date: null,
+        a_depth_upper: 0,
+        a_source: null,
+    },
+    {
+        parameter: "a_som_loi",
+        a_depth_lower: 0,
+        value: 10,
+        a_id: "",
+        b_sampling_date: null,
+        a_depth_upper: 0,
+        a_source: null,
+    },
 ]
 
 // Mock response from the NMI API

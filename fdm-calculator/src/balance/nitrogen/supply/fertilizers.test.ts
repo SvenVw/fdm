@@ -30,60 +30,88 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 p_id_catalogue: "mineral1",
                 p_app_amount: 1000,
                 p_app_id: "app1",
+                p_id: "mineral1", // Added p_id
+                p_name_nl: null,
+                p_app_method: null,
+                p_app_date: new Date('2025-03-15'),
             },
-            { p_id_catalogue: "manure1", p_app_amount: 500, p_app_id: "app2" },
-            { p_id_catalogue: "compost1", p_app_amount: 250, p_app_id: "app3" },
-            { p_id_catalogue: "other1", p_app_amount: 100, p_app_id: "app4" },
+            {
+                p_id_catalogue: "manure1",
+                p_app_amount: 500,
+                p_app_id: "app2",
+                p_id: "manure1", // Added p_id
+                p_name_nl: null,
+                p_app_method: null,
+                p_app_date: new Date('2025-03-15'),
+            },
+            {
+                p_id_catalogue: "compost1",
+                p_app_amount: 250,
+                p_app_id: "app3",
+                p_id: "compost1", // Added p_id
+                p_name_nl: null,
+                p_app_method: null,
+                p_app_date: new Date('2025-03-15'),
+            },
+            {
+                p_id_catalogue: "other1",
+                p_app_amount: 100,
+                p_app_id: "app4",
+                p_id: "other1", // Added p_id
+                p_name_nl: null,
+                p_app_method: null,
+                p_app_date: new Date('2025-03-15'),
+            },
         ]
 
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>([
             [
                 "mineral1",
                 {
-                    p_id_catalogue: "mineral1",
+                    p_id: "mineral1", // Changed from p_id_catalogue
                     p_n_rt: 20,
                     p_no3_rt: 0,
                     p_nh4_rt: 0,
                     p_s_rt: 0,
                     p_ef_nh3: 0,
                     p_type: "mineral",
-                },
+                } as const,
             ],
             [
                 "manure1",
                 {
-                    p_id_catalogue: "manure1",
+                    p_id: "manure1", // Changed from p_id_catalogue
                     p_n_rt: 15,
                     p_no3_rt: 0,
                     p_nh4_rt: 0,
                     p_s_rt: 0,
                     p_ef_nh3: 0,
                     p_type: "manure",
-                },
+                } as const,
             ],
             [
                 "compost1",
                 {
-                    p_id_catalogue: "compost1",
+                    p_id: "compost1", // Changed from p_id_catalogue
                     p_n_rt: 10,
                     p_no3_rt: 0,
                     p_nh4_rt: 0,
                     p_s_rt: 0,
                     p_ef_nh3: 0,
                     p_type: "compost",
-                },
+                } as const,
             ],
             [
                 "other1",
                 {
-                    p_id_catalogue: "other1",
+                    p_id: "other1", // Changed from p_id_catalogue
                     p_n_rt: 10,
                     p_no3_rt: 0,
                     p_nh4_rt: 0,
                     p_s_rt: 0,
                     p_ef_nh3: 0,
-                    p_type: "other",
-                },
+                    p_type: null, // Changed from "other" to null
+                } as const,
             ],
         ])
 
@@ -105,22 +133,34 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 p_id_catalogue: "mineral1",
                 p_app_amount: 1000,
                 p_app_id: "app1",
+                p_id: "mineral1", // Added p_id
+                p_name_nl: null,
+                p_app_method: null,
+                p_app_date: new Date('2025-03-15'),
             },
-            { p_id_catalogue: "missing", p_app_amount: 500, p_app_id: "app2" },
+            {
+                p_id_catalogue: "missing",
+                p_app_amount: 500,
+                p_app_id: "app2",
+                p_id: "missing", // Added p_id
+                p_name_nl: null,
+                p_app_method: null,
+                p_app_date: new Date('2025-03-15'),
+            },
         ]
 
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>([
             [
                 "mineral1",
                 {
-                    p_id_catalogue: "mineral1",
+                    p_id: "mineral1", // Changed from p_id_catalogue
                     p_n_rt: 20,
                     p_no3_rt: 0,
                     p_nh4_rt: 0,
                     p_s_rt: 0,
                     p_ef_nh3: 0,
                     p_type: "mineral",
-                },
+                } as const,
             ],
         ])
 
@@ -138,6 +178,10 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 p_id_catalogue: "mineral1",
                 p_app_amount: 1000,
                 p_app_id: "app1",
+                p_id: "mineral1", // Added p_id
+                p_name_nl: null,
+                p_app_method: null,
+                p_app_date: new Date('2025-03-15'),
             },
         ]
 

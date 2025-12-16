@@ -9,7 +9,7 @@ import type {
     NL2025NormsFillingInput,
     WorkingCoefficientDetails,
 } from "./types"
-import type { NormFilling } from "norms/nl/types"
+import type { NormFilling } from "../../types"
 
 /**
  * Calculates the nitrogen utilization norm filling for a set of fertilizer applications.
@@ -38,7 +38,7 @@ export async function calculateNL2025FertilizerApplicationFillingForStikstofGebr
 
     for (const application of applications) {
         const fertilizer = fertilizers.find(
-            (f) => f.p_id_catalogue === application.p_id_catalogue,
+            (f) => f.p_id === application.p_id_catalogue,
         )
         if (!fertilizer) {
             throw new Error(
@@ -77,7 +77,7 @@ export async function calculateNL2025FertilizerApplicationFillingForStikstofGebr
         )
 
         // Calculate norm filling: amount * nitrogen content * (working coefficient / 100) / 1000
-        const p_app_amount = new Decimal(application.p_app_amount)
+        const p_app_amount = new Decimal(application.p_app_amount ?? 0)
         const normFilling = p_app_amount
             .times(p_n_rt)
             .times(workingCoefficientDetails.p_n_wcl)
@@ -119,8 +119,9 @@ export function isBouwland(
     const nonBouwlandCodes = ["nl_265", "nl_266", "nl_331", "nl_332", "nl_335"]
 
     const activeCultivation = cultivations.find((c) => {
-        const startDate = new Date(c.b_start)
-        const endDate = c.b_end ? new Date(c.b_end) : undefined
+        if (!c.b_lu_start) return false // Ensure b_start exists
+        const startDate = new Date(c.b_lu_start)
+        const endDate = c.b_lu_end ? new Date(c.b_lu_end) : undefined
         return (
             p_app_date >= startDate &&
             (endDate === undefined || p_app_date <= endDate)

@@ -79,7 +79,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByResidues", () => {
                         {
                             b_lu_yield: 1000,
                             b_lu_n_harvestable: 20,
-                        },
+                        } as any,
                     ],
                 },
             },
@@ -180,7 +180,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByResidues", () => {
                 b_lu_catalogue: "catalogue1",
                 b_lu_start: new Date("2022-01-01"),
                 b_lu_end: new Date("2022-12-31"),
-                m_cropresidue: undefined, // Undefined residue handling
+                m_cropresidue: null, // Undefined residue handling
             },
         ]
         const harvests: FieldInput["harvests"] = []
@@ -280,7 +280,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByResidues", () => {
                         {
                             b_lu_yield: 1000,
                             b_lu_n_harvestable: 20,
-                        },
+                        } as any,
                     ],
                 },
             },

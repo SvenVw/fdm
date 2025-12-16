@@ -50,10 +50,7 @@ export function calculateNL2026FertilizerApplicationFillingForFosfaatGebruiksNor
     // Create maps for efficient lookups of fertilizers and RVO types.
     // This avoids iterating over the arrays repeatedly in a loop.
     const fertilizersMap = new Map(
-        fertilizers.map((fertilizer) => [
-            fertilizer.p_id_catalogue,
-            fertilizer,
-        ]),
+        fertilizers.map((fertilizer) => [fertilizer.p_id, fertilizer]),
     )
 
     // Determines if at least 20 kg P2O5 / ha is applied with organic-rich fertilizers
@@ -85,18 +82,20 @@ export function calculateNL2026FertilizerApplicationFillingForFosfaatGebruiksNor
 
     applications.forEach((application, index) => {
         const p_app_amount = new Decimal(application.p_app_amount ?? 0)
+        const fertilizer = fertilizersMap.get(application.p_id_catalogue)
+        if (!fertilizer) {
+            throw new Error(
+                `Fertilizer ${application.p_id_catalogue} not found for application ${application.p_app_id}`,
+            )
+        }
         const p_p_rt = new Decimal(
-            fertilizersMap.get(application.p_id_catalogue)?.p_p_rt ??
+            fertilizer.p_p_rt ??
                 table11Mestcodes.find(
-                    (t) =>
-                        t.p_type_rvo ===
-                        fertilizersMap.get(application.p_id_catalogue)
-                            ?.p_type_rvo,
+                    (t) => t.p_type_rvo === fertilizer.p_type_rvo,
                 )?.p_p_rt ??
                 0,
         )
-        const p_type_rvo =
-            fertilizersMap.get(application.p_id_catalogue)?.p_type_rvo ?? ""
+        const p_type_rvo = fertilizer.p_type_rvo ?? ""
 
         if (
             rvoMestcodesOrganicRich25Percent.includes(p_type_rvo) ||

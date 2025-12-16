@@ -498,7 +498,7 @@ export type CultivationDetail = Pick<
  */
 export type FertilizerDetail = Pick<
     Fertilizer,
-    | "p_id_catalogue"
+    | "p_id"
     | "p_n_rt" // Total nitrogen content (g N / kg fertilizer)
     | "p_no3_rt" // Nitrate content (g N / kg fertilizer)
     | "p_nh4_rt" // Ammonium content (g N / kg fertilizer)

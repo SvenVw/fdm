@@ -18,6 +18,8 @@ export interface Fertilizer {
     p_nh4_rt: number | null
     p_p_rt: number | null
     p_k_rt: number | null
+    p_eom: number | null
+    p_eoc: number | null
     p_mg_rt: number | null
     p_ca_rt: number | null
     p_ne: number | null

@@ -44,8 +44,11 @@ export async function calculateNitrogenBalance(
     const fdmPublicDataUrl = getFdmPublicDataUrl()
 
     // Pre-process details into Maps for efficient lookups
-    const fertilizerDetailsMap = new Map(
-        fertilizerDetails.map((detail) => [detail.p_id_catalogue, detail]),
+    const fertilizerDetailsMap = new Map<string, FertilizerDetail>(
+        fertilizerDetails.map((detail) => [
+            detail.p_id as string,
+            detail,
+        ]),
     )
     const cultivationDetailsMap = new Map(
         cultivationDetails.map((detail) => [detail.b_lu_catalogue, detail]),
@@ -169,6 +172,9 @@ export function calculateNitrogenBalanceField(
     depositionSupply: NitrogenBalanceField["supply"]["deposition"],
 ): NitrogenBalanceFieldResult {
     try {
+        if (!timeFrame.start || !timeFrame.end) {
+            throw new Error("Timeframe start and end dates must be provided.");
+        }
         // Get the details of the field
         const fieldDetails = field
 
@@ -188,16 +194,15 @@ export function calculateNitrogenBalanceField(
         )
 
         // Use a field-local timeframe (intersection with input timeframe)
+        const timeFrameStartTime = timeFrame.start.getTime();
+        const timeFrameEndTime = timeFrame.end.getTime();
+
+        const fieldStartTime = field.b_start ? field.b_start.getTime() : -Infinity;
+        const fieldEndTime = field.b_end ? field.b_end.getTime() : Infinity;
+
         const timeFrameField = {
-            start:
-                field.b_start &&
-                field.b_start.getTime() > timeFrame.start.getTime()
-                    ? field.b_start
-                    : timeFrame.start,
-            end:
-                field.b_end && field.b_end.getTime() < timeFrame.end.getTime()
-                    ? field.b_end
-                    : timeFrame.end,
+            start: new Date(Math.max(fieldStartTime, timeFrameStartTime)),
+            end: new Date(Math.min(fieldEndTime, timeFrameEndTime)),
         }
         // Normalize: ensure start <= end
         if (timeFrameField.end.getTime() < timeFrameField.start.getTime()) {

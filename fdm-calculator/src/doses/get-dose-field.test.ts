@@ -102,9 +102,14 @@ describe("getDoseForField", () => {
                 p_pb_rt: 0,
                 p_hg_rt: 0,
                 p_cl_rt: 0,
-                p_type_manure: false,
-                p_type_mineral: true,
-                p_type_compost: false,
+                p_type: "manure",
+                p_app_method_options: undefined,
+                p_no3_rt: undefined,
+                p_nh4_rt: undefined,
+                p_cr_rt: undefined,
+                p_cr_vi: undefined,
+                p_ef_nh3: undefined,
+                p_type_rvo: undefined,
             },
         )
         p_id = await addFertilizer(
