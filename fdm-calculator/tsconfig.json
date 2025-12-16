@@ -19,7 +19,11 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
-        "baseUrl": "./src"
+        "baseUrl": ".",
+        "paths": {
+            "@svenvw/fdm-core": ["../fdm-core/src/index.ts"],
+            "@svenvw/fdm-data": ["../fdm-data/src/index.ts"]
+        }
     },
     "include": ["src"]
 }
