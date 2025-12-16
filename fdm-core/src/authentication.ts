@@ -8,6 +8,8 @@ import * as authNSchema from "./db/schema-authn"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 
+export type BetterAuth = FdmAuth
+
 /**
  * Initializes and configures the authentication system for the FDM application using Better Auth.
  *

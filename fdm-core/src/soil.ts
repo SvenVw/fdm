@@ -541,13 +541,12 @@ export async function getCurrentSoilData(
             "b_soiltype_agr",
         ]
 
-        const currentSoilData: CurrentSoilData = parameters
+        const currentSoilData = parameters
             .map((parameter) => {
                 const analysis = soilAnalyses.find(
-                    (a: Record<string, any>) =>
+                    (a: Record<string, string | number>) =>
                         a[parameter as keyof typeof a] !== null,
                 )
-                if (!analysis) return null
 
                 return {
                     parameter,
@@ -559,7 +558,7 @@ export async function getCurrentSoilData(
                     a_source: analysis.a_source,
                 }
             })
-            .filter(Boolean) as CurrentSoilData
+            .filter(Boolean)
 
         return currentSoilData
     } catch (err) {

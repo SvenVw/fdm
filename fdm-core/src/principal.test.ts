@@ -48,7 +48,7 @@ describe("Principals", () => {
                     surname: "User",
                     username: userName,
                     password: "password",
-                },
+                } as any,
             })
         ).user.id
 
