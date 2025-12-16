@@ -32,6 +32,7 @@ const baseApplication: FertilizerApplication = {
 
 const baseFertilizer: Fertilizer = {
     p_id: "fert1",
+    p_id_catalogue: "fert1",
     p_n_rt: 100,
     p_p_rt: 50,
     p_k_rt: 30,
