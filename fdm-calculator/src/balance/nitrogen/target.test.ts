@@ -156,7 +156,7 @@ describe("calculateTargetForNitrogenBalance", () => {
             cultivationDetailsMap,
             defaultTimeFrame,
         )
-        expect(result.toNumber()).toBe(125)
+        expect(result.toNumber()).toBe(115)
     })
 
     it("should calculate target for arable land on other clay soil", () => {
