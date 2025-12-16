@@ -205,8 +205,7 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                             <Tooltip>
                                 <TooltipTrigger>Gelijk</TooltipTrigger>
                                 <TooltipContent>
-                                    {clientConfig.name} en RVO perceel komen
-                                    volledig overeen.
+                                    Perceel komt in {clientConfig.name} en bij RVO volledig overeen.
                                 </TooltipContent>
                             </Tooltip>
                         </Badge>
@@ -250,10 +249,10 @@ export const columns: ColumnDef<RvoImportReviewItem<any>>[] = [
                             className="bg-orange-50 text-orange-700 border-orange-200"
                         >
                             <Tooltip>
-                                <TooltipTrigger>Verlopen</TooltipTrigger>
+                                <TooltipTrigger>Niet meer actief</TooltipTrigger>
                                 <TooltipContent>
-                                    Perceel is in {clientConfig.name} actief,
-                                    maar niet meer bij RVO.
+                                    Perceel is in {clientConfig.name} nog
+                                    actief, maar komt niet meer voor bij RVO.
                                 </TooltipContent>
                             </Tooltip>
                         </Badge>
