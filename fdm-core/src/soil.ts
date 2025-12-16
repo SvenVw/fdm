@@ -420,7 +420,7 @@ export async function getCurrentSoilData(
     principal_id: PrincipalId,
     b_id: schema.soilSamplingTypeSelect["b_id"],
     timeframe?: Timeframe,
-): Promise<CurrentSoilData> {
+): Promise<CurrentSoilData | []> {
     try {
         await checkPermission(
             fdm,
@@ -547,10 +547,7 @@ export async function getCurrentSoilData(
                     (a: Record<string, string | number>) =>
                         a[parameter as keyof typeof a] !== null,
                 )
-
-                if (!analysis) {
-                    return undefined
-                }
+                if (!analysis) return null
 
                 return {
                     parameter,
@@ -562,7 +559,7 @@ export async function getCurrentSoilData(
                     a_source: analysis.a_source,
                 }
             })
-            .filter(Boolean)
+            .filter((item) => item !== null)
 
         return currentSoilData
     } catch (err) {
