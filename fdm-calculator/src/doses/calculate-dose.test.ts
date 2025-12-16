@@ -122,7 +122,6 @@ describe("calculateDose", () => {
         expect(result.dose.p_dose_nw).toBeCloseTo(15)
         expect(result.dose.p_dose_p).toBeCloseTo(5)
         expect(result.dose.p_dose_k).toBeCloseTo(6)
-        // expect(result.dose.p_dose_eoc).toBeCloseTo(1.25) // Removed as p_eoc is null in baseFertilizer and not set in test
         expect(result.dose.p_dose_s).toBeCloseTo(2.5)
         expect(result.dose.p_dose_mg).toBeCloseTo(1.75)
         expect(result.dose.p_dose_ca).toBeCloseTo(3.25)
