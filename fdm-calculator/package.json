@@ -50,7 +50,7 @@
         "@rollup/plugin-commonjs": "catalog:",
         "@rollup/plugin-node-resolve": "catalog:",
         "@svenvw/fdm-core": "workspace:*",
-        "@types/node": "^24.10.1",
+        "@types/node": "catalog:",
         "@vitest/coverage-v8": "catalog:",
         "postgres": "^3.4.7",
         "rollup": "catalog:",
