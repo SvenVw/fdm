@@ -548,6 +548,10 @@ export async function getCurrentSoilData(
                         a[parameter as keyof typeof a] !== null,
                 )
 
+                if (!analysis) {
+                    return undefined
+                }
+
                 return {
                     parameter,
                     value: analysis[parameter as keyof typeof analysis],

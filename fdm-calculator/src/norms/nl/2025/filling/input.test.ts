@@ -79,11 +79,7 @@ describe("collectNL2025InputForFertilizerApplicationFilling", () => {
                 p_app_id: "app1",
                 p_id_catalogue: "fert1",
                 p_app_amount: 1000,
-                p_id: "",
-                p_name_nl: null,
-                p_app_method: null,
-                p_app_date: new Date("2025-03-15"),
-            },
+            } as FertilizerApplication,
         ]
         const expectedFertilizers: Fertilizer[] = [
             { p_id: "fert1", p_n_rt: 5, p_type_rvo: "115" },

@@ -60,6 +60,7 @@ describe("isBouwland", () => {
         const cultivations = [
             {
                 b_lu: "cult1",
+                b_lu_start: new Date("2025-01-01"),
                 b_lu_catalogue: "nl_2014",
             }
         ] as unknown as Cultivation[]
@@ -72,6 +73,7 @@ describe("isBouwland", () => {
             {
                 b_lu: "cult1",
                 b_lu_start: new Date("2025-01-01"),
+                b_lu_end: new Date("2025-06-01"),
                 b_lu_catalogue: "nl_2014",
             },
         ] as unknown as Cultivation[]
