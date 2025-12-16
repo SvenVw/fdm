@@ -50,7 +50,7 @@ export function calculateNL2025FertilizerApplicationFillingForFosfaatGebruiksNor
     // Create maps for efficient lookups of fertilizers and RVO types.
     // This avoids iterating over the arrays repeatedly in a loop.
     const fertilizersMap = new Map(
-        fertilizers.map((fertilizer) => [fertilizer.p_id, fertilizer]),
+        fertilizers.map((fertilizer) => [fertilizer.p_id_catalogue, fertilizer]),
     )
 
     // Determines if at least 20 kg P2O5 / ha is applied with organic-rich fertilizers

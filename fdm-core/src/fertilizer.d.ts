@@ -3,6 +3,7 @@ import type * as schema from "./db/schema"
 
 export interface Fertilizer {
     p_id: string
+    p_id_catalogue: string
     p_name_nl: string | null
     p_name_en: string | null
     p_description: string | null

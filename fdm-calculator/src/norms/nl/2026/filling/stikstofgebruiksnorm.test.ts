@@ -609,6 +609,7 @@ describe("calculateNL2026FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers: Fertilizer[] = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 5, // 5 kg N per ton
                 p_type_rvo: "115",
                 p_name_nl: null,
@@ -702,6 +703,7 @@ describe("calculateNL2026FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers: Fertilizer[] = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 5, // 5 kg N per ton
                 p_type_rvo: "115",
                 p_name_nl: null,
@@ -747,6 +749,7 @@ describe("calculateNL2026FertilizerApplicationFillingForStikstofGebruiksNorm", (
             },
             {
                 p_id: "fert2",
+                p_id_catalogue: "fert2",
                 p_n_rt: 10, // 10 kg N per ton
                 p_type_rvo: "111",
                 p_name_nl: null,
@@ -837,6 +840,7 @@ describe("calculateNL2026FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers: Fertilizer[] = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 0, // Nitrogen content not directly known
                 p_type_rvo: "14",
                 p_name_nl: null,
@@ -955,6 +959,7 @@ describe("calculateNL2026FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers: Fertilizer[] = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 0, // Nitrogen content not directly known
                 p_type_rvo: "14",
                 p_name_nl: null,
@@ -1042,6 +1047,7 @@ describe("calculateNL2026FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers: Fertilizer[] = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 10, // 10 kg N per ton
                 p_type_rvo: "10",
                 p_name_nl: null,

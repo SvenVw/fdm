@@ -7,6 +7,7 @@ import type { NL2026NormsFillingInput } from "./types"
 const mockFertilizers = [
     {
         p_id: "f1",
+        p_id_catalogue: "f1",
         p_name_nl: "Drijfmest van rundvee",
         p_type: "manure",
         p_type_rvo: "14",
@@ -14,6 +15,7 @@ const mockFertilizers = [
     },
     {
         p_id: "f2",
+        p_id_catalogue: "f2",
         p_name_nl: "Strorijke vaste mest van rundvee",
         p_type: "manure",
         p_type_rvo: "10",
@@ -21,6 +23,7 @@ const mockFertilizers = [
     },
     {
         p_id: "f3",
+        p_id_catalogue: "f3",
         p_name_nl: "Groencompost",
         p_type: "compost",
         p_type_rvo: "111",
@@ -28,6 +31,7 @@ const mockFertilizers = [
     },
     {
         p_id: "f4",
+        p_id_catalogue: "f4",
         p_name_nl: "Drijfmest",
         p_type: "manure",
         p_type_rvo: "14",
@@ -35,6 +39,7 @@ const mockFertilizers = [
     },
     {
         p_id: "f5",
+        p_id_catalogue: "f5",
         p_name_nl: "GFT-compost",
         p_type: "compost",
         p_type_rvo: "112",
@@ -42,6 +47,7 @@ const mockFertilizers = [
     },
     {
         p_id: "f6",
+        p_id_catalogue: "f6",
         p_name_nl: "Strorijke vaste mest van paarden",
         p_type: "manure",
         p_type_rvo: "25",
@@ -49,6 +55,7 @@ const mockFertilizers = [
     },
     {
         p_id: "f7",
+        p_id_catalogue: "f7",
         p_name_nl: "Vaste mest varkens (biologisch)",
         p_type: "manure",
         p_type_rvo: "40",
@@ -56,6 +63,7 @@ const mockFertilizers = [
     },
     {
         p_id: "f8",
+        p_id_catalogue: "f8",
         p_name_nl: "Kunstmest",
         p_type: "mineral",
         p_type_rvo: "115",
@@ -63,6 +71,7 @@ const mockFertilizers = [
     },
     {
         p_id: "f9",
+        p_id_catalogue: "f9",
         p_name_nl: "Fertilizer with no p_p_rt",
         p_type: "manure",
         p_type_rvo: "108", // A type_rvo that has no p_p_rt in table11Mestcodes
@@ -70,6 +79,7 @@ const mockFertilizers = [
     },
     {
         p_id: "f10",
+        p_id_catalogue: "f10",
         p_name_nl: "Fertilizer with p_p_rt in table11Mestcodes",
         p_type: "manure",
         p_type_rvo: "107", // A type_rvo that has p_p_rt in table11Mestcodes (3.1)

@@ -7,23 +7,28 @@ describe("calculateNL2026FertilizerApplicationFillingForDierlijkeMestGebruiksNor
     const mockFertilizers = [
         {
             p_id: "1",
+            p_id_catalogue: "1",
             p_type_rvo: "11",
             p_n_rt: 0.5,
         },
         {
             p_id: "2",
+            p_id_catalogue: "2",
             p_type_rvo: "12",
         },
         {
             p_id: "3",
+            p_id_catalogue: "3",
             p_type_rvo: "200", // Not in table11Mestcodes
         },
         {
             p_id: "4",
+            p_id_catalogue: "4",
             // No p_type_rvo
         },
         {
             p_id: "5",
+            p_id_catalogue: "5",
             p_type_rvo: "115", // Not relevant for nitrates directive
         },
     ] as unknown as Fertilizer[]
