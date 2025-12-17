@@ -71,10 +71,10 @@ import { extractFormValuesFromRequest } from "../lib/form"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: `Aanmelden | ${clientConfig.name}` },
+        { title: `${clientConfig.name}: Bemestingsadvies, Doelsturing & Perceelsdata` },
         {
             name: "description",
-            content: `Meld je aan bij ${clientConfig.name} om toegang te krijgen tot je dashboard en je bedrijfsgegevens te beheren.`,
+            content: `Faciliteert datagedreven inzicht in bodem en bemesting voor ondernemers en adviseurs. ${clientConfig.name} ondersteunt doelsturing via de stikstofbalans, opbouw van bodemkoolstof met een OS Balans, bemestingsadvies en wettelijke gebruiksruimte, aangevuld met gedetailleerde perceelsdata zoals gewashistorie en bodemkenmerken.`,
         },
     ]
 }
