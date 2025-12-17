@@ -400,7 +400,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                                 p_type: app.p_type,
                             }),
                         ),
-                        fields: [],
                     })),
                 }
             })

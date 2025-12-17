@@ -6,7 +6,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
-import type { RotationExtended } from "./columns"
+import type { FieldRow, RotationExtended } from "./columns"
 
 type FertilizerDisplayProps = {
     cultivation: RotationExtended
@@ -51,7 +51,8 @@ export const FertilizerDisplay: React.FC<FertilizerDisplayProps> = ({
     const uniqueFertilizers = React.useMemo(() => {
         const fields = cultivation.fields
         const fertilizers =
-            resolvedFertilizers ?? fields.flatMap((field) => field.fertilizers)
+            resolvedFertilizers ??
+            (fields as FieldRow[]).flatMap((field) => field.fertilizers)
         return Array.from(new Map(fertilizers.map((f) => [f.p_id, f])).values())
     }, [resolvedFertilizers, cultivation.fields])
 
@@ -61,7 +62,8 @@ export const FertilizerDisplay: React.FC<FertilizerDisplayProps> = ({
             <div className="flex items-start flex-col space-y-2">
                 {uniqueFertilizers.map((fertilizer) => {
                     const isFertilizerUsedOnAllFieldsForThisCultivation =
-                        fields.every((field) =>
+                        cultivation.type === "field" ||
+                        (fields as FieldRow[]).every((field) =>
                             field.fertilizers.some(
                                 (f) => f.p_id === fertilizer.p_id,
                             ),
@@ -110,7 +112,7 @@ export const FertilizerDisplay: React.FC<FertilizerDisplayProps> = ({
                 })}
             </div>
         )
-    }, [uniqueFertilizers, cultivation.fields])
+    }, [uniqueFertilizers, cultivation.type, cultivation.fields])
 
     return fertilizerDisplay
 }
