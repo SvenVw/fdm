@@ -68,8 +68,8 @@ function isPointInPolygon(point: [number, number], vs: [number, number][]) {
     return inside
 }
 
-// Helper: Check if polygon intersects polygon (simple AABB check for index speed, then detail?)
-// For now, we just check if any point of tile is in view or view in tile?
+// Helper: Check if polygon intersects polygon (simple AABB check for index speed)
+// For now, we just check if any point of tile is in view or view in tile
 // Simpler: Convert Viewport to RD Polygon, check intersection with Tile Polygon (also RD).
 function polygonIntersectsPolygon(
     poly1: [number, number][],
@@ -92,7 +92,7 @@ interface ActiveTile {
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Hoogte - Kaart | ${clientConfig.name}` },
+        { title: `Hoogte - Atlas | ${clientConfig.name}` },
         {
             name: "description",
             content: "Bekijk hoogtegegevens op de kaart.",
