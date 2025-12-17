@@ -11,6 +11,7 @@ import {
     useLoaderData,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
+import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
@@ -144,6 +145,7 @@ export default function FarmFieldAtlasBlock() {
                             interactiveLayerIds={[id]}
                             ref={mapRef}
                         >
+                            <MapTilerAttribution />
                             <FieldsSourceNotClickable
                                 id={id}
                                 fieldsData={fields}
