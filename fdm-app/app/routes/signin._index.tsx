@@ -11,10 +11,8 @@ import {
     FlaskConical,
     Github,
     History,
-    Layers,
     LineChart,
-    MapIcon,
-    MousePointerClick,
+    Mountain,
     MoveDown,
     Scale,
     ScanText,
@@ -25,6 +23,8 @@ import {
     Tractor,
     Users,
     Wheat,
+    Landmark,
+    LayersIcon,
 } from "lucide-react"
 import { useEffect, useRef } from "react"
 import { FormProvider } from "react-hook-form"
@@ -873,7 +873,7 @@ export default function SignIn() {
                                 <div className="flex items-center gap-3 mb-4 text-amber-800">
                                     <AlertTriangle className="h-6 w-6" />
                                     <h3 className="font-semibold text-lg">
-                                        Belangrijke Disclaimer
+                                        Disclaimer
                                     </h3>
                                 </div>
                                 <p className="text-amber-900/80 leading-relaxed mb-6">
@@ -904,26 +904,65 @@ export default function SignIn() {
                             <p className="text-lg leading-relaxed text-muted-foreground">
                                 Verken agrarisch Nederland met de interactieve
                                 Atlas. Navigeer door de jaren heen en krijg
-                                direct inzicht in perceelshistorie en
+                                direct inzicht in perceelshistorie, het microreliëf en
                                 gebiedskenmerken.
                             </p>
                         </div>
 
-                        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:auto-rows-[1fr]">
+                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all lg:col-span-2">
+                                <CardHeader>
+                                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                        <Sprout className="h-6 w-6" />
+                                    </div>
+                                    <CardTitle className="text-lg">
+                                        Gewasrotatie in beeld
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        De interactieve kaart toont
+                                        gewaspercelen tot 2020, helder
+                                        ingekleurd per gewasgroep. Krijg direct
+                                        visueel inzicht in toegepaste rotaties door de jaren heen.
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
+                                <CardHeader>
+                                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                        <Mountain className="h-6 w-6" />
+                                    </div>
+                                    <CardTitle className="text-lg">
+                                        Hoogtekaart (AHN4)
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        Bekijk de AHN4 voor een
+                                        gedetailleerde weergave van het
+                                        hoogteverloop en het microreliëf op en
+                                        rondom percelen.
+                                    </p>
+                                </CardContent>
+                            </Card>
+
                             <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                         <History className="h-6 w-6" />
                                     </div>
                                     <CardTitle className="text-lg">
-                                        Visuele Teelthistorie
+                                        Gewashistorie & rustgewassen
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-sm text-muted-foreground leading-relaxed">
-                                        Bekijk percelen terug tot 2020. De kaart
-                                        kleurt mee met de gewascategorie, zodat
-                                        u in één oogopslag de rotatie ziet.
+                                        Klik op een perceel voor details: bekijk
+                                        de volledige gewashistorie tot 2009 en
+                                        zie direct in welke jaren er een
+                                        rustgewas is geteeld.
                                     </p>
                                 </CardContent>
                             </Card>
@@ -931,26 +970,7 @@ export default function SignIn() {
                             <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <MousePointerClick className="h-6 w-6" />
-                                    </div>
-                                    <CardTitle className="text-lg">
-                                        Interactief & Gedetailleerd
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-sm text-muted-foreground leading-relaxed">
-                                        Klik op een perceel voor alle details:
-                                        van exacte oppervlakte en grenzen tot de
-                                        historie van geteelde gewassen tot en
-                                        met 2009.
-                                    </p>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
-                                <CardHeader>
-                                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <MapIcon className="h-6 w-6" />
+                                        <Landmark className="h-6 w-6" />
                                     </div>
                                     <CardTitle className="text-lg">
                                         Gebiedsgerichte normen
@@ -958,9 +978,9 @@ export default function SignIn() {
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-sm text-muted-foreground leading-relaxed">
-                                        Zie direct welke mestwetgeving van
-                                        toepassing is. De kaart toont relevante
-                                        regio's zoals NV-gebieden.
+                                        De kaart toont in welke relevante
+                                        gebieden een perceel ligt, zodat u direct
+                                        weet welke in welke regio's voor de gebruiksnormen het perceel ligt.
                                     </p>
                                 </CardContent>
                             </Card>
@@ -968,18 +988,16 @@ export default function SignIn() {
                             <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <Layers className="h-6 w-6" />
+                                        <LayersIcon className="h-6 w-6" />
                                     </div>
                                     <CardTitle className="text-lg">
-                                        Bodem & Water
+                                        Bodem & water
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-sm text-muted-foreground leading-relaxed">
-                                        Combineer perceelsdata met kaarten voor
-                                        grondsoorten en grondwatertrappen voor
-                                        een compleet beeld van de
-                                        bodemgesteldheid.
+                                        Raadpleeg data voor uw gewas:
+                                        van grondwatertrappen tot de bodemsamenstelling zoals zand-, klei- en siltgehalte.
                                     </p>
                                 </CardContent>
                             </Card>
