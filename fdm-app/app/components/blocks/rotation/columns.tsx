@@ -1,7 +1,9 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { ChevronRight } from "lucide-react"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale/nl"
+import { ArrowUpRightFromSquare, ChevronRight } from "lucide-react"
 import React from "react"
-import { NavLink, useFetcher } from "react-router-dom"
+import { NavLink, useFetcher, useParams } from "react-router-dom"
 import { cn } from "@/app/lib/utils"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
@@ -25,8 +27,6 @@ import { DataTableColumnHeader } from "./column-header"
 import { DateRangeDisplay } from "./date-range-display"
 import { FertilizerDisplay } from "./fertilizer-display"
 import { HarvestDatesDisplay } from "./harvest-dates-display"
-import { format } from "date-fns"
-import { nl } from "date-fns/locale"
 
 export type CropRow = {
     type: "crop"
@@ -115,33 +115,37 @@ export const columns: ColumnDef<RotationExtended>[] = [
             />
         ),
         cell: ({ row }) => (
-            <Checkbox
-                checked={
-                    row.getIsSelected()
-                        ? true
-                        : row.getIsSomeSelected()
-                          ? "indeterminate"
-                          : false
-                }
-                onCheckedChange={(value) => {
-                    row.toggleSelected(!!value)
-                    const parentRow = row.getParentRow()
-                    if (parentRow) {
-                        const wantedValue = parentRow.subRows.every(
-                            (childRow) =>
-                                childRow.id === row.id
-                                    ? value
-                                    : childRow.getIsSelected(),
-                        )
-                        if (parentRow.getIsSelected() !== wantedValue) {
-                            parentRow.toggleSelected(wantedValue, {
-                                selectChildren: false,
-                            })
-                        }
+            <div
+                className={cn(row.original.type === "field" ? "ps-4" : "pe-4")}
+            >
+                <Checkbox
+                    checked={
+                        row.getIsSelected()
+                            ? true
+                            : row.getIsSomeSelected()
+                              ? "indeterminate"
+                              : false
                     }
-                }}
-                aria-label="Selecteer deze rij"
-            />
+                    onCheckedChange={(value) => {
+                        row.toggleSelected(!!value)
+                        const parentRow = row.getParentRow()
+                        if (parentRow) {
+                            const wantedValue = parentRow.subRows.every(
+                                (childRow) =>
+                                    childRow.id === row.id
+                                        ? value
+                                        : childRow.getIsSelected(),
+                            )
+                            if (parentRow.getIsSelected() !== wantedValue) {
+                                parentRow.toggleSelected(wantedValue, {
+                                    selectChildren: false,
+                                })
+                            }
+                        }
+                    }}
+                    aria-label="Selecteer deze rij"
+                />
+            </div>
         ),
         enableSorting: false,
         enableHiding: false,
@@ -155,6 +159,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
         },
         cell: ({ row }) => {
             const original = row.original
+            const params = useParams()
             return original.type === "crop" ? (
                 <Badge
                     style={{
@@ -168,7 +173,13 @@ export const columns: ColumnDef<RotationExtended>[] = [
                     {original.b_lu_name}
                 </Badge>
             ) : (
-                original.b_name
+                <NavLink
+                    to={`/farm/${params.b_id_farm}/${params.calendar}/field/${original.b_id}`}
+                    className="group flex items-center hover:underline w-fit"
+                >
+                    {original.b_name}
+                    <ArrowUpRightFromSquare className="ml-2 h-4 w-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </NavLink>
             )
         },
     },

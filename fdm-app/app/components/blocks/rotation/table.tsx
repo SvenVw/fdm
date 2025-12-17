@@ -217,7 +217,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
             const crop_b_lu_harvest_date = new Set<string>()
 
             const formatDate = (date: Date) =>
-                format(date, "d MMMM yyy", { locale: nl })
+                format(date, "d MMMM yyyy", { locale: nl })
             const dateTermsArr = (dates: Date[]) =>
                 [...new Set(dates.map(formatDate))].join(" ")
 
