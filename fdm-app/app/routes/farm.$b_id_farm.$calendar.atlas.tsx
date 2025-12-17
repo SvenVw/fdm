@@ -21,7 +21,7 @@ import { fdm } from "~/lib/fdm.server"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Kaarten | ${clientConfig.name}` },
+        { title: `Atlas | ${clientConfig.name}` },
         {
             name: "description",
             content: "Bekijk informatie op de kaart.",
