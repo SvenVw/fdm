@@ -11,6 +11,7 @@ import maplibregl from "maplibre-gl"
 import type { MetaFunction } from "react-router"
 import { type LoaderFunctionArgs, useLoaderData } from "react-router"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
 import {
@@ -28,7 +29,7 @@ import { fdm } from "~/lib/fdm.server"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: `Percelen - Kaart | ${clientConfig.name}` },
+        { title: `Percelen - Atlas | ${clientConfig.name}` },
         {
             name: "description",
             content:
@@ -182,6 +183,8 @@ export default function FarmAtlasFieldsBlock() {
                 showFields={showFields}
                 onToggleFields={() => setShowFields(!showFields)}
             />
+
+            <MapTilerAttribution />
 
             <FieldsSourceAvailable
                 id={fieldsAvailableId}

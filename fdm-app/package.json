@@ -1,6 +1,6 @@
 {
     "name": "@svenvw/fdm-app",
-    "version": "0.25.3",
+    "version": "0.25.4",
     "private": true,
     "sideEffects": false,
     "type": "module",
@@ -15,6 +15,7 @@
     },
     "dependencies": {
         "@date-fns/tz": "^1.4.1",
+        "@geomatico/maplibre-cog-protocol": "github:SvenVw/maplibre-cog-protocol#add-prepare",
         "@hookform/resolvers": "^5.2.2",
         "@lucide/lab": "^0.1.2",
         "@mapbox/geojson-extent": "^1.0.1",
@@ -40,6 +41,7 @@
         "@svenvw/fdm-data": "workspace:*",
         "@tailwindcss/vite": "^4.1.17",
         "@tanstack/react-table": "^8.21.3",
+        "@turf/boolean-intersects": "^7.3.1",
         "@turf/centroid": "^7.3.1",
         "@turf/turf": "^7.3.1",
         "better-auth": "catalog:",
