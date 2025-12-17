@@ -30,6 +30,7 @@ import { useEffect, useRef } from "react"
 import { FormProvider } from "react-hook-form"
 import type {
     ActionFunctionArgs,
+    LinksFunction,
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
@@ -70,13 +71,28 @@ import { cn } from "~/lib/utils"
 import { extractFormValuesFromRequest } from "../lib/form"
 
 export const meta: MetaFunction = () => {
+    const title = `${clientConfig.name}: Bemestingsadvies, Doelsturing & Perceelsdata`
+    const description = `Faciliteert datagedreven inzicht in bodem en bemesting voor ondernemers en adviseurs. ${clientConfig.name} ondersteunt doelsturing via de stikstofbalans, optimalisatie van de organische stofbalans, bemestingsadvies en wettelijke gebruiksruimte, aangevuld met gedetailleerde perceelsdata zoals AHN4 en gewashistorie.`
+    const ogImage =
+        "https://images.unsplash.com/photo-1717702576954-c07131c54169?q=80&w=1200&auto=format&fit=crop"
+
     return [
-        { title: `${clientConfig.name}: Bemestingsadvies, Doelsturing & Perceelsdata` },
-        {
-            name: "description",
-            content: `Faciliteert datagedreven inzicht in bodem en bemesting voor ondernemers en adviseurs. ${clientConfig.name} ondersteunt doelsturing via de stikstofbalans, opbouw van bodemkoolstof met een OS Balans, bemestingsadvies en wettelijke gebruiksruimte, aangevuld met gedetailleerde perceelsdata zoals gewashistorie en bodemkenmerken.`,
-        },
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:image", content: ogImage },
+        { property: "og:url", content: clientConfig.url },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: ogImage },
     ]
+}
+
+export const links: LinksFunction = () => {
+    return [{ rel: "canonical", href: clientConfig.url }]
 }
 
 const FormSchema = z.object({
@@ -216,9 +232,9 @@ export default function SignIn() {
                                             />
                                         </div>
                                     </div>
-                                    <CardTitle className="text-2xl">
+                                    <h1 className="text-2xl font-semibold tracking-tight">
                                         {clientConfig.name}
-                                    </CardTitle>
+                                    </h1>
                                     <CardDescription>
                                         Meld je aan om toegang te krijgen tot je
                                         dashboard.
