@@ -28,7 +28,7 @@ import { fdm } from "~/lib/fdm.server"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: `Percelen - Kaart | ${clientConfig.name}` },
+        { title: `Percelen - Atlas | ${clientConfig.name}` },
         {
             name: "description",
             content:
