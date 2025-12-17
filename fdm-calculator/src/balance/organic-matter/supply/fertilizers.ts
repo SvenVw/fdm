@@ -57,7 +57,7 @@ export function calculateOrganicMatterSupplyByFertilizers(
                 return acc
             }
 
-            const p_eom = new Decimal(fertilizerDetail.p_eom as number) // g EOM / kg product
+            const p_eom = new Decimal(fertilizerDetail.p_eom) // g EOM / kg product
             const p_amount = new Decimal(application.p_app_amount ?? 0) // kg product / ha
 
             // Calculate the EOM supply for this specific application.
