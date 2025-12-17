@@ -1,12 +1,19 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { ChevronRight } from "lucide-react"
 import React from "react"
-import { NavLink } from "react-router-dom"
+import { NavLink, useFetcher } from "react-router-dom"
 import { cn } from "@/app/lib/utils"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Checkbox } from "~/components/ui/checkbox"
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogFooter,
+} from "~/components/ui/dialog"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -43,7 +50,7 @@ export type FieldRow = {
     b_isproductive: boolean
     a_som_loi: number
     b_soiltype_agr: string
-    m_cropresidue: string
+    m_cropresidue: "all" | "some" | "none"
     b_lu_variety: string
     b_lu_harvest_date: Date[]
     b_lu_croprotation: string
@@ -192,6 +199,111 @@ export const columns: ColumnDef<RotationExtended>[] = [
         cell: ({ row }) => {
             const cultivation = row.original
             return <HarvestDatesDisplay cultivation={cultivation} />
+        },
+    },
+    {
+        accessorKey: "m_cropresidue",
+        enableSorting: false,
+        header: ({ column }) => {
+            return <DataTableColumnHeader column={column} title="Gewasresten" />
+        },
+        enableHiding: true, // Enable hiding for mobile
+        cell: ({ row }) => {
+            const fetcher = useFetcher()
+            const [dialogValue, setDialogValue] = React.useState<
+                string | undefined
+            >()
+
+            const submit = (value: boolean) => {
+                return fetcher.submit(
+                    {
+                        fieldIds: (row.original.type === "crop"
+                            ? row.original.fields
+                            : [row.original]
+                        ).map((field) => field.b_id),
+                        cultivationIds: [
+                            (
+                                (row.getParentRow()?.original ??
+                                    row.original) as CropRow
+                            ).b_lu_catalogue,
+                        ],
+                        m_cropresidue: value,
+                    },
+                    { method: "POST" },
+                )
+            }
+
+            return (
+                <>
+                    <Dialog
+                        open={!!dialogValue}
+                        onOpenChange={(open) => {
+                            if (!open && dialogValue) setDialogValue(undefined)
+                        }}
+                    >
+                        <DialogContent>
+                            {dialogValue === "none"
+                                ? `Weet u zeker dat u gewasresten naar ${
+                                      row.original.type === "crop"
+                                          ? row.original.fields.length
+                                          : 1
+                                  } percelen wilt verwijderen?`
+                                : `Weet u zeker dat u gewasresten aan ${
+                                      row.original.type === "crop"
+                                          ? row.original.fields.length
+                                          : 1
+                                  } percelen wilt toevoegen?`}
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="mr-auto"
+                                    >
+                                        Annuleren
+                                    </Button>
+                                </DialogClose>
+                                <Button
+                                    type="button"
+                                    form="formHarvest"
+                                    disabled={fetcher.state === "submitting"}
+                                    onClick={() =>
+                                        submit(dialogValue === "all").then(() =>
+                                            setDialogValue(undefined),
+                                        )
+                                    }
+                                >
+                                    {fetcher.state === "submitting" ? (
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />
+                                            <span>Opslaan...</span>
+                                        </div>
+                                    ) : (
+                                        "Bijwerken"
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                    <Checkbox
+                        checked={
+                            (
+                                {
+                                    all: true,
+                                    some: "indeterminate",
+                                    none: false,
+                                } as const
+                            )[row.original.m_cropresidue]
+                        }
+                        onCheckedChange={(value) => {
+                            row.original.type === "crop" &&
+                            row.original.fields.length > 1
+                                ? setDialogValue(value ? "all" : "none")
+                                : submit(!!value)
+                        }}
+                    />
+                </>
+            )
         },
     },
     {

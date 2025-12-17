@@ -1,4 +1,5 @@
 import {
+    type Cultivation,
     type CultivationCatalogue,
     checkPermission,
     getCultivations,
@@ -9,14 +10,15 @@ import {
     getFertilizers,
     getFields,
     getHarvests,
+    updateCultivation,
 } from "@svenvw/fdm-core"
 import {
-    type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
     redirect,
     useLoaderData,
 } from "react-router"
+import { dataWithSuccess } from "remix-toast"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
@@ -25,6 +27,7 @@ import {
     columns,
     type RotationExtended,
 } from "~/components/blocks/rotation/columns"
+import { RotationTableFormSchema } from "~/components/blocks/rotation/schema"
 import { DataTable } from "~/components/blocks/rotation/table"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
@@ -34,7 +37,9 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 import { cn } from "~/lib/utils"
+import type { Route } from "./+types/farm.$b_id_farm.$calendar.rotation._index"
 
 export const meta: MetaFunction = () => {
     return [
@@ -65,7 +70,7 @@ export const meta: MetaFunction = () => {
  * - userName: The name of the current user.
  * - farmWritePermission: A Boolean indicating if the user is able to add things to the farm. Set to true if the information could not be obtained.
  */
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
     try {
         // Get the active farm
         const b_id_farm = params.b_id_farm
@@ -283,6 +288,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     (cultivation: { b_lu: string }) => cultivation.b_lu,
                 )
 
+                const cropResidue = fieldsWithThisCultivation.map((field) =>
+                    field.cultivations
+                        .filter(
+                            (cultivation) =>
+                                cultivation.b_lu_catalogue === b_lu_catalogue,
+                        )
+                        .some((cultivation) => cultivation.m_cropresidue),
+                )
+                const aggr_m_crop_residue = cropResidue.every((a) => a)
+                    ? "all"
+                    : cropResidue.some((a) => a)
+                      ? "some"
+                      : "none"
                 return {
                     type: "crop",
                     b_lu_catalogue: b_lu_catalogue,
@@ -295,6 +313,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     b_lu_start: b_lu_start,
                     b_lu_end: b_lu_end,
                     calendar: calendar,
+                    m_cropresidue: aggr_m_crop_residue,
                     fields: fieldsWithThisCultivation.map((field) => ({
                         // TODO: Define a proper type for field
                         type: "field",
@@ -330,6 +349,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                                 (harvest: { b_lu_harvest_date: Date[] }) =>
                                     harvest.b_lu_harvest_date,
                             ),
+                        m_cropresidue: field.cultivations
+                            .filter(
+                                (cultivation) =>
+                                    cultivation.b_lu_catalogue ===
+                                    b_lu_catalogue,
+                            )
+                            .some((cultivation) => cultivation.m_cropresidue)
+                            ? "all"
+                            : "none",
                         fertilizerApplications:
                             field.fertilizerApplications.map(
                                 (app: {
@@ -479,4 +507,73 @@ export default function FarmRotationIndex() {
             </main>
         </SidebarInset>
     )
+}
+
+export async function action({ params, request }: Route.ActionArgs) {
+    let fields: Field[] | null
+    const session = await getSession(request)
+    const timeframe = await getTimeframe(params)
+    const b_id_farm = params.b_id_farm
+
+    const values = await extractFormValuesFromRequest(
+        request,
+        RotationTableFormSchema,
+    )
+
+    const fieldIds = new Set(values.fieldIds.split(","))
+    async function loadFields() {
+        fields ??= (
+            await getFields(fdm, session.principal_id, b_id_farm, timeframe)
+        ).filter((field) => fieldIds.has(field.b_id))
+        return fields
+    }
+
+    const cultivationIds = new Set(values.cultivationIds.split(","))
+
+    // Determine what needs to be done
+    const cultivationUpdates: Partial<Cultivation> = {}
+
+    if (
+        typeof values.m_cropresidue !== "undefined" &&
+        values.m_cropresidue !== null
+    ) {
+        cultivationUpdates.m_cropresidue = values.m_cropresidue
+    }
+
+    if (Object.keys(cultivationUpdates).length > 0) {
+        const fields = await loadFields()
+        await Promise.all(
+            fields.map(async (field) => {
+                const cultivations = (
+                    await getCultivations(
+                        fdm,
+                        session.principal_id,
+                        field.b_id,
+                        timeframe,
+                    )
+                ).filter((cultivation) =>
+                    cultivationIds.has(cultivation.b_lu_catalogue),
+                )
+
+                return Promise.all(
+                    cultivations.map((cultivation) => {
+                        return updateCultivation(
+                            fdm,
+                            session.principal_id,
+                            cultivation.b_lu,
+                            cultivationUpdates.b_lu_catalogue,
+                            cultivationUpdates.b_lu_start,
+                            cultivationUpdates.b_lu_end,
+                            cultivationUpdates.m_cropresidue,
+                            cultivationUpdates.b_lu_variety,
+                        )
+                    }),
+                )
+            }),
+        )
+    }
+
+    return dataWithSuccess(null, {
+        message: "Succesvol bewerkt.",
+    })
 }
