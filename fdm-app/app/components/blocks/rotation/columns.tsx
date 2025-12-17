@@ -341,8 +341,8 @@ export const columns: ColumnDef<RotationExtended>[] = [
                                                             Eindigt op{" "}
                                                             {format(
                                                                 date,
-                                                                "d MMMM yyy",
-                                                                nl,
+                                                                "d MMMM yyyy",
+                                                                { locale: nl },
                                                             )}
                                                         </td>
                                                         <td className="p-2 border-solid rounded-r">

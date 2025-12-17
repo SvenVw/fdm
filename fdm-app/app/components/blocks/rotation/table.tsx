@@ -459,7 +459,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                         </Button>
                                     ) : (
                                         <NavLink
-                                            to={`/farm/${b_id_farm}/${calendar}/rotation/harvest?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}&fieldIds=${selectedFieldIds.join(",")}`}
+                                            to={`/farm/${b_id_farm}/${calendar}/rotation/harvest?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}&fieldIds=${selectedFieldIds.map(encodeURIComponent).join(",")}`}
                                         >
                                             <Button>
                                                 <Plus className="mr-2 h-4 w-4" />
