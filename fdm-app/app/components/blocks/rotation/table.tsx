@@ -379,7 +379,10 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                         {
                                             b_lu_name: "Gewas",
                                             b_lu_start: "Zaaidatum",
+                                            b_lu_end: "Einddatum",
                                             b_harvest_date: "Oogstdata",
+                                            b_lu_variety: "Variëteit",
+                                            m_cropresidue: "Gewasresten",
                                             fertilizers: "Bemesting",
                                             b_name: "Percelen",
                                             b_area: "Oppervlakte",
