@@ -306,6 +306,35 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     b_lu_catalogue: b_lu_catalogue,
                     b_lu: b_lu,
                     b_lu_name: cultivationsForCatalogue[0]?.b_lu_name ?? "",
+                    b_lu_variety: Object.fromEntries(
+                        Object.entries(
+                            fieldsWithThisCultivation
+                                .flatMap((field) =>
+                                    field.cultivations
+                                        .filter(
+                                            (cultivation) =>
+                                                cultivation.b_lu_catalogue ===
+                                                b_lu_catalogue,
+                                        )
+                                        .flatMap(
+                                            (cultivation: {
+                                                b_lu_variety: string | null
+                                            }) =>
+                                                cultivation.b_lu_variety
+                                                    ? [cultivation.b_lu_variety]
+                                                    : [],
+                                        ),
+                                )
+                                .reduce(
+                                    (counts, variety) => {
+                                        counts[variety] =
+                                            (counts[variety] ?? 0) + 1
+                                        return counts
+                                    },
+                                    {} as Record<string, number>,
+                                ),
+                        ).sort((a, b) => b[1] - a[1]),
+                    ),
                     b_lu_croprotation:
                         cultivationsForCatalogue[0]?.b_lu_croprotation ?? "",
                     b_lu_harvestable:
@@ -349,6 +378,32 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                                 (harvest: { b_lu_harvest_date: Date[] }) =>
                                     harvest.b_lu_harvest_date,
                             ),
+                        b_lu_variety: Object.fromEntries(
+                            Object.entries(
+                                field.cultivations
+                                    .filter(
+                                        (cultivation) =>
+                                            cultivation.b_lu_catalogue ===
+                                            b_lu_catalogue,
+                                    )
+                                    .flatMap(
+                                        (cultivation: {
+                                            b_lu_variety: string | null
+                                        }) =>
+                                            cultivation.b_lu_variety
+                                                ? [cultivation.b_lu_variety]
+                                                : [],
+                                    )
+                                    .reduce(
+                                        (counts, variety) => {
+                                            counts[variety] =
+                                                (counts[variety] ?? 0) + 1
+                                            return counts
+                                        },
+                                        {} as Record<string, number>,
+                                    ),
+                            ).sort((a, b) => b[1] - a[1]),
+                        ),
                         ...(() => {
                             const cultivations = field.cultivations.filter(
                                 (cultivation) =>

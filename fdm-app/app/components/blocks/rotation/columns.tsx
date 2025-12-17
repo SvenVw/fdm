@@ -34,8 +34,7 @@ export type CropRow = {
     b_lu: string[]
     b_lu_name: string
     m_cropresidue: string
-    b_lu_variety: string
-    b_lu_variety_options: string
+    b_lu_variety: Record<string, number>
     b_lu_croprotation: string
     b_lu_harvestable: "once" | "multiple" | "none"
     calendar: string
@@ -54,7 +53,7 @@ export type FieldRow = {
     b_soiltype_agr: string
     m_cropresidue: "all" | "some" | "none"
     m_cropresidue_ending: [Date, boolean][]
-    b_lu_variety: string
+    b_lu_variety: Record<string, number>
     b_lu_harvest_date: Date[]
     b_lu_croprotation: string
     b_lu_harvestable: "once" | "multiple" | "none"
@@ -177,8 +176,10 @@ export const columns: ColumnDef<RotationExtended>[] = [
                     to={`/farm/${params.b_id_farm}/${params.calendar}/field/${original.b_id}`}
                     className="group flex items-center hover:underline w-fit"
                 >
-                    {original.b_name}
-                    <ArrowUpRightFromSquare className="ml-2 h-4 w-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="inline-block ps-4">
+                        {original.b_name}
+                        <ArrowUpRightFromSquare className="ml-2 h-4 w-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
                 </NavLink>
             )
         },
@@ -213,6 +214,26 @@ export const columns: ColumnDef<RotationExtended>[] = [
         cell: ({ row }) => {
             const cultivation = row.original
             return <HarvestDatesDisplay cultivation={cultivation} />
+        },
+    },
+    {
+        accessorKey: "b_lu_variety",
+        enableSorting: false,
+        header: ({ column }) => {
+            return <DataTableColumnHeader column={column} title="Variëteit" />
+        },
+        enableHiding: true, // Enable hiding for mobile
+        cell: ({ row }) => {
+            const value = row.original.b_lu_variety
+                ? Object.keys(row.original.b_lu_variety)
+                : null
+            if (!value) return null
+            console.log(value)
+            const str =
+                value.length <= 5
+                    ? value.join(", ")
+                    : `${value.slice(0, 5).join(", ")} en meer`
+            return str
         },
     },
     {
