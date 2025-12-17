@@ -29,11 +29,12 @@ import {
     type MetaFunction,
     useLoaderData,
 } from "react-router"
+import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { ElevationLegend } from "~/components/blocks/atlas/atlas-legend"
 import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
-import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import { getMapStyle } from "~/integrations/map"
 import { getSession } from "~/lib/auth.server"
@@ -552,6 +553,8 @@ export default function FarmAtlasElevationBlock() {
                     showElevation={showElevation}
                     onToggleElevation={onToggleElevation}
                 />
+
+                <MapTilerAttribution />
 
                 {/* WMS Overview Layer (Zoom < 13) */}
                 {showElevation && (
