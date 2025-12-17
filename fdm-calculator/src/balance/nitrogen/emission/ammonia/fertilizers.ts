@@ -40,7 +40,7 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
 
             if (!fertilizerDetail) {
                 throw new Error(
-                    `Fertilizer application ${application.p_app_id} has no fertilizerDetails`,
+                    `Fertilizer application ${application.p_app_id} has no fertilizerDetails for fertilizer ${application.p_id_catalogue}`,
                 )
             }
 

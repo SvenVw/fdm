@@ -68,7 +68,7 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
             [
                 "mineral1",
                 {
-                    p_id: "mineral1", // Changed from p_id_catalogue
+                    p_id_catalogue: "mineral1", // Changed from p_id_catalogue
                     p_n_rt: 20,
                     p_no3_rt: 0,
                     p_nh4_rt: 0,
@@ -80,7 +80,7 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
             [
                 "manure1",
                 {
-                    p_id: "manure1", // Changed from p_id_catalogue
+                    p_id_catalogue: "manure1", // Changed from p_id_catalogue
                     p_n_rt: 15,
                     p_no3_rt: 0,
                     p_nh4_rt: 0,
@@ -92,7 +92,7 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
             [
                 "compost1",
                 {
-                    p_id: "compost1", // Changed from p_id_catalogue
+                    p_id_catalogue: "compost1", // Changed from p_id_catalogue
                     p_n_rt: 10,
                     p_no3_rt: 0,
                     p_nh4_rt: 0,
@@ -104,7 +104,7 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
             [
                 "other1",
                 {
-                    p_id: "other1", // Changed from p_id_catalogue
+                    p_id_catalogue: "other1", // Changed from p_id_catalogue
                     p_n_rt: 10,
                     p_no3_rt: 0,
                     p_nh4_rt: 0,
@@ -153,7 +153,7 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
             [
                 "mineral1",
                 {
-                    p_id: "mineral1", // Changed from p_id_catalogue
+                    p_id_catalogue: "mineral1", // Changed from p_id_catalogue
                     p_n_rt: 20,
                     p_no3_rt: 0,
                     p_nh4_rt: 0,

@@ -19,7 +19,7 @@ function generateMockData(numberOfFields: number): NitrogenBalanceInput {
     const fields: FieldInput[] = []
     const fertilizerDetails: FertilizerDetail[] = [
         {
-            p_id: "fert-cat-1",
+            p_id_catalogue: "fert-cat-1",
             p_n_rt: 5,
             p_type: "manure",
             p_no3_rt: 1,
@@ -28,7 +28,7 @@ function generateMockData(numberOfFields: number): NitrogenBalanceInput {
             p_ef_nh3: 0.1,
         },
         {
-            p_id: "fert-cat-2",
+            p_id_catalogue: "fert-cat-2",
             p_n_rt: 10,
             p_type: "mineral",
             p_no3_rt: 5,

@@ -29,7 +29,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
 
     const mockFertilizerDetailsMap = new Map<string, FertilizerDetail>()
     mockFertilizerDetailsMap.set("mineral-fertilizer-1", {
-        p_id: "mineral-fertilizer-1",
+        p_id_catalogue: "mineral-fertilizer-1",
         p_type: "mineral",
         p_n_rt: 100,
         p_no3_rt: 50,
@@ -39,7 +39,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         // p_inhibitor: false,
     })
     mockFertilizerDetailsMap.set("mineral-fertilizer-2", {
-        p_id: "mineral-fertilizer-2",
+        p_id_catalogue: "mineral-fertilizer-2",
         p_type: "mineral",
         p_n_rt: 80,
         p_no3_rt: 0,
@@ -49,7 +49,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         // p_inhibitor: false,
     })
     mockFertilizerDetailsMap.set("manure-fertilizer", {
-        p_id: "manure-fertilizer",
+        p_id_catalogue: "manure-fertilizer",
         p_type: "manure",
         p_n_rt: 20,
         p_no3_rt: 0,
@@ -59,7 +59,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         // p_inhibitor: false,
     })
     mockFertilizerDetailsMap.set("compost-fertilizer", {
-        p_id: "compost-fertilizer",
+        p_id_catalogue: "compost-fertilizer",
         p_type: "compost",
         p_n_rt: 15,
         p_no3_rt: 0,
@@ -69,7 +69,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         // p_inhibitor: false,
     })
     mockFertilizerDetailsMap.set("other-fertilizer", {
-        p_id: "other-fertilizer",
+        p_id_catalogue: "other-fertilizer",
         p_type: "other" as any,
         p_n_rt: 10,
         p_no3_rt: 0,
@@ -362,7 +362,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             },
         ]
         mockFertilizerDetailsMap.set("mineral-fertilizer-no-inhibitor", {
-            p_id: "mineral-fertilizer-no-inhibitor",
+            p_id_catalogue: "mineral-fertilizer-no-inhibitor",
             p_type: "mineral",
             p_n_rt: 100,
             p_no3_rt: 20,

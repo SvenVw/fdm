@@ -41,7 +41,7 @@ describe("calculateOrganicMatterSupplyByFertilizers", () => {
 
     it("should calculate EOM supply correctly for a single manure application", () => {
         const fertilizerApplications: FieldInput["fertilizerApplications"] = [
-            { p_id: "app1", p_id_catalogue: "manure-1",p_app_amount: 1500 }, // 1500 kg/ha
+            { p_id: "app1", p_id_catalogue: "manure-1", p_app_amount: 1500 }, // 1500 kg/ha
         ] as FieldInput["fertilizerApplications"]
 
         const result = calculateOrganicMatterSupplyByFertilizers(
@@ -58,9 +58,9 @@ describe("calculateOrganicMatterSupplyByFertilizers", () => {
 
     it("should calculate EOM supply for multiple categories", () => {
         const fertilizerApplications: FieldInput["fertilizerApplications"] = [
-            { p_id: "app1", p_id_catalogue: "manure-1",p_app_amount: 2000 }, // 2000 kg/ha
-            { p_id: "app2", p_id_catalogue: "compost-1",p_app_amount: 1000 }, // 1000 kg/ha
-            { p_id: "app3", p_id_catalogue: "other-1",p_app_amount: 500 }, // 500 kg/ha
+            { p_id: "app1", p_id_catalogue: "manure-1", p_app_amount: 2000 }, // 2000 kg/ha
+            { p_id: "app2", p_id_catalogue: "compost-1", p_app_amount: 1000 }, // 1000 kg/ha
+            { p_id: "app3", p_id_catalogue: "other-1", p_app_amount: 500 }, // 500 kg/ha
         ] as FieldInput["fertilizerApplications"]
 
         const result = calculateOrganicMatterSupplyByFertilizers(
@@ -89,7 +89,7 @@ describe("calculateOrganicMatterSupplyByFertilizers", () => {
 
     it("should ignore mineral fertilizers without p_eom", () => {
         const fertilizerApplications: FieldInput["fertilizerApplications"] = [
-            { p_id: "app1", p_id_catalogue: "mineral-1",p_app_amount: 100 },
+            { p_id: "app1", p_id_catalogue: "mineral-1", p_app_amount: 100 },
         ] as FieldInput["fertilizerApplications"]
 
         const result = calculateOrganicMatterSupplyByFertilizers(
@@ -114,7 +114,11 @@ describe("calculateOrganicMatterSupplyByFertilizers", () => {
 
     it("should throw an error if fertilizer details are not found", () => {
         const fertilizerApplications: FieldInput["fertilizerApplications"] = [
-            { p_id: "app1", p_id_catalogue: "non-existent",p_app_amount: 100 },
+            {
+                p_app_id: "app1",
+                p_id_catalogue: "non-existent",
+                p_app_amount: 100,
+            },
         ] as FieldInput["fertilizerApplications"]
 
         expect(() =>

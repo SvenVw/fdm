@@ -80,7 +80,7 @@ describe("calculateNitrogenBalance", () => {
             ],
             fertilizerDetails: [
                 {
-                    p_id: "fertilizer1",
+                    p_id_catalogue: "fertilizer1",
                     p_n_rt: 10,
                     p_type: "mineral",
                     p_no3_rt: 2,

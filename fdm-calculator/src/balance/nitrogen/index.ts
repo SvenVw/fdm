@@ -45,7 +45,7 @@ export async function calculateNitrogenBalance(
 
     // Pre-process details into Maps for efficient lookups
     const fertilizerDetailsMap = new Map<string, FertilizerDetail>(
-        fertilizerDetails.map((detail) => [detail.p_id as string, detail]),
+        fertilizerDetails.map((detail) => [detail.p_id_catalogue as string, detail]),
     )
     const cultivationDetailsMap = new Map(
         cultivationDetails.map((detail) => [detail.b_lu_catalogue, detail]),
