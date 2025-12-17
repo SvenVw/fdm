@@ -78,7 +78,7 @@ export const MagicLinkEmail = ({
                     </Text>
                     <Link
                         href={url}
-                        className="text-[#0070f3] text-[10px] leading-[24px] break-all block mb-[16px]"
+                        className="text-[#0070f3] text-[12px] leading-[24px] break-all block mb-[16px]"
                     >
                         {url}
                     </Link>
