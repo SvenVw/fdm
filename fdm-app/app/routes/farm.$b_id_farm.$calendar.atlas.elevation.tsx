@@ -550,7 +550,7 @@ export default function FarmAtlasElevationBlock() {
                 />
 
                 {/* WMS Overview Layer (Zoom < 13) */}
-                {viewState.zoom < 13 && showElevation && (
+                {showElevation && (
                     <Source
                         id="ahn-wms"
                         type="raster"
@@ -570,8 +570,7 @@ export default function FarmAtlasElevationBlock() {
                 )}
 
                 {/* Render Active Tiles (Zoom >= 13) */}
-                {viewState.zoom >= 13 &&
-                    showElevation &&
+                {showElevation &&
                     activeTiles.map((tile) => (
                         <Fragment key={tile.id}>
                             <Source
@@ -651,6 +650,11 @@ export default function FarmAtlasElevationBlock() {
                         hoverValue={hoverElevation}
                         showScale={viewState.zoom >= 13 && showElevation}
                         networkStatus={networkStatus}
+                        message={
+                            showElevation && viewState.zoom < 13
+                                ? "Zoom in voor meer detail"
+                                : undefined
+                        }
                     />
                     <div className="grid gap-4 w-[350px]">
                         <FieldsPanelHover

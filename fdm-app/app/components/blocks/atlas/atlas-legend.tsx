@@ -8,9 +8,10 @@ interface ElevationLegendProps {
     hoverValue?: number | null
     showScale?: boolean
     networkStatus?: "idle" | "loading" | "slow" | "error"
+    message?: string
 }
 
-export function ElevationLegend({ min, max, loading, hoverValue, showScale = true, networkStatus }: ElevationLegendProps) {
+export function ElevationLegend({ min, max, loading, hoverValue, showScale = true, networkStatus, message }: ElevationLegendProps) {
     return (
         <div className="w-40">
             <Card className="bg-background/90 backdrop-blur-sm shadow-sm">
@@ -31,6 +32,12 @@ export function ElevationLegend({ min, max, loading, hoverValue, showScale = tru
                     {networkStatus === "error" && (
                         <div className="mb-2 text-xs font-medium text-destructive">
                             Fout bij laden
+                        </div>
+                    )}
+
+                    {message && (
+                        <div className="mb-2 text-xs font-medium text-muted-foreground">
+                            {message}
                         </div>
                     )}
                     
