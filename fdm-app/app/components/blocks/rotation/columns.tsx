@@ -25,6 +25,8 @@ import { DataTableColumnHeader } from "./column-header"
 import { DateRangeDisplay } from "./date-range-display"
 import { FertilizerDisplay } from "./fertilizer-display"
 import { HarvestDatesDisplay } from "./harvest-dates-display"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale"
 
 export type CropRow = {
     type: "crop"
@@ -51,6 +53,7 @@ export type FieldRow = {
     a_som_loi: number
     b_soiltype_agr: string
     m_cropresidue: "all" | "some" | "none"
+    m_cropresidue_ending: [Date, boolean][]
     b_lu_variety: string
     b_lu_harvest_date: Date[]
     b_lu_croprotation: string
@@ -233,6 +236,8 @@ export const columns: ColumnDef<RotationExtended>[] = [
                 )
             }
 
+            const affectedFieldsCount =
+                row.original.type === "crop" ? row.original.fields.length : 1
             return (
                 <>
                     <Dialog
@@ -244,15 +249,11 @@ export const columns: ColumnDef<RotationExtended>[] = [
                         <DialogContent>
                             {dialogValue === "none"
                                 ? `Weet u zeker dat u gewasresten naar ${
-                                      row.original.type === "crop"
-                                          ? row.original.fields.length
-                                          : 1
-                                  } percelen wilt verwijderen?`
+                                      affectedFieldsCount
+                                  } ${affectedFieldsCount === 1 ? "perceel" : "percelen"} wilt verwijderen?`
                                 : `Weet u zeker dat u gewasresten aan ${
-                                      row.original.type === "crop"
-                                          ? row.original.fields.length
-                                          : 1
-                                  } percelen wilt toevoegen?`}
+                                      affectedFieldsCount
+                                  } ${affectedFieldsCount === 1 ? "perceel" : "percelen"} wilt toevoegen?`}
                             <DialogFooter>
                                 <DialogClose asChild>
                                     <Button
@@ -295,13 +296,76 @@ export const columns: ColumnDef<RotationExtended>[] = [
                                 } as const
                             )[row.original.m_cropresidue]
                         }
-                        onCheckedChange={(value) => {
-                            row.original.type === "crop" &&
-                            row.original.fields.length > 1
-                                ? setDialogValue(value ? "all" : "none")
-                                : submit(!!value)
-                        }}
-                    />
+                        onCheckedChange={(value) =>
+                            setDialogValue(value ? "all" : "none")
+                        }
+                    />{" "}
+                    {row.original.type === "field" ? (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger>
+                                <Button variant="ghost">
+                                    <p className="text-muted-foreground">
+                                        {
+                                            {
+                                                all: "Ja",
+                                                some: "Som",
+                                                none: "Nee",
+                                            }[row.original.m_cropresidue]
+                                        }
+                                    </p>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <table className="border-separate border-spacing-y-1">
+                                    <tbody>
+                                        {row.original.m_cropresidue_ending.map(
+                                            ([date, value], i) => (
+                                                <DropdownMenuItem
+                                                    key={i}
+                                                    asChild
+                                                    className="table-row"
+                                                >
+                                                    <tr>
+                                                        <td className="p-2 border-solid rounded-l">
+                                                            Eindigt op{" "}
+                                                            {format(
+                                                                date,
+                                                                "d MMMM yyy",
+                                                                nl,
+                                                            )}
+                                                        </td>
+                                                        <td className="p-2 border-solid rounded-r">
+                                                            {value
+                                                                ? "Ja"
+                                                                : "Nee"}
+                                                        </td>
+                                                    </tr>
+                                                </DropdownMenuItem>
+                                            ),
+                                        )}
+                                    </tbody>
+                                </table>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    ) : (
+                        <Button
+                            variant="ghost"
+                            asChild
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                if (!row.getIsExpanded())
+                                    row.toggleExpanded(true)
+                            }}
+                        >
+                            <div>
+                                {
+                                    { all: "Ja", some: "Som", none: "Nee" }[
+                                        row.original.m_cropresidue
+                                    ]
+                                }
+                            </div>
+                        </Button>
+                    )}
                 </>
             )
         },

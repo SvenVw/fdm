@@ -288,13 +288,13 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     (cultivation: { b_lu: string }) => cultivation.b_lu,
                 )
 
-                const cropResidue = fieldsWithThisCultivation.map((field) =>
+                const cropResidue = fieldsWithThisCultivation.flatMap((field) =>
                     field.cultivations
                         .filter(
                             (cultivation) =>
                                 cultivation.b_lu_catalogue === b_lu_catalogue,
                         )
-                        .some((cultivation) => cultivation.m_cropresidue),
+                        .map((cultivation) => cultivation.m_cropresidue),
                 )
                 const aggr_m_crop_residue = cropResidue.every((a) => a)
                     ? "all"
@@ -314,7 +314,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     b_lu_end: b_lu_end,
                     calendar: calendar,
                     m_cropresidue: aggr_m_crop_residue,
-                    fields: fieldsWithThisCultivation.map((field) => ({
+                    fields: fieldsWithThisCultivation.map((field, i) => ({
                         // TODO: Define a proper type for field
                         type: "field",
                         b_id: field.b_id,
@@ -349,15 +349,34 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                                 (harvest: { b_lu_harvest_date: Date[] }) =>
                                     harvest.b_lu_harvest_date,
                             ),
-                        m_cropresidue: field.cultivations
-                            .filter(
+                        ...(() => {
+                            const cultivations = field.cultivations.filter(
                                 (cultivation) =>
                                     cultivation.b_lu_catalogue ===
                                     b_lu_catalogue,
                             )
-                            .some((cultivation) => cultivation.m_cropresidue)
-                            ? "all"
-                            : "none",
+
+                            return {
+                                m_cropresidue: cultivations.every(
+                                    (cultivation) => cultivation.m_cropresidue,
+                                )
+                                    ? "all"
+                                    : cultivations.some(
+                                            (cultivation) =>
+                                                cultivation.m_cropresidue,
+                                        )
+                                      ? "some"
+                                      : "none",
+                                m_cropresidue_ending: cultivations
+                                    .filter(
+                                        (cultivation) => cultivation.b_lu_end,
+                                    )
+                                    .map((cultivation) => [
+                                        cultivation.b_lu_end,
+                                        cultivation.m_cropresidue,
+                                    ]),
+                            }
+                        })(),
                         fertilizerApplications:
                             field.fertilizerApplications.map(
                                 (app: {
