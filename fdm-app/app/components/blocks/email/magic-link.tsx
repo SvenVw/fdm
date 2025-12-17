@@ -71,10 +71,20 @@ export const MagicLinkEmail = ({
                         >
                             Aanmelden bij {appName}
                         </Button>
-                        <Text className="text-[#666666] text-[12px] leading-[24px] mt-[5px] block text-center">
-                            Deze link is éénmalig en voor 15 minuten geldig.
-                        </Text>
                     </Section>
+                    <Text className="text-black text-[14px] leading-[24px]">
+                        Werkt de knop niet? Kopieer en plak dan de onderstaande
+                        link in uw browser:
+                    </Text>
+                    <Link
+                        href={url}
+                        className="text-[#0070f3] text-[12px] leading-[24px] break-all block mb-[16px]"
+                    >
+                        {url}
+                    </Link>
+                    <Text className="text-[#666666] text-[12px] leading-[24px] mt-[5px] block text-center mb-[32px]">
+                        Deze link is éénmalig en voor 15 minuten geldig.
+                    </Text>
                     <Text className="text-black text-[14px] leading-[24px]">
                         Indien u dit niet heeft aangevraagd, kunt u deze e-mail
                         negeren.
