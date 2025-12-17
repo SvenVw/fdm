@@ -216,6 +216,7 @@ export default function FarmAtlasElevationBlock() {
     useEffect(() => {
         async function fetchIndex() {
             const cacheKey = "ahn_kaartbladindex_v1"
+            setNetworkStatus("loading")
             try {
                 // Try cache
                 if (typeof localStorage !== "undefined") {
@@ -229,6 +230,7 @@ export default function FarmAtlasElevationBlock() {
                                 7 * 24 * 60 * 60 * 1000
                             ) {
                                 setIndexData(data)
+                                setNetworkStatus("idle")
                                 return
                             }
                         } catch {
@@ -243,6 +245,7 @@ export default function FarmAtlasElevationBlock() {
                 if (!response.ok) throw new Error("Failed to fetch COG index")
                 const data = (await response.json()) as FeatureCollection
                 setIndexData(data)
+                setNetworkStatus("idle")
 
                 if (typeof localStorage !== "undefined") {
                     try {
@@ -256,6 +259,7 @@ export default function FarmAtlasElevationBlock() {
                 }
             } catch (e) {
                 console.error("Error fetching COG index:", e)
+                setNetworkStatus("error")
             }
         }
         fetchIndex()
