@@ -543,16 +543,17 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                                 "sticky right-0 bg-background":
                                                     cell.column.id ===
                                                     "actions",
-                                                "pt-0 pb-0 ps-2":
-                                                    row.original.type ===
-                                                    "field",
-                                                // Override specific style class in the Table component definition
-                                                "[&:has([role=checkbox])]:ps-2":
-                                                    row.original.type ===
-                                                        "field" &&
-                                                    cell.column.id ===
-                                                        "m_cropresidue",
                                             })}
+                                            // This is cleaner than using Tailwind due to class priority issues
+                                            style={{
+                                                ...(row.original.type ===
+                                                "field"
+                                                    ? {
+                                                          padding:
+                                                              "calc(0.5 * var(--spacing)) calc(2 * var(--spacing));",
+                                                      }
+                                                    : {}),
+                                            }}
                                         >
                                             {flexRender(
                                                 cell.column.columnDef.cell,

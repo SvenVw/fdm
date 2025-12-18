@@ -25,6 +25,7 @@ import { DateRangeDisplay } from "./date-range-display"
 import { TableDateSelector } from "./date-selector"
 import { FertilizerDisplay } from "./fertilizer-display"
 import { HarvestDatesDisplay } from "./harvest-dates-display"
+import { TableVarietySelector } from "./variety-selector"
 
 export type CropRow = {
     type: "crop"
@@ -33,6 +34,7 @@ export type CropRow = {
     b_lu_name: string
     m_cropresidue: string
     b_lu_variety: Record<string, number>
+    b_lu_variety_options: { label: string; value: string }[] | null
     b_lu_croprotation: string
     b_lu_harvestable: "once" | "multiple" | "none"
     calendar: string
@@ -262,17 +264,13 @@ export const columns: ColumnDef<RotationExtended>[] = [
             return <DataTableColumnHeader column={column} title="Variëteit" />
         },
         enableHiding: true, // Enable hiding for mobile
-        cell: ({ row }) => {
-            const value = row.original.b_lu_variety
-                ? Object.keys(row.original.b_lu_variety)
-                : null
-            if (!value) return null
-            const str =
-                value.length <= 5
-                    ? value.join(", ")
-                    : `${value.slice(0, 5).join(", ")} en meer`
-            return str
-        },
+        cell: ({ cell, row }) => (
+            <TableVarietySelector
+                name="b_lu_variety"
+                row={row}
+                cellId={cell.id}
+            />
+        ),
     },
     {
         accessorKey: "m_cropresidue",

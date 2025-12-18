@@ -334,6 +334,16 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                                 ),
                         ).sort((a, b) => b[1] - a[1]),
                     ),
+                    b_lu_variety_options:
+                        cultivationCatalogue
+                            .find(
+                                (item: { b_lu_catalogue: string }) =>
+                                    item.b_lu_catalogue === b_lu_catalogue,
+                            )
+                            ?.b_lu_variety_options?.map((option: string) => ({
+                                value: option,
+                                label: option,
+                            })) ?? null,
                     b_lu_croprotation:
                         cultivationsForCatalogue[0]?.b_lu_croprotation ?? "",
                     b_lu_harvestable:
