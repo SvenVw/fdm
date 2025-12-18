@@ -1,6 +1,4 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { format } from "date-fns"
-import { nl } from "date-fns/locale/nl"
 import { ArrowUpRightFromSquare, ChevronRight } from "lucide-react"
 import React from "react"
 import { NavLink, useFetcher, useParams } from "react-router-dom"
@@ -10,12 +8,6 @@ import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Checkbox } from "~/components/ui/checkbox"
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogFooter,
-} from "~/components/ui/dialog"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -243,11 +235,8 @@ export const columns: ColumnDef<RotationExtended>[] = [
             return <DataTableColumnHeader column={column} title="Gewasresten" />
         },
         enableHiding: true, // Enable hiding for mobile
-        cell: ({ row }) => {
+        cell: ({ cell, row }) => {
             const fetcher = useFetcher()
-            const [dialogValue, setDialogValue] = React.useState<
-                string | undefined
-            >()
 
             const submit = (value: boolean) => {
                 return fetcher.submit(
@@ -268,57 +257,14 @@ export const columns: ColumnDef<RotationExtended>[] = [
                 )
             }
 
-            const affectedFieldsCount =
-                row.original.type === "crop" ? row.original.fields.length : 1
-            return (
-                <>
-                    <Dialog
-                        open={!!dialogValue}
-                        onOpenChange={(open) => {
-                            if (!open && dialogValue) setDialogValue(undefined)
-                        }}
-                    >
-                        <DialogContent>
-                            {dialogValue === "none"
-                                ? `Weet u zeker dat u gewasresten naar ${
-                                      affectedFieldsCount
-                                  } ${affectedFieldsCount === 1 ? "perceel" : "percelen"} wilt verwijderen?`
-                                : `Weet u zeker dat u gewasresten aan ${
-                                      affectedFieldsCount
-                                  } ${affectedFieldsCount === 1 ? "perceel" : "percelen"} wilt toevoegen?`}
-                            <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        className="mr-auto"
-                                    >
-                                        Annuleren
-                                    </Button>
-                                </DialogClose>
-                                <Button
-                                    type="button"
-                                    form="formHarvest"
-                                    disabled={fetcher.state === "submitting"}
-                                    onClick={() =>
-                                        submit(dialogValue === "all").then(() =>
-                                            setDialogValue(undefined),
-                                        )
-                                    }
-                                >
-                                    {fetcher.state === "submitting" ? (
-                                        <div className="flex items-center space-x-2">
-                                            <LoadingSpinner />
-                                            <span>Opslaan...</span>
-                                        </div>
-                                    ) : (
-                                        "Bijwerken"
-                                    )}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+            const inputId = `${cell.id}_checkbox`
+
+            return fetcher.state === "submitting" ? (
+                <LoadingSpinner />
+            ) : (
+                <div className="flex flex-row items-center gap-1">
                     <Checkbox
+                        id={inputId}
                         checked={
                             (
                                 {
@@ -328,77 +274,21 @@ export const columns: ColumnDef<RotationExtended>[] = [
                                 } as const
                             )[row.original.m_cropresidue]
                         }
-                        onCheckedChange={(value) =>
-                            setDialogValue(value ? "all" : "none")
-                        }
-                    />{" "}
-                    {row.original.type === "field" ? (
-                        <DropdownMenu>
-                            <DropdownMenuTrigger>
-                                <Button variant="ghost">
-                                    <p className="text-muted-foreground">
-                                        {
-                                            {
-                                                all: "Ja",
-                                                some: "Som",
-                                                none: "Nee",
-                                            }[row.original.m_cropresidue]
-                                        }
-                                    </p>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <table className="border-separate border-spacing-y-1">
-                                    <tbody>
-                                        {row.original.m_cropresidue_ending.map(
-                                            ([date, value], i) => (
-                                                <DropdownMenuItem
-                                                    key={i}
-                                                    asChild
-                                                    className="table-row"
-                                                >
-                                                    <tr>
-                                                        <td className="p-2 border-solid rounded-l">
-                                                            Eindigt op{" "}
-                                                            {format(
-                                                                date,
-                                                                "d MMMM yyyy",
-                                                                { locale: nl },
-                                                            )}
-                                                        </td>
-                                                        <td className="p-2 border-solid rounded-r">
-                                                            {value
-                                                                ? "Ja"
-                                                                : "Nee"}
-                                                        </td>
-                                                    </tr>
-                                                </DropdownMenuItem>
-                                            ),
-                                        )}
-                                    </tbody>
-                                </table>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    ) : (
-                        <Button
-                            variant="ghost"
-                            asChild
-                            onClick={(e) => {
-                                e.stopPropagation()
-                                if (!row.getIsExpanded())
-                                    row.toggleExpanded(true)
-                            }}
-                        >
-                            <div>
+                        onCheckedChange={(value) => submit(!!value)}
+                    />
+                    <label htmlFor={inputId}>
+                        {" "}
+                        {
+                            (
                                 {
-                                    { all: "Ja", some: "Som", none: "Nee" }[
-                                        row.original.m_cropresidue
-                                    ]
-                                }
-                            </div>
-                        </Button>
-                    )}
-                </>
+                                    all: "Ja",
+                                    some: "Gedeeltelijk",
+                                    none: "Nee",
+                                } as const
+                            )[row.original.m_cropresidue]
+                        }
+                    </label>
+                </div>
             )
         },
     },
