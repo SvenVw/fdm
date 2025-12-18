@@ -543,6 +543,15 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                                 "sticky right-0 bg-background":
                                                     cell.column.id ===
                                                     "actions",
+                                                "p-0 ps-2":
+                                                    row.original.type ===
+                                                    "field",
+                                                // Override specific style class in the Table component definition
+                                                "[&:has([role=checkbox])]:ps-2":
+                                                    row.original.type ===
+                                                        "field" &&
+                                                    cell.column.id ===
+                                                        "m_cropresidue",
                                             })}
                                         >
                                             {flexRender(

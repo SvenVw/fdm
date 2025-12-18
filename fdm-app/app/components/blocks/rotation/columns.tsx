@@ -174,7 +174,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
                     to={`/farm/${params.b_id_farm}/${params.calendar}/field/${original.b_id}`}
                     className="group flex items-center hover:underline w-fit"
                 >
-                    <div className="inline-block ps-4">
+                    <div className="group flex items-center hover:underline w-fit ps-4">
                         {original.b_name}
                         <ArrowUpRightFromSquare className="ml-2 h-4 w-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
@@ -228,9 +228,10 @@ export const columns: ColumnDef<RotationExtended>[] = [
                         range={row.original.b_lu_end}
                         emptyContent="Geen"
                     />
+                    &nbsp;
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <CircleQuestionMark className="text-muted-foreground inline-block h-4" />
+                            <CircleQuestionMark className="inline-block text-muted-foreground h-4" />
                         </TooltipTrigger>
                         <TooltipContent>
                             U zou in plaats daarvan een oogst moeten toevoegen.
