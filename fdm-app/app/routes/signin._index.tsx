@@ -26,7 +26,7 @@ import {
     Landmark,
     LayersIcon,
 } from "lucide-react"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { FormProvider } from "react-hook-form"
 import type {
     ActionFunctionArgs,
@@ -36,7 +36,7 @@ import type {
 } from "react-router"
 import { Form, Link, NavLink, redirect, useSearchParams } from "react-router"
 import { useRemixForm } from "remix-hook-form"
-import { dataWithError, redirectWithSuccess } from "remix-toast"
+import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
@@ -163,6 +163,9 @@ function getSafeRedirect(address: string | null) {
 export default function SignIn() {
     const [searchParams, setSearchParams] = useSearchParams() // Get search params
     const moreInfoRef = useRef<HTMLDivElement>(null)
+    const [socialSignInError, setSocialSignInError] = useState<string | null>(
+        null,
+    )
 
     const rawRedirectTo = searchParams.get("redirectTo")
     const redirectTo = getSafeRedirect(rawRedirectTo) // Validate redirectTo to prevent open redirect
@@ -182,8 +185,7 @@ export default function SignIn() {
     )
 
     const handleSignInError = (provider: string, error: unknown) => {
-        dataWithError(
-            null,
+        setSocialSignInError(
             `Er is helaas iets misgegaan bij het aanmelden met ${provider}. Probeer het opnieuw.`,
         )
         console.error("Social sign-in failed:", error)
@@ -346,6 +348,14 @@ export default function SignIn() {
                                                 Aanmelden met Google
                                             </Button>
                                         </div>
+                                        {socialSignInError && (
+                                            <p
+                                                role="alert"
+                                                className="text-sm text-destructive text-center"
+                                            >
+                                                {socialSignInError}
+                                            </p>
+                                        )}
                                     </div>
                                     <div className="relative">
                                         <div className="absolute inset-0 flex items-center">
@@ -920,8 +930,8 @@ export default function SignIn() {
                             <p className="text-lg leading-relaxed text-muted-foreground">
                                 Verken agrarisch Nederland met de interactieve
                                 Atlas. Navigeer door de jaren heen en krijg
-                                direct inzicht in perceelshistorie, het microreliëf en
-                                gebiedskenmerken.
+                                direct inzicht in perceelshistorie, het
+                                microreliëf en gebiedskenmerken.
                             </p>
                         </div>
 
@@ -940,7 +950,8 @@ export default function SignIn() {
                                         De interactieve kaart toont
                                         gewaspercelen tot 2020, helder
                                         ingekleurd per gewasgroep. Krijg direct
-                                        visueel inzicht in toegepaste rotaties door de jaren heen.
+                                        visueel inzicht in toegepaste rotaties
+                                        door de jaren heen.
                                     </p>
                                 </CardContent>
                             </Card>
@@ -956,10 +967,9 @@ export default function SignIn() {
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-sm text-muted-foreground leading-relaxed">
-                                        Bekijk de AHN4 voor een
-                                        gedetailleerde weergave van het
-                                        hoogteverloop en het microreliëf op en
-                                        rondom percelen.
+                                        Bekijk de AHN4 voor een gedetailleerde
+                                        weergave van het hoogteverloop en het
+                                        microreliëf op en rondom percelen.
                                     </p>
                                 </CardContent>
                             </Card>
@@ -995,8 +1005,9 @@ export default function SignIn() {
                                 <CardContent>
                                     <p className="text-sm text-muted-foreground leading-relaxed">
                                         De kaart toont in welke relevante
-                                        gebieden een perceel ligt, zodat u direct
-                                        weet welke in welke regio's voor de gebruiksnormen het perceel ligt.
+                                        gebieden een perceel ligt, zodat u
+                                        direct weet welke in welke regio's voor
+                                        de gebruiksnormen het perceel ligt.
                                     </p>
                                 </CardContent>
                             </Card>
@@ -1012,8 +1023,10 @@ export default function SignIn() {
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-sm text-muted-foreground leading-relaxed">
-                                        Raadpleeg data voor uw gewas:
-                                        van grondwatertrappen tot de bodemsamenstelling zoals zand-, klei- en siltgehalte.
+                                        Raadpleeg data voor uw gewas: van
+                                        grondwatertrappen tot de
+                                        bodemsamenstelling zoals zand-, klei- en
+                                        siltgehalte.
                                     </p>
                                 </CardContent>
                             </Card>
