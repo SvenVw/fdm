@@ -317,9 +317,6 @@ importers:
       '@types/mapbox__geojson-extent':
         specifier: ^1.0.3
         version: 1.0.3
-      '@types/maplibre-gl':
-        specifier: ^1.14.0
-        version: 1.14.0
       '@types/react':
         specifier: ^19.2.7
         version: 19.2.7
@@ -5047,10 +5044,6 @@ packages:
 
   '@types/mapbox__geojson-extent@1.0.3':
     resolution: {integrity: sha512-i7r+3Iencd5PMleZmIRciaN8ntaGvwPA2sHts50YFrZeH9FIJFAjK64HgDaqzrtecmPbMvIltQuwuEbEQfoUJA==}
-
-  '@types/maplibre-gl@1.14.0':
-    resolution: {integrity: sha512-I6ibscT7UdL1oOqqCz9s1gjcolLaUPkHIIfMLusczTvlsMhjORyS6sE1g4V/NESAOL5KhNQX3/31LJH+OCGjkg==}
-    deprecated: This is a stub types definition. maplibre-gl provides its own type definitions, so you do not need this installed.
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -16732,10 +16725,6 @@ snapshots:
   '@types/mapbox__geojson-extent@1.0.3':
     dependencies:
       '@types/geojson': 7946.0.16
-
-  '@types/maplibre-gl@1.14.0':
-    dependencies:
-      maplibre-gl: 5.15.0
 
   '@types/mdast@4.0.4':
     dependencies:
