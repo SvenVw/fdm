@@ -48,6 +48,7 @@
         },
         "onlyBuiltDependencies": [
             "@biomejs/biome",
+            "@geomatico/maplibre-cog-protocol",
             "@sentry-internal/node-cpu-profiler",
             "@sentry/cli",
             "@swc/core",
