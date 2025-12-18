@@ -122,8 +122,8 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
             },
         ]
         const timeFrame: NitrogenBalanceInput["timeFrame"] = {
-            start: new Date(new Date("2023-01-01")),
-            end: new Date(new Date("2023-12-31")),
+            start: new Date("2023-01-01"),
+            end: new Date("2023-12-31"),
         }
         const soilAnalysis: SoilAnalysisPicked = {
             ...mockSoilAnalysis,
@@ -151,8 +151,8 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
             },
         ]
         const timeFrame: NitrogenBalanceInput["timeFrame"] = {
-            start: new Date(new Date("2023-01-01")),
-            end: new Date(new Date("2023-12-31")),
+            start: new Date("2023-01-01"),
+            end: new Date("2023-12-31"),
         }
         const soilAnalysis: SoilAnalysisPicked = {
             ...mockSoilAnalysis,
@@ -180,8 +180,8 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
             },
         ]
         const timeFrame: NitrogenBalanceInput["timeFrame"] = {
-            start: new Date(new Date("2023-01-01")),
-            end: new Date(new Date("2023-12-31")),
+            start: new Date("2023-01-01"),
+            end: new Date("2023-12-31"),
         }
         const soilAnalysis: SoilAnalysisPicked = {
             ...mockSoilAnalysis,
@@ -209,7 +209,7 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
             },
         ]
         const timeFrame: NitrogenBalanceInput["timeFrame"] = {
-            start: new Date(new Date("2023-01-01")),
+            start: new Date("2023-01-01"),
             end: new Date("2023-06-30"),
         }
         const soilAnalysis: SoilAnalysisPicked = {
@@ -238,8 +238,8 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
             },
         ]
         const timeFrame: NitrogenBalanceInput["timeFrame"] = {
-            start: new Date(new Date("2023-01-01")),
-            end: new Date(new Date("2024-12-31")),
+            start: new Date("2023-01-01"),
+            end: new Date("2024-12-31"),
         }
         const soilAnalysis: SoilAnalysisPicked = {
             ...mockSoilAnalysis,
