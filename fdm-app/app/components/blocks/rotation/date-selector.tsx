@@ -114,6 +114,7 @@ export function TableDateSelector({
     return (
         <Button
             variant="link"
+            className="px-0"
             onClick={(e) => {
                 e.stopPropagation()
                 activeTableFormStore.setActiveForm(cellId)
