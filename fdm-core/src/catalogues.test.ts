@@ -823,7 +823,7 @@ describe("Catalogues syncing", () => {
         expect(Array.isArray(options)).toBe(true)
         expect(options.length).toBeGreaterThan(0)
         expect(
-            options.every((s) => typeof s === "string" && s.trim().length > 0),
+            options.every((s: string) => typeof s === "string" && s.trim().length > 0),
         ).toBe(true)
     })
 })

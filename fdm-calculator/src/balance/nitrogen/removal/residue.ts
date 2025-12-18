@@ -40,7 +40,7 @@ export function calculateNitrogenRemovalByResidue(
         }
 
         // If no crop residues are left or if this is not known return 0 for the amount of Nitrogen removed by crop residues
-        if (!cultivation.m_cropresidue || cultivation.m_cropresidue === false) {
+        if (!cultivation.m_cropresidue) {
             return {
                 id: cultivation.b_lu,
                 value: new Decimal(0),
@@ -62,13 +62,15 @@ export function calculateNitrogenRemovalByResidue(
                 // Prioritize the specific yield if available
                 const analysisWithYield =
                     harvest.harvestable.harvestable_analyses.find(
-                        (analysis: { b_lu_yield: number | undefined }) =>
+                        (analysis: {
+                            b_lu_yield: number | null | undefined
+                        }) =>
                             analysis.b_lu_yield !== undefined &&
                             analysis.b_lu_yield !== null,
                     )
                 if (analysisWithYield) {
                     yieldForThisHarvest = new Decimal(
-                        analysisWithYield.b_lu_yield,
+                        analysisWithYield.b_lu_yield ?? 0,
                     )
                 }
             }

@@ -24,10 +24,7 @@ export function calculateNL2026FertilizerApplicationFillingForDierlijkeMestGebru
     // Create maps for efficient lookups of fertilizers and RVO types.
     // This avoids iterating over the arrays repeatedly in a loop.
     const fertilizersMap = new Map(
-        fertilizers.map((fertilizer) => [
-            fertilizer.p_id_catalogue,
-            fertilizer,
-        ]),
+        fertilizers.map((fertilizer) => [fertilizer.p_id_catalogue, fertilizer]),
     )
     const rvoTypeMap = new Map(
         table11Mestcodes.map((rvoType) => [rvoType.p_type_rvo, rvoType]),
@@ -63,7 +60,7 @@ export function calculateNL2026FertilizerApplicationFillingForDierlijkeMestGebru
             let normFilling = new Decimal(0)
             // Check if the fertilizer is relevant for the nitrates directive.
             if (rvoTypeProperties.p_type_nitratesdirective) {
-                const amount = new Decimal(application.p_app_amount)
+                const amount = new Decimal(application.p_app_amount ?? 0)
                 // Determine the nitrogen content, using specific values if available, otherwise fallback to default.
                 const p_n_rt = new Decimal(
                     fertilizer.p_n_rt ?? rvoTypeProperties.p_n_rt ?? 0,

@@ -98,6 +98,8 @@ export interface CurrentSoilDataItem {
     value: number | string | null
     a_id: schema.soilAnalysisTypeSelect["a_id"]
     b_sampling_date: schema.soilSamplingTypeSelect["b_sampling_date"]
+    a_depth_upper: schema.soilSamplingTypeSelect["a_depth_upper"]
+    a_depth_lower: schema.soilSamplingTypeSelect["a_depth_lower"]
     a_source: schema.soilAnalysisTypeSelect["a_source"]
 }
 

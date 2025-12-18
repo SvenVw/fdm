@@ -69,7 +69,7 @@ describe("Farm Data Model", () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry: Polygon = {
-                type: "Polygon",
+                type: "Polygon" as const,
                 coordinates: [
                     [
                         [0, 0],
@@ -116,7 +116,7 @@ describe("Farm Data Model", () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry: Polygon = {
-                type: "Polygon",
+                type: "Polygon" as const,
                 coordinates: [
                     [
                         [0, 0],
@@ -180,7 +180,7 @@ describe("Farm Data Model", () => {
                 const field1Name = "Field 1"
                 const field1Source = "source1"
                 const field1Geometry = {
-                    type: "Polygon",
+                    type: "Polygon" as const,
                     coordinates: [
                         [
                             [30, 10],
@@ -207,7 +207,7 @@ describe("Farm Data Model", () => {
                 const field2Name = "Field 2"
                 const field2Source = "source2"
                 const field2Geometry = {
-                    type: "Polygon",
+                    type: "Polygon" as const,
                     coordinates: [
                         [
                             [30, 10],
@@ -256,7 +256,7 @@ describe("Farm Data Model", () => {
                 const field1Name = "Field 1"
                 const field1Source = "source1"
                 const field1Geometry = {
-                    type: "Polygon",
+                    type: "Polygon" as const,
                     coordinates: [
                         [
                             [30, 10],
@@ -285,7 +285,7 @@ describe("Farm Data Model", () => {
                 const field2Name = "Field 2"
                 const field2Source = "source2"
                 const field2Geometry = {
-                    type: "Polygon",
+                    type: "Polygon" as const,
                     coordinates: [
                         [
                             [30, 10],
@@ -311,7 +311,7 @@ describe("Farm Data Model", () => {
                 const field3Name = "Field 3"
                 const field3Source = "source3"
                 const field3Geometry = {
-                    type: "Polygon",
+                    type: "Polygon" as const,
                     coordinates: [
                         [
                             [30, 10],
@@ -339,7 +339,7 @@ describe("Farm Data Model", () => {
                 const field4Name = "Field 4"
                 const field4Source = "source4"
                 const field4Geometry = {
-                    type: "Polygon",
+                    type: "Polygon" as const,
                     coordinates: [
                         [
                             [30, 10],
@@ -471,7 +471,7 @@ describe("Farm Data Model", () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry: Polygon = {
-                type: "Polygon",
+                type: "Polygon" as const,
                 coordinates: [
                     [
                         [0, 0],
@@ -500,7 +500,7 @@ describe("Farm Data Model", () => {
             const updatedFieldName = "Updated Test Field"
             const updatedFieldIDSource = "updated-test-field-id"
             const updatedFieldGeometry: Polygon = {
-                type: "Polygon",
+                type: "Polygon" as const,
                 coordinates: [
                     [
                         [30, 10],
@@ -550,7 +550,7 @@ describe("Farm Data Model", () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry: Polygon = {
-                type: "Polygon",
+                type: "Polygon" as const,
                 coordinates: [
                     [
                         [0, 0],
@@ -681,7 +681,7 @@ describe("Farm Data Model", () => {
             const fieldName = "Field with Hole"
             const fieldIDSource = "test-field-id-hole"
             const fieldGeometry: Polygon = {
-                type: "Polygon",
+                type: "Polygon" as const,
                 coordinates: [
                     // Outer ring
                     [
@@ -758,6 +758,10 @@ describe("Farm Data Model", () => {
                 b_lu_hcat3: "test-hcat3",
                 b_lu_hcat3_name: "test-hcat3-name",
                 b_lu_croprotation: "cereal",
+                b_lu_harvestcat: "HC010",
+                b_lu_dm: 500,
+                b_lu_eom: null,
+                b_lu_eom_residues: null,
                 b_lu_yield: 6000,
                 b_lu_hi: 0.4,
                 b_lu_n_harvestable: 4,
@@ -778,7 +782,7 @@ describe("Farm Data Model", () => {
                 "Test Field",
                 "source1",
                 {
-                    type: "Polygon",
+                    type: "Polygon" as const,
                     coordinates: [
                         [
                             [-1, -1],
@@ -840,7 +844,7 @@ describe("Farm Data Model", () => {
                 "Test Field",
                 "source1",
                 {
-                    type: "Polygon",
+                    type: "Polygon" as const,
                     coordinates: [
                         [
                             [-1, -1],
@@ -883,7 +887,7 @@ describe("Farm Data Model", () => {
                 "Test Field",
                 "source1",
                 {
-                    type: "Polygon",
+                    type: "Polygon" as const,
                     coordinates: [
                         [
                             [-1, -1],
@@ -911,7 +915,7 @@ describe("Farm Data Model", () => {
                 "Test Field",
                 "source1",
                 {
-                    type: "Polygon",
+                    type: "Polygon" as const,
                     coordinates: [
                         [
                             [-1, -1],
@@ -938,7 +942,11 @@ describe("Farm Data Model", () => {
                 principal_id,
                 cultivationId,
                 new Date("2025-08-10"),
-                5000,
+                {
+                    b_lu_yield_fresh: 5000,
+                    b_lu_dm: 500,
+                    b_lu_n_harvestable: 20,
+                },
             )
 
             await removeField(fdm, principal_id, fieldId)

@@ -83,6 +83,7 @@ describe("collectInputForOrganicMatterBalance", () => {
     })
 
     it("should throw an error if a specified field is not found", async () => {
+        // @ts-expect-error
         vi.spyOn(fdmCore, "getField").mockResolvedValue(null)
 
         await expect(

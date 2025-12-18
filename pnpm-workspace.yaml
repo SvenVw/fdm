@@ -12,6 +12,7 @@ catalog:
   '@rollup/plugin-node-resolve': ^16.0.3
   '@rollup/plugin-typescript': ^12.3.0
   '@vitest/coverage-v8': 4.0.14
+  '@types/node': ^24.10.1
   better-auth: ^1.4.5
   drizzle-kit: ^0.31.7
   drizzle-orm: ^0.44.7

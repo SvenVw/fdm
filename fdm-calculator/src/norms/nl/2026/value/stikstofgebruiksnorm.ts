@@ -144,6 +144,7 @@ function determineSubTypeOmschrijving(
         const hasLucernceCultivationInPreviousYear = cultivations.some(
             (c) =>
                 lucerneCultivationCodes.includes(c.b_lu_catalogue) &&
+                c.b_lu_start &&
                 c.b_lu_start.getFullYear() <= 2025,
         )
         return hasLucernceCultivationInPreviousYear
@@ -166,6 +167,7 @@ function determineSubTypeOmschrijving(
         const hasGrasCultivationInPreviousYear = cultivations.some(
             (c) =>
                 grasCultivationCodes.includes(c.b_lu_catalogue) &&
+                c.b_lu_start &&
                 c.b_lu_start.getFullYear() <= 2025,
         )
         return hasGrasCultivationInPreviousYear
@@ -182,6 +184,7 @@ function determineSubTypeOmschrijving(
         const hasGraszaadCultivationInPreviousYear = cultivations.some(
             (c) =>
                 graszaadCultivationCodes.includes(c.b_lu_catalogue) &&
+                c.b_lu_start &&
                 c.b_lu_start.getFullYear() <= 2025,
         )
         return hasGraszaadCultivationInPreviousYear ? "overjarig" : "1e jaars"
@@ -195,6 +198,7 @@ function determineSubTypeOmschrijving(
         const hasRoodzwenkgrasCultivationInPreviousYear = cultivations.some(
             (c) =>
                 roodzwenkgrasCultivationCodes.includes(c.b_lu_catalogue) &&
+                c.b_lu_start &&
                 c.b_lu_start.getFullYear() <= 2025,
         )
         return hasRoodzwenkgrasCultivationInPreviousYear
@@ -265,7 +269,9 @@ function calculateKorting(
 
     // Determine hoofdteelt for the current year (2026)
     const hoofdteelt2026 = determineNLHoofdteelt(
-        cultivations.filter((c) => c.b_lu_start.getFullYear() === currentYear),
+        cultivations.filter(
+            (c) => c.b_lu_start && c.b_lu_start.getFullYear() === currentYear,
+        ),
         2026,
     )
     const hoofdteelt2026Standard = nitrogenStandardsData.find((ns) =>
@@ -282,7 +288,7 @@ function calculateKorting(
 
     // Filter cultivations for the previous year (2025)
     const cultivations2025 = cultivations.filter(
-        (c) => c.b_lu_start.getFullYear() === previousYear,
+        (c) => c.b_lu_start && c.b_lu_start.getFullYear() === previousYear,
     )
 
     // Check for vanggewas exception in 2025
@@ -291,6 +297,7 @@ function calculateKorting(
             ns.b_lu_catalogue_match.includes(prevCultivation.b_lu_catalogue),
         )
         const matchingYear =
+            prevCultivation.b_lu_start &&
             prevCultivation.b_lu_start.getTime() <
                 new Date(currentYear, 1, 1).getTime() &&
             prevCultivation.b_lu_start.getTime() >
@@ -309,7 +316,9 @@ function calculateKorting(
         (prevCultivation) => {
             return (
                 prevCultivation.b_lu_end === null ||
-                prevCultivation.b_lu_end.getTime() >= new Date(currentYear, 1) // Month 1 is February
+                (prevCultivation.b_lu_end &&
+                    prevCultivation.b_lu_end.getTime() >=
+                        new Date(currentYear, 1).getTime()) // Month 1 is February
             )
         },
     )
@@ -321,12 +330,24 @@ function calculateKorting(
         }
     }
     // If multiple vanggewassen are completed to February 1st select the vangewas that was first sown
-    const sortedVanggewassen = vanggewassenCompleted2025.sort((a, b) => {
-        return a.b_lu_start.getTime() - b.b_lu_start.getTime()
-    })
+    const sortedVanggewassen = vanggewassenCompleted2025
+        .filter((v) => v.b_lu_start !== undefined)
+        .sort((a, b) => {
+            if (!a.b_lu_start || !b.b_lu_start) {
+                return 0
+            }
+            return a.b_lu_start.getTime() - b.b_lu_start.getTime()
+        })
     const vanggewas2025 = sortedVanggewassen[0]
 
     const sowDate = vanggewas2025.b_lu_start
+    if (!sowDate) {
+        return {
+            amount: new Decimal(20),
+            description: ". Korting: 20kg N/ha, geen zaaidatum bekend",
+        }
+    }
+
     const october1 = new Date(previousYear, 9, 1) // October 1st
     const october15 = new Date(previousYear, 9, 15) // October 15th
     const november1 = new Date(previousYear, 10, 1) // November 1st
@@ -510,7 +531,7 @@ export async function calculateNL2026StikstofGebruiksNorm(
 
     const applicableNorms = getNormsForCultivation(
         selectedStandard,
-        cultivation.b_lu_end,
+        cultivation.b_lu_end ?? new Date("2026-12-31"),
         subTypeOmschrijving,
     )
 

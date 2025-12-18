@@ -15,7 +15,7 @@ import type {
     OrganicMatterBalanceField,
     OrganicMatterBalanceFieldResult,
     OrganicMatterBalanceInput,
-} from "./types.d"
+} from "./types"
 
 vi.mock("./supply")
 vi.mock("./degradation")

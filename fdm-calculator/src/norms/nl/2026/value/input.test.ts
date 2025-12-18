@@ -1,8 +1,8 @@
 import type {
     Cultivation,
+    CurrentSoilData,
     FdmType,
     Field,
-    SoilAnalysis,
 } from "@svenvw/fdm-core"
 import * as fdmCore from "@svenvw/fdm-core"
 import { describe, expect, it, vi } from "vitest"
@@ -30,9 +30,9 @@ describe("collectNL2026InputForNorms", () => {
             b_id: mockFieldId,
             b_id_farm: "farm-1",
             b_centroid: { type: "Point", coordinates: [5.0, 52.0] },
-        } as Field
+        } as unknown as Field
         const mockCultivations = [{ b_lu: "test" }] as Cultivation[]
-        const mockSoilAnalysis = [
+        const mockCurrentSoilData = [
             { parameter: "a_p_cc", value: 1.0 },
             { parameter: "a_p_al", value: 20 },
         ]
@@ -50,7 +50,7 @@ describe("collectNL2026InputForNorms", () => {
         vi.mocked(fdmCore.getField).mockResolvedValue(mockField)
         vi.mocked(fdmCore.getCultivations).mockResolvedValue(mockCultivations)
         vi.mocked(fdmCore.getCurrentSoilData).mockResolvedValue(
-            mockSoilAnalysis as unknown as SoilAnalysis[],
+            mockCurrentSoilData as unknown as CurrentSoilData,
         )
         vi.mocked(fdmCore.getGrazingIntention).mockResolvedValue(false)
 

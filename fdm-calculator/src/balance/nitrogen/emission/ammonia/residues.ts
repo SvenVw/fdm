@@ -40,7 +40,7 @@ export function calculateNitrogenEmissionViaAmmoniaByResidues(
         }
 
         // If no crop residues are left or if this is not know return 0 for the amount of Nitrogen volatilized by crop residues
-        if (!cultivation.m_cropresidue || cultivation.m_cropresidue === false) {
+        if (!cultivation.m_cropresidue) {
             return {
                 id: cultivation.b_lu,
                 value: new Decimal(0),
@@ -67,7 +67,7 @@ export function calculateNitrogenEmissionViaAmmoniaByResidues(
                     )
                 if (analysisWithYield) {
                     yieldForThisHarvest = new Decimal(
-                        analysisWithYield.b_lu_yield,
+                        analysisWithYield.b_lu_yield ?? 0,
                     )
                 }
             }

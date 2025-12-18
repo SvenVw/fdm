@@ -4,8 +4,9 @@ import { calculateNL2026FertilizerApplicationFillingForFosfaatGebruiksNorm } fro
 import type { NL2026NormsFillingInput } from "./types"
 
 // Mock data for fertilizers
-const mockFertilizers: Fertilizer[] = [
+const mockFertilizers = [
     {
+        p_id: "f1",
         p_id_catalogue: "f1",
         p_name_nl: "Drijfmest van rundvee",
         p_type: "manure",
@@ -13,6 +14,7 @@ const mockFertilizers: Fertilizer[] = [
         p_p_rt: 1.5, // Example 1: 30kg P / 20 = 1.5
     },
     {
+        p_id: "f2",
         p_id_catalogue: "f2",
         p_name_nl: "Strorijke vaste mest van rundvee",
         p_type: "manure",
@@ -20,6 +22,7 @@ const mockFertilizers: Fertilizer[] = [
         p_p_rt: 0.75, // Example 1: 30kg P / 40 = 0.75
     },
     {
+        p_id: "f3",
         p_id_catalogue: "f3",
         p_name_nl: "Groencompost",
         p_type: "compost",
@@ -27,6 +30,7 @@ const mockFertilizers: Fertilizer[] = [
         p_p_rt: 10, // Example 2: 1200 kg P / 120 = 10
     },
     {
+        p_id: "f4",
         p_id_catalogue: "f4",
         p_name_nl: "Drijfmest",
         p_type: "manure",
@@ -34,6 +38,7 @@ const mockFertilizers: Fertilizer[] = [
         p_p_rt: 1.0, // Example 3: 60kg P / 60 = 1.0
     },
     {
+        p_id: "f5",
         p_id_catalogue: "f5",
         p_name_nl: "GFT-compost",
         p_type: "compost",
@@ -41,6 +46,7 @@ const mockFertilizers: Fertilizer[] = [
         p_p_rt: 0.25, // Example 4: 10kg P / 40 = 0.25
     },
     {
+        p_id: "f6",
         p_id_catalogue: "f6",
         p_name_nl: "Strorijke vaste mest van paarden",
         p_type: "manure",
@@ -48,6 +54,7 @@ const mockFertilizers: Fertilizer[] = [
         p_p_rt: 0.75, // Example 4: 10kg P / 13.3 = 0.75
     },
     {
+        p_id: "f7",
         p_id_catalogue: "f7",
         p_name_nl: "Vaste mest varkens (biologisch)",
         p_type: "manure",
@@ -55,6 +62,7 @@ const mockFertilizers: Fertilizer[] = [
         p_p_rt: 0.75,
     },
     {
+        p_id: "f8",
         p_id_catalogue: "f8",
         p_name_nl: "Kunstmest",
         p_type: "mineral",
@@ -62,6 +70,7 @@ const mockFertilizers: Fertilizer[] = [
         p_p_rt: 50,
     },
     {
+        p_id: "f9",
         p_id_catalogue: "f9",
         p_name_nl: "Fertilizer with no p_p_rt",
         p_type: "manure",
@@ -69,13 +78,14 @@ const mockFertilizers: Fertilizer[] = [
         p_p_rt: null,
     },
     {
+        p_id: "f10",
         p_id_catalogue: "f10",
         p_name_nl: "Fertilizer with p_p_rt in table11Mestcodes",
         p_type: "manure",
         p_type_rvo: "107", // A type_rvo that has p_p_rt in table11Mestcodes (3.1)
         p_p_rt: null,
     },
-]
+] as unknown as Fertilizer[]
 
 describe("calculateNL2026FertilizerApplicationFillingForFosfaatGebruiksNorm", () => {
     // Helper to create a FertilizerApplication
@@ -85,10 +95,11 @@ describe("calculateNL2026FertilizerApplicationFillingForFosfaatGebruiksNorm", ()
         appId: string,
     ): FertilizerApplication => ({
         p_app_id: appId,
+        p_id: appId,
         p_id_catalogue: fertilizerId,
         p_name_nl: `Application for ${fertilizerId}`,
         p_app_amount: amount,
-        p_app_method: "spreading",
+        p_app_method: "spraying",
         p_app_date: new Date(),
     })
 

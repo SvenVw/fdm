@@ -150,6 +150,10 @@ export function determineNitrateLeachingFactor(
         throw new Error(`Unknown land type: ${landType}`)
     }
 
+    if (typeof b_soiltype_agr !== "string") {
+        throw new Error(`Invalid or missing soil type: ${b_soiltype_agr}`)
+    }
+
     let nitrateLeachingFactor = 0
 
     // Group the soil types for easier processing
@@ -166,6 +170,12 @@ export function determineNitrateLeachingFactor(
     } else if (loessSoils.includes(b_soiltype_agr)) {
         nitrateLeachingFactor = landType === "grassland" ? 0.14 : 0.74
     } else if (sandySoils.includes(b_soiltype_agr)) {
+        if (typeof b_gwl_class !== "string") {
+            throw new Error(
+                `Invalid or missing GWL class '${b_gwl_class}' for sandy soil '${b_soiltype_agr}'`,
+            )
+        }
+
         // For sandy soils, the factor also depends on the groundwater level class (GWL)
         if (
             ["I", "Ia", "Ic", "II", "IIa", "IIb", "IIc"].includes(b_gwl_class)

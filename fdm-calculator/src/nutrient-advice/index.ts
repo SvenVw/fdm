@@ -5,18 +5,17 @@ import type {
     NutrientAdviceInputs,
     NutrientAdviceResponse,
 } from "./types"
+import type { CurrentSoilData } from "@svenvw/fdm-core"
 
-/**
- * Requests nutrient advice from the NMI API based on provided field and soil data.
- *
- * @param {NutrientAdviceInputs} inputs - An object containing all necessary inputs for the nutrient advice calculation.
- * @param {string} inputs.b_lu_catalogue - The BRP cultivation catalogue identifier (e.g., "nl_2014").
- * @param {[number, number]} inputs.b_centroid - The centroid coordinates of the field [longitude, latitude].
- * @param {CurrentSoilData} inputs.currentSoilData - Current soil data for the field, used to extract Nmin values and other soil parameters.
- * @param {string | undefined} inputs.nmiApiKey - The NMI API key for authentication.
- * @returns {Promise<NutrientAdvice>} A promise that resolves to an object containing the nutrient advice for the year.
- * @throws {Error} If the NMI API key is not provided or if the request to the NMI API fails.
- */
+// Requests nutrient advice from the NMI API based on provided field and soil data.
+//
+// @param {NutrientAdviceInputs} inputs - An object containing all necessary inputs for the nutrient advice calculation.
+// @param {string} inputs.b_lu_catalogue - The BRP cultivation catalogue identifier (e.g., "nl_2014").
+// @param {[number, number]} inputs.b_centroid - The centroid coordinates of the field [longitude, latitude].
+// @param {CurrentSoilData} inputs.currentSoilData - Current soil data for the field, used to extract Nmin values and other soil parameters.
+// @param {string | undefined} inputs.nmiApiKey - The NMI API key for authentication.
+// @returns {Promise<NutrientAdvice>} A promise that resolves to an object containing the nutrient advice for the year.
+// @throws {Error} If the NMI API key is not provided or if the request to the NMI API fails.
 export async function requestNutrientAdvice({
     b_lu_catalogue,
     b_centroid,
@@ -32,17 +31,19 @@ export async function requestNutrientAdvice({
         let a_nmin_cc_d60: number | undefined
         const soilData: Record<string, number | string> = {}
         // Extract Nmin values and other soil parameters from currentSoilData
-        for (const item of currentSoilData) {
+        for (const item of currentSoilData as CurrentSoilData) {
             // Exclude 'a_nmin_cc' from soilData as it's handled separately
             if (item.parameter === "a_nmin_cc") {
-                if (item.a_depth_lower <= 30) {
-                    a_nmin_cc_d30 = item.value
-                } else if (item.a_depth_lower <= 60) {
-                    a_nmin_cc_d60 = item.value
+                if ((item.a_depth_lower ?? 0) <= 30) {
+                    a_nmin_cc_d30 = item.value as number
+                } else if ((item.a_depth_lower ?? 0) <= 60) {
+                    a_nmin_cc_d60 = item.value as number
                 }
                 continue // Skip adding a_nmin_cc to soilData
             }
-            soilData[item.parameter] = item.value
+            if (item.value !== null && item.value !== undefined) {
+                soilData[item.parameter] = item.value as string | number
+            }
         }
 
         // Create request body for the NMI API

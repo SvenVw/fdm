@@ -44,7 +44,7 @@ export function calculateOrganicMatterDegradation(
         const b_lu_catalogue = c.b_lu_catalogue
         const b_lu_croprotation =
             cultivationDetailsMap.get(b_lu_catalogue)?.b_lu_croprotation
-        return b_lu_croprotation === "grassland"
+        return b_lu_croprotation === "grass"
     })
 
     // Set the active soil depth based on land use: 10 cm for grassland, 30 cm for arable land.
