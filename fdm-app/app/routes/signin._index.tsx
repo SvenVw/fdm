@@ -200,7 +200,12 @@ export default function SignIn() {
     }
 
     const scrollToMoreInfo = () => {
-        moreInfoRef.current?.scrollIntoView({ behavior: "smooth" })
+        const reduce = window.matchMedia?.(
+            "(prefers-reduced-motion: reduce)",
+        )?.matches
+        moreInfoRef.current?.scrollIntoView({
+            behavior: reduce ? "auto" : "smooth",
+        })
     }
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
