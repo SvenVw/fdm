@@ -76,64 +76,61 @@ export default function SignIn() {
     }
 
     return (
-        <div>
-            <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
-                <div className="flex h-screen items-center justify-center py-12">
-                    <div className="mx-auto grid w-[350px] gap-6">
-                        <div className="flex items-center justify-center gap-2">
-                            <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-[#122023]">
-                                <img
-                                    className="size-12"
-                                    src={clientConfig.logomark}
-                                    alt={clientConfig.name}
-                                />
+        <div className="w-full min-h-screen lg:grid lg:grid-cols-2">
+            <div className="flex items-center justify-center py-12">
+                <div className="mx-auto grid w-[350px] gap-6">
+                    <Card className="shadow-xl">
+                        <CardHeader className="text-center">
+                            <div className="flex justify-center mb-4">
+                                <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-[#122023]">
+                                    <img
+                                        className="size-12"
+                                        src={clientConfig.logomark}
+                                        alt={clientConfig.name}
+                                    />
+                                </div>
                             </div>
-                            <div className="flex flex-col gap-0.5 leading-none">
-                                <span className="font-semibold text-4xl">
-                                    {clientConfig.name}
-                                </span>
-                            </div>
-                        </div>
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>
-                                    Controleer je e-mail inbox
-                                </CardTitle>
-                                <CardDescription>
-                                    Een tijdelijke aanmeldlink is naar je
-                                    e-mailadres gestuurd.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <p className="text-sm text-muted-foreground">
-                                    De aanmeldlink is 15 minuten geldig en kan
-                                    maar één keer worden gebruikt.
-                                </p>
-                            </CardContent>
-                            <CardFooter className="flex justify-center">
-                                <Button
-                                    asChild
-                                    variant="secondary"
-                                    className="w-full"
-                                >
-                                    <NavLink to="/signin">
-                                        Terug naar aanmelden
-                                    </NavLink>
-                                </Button>
-                            </CardFooter>
-                        </Card>
-                    </div>
+                            <h2 className="text-lg font-semibold tracking-tight text-muted-foreground mb-2">
+                                {clientConfig.name}
+                            </h2>
+                            <CardTitle className="text-xl">
+                                Controleer je e-mail inbox
+                            </CardTitle>
+                            <CardDescription>
+                                Een tijdelijke aanmeldlink is naar je
+                                e-mailadres gestuurd.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <p className="text-sm text-muted-foreground text-center">
+                                De aanmeldlink is 15 minuten geldig en kan maar
+                                één keer worden gebruikt.
+                            </p>
+                        </CardContent>
+                        <CardFooter className="flex justify-center">
+                            <Button
+                                asChild
+                                variant="secondary"
+                                className="w-full"
+                            >
+                                <NavLink to="/signin">
+                                    Terug naar aanmelden
+                                </NavLink>
+                            </Button>
+                        </CardFooter>
+                    </Card>
                 </div>
-                <div className="hidden bg-muted lg:block">
-                    <img
-                        src="https://images.unsplash.com/photo-1662127245625-a72f1ad7e6ca?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                        alt='Photo by <a href="https://unsplash.com/@datingjungle?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Datingjungle</a> on <a href="https://unsplash.com/photos/a-river-running-through-a-green-landscape-IXYb976ga5E?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>'
-                        width="1920"
-                        height="1080"
-                        loading="lazy"
-                        className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-                    />
-                </div>
+            </div>
+            <div className="hidden bg-muted lg:block">
+                {/* Photo by <a href="https://unsplash.com/@datingjungle?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Datingjungle</a> on <a href="https://unsplash.com/photos/a-river-running-through-a-green-landscape-IXYb976ga5E?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a> */}
+                <img
+                    src="https://images.unsplash.com/photo-1662127245625-a72f1ad7e6ca?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    alt="A river running through a green landscape"
+                    width="1920"
+                    height="1080"
+                    loading="lazy"
+                    className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+                />
             </div>
             <div className="fixed bottom-3 left-3 z-50">
                 <Button

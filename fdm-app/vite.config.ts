@@ -31,7 +31,7 @@ export default defineConfig((env) => {
         ].filter(Boolean),
         envPrefix: "PUBLIC_",
         ssr: {
-            noExternal: ["posthog-js", "posthog-js/react"],
+            noExternal: ["posthog-js", "posthog-js/react", "@geomatico/maplibre-cog-protocol"],
         },
         build: {
             sourcemap: true,

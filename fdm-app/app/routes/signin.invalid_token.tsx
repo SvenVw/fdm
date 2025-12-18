@@ -75,61 +75,58 @@ export default function SignIn() {
     }
 
     return (
-        <div>
-            <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
-                <div className="flex h-screen items-center justify-center py-12">
-                    <div className="mx-auto grid w-[350px] gap-6">
-                        <div className="flex items-center justify-center gap-2">
-                            <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-[#122023]">
-                                <img
-                                    className="size-12"
-                                    src={clientConfig.logomark}
-                                    alt={clientConfig.name}
-                                />
+        <div className="w-full min-h-screen lg:grid lg:grid-cols-2">
+            <div className="flex items-center justify-center py-12">
+                <div className="mx-auto grid w-[350px] gap-6">
+                    <Card className="shadow-xl">
+                        <CardHeader className="text-center">
+                            <div className="flex justify-center mb-4">
+                                <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-[#122023]">
+                                    <img
+                                        className="size-12"
+                                        src={clientConfig.logomark}
+                                        alt={clientConfig.name}
+                                    />
+                                </div>
                             </div>
-                            <div className="flex flex-col gap-0.5 leading-none">
-                                <span className="font-semibold text-4xl">
-                                    {clientConfig.name}
-                                </span>
-                            </div>
-                        </div>
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>
-                                    Aanmeldlink is niet meer geldig
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <p className="text-sm text-muted-foreground">
-                                    Helaas is de aanmeldlink niet meer geldig.
-                                    De link is slechts 15 minuten geldig en kan
-                                    maar één keer gebruikt worden.
-                                </p>
-                            </CardContent>
-                            <CardFooter className="flex justify-center">
-                                <Button
-                                    asChild
-                                    variant="default"
-                                    className="w-full"
-                                >
-                                    <NavLink to="/signin">
-                                        Terug naar aanmelden
-                                    </NavLink>
-                                </Button>
-                            </CardFooter>
-                        </Card>
-                    </div>
+                            <h2 className="text-lg font-semibold tracking-tight text-muted-foreground mb-2">
+                                {clientConfig.name}
+                            </h2>
+                            <CardTitle className="text-xl">
+                                Aanmeldlink is niet meer geldig
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <p className="text-sm text-muted-foreground text-center">
+                                Helaas is de aanmeldlink niet meer geldig. De
+                                link is slechts 15 minuten geldig en kan maar
+                                één keer gebruikt worden.
+                            </p>
+                        </CardContent>
+                        <CardFooter className="flex justify-center">
+                            <Button
+                                asChild
+                                variant="default"
+                                className="w-full"
+                            >
+                                <NavLink to="/signin">
+                                    Terug naar aanmelden
+                                </NavLink>
+                            </Button>
+                        </CardFooter>
+                    </Card>
                 </div>
-                <div className="hidden bg-muted lg:block">
-                    <img
-                        src="https://images.unsplash.com/photo-1722086853375-8b4d97ca666a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                        alt='Photo by <a href="https://unsplash.com/@ries_bosch?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Ries Bosch</a> on <a href="https://unsplash.com/photos/a-sheep-is-standing-in-a-grassy-field-jNAsTN4qPu4?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>'
-                        width="1920"
-                        height="1080"
-                        loading="lazy"
-                        className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-                    />
-                </div>
+            </div>
+            <div className="hidden bg-muted lg:block">
+                {/* Photo by <a href="https://unsplash.com/@ries_bosch?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Ries Bosch</a> on <a href="https://unsplash.com/photos/a-sheep-is-standing-in-a-grassy-field-jNAsTN4qPu4?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a> */}
+                <img
+                    src="https://images.unsplash.com/photo-1722086853375-8b4d97ca666a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    alt="A sheep standing in a grassy field"
+                    width="1920"
+                    height="1080"
+                    loading="lazy"
+                    className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+                />
             </div>
             <div className="fixed bottom-3 left-3 z-50">
                 <Button

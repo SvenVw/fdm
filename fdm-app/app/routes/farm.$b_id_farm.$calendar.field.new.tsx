@@ -27,6 +27,7 @@ import {
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import {
     FieldsPanelHover,
@@ -341,6 +342,8 @@ export default function Index() {
                                         setShowFields(!showFields)
                                     }
                                 />
+
+                                <MapTilerAttribution />
 
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}

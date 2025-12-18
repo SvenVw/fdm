@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.25.4
+
+### Patch Changes
+
+- ff45398: Fix rendering issue of button in magic link email for some versions of Outlook and include a fallback link
+
 ## 0.25.3
 
 ### Patch Changes
