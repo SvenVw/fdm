@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
-    AlertTriangle,
+    Info,
     ArrowRight,
     BadgeCheck,
     BookOpen,
@@ -25,6 +25,10 @@ import {
     Wheat,
     Landmark,
     LayersIcon,
+    SearchCheck,
+    Calculator,
+    ListChecks,
+    ArrowDown,
 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { FormProvider } from "react-hook-form"
@@ -503,17 +507,16 @@ export default function SignIn() {
                                     <p>
                                         {clientConfig.name} is een initiatief
                                         van het Nutriënten Management Instituut
-                                        (NMI). Het platform is volop in
-                                        ontwikkeling, maar nu al inzetbaar voor
-                                        uw bedrijf. {clientConfig.name} is
-                                        bovendien een open-source platform. Dit
-                                        betekent transparantie en de
-                                        mogelijkheid voor derden om bij te
-                                        dragen aan de doorontwikkeling. Door
-                                        twee innovatieve projecten samen te
-                                        brengen, faciliteren we kennisdeling en
-                                        versnellen we de transitie naar een
-                                        duurzamere landbouw:
+                                        (NMI) en is volop in ontwikkeling, maar
+                                        nu al inzetbaar voor uw bedrijf.{" "}
+                                        {clientConfig.name} is bovendien een
+                                        open-source platform. Dit betekent
+                                        transparantie en de mogelijkheid voor
+                                        derden om bij te dragen aan de
+                                        doorontwikkeling. Door twee innovatieve
+                                        projecten samen te brengen, faciliteren
+                                        we kennisdeling en versnellen we de
+                                        transitie naar een duurzamere landbouw:
                                     </p>
                                     <ul className="space-y-3">
                                         <li className="flex gap-2">
@@ -522,9 +525,11 @@ export default function SignIn() {
                                                 <strong className="text-foreground">
                                                     Doelsturing:
                                                 </strong>{" "}
-                                                In samenwerking met LTO Noord,
-                                                ZLTO, LVVN, NVWA en RVO testen
-                                                we hoe doelsturing werkt in de
+                                                In samenwerking met boeren, de
+                                                agrarische sector,
+                                                kennisinstellingen, overheden en
+                                                overheidsorganisaties testen we
+                                                hoe doelsturing werkt in de
                                                 praktijk, met de Stikstofbalans
                                                 als basis.
                                             </span>
@@ -535,12 +540,30 @@ export default function SignIn() {
                                                 <strong className="text-foreground">
                                                     PPS BAAT:
                                                 </strong>{" "}
-                                                Samen met Wageningen University
-                                                maken we bemestingsadvies
-                                                toegankelijker. Krijg inzicht in
-                                                zowel opbrengst als
+                                                Samen met Wageningen Plant
+                                                Research maken we
+                                                bemestingsadvies toegankelijker.
+                                                Krijg inzicht in zowel de
+                                                geadviseerde gift als
                                                 milieu-impact voor een bewuste
                                                 meststofkeuze.
+                                            </span>
+                                        </li>
+                                        <li className="flex gap-2 items-baseline">
+                                            <span className="mt-2 flex h-1.5 w-1.5 shrink-0 rounded-full bg-primary items-center" />
+                                            <span>
+                                                <strong className="text-foreground">
+                                                    Open Bodem Index & BBWP:
+                                                </strong>{" "}
+                                                Deze twee veelgebruikte methoden
+                                                helpen boeren en adviseurs nu al
+                                                in het effectief nemen van
+                                                maatregelen en het inzicht
+                                                krijgen in de bodemgezondheid.
+                                                In 2026 komen OBI en BBWP ook
+                                                beschikbaar in{" "}
+                                                {clientConfig.name} en maken we
+                                                ze nog toegangelijker.
                                             </span>
                                         </li>
                                     </ul>
@@ -550,10 +573,9 @@ export default function SignIn() {
                                         Partners
                                     </p>
                                     <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium text-foreground/80">
-                                        <span>LTO Noord</span>•<span>ZLTO</span>
-                                        •<span>Wageningen University</span>•
-                                        <span>LVVN</span>•<span>NVWA</span>•
-                                        <span>RVO</span>
+                                        <span>ZLTO</span>•<span>LTO Noord</span>
+                                        •<span>WUR</span>•<span>LVVN</span>•
+                                        <span>NVWA</span>•<span>RVO</span>
                                     </div>
                                 </div>
                             </div>
@@ -590,12 +612,15 @@ export default function SignIn() {
                                             </div>
                                             <div>
                                                 <h4 className="font-semibold">
-                                                    Transparant & Deelbaar
+                                                    Transparant & deelbaar
                                                 </h4>
                                                 <p className="mt-1 text-sm text-muted-foreground">
-                                                    Als open-source platform
-                                                    faciliteren we kennisdeling
-                                                    en versnellen we innovatie.
+                                                    Als open-source inititiaf
+                                                    zijn de rekenregels en
+                                                    methodes beschikbaar en kan
+                                                    iedereen deze lezen en
+                                                    verbeteringn ops
+                                                    voorstellen.
                                                 </p>
                                             </div>
                                         </div>
@@ -624,7 +649,7 @@ export default function SignIn() {
                     <div className="container mx-auto max-w-6xl px-4 lg:px-8">
                         <div className="mx-auto mb-20 max-w-3xl text-center">
                             <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                                Doelsturing: Kansen en Uitdagingen
+                                Doelsturing: Kansen en uitdagingen
                             </h2>
                             <p className="text-lg leading-relaxed text-muted-foreground">
                                 Doelsturing kan een effectieve methode zijn om
@@ -647,7 +672,7 @@ export default function SignIn() {
                                 {/* Step 1: Supply */}
                                 <div className="group rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
                                     <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-700">
-                                        <Tractor className="h-7 w-7" />
+                                        <ArrowDown className="h-7 w-7" />
                                     </div>
                                     <h3 className="mb-2 text-lg font-semibold">
                                         Aanvoer
@@ -665,7 +690,7 @@ export default function SignIn() {
                                 {/* Step 2: Removal & Ammonia */}
                                 <div className="group rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
                                     <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-amber-700">
-                                        <Wheat className="h-7 w-7" />
+                                        <ArrowRight className="h-7 w-7" />
                                     </div>
                                     <h3 className="mb-2 text-lg font-semibold">
                                         Afvoer & Emissie
@@ -673,27 +698,28 @@ export default function SignIn() {
                                     <ul className="text-sm text-muted-foreground space-y-1">
                                         <li>• Oogst </li>
                                         <li>• Gewasresten </li>
-                                        <li>• Ammoniak (Vervluchtiging)</li>
+                                        <li>• Ammoniak</li>
+                                        <li>• Nitraat</li>
                                     </ul>
                                 </div>
 
                                 {/* Step 3: Surplus */}
                                 <div className="group rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
-                                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-green-700">
                                         <Scale className="h-7 w-7" />
                                     </div>
                                     <h3 className="mb-2 text-lg font-semibold">
-                                        Stikstofoverschot
+                                        Stikstofbodemoverschot
                                     </h3>
                                     <p className="text-sm text-muted-foreground">
-                                        Het resultaat van Aanvoer min Afvoer en
-                                        Ammoniak.
+                                        Het stikstofbodemoverschot laat zien hoe
+                                        efficiënt stikstof wordt gebruik.
                                     </p>
                                 </div>
 
                                 {/* Step 4: Leaching */}
-                                <div className="group rounded-xl border border-blue-200 bg-blue-50/50 p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
-                                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+                                <div className="group rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
+                                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-violet-100 text-violet-700">
                                         <Droplets className="h-7 w-7" />
                                     </div>
                                     <h3 className="mb-2 text-lg font-semibold">
@@ -706,226 +732,9 @@ export default function SignIn() {
                                 </div>
                             </div>
                         </div>
-
-                        <div className="mx-auto mt-16 max-w-2xl text-center">
-                            <div className="inline-flex items-center gap-2 rounded-full border border-muted bg-muted/50 px-4 py-1.5 text-sm text-muted-foreground">
-                                <span className="font-semibold text-foreground">
-                                    Scope:
-                                </span>
-                                Focus op percelen (stalbalans volgt later).
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <div className="bg-muted/10 py-24">
-                    <div className="container mx-auto max-w-6xl px-4 lg:px-8">
-                        <div className="mb-20 mx-auto max-w-3xl text-center">
-                            <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                                Bemestingsadviezen: Kennis binnen handbereik
-                            </h2>
-                            <p className="text-lg leading-relaxed text-muted-foreground">
-                                Bij NMI hebben we jarenlange kennis van
-                                bemesting en bodemvruchtbaarheid omgezet in
-                                digitale adviezen, direct beschikbaar in{" "}
-                                {clientConfig.name}.
-                            </p>
-                        </div>
-
-                        <div className="grid gap-12 lg:grid-cols-2 items-center">
-                            {/* Left: Text with Benefits */}
-                            <div>
-                                <h3 className="text-2xl font-semibold mb-6">
-                                    Altijd het juiste advies voor uw gewas
-                                </h3>
-                                <div className="space-y-6">
-                                    <div className="flex items-start gap-4">
-                                        <BookOpen className="h-6 w-6 text-primary shrink-0 mt-1" />
-                                        <div>
-                                            <h4 className="font-semibold">
-                                                Gebundelde expertise
-                                            </h4>
-                                            <p className="text-muted-foreground">
-                                                We hebben de complete
-                                                bemestingsadviezen uit de
-                                                bekende{" "}
-                                                <strong className="text-foreground">
-                                                    CBGV (Bemestingsadvies)
-                                                </strong>{" "}
-                                                en{" "}
-                                                <strong className="text-foreground">
-                                                    CBAV (Handboek Bodem en
-                                                    Bemesting)
-                                                </strong>{" "}
-                                                volledig gedigitaliseerd voor
-                                                vrijwel alle teelten in
-                                                Nederland.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start gap-4">
-                                        <Sprout className="h-6 w-6 text-primary shrink-0 mt-1" />
-                                        <div>
-                                            <h4 className="font-semibold">
-                                                Compleet Overzicht Nutriënten
-                                            </h4>
-                                            <p className="text-muted-foreground">
-                                                Adviezen omvatten primaire (N,
-                                                P, K), organische stof,
-                                                secundaire en micronutriënten,
-                                                specifiek voor uw situatie.
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start gap-4">
-                                        <LineChart className="h-6 w-6 text-primary shrink-0 mt-1" />
-                                        <div>
-                                            <h4 className="font-semibold">
-                                                Inzicht in Uw Bemesting
-                                            </h4>
-                                            <p className="text-muted-foreground">
-                                                Naast de aanbevelingen tonen we
-                                                per nutriënt ook hoeveel u
-                                                daadwerkelijk heeft gegeven,
-                                                gebaseerd op uw ingevoerde
-                                                bemestingsplannen.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Right: Emphasize Importance */}
-                            <Card className="shadow-xl border-primary/20 bg-background">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <FlaskConical className="h-6 w-6 text-primary" />
-                                        Waarom advies essentieel is
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <p className="text-muted-foreground leading-relaxed">
-                                        Bemestingsadviezen gaan verder dan enkel
-                                        de wettelijke
-                                        <strong className="text-foreground">
-                                            {" "}
-                                            gebruiksnormen
-                                        </strong>
-                                        . Ze zijn cruciaal voor:
-                                    </p>
-                                    <ul className="space-y-2 text-muted-foreground">
-                                        <li className="flex items-start gap-2">
-                                            <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
-                                            <span>
-                                                Optimale groei en opbrengst van
-                                                uw gewassen.
-                                            </span>
-                                        </li>
-                                        <li className="flex items-start gap-2">
-                                            <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
-                                            <span>
-                                                Het behouden en verbeteren van
-                                                bodemvruchtbaarheid op lange
-                                                termijn.
-                                            </span>
-                                        </li>
-                                        <li className="flex items-start gap-2">
-                                            <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
-                                            <span>
-                                                Efficiënt gebruik van
-                                                nutriënten, ter voorkoming van
-                                                overbemesting en verliezen.
-                                            </span>
-                                        </li>
-                                    </ul>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
-                </div>
-                {/* END OF NEW BEMESTINGSADVIEZEN SECTION */}
-                <div className="bg-background py-24">
-                    <div className="container mx-auto max-w-6xl px-4 lg:px-8">
-                        <div className="mb-20 mx-auto max-w-3xl text-center">
-                            <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                                Gebruiksruimte: Binnen de kaders, met inzicht
-                            </h2>
-                            <p className="text-lg leading-relaxed text-muted-foreground">
-                                Naast advies is ook de wettelijke ruimte
-                                cruciaal. {clientConfig.name} berekent uw
-                                gebruiksruimte zodat u bij het optimaliseren van
-                                uw bemesting altijd binnen de wettelijke kaders
-                                blijft.
-                            </p>
-                        </div>
-
-                        <div className="grid gap-12 lg:grid-cols-2 items-start">
-                            {/* Left: Features */}
-                            <div className="space-y-8">
-                                <div className="flex gap-4">
-                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <BadgeCheck className="h-6 w-6" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-semibold mb-2">
-                                            Blijf binnen de normen
-                                        </h3>
-                                        <p className="text-muted-foreground leading-relaxed">
-                                            We berekenen de gebruiksruimte voor
-                                            stikstof (N), fosfaat (P2O5) en
-                                            dierlijke mest op basis van uw
-                                            percelen en gewassen en tellen die
-                                            op naar bedrijfsniveau. Zo ziet u
-                                            direct of uw plannen haalbaar zijn.
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex gap-4">
-                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <LineChart className="h-6 w-6" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-semibold mb-2">
-                                            Diepgaand inzicht
-                                        </h3>
-                                        <p className="text-muted-foreground leading-relaxed">
-                                            Geen zwarte doos: we geven inzicht
-                                            in de opbouw van de berekening,
-                                            inclusief alle correcties en normen
-                                            die voor uw specifieke situatie
-                                            gelden.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Right: Disclaimer Box */}
-                            <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-8 shadow-xs">
-                                <div className="flex items-center gap-3 mb-4 text-amber-800">
-                                    <AlertTriangle className="h-6 w-6" />
-                                    <h3 className="font-semibold text-lg">
-                                        Disclaimer
-                                    </h3>
-                                </div>
-                                <p className="text-amber-900/80 leading-relaxed mb-6">
-                                    De berekeningen in {clientConfig.name} zijn
-                                    bedoeld als{" "}
-                                    <strong>ondersteunende indicatie</strong>.
-                                    Hoewel we de grootst mogelijke
-                                    zorgvuldigheid betrachten en gedetailleerde
-                                    rekenregels hanteren, kunnen er verschillen
-                                    zijn met de officiële vaststelling.
-                                </p>
-                                <p className="text-amber-900/80 leading-relaxed text-sm">
-                                    Raadpleeg voor definitieve beslissingen en
-                                    de wettelijke verantwoording altijd een
-                                    erkend adviseur of de officiële tools van de
-                                    overheid (RVO).
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div className="bg-muted/10 py-24">
                     <div className="container mx-auto max-w-6xl px-4 lg:px-8">
                         <div className="mb-20 mx-auto max-w-3xl text-center">
@@ -1038,16 +847,227 @@ export default function SignIn() {
                         </div>
                     </div>
                 </div>
+
+                <div className="bg-muted/10 py-24">
+                    <div className="container mx-auto max-w-6xl px-4 lg:px-8">
+                        <div className="mb-20 mx-auto max-w-3xl text-center">
+                            <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                                Bemestingsadviezen: Kennis binnen handbereik
+                            </h2>
+                            <p className="text-lg leading-relaxed text-muted-foreground">
+                                Bij NMI hebben we jarenlange kennis van
+                                bemesting en bodemvruchtbaarheid omgezet in
+                                digitale adviezen, direct beschikbaar in{" "}
+                                {clientConfig.name}.
+                            </p>
+                        </div>
+
+                        <div className="grid gap-12 lg:grid-cols-2 items-center">
+                            {/* Left: Text with Benefits */}
+                            <div>
+                                <h3 className="text-2xl font-semibold mb-6">
+                                    Altijd het juiste advies voor uw gewas
+                                </h3>
+                                <div className="space-y-6">
+                                    <div className="flex items-start gap-4">
+                                        <BookOpen className="h-6 w-6 text-primary shrink-0 mt-1" />
+                                        <div>
+                                            <h4 className="font-semibold">
+                                                Gebundelde expertise
+                                            </h4>
+                                            <p className="text-muted-foreground">
+                                                We hebben de complete
+                                                bemestingsadviezen uit de
+                                                bekende{" "}
+                                                <strong className="text-foreground">
+                                                    CBGV (Bemestingsadvies)
+                                                </strong>{" "}
+                                                en{" "}
+                                                <strong className="text-foreground">
+                                                    CBAV (Handboek Bodem en
+                                                    Bemesting)
+                                                </strong>{" "}
+                                                volledig gedigitaliseerd voor
+                                                vrijwel alle teelten in
+                                                Nederland.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <ListChecks className="h-6 w-6 text-primary shrink-0 mt-1" />
+                                        <div>
+                                            <h4 className="font-semibold">
+                                                Voor alle nutriënten
+                                            </h4>
+                                            <p className="text-muted-foreground">
+                                                Adviezen omvatten primaire (N,
+                                                P, K), organische stof,
+                                                secundaire en micronutriënten,
+                                                specifiek voor uw gewas en
+                                                bodemtoestand.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <Calculator className="h-6 w-6 text-primary shrink-0 mt-1" />
+                                        <div>
+                                            <h4 className="font-semibold">
+                                                Inzicht in uw bemesting
+                                            </h4>
+                                            <p className="text-muted-foreground">
+                                                Naast de geadviseerde gift tonen
+                                                we per nutriënt ook hoeveel u
+                                                daadwerkelijk heeft gegeven,
+                                                gebaseerd op uw ingevoerde
+                                                bemestingsplannen.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right: Emphasize Importance */}
+                            <Card className="shadow-xl border-primary/20 bg-background">
+                                <CardHeader>
+                                    <CardTitle className="flex items-center gap-2">
+                                        <FlaskConical className="h-6 w-6 text-primary" />
+                                        Waarom is een bemestingsadvies
+                                        belangrijk
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <p className="text-muted-foreground leading-relaxed">
+                                        Bemestingsadviezen gaan verder dan enkel
+                                        de wettelijke
+                                        <strong className="text-foreground">
+                                            {" "}
+                                            gebruiksnormen
+                                        </strong>
+                                        . Ze zijn cruciaal voor:
+                                    </p>
+                                    <ul className="space-y-2 text-muted-foreground">
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+                                            <span>
+                                                Optimale opbrengst en kwaliteit
+                                                van het gewas.
+                                            </span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+                                            <span>
+                                                Het behouden en verbeteren van
+                                                bodemvruchtbaarheid op lange
+                                                termijn.
+                                            </span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+                                            <span>
+                                                Efficiënt gebruik van
+                                                nutriënten, ter voorkoming van
+                                                overbemesting en verliezen.
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+                {/* END OF NEW BEMESTINGSADVIEZEN SECTION */}
                 <div className="bg-background py-24">
                     <div className="container mx-auto max-w-6xl px-4 lg:px-8">
                         <div className="mb-20 mx-auto max-w-3xl text-center">
                             <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-                                Slimmer werken, niet harder
+                                Gebruiksruimte: Binnen de kaders, met inzicht
                             </h2>
                             <p className="text-lg leading-relaxed text-muted-foreground">
-                                We maken databeheer zo eenvoudig mogelijk. Van
-                                slimme imports tot samenwerken met uw adviseur:
-                                {clientConfig.name} bespaart u tijd en gedoe.
+                                Naast een bemestingsadvies is ook de wettelijke
+                                gebruiksruimte cruciaal. {clientConfig.name}{" "}
+                                berekent uw gebruiksruimte zodat u bij het
+                                bepalen van uw bemestingsplan ook ziet of u deze
+                                niet overschrijdt op perceels- en
+                                bedrijfsniveau.
+                            </p>
+                        </div>
+
+                        <div className="grid gap-12 lg:grid-cols-2 items-start">
+                            {/* Left: Features */}
+                            <div className="space-y-8">
+                                <div className="flex gap-4">
+                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                        <BadgeCheck className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-semibold mb-2">
+                                            Blijf binnen de normen
+                                        </h3>
+                                        <p className="text-muted-foreground leading-relaxed">
+                                            We berekenen de gebruiksruimte voor
+                                            stikstof (N), fosfaat (P2O5) en
+                                            dierlijke mest op basis van uw
+                                            percelen en gewassen en tellen die
+                                            op naar bedrijfsniveau. Zo ziet u
+                                            direct of uw bemestingsplan voldoet.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex gap-4">
+                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                        <SearchCheck className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-semibold mb-2">
+                                            Inzicht in de berekening
+                                        </h3>
+                                        <p className="text-muted-foreground leading-relaxed">
+                                            Geen zwarte doos: we geven inzicht
+                                            in de opbouw van de berekening,
+                                            inclusief alle correcties en normen
+                                            die voor uw specifieke situatie
+                                            gelden.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Right: Disclaimer Box */}
+                            <div className="rounded-2xl border bg-muted/30 p-8">
+                                <div className="flex items-center gap-3 mb-4 text-muted-foreground">
+                                    <Info className="h-6 w-6" />
+                                    <h3 className="font-semibold text-lg text-foreground">
+                                        Hulp bij berekenen
+                                    </h3>
+                                </div>
+                                <p className="text-muted-foreground leading-relaxed mb-6">
+                                    {clientConfig.name} helpt je bij het
+                                    berekenen van de gebruiksnormen. De getoonde
+                                    getallen zijn indicatief en bedoeld ter
+                                    ondersteuning.
+                                </p>
+                                <p className="text-muted-foreground leading-relaxed text-sm">
+                                    Voor de juridische werkelijkheid en
+                                    definitieve opgaven verwijzen we je naar de
+                                    RVO en je adviseur.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-background py-24">
+                    <div className="container mx-auto max-w-6xl px-4 lg:px-8">
+                        <div className="mb-20 mx-auto max-w-3xl text-center">
+                            <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                                Handige functies
+                            </h2>
+                            <p className="text-lg leading-relaxed text-muted-foreground">
+                                Van slimme imports tot samenwerken met uw
+                                adviseur. Met handige functies proberen we het
+                                zo makkelijk mogelijk te maken om eenvoudig
+                                gegevens in te vullen, zodat u snel toegang
+                                heeft tot
                             </p>
                         </div>
 
@@ -1058,12 +1078,18 @@ export default function SignIn() {
                                     <FileUp className="h-8 w-8" />
                                 </div>
                                 <h3 className="text-xl font-semibold">
-                                    RVO Import
+                                    Percelen ophalen bij RVO
                                 </h3>
                                 <p className="text-muted-foreground">
                                     Start direct door uw percelen in te lezen
                                     via een RVO shapefile. Uw percelen staan
-                                    binnen enkele seconden correct op de kaart.
+                                    binnen enkele seconden correct op de kaart,
+                                    inclusief het gewas.
+                                </p>
+                                <p className="text-muted-foreground text-sm">
+                                    Binnenkort heeft u ook de mogelijkheid
+                                    direct vanuit RVO percelen te importeren met
+                                    behulp van eHerkenning.
                                 </p>
                             </div>
 
@@ -1076,10 +1102,12 @@ export default function SignIn() {
                                     Bodemanalyses
                                 </h3>
                                 <p className="text-muted-foreground">
-                                    Geen handmatig overtypwerk meer. Upload de
-                                    PDF van uw laboratorium en{" "}
-                                    {clientConfig.name} haalt automatisch de
-                                    juiste waarden op.
+                                    Upload de PDF van uw bodemanalyse en{" "}
+                                    {clientConfig.name} leest automatisch de
+                                    juiste waarden uit. Heeft u geen
+                                    bodemanalyse voor een perceel? Dan kunt u
+                                    gebruiken maken van geschatte bodemwaardes
+                                    door het NMI.
                                 </p>
                             </div>
 
@@ -1089,7 +1117,7 @@ export default function SignIn() {
                                     <Table2 className="h-8 w-8" />
                                 </div>
                                 <h3 className="text-xl font-semibold">
-                                    Slimme Tabellen
+                                    Slimme tabellen
                                 </h3>
                                 <p className="text-muted-foreground">
                                     Beheer uw bouwplan, bemesting en oogst in
@@ -1141,7 +1169,7 @@ export default function SignIn() {
                                             <ShieldCheck className="mx-auto h-16 w-16 text-primary" />
                                             <div>
                                                 <h4 className="mb-2 text-lg font-bold">
-                                                    Veilig & Vertrouwd
+                                                    Veilig & vertrouwd
                                                 </h4>
                                                 <p className="text-sm text-muted-foreground">
                                                     U blijft eigenaar van uw
@@ -1164,9 +1192,8 @@ export default function SignIn() {
                             Nieuwsgierig naar de mogelijkheden?
                         </h2>
                         <p className="text-primary-foreground/80 text-lg mb-10 max-w-2xl mx-auto">
-                            Probeer {clientConfig.name} vrijblijvend uit. Ontdek
-                            hoe inzicht in uw data bijdraagt aan een duurzame
-                            bedrijfsvoering.
+                            Probeer {clientConfig.name} uit. We horen graag wat
+                            u ervan vindt en als u nog tips heeft.
                         </p>
                         <Button
                             size="lg"
@@ -1186,7 +1213,7 @@ export default function SignIn() {
                     <div className="container mx-auto max-w-3xl px-4 lg:px-8">
                         <div className="text-center mb-16">
                             <h2 className="text-3xl font-bold tracking-tight mb-4">
-                                Veelgestelde Vragen
+                                Veelgestelde vragen
                             </h2>
                             <p className="text-muted-foreground">
                                 Antwoorden op de meest voorkomende vragen over{" "}
@@ -1272,10 +1299,9 @@ export default function SignIn() {
                                 <AccordionContent className="text-muted-foreground">
                                     Nee, {clientConfig.name} is ontwikkeld door
                                     NMI als ondersteunend instrument voor de
-                                    sector. Hoewel we nauw samenwerken met
-                                    partners zoals LTO en WUR, dient het als
-                                    inzicht- en adviestool, niet voor wettelijke
-                                    aangifte.
+                                    sector. Hoewel we nauw samenwerken met onze
+                                    partners, dient het als inzicht- en
+                                    adviestool, niet voor wettelijke aangifte.
                                 </AccordionContent>
                             </AccordionItem>
 
@@ -1289,8 +1315,11 @@ export default function SignIn() {
                                 <AccordionContent className="text-muted-foreground">
                                     Voor technische vragen of feedback kunt u
                                     contact opnemen met het supportteam van NMI.
-                                    We horen graag uw bevindingen om het
-                                    platform te verbeteren.
+                                    We horen graag uw bevindingen om{" "}
+                                    {clientConfig.name} verder te verbeteren.{" "}
+                                    {clientConfig.name} bevat ook een
+                                    feedbackknop in de zijbalk om eenvoudig
+                                    feedback te geven.
                                 </AccordionContent>
                             </AccordionItem>
                         </Accordion>
