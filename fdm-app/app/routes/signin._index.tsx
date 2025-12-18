@@ -1006,8 +1006,8 @@ export default function SignIn() {
                                     <p className="text-sm text-muted-foreground leading-relaxed">
                                         De kaart toont in welke relevante
                                         gebieden een perceel ligt, zodat u
-                                        direct weet welke in welke regio's voor
-                                        de gebruiksnormen het perceel ligt.
+                                        direct weet in welke regio's voor de
+                                        gebruiksnormen het perceel ligt.
                                     </p>
                                 </CardContent>
                             </Card>
