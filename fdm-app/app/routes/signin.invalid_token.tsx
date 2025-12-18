@@ -118,9 +118,10 @@ export default function SignIn() {
                 </div>
             </div>
             <div className="hidden bg-muted lg:block">
+                {/* Photo by <a href="https://unsplash.com/@ries_bosch?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Ries Bosch</a> on <a href="https://unsplash.com/photos/a-sheep-is-standing-in-a-grassy-field-jNAsTN4qPu4?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a> */}
                 <img
                     src="https://images.unsplash.com/photo-1722086853375-8b4d97ca666a?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    alt='Photo by <a href="https://unsplash.com/@ries_bosch?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Ries Bosch</a> on <a href="https://unsplash.com/photos/a-sheep-is-standing-in-a-grassy-field-jNAsTN4qPu4?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>'
+                    alt="A sheep standing in a grassy field"
                     width="1920"
                     height="1080"
                     loading="lazy"

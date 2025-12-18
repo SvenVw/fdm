@@ -122,9 +122,10 @@ export default function SignIn() {
                 </div>
             </div>
             <div className="hidden bg-muted lg:block">
+                {/* Photo by <a href="https://unsplash.com/@datingjungle?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Datingjungle</a> on <a href="https://unsplash.com/photos/a-river-running-through-a-green-landscape-IXYb976ga5E?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a> */}
                 <img
                     src="https://images.unsplash.com/photo-1662127245625-a72f1ad7e6ca?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                    alt='Photo by <a href="https://unsplash.com/@datingjungle?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Datingjungle</a> on <a href="https://unsplash.com/photos/a-river-running-through-a-green-landscape-IXYb976ga5E?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>'
+                    alt="A river running through a green landscape"
                     width="1920"
                     height="1080"
                     loading="lazy"
