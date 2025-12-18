@@ -42,6 +42,7 @@ import { Form, redirect, useSearchParams } from "react-router"
 import { useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
     Accordion,
@@ -96,7 +97,34 @@ export const meta: MetaFunction = () => {
 }
 
 export const links: LinksFunction = () => {
-    return [{ rel: "canonical", href: clientConfig.url }]
+    return [
+        { rel: "canonical", href: clientConfig.url },
+        {
+            rel: "preload",
+            as: "image",
+            href: "https://images.unsplash.com/photo-1717702576954-c07131c54169?q=80&w=1974&auto=format&fit=crop",
+        },
+        {
+            rel: "preload",
+            as: "image",
+            href: "/fdm-screenshot-atlas-cultivations.png",
+        },
+        {
+            rel: "preload",
+            as: "image",
+            href: "/fdm-screenshot-atlas-elevation.png",
+        },
+        {
+            rel: "preload",
+            as: "image",
+            href: "/fdm-screenshot-atlas-cultivation-history.png",
+        },
+        {
+            rel: "preload",
+            as: "image",
+            href: "/fdm-screenshot-nutrient-advice-npk.png",
+        },
+    ]
 }
 
 const FormSchema = z.object({
@@ -153,6 +181,78 @@ function getSafeRedirect(address: string | null) {
     return address?.startsWith("/") && !address.startsWith("//")
         ? address
         : "/farm"
+}
+
+const UIPlaceholder = ({
+    className,
+    label,
+}: {
+    className?: string
+    label?: string
+}) => (
+    <div
+        className={cn(
+            "w-full h-32 bg-muted/30 rounded-lg border-2 border-dashed border-muted-foreground/10 flex flex-col items-center justify-center gap-2 overflow-hidden relative",
+            className,
+        )}
+    >
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent to-muted/20" />
+        <div className="w-16 h-10 bg-background rounded shadow-sm border opacity-50 mb-1" />
+        <div className="w-20 h-2 bg-muted-foreground/20 rounded-full" />
+        <div className="w-12 h-2 bg-muted-foreground/20 rounded-full" />
+        {label && (
+            <span className="text-muted-foreground/50 text-xs font-medium z-10 mt-2">
+                {label}
+            </span>
+        )}
+    </div>
+)
+
+const StickyHeader = () => {
+    const { scrollY } = useScroll()
+    const [isVisible, setIsVisible] = useState(false)
+
+    useEffect(() => {
+        return scrollY.on("change", (latest) => {
+            setIsVisible(latest > 600)
+        })
+    }, [scrollY])
+
+    return (
+        <AnimatePresence>
+            {isVisible && (
+                <motion.header
+                    initial={{ y: -100, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: -100, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="fixed top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-md px-4 py-3 shadow-xs"
+                >
+                    <div className="container mx-auto flex max-w-6xl items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="flex size-8 items-center justify-center rounded-lg bg-[#122023]">
+                                <img
+                                    className="size-6"
+                                    src={clientConfig.logomark}
+                                    alt={clientConfig.name}
+                                />
+                            </div>
+                            <span className="font-semibold">
+                                {clientConfig.name}
+                            </span>
+                        </div>
+                        <Button
+                            onClick={() =>
+                                window.scrollTo({ top: 0, behavior: "smooth" })
+                            }
+                        >
+                            Aanmelden
+                        </Button>
+                    </div>
+                </motion.header>
+            )}
+        </AnimatePresence>
+    )
 }
 
 /**
@@ -227,12 +327,25 @@ export default function SignIn() {
     }, [form.setValue])
 
     return (
-        <div>
-            <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
-                <div className="relative flex min-h-screen flex-col bg-muted/20">
+        <div className="relative">
+            <StickyHeader />
+            <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px] relative">
+                {/* Mobile Background Image */}
+                <div className="absolute inset-0 lg:hidden z-0 bg-[#122023]">
+                    <img
+                        src="https://images.unsplash.com/photo-1717702576954-c07131c54169?q=80&w=1200&auto=format&fit=crop"
+                        alt="Background"
+                        className="h-full w-full object-cover"
+                        loading="eager"
+                        fetchPriority="high"
+                    />
+                    <div className="absolute inset-0 bg-black/60" />
+                </div>
+
+                <div className="relative z-10 flex min-h-screen flex-col bg-transparent lg:bg-muted/20">
                     <div className="flex flex-1 flex-col items-center justify-center px-4 py-12">
                         <div className="mx-auto grid w-full max-w-sm gap-6">
-                            <Card className="shadow-xl">
+                            <Card className="shadow-xl border-border/40 lg:border-border">
                                 <CardHeader className="text-center">
                                     <div className="flex justify-center mb-4">
                                         <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-[#122023]">
@@ -450,7 +563,7 @@ export default function SignIn() {
                                         </Form>
                                     </FormProvider>
                                 </CardContent>
-                                <CardFooter className="flex justify-center">
+                                <CardFooter className="flex flex-col gap-2">
                                     <p className="text-sm font-medium text-muted-foreground text-center">
                                         Door verder te gaan, gaat u akkoord met
                                         het{" "}
@@ -459,7 +572,7 @@ export default function SignIn() {
                                             aria-label="Lees ons privacybeleid"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="underline hover:text-primary focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                            className="underline decoration-primary/30 underline-offset-4 hover:text-primary hover:decoration-primary transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2"
                                         >
                                             Privacybeleid
                                         </a>
@@ -470,24 +583,31 @@ export default function SignIn() {
                                 <Button
                                     variant="ghost"
                                     onClick={scrollToMoreInfo}
-                                    className="group text-muted-foreground hover:text-foreground hover:bg-transparent"
+                                    className="group text-muted-foreground hover:text-foreground lg:text-muted-foreground hover:bg-white/10 lg:hover:bg-transparent"
                                 >
                                     Ontdek wat {clientConfig.name} kan doen
-                                    <MoveDown className="ml-2 h-4 w-4 transition-transform group-hover:translate-y-1" />
+                                    <motion.div
+                                        animate={{ y: [0, 4, 0] }}
+                                        transition={{
+                                            duration: 2,
+                                            repeat: Number.POSITIVE_INFINITY,
+                                            ease: "easeInOut",
+                                        }}
+                                    >
+                                        <MoveDown className="ml-2 h-4 w-4" />
+                                    </motion.div>
                                 </Button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="hidden bg-muted lg:block">
-                    {/* Photo by <a href="https://unsplash.com/@tombelgium?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Tom De Decker</a> on <a href="https://unsplash.com/photos/a-tractor-plowing-a-field-at-sunset-_dnc3j1oVlk?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a> */}
+                <div className="hidden bg-muted lg:block relative">
                     <img
-                        src="https://images.unsplash.com/photo-1717702576954-c07131c54169?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        src="https://images.unsplash.com/photo-1717702576954-c07131c54169?q=80&w=1974&auto=format&fit=crop"
                         alt="A tractor plowing a field at sunset"
-                        width="1920"
-                        height="1080"
-                        loading="lazy"
                         className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+                        loading="eager"
+                        fetchPriority="high"
                     />
                 </div>
             </div>
@@ -510,20 +630,20 @@ export default function SignIn() {
                                         (NMI) en is volop in ontwikkeling, maar
                                         nu al inzetbaar voor uw bedrijf.{" "}
                                         {clientConfig.name} is bovendien een
-                                        open-source platform. Dit betekent
-                                        transparantie en de mogelijkheid voor
-                                        derden om bij te dragen aan de
-                                        doorontwikkeling. Door twee innovatieve
-                                        projecten samen te brengen, faciliteren
-                                        we kennisdeling en versnellen we de
-                                        transitie naar een duurzamere landbouw:
+                                        open-source. Dit betekent transparantie
+                                        en de mogelijkheid voor derden om bij te
+                                        dragen aan de doorontwikkeling. Door
+                                        drie innovatieve projecten samen te
+                                        brengen, faciliteren we kennisdeling en
+                                        versnellen we de transitie naar een
+                                        duurzamere landbouw:
                                     </p>
                                     <ul className="space-y-3">
                                         <li className="flex gap-2">
                                             <span className="mt-2 flex h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                                             <span>
                                                 <strong className="text-foreground">
-                                                    Doelsturing:
+                                                    Pilot Maatwerkaanpak:
                                                 </strong>{" "}
                                                 In samenwerking met boeren, de
                                                 agrarische sector,
@@ -645,6 +765,7 @@ export default function SignIn() {
                         </div>
                     </div>
                 </div>
+
                 <div className="bg-background py-24">
                     <div className="container mx-auto max-w-6xl px-4 lg:px-8">
                         <div className="mx-auto mb-20 max-w-3xl text-center">
@@ -666,7 +787,39 @@ export default function SignIn() {
 
                         <div className="relative">
                             {/* Connecting line for desktop */}
-                            <div className="absolute top-1/2 left-0 hidden w-full -translate-y-1/2 border-t-2 border-dashed border-muted lg:block" />
+                            <div className="absolute top-1/2 left-0 hidden w-full -translate-y-1/2 lg:block h-px z-0 pointer-events-none px-12">
+                                <svg
+                                    width="100%"
+                                    height="2"
+                                    fill="none"
+                                    preserveAspectRatio="none"
+                                    overflow="visible"
+                                >
+                                    <motion.line
+                                        x1="0"
+                                        y1="1"
+                                        x2="100%"
+                                        y2="1"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeDasharray="8 8"
+                                        className="text-primary/20"
+                                        initial={{ pathLength: 0, opacity: 0 }}
+                                        whileInView={{
+                                            pathLength: 1,
+                                            opacity: 1,
+                                        }}
+                                        viewport={{
+                                            once: true,
+                                            margin: "-100px",
+                                        }}
+                                        transition={{
+                                            duration: 2,
+                                            ease: "easeInOut",
+                                        }}
+                                    />
+                                </svg>
+                            </div>
 
                             <div className="grid gap-8 lg:grid-cols-4 relative z-10">
                                 {/* Step 1: Supply */}
@@ -748,29 +901,40 @@ export default function SignIn() {
                                 microreliëf en gebiedskenmerken.
                             </p>
                         </div>
-
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 lg:auto-rows-[1fr]">
-                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all lg:col-span-2">
-                                <CardHeader>
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {/* 1. Rotatie (Wide Top-Left) */}
+                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all lg:col-span-2 overflow-hidden flex flex-col">
+                                <div className="p-6">
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                         <Sprout className="h-6 w-6" />
                                     </div>
-                                    <CardTitle className="text-lg">
+                                    <CardTitle className="text-lg mb-2">
                                         Gewasrotatie in beeld
                                     </CardTitle>
-                                </CardHeader>
-                                <CardContent>
                                     <p className="text-sm text-muted-foreground leading-relaxed">
                                         De interactieve kaart toont
                                         gewaspercelen tot 2020, helder
-                                        ingekleurd per gewasgroep. Krijg direct
+                                        ingekleurd per gewasgroup. Krijg direct
                                         visueel inzicht in toegepaste rotaties
                                         door de jaren heen.
                                     </p>
-                                </CardContent>
+                                </div>
+                                <div className="w-full aspect-video bg-muted/20 border-t relative">
+                                    <img
+                                        src="/fdm-screenshot-atlas-cultivations.png"
+                                        alt="Gewasrotatie screenshot"
+                                        className="absolute inset-0 w-full h-full object-cover object-top"
+                                    />
+                                </div>
                             </Card>
 
-                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
+                            {/* 3. History (Tall Right) - HTML order swapped for Mobile/Desktop strategy, 
+                                                        but explicit grid placement puts it on the right. 
+                                                        Actually, if I want Elevation second on mobile, History must be 3rd in HTML. 
+                                                        Explicit grid placement handles Desktop. */}
+
+                            {/* 2. Elevation (Wide Middle-Left) */}
+                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all lg:col-span-2 flex flex-col">
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                         <Mountain className="h-6 w-6" />
@@ -778,36 +942,45 @@ export default function SignIn() {
                                     <CardTitle className="text-lg">
                                         Hoogtekaart (AHN4)
                                     </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                                         Bekijk de AHN4 voor een gedetailleerde
-                                        weergave van het hoogteverloop en het
-                                        microreliëf op en rondom percelen.
+                                        weergave van het hoogteverloop.
                                     </p>
-                                </CardContent>
+                                </CardHeader>
+                                <div className="relative aspect-video w-full mt-auto rounded-lg overflow-hidden border shadow-xs">
+                                    <img
+                                        src="/fdm-screenshot-atlas-elevation.png"
+                                        alt="Hoogtekaart AHN4"
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
                             </Card>
 
-                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
+                            {/* 3. History (Tall Right) */}
+                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all lg:col-start-3 lg:row-start-1 lg:row-span-2 flex flex-col overflow-hidden">
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                         <History className="h-6 w-6" />
                                     </div>
                                     <CardTitle className="text-lg">
-                                        Gewashistorie & rustgewassen
+                                        Gewashistorie
                                     </CardTitle>
-                                </CardHeader>
-                                <CardContent>
                                     <p className="text-sm text-muted-foreground leading-relaxed">
-                                        Klik op een perceel voor details: bekijk
-                                        de volledige gewashistorie tot 2009 en
-                                        zie direct in welke jaren er een
-                                        rustgewas is geteeld.
+                                        Klik op een perceel voor meer
+                                        informatie: bekijk de volledige
+                                        gewashistorie tot 2009.
                                     </p>
-                                </CardContent>
+                                </CardHeader>
+                                <div className="relative w-full flex-1 min-h-[400px] bg-muted/10 border-t p-4 flex items-start justify-center">
+                                    <img
+                                        src="/fdm-screenshot-atlas-cultivation-history.png"
+                                        alt="Gewashistorie screenshot"
+                                        className="w-full h-auto max-h-full object-contain rounded-md shadow-sm bg-background"
+                                    />
+                                </div>
                             </Card>
-
-                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
+                            {/* 4. Normen (Small Bottom-Left) */}
+                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all lg:col-span-1">
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                         <Landmark className="h-6 w-6" />
@@ -818,15 +991,14 @@ export default function SignIn() {
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-sm text-muted-foreground leading-relaxed">
-                                        De kaart toont in welke relevante
-                                        gebieden een perceel ligt, zodat u
-                                        direct weet in welke regio's voor de
+                                        Zie direct in welke regio's voor de
                                         gebruiksnormen het perceel ligt.
                                     </p>
                                 </CardContent>
                             </Card>
 
-                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all">
+                            {/* 5. Bodem (Wide Bottom-Right) */}
+                            <Card className="bg-background border-none shadow-sm hover:shadow-md transition-all lg:col-span-2">
                                 <CardHeader>
                                     <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                         <LayersIcon className="h-6 w-6" />
@@ -844,11 +1016,11 @@ export default function SignIn() {
                                     </p>
                                 </CardContent>
                             </Card>
-                        </div>
+                        </div>{" "}
                     </div>
                 </div>
 
-                <div className="bg-muted/10 py-24">
+                <div className="bg-background py-24">
                     <div className="container mx-auto max-w-6xl px-4 lg:px-8">
                         <div className="mb-20 mx-auto max-w-3xl text-center">
                             <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -862,11 +1034,11 @@ export default function SignIn() {
                             </p>
                         </div>
 
-                        <div className="grid gap-12 lg:grid-cols-2 items-center">
+                        <div className="grid gap-12 lg:grid-cols-2 items-start mb-16">
                             {/* Left: Text with Benefits */}
                             <div>
                                 <h3 className="text-2xl font-semibold mb-6">
-                                    Altijd het juiste advies voor uw gewas
+                                    Altijd het juiste advies for uw gewas
                                 </h3>
                                 <div className="space-y-6">
                                     <div className="flex items-start gap-4">
@@ -876,9 +1048,10 @@ export default function SignIn() {
                                                 Gebundelde expertise
                                             </h4>
                                             <p className="text-muted-foreground">
-                                                We hebben de complete
-                                                bemestingsadviezen uit de
-                                                bekende{" "}
+                                                We brengen per perceel en voor
+                                                elk gewas in beeld wat de
+                                                gewenste bemesting is volgens de
+                                                adviezen uit{" "}
                                                 <strong className="text-foreground">
                                                     CBGV (Bemestingsadvies)
                                                 </strong>{" "}
@@ -887,9 +1060,7 @@ export default function SignIn() {
                                                     CBAV (Handboek Bodem en
                                                     Bemesting)
                                                 </strong>{" "}
-                                                volledig gedigitaliseerd voor
-                                                vrijwel alle teelten in
-                                                Nederland.
+                                                .
                                             </p>
                                         </div>
                                     </div>
@@ -903,7 +1074,7 @@ export default function SignIn() {
                                                 Adviezen omvatten primaire (N,
                                                 P, K), organische stof,
                                                 secundaire en micronutriënten,
-                                                specifiek voor uw gewas en
+                                                specifiek for uw gewas en
                                                 bodemtoestand.
                                             </p>
                                         </div>
@@ -927,7 +1098,7 @@ export default function SignIn() {
                             </div>
 
                             {/* Right: Emphasize Importance */}
-                            <Card className="shadow-xl border-primary/20 bg-background">
+                            <Card className="shadow-lg border-primary/20 bg-background h-full">
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <FlaskConical className="h-6 w-6 text-primary" />
@@ -943,7 +1114,7 @@ export default function SignIn() {
                                             {" "}
                                             gebruiksnormen
                                         </strong>
-                                        . Ze zijn cruciaal voor:
+                                        . Ze zijn cruciaal for:
                                     </p>
                                     <ul className="space-y-2 text-muted-foreground">
                                         <li className="flex items-start gap-2">
@@ -973,10 +1144,31 @@ export default function SignIn() {
                                 </CardContent>
                             </Card>
                         </div>
+
+                        {/* Full width screenshot */}
+                        <div className="rounded-xl border bg-background shadow-2xl overflow-hidden ring-1 ring-border/50">
+                            <div className="border-b bg-muted/40 p-3 flex items-center gap-2">
+                                <div className="flex gap-1.5 ml-1">
+                                    <div className="w-3 h-3 rounded-full bg-red-400/80 border border-red-500/20" />
+                                    <div className="w-3 h-3 rounded-full bg-yellow-400/80 border border-yellow-500/20" />
+                                    <div className="w-3 h-3 rounded-full bg-green-400/80 border border-green-500/20" />
+                                </div>
+                                {/* <div className="ml-4 h-6 bg-background rounded-md border w-64 flex items-center px-2">
+                                    <span className="text-[10px] text-muted-foreground">fdm.app/advies</span>
+                                </div> */}
+                            </div>
+                            <div className="relative w-full bg-muted/5">
+                                <img
+                                    src="/fdm-screenshot-nutrient-advice-npk.png"
+                                    alt="Bemestingsadvies tabel"
+                                    className="w-full h-auto shadow-inner"
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
-                {/* END OF NEW BEMESTINGSADVIEZEN SECTION */}
-                <div className="bg-background py-24">
+
+                <div className="bg-muted/10 py-24">
                     <div className="container mx-auto max-w-6xl px-4 lg:px-8">
                         <div className="mb-20 mx-auto max-w-3xl text-center">
                             <h2 className="mb-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -1004,7 +1196,7 @@ export default function SignIn() {
                                             Blijf binnen de normen
                                         </h3>
                                         <p className="text-muted-foreground leading-relaxed">
-                                            We berekenen de gebruiksruimte voor
+                                            We berekenen de gebruiksruimte for
                                             stikstof (N), fosfaat (P2O5) en
                                             dierlijke mest op basis van uw
                                             percelen en gewassen en tellen die
@@ -1025,7 +1217,7 @@ export default function SignIn() {
                                             Geen zwarte doos: we geven inzicht
                                             in de opbouw van de berekening,
                                             inclusief alle correcties en normen
-                                            die voor uw specifieke situatie
+                                            die for uw specifieke situatie
                                             gelden.
                                         </p>
                                     </div>
@@ -1033,7 +1225,7 @@ export default function SignIn() {
                             </div>
 
                             {/* Right: Disclaimer Box */}
-                            <div className="rounded-2xl border bg-muted/30 p-8">
+                            <div className="rounded-2xl border bg-background/50 p-8">
                                 <div className="flex items-center gap-3 mb-4 text-muted-foreground">
                                     <Info className="h-6 w-6" />
                                     <h3 className="font-semibold text-lg text-foreground">
@@ -1105,7 +1297,7 @@ export default function SignIn() {
                                     Upload de PDF van uw bodemanalyse en{" "}
                                     {clientConfig.name} leest automatisch de
                                     juiste waarden uit. Heeft u geen
-                                    bodemanalyse voor een perceel? Dan kunt u
+                                    bodemanalyse for een perceel? Dan kunt u
                                     gebruiken maken van geschatte bodemwaardes
                                     door het NMI.
                                 </p>
@@ -1122,7 +1314,7 @@ export default function SignIn() {
                                 <p className="text-muted-foreground">
                                     Beheer uw bouwplan, bemesting en oogst in
                                     overzichtelijke tabellen. Voer acties uit
-                                    voor meerdere percelen of gewassen tegelijk.
+                                    for meerdere percelen of gewassen tegelijk.
                                 </p>
                             </div>
                         </div>
@@ -1139,7 +1331,7 @@ export default function SignIn() {
                                         Deel kennis, behoud controle
                                     </h3>
                                     <p className="leading-relaxed text-muted-foreground">
-                                        {clientConfig.name} is gebouwd voor
+                                        {clientConfig.name} is gebouwd for
                                         samenwerking. Geef uw adviseur of
                                         organisatie toegang om mee te kijken of
                                         advies te geven.
@@ -1238,7 +1430,7 @@ export default function SignIn() {
                                     {clientConfig.name} is een open-source
                                     initiatief en momenteel gratis te gebruiken
                                     tijdens de pilotfase. Ons doel is om een
-                                    toegankelijke standaard te zetten voor de
+                                    toegankelijke standaard te zetten for de
                                     sector.
                                 </AccordionContent>
                             </AccordionItem>
@@ -1268,9 +1460,9 @@ export default function SignIn() {
                                 </AccordionTrigger>
                                 <AccordionContent className="text-muted-foreground">
                                     Ja. Uw data wordt versleuteld opgeslagen en
-                                    is alleen toegankelijk voor u. U bepaalt
-                                    zelf of en met wie (bijv. uw adviseur) u
-                                    gegevens deelt.
+                                    is alleen toegankelijk for u. U bepaalt zelf
+                                    of en met wie (bijv. uw adviseur) u gegevens
+                                    deelt.
                                 </AccordionContent>
                             </AccordionItem>
 
@@ -1283,7 +1475,7 @@ export default function SignIn() {
                                 </AccordionTrigger>
                                 <AccordionContent className="text-muted-foreground">
                                     Zeker. U kunt uw adviseur of andere
-                                    betrokkenen uitnodigen voor uw bedrijf. U
+                                    betrokkenen uitnodigen for uw bedrijf. U
                                     bepaalt welke rechten zij krijgen.
                                 </AccordionContent>
                             </AccordionItem>
@@ -1298,10 +1490,10 @@ export default function SignIn() {
                                 </AccordionTrigger>
                                 <AccordionContent className="text-muted-foreground">
                                     Nee, {clientConfig.name} is ontwikkeld door
-                                    NMI als ondersteunend instrument voor de
+                                    NMI als ondersteunend instrument for de
                                     sector. Hoewel we nauw samenwerken met onze
                                     partners, dient het als inzicht- en
-                                    adviestool, niet voor wettelijke aangifte.
+                                    adviestool, niet for wettelijke aangifte.
                                 </AccordionContent>
                             </AccordionItem>
 
@@ -1310,7 +1502,7 @@ export default function SignIn() {
                                 className="border-none rounded-lg bg-background px-6 shadow-sm"
                             >
                                 <AccordionTrigger className="text-lg hover:no-underline font-medium">
-                                    Waar kan ik terecht voor ondersteuning?
+                                    Waar kan ik terecht for ondersteuning?
                                 </AccordionTrigger>
                                 <AccordionContent className="text-muted-foreground">
                                     Voor technische vragen of feedback kunt u
@@ -1343,7 +1535,7 @@ export default function SignIn() {
                                     </span>
                                 </div>
                                 <p className="text-sm text-muted-foreground max-w-xs">
-                                    Innovatieve software voor een duurzame
+                                    Innovatieve software for een duurzame
                                     landbouw. Een initiatief van het NMI in
                                     samenwerking met de sector.
                                 </p>
