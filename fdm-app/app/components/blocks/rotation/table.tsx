@@ -543,7 +543,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                                 "sticky right-0 bg-background":
                                                     cell.column.id ===
                                                     "actions",
-                                                "p-0 ps-2":
+                                                "pt-0 pb-0 ps-2":
                                                     row.original.type ===
                                                     "field",
                                                 // Override specific style class in the Table component definition
