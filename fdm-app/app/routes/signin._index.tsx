@@ -1038,7 +1038,7 @@ export default function SignIn() {
                             {/* Left: Text with Benefits */}
                             <div>
                                 <h3 className="text-2xl font-semibold mb-6">
-                                    Altijd het juiste advies for uw gewas
+                                    Altijd het juiste advies voor uw gewas
                                 </h3>
                                 <div className="space-y-6">
                                     <div className="flex items-start gap-4">
@@ -1074,7 +1074,7 @@ export default function SignIn() {
                                                 Adviezen omvatten primaire (N,
                                                 P, K), organische stof,
                                                 secundaire en micronutriënten,
-                                                specifiek for uw gewas en
+                                                specifiek voor uw gewas en
                                                 bodemtoestand.
                                             </p>
                                         </div>
@@ -1217,7 +1217,7 @@ export default function SignIn() {
                                             Geen zwarte doos: we geven inzicht
                                             in de opbouw van de berekening,
                                             inclusief alle correcties en normen
-                                            die for uw specifieke situatie
+                                            die voor uw specifieke situatie
                                             gelden.
                                         </p>
                                     </div>
@@ -1297,7 +1297,7 @@ export default function SignIn() {
                                     Upload de PDF van uw bodemanalyse en{" "}
                                     {clientConfig.name} leest automatisch de
                                     juiste waarden uit. Heeft u geen
-                                    bodemanalyse for een perceel? Dan kunt u
+                                    bodemanalyse voor een perceel? Dan kunt u
                                     gebruiken maken van geschatte bodemwaardes
                                     door het NMI.
                                 </p>
@@ -1314,7 +1314,7 @@ export default function SignIn() {
                                 <p className="text-muted-foreground">
                                     Beheer uw bouwplan, bemesting en oogst in
                                     overzichtelijke tabellen. Voer acties uit
-                                    for meerdere percelen of gewassen tegelijk.
+                                    voor meerdere percelen of gewassen tegelijk.
                                 </p>
                             </div>
                         </div>
@@ -1385,7 +1385,7 @@ export default function SignIn() {
                         </h2>
                         <p className="text-primary-foreground/80 text-lg mb-10 max-w-2xl mx-auto">
                             Probeer {clientConfig.name} uit. We horen graag wat
-                            u ervan vindt en als u nog tips heeft.
+                            uw mening is en of u tips heeft.
                         </p>
                         <Button
                             size="lg"
@@ -1430,7 +1430,7 @@ export default function SignIn() {
                                     {clientConfig.name} is een open-source
                                     initiatief en momenteel gratis te gebruiken
                                     tijdens de pilotfase. Ons doel is om een
-                                    toegankelijke standaard te zetten for de
+                                    toegankelijke standaard te zetten voor de
                                     sector.
                                 </AccordionContent>
                             </AccordionItem>
@@ -1460,9 +1460,9 @@ export default function SignIn() {
                                 </AccordionTrigger>
                                 <AccordionContent className="text-muted-foreground">
                                     Ja. Uw data wordt versleuteld opgeslagen en
-                                    is alleen toegankelijk for u. U bepaalt zelf
-                                    of en met wie (bijv. uw adviseur) u gegevens
-                                    deelt.
+                                    is alleen toegankelijk voor u. U bepaalt
+                                    zelf of en met wie (bijv. uw adviseur) u
+                                    gegevens deelt.
                                 </AccordionContent>
                             </AccordionItem>
 
@@ -1475,7 +1475,7 @@ export default function SignIn() {
                                 </AccordionTrigger>
                                 <AccordionContent className="text-muted-foreground">
                                     Zeker. U kunt uw adviseur of andere
-                                    betrokkenen uitnodigen for uw bedrijf. U
+                                    betrokkenen uitnodigen voor uw bedrijf. U
                                     bepaalt welke rechten zij krijgen.
                                 </AccordionContent>
                             </AccordionItem>
@@ -1490,10 +1490,10 @@ export default function SignIn() {
                                 </AccordionTrigger>
                                 <AccordionContent className="text-muted-foreground">
                                     Nee, {clientConfig.name} is ontwikkeld door
-                                    NMI als ondersteunend instrument for de
+                                    NMI als ondersteunend instrument voor de
                                     sector. Hoewel we nauw samenwerken met onze
                                     partners, dient het als inzicht- en
-                                    adviestool, niet for wettelijke aangifte.
+                                    adviestool, niet voor wettelijke aangifte.
                                 </AccordionContent>
                             </AccordionItem>
 
@@ -1502,7 +1502,7 @@ export default function SignIn() {
                                 className="border-none rounded-lg bg-background px-6 shadow-sm"
                             >
                                 <AccordionTrigger className="text-lg hover:no-underline font-medium">
-                                    Waar kan ik terecht for ondersteuning?
+                                    Waar kan ik terecht voor ondersteuning?
                                 </AccordionTrigger>
                                 <AccordionContent className="text-muted-foreground">
                                     Voor technische vragen of feedback kunt u
@@ -1535,7 +1535,7 @@ export default function SignIn() {
                                     </span>
                                 </div>
                                 <p className="text-sm text-muted-foreground max-w-xs">
-                                    Innovatieve software for een duurzame
+                                    Innovatieve software voor een duurzame
                                     landbouw. Een initiatief van het NMI in
                                     samenwerking met de sector.
                                 </p>
