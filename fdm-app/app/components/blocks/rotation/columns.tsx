@@ -1,5 +1,9 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpRightFromSquare, ChevronRight } from "lucide-react"
+import {
+    ArrowUpRightFromSquare,
+    ChevronRight,
+    CircleQuestionMark,
+} from "lucide-react"
 import React from "react"
 import { NavLink, useFetcher, useParams } from "react-router-dom"
 import { cn } from "@/app/lib/utils"
@@ -15,8 +19,10 @@ import {
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
 import { ScrollArea } from "~/components/ui/scroll-area"
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip"
 import { DataTableColumnHeader } from "./column-header"
 import { DateRangeDisplay } from "./date-range-display"
+import { TableDateSelector } from "./date-selector"
 import { FertilizerDisplay } from "./fertilizer-display"
 import { HarvestDatesDisplay } from "./harvest-dates-display"
 
@@ -184,7 +190,19 @@ export const columns: ColumnDef<RotationExtended>[] = [
             return <DataTableColumnHeader column={column} title="Zaaidatum" />
         },
         enableHiding: true, // Enable hiding for mobile
-        cell: ({ row }) => <DateRangeDisplay range={row.original.b_lu_start} />,
+        cell: ({ cell, row }) =>
+            row.original.type === "crop" ? (
+                <DateRangeDisplay
+                    range={row.original.b_lu_end}
+                    emptyContent="Geen"
+                />
+            ) : (
+                <TableDateSelector
+                    name="b_lu_start"
+                    row={row}
+                    cellId={cell.id}
+                />
+            ),
     },
     {
         accessorKey: "b_lu_end",
@@ -194,7 +212,35 @@ export const columns: ColumnDef<RotationExtended>[] = [
             return <DataTableColumnHeader column={column} title="Einddatum" />
         },
         enableHiding: true, // Enable hiding for mobile
-        cell: ({ row }) => <DateRangeDisplay range={row.original.b_lu_end} />,
+        cell: ({ cell, row }) => {
+            if (row.original.type === "crop") {
+                return (
+                    <DateRangeDisplay
+                        range={row.original.b_lu_end}
+                        emptyContent="Geen"
+                    />
+                )
+            }
+            const cultivation = (row.getParentRow() ?? row).original as CropRow
+            return cultivation.b_lu_harvestable !== "multiple" ? (
+                <>
+                    <DateRangeDisplay
+                        range={row.original.b_lu_end}
+                        emptyContent="Geen"
+                    />
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <CircleQuestionMark className="text-muted-foreground inline-block h-4" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            U zou in plaats daarvan een oogst moeten toevoegen.
+                        </TooltipContent>
+                    </Tooltip>
+                </>
+            ) : (
+                <TableDateSelector name="b_lu_end" row={row} cellId={cell.id} />
+            )
+        },
     },
     {
         accessorKey: "b_harvest_date",
@@ -220,7 +266,6 @@ export const columns: ColumnDef<RotationExtended>[] = [
                 ? Object.keys(row.original.b_lu_variety)
                 : null
             if (!value) return null
-            console.log(value)
             const str =
                 value.length <= 5
                     ? value.join(", ")
@@ -239,21 +284,25 @@ export const columns: ColumnDef<RotationExtended>[] = [
             const fetcher = useFetcher()
 
             const submit = (value: boolean) => {
+                const fieldIds = (
+                    row.original.type === "crop"
+                        ? row.original.fields
+                        : [row.original]
+                )
+                    .map((field) => encodeURIComponent(field.b_id))
+                    .join(",")
+                const cultivationIds = encodeURIComponent(
+                    ((row.getParentRow()?.original ?? row.original) as CropRow)
+                        .b_lu_catalogue,
+                )
                 return fetcher.submit(
                     {
-                        fieldIds: (row.original.type === "crop"
-                            ? row.original.fields
-                            : [row.original]
-                        ).map((field) => field.b_id),
-                        cultivationIds: [
-                            (
-                                (row.getParentRow()?.original ??
-                                    row.original) as CropRow
-                            ).b_lu_catalogue,
-                        ],
                         m_cropresidue: value,
                     },
-                    { method: "POST" },
+                    {
+                        method: "POST",
+                        action: `?cultivationIds=${cultivationIds}&fieldIds=${fieldIds}`,
+                    },
                 )
             }
 

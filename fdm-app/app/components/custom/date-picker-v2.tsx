@@ -22,7 +22,7 @@ import {
 } from "~/components/ui/popover"
 
 type DatePickerProps = {
-    label: string
+    label: string | undefined
     defaultValue?: Date
     field: ControllerRenderProps<FieldValues, string>
     fieldState: ControllerFieldState
@@ -96,7 +96,7 @@ export function DatePicker({
 
     return (
         <Field data-invalid={fieldState.invalid} className="gap-1">
-            <FieldLabel>{label}</FieldLabel>
+            {typeof label !== "undefined" && <FieldLabel>{label}</FieldLabel>}
             <div className="flex relative gap-2">
                 <Input
                     {...field}

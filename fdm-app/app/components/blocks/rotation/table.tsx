@@ -21,6 +21,7 @@ import { ChevronDown, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { NavLink, useParams } from "react-router-dom"
 import { toast as notify } from "sonner"
+import { useActiveTableFormStore } from "@/app/store/active-table-form"
 import { useFieldFilterStore } from "@/app/store/field-filter"
 import { Button } from "~/components/ui/button"
 import {
@@ -84,6 +85,10 @@ export function DataTable<TData extends RotationExtended, TValue>({
     const b_id_farm = params.b_id_farm
     const calendar = params.calendar
 
+    const clearActiveForm = useActiveTableFormStore(
+        (store) => store.clearActiveForm,
+    )
+
     const handleRowClick = (
         row: Row<TData>,
         event: React.MouseEvent<HTMLTableRowElement>,
@@ -100,6 +105,8 @@ export function DataTable<TData extends RotationExtended, TValue>({
             // If a link was clicked, let the default navigation happen
             return
         }
+
+        clearActiveForm()
 
         if (event.shiftKey && lastSelectedRowIndex.current !== null) {
             document.getSelection()?.removeAllRanges()

@@ -1,5 +1,4 @@
 import {
-    type Cultivation,
     type CultivationCatalogue,
     checkPermission,
     getCultivations,
@@ -18,7 +17,7 @@ import {
     redirect,
     useLoaderData,
 } from "react-router"
-import { dataWithSuccess } from "remix-toast"
+import { dataWithError, dataWithSuccess } from "remix-toast"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
@@ -35,7 +34,7 @@ import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
-import { handleLoaderError } from "~/lib/error"
+import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { cn } from "~/lib/utils"
@@ -583,70 +582,86 @@ export default function FarmRotationIndex() {
 }
 
 export async function action({ params, request }: Route.ActionArgs) {
-    let fields: Field[] | null
-    const session = await getSession(request)
-    const timeframe = await getTimeframe(params)
-    const b_id_farm = params.b_id_farm
+    try {
+        const session = await getSession(request)
+        const timeframe = await getTimeframe(params)
+        const b_id_farm = params.b_id_farm
 
-    const values = await extractFormValuesFromRequest(
-        request,
-        RotationTableFormSchema,
-    )
+        const searchParams = new URL(request.url).searchParams
 
-    const fieldIds = new Set(values.fieldIds.split(","))
-    async function loadFields() {
-        fields ??= (
-            await getFields(fdm, session.principal_id, b_id_farm, timeframe)
-        ).filter((field) => fieldIds.has(field.b_id))
-        return fields
-    }
+        const fieldIdsParam = searchParams.get("fieldIds") ?? ""
+        const cultivationIdsParam = searchParams.get("cultivationIds") ?? ""
 
-    const cultivationIds = new Set(values.cultivationIds.split(","))
+        if (!fieldIdsParam?.length) {
+            return dataWithError(null, { message: "fieldIds is verplicht." })
+        }
 
-    // Determine what needs to be done
-    const cultivationUpdates: Partial<Cultivation> = {}
+        if (!cultivationIdsParam?.length) {
+            return dataWithError(null, {
+                message: "cultivationIds is verplicht.",
+            })
+        }
 
-    if (
-        typeof values.m_cropresidue !== "undefined" &&
-        values.m_cropresidue !== null
-    ) {
-        cultivationUpdates.m_cropresidue = values.m_cropresidue
-    }
+        const fieldIds = new Set(fieldIdsParam.split(","))
+        const cultivationIds = new Set(cultivationIdsParam.split(","))
 
-    if (Object.keys(cultivationUpdates).length > 0) {
-        const fields = await loadFields()
-        await Promise.all(
-            fields.map(async (field) => {
-                const cultivations = (
-                    await getCultivations(
-                        fdm,
-                        session.principal_id,
-                        field.b_id,
-                        timeframe,
-                    )
-                ).filter((cultivation) =>
-                    cultivationIds.has(cultivation.b_lu_catalogue),
-                )
+        // Determine what needs to be done
+        const cultivationUpdates = await extractFormValuesFromRequest(
+            request,
+            RotationTableFormSchema,
+        )
 
-                return Promise.all(
-                    cultivations.map((cultivation) => {
-                        return updateCultivation(
+        let fields: Awaited<ReturnType<typeof getFields>> | null
+        async function loadFields() {
+            fields ??= (
+                await getFields(fdm, session.principal_id, b_id_farm, timeframe)
+            ).filter((field) => fieldIds.has(field.b_id))
+            return fields
+        }
+
+        if (
+            Object.keys(cultivationUpdates).length > 0 &&
+            Object.values(cultivationUpdates).some(
+                (val) => typeof val !== "undefined" && val !== null,
+            )
+        ) {
+            // Perform the cultivation updates
+            const fields = await loadFields()
+            await Promise.all(
+                fields.map(async (field) => {
+                    const cultivations = (
+                        await getCultivations(
                             fdm,
                             session.principal_id,
-                            cultivation.b_lu,
-                            cultivationUpdates.b_lu_catalogue,
-                            cultivationUpdates.b_lu_start,
-                            cultivationUpdates.b_lu_end,
-                            cultivationUpdates.m_cropresidue,
-                            cultivationUpdates.b_lu_variety,
+                            field.b_id,
+                            timeframe,
                         )
-                    }),
-                )
-            }),
-        )
-    }
+                    ).filter((cultivation) =>
+                        cultivationIds.has(cultivation.b_lu_catalogue),
+                    )
 
-    return dataWithSuccess(null, {
-        message: "Succesvol bewerkt.",
-    })
+                    return Promise.all(
+                        cultivations.map((cultivation) => {
+                            return updateCultivation(
+                                fdm,
+                                session.principal_id,
+                                cultivation.b_lu,
+                                undefined,
+                                cultivationUpdates.b_lu_start,
+                                cultivationUpdates.b_lu_end,
+                                cultivationUpdates.m_cropresidue,
+                                cultivationUpdates.b_lu_variety,
+                            )
+                        }),
+                    )
+                }),
+            )
+        }
+
+        return dataWithSuccess(null, {
+            message: "Succesvol bijwerkt.",
+        })
+    } catch (e) {
+        handleActionError(e)
+    }
 }
