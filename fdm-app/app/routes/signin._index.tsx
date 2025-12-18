@@ -34,7 +34,7 @@ import type {
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
-import { Form, Link, NavLink, redirect, useSearchParams } from "react-router"
+import { Form, redirect, useSearchParams } from "react-router"
 import { useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
@@ -1319,45 +1319,45 @@ export default function SignIn() {
                                 <h4 className="font-semibold mb-4">Links</h4>
                                 <ul className="space-y-2 text-sm text-muted-foreground">
                                     <li>
-                                        <NavLink
-                                            to="https://www.nmi-agro.nl"
+                                        <a
+                                            href="https://www.nmi-agro.nl"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="hover:text-primary flex items-center gap-2"
                                         >
                                             Over NMI{" "}
                                             <ExternalLink className="h-3 w-3" />
-                                        </NavLink>
+                                        </a>
                                     </li>
                                     <li>
-                                        <NavLink
-                                            to="https://github.com/SvenVw/fdm"
+                                        <a
+                                            href="https://github.com/SvenVw/fdm"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="hover:text-primary flex items-center gap-2"
                                         >
                                             GitHub Repository{" "}
                                             <Github className="h-3 w-3" />
-                                        </NavLink>
+                                        </a>
                                     </li>
                                     <li>
-                                        <NavLink
-                                            to={clientConfig.privacy_url}
+                                        <a
+                                            href={clientConfig.privacy_url}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="hover:text-primary"
                                         >
                                             Privacybeleid
-                                        </NavLink>
+                                        </a>
                                     </li>
                                     <li>
-                                        <Link
-                                            to="#"
+                                        <button
+                                            type="button"
                                             onClick={onOpenCookieSettings}
                                             className="hover:text-primary text-left"
                                         >
                                             Cookie instellingen
-                                        </Link>
+                                        </button>
                                     </li>
                                 </ul>
                             </div>
