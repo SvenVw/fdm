@@ -8,6 +8,7 @@ import * as authNSchema from "./db/schema-authn"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import { generateReadSafeOTP } from "./token-generator"
+import { customAlphabet } from "nanoid"
 
 export type BetterAuth = FdmAuth
 
@@ -403,4 +404,19 @@ export function createDisplayUsername(
     }
 
     return name
+}
+
+const ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"
+const generateCodeWithNanoId = customAlphabet(ALPHABET, 8)
+/**
+ * Generates a read-safe OTP (One-Time Password).
+ *
+ * This function uses a character set that avoids ambiguous characters
+ * (e.g., I, O, 1, 0) to ensure the code is easy to read and type.
+ * It produces an 8-character string.
+ *
+ * @returns {string} An 8-character read-safe OTP.
+ */
+function generateReadSafeOTP(): string {   
+    return generateCodeWithNanoId ()
 }
