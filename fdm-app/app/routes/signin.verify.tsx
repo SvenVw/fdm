@@ -119,7 +119,7 @@ export default function Verify() {
 
 export async function action({ request }: ActionFunctionArgs) {
     // Artificial delay to ensure the loading state is visible to the user
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 700))
 
     const formValues = await extractFormValuesFromRequest(request, FormSchema)
     const { code, redirectTo = "/farm" } = formValues

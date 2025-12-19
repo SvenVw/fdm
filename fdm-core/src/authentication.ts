@@ -417,5 +417,5 @@ const generateCodeWithNanoId = customAlphabet(ALPHABET, 8)
  * @returns {string} An 8-character read-safe OTP.
  */
 function generateReadSafeOTP(): string {   
-    return generateCodeWithNanoId ()
+    return generateCodeWithNanoId()
 }
