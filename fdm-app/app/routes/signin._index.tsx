@@ -42,7 +42,7 @@ import { Form, redirect, useSearchParams } from "react-router"
 import { useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
+import { motion, useScroll, AnimatePresence } from "framer-motion"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
     Accordion,
@@ -586,16 +586,7 @@ export default function SignIn() {
                                     className="group text-muted-foreground hover:text-foreground lg:text-muted-foreground hover:bg-white/10 lg:hover:bg-transparent"
                                 >
                                     Ontdek wat {clientConfig.name} kan doen
-                                    <motion.div
-                                        animate={{ y: [0, 4, 0] }}
-                                        transition={{
-                                            duration: 2,
-                                            repeat: Number.POSITIVE_INFINITY,
-                                            ease: "easeInOut",
-                                        }}
-                                    >
-                                        <MoveDown className="ml-2 h-4 w-4" />
-                                    </motion.div>
+                                    <MoveDown className="ml-2 h-4 w-4 animate-up-and-down-down" />
                                 </Button>
                             </div>
                         </div>
