@@ -88,8 +88,6 @@ export default function SignIn() {
                         </span>
                     </div>
                 </div>
-
-                <FormProvider {...form}>
                     <Form
                         ref={formRef}
                         method="POST"
@@ -123,7 +121,6 @@ export default function SignIn() {
                             )}
                         </Button>
                     </Form>
-                </FormProvider>
             </AuthCard>
         </AuthLayout>
     )
