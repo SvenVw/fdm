@@ -55,6 +55,13 @@
     --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
     --color-sidebar-border: hsl(var(--sidebar-border));
     --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+    --animate-up-and-down-down: up-and-down-down 1s ease-in-out infinite;
+    @keyframes up-and-down-down {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(50%); }
+        100% { transform: translateY(0); }
+    }
 }
 
 /*
