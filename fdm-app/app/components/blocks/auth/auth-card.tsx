@@ -34,20 +34,20 @@ export function AuthCard({
         <Card className="shadow-xl">
             <CardHeader className="text-center">
                 {showLogo && (
-                    <div className="flex justify-center mb-4">
-                        <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-[#122023]">
-                            <img
-                                className="size-12"
-                                src={clientConfig.logomark}
-                                alt={clientConfig.name}
-                            />
+                     <>
+                        <div className="flex justify-center mb-4">
+                            <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-[#122023]">
+                                <img
+                                    className="size-12"
+                                    src={clientConfig.logomark}
+                                    alt={clientConfig.name}
+                                />
+                            </div>
                         </div>
-                    </div>
-                )}
-                {showLogo && (
-                    <h2 className="text-lg font-semibold tracking-tight text-muted-foreground mb-2">
-                        {clientConfig.name}
-                    </h2>
+                        <h2 className="text-lg font-semibold tracking-tight text-muted-foreground mb-2">
+                           {clientConfig.name}
+                        </h2>
+                    </>
                 )}
                 <CardTitle className="text-xl">{title}</CardTitle>
                 <CardDescription>{description}</CardDescription>

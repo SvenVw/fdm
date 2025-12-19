@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { FormProvider } from "react-hook-form"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
 import { Form, redirect, useNavigation, useSearchParams } from "react-router"
@@ -53,6 +53,15 @@ export default function SignIn() {
         params.set("redirectTo", redirectTo)
     })
 
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+               clearTimeout(timeoutRef.current)
+            }
+         }
+    }, [])
+
     const isSubmitting =
         (navigation.state === "submitting" &&
             navigation.formAction?.startsWith("/signin/verify")) ||
@@ -101,7 +110,7 @@ export default function SignIn() {
                                 setIsAutoSubmitting(true)
                                 // Trigger programmatic submit which fires onSubmit handler
                                 // 1.5s delay so user sees the completed code
-                                setTimeout(() => {
+                                timeoutRef.current = setTimeout(() => {
                                     formRef.current?.requestSubmit()
                                 }, 1500)
                             }}

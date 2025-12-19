@@ -6,10 +6,12 @@ import {
     FieldError,
     FieldLabel,
 } from "~/components/ui/field"
+import { FormSchema } from "./auth-formschema"
+import z from "zod"
 
 interface AuthCodeFieldProps {
-    control: Control<any>
-    name?: string
+    control:  Control<z.infer<typeof FormSchema>>
+    name?: 'code' | 'redirectTo'
     onComplete?: (value: string) => void
     serverError?: string
 }

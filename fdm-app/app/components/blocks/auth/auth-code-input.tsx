@@ -8,7 +8,7 @@ import {
 interface AuthCodeInputProps {
     field: {
         onChange: (value: string) => void
-        value: string
+        value: string | undefined
         onBlur: () => void
         name: string
         ref: React.Ref<HTMLInputElement>
