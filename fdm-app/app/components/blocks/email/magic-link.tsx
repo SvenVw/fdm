@@ -70,7 +70,9 @@ export const MagicLinkEmail = ({
                             Uw inlogcode
                         </Text>
                         <Text className="m-0 text-black text-3xl font-bold tracking-[0.2em] py-2">
-                            {code.slice(0, 4)}-{code.slice(4)}
+                            <Text className="m-0 text-black text-3xl font-bold tracking-[0.2em] py-2">
+                                {code.length === 8 ? `${code.slice(0, 4)}-${code.slice(4)}` : code}
+                            </Text>
                         </Text>
                     </Section>
                     <Text className="text-black text-[14px] leading-6">
