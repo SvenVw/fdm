@@ -1637,9 +1637,15 @@ export async function action({ request }: ActionFunctionArgs) {
             },
             headers: request.headers,
         })
+
+        // Construct redirect URL preserving redirectTo/callbackURL
+        const nextUrl = new URL("/signin/check-your-email", "http://localhost")
+        nextUrl.searchParams.set("redirectTo", safeRedirectTo)
+        const redirectUrl = `${nextUrl.pathname}${nextUrl.search}`
+
         return redirectWithSuccess(
-            "/signin/check-your-email",
-            `Aanmeldlink is verstuurd naar ${email}.`,
+            redirectUrl,
+            `Een aanmeldcode is verstuurd naar ${email}.`,
         )
     } catch (error) {
         console.error("Error sending magic link") // Don't log full error details
