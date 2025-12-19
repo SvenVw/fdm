@@ -10,10 +10,13 @@ type HarvestDatesDisplayProps = {
 export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
     cultivation,
 }) => {
+    const resolved_b_lu_harvest_date =
+        cultivation.type === "field" ? cultivation.b_lu_harvest_date : null
     const formattedHarvestDates = React.useMemo(() => {
-        const b_lu_harvest_date = cultivation.fields.flatMap(
-            (field) => field.b_lu_harvest_date,
-        )
+        const b_lu_harvest_date =
+            cultivation.type === "field"
+                ? (resolved_b_lu_harvest_date as Date[])
+                : cultivation.fields.flatMap((field) => field.b_lu_harvest_date)
         if (b_lu_harvest_date.length === 1) {
             return (
                 <p className="text-muted-foreground">
@@ -43,9 +46,10 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
             b_lu_harvest_date.length > 1 &&
             cultivation.b_lu_harvestable === "multiple"
         ) {
-            const b_lu_harvest_date_per_field = cultivation.fields.map(
-                (field) => field.b_lu_harvest_date,
-            )
+            const b_lu_harvest_date_per_field =
+                cultivation.type === "field"
+                    ? [resolved_b_lu_harvest_date as Date[]]
+                    : cultivation.fields.map((field) => field.b_lu_harvest_date)
 
             const harvestsByOrder: Date[][] = []
             for (const harvestDates of b_lu_harvest_date_per_field) {
@@ -88,6 +92,8 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
         }
         return null // Should not happen
     }, [
+        cultivation.type,
+        resolved_b_lu_harvest_date,
         cultivation.fields,
         cultivation.b_lu_harvestable,
         cultivation.b_lu_croprotation,

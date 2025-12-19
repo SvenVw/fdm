@@ -9,14 +9,15 @@ import {
     getFertilizers,
     getFields,
     getHarvests,
+    updateCultivation,
 } from "@svenvw/fdm-core"
 import {
-    type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
     redirect,
     useLoaderData,
 } from "react-router"
+import { dataWithError, dataWithSuccess } from "remix-toast"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
@@ -25,6 +26,7 @@ import {
     columns,
     type RotationExtended,
 } from "~/components/blocks/rotation/columns"
+import { RotationTableFormSchema } from "~/components/blocks/rotation/schema"
 import { DataTable } from "~/components/blocks/rotation/table"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
@@ -32,9 +34,11 @@ import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
-import { handleLoaderError } from "~/lib/error"
+import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 import { cn } from "~/lib/utils"
+import type { Route } from "./+types/farm.$b_id_farm.$calendar.rotation._index"
 
 export const meta: MetaFunction = () => {
     return [
@@ -65,7 +69,7 @@ export const meta: MetaFunction = () => {
  * - userName: The name of the current user.
  * - farmWritePermission: A Boolean indicating if the user is able to add things to the farm. Set to true if the information could not be obtained.
  */
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
     try {
         // Get the active farm
         const b_id_farm = params.b_id_farm
@@ -219,8 +223,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }),
         )
 
+        type FieldsExtended = typeof fieldsExtended
+
         const transformFieldsToRotationExtended = (
-            fieldsExtended: any[], // TODO: Define a proper type for fieldsExtended
+            fieldsExtended: FieldsExtended, // TODO: Define a proper type for fieldsExtended
             _cultivationCatalogue: CultivationCatalogue,
         ): RotationExtended[] => {
             const cultivationsInRotation: string[] = [
@@ -281,10 +287,63 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     (cultivation: { b_lu: string }) => cultivation.b_lu,
                 )
 
+                const cropResidue = fieldsWithThisCultivation.flatMap((field) =>
+                    field.cultivations
+                        .filter(
+                            (cultivation) =>
+                                cultivation.b_lu_catalogue === b_lu_catalogue,
+                        )
+                        .map((cultivation) => cultivation.m_cropresidue),
+                )
+                const aggr_m_crop_residue = cropResidue.every((a) => a)
+                    ? "all"
+                    : cropResidue.some((a) => a)
+                      ? "some"
+                      : "none"
                 return {
+                    type: "crop",
                     b_lu_catalogue: b_lu_catalogue,
                     b_lu: b_lu,
                     b_lu_name: cultivationsForCatalogue[0]?.b_lu_name ?? "",
+                    b_lu_variety: Object.fromEntries(
+                        Object.entries(
+                            fieldsWithThisCultivation
+                                .flatMap((field) =>
+                                    field.cultivations
+                                        .filter(
+                                            (cultivation) =>
+                                                cultivation.b_lu_catalogue ===
+                                                b_lu_catalogue,
+                                        )
+                                        .flatMap(
+                                            (cultivation: {
+                                                b_lu_variety: string | null
+                                            }) =>
+                                                cultivation.b_lu_variety
+                                                    ? [cultivation.b_lu_variety]
+                                                    : [],
+                                        ),
+                                )
+                                .reduce(
+                                    (counts, variety) => {
+                                        counts[variety] =
+                                            (counts[variety] ?? 0) + 1
+                                        return counts
+                                    },
+                                    {} as Record<string, number>,
+                                ),
+                        ).sort((a, b) => b[1] - a[1]),
+                    ),
+                    b_lu_variety_options:
+                        cultivationCatalogue
+                            .find(
+                                (item: { b_lu_catalogue: string }) =>
+                                    item.b_lu_catalogue === b_lu_catalogue,
+                            )
+                            ?.b_lu_variety_options?.map((option: string) => ({
+                                value: option,
+                                label: option,
+                            })) ?? null,
                     b_lu_croprotation:
                         cultivationsForCatalogue[0]?.b_lu_croprotation ?? "",
                     b_lu_harvestable:
@@ -292,14 +351,34 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     b_lu_start: b_lu_start,
                     b_lu_end: b_lu_end,
                     calendar: calendar,
-                    fields: fieldsWithThisCultivation.map((field: any) => ({
+                    m_cropresidue: aggr_m_crop_residue,
+                    fields: fieldsWithThisCultivation.map((field, i) => ({
                         // TODO: Define a proper type for field
+                        type: "field",
                         b_id: field.b_id,
                         b_name: field.b_name,
                         b_area: field.b_area,
                         b_isproductive: field.b_isproductive,
                         a_som_loi: field.a_som_loi ?? 0,
                         b_soiltype_agr: field.b_soiltype_agr ?? "",
+                        b_lu_start: field.cultivations
+                            .filter(
+                                (cultivation) =>
+                                    cultivation.b_lu_catalogue ===
+                                    b_lu_catalogue,
+                            )
+                            .map((cultivation) => cultivation.b_lu_start),
+                        b_lu_end: field.cultivations
+                            .filter(
+                                (cultivation) =>
+                                    cultivation.b_lu_catalogue ===
+                                    b_lu_catalogue,
+                            )
+                            .flatMap((cultivation) =>
+                                cultivation.b_lu_end
+                                    ? [cultivation.b_lu_end]
+                                    : [],
+                            ),
                         b_lu_harvest_date: field.harvests
                             .filter((harvest: { b_lu: string }) =>
                                 b_lu.includes(harvest.b_lu),
@@ -308,6 +387,60 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                                 (harvest: { b_lu_harvest_date: Date[] }) =>
                                     harvest.b_lu_harvest_date,
                             ),
+                        b_lu_variety: Object.fromEntries(
+                            Object.entries(
+                                field.cultivations
+                                    .filter(
+                                        (cultivation) =>
+                                            cultivation.b_lu_catalogue ===
+                                            b_lu_catalogue,
+                                    )
+                                    .flatMap(
+                                        (cultivation: {
+                                            b_lu_variety: string | null
+                                        }) =>
+                                            cultivation.b_lu_variety
+                                                ? [cultivation.b_lu_variety]
+                                                : [],
+                                    )
+                                    .reduce(
+                                        (counts, variety) => {
+                                            counts[variety] =
+                                                (counts[variety] ?? 0) + 1
+                                            return counts
+                                        },
+                                        {} as Record<string, number>,
+                                    ),
+                            ).sort((a, b) => b[1] - a[1]),
+                        ),
+                        ...(() => {
+                            const cultivations = field.cultivations.filter(
+                                (cultivation) =>
+                                    cultivation.b_lu_catalogue ===
+                                    b_lu_catalogue,
+                            )
+
+                            return {
+                                m_cropresidue: cultivations.every(
+                                    (cultivation) => cultivation.m_cropresidue,
+                                )
+                                    ? "all"
+                                    : cultivations.some(
+                                            (cultivation) =>
+                                                cultivation.m_cropresidue,
+                                        )
+                                      ? "some"
+                                      : "none",
+                                m_cropresidue_ending: cultivations
+                                    .filter(
+                                        (cultivation) => cultivation.b_lu_end,
+                                    )
+                                    .map((cultivation) => [
+                                        cultivation.b_lu_end,
+                                        cultivation.m_cropresidue,
+                                    ]),
+                            }
+                        })(),
                         fertilizerApplications:
                             field.fertilizerApplications.map(
                                 (app: {
@@ -456,4 +589,89 @@ export default function FarmRotationIndex() {
             </main>
         </SidebarInset>
     )
+}
+
+export async function action({ params, request }: Route.ActionArgs) {
+    try {
+        const session = await getSession(request)
+        const timeframe = await getTimeframe(params)
+        const b_id_farm = params.b_id_farm
+
+        const searchParams = new URL(request.url).searchParams
+
+        const fieldIdsParam = searchParams.get("fieldIds") ?? ""
+        const cultivationIdsParam = searchParams.get("cultivationIds") ?? ""
+
+        if (!fieldIdsParam?.length) {
+            return dataWithError(null, { message: "fieldIds is verplicht." })
+        }
+
+        if (!cultivationIdsParam?.length) {
+            return dataWithError(null, {
+                message: "cultivationIds is verplicht.",
+            })
+        }
+
+        const fieldIds = new Set(fieldIdsParam.split(","))
+        const cultivationIds = new Set(cultivationIdsParam.split(","))
+
+        // Determine what needs to be done
+        const cultivationUpdates = await extractFormValuesFromRequest(
+            request,
+            RotationTableFormSchema,
+        )
+
+        let fields: Awaited<ReturnType<typeof getFields>> | null
+        async function loadFields() {
+            fields ??= (
+                await getFields(fdm, session.principal_id, b_id_farm, timeframe)
+            ).filter((field) => fieldIds.has(field.b_id))
+            return fields
+        }
+
+        if (
+            Object.keys(cultivationUpdates).length > 0 &&
+            Object.values(cultivationUpdates).some(
+                (val) => typeof val !== "undefined" && val !== null,
+            )
+        ) {
+            // Perform the cultivation updates
+            const fields = await loadFields()
+            await Promise.all(
+                fields.map(async (field) => {
+                    const cultivations = (
+                        await getCultivations(
+                            fdm,
+                            session.principal_id,
+                            field.b_id,
+                            timeframe,
+                        )
+                    ).filter((cultivation) =>
+                        cultivationIds.has(cultivation.b_lu_catalogue),
+                    )
+
+                    return Promise.all(
+                        cultivations.map((cultivation) => {
+                            return updateCultivation(
+                                fdm,
+                                session.principal_id,
+                                cultivation.b_lu,
+                                undefined,
+                                cultivationUpdates.b_lu_start,
+                                cultivationUpdates.b_lu_end,
+                                cultivationUpdates.m_cropresidue,
+                                cultivationUpdates.b_lu_variety,
+                            )
+                        }),
+                    )
+                }),
+            )
+        }
+
+        return dataWithSuccess(null, {
+            message: "Succesvol bijwerkt.",
+        })
+    } catch (e) {
+        handleActionError(e)
+    }
 }
