@@ -171,13 +171,12 @@ export async function action({ request }: LoaderFunctionArgs) {
             if (location) {
                 const locationUrl = new URL(location, serverConfig.url)
                 const error = locationUrl.searchParams.get("error")
+                              
+                // Check if redirect is to an error page (exact match) or has error param
+                const isErrorPage = locationUrl.pathname === "/error" || locationUrl.pathname.startsWith("/error/")
+                const isSigninError = locationUrl.pathname === "/signin" && error
                 
-                // If there is an error param, or if it redirects to /signin (which implies failure if we expected success)
-                // Note: Success also redirects (to callbackURL), so we must distinguish.
-                // We passed callbackURL as redirectTo.
-                // If location matches redirectTo, it's success.
-                // If location matches /signin or /error, it's failure.                
-                if (error || locationUrl.pathname.includes("/error") || (locationUrl.pathname.includes("/signin") && locationUrl.searchParams.has("error"))) {
+                if (error || isErrorPage || isSigninError) {
                      return {
                         errors: {
                             code: "Deze code is niet geldig of is verlopen. Vraag een nieuwe code aan.",
