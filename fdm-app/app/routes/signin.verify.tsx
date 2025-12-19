@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useRef } from "react"
-import { FormProvider } from "react-hook-form"
 import { LoaderFunctionArgs, MetaFunction, redirect } from "react-router"
 import { Form, useActionData, useLoaderData, useNavigation } from "react-router"
 import { useRemixForm } from "remix-hook-form"
@@ -51,7 +50,6 @@ export default function Verify() {
     const { code, redirectTo } = useLoaderData<typeof loader>()
     const actionData = useActionData<typeof action>()
     const navigation = useNavigation()
-    const formRef = useRef<HTMLFormElement>(null)
     const isSubmitting = navigation.state === "submitting"
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
@@ -86,8 +84,7 @@ export default function Verify() {
                 title="Verifieer je code"
                 description="Vul de 8-cijferige code in die je per e-mail hebt ontvangen."
             >
-                <FormProvider {...form}>
-                    <Form
+                         <Form
                         onSubmit={form.handleSubmit}
                         method="POST"
                         className="space-y-6"
@@ -97,12 +94,6 @@ export default function Verify() {
                         <AuthCodeField 
                             control={form.control} 
                             serverError={actionData?.errors?.code} 
-                             onComplete={() => {                  
-                                // 1s delay so user sees the code is submitted
-                                setTimeout(() => {
-                                    formRef.current?.requestSubmit()
-                                }, 1000)
-                            }}
                         />
 
                         <Button
@@ -119,8 +110,7 @@ export default function Verify() {
                                 "Verifiëren en aanmelden"
                             )}
                         </Button>
-                    </Form>
-                </FormProvider>
+                    </Form>          
             </AuthCard>
         </AuthLayout>
     )
@@ -128,6 +118,9 @@ export default function Verify() {
 
 
 export async function action({ request }: LoaderFunctionArgs) {
+    // Artificial delay to ensure the loading state is visible to the user
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
     const formValues = await extractFormValuesFromRequest(request, FormSchema)
     const { code, redirectTo = "/farm" } = formValues
 
