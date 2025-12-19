@@ -38,7 +38,7 @@ export async function calculateNL2026FertilizerApplicationFillingForStikstofGebr
 
     for (const application of applications) {
         const fertilizer = fertilizers.find(
-            (f) => f.p_id === application.p_id_catalogue,
+            (f) => f.p_id_catalogue === application.p_id_catalogue,
         )
         if (!fertilizer) {
             throw new Error(
