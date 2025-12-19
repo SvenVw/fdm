@@ -73,8 +73,25 @@ export async function renderInvitationEmail(
 export async function renderMagicLinkEmail(
     emailAddress: string,
     magicLinkUrl: string,
+    code: string,
 ): Promise<Email> {
     const timeZone = getTimeZoneFromUrl(magicLinkUrl)
+
+    // Construct the frontend verification URL
+    // We want to point to /signin/verify instead of the API endpoint
+    // We preserve query parameters like callbackURL
+    const parsedMagicLinkUrl = new URL(magicLinkUrl)
+    const frontendUrl = new URL("/signin/verify", serverConfig.url)
+    frontendUrl.searchParams.set("code", code)
+    
+    // Copy relevant search params (like callbackURL)
+    parsedMagicLinkUrl.searchParams.forEach((value, key) => {
+        if (key !== "token") { // We use 'code' instead of 'token'
+            frontendUrl.searchParams.set(key, value)
+        }
+    })
+
+    const finalUrl = frontendUrl.toString()
 
     // Show the local time only if available, otherwise show server time
     const emailTimestamp: string = format(
@@ -85,7 +102,8 @@ export async function renderMagicLinkEmail(
 
     const emailHtml = await render(
         MagicLinkEmail({
-            url: magicLinkUrl,
+            url: finalUrl,
+            code: code,
             appName: serverConfig.name,
             appBaseUrl: serverConfig.url,
             senderName: serverConfig.mail?.postmark.sender_name,
@@ -97,7 +115,7 @@ export async function renderMagicLinkEmail(
     const email: Email = {
         From: `"${serverConfig.mail?.postmark.sender_name}" <${serverConfig.mail?.postmark.sender_address}>`,
         To: emailAddress,
-        Subject: `Aanmeldlink voor ${serverConfig.name} | ${emailTimestamp}`,
+        Subject: `Aanmeldcode voor ${serverConfig.name} | ${emailTimestamp}`,
         HtmlBody: emailHtml,
         Tag: "magic-link",
     }
@@ -148,7 +166,8 @@ export async function sendEmail(email: Email): Promise<void> {
 export async function sendMagicLinkEmailToUser(
     emailAddress: string,
     magicLinkUrl: string,
+    code: string,
 ): Promise<void> {
-    const email = await renderMagicLinkEmail(emailAddress, magicLinkUrl)
+    const email = await renderMagicLinkEmail(emailAddress, magicLinkUrl, code)
     await sendEmail(email)
 }

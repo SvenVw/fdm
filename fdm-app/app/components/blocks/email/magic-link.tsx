@@ -15,6 +15,7 @@ import { Tailwind } from "@react-email/tailwind"
 
 interface MagicLinkEmailProps {
     url: string
+    code: string
     appName: string
     appBaseUrl: string
     senderName: string | undefined
@@ -23,6 +24,7 @@ interface MagicLinkEmailProps {
 
 export const MagicLinkEmail = ({
     url,
+    code,
     appName,
     appBaseUrl,
     senderName,
@@ -60,8 +62,20 @@ export const MagicLinkEmail = ({
                         Hallo,
                     </Text>
                     <Text className="text-black text-[14px] leading-6">
-                        U heeft een link aangevraagd om in te loggen bij{" "}
-                        {appName}. Klik op de knop hieronder om verder te gaan:
+                        U heeft een code aangevraagd om in te loggen bij{" "}
+                        {appName}.
+                    </Text>
+                    <Section className="bg-gray-100 rounded p-4 text-center my-6 border border-gray-200">
+                        <Text className="m-0 text-gray-500 text-xs uppercase tracking-wider font-semibold">
+                            Uw inlogcode
+                        </Text>
+                        <Text className="m-0 text-black text-3xl font-bold tracking-[0.2em] py-2">                            
+                            {code.length === 8 ? `${code.slice(0, 4)}-${code.slice(4)}` : code}
+                        </Text>
+                    </Section>
+                    <Text className="text-black text-[14px] leading-6">
+                        Kopieer de code hierboven of klik op de knop hieronder
+                        om direct verder te gaan:
                     </Text>
                     <Section className="mt-8 mb-8 text-center">
                         <Button
@@ -72,18 +86,9 @@ export const MagicLinkEmail = ({
                             Aanmelden bij {appName}
                         </Button>
                     </Section>
-                    <Text className="text-black text-[14px] leading-6">
-                        Werkt de knop niet? Kopieer en plak dan de onderstaande
-                        link in uw browser:
-                    </Text>
-                    <Link
-                        href={url}
-                        className="text-[#0070f3] text-[12px] leading-6 break-all block mb-4"
-                    >
-                        {url}
-                    </Link>
                     <Text className="text-[#666666] text-[12px] leading-6 mt-1.25 block text-center mb-8">
-                        Deze link is éénmalig en voor 15 minuten geldig.
+                        Deze code en link zijn éénmalig en voor 15 minuten
+                        geldig.
                     </Text>
                     <Text className="text-black text-[14px] leading-6">
                         Indien u dit niet heeft aangevraagd, kunt u deze e-mail
