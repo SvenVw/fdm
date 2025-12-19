@@ -2,13 +2,20 @@ import {
     addCultivation,
     addField,
     addSoilAnalysis,
+    getCultivations,
     getCultivationsFromCatalogue,
     getDefaultDatesOfCultivation,
     getFarm,
     getFarms,
     getFields,
 } from "@svenvw/fdm-core"
-import type { Feature, FeatureCollection, Polygon } from "geojson"
+import type {
+    Feature,
+    FeatureCollection,
+    GeoJsonProperties,
+    Polygon,
+} from "geojson"
+import maplibregl from "maplibre-gl"
 import { useState } from "react"
 import {
     Layer,
@@ -16,7 +23,6 @@ import {
     type ViewState,
     type ViewStateChangeEvent,
 } from "react-map-gl/maplibre"
-import maplibregl from "maplibre-gl"
 import {
     type ActionFunctionArgs,
     data,
@@ -31,16 +37,16 @@ import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import {
     FieldsPanelHover,
+    FieldsPanelSelection,
     FieldsPanelZoom,
 } from "~/components/blocks/atlas/atlas-panels"
 import {
     FieldsSourceAvailable,
     FieldsSourceNotClickable,
+    FieldsSourceSelected,
 } from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
-import FieldDetailsDialog from "~/components/blocks/field/form"
-import { FormSchema } from "~/components/blocks/field/schema"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { HeaderField } from "~/components/blocks/header/field"
@@ -54,8 +60,9 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { extractFormValuesFromRequest } from "~/lib/form"
 import { useCalendarStore } from "~/store/calendar"
+import FieldDetailsInfoPopup from "~/components/blocks/field/popup"
+import { generateFeatureClass } from "~/components/blocks/atlas/atlas-functions"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -143,6 +150,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             features: features,
         }
 
+        const fieldsSaved: FeatureCollection = {
+            type: "FeatureCollection",
+            features: features,
+        }
+
         // Get the available cultivations
         let cultivationOptions = []
         const cultivationsCatalogue = await getCultivationsFromCatalogue(
@@ -176,6 +188,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             farmOptions: farmOptions,
             b_id_farm: b_id_farm,
             b_name_farm: farm.b_name_farm,
+            fieldsSaved: fieldsSaved,
             calendar: calendar,
             featureCollection: featureCollection,
             fieldNameDefault: fieldNameDefault,
@@ -218,19 +231,18 @@ export default function Index() {
         null,
     )
 
-    function setDialogOpen(value: boolean) {
-        if (value) {
-            setOpen(true)
-        } else {
-            setSelectedField(null)
-            setOpen(false)
-        }
-    }
-
-    const handleSelectField = (feature: Feature<Polygon>) => {
+    const handleClickSavedField = async (feature: Feature<Polygon>) => {
         setSelectedField(feature)
         setOpen(true)
     }
+
+    const fieldsSelectedId = "fieldsSelected"
+    const fieldsSelectedStyle = getFieldsStyle(fieldsSelectedId)
+
+    // Set selected fields
+    const [selectedFieldsData, setSelectedFieldsData] = useState(
+        generateFeatureClass(),
+    )
 
     // onViewportChange handler as Controls requires it
     const onViewportChange = (event: ViewStateChangeEvent) => {
@@ -275,10 +287,10 @@ export default function Index() {
                     <div className="flex items-center">
                         <div className="space-y-0.5">
                             <h2 className="text-2xl font-bold tracking-tight">
-                                Nieuw perceel
+                                Kaart
                             </h2>
                             <p className="text-muted-foreground">
-                                Zoom in en voeg een nieuw perceel toe
+                                Zoom in en selecteer je percelen
                             </p>
                         </div>
                     </div>
@@ -302,27 +314,19 @@ export default function Index() {
                                 mapLib={maplibregl}
                                 interactiveLayerIds={[
                                     fieldsAvailableId,
+                                    fieldsSelectedId,
                                     fieldsSavedId,
                                 ]}
-                                onMove={onViewportChange} // Set onMove handler
+                                onMove={onViewportChange}
                                 onClick={(evt) => {
                                     if (!evt.features) return
                                     const polygonFeature = evt.features.find(
                                         (f) =>
-                                            f.source === fieldsAvailableId &&
+                                            f.source === fieldsSavedId &&
                                             f.geometry?.type === "Polygon",
                                     )
-                                    const savedPolygonFeature =
-                                        evt.features.find(
-                                            (f) =>
-                                                f.source === fieldsSavedId &&
-                                                f.geometry?.type === "Polygon",
-                                        )
-                                    if (
-                                        polygonFeature &&
-                                        !savedPolygonFeature
-                                    ) {
-                                        handleSelectField(
+                                    if (polygonFeature) {
+                                        handleClickSavedField(
                                             polygonFeature as Feature<Polygon>,
                                         )
                                     }
@@ -359,22 +363,58 @@ export default function Index() {
                                     />
                                 </FieldsSourceAvailable>
 
+                                <FieldsSourceSelected
+                                    id={fieldsSelectedId}
+                                    availableLayerId={fieldsAvailableId}
+                                    fieldsData={selectedFieldsData}
+                                    setFieldsData={setSelectedFieldsData}
+                                    excludedLayerId={fieldsSavedId}
+                                >
+                                    <Layer
+                                        {...({
+                                            ...fieldsSelectedStyle,
+                                            layout: layerLayout,
+                                        } as any)}
+                                    />
+                                </FieldsSourceSelected>
+
                                 <FieldsSourceNotClickable
                                     id={fieldsSavedId}
                                     fieldsData={fieldsSaved}
                                 >
-                                    <Layer {...fieldsSavedStyle} />
-                                    <Layer {...fieldsSavedOutlineStyle} />
+                                    <Layer
+                                        {...fieldsSavedOutlineStyle}
+                                        source={fieldsSavedId}
+                                    />
+                                    <Layer
+                                        {...fieldsSavedStyle}
+                                        source={fieldsSavedId}
+                                    />
                                 </FieldsSourceNotClickable>
 
                                 <div className="fields-panel grid gap-4 w-[350px]">
+                                    <FieldsPanelSelection
+                                        fields={selectedFieldsData}
+                                        numFieldsSaved={
+                                            loaderData.fieldsSaved.features
+                                                .length
+                                        }
+                                        continueTo={loaderData.continueTo}
+                                    />
                                     <FieldsPanelZoom
                                         zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                     />
                                     <FieldsPanelHover
                                         zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                         layer={fieldsAvailableId}
-                                        layerExclude={fieldsSavedId}
+                                        layerExclude={[
+                                            fieldsSelectedId,
+                                            fieldsSavedId,
+                                        ]}
+                                    />
+                                    <FieldsPanelHover
+                                        zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                                        layer={fieldsSelectedId}
                                     />
                                 </div>
                             </MapGL>
@@ -383,18 +423,30 @@ export default function Index() {
                 </div>
             </main>
             {selectedField && (
-                <FieldDetailsDialog
+                <FieldDetailsInfoPopup
                     open={open}
-                    setOpen={setDialogOpen}
-                    field={selectedField as Feature<Polygon>}
-                    cultivationOptions={loaderData.cultivationOptions}
-                    fieldNameDefault={loaderData.fieldNameDefault}
+                    setOpen={setOpen}
+                    field={selectedField}
+                    hint="Dit perceel is al opgeslagen. U kunt percelen verwijderen op de volgende pagina."
                 />
             )}
         </SidebarInset>
     )
 }
 
+/**
+ * Processes form submission for adding fields to a farm.
+ *
+ * This action extracts selected fields from the incoming form data, validates the presence
+ * of the farm identifier, and establishes the user session. It adds each field to the specified farm,
+ * creates the corresponding cultivation entry, and conditionally performs soil analysis if an API key is present.
+ * Upon successful processing, it redirects to the farm fields page with a success message.
+ *
+ * @returns A redirect response to the farm fields page with a success message.
+ *
+ * @throws {Error} If the farm identifier is missing or if an operation (such as adding a field, cultivation,
+ * or soil analysis) fails.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     // Get the farm id
     const b_id_farm = params.b_id_farm
@@ -406,113 +458,123 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
 
     try {
+        const formData = await request.formData()
+
         // Get the session
         const session = await getSession(request)
 
         // Get the timeframe
         const timeframe = getTimeframe(params)
         const calendar = getCalendar(params)
+        let firstFieldIndex: number
+        try {
+            firstFieldIndex =
+                (
+                    await getFields(
+                        fdm,
+                        session.principal_id,
+                        b_id_farm,
+                        timeframe,
+                    )
+                ).length + 1
+        } catch (e) {
+            console.warn(e)
+            firstFieldIndex = 1
+        }
 
         const nmiApiKey = getNmiApiKey()
 
         // Get form values
-        const formValues = await extractFormValuesFromRequest(
-            request,
-            FormSchema,
+        const selectedFields = JSON.parse(
+            String(formData.get("selected_fields")),
         )
 
-        // Check if cultivation is available
-        let cultivationOptions = []
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(
-            fdm,
-            session.principal_id,
-            b_id_farm,
+        // Add fields to farm
+        const fieldIds: string[] = await Promise.all(
+            selectedFields.features.map(
+                async (
+                    field: Feature<Polygon, GeoJsonProperties>,
+                    index: number,
+                ) => {
+                    if (!field.properties) {
+                        throw new Error("missing: field.properties")
+                    }
+                    const b_name = `Perceel ${firstFieldIndex + index}`
+                    const b_id_source = field.properties.b_id_source
+                    const b_lu_catalogue = field.properties.b_lu_catalogue
+                    const b_geometry = field.geometry
+
+                    const parsedYear = Number.parseInt(
+                        String(calendar ?? ""),
+                        10,
+                    )
+                    const currentYear =
+                        Number.isInteger(parsedYear) &&
+                        parsedYear >= 1970 &&
+                        parsedYear < 2100
+                            ? parsedYear
+                            : timeframe.start.getFullYear()
+                    const cultivationDefaultDates =
+                        await getDefaultDatesOfCultivation(
+                            fdm,
+                            session.principal_id,
+                            b_id_farm,
+                            b_lu_catalogue,
+                            currentYear,
+                        )
+                    const b_start = new Date(`${currentYear}-01-01`)
+                    const b_lu_start = cultivationDefaultDates.b_lu_start
+                    const b_lu_end = cultivationDefaultDates.b_lu_end
+                    const b_end = undefined
+                    const b_acquiring_method = "unknown"
+
+                    const b_id = await addField(
+                        fdm,
+                        session.principal_id,
+                        b_id_farm,
+                        b_name,
+                        b_id_source,
+                        b_geometry,
+                        b_start,
+                        b_acquiring_method,
+                        b_end,
+                    )
+                    await addCultivation(
+                        fdm,
+                        session.principal_id,
+                        b_lu_catalogue,
+                        b_id,
+                        b_lu_start,
+                        b_lu_end,
+                    )
+
+                    if (nmiApiKey) {
+                        const estimates = await getSoilParameterEstimates(
+                            field,
+                            nmiApiKey,
+                        )
+
+                        await addSoilAnalysis(
+                            fdm,
+                            session.principal_id,
+                            undefined,
+                            estimates.a_source,
+                            b_id,
+                            estimates.a_depth_lower,
+                            undefined,
+                            estimates,
+                        )
+                    }
+
+                    return b_id
+                },
+            ),
         )
-        cultivationOptions = cultivationsCatalogue
-            .filter(
-                (cultivation) =>
-                    cultivation?.b_lu_catalogue && cultivation?.b_lu_name,
-            )
-            .map((cultivation) => {
-                return cultivation.b_lu_catalogue
-            })
-        if (!cultivationOptions.includes(formValues.b_lu_catalogue)) {
-            return dataWithError(
-                `Cultivation ${formValues.b_lu_catalogue} is not available`,
-                "Gewas is onbekend. Kies een gewas uit de lijst",
-            )
-        }
-
-        const b_name = formValues.b_name
-        const b_id_source = formValues.b_id_source
-        const b_lu_catalogue = formValues.b_lu_catalogue
-        // Parse the geometry string twice to get the actual GeoJSON object
-        const b_geometry = JSON.parse(
-            JSON.parse(String(formValues.b_geometry)),
-        ) as Polygon
-        const parsedYear = Number.parseInt(String(calendar ?? ""), 10)
-
-        const currentYear =
-            Number.isInteger(parsedYear) &&
-            parsedYear >= 1970 &&
-            parsedYear < 2100
-                ? parsedYear
-                : timeframe.start.getFullYear()
-        const cultivationDefaultDates = await getDefaultDatesOfCultivation(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            b_lu_catalogue,
-            currentYear,
-        )
-        const b_start = new Date(`${currentYear}-01-01`)
-        const b_lu_start = cultivationDefaultDates.b_lu_start
-        const b_lu_end = cultivationDefaultDates.b_lu_end
-        const b_end = undefined
-        const b_acquiring_method = "unknown"
-
-        const b_id = await addField(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            b_name,
-            b_id_source,
-            b_geometry,
-            b_start,
-            b_acquiring_method,
-            b_end,
-        )
-        await addCultivation(
-            fdm,
-            session.principal_id,
-            b_lu_catalogue,
-            b_id,
-            b_lu_start,
-            b_lu_end,
-        )
-
-        if (nmiApiKey) {
-            const estimates = await getSoilParameterEstimates(
-                b_geometry,
-                nmiApiKey,
-            )
-
-            await addSoilAnalysis(
-                fdm,
-                session.principal_id,
-                undefined,
-                estimates.a_source,
-                b_id,
-                estimates.a_depth_lower,
-                undefined,
-                estimates,
-            )
-        }
 
         return redirectWithSuccess(
-            `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer`,
+            `/farm/${b_id_farm}/${calendar}/field/${fieldIds[0]}/fertilizer?fieldIds=${encodeURIComponent(fieldIds.map(encodeURIComponent).join(","))}`,
             {
-                message: `${b_name} is toegevoegd! 🎉`,
+                message: `${fieldIds.length} ${fieldIds.length === 1 ? "perceel is" : "percelen zijn"} toegevoegd! 🎉`,
             },
         )
     } catch (error) {

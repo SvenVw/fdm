@@ -280,8 +280,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         if (request.method === "DELETE") {
             await removeCultivation(fdm, session.principal_id, b_lu)
+            const url = new URL(request.url)
             return redirectWithSuccess(
-                `/farm/${params.b_id_farm}/${params.calendar}/field/${b_id}/cultivation`,
+                `/farm/${params.b_id_farm}/${params.calendar}/field/${b_id}/cultivation${url.search}`,
                 { message: "Gewas is verwijderd" },
             )
         }

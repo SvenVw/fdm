@@ -40,7 +40,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         )
 
         // Redirect to overview page
-        return redirect(`./${cultivations[0].b_lu}`)
+        const url = new URL(request.url)
+        return redirect(`./${cultivations[0].b_lu}${url.search}`)
     } catch (error) {
         return handleLoaderError(error)
     }

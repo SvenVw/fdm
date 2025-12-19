@@ -195,7 +195,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
             formValues,
         )
 
-        return redirectWithSuccess("../soil", {
+        const url = new URL(request.url)
+        return redirectWithSuccess(`../soil${url.search}`, {
             message: "Bodemanalyse is toegevoegd! 🎉",
         })
     } catch (error) {

@@ -456,9 +456,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
 
-        return redirectWithSuccess(`/farm/${b_id_farm}/${calendar}/field`, {
-            message: `Bemesting succesvol toegevoegd aan ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
-        })
+        return redirectWithSuccess(
+            `/farm/${b_id_farm}/${calendar}/field${url.search}`,
+            {
+                message: `Bemesting succesvol toegevoegd aan ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
+            },
+        )
     } catch (error) {
         if (error instanceof z.ZodError) {
             return dataWithError(

@@ -25,6 +25,7 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
+import { modifySearchParams } from "../lib/url-utils"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -77,6 +78,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
+        const url = new URL(request.url)
+        const fieldIdsStr = url.searchParams.get("fieldIds")
+
         // Get the session
         const session = await getSession(request)
 
@@ -110,7 +114,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm,
             timeframe,
         )
-        const fieldOptions = fields.map((field) => {
+        const wantedFieldIds = fieldIdsStr?.length
+            ? fieldIdsStr.split(",")
+            : null
+        let fieldOptions = fields.map((field) => {
             if (!field?.b_id || !field?.b_name) {
                 throw new Error("Invalid field data structure")
             }
@@ -120,6 +127,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 b_area: Math.round(field.b_area * 10) / 10,
             }
         })
+        if (wantedFieldIds) {
+            const fieldIdsSet = new Set(wantedFieldIds)
+            fieldOptions = fieldOptions.filter((field) =>
+                fieldIdsSet.has(field.b_id),
+            )
+        }
 
         // Sort fields by name alphabetically
         fieldOptions.sort((a, b) => a.b_name.localeCompare(b.b_name))
@@ -156,6 +169,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 title: "Kaart",
             },
         ]
+        if (fieldIdsStr) {
+            sidebarPageItems.forEach((conf) => {
+                conf.to = modifySearchParams(conf.to, (searchParams) =>
+                    searchParams.set("fieldIds", fieldIdsStr),
+                )
+            })
+        }
+
+        console.log(sidebarPageItems)
 
         const fieldWritePermission = await checkPermission(
             fdm,
@@ -183,6 +205,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id: b_id,
             sidebarPageItems: sidebarPageItems,
             user: session.user,
+            fieldOptionsLocation: wantedFieldIds ? "sidebar" : "header",
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -219,7 +242,11 @@ export default function FarmFieldIndex() {
                 />
                 <HeaderField
                     b_id_farm={loaderData.b_id_farm}
-                    fieldOptions={loaderData.fieldOptions}
+                    fieldOptions={
+                        loaderData.fieldOptionsLocation === "header"
+                            ? loaderData.fieldOptions
+                            : []
+                    }
                     b_id={loaderData.b_id}
                 />
             </Header>
@@ -228,7 +255,14 @@ export default function FarmFieldIndex() {
                     title={loaderData.field?.b_name}
                     description={"Beheer hier de gegevens van dit perceel"}
                 />
-                <FarmContent sidebarItems={loaderData.sidebarPageItems}>
+                <FarmContent
+                    fieldOptions={
+                        loaderData.fieldOptionsLocation === "sidebar"
+                            ? loaderData.fieldOptions
+                            : undefined
+                    }
+                    sidebarItems={loaderData.sidebarPageItems}
+                >
                     <Outlet />
                 </FarmContent>
             </main>
