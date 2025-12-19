@@ -26,7 +26,10 @@ import {
     columns,
     type RotationExtended,
 } from "~/components/blocks/rotation/columns"
-import { RotationTableFormSchema } from "~/components/blocks/rotation/schema"
+import {
+    RotationTableFormSchema,
+    RotationTableFormSchemaType,
+} from "~/components/blocks/rotation/schema"
 import { DataTable } from "~/components/blocks/rotation/table"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
@@ -669,9 +672,9 @@ export async function action({ params, request }: Route.ActionArgs) {
         }
 
         return dataWithSuccess(null, {
-            message: "Succesvol bijwerkt.",
+            message: "Succesvol bijgewerkt.",
         })
     } catch (e) {
-        handleActionError(e)
+        throw handleActionError(e)
     }
 }

@@ -106,7 +106,11 @@ export function TableDateSelector({
             <TableDateSelectorForm
                 name={name}
                 row={row}
-                onHide={() => activeTableFormStore.clearActiveForm()}
+                onHide={() => {
+                    const currentState = useActiveTableFormStore.getState()
+                    if (currentState.activeForm === cellId)
+                        currentState.clearActiveForm()
+                }}
             />
         )
     }

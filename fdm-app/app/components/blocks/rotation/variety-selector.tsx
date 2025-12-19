@@ -147,7 +147,11 @@ export function TableVarietySelector({
                 name={name}
                 row={row}
                 b_lu_variety_options={b_lu_variety_options}
-                onHide={() => activeTableFormStore.clearActiveForm()}
+                onHide={() => {
+                    const currentState = useActiveTableFormStore.getState()
+                    if (currentState.activeForm === cellId)
+                        currentState.clearActiveForm()
+                }}
             />
         )
     }

@@ -195,7 +195,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
         cell: ({ cell, row }) =>
             row.original.type === "crop" ? (
                 <DateRangeDisplay
-                    range={row.original.b_lu_end}
+                    range={row.original.b_lu_start}
                     emptyContent="Geen"
                 />
             ) : (
@@ -307,7 +307,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
 
             const inputId = `${cell.id}_checkbox`
 
-            return fetcher.state === "submitting" ? (
+            return fetcher.state !== "idle" ? (
                 <LoadingSpinner />
             ) : (
                 <div className="flex flex-row items-center gap-1">

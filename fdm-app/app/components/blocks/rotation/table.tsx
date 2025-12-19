@@ -550,7 +550,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                                 "field"
                                                     ? {
                                                           padding:
-                                                              "calc(0.5 * var(--spacing)) calc(2 * var(--spacing));",
+                                                              "calc(0.5 * var(--spacing)) calc(2 * var(--spacing))",
                                                       }
                                                     : {}),
                                             }}
