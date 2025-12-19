@@ -4,7 +4,7 @@ import { serverConfig } from "~/lib/config.server"
 const posthogProxy = async (request: Request) => {
     
     if (!serverConfig.analytics.posthog) {
-        return {}
+        return new Response(null, { status: 204 })
     }
 
     const API_HOST = serverConfig.analytics.posthog.host.replace("https://", "")
