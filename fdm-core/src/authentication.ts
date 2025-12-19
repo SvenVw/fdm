@@ -405,7 +405,7 @@ export function createDisplayUsername(
     return name
 }
 
-const ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"
+const ALPHABET = "23456789ABCDFGHJKLMNPQRSTVWXYZ"
 const generateCodeWithNanoId = customAlphabet(ALPHABET, 8)
 /**
  * Generates a read-safe OTP (One-Time Password).
