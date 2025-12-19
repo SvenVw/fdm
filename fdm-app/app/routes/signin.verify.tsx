@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useRef } from "react"
-import { LoaderFunctionArgs, MetaFunction, redirect } from "react-router"
+import { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction, redirect } from "react-router"
 import { Form, useActionData, useLoaderData, useNavigation } from "react-router"
 import { useRemixForm } from "remix-hook-form"
 import { z } from "zod"
@@ -117,7 +117,7 @@ export default function Verify() {
 }
 
 
-export async function action({ request }: LoaderFunctionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
     // Artificial delay to ensure the loading state is visible to the user
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
