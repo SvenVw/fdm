@@ -69,7 +69,8 @@ const posthogConfig = clientConfig.analytics.posthog
 if (posthogConfig) {
     try {
         posthog.init(posthogConfig.key, {
-            api_host: posthogConfig.host,
+            api_host: '/ph',
+            ui_host: posthogConfig.host,
             person_profiles: "always",
             loaded: () => {},
         })
