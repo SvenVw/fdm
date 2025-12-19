@@ -514,6 +514,7 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 5, // 5 kg N per ton
                 p_type_rvo: "115", // Kunstmest (working coefficient 1.0)
             },
@@ -563,11 +564,13 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 5, // 5 kg N per ton
                 p_type_rvo: "115", // Kunstmest (working coefficient 1.0)
             },
             {
                 p_id: "fert2",
+                p_id_catalogue: "fert2",
                 p_n_rt: 10, // 10 kg N per ton
                 p_type_rvo: "111", // Compost (working coefficient 0.1)
             },
@@ -616,6 +619,7 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 0, // Nitrogen content not directly known
                 p_type_rvo: "14", // Drijfmest rundvee (Table 11: 4.0 kg N/ton)
             },
@@ -689,6 +693,7 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 0, // Nitrogen content not directly known
                 p_type_rvo: "14", // Drijfmest rundvee (Table 11: 4.0 kg N/ton)
             },
@@ -735,6 +740,7 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 10, // 10 kg N per ton
                 p_type_rvo: "10",
             },
