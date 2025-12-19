@@ -32,11 +32,20 @@ const posthogProxy = async (request: Request) => {
     const headers = new Headers(request.headers)
     headers.set("host", hostname)
     headers.delete("accept-encoding")
+    headers.delete("x-forwarded-for")
+    headers.delete("x-forwarded-host")
+    headers.delete("x-forwarded-proto")
+    headers.delete("forwarded")
+    headers.delete("proxy-authorization")
+    headers.delete("authorization")
+    headers.delete("cookie")
+    headers.delete("upgrade")
 
     let response: Response
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
     try {
         const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 30000) // 30s timeout
+        timeoutId = setTimeout(() => controller.abort(), 30000) // 30s timeout
         
         response = await fetch(newUrl, {
             method: request.method,
@@ -46,14 +55,16 @@ const posthogProxy = async (request: Request) => {
             // @ts-ignore - duplex is required for streaming request bodies
             duplex: 'half',
         })
-        
-        clearTimeout(timeoutId)
     } catch (error) {
         console.error('PostHog proxy error:', error)
         return new Response('Service unavailable', { 
             status: 503,
             statusText: 'PostHog proxy error'
         })
+    } finally {
+        if (timeoutId) {
+            clearTimeout(timeoutId)
+        }
     }
 
     const responseHeaders = new Headers(response.headers)
