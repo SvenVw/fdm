@@ -8,7 +8,7 @@ const posthogProxy = async (request: Request) => {
     }
 
     const API_HOST = serverConfig.analytics.posthog.host.replace("https://", "")
-    const ASSET_HOST = API_HOST?.replace("eu", "eu-assets")
+    const ASSET_HOST = API_HOST?.replace(/^([a-z]{2})\./, "$1-assets.")
 
     const url = new URL(request.url)
     const hostname = url.pathname.startsWith("/ph/static/")
