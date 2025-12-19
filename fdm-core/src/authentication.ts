@@ -7,7 +7,6 @@ import type { FdmAuth } from "./authentication.d"
 import * as authNSchema from "./db/schema-authn"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import { generateReadSafeOTP } from "./token-generator"
 import { customAlphabet } from "nanoid"
 
 export type BetterAuth = FdmAuth
