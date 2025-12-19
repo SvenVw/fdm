@@ -317,7 +317,7 @@ export default function SignIn() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             email: "",
-            timeZone: undefined,
+            timeZone: "",
         },
     })
 

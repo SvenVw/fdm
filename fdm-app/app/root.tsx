@@ -86,6 +86,23 @@ export function Layout() {
     const runtimeEnv = loaderData?.runtimeEnv // Get runtimeEnv from loader data
     const location = useLocation()
 
+    // Initialize PostHog
+    useEffect(() => {
+        const posthogConfig = clientConfig.analytics.posthog
+        if (posthogConfig) {
+            try {
+                posthog.init(posthogConfig.key, {
+                    api_host: "/ph",
+                    ui_host: posthogConfig.host,
+                    person_profiles: "always",
+                    loaded: () => {},
+                })
+            } catch (error) {
+                console.error("Failed to initialize PostHog:", error)
+            }
+        }
+    }, [])
+
     // Capture pageviews if PostHog is configured
     // biome-ignore lint/correctness/useExhaustiveDependencies: This is a false positive: the useEffect should run whenever the location changes to capture new pageviews correctly
     useEffect(() => {
