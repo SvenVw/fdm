@@ -29,6 +29,7 @@ import {
     getDefaultsForHarvestParameters,
     getHarvestableTypeOfCultivation,
     getHarvests,
+    removeHarvest,
 } from "./harvest"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
@@ -1260,7 +1261,7 @@ export async function updateCultivation(
                         )
                         .limit(1)
 
-                    if (result.length > 0) {
+                    if (result.length > 0 && b_lu_end) {
                         if (
                             result[0].b_lu_start.getTime() >= b_lu_end.getTime()
                         ) {
@@ -1329,6 +1330,29 @@ export async function updateCultivation(
                             defaultHarvestParameters,
                         )
                     }
+                }
+            } else if (b_lu_end === null) {
+                const harvestableType = await getHarvestableTypeOfCultivation(
+                    tx,
+                    b_lu,
+                )
+                if (harvestableType === "once") {
+                    // If harvestable type is "once", remove the harvest
+                    const harvests = await getHarvests(tx, principal_id, b_lu)
+                    await Promise.all(
+                        harvests.map((harvest) =>
+                            removeHarvest(
+                                tx,
+                                principal_id,
+                                harvest.b_id_harvesting,
+                            ),
+                        ),
+                    )
+                } else {
+                    await tx
+                        .update(schema.cultivationEnding)
+                        .set({ b_lu_end: null, updated: updated })
+                        .where(eq(schema.cultivationEnding.b_lu, b_lu))
                 }
             }
         })
