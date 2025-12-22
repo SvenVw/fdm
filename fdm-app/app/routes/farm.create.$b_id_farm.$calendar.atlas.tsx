@@ -13,13 +13,14 @@ import type {
     GeoJsonProperties,
     Polygon,
 } from "geojson"
+import maplibregl from "maplibre-gl"
 import { useCallback, useState } from "react"
 import {
     Layer,
     Map as MapGL,
     type ViewState,
     type ViewStateChangeEvent,
-} from "react-map-gl/mapbox"
+} from "react-map-gl/maplibre"
 import {
     type ActionFunctionArgs,
     data,
@@ -30,6 +31,7 @@ import {
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { generateFeatureClass } from "~/components/blocks/atlas/atlas-functions"
 import {
@@ -49,7 +51,7 @@ import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
-import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
+import { getMapStyle } from "~/integrations/map"
 import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
@@ -73,11 +75,11 @@ export const meta: MetaFunction = () => {
 /**
  * Retrieves farm details and map configurations for rendering the farm map.
  *
- * This loader function extracts the farm ID from route parameters, validates its presence, and uses the current session to fetch the corresponding farm details. It then retrieves the Mapbox token and style configuration, and returns these along with the farm's display name and a URL for available fields. Any errors encountered during processing are transformed using {~link handleLoaderError}.
+ * This loader function extracts the farm ID from route parameters, validates its presence, and uses the current session to fetch the corresponding farm details. It then retrieves the Maplibre token and style configuration, and returns these along with the farm's display name and a URL for available fields. Any errors encountered during processing are transformed using {~link handleLoaderError}.
  *
  * ~throws {Response} When the farm ID is missing, the specified farm is not found, or another error occurs during data retrieval.
  *
- * ~returns An object containing the farm name, Mapbox token, Mapbox style, and the URL for available fields.
+ * ~returns An object containing the farm name, Maplibre token, Maplibre style, and the URL for available fields.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -157,9 +159,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             features: features,
         }
 
-        // Get the Mapbox token and style
-        const mapboxToken = getMapboxToken()
-        const mapboxStyle = getMapboxStyle()
+        // Get Map Style
+        const mapStyle = getMapStyle("satellite")
 
         return {
             b_id_farm: farm.b_id_farm,
@@ -167,8 +168,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fieldsSaved: fieldsSaved,
             timeframe: timeframe,
             calendar: calendar,
-            mapboxToken: mapboxToken,
-            mapboxStyle: mapboxStyle,
+            mapStyle: mapStyle,
             continueTo: `/farm/create/${b_id_farm}/${calendar}/fields`,
         }
     } catch (error) {
@@ -260,8 +260,8 @@ export default function Index() {
                                     width: "100%",
                                 }}
                                 interactive={true}
-                                mapStyle={loaderData.mapboxStyle}
-                                mapboxAccessToken={loaderData.mapboxToken}
+                                mapStyle={loaderData.mapStyle}
+                                mapLib={maplibregl}
                                 interactiveLayerIds={[
                                     fieldsAvailableId,
                                     fieldsSelectedId,
@@ -302,6 +302,8 @@ export default function Index() {
                                         setShowFields(!showFields)
                                     }
                                 />
+
+                                <MapTilerAttribution />
 
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}

@@ -65,21 +65,6 @@ if (clientConfig.analytics.sentry) {
     })
 }
 
-const posthogConfig = clientConfig.analytics.posthog
-if (posthogConfig) {
-    try {
-        posthog.init(posthogConfig.key, {
-            api_host: posthogConfig.host,
-            person_profiles: "always",
-            loaded: () => {},
-        })
-    } catch (error) {
-        console.error("Failed to initialize PostHog:", error)
-    }
-} else {
-    console.warn("PostHog not initialized - missing or invalid configuration")
-}
-
 startTransition(() => {
     hydrateRoot(
         document,

@@ -3,10 +3,10 @@ import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { getGeoTiffValue } from "../../../../shared/geotiff"
 import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
-import { determineNL2025Hoofdteelt } from "./hoofdteelt"
+import type { GebruiksnormResult } from "../../types"
+import { determineNLHoofdteelt } from "./hoofdteelt"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {
-    GebruiksnormResult,
     NitrogenStandard,
     NL2025NormsInput,
     NL2025NormsInputForCultivation,
@@ -243,6 +243,7 @@ function determineSubTypeOmschrijving(
         const hasLucernceCultivationInPreviousYear = cultivations.some(
             (c) =>
                 lucerneCultivationCodes.includes(c.b_lu_catalogue) &&
+                c.b_lu_start &&
                 c.b_lu_start.getFullYear() <= 2024,
         )
         return hasLucernceCultivationInPreviousYear
@@ -265,6 +266,7 @@ function determineSubTypeOmschrijving(
         const hasGrasCultivationInPreviousYear = cultivations.some(
             (c) =>
                 grasCultivationCodes.includes(c.b_lu_catalogue) &&
+                c.b_lu_start &&
                 c.b_lu_start.getFullYear() <= 2024,
         )
         return hasGrasCultivationInPreviousYear
@@ -281,6 +283,7 @@ function determineSubTypeOmschrijving(
         const hasGraszaadCultivationInPreviousYear = cultivations.some(
             (c) =>
                 graszaadCultivationCodes.includes(c.b_lu_catalogue) &&
+                c.b_lu_start &&
                 c.b_lu_start.getFullYear() <= 2024,
         )
         return hasGraszaadCultivationInPreviousYear ? "overjarig" : "1e jaars"
@@ -294,6 +297,7 @@ function determineSubTypeOmschrijving(
         const hasRoodzwenkgrasCultivationInPreviousYear = cultivations.some(
             (c) =>
                 roodzwenkgrasCultivationCodes.includes(c.b_lu_catalogue) &&
+                c.b_lu_start &&
                 c.b_lu_start.getFullYear() <= 2024,
         )
         return hasRoodzwenkgrasCultivationInPreviousYear
@@ -318,7 +322,7 @@ function determineSubTypeOmschrijving(
     ]
 
     if (bladgewasRvoTable2s.includes(standard.cultivation_rvo_table2)) {
-        const hoofdteeltCatalogue = determineNL2025Hoofdteelt(cultivations)
+        const hoofdteeltCatalogue = determineNLHoofdteelt(cultivations, 2025)
         if (cultivation.b_lu_catalogue === hoofdteeltCatalogue) {
             return "1e teelt"
         }
@@ -363,8 +367,11 @@ function calculateKorting(
     }
 
     // Determine hoofdteelt for the current year (2025)
-    const hoofdteelt2025 = determineNL2025Hoofdteelt(
-        cultivations.filter((c) => c.b_lu_start.getFullYear() === currentYear),
+    const hoofdteelt2025 = determineNLHoofdteelt(
+        cultivations.filter(
+            (c) => c.b_lu_start && c.b_lu_start.getFullYear() === currentYear,
+        ),
+        2025,
     )
     const hoofdteelt2025Standard = nitrogenStandardsData.find((ns) =>
         ns.b_lu_catalogue_match.includes(hoofdteelt2025),
@@ -380,7 +387,7 @@ function calculateKorting(
 
     // Filter cultivations for the previous year (2024)
     const cultivations2024 = cultivations.filter(
-        (c) => c.b_lu_start.getFullYear() === previousYear,
+        (c) => c.b_lu_start && c.b_lu_start.getFullYear() === previousYear,
     )
 
     // Check for vanggewas exception in 2024
@@ -389,10 +396,11 @@ function calculateKorting(
             ns.b_lu_catalogue_match.includes(prevCultivation.b_lu_catalogue),
         )
         const matchingYear =
+            prevCultivation.b_lu_start &&
             prevCultivation.b_lu_start.getTime() <
                 new Date(currentYear, 1, 1).getTime() &&
             prevCultivation.b_lu_start.getTime() >
-                new Date(previousYear, 6, 15).getTime() // Vanggewas should be sown between July 15th, 2024 and January 31th 2025
+                new Date(previousYear, 6, 15).getTime() // Vanggewas should be sown between July 15th, 2024 and February 1st 2025 (exclusive)
         return matchingStandard?.is_vanggewas === true && matchingYear === true
     })
     if (vanggewassen2024.length === 0) {
@@ -407,7 +415,9 @@ function calculateKorting(
         (prevCultivation) => {
             return (
                 prevCultivation.b_lu_end === null ||
-                prevCultivation.b_lu_end.getTime() >= new Date(currentYear, 1) // Month 1 is February
+                (prevCultivation.b_lu_end &&
+                    prevCultivation.b_lu_end.getTime() >=
+                        new Date(currentYear, 1).getTime()) // Month 1 is February
             )
         },
     )
@@ -419,12 +429,24 @@ function calculateKorting(
         }
     }
     // If multiple vanggewassen are completed to February 1st select the vangewas that was first sown
-    const sortedVanggewassen = vanggewassenCompleted2024.sort((a, b) => {
-        return a.b_lu_start.getTime() - b.b_lu_start.getTime()
-    })
+    const sortedVanggewassen = vanggewassenCompleted2024
+        .filter((v) => v.b_lu_start !== undefined)
+        .sort((a, b) => {
+            if (!a.b_lu_start || !b.b_lu_start) {
+                return 0
+            }
+            return a.b_lu_start.getTime() - b.b_lu_start.getTime()
+        })
     const vanggewas2024 = sortedVanggewassen[0]
 
     const sowDate = vanggewas2024.b_lu_start
+    if (!sowDate) {
+        return {
+            amount: new Decimal(20),
+            description: ". Korting: 20kg N/ha, geen zaaidatum bekend",
+        }
+    }
+
     const october1 = new Date(previousYear, 9, 1) // October 1st
     const october15 = new Date(previousYear, 9, 15) // October 15th
     const november1 = new Date(previousYear, 10, 1) // November 1st
@@ -437,11 +459,11 @@ function calculateKorting(
         kortingAmount = new Decimal(0)
         kortingDescription =
             ". Geen korting: vanggewas gezaaid uiterlijk 1 oktober"
-    } else if (sowDate > october1 && sowDate <= october15) {
+    } else if (sowDate > october1 && sowDate < october15) {
         kortingAmount = new Decimal(5)
         kortingDescription =
             ". Korting: 5kg N/ha, vanggewas gezaaid tussen 2 t/m 14 oktober"
-    } else if (sowDate > october15 && sowDate < november1) {
+    } else if (sowDate >= october15 && sowDate < november1) {
         kortingAmount = new Decimal(10)
         kortingDescription =
             ". Korting: 10kg N/ha, vanggewas gezaaid tussen 15 t/m 31 oktober"
@@ -478,7 +500,7 @@ function calculateKorting(
  * correct nitrogen norm:
  *
  * 1.  **Identify Main Crop (`hoofdteelt`)**:
- *     The `determineNL2025Hoofdteelt` function is called to identify the primary cultivation
+ *     The `determineNLHoofdteelt` function is called to identify the primary cultivation
  *     (`b_lu_catalogue`) for the field based on the provided `cultivations` array. This is
  *     the first step to narrow down the applicable nitrogen standards.
  *
@@ -540,7 +562,7 @@ export async function calculateNL2025StikstofGebruiksNorm(
     const cultivations = input.cultivations
 
     // Determine hoofdteelt
-    const b_lu_catalogue = determineNL2025Hoofdteelt(cultivations)
+    const b_lu_catalogue = determineNLHoofdteelt(cultivations, 2025)
     let cultivation = cultivations.find(
         (c) => c.b_lu_catalogue === b_lu_catalogue,
     )
@@ -610,7 +632,7 @@ export async function calculateNL2025StikstofGebruiksNorm(
 
     const applicableNorms = getNormsForCultivation(
         selectedStandard,
-        cultivation.b_lu_end,
+        cultivation.b_lu_end ?? new Date("2025-12-31"),
         subTypeOmschrijving,
     )
 

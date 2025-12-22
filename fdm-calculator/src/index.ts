@@ -51,7 +51,6 @@ export type {
     InputAggregateNormFillingsToFarmLevel,
     InputAggregateNormsToFarmLevel,
 } from "./norms/farm"
-export type { NormFilling } from "./norms/nl/2025/filling/types"
 export {
     isFieldInGWGBGebied,
     isFieldInNatura2000Gebied,
@@ -60,10 +59,11 @@ export {
     getRegion,
     isFieldInNVGebied,
 } from "./norms/nl/2025/value/stikstofgebruiksnorm"
+export type { NL2025NormsInput } from "./norms/nl/2025/value/types"
 export type {
     GebruiksnormResult,
-    NL2025NormsInput,
-} from "./norms/nl/2025/value/types"
+    NormFilling,
+} from "./norms/nl/types"
 export {
     getNutrientAdvice,
     requestNutrientAdvice,

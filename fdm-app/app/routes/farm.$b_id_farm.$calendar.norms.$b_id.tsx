@@ -160,11 +160,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
 
         const asyncData = (async () => {
-            if (calendar !== "2025") {
+            if (calendar !== "2025" && calendar !== "2026") {
                 return {
                     fieldNormData: undefined,
                     errorMessage:
-                        "Gebruiksnormen zijn alleen beschikbaar voor 2025.",
+                        "Gebruiksnormen zijn alleen beschikbaar voor 2025 en 2026.",
                 }
             }
 

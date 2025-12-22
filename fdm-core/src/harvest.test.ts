@@ -103,6 +103,8 @@ describe("Harvest Data Model", () => {
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
             b_lu_start_default: "03-15",
+            b_lu_eom: null,
+            b_lu_eom_residues: null,
             b_date_harvest_default: "09-15",
         })
 
@@ -125,6 +127,8 @@ describe("Harvest Data Model", () => {
             b_lu_rest_oravib: false,
             b_lu_variety_options: ["Agria"],
             b_lu_start_default: "03-15",
+            b_lu_eom: null,
+            b_lu_eom_residues: null,
             b_date_harvest_default: "09-15",
         })
 
@@ -477,7 +481,7 @@ describe("getParametersForHarvestCat", () => {
     })
 
     it("should return an empty array for an unrecognized harvest category", () => {
-        const params = getParametersForHarvestCat("UNKNOWN_CAT")
+        const params = getParametersForHarvestCat("UNKNOWN_CAT" as any)
         expect(params).toEqual([])
     })
 
@@ -510,6 +514,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_n_harvestable: 15,
             b_lu_n_residue: 5,
             b_n_fixation: 0,
+            b_lu_eom: null,
+            b_lu_eom_residues: null,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
@@ -534,6 +540,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_n_harvestable: 20,
             b_lu_n_residue: 5,
             b_n_fixation: 0,
+            b_lu_eom: null,
+            b_lu_eom_residues: null,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
@@ -558,6 +566,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_n_harvestable: 14,
             b_lu_n_residue: 5,
             b_n_fixation: 0,
+            b_lu_eom: null,
+            b_lu_eom_residues: null,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
@@ -582,6 +592,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_n_harvestable: 20,
             b_lu_n_residue: 5,
             b_n_fixation: 0,
+            b_lu_eom: null,
+            b_lu_eom_residues: null,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
@@ -606,6 +618,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_n_harvestable: 18,
             b_lu_n_residue: 5,
             b_n_fixation: 0,
+            b_lu_eom: null,
+            b_lu_eom_residues: null,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
@@ -630,6 +644,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_n_harvestable: 25,
             b_lu_n_residue: 5,
             b_n_fixation: 0,
+            b_lu_eom: null,
+            b_lu_eom_residues: null,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
@@ -654,6 +670,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_n_harvestable: 20, // Corresponds to 114 g/kg CP
             b_lu_n_residue: 5,
             b_n_fixation: 0,
+            b_lu_eom: null,
+            b_lu_eom_residues: null,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",
@@ -678,6 +696,8 @@ describe("getDefaultsForHarvestParameters", () => {
             b_lu_n_harvestable: 10,
             b_lu_n_residue: 5,
             b_n_fixation: 0,
+            b_lu_eom: null,
+            b_lu_eom_residues: null,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
             b_lu_start_default: "01-01",

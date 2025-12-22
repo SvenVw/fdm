@@ -7,15 +7,6 @@ import type {
 } from "@svenvw/fdm-core"
 import type { RegionKey } from "../value/types"
 
-export type NormFilling = {
-    normFilling: number
-    applicationFilling: {
-        p_app_id: string
-        normFilling: number
-        normFillingDetails?: string
-    }[]
-}
-
 export type Table11Mestcodes = {
     p_type_rvo: schema.fertilizersCatalogueTypeSelect["p_type_rvo"]
     p_type_nitratesdirective: boolean

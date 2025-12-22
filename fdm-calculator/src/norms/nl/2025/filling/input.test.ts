@@ -6,7 +6,7 @@ import type {
     Field,
 } from "@svenvw/fdm-core"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { collectInputForFertilizerApplicationFilling } from "./input"
+import { collectNL2025InputForFertilizerApplicationFilling } from "./input"
 import type { NL2025NormsFillingInput } from "./types"
 
 // Mock the entire @svenvw/fdm-core module
@@ -29,7 +29,7 @@ import {
     isOrganicCertificationValid,
 } from "@svenvw/fdm-core"
 
-describe("collectInputForFertilizerApplicationFilling", () => {
+describe("collectNL2025InputForFertilizerApplicationFilling", () => {
     const mockFdm = {} as FdmType
     const mockPrincipalId = "principal123"
     const mockFieldId = "field456"
@@ -60,8 +60,8 @@ describe("collectInputForFertilizerApplicationFilling", () => {
             { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 1000 },
         ] as FertilizerApplication[])
         vi.mocked(getFertilizers).mockResolvedValue([
-            { p_id_catalogue: "fert1", p_n_rt: 5, p_type_rvo: "115" },
-        ] as Fertilizer[])
+            { p_id: "fert1", p_n_rt: 5, p_type_rvo: "115" },
+        ] as unknown as Fertilizer[])
     })
 
     it("should successfully collect all input data for a valid scenario", async () => {
@@ -75,13 +75,17 @@ describe("collectInputForFertilizerApplicationFilling", () => {
             },
         ]
         const expectedApplications: FertilizerApplication[] = [
-            { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 1000 },
+            {
+                p_app_id: "app1",
+                p_id_catalogue: "fert1",
+                p_app_amount: 1000,
+            } as FertilizerApplication,
         ]
         const expectedFertilizers: Fertilizer[] = [
-            { p_id_catalogue: "fert1", p_n_rt: 5, p_type_rvo: "115" },
-        ]
+            { p_id: "fert1", p_n_rt: 5, p_type_rvo: "115" },
+        ] as unknown as Fertilizer[]
 
-        const result = await collectInputForFertilizerApplicationFilling(
+        const result = await collectNL2025InputForFertilizerApplicationFilling(
             mockFdm,
             mockPrincipalId,
             mockFieldId,
@@ -143,10 +147,10 @@ describe("collectInputForFertilizerApplicationFilling", () => {
     })
 
     it("should throw an error if the field is not found", async () => {
-        vi.mocked(getField).mockResolvedValue(null) // Simulate field not found
+        vi.mocked(getField).mockResolvedValue(null as unknown as Field) // Simulate field not found
 
         await expect(
-            collectInputForFertilizerApplicationFilling(
+            collectNL2025InputForFertilizerApplicationFilling(
                 mockFdm,
                 mockPrincipalId,
                 mockFieldId,

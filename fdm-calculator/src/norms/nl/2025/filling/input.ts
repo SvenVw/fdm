@@ -23,7 +23,7 @@ import type { NL2025NormsFillingInput } from "./types"
  *   grazing intention status, the phosphate usage norm, and the field's centroid.
  * @throws {Error} Throws an error if the specified field cannot be found.
  */
-export async function collectInputForFertilizerApplicationFilling(
+export async function collectNL2025InputForFertilizerApplicationFilling(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id: string,

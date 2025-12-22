@@ -1,8 +1,23 @@
 import { describe, expect, it } from "vitest"
-import type { FieldInput, NitrogenRemoval } from "../types"
+import type { CultivationDetail, FieldInput, NitrogenRemoval } from "../types"
 import { calculateNitrogenRemoval } from "."
 
 describe("calculateNitrogenRemoval", () => {
+    const cultivationDetailsMap = new Map<string, CultivationDetail>([
+        [
+            "catalogue1",
+            {
+                b_lu_catalogue: "catalogue1",
+                b_lu_croprotation: "cereal",
+                b_lu_yield: 1000,
+                b_lu_n_harvestable: 20,
+                b_lu_hi: 0.4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
+            } as const,
+        ],
+    ])
+
     it("should calculate total nitrogen removal from harvests and residues", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
@@ -21,25 +36,27 @@ describe("calculateNitrogenRemoval", () => {
                 harvestable: {
                     b_id_harvestable: "harvestable1",
                     harvestable_analyses: [
-                        { b_lu_yield: 1000, b_lu_n_harvestable: 20 },
+                        {
+                            b_lu_yield: 1000,
+                            b_lu_n_harvestable: 20,
+                            b_id_harvestable_analysis: "",
+                            b_lu_yield_fresh: null,
+                            b_lu_yield_bruto: null,
+                            b_lu_tarra: null,
+                            b_lu_dm: null,
+                            b_lu_moist: null,
+                            b_lu_uww: null,
+                            b_lu_cp: null,
+                            b_lu_n_residue: null,
+                            b_lu_p_harvestable: null,
+                            b_lu_p_residue: null,
+                            b_lu_k_harvestable: null,
+                            b_lu_k_residue: null,
+                        },
                     ],
                 },
             },
         ]
-        const cultivationDetailsMap = new Map([
-            [
-                "catalogue1",
-                {
-                    b_lu_catalogue: "catalogue1",
-                    b_lu_croprotation: "cereal",
-                    b_lu_yield: 1000,
-                    b_lu_n_harvestable: 20,
-                    b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
-                    b_n_fixation: 0,
-                },
-            ],
-        ])
 
         const result: NitrogenRemoval = calculateNitrogenRemoval(
             cultivations,
@@ -63,20 +80,6 @@ describe("calculateNitrogenRemoval", () => {
             },
         ]
         const harvests: FieldInput["harvests"] = []
-        const cultivationDetailsMap = new Map([
-            [
-                "catalogue1",
-                {
-                    b_lu_catalogue: "catalogue1",
-                    b_lu_croprotation: "cereal",
-                    b_lu_yield: 1000,
-                    b_lu_n_harvestable: 20,
-                    b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
-                    b_n_fixation: 0,
-                },
-            ],
-        ])
 
         const result: NitrogenRemoval = calculateNitrogenRemoval(
             cultivations,

@@ -42,13 +42,13 @@ export function calculateTargetForNitrogenBalance(
     let soilType: string
     if (
         ["moerige_klei", "rivierklei", "zeeklei", "maasklei", "veen"].includes(
-            soilAnalysis.b_soiltype_agr,
+            soilAnalysis.b_soiltype_agr ?? "",
         )
     ) {
         soilType = "clay"
     } else if (
         ["dekzand", "dalgrond", "duinzand", "loess"].includes(
-            soilAnalysis.b_soiltype_agr,
+            soilAnalysis.b_soiltype_agr ?? "",
         )
     ) {
         soilType = "sand"
@@ -60,7 +60,7 @@ export function calculateTargetForNitrogenBalance(
     let groundwaterClass: string
     if (
         ["VII", "VIIo", "VIId", "VIII", "VIIIo", "VIIId"].includes(
-            soilAnalysis.b_gwl_class,
+            soilAnalysis.b_gwl_class ?? "",
         )
     ) {
         groundwaterClass = "dry"
@@ -78,7 +78,7 @@ export function calculateTargetForNitrogenBalance(
             "VI",
             "VIo",
             "VId",
-        ].includes(soilAnalysis.b_gwl_class)
+        ].includes(soilAnalysis.b_gwl_class ?? "")
     ) {
         groundwaterClass = "average"
     } else if (
@@ -96,7 +96,7 @@ export function calculateTargetForNitrogenBalance(
             "IV",
             "IVu",
             "IVc",
-        ].includes(soilAnalysis.b_gwl_class)
+        ].includes(soilAnalysis.b_gwl_class ?? "")
     ) {
         groundwaterClass = "wet"
     } else {
@@ -104,7 +104,7 @@ export function calculateTargetForNitrogenBalance(
     }
 
     // Determine targetValue based on Ros et al. 2023
-    let targetValue: Decimal
+    let targetValue: Decimal = new Decimal(0)
     if (
         cultivationType === "grassland" &&
         soilType === "sand" &&
@@ -137,7 +137,6 @@ export function calculateTargetForNitrogenBalance(
         groundwaterClass === "dry"
     ) {
         targetValue = new Decimal(115)
-        targetValue = new Decimal(125)
     } else if (cultivationType === "arable" && soilType === "clay") {
         targetValue = new Decimal(125)
     } else {

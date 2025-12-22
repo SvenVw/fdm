@@ -38,7 +38,7 @@ describe("calculateTargetForNitrogenBalance", () => {
 
     const createCultivationDetailsMap = (
         b_lu_catalogue: string,
-        b_lu_croprotation: string,
+        b_lu_croprotation: "cereal" | "grass" | "maize" | "other",
     ): Map<string, CultivationDetail> =>
         new Map([
             [
@@ -156,7 +156,7 @@ describe("calculateTargetForNitrogenBalance", () => {
             cultivationDetailsMap,
             defaultTimeFrame,
         )
-        expect(result.toNumber()).toBe(125)
+        expect(result.toNumber()).toBe(115)
     })
 
     it("should calculate target for arable land on other clay soil", () => {

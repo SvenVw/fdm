@@ -8,7 +8,7 @@ describe("calculateNL2025FosfaatGebruiksNorm", () => {
             farm: { is_derogatie_bedrijf: false, has_grazing_intention: true },
             field: {
                 b_id: "1",
-                b_centroid: { type: "Point", coordinates: [5.0, 52.0] },
+                b_centroid: [5.0, 52.0],
             },
             cultivations: [
                 {
@@ -27,7 +27,7 @@ describe("calculateNL2025FosfaatGebruiksNorm", () => {
             farm: { is_derogatie_bedrijf: false, has_grazing_intention: true },
             field: {
                 b_id: "1",
-                b_centroid: { type: "Point", coordinates: [5.0, 52.0] },
+                b_centroid: [5.0, 52.0],
             },
             cultivations: [
                 {

@@ -46,19 +46,16 @@ export const meta: MetaFunction = () => {
 }
 
 /**
- * Loads and prepares all data required for the farm creation page.
+ * Loads farm details, available fields, and map configuration for the field selection page.
  *
- * This loader retrieves the details of a farm and its associated fields using the provided farm ID from the URL parameters.
- * It also fetches available cultivation options from the catalogue and the Mapbox access token from the environment.
- * The fields are returned for client-side filtering/sorting into sidebar navigation items.
+ * This loader function retrieves the farm ID from the route parameters and validates its presence. It then
+ * fetches the farm details using the current session. Additionally, it loads the list of available fields
+ * for the specified calendar year (or the current year if not provided) from an external source.
+ * It also fetches available cultivation options from the catalogue.
  *
- * @returns An object containing:
- * - fields: Array of fields for the farm (respects timeframe).
- * - b_id_farm: The farm ID.
- * - b_name_farm: The name of the farm.
- * - action: The URL for field update submissions.
- *
- * @throws {Response} If the farm ID is missing or if the Mapbox token is not set.
+ * @param {LoaderFunctionArgs} args - The arguments for the loader function, including the request and parameters.
+ * @returns {Promise<object>} An object containing farm details, the list of available fields, cultivation options, and other related data.
+ * @throws {Response} If the farm ID is missing.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {

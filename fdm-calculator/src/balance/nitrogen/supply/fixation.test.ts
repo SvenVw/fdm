@@ -23,6 +23,8 @@ describe("calculateNitrogenFixation", () => {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
                 m_cropresidue: false,
+                b_lu_start: null,
+                b_lu_end: null,
             },
         ]
 
@@ -37,7 +39,7 @@ describe("calculateNitrogenFixation", () => {
                     b_lu_hi: 0.4,
                     b_lu_n_residue: 2,
                     b_n_fixation: 50, // kg N/ha
-                },
+                } as const,
             ],
         ])
 
@@ -58,11 +60,15 @@ describe("calculateNitrogenFixation", () => {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
                 m_cropresidue: true,
+                b_lu_start: null,
+                b_lu_end: null,
             },
             {
                 b_lu: "cultivation2",
                 b_lu_catalogue: "catalogue2",
                 m_cropresidue: false,
+                b_lu_start: null,
+                b_lu_end: null,
             },
         ]
 
@@ -77,19 +83,19 @@ describe("calculateNitrogenFixation", () => {
                     b_lu_hi: 0.4,
                     b_lu_n_residue: 2,
                     b_n_fixation: 50, // kg N/ha
-                },
+                } as const,
             ],
             [
                 "catalogue2",
                 {
                     b_lu_catalogue: "catalogue2",
-                    b_lu_croprotation: "legume",
+                    b_lu_croprotation: "other", // Changed from "legume"
                     b_lu_yield: 1200,
                     b_lu_n_harvestable: 22,
                     b_lu_hi: 0.5,
                     b_lu_n_residue: 3,
                     b_n_fixation: 75, // kg N/ha
-                },
+                } as const,
             ],
         ])
 
@@ -111,11 +117,15 @@ describe("calculateNitrogenFixation", () => {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
                 m_cropresidue: true,
+                b_lu_start: null,
+                b_lu_end: null,
             },
             {
                 b_lu: "cultivation2",
                 b_lu_catalogue: "catalogue2",
                 m_cropresidue: false,
+                b_lu_start: null,
+                b_lu_end: null,
             },
         ]
 
@@ -130,7 +140,7 @@ describe("calculateNitrogenFixation", () => {
                     b_lu_hi: 0.4,
                     b_lu_n_residue: 2,
                     b_n_fixation: 50, // kg N/ha
-                },
+                } as const,
             ],
             [
                 "catalogue2",
@@ -141,8 +151,8 @@ describe("calculateNitrogenFixation", () => {
                     b_lu_n_harvestable: 22,
                     b_lu_hi: 0.5,
                     b_lu_n_residue: 3,
-                    b_n_fixation: undefined, //undefined fixation value
-                },
+                    b_n_fixation: null,
+                } as const,
             ],
         ])
 
@@ -164,6 +174,8 @@ describe("calculateNitrogenFixation", () => {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
                 m_cropresidue: true,
+                b_lu_start: null,
+                b_lu_end: null,
             },
         ]
 

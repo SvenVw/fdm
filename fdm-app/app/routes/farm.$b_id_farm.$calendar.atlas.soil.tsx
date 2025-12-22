@@ -4,10 +4,8 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
-    useLoaderData,
 } from "react-router"
 import { Button } from "~/components/ui/button"
-import { getMapboxToken } from "~/integrations/mapbox"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -26,16 +24,16 @@ export const meta: MetaFunction = () => {
 }
 
 /**
- * Loads farm fields as a GeoJSON FeatureCollection along with a Mapbox token.
+ * Loads farm fields as a GeoJSON FeatureCollection.
  *
- * This function validates that the farm ID is present in the route parameters, retrieves the user session, and
- * fetches the farm's fields. It then converts each field into a GeoJSON feature with its area rounded to one
- * decimal place, assembles these features into a FeatureCollection, and obtains a Mapbox token. The returned
- * object includes both the token and the FeatureCollection.
+ * This function retrieves the farm ID from the route parameters and ensures it is present. It then accesses the
+ * current session to fetch the fields associated with the farm for the specified timeframe. Each field is
+ * transformed into a GeoJSON feature, with properties including its ID, name, and area rounded to the nearest
+ * decimal place, and assembles these features into a FeatureCollection. The returned object provides the
+ * necessary data for rendering the farm's soil atlas.
  *
- * @returns A promise that resolves to an object containing a Mapbox token and a GeoJSON FeatureCollection of farm fields.
- *
- * @throws {Response} If the farm ID is missing from the parameters or an error occurs during data fetching.
+ * @param {LoaderFunctionArgs} args - The arguments containing the request and route parameters.
+ * @returns A promise that resolves to an object containing a GeoJSON FeatureCollection of farm fields.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -79,11 +77,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             features: features,
         }
 
-        // Get the Mapbox token
-        const mapboxToken = getMapboxToken()
         // Return user information from loader
         return {
-            mapboxToken: mapboxToken,
             fields: featureCollection,
         }
     } catch (error) {
@@ -98,8 +93,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * linking to the field map.
  */
 export default function FarmAtlasSoilBlock() {
-    const _loaderData = useLoaderData<typeof loader>()
-
     return (
         <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
             <div className="flex flex-col space-y-2 text-center">

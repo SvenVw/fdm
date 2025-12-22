@@ -37,20 +37,20 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu_catalogue: "nl_265",
-                b_lu: undefined,
-                b_lu_start: undefined,
-                b_lu_end: undefined,
-                m_cropresidue: undefined,
+                b_lu: "test-id",
+                b_lu_start: null,
+                b_lu_end: null,
+                m_cropresidue: null,
             },
         ]
         const soilAnalysis: SoilAnalysisPicked = {
             b_soiltype_agr: "dekzand",
             b_gwl_class: "V",
-            a_c_of: undefined,
-            a_cn_fr: undefined,
-            a_density_sa: undefined,
-            a_n_rt: undefined,
-            a_som_loi: undefined,
+            a_c_of: 5,
+            a_cn_fr: 10,
+            a_density_sa: 1.1,
+            a_n_rt: 1000,
+            a_som_loi: 2.5,
         }
 
         const result = calculateNitrogenEmissionViaNitrate(
@@ -68,20 +68,20 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu_catalogue: "nl_1019",
-                b_lu: undefined,
-                b_lu_start: undefined,
-                b_lu_end: undefined,
-                m_cropresidue: undefined,
+                b_lu: "test-id",
+                b_lu_start: null,
+                b_lu_end: null,
+                m_cropresidue: null,
             },
         ]
         const soilAnalysis: SoilAnalysisPicked = {
             b_soiltype_agr: "zeeklei",
             b_gwl_class: "III",
-            a_c_of: undefined,
-            a_cn_fr: undefined,
-            a_density_sa: undefined,
-            a_n_rt: undefined,
-            a_som_loi: undefined,
+            a_c_of: 5,
+            a_cn_fr: 10,
+            a_density_sa: 1.1,
+            a_n_rt: 1000,
+            a_som_loi: 2.5,
         }
 
         const result = calculateNitrogenEmissionViaNitrate(
@@ -99,20 +99,20 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu_catalogue: "nl_6794",
-                b_lu: undefined,
-                b_lu_start: undefined,
-                b_lu_end: undefined,
-                m_cropresidue: undefined,
+                b_lu: "test-id",
+                b_lu_start: null,
+                b_lu_end: null,
+                m_cropresidue: null,
             },
         ]
         const soilAnalysis: SoilAnalysisPicked = {
             b_soiltype_agr: "dekzand",
             b_gwl_class: "V",
-            a_c_of: undefined,
-            a_cn_fr: undefined,
-            a_density_sa: undefined,
-            a_n_rt: undefined,
-            a_som_loi: undefined,
+            a_c_of: 5,
+            a_cn_fr: 10,
+            a_density_sa: 1.1,
+            a_n_rt: 1000,
+            a_som_loi: 2.5,
         }
 
         const result = calculateNitrogenEmissionViaNitrate(
@@ -131,20 +131,20 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu_catalogue: "nl_265",
-                b_lu: undefined,
-                b_lu_start: undefined,
-                b_lu_end: undefined,
-                m_cropresidue: undefined,
+                b_lu: "test-id",
+                b_lu_start: null,
+                b_lu_end: null,
+                m_cropresidue: null,
             },
         ]
         const soilAnalysis: SoilAnalysisPicked = {
             b_soiltype_agr: "dekzand",
             b_gwl_class: "V",
-            a_c_of: undefined,
-            a_cn_fr: undefined,
-            a_density_sa: undefined,
-            a_n_rt: undefined,
-            a_som_loi: undefined,
+            a_c_of: 5,
+            a_cn_fr: 10,
+            a_density_sa: 1.1,
+            a_n_rt: 1000,
+            a_som_loi: 2.5,
         }
 
         const result = calculateNitrogenEmissionViaNitrate(
@@ -162,27 +162,27 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu_catalogue: "nl_265",
-                b_lu: undefined,
-                b_lu_start: undefined,
-                b_lu_end: undefined,
-                m_cropresidue: undefined,
+                b_lu: "test-id",
+                b_lu_start: null,
+                b_lu_end: null,
+                m_cropresidue: null,
             },
             {
                 b_lu_catalogue: "nl_1019",
-                b_lu: undefined,
-                b_lu_start: undefined,
-                b_lu_end: undefined,
-                m_cropresidue: undefined,
+                b_lu: "test-id",
+                b_lu_start: null,
+                b_lu_end: null,
+                m_cropresidue: null,
             },
         ]
         const soilAnalysis: SoilAnalysisPicked = {
             b_soiltype_agr: "dekzand",
             b_gwl_class: "V",
-            a_c_of: undefined,
-            a_cn_fr: undefined,
-            a_density_sa: undefined,
-            a_n_rt: undefined,
-            a_som_loi: undefined,
+            a_c_of: 5,
+            a_cn_fr: 10,
+            a_density_sa: 1.1,
+            a_n_rt: 1000,
+            a_som_loi: 2.5,
         }
 
         const result = calculateNitrogenEmissionViaNitrate(

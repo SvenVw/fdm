@@ -41,7 +41,7 @@ export function calculateDose({
     applications: FertilizerApplication[]
     fertilizers: Fertilizer[]
 }): { dose: Dose; applications: Dose[] } {
-    if (applications.some((app) => app.p_app_amount < 0)) {
+    if (applications.some((app) => (app.p_app_amount ?? 0) < 0)) {
         throw new Error("Application amounts must be non-negative")
     }
 
@@ -61,9 +61,15 @@ export function calculateDose({
         "p_mo_rt",
         "p_b_rt",
     ]
+    const getNutrientRate = (fert: Fertilizer, rate: string): number | null => {
+        return fert[rate as keyof Fertilizer] as number | null
+    }
     if (
         fertilizers.some((fert) =>
-            nutrientRates.some((rate) => (fert[rate] ? fert[rate] < 0 : false)),
+            nutrientRates.some((rate) => {
+                const value = getNutrientRate(fert, rate)
+                return value !== null && value < 0
+            }),
         )
     ) {
         throw new Error("Nutrient rates must be non-negative")
@@ -91,41 +97,30 @@ export function calculateDose({
     const applicationDoses: Dose[] = []
 
     for (const application of applications) {
-        const fertilizer = fertilizers.find(
-            (f) => f.p_id_catalogue === application.p_id_catalogue,
-        )
+        const fertilizer = fertilizers.find((f) => f.p_id === application.p_id)
         if (!fertilizer) {
             throw new Error(
-                `Fertilizer ${application.p_id_catalogue} not found for application ${application.p_app_id}`,
+                `Fertilizer ${application.p_id} not found for application ${application.p_app_id}`,
             )
         }
         const currentDose = { ...initialDose, p_app_id: application.p_app_id }
 
-        if (fertilizer) {
-            const amount = application.p_app_amount
-            currentDose.p_dose_n = amount * ((fertilizer.p_n_rt ?? 0) / 1000)
-            currentDose.p_dose_nw =
-                currentDose.p_dose_n * (fertilizer.p_n_wc ?? 1)
-            currentDose.p_dose_p = amount * ((fertilizer.p_p_rt ?? 0) / 1000)
-            currentDose.p_dose_k = amount * ((fertilizer.p_k_rt ?? 0) / 1000)
-            currentDose.p_dose_eoc = amount * ((fertilizer.p_eoc ?? 0) / 1000)
-            currentDose.p_dose_s = amount * ((fertilizer.p_s_rt ?? 0) / 1000)
-            currentDose.p_dose_mg = amount * ((fertilizer.p_mg_rt ?? 0) / 1000)
-            currentDose.p_dose_ca = amount * ((fertilizer.p_ca_rt ?? 0) / 1000)
-            currentDose.p_dose_na =
-                amount * ((fertilizer.p_na_rt ?? 0) / 1000000)
-            currentDose.p_dose_cu =
-                amount * ((fertilizer.p_cu_rt ?? 0) / 1000000)
-            currentDose.p_dose_zn =
-                amount * ((fertilizer.p_zn_rt ?? 0) / 1000000)
-            currentDose.p_dose_co =
-                amount * ((fertilizer.p_co_rt ?? 0) / 1000000)
-            currentDose.p_dose_mn =
-                amount * ((fertilizer.p_mn_rt ?? 0) / 1000000)
-            currentDose.p_dose_mo =
-                amount * ((fertilizer.p_mo_rt ?? 0) / 1000000)
-            currentDose.p_dose_b = amount * ((fertilizer.p_b_rt ?? 0) / 1000000)
-        }
+        const amount = application.p_app_amount ?? 0
+        currentDose.p_dose_n = amount * ((fertilizer.p_n_rt ?? 0) / 1000)
+        currentDose.p_dose_nw = currentDose.p_dose_n * (fertilizer.p_n_wc ?? 1)
+        currentDose.p_dose_p = amount * ((fertilizer.p_p_rt ?? 0) / 1000)
+        currentDose.p_dose_k = amount * ((fertilizer.p_k_rt ?? 0) / 1000)
+        currentDose.p_dose_eoc = amount * ((fertilizer.p_eoc ?? 0) / 1000)
+        currentDose.p_dose_s = amount * ((fertilizer.p_s_rt ?? 0) / 1000)
+        currentDose.p_dose_mg = amount * ((fertilizer.p_mg_rt ?? 0) / 1000)
+        currentDose.p_dose_ca = amount * ((fertilizer.p_ca_rt ?? 0) / 1000)
+        currentDose.p_dose_na = amount * ((fertilizer.p_na_rt ?? 0) / 1000000)
+        currentDose.p_dose_cu = amount * ((fertilizer.p_cu_rt ?? 0) / 1000000)
+        currentDose.p_dose_zn = amount * ((fertilizer.p_zn_rt ?? 0) / 1000000)
+        currentDose.p_dose_co = amount * ((fertilizer.p_co_rt ?? 0) / 1000000)
+        currentDose.p_dose_mn = amount * ((fertilizer.p_mn_rt ?? 0) / 1000000)
+        currentDose.p_dose_mo = amount * ((fertilizer.p_mo_rt ?? 0) / 1000000)
+        currentDose.p_dose_b = amount * ((fertilizer.p_b_rt ?? 0) / 1000000)
 
         applicationDoses.push(currentDose)
         for (const key of Object.keys(totalDose) as NumericDoseKeys[]) {

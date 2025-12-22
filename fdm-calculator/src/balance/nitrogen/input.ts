@@ -43,7 +43,7 @@ export async function collectInputForNitrogenBalance(
     try {
         return await fdm.transaction(async (tx: FdmType) => {
             // Collect the fields for the farm
-            let farmFields: fdmSchema.fieldsTypeSelect[]
+            let farmFields: Awaited<ReturnType<typeof getFields>>
             if (b_id) {
                 const field = await getField(tx, principal_id, b_id)
                 if (!field) {

@@ -1,26 +1,26 @@
 import { describe, expect, it } from "vitest"
-import { determineNL2025Hoofdteelt } from "./hoofdteelt"
+import { determineNLHoofdteelt } from "./hoofdteelt"
 import type { NL2025NormsInputForCultivation } from "./types"
 
-describe("determineNL2025Hoofdteelt", () => {
+describe("determineNLHoofdteelt", () => {
     it("should return the cultivation with the longest duration in the period", async () => {
         const cultivations: NL2025NormsInputForCultivation[] = [
             {
                 b_lu: "Gewas A",
                 b_lu_catalogue: "cat_A",
-                b_lu_start: "2025-05-01",
-                b_lu_end: "2025-06-10",
+                b_lu_start: new Date("2025-05-01"),
+                b_lu_end: new Date("2025-06-10"),
                 b_lu_variety: null,
             },
             {
                 b_lu: "Gewas B",
                 b_lu_catalogue: "cat_B",
-                b_lu_start: "2025-06-01",
-                b_lu_end: "2025-07-20",
+                b_lu_start: new Date("2025-06-01"),
+                b_lu_end: new Date("2025-07-20"),
                 b_lu_variety: null,
             },
         ]
-        const result = await determineNL2025Hoofdteelt(cultivations)
+        const result = await determineNLHoofdteelt(cultivations, 2025)
         expect(result).toBe("cat_B")
     })
 
@@ -29,19 +29,19 @@ describe("determineNL2025Hoofdteelt", () => {
             {
                 b_lu: "Gewas C",
                 b_lu_catalogue: "cat_C",
-                b_lu_start: "2025-05-15",
-                b_lu_end: "2025-06-15",
+                b_lu_start: new Date("2025-05-15"),
+                b_lu_end: new Date("2025-06-15"),
                 b_lu_variety: null,
             },
             {
                 b_lu: "Gewas D",
                 b_lu_catalogue: "cat_D",
-                b_lu_start: "2025-06-15",
-                b_lu_end: "2025-07-15",
+                b_lu_start: new Date("2025-06-15"),
+                b_lu_end: new Date("2025-07-15"),
                 b_lu_variety: null,
             },
         ]
-        const result = await determineNL2025Hoofdteelt(cultivations)
+        const result = await determineNLHoofdteelt(cultivations, 2025)
         expect(result).toBe("cat_C")
     })
 
@@ -50,12 +50,12 @@ describe("determineNL2025Hoofdteelt", () => {
             {
                 b_lu: "Gewas E",
                 b_lu_catalogue: "cat_E",
-                b_lu_start: "2025-01-01",
-                b_lu_end: "2025-05-14",
+                b_lu_start: new Date("2025-01-01"),
+                b_lu_end: new Date("2025-05-14"),
                 b_lu_variety: null,
             },
         ]
-        const result = await determineNL2025Hoofdteelt(cultivations)
+        const result = await determineNLHoofdteelt(cultivations, 2025)
         expect(result).toBe("nl_6794")
     })
 
@@ -64,25 +64,25 @@ describe("determineNL2025Hoofdteelt", () => {
             {
                 b_lu: "Gewas F",
                 b_lu_catalogue: "cat_F",
-                b_lu_start: "2025-07-10",
-                b_lu_end: "2025-08-01",
+                b_lu_start: new Date("2025-07-10"),
+                b_lu_end: new Date("2025-08-01"),
                 b_lu_variety: null,
             },
             {
                 b_lu: "Gewas G",
                 b_lu_catalogue: "cat_G",
-                b_lu_start: "2025-05-01",
-                b_lu_end: "2025-05-20",
+                b_lu_start: new Date("2025-05-01"),
+                b_lu_end: new Date("2025-05-20"),
                 b_lu_variety: null,
             },
         ]
-        const result = await determineNL2025Hoofdteelt(cultivations)
+        const result = await determineNLHoofdteelt(cultivations, 2025)
         expect(result).toBe("cat_F")
     })
 
     it("should handle an empty array of cultivations by returning nl_6794", async () => {
         const cultivations: NL2025NormsInputForCultivation[] = []
-        const result = await determineNL2025Hoofdteelt(cultivations)
+        const result = await determineNLHoofdteelt(cultivations, 2025)
         expect(result).toBe("nl_6794")
     })
 
@@ -91,12 +91,12 @@ describe("determineNL2025Hoofdteelt", () => {
             {
                 b_lu: "Gewas H",
                 b_lu_catalogue: "cat_H",
-                b_lu_start: "2025-01-01",
+                b_lu_start: new Date("2025-01-01"),
                 b_lu_end: null,
                 b_lu_variety: null,
             },
         ]
-        const result = await determineNL2025Hoofdteelt(cultivations)
+        const result = await determineNLHoofdteelt(cultivations, 2025)
         expect(result).toBe("cat_H")
     })
 })

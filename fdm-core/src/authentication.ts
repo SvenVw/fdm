@@ -2,11 +2,14 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { betterAuth } from "better-auth/minimal"
 import { magicLink, organization, username } from "better-auth/plugins"
 import { eq } from "drizzle-orm"
+import { customAlphabet } from "nanoid"
 import { generateFromEmail } from "unique-username-generator"
 import type { FdmAuth } from "./authentication.d"
 import * as authNSchema from "./db/schema-authn"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
+
+export type BetterAuth = FdmAuth
 
 /**
  * Initializes and configures the authentication system for the FDM application using Better Auth.
@@ -29,7 +32,11 @@ export function createFdmAuth(
     fdm: FdmType,
     google?: { clientSecret: string; clientId: string },
     microsoft?: { clientSecret: string; clientId: string },
-    sendMagicLinkEmail?: (email: string, url: string) => Promise<void>,
+    sendMagicLinkEmail?: (
+        email: string,
+        url: string,
+        code: string,
+    ) => Promise<void>,
     emailAndPassword?: boolean,
 ): FdmAuth {
     // Setup social auth providers
@@ -128,6 +135,12 @@ export function createFdmAuth(
             window: 10,
             max: 100,
             storage: "database",
+            customRules: {
+                "/magic-link/verify": {
+                    window: 60 * 15, // 15 minutes
+                    max: 5,
+                },
+            },
         },
         emailAndPassword: {
             enabled: emailAndPassword || false,
@@ -152,12 +165,13 @@ export function createFdmAuth(
             }),
             magicLink({
                 expiresIn: 60 * 15,
+                generateToken: () => generateReadSafeOTP(),
                 sendMagicLink: async (
-                    { email, url },
+                    { email, url, token },
                     _request,
                 ): Promise<void> => {
                     if (sendMagicLinkEmail) {
-                        await sendMagicLinkEmail(email, url)
+                        await sendMagicLinkEmail(email, url, token)
 
                         // Set username if user is new
                         const user = await fdm
@@ -389,4 +403,19 @@ export function createDisplayUsername(
     }
 
     return name
+}
+
+const ALPHABET = "23456789ABCDFGHJKLMNPQRSTVWXYZ"
+const generateCodeWithNanoId = customAlphabet(ALPHABET, 8)
+/**
+ * Generates a read-safe OTP (One-Time Password).
+ *
+ * This function uses a character set that avoids ambiguous characters
+ * (e.g., I, O, 1, 0) to ensure the code is easy to read and type.
+ * It produces an 8-character string.
+ *
+ * @returns {string} An 8-character read-safe OTP.
+ */
+function generateReadSafeOTP(): string {
+    return generateCodeWithNanoId()
 }

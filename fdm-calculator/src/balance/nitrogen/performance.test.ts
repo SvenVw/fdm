@@ -49,7 +49,7 @@ function generateMockData(numberOfFields: number): NitrogenBalanceInput {
         },
         {
             b_lu_catalogue: "cat-cult-2",
-            b_lu_croprotation: "wheat",
+            b_lu_croprotation: "cereal",
             b_lu_yield: 6000,
             b_lu_hi: 0.4,
             b_lu_n_harvestable: 1.5,
@@ -89,18 +89,27 @@ function generateMockData(numberOfFields: number): NitrogenBalanceInput {
                 b_id_harvesting: `harvest-${fieldId}-1`,
                 b_lu: `cult-${fieldId}-1`,
                 b_lu_harvest_date: new Date(2023, 8, 15),
-                b_lu_yield: 5000,
-                b_id_field: fieldId,
-                b_id_farm: "test-farm",
-                b_principal_id_field: "test-principal",
-                b_principal_id_farm: "test-principal",
                 harvestable: {
                     harvestable_analyses: [
                         {
                             b_lu_yield: 5000,
                             b_lu_n_harvestable: 1.2,
+                            b_id_harvestable_analysis: "",
+                            b_lu_yield_fresh: null,
+                            b_lu_yield_bruto: null,
+                            b_lu_tarra: null,
+                            b_lu_dm: null,
+                            b_lu_moist: null,
+                            b_lu_uww: null,
+                            b_lu_cp: null,
+                            b_lu_n_residue: null,
+                            b_lu_p_harvestable: null,
+                            b_lu_p_residue: null,
+                            b_lu_k_harvestable: null,
+                            b_lu_k_residue: null,
                         },
                     ],
+                    b_id_harvestable: "",
                 },
             },
         ]
@@ -123,13 +132,8 @@ function generateMockData(numberOfFields: number): NitrogenBalanceInput {
             {
                 p_app_id: `fa-${fieldId}-1`,
                 // Randomly pick one of the available fertilizer catalogue IDs
-                p_id_catalogue:
-                    fertilizerDetails[
-                        Math.floor(Math.random() * fertilizerDetails.length)
-                    ].p_id_catalogue,
+                p_id_catalogue: "fert-cat-1",
                 p_app_amount: Math.floor(Math.random() * 500 + 100), // 100-600
-                b_id: fieldId,
-                b_id_farm: "test-farm",
                 p_app_date: new Date(2023, 4, 1),
                 p_app_method: "broadcasting",
                 p_name_nl: "Mock Fertilizer",

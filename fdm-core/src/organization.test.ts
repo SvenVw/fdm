@@ -60,7 +60,7 @@ describe("Organization Data Model", () => {
                     surname: "user1",
                     username: "user1",
                     password: "password",
-                },
+                } as any,
             })
             user1_id = user1.user.id
 
@@ -73,7 +73,7 @@ describe("Organization Data Model", () => {
                     surname: "user2",
                     username: "user2",
                     password: "password",
-                },
+                } as any,
             })
             user2_id = user2.user.id
 
@@ -86,7 +86,7 @@ describe("Organization Data Model", () => {
                     surname: "user3",
                     username: "user3",
                     password: "password",
-                },
+                } as any,
             })
             user3_id = user3.user.id
         } catch (error) {
@@ -842,7 +842,7 @@ describe("Organization Data Model", () => {
                     .limit(1)
 
                 expect(organization[0].name).toBe(updatedName)
-                const metadata = JSON.parse(organization[0].metadata)
+                const metadata = JSON.parse(organization[0].metadata || "{}")
                 expect(metadata.description).toBe(updatedDescription)
                 expect(organization[0].logo).toBe(oldLogo)
             })
@@ -931,7 +931,7 @@ describe("Organization Data Model", () => {
                     .from(authNSchema.organization)
                     .where(eq(authNSchema.organization.id, organization_id))
                     .limit(1)
-                const metadata = JSON.parse(organization[0].metadata)
+                const metadata = JSON.parse(organization[0].metadata || "{}")
                 expect(metadata.isVerified).toBe(updatedIsVerified)
             })
 

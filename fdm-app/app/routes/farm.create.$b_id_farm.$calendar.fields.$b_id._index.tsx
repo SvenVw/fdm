@@ -11,8 +11,9 @@ import {
 } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { Plus } from "lucide-react"
+import maplibregl from "maplibre-gl"
 import { useEffect, useRef, useState } from "react"
-import { Layer, Map as MapGL, type MapRef } from "react-map-gl/mapbox"
+import { Layer, Map as MapGL, type MapRef } from "react-map-gl/maplibre"
 import {
     type ActionFunctionArgs,
     data,
@@ -25,6 +26,7 @@ import {
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess, redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
+import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
@@ -51,7 +53,7 @@ import {
 import { Input } from "~/components/ui/input"
 import { Separator } from "~/components/ui/separator"
 import { Skeleton } from "~/components/ui/skeleton"
-import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
+import { getMapStyle } from "~/integrations/map"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -93,12 +95,12 @@ const FormSchema = z.object({
  * This loader validates the presence of the required farm and field IDs extracted from the URL parameters,
  * obtains the session information, and uses it to fetch the associated field data. It constructs a GeoJSON
  * FeatureCollection based on the field's geometry and retrieves additional details such as soil analysis,
- * cultivation options filtered from the catalogue, and Mapbox configuration (token and style).
+ * cultivation options filtered from the catalogue, and Maplibre configuration (token and style).
  *
  * @param request - The incoming HTTP request.
  * @param params - URL parameters with 'b_id_farm' as the farm ID and 'b_id' as the field ID.
  * @returns An object containing field properties, soil analysis, cultivation details, a GeoJSON FeatureCollection,
- *   and Mapbox configuration needed for the field details page.
+ *   and Maplibre configuration needed for the field details page.
  * @throws {Error} When required identifiers (farm ID, field ID), field data, or field geometry are missing.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -193,9 +195,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         )
         const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
 
-        // Get Mapbox token and Style
-        const mapboxToken = getMapboxToken()
-        const mapboxStyle = getMapboxStyle()
+        // Get Map Style
+        const mapStyle = getMapStyle("satellite")
 
         return {
             b_id: b_id,
@@ -208,8 +209,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_area: field.b_area,
             featureCollection: featureCollection,
             cultivationOptions: cultivationOptions,
-            mapboxToken: mapboxToken,
-            mapboxStyle: mapboxStyle,
+            mapStyle: mapStyle,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -383,11 +383,12 @@ export default function Index() {
                                     borderRadius: "0.75rem",
                                 }}
                                 interactive={false}
-                                mapStyle={loaderData.mapboxStyle}
-                                mapboxAccessToken={loaderData.mapboxToken}
+                                mapStyle={loaderData.mapStyle}
+                                mapLib={maplibregl}
                                 interactiveLayerIds={[id]}
                                 ref={mapRef}
                             >
+                                <MapTilerAttribution />
                                 <FieldsSourceNotClickable
                                     id={id}
                                     fieldsData={fields}

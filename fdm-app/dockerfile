@@ -1,18 +1,33 @@
 ARG NODE_VERSION=24
 ARG PROJECT=@svenvw/fdm-app
 
-# Alpine image
+# Base stage
 FROM node:${NODE_VERSION}-alpine AS base
-RUN apk update && \
-    apk add --no-cache libc6-compat && \
-    npm install -g pnpm turbo && \
-    pnpm config set store-dir ~/.pnpm-store
+RUN apk update && apk add --no-cache libc6-compat
+RUN npm install -g pnpm turbo
+WORKDIR /app
+
+# Pruner stage
+FROM base AS pruner
+COPY . .
+RUN turbo prune --scope=@svenvw/fdm-app --docker
 
 # Builder stage
 FROM base AS builder
 WORKDIR /app
-COPY . .
+
+# Copy lockfile and package.json's of isolated subworkspace
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=pruner /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
+
+# Install dependencies
 RUN pnpm install --frozen-lockfile
+
+# Copy source code of isolated subworkspace
+COPY --from=pruner /app/out/full/ .
+
+# Build the project
 RUN pnpm build
 
 # Production runner stage
@@ -22,23 +37,25 @@ WORKDIR /app
 # Add non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 user && \
-    apk add --no-cache libc6-compat && \
+    apk add --no-cache libc6-compat curl && \
     npm install -g pnpm
 
-# Copy necessary files
-COPY --from=builder --chown=user:nodejs /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
-COPY --from=builder --chown=user:nodejs /app/fdm-app/package.json ./fdm-app/
-COPY --from=builder --chown=user:nodejs /app/fdm-core/package.json ./fdm-core/
-COPY --from=builder --chown=user:nodejs /app/fdm-data/package.json ./fdm-data/
-COPY --from=builder --chown=user:nodejs /app/fdm-calculator/package.json ./fdm-calculator/
+# Copy package.json files for workspace installation
+COPY --from=pruner --chown=user:nodejs /app/out/json/ .
+COPY --from=pruner --chown=user:nodejs /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=pruner --chown=user:nodejs /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
+
+# Install production dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy built artifacts
+# App build
 COPY --from=builder --chown=user:nodejs /app/fdm-app/build ./fdm-app/build
 COPY --from=builder --chown=user:nodejs /app/fdm-app/app ./fdm-app/app
+# Workspace dependencies builds
 COPY --from=builder --chown=user:nodejs /app/fdm-core/dist ./fdm-core/dist
 COPY --from=builder --chown=user:nodejs /app/fdm-data/dist ./fdm-data/dist
 COPY --from=builder --chown=user:nodejs /app/fdm-calculator/dist ./fdm-calculator/dist
-
-# Install production dependencies
-RUN pnpm install --prod --frozen-lockfile
 
 # Set production environment
 ENV NODE_ENV=production
@@ -52,7 +69,7 @@ EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s \
-  CMD wget -q --spider http://localhost:8080/health || exit 1
+  CMD curl -f http://localhost:8080/health || exit 1
 
 WORKDIR /app/fdm-app
 CMD ["pnpm", "start"]

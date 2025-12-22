@@ -1,5 +1,5 @@
-import { Layers } from "lucide-react"
-import type { ControlPosition, Map as MapboxMap } from "mapbox-gl"
+import { Layers, Mountain } from "lucide-react"
+import type { ControlPosition, Map as MapLibreMap } from "maplibre-gl"
 import { useEffect } from "react"
 import { createRoot, type Root } from "react-dom/client"
 import {
@@ -7,7 +7,7 @@ import {
     type IControl,
     NavigationControl,
     useControl,
-} from "react-map-gl/mapbox"
+} from "react-map-gl/maplibre"
 import { useIsMobile } from "~/hooks/use-mobile"
 import { GeocoderControl } from "./atlas-geocoder"
 
@@ -19,6 +19,8 @@ type ControlsProps = {
     }) => void
     showFields?: boolean
     onToggleFields?: () => void
+    showElevation?: boolean
+    onToggleElevation?: () => void
 }
 
 export function Controls(props: ControlsProps) {
@@ -36,6 +38,12 @@ export function Controls(props: ControlsProps) {
                     onToggle={props.onToggleFields}
                 />
             )}
+            {props.showElevation !== undefined && props.onToggleElevation && (
+                <ElevationControl
+                    showElevation={props.showElevation}
+                    onToggle={props.onToggleElevation}
+                />
+            )}
             <GeolocateControl
                 positionOptions={{ enableHighAccuracy: true }}
                 trackUserLocation={true}
@@ -45,44 +53,53 @@ export function Controls(props: ControlsProps) {
     )
 }
 
-interface FieldsButtonProps {
-    showFields: boolean
+interface ButtonProps {
+    active: boolean
     onToggle: () => void
+    labelActive: string
+    labelInactive: string
+    Icon: React.ElementType
 }
 
-function FieldsButton({ showFields, onToggle }: FieldsButtonProps) {
+function ControlButton({
+    active,
+    onToggle,
+    labelActive,
+    labelInactive,
+    Icon,
+}: ButtonProps) {
     return (
         <button
             type="button"
-            className="mapboxgl-ctrl-icon flex items-center justify-center p-0!"
+            className="maplibregl-ctrl-icon flex items-center justify-center p-0!"
             onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
                 onToggle()
             }}
-            title={showFields ? "Verberg percelen" : "Toon percelen"}
+            title={active ? labelActive : labelInactive}
         >
-            <Layers
-                className={`h-5 w-full ${showFields ? "opacity-100" : "opacity-40"}`}
+            <Icon
+                className={`h-5 w-full ${active ? "opacity-100" : "opacity-40"}`}
             />
         </button>
     )
 }
 
-class CustomFieldsControl implements IControl {
-    _map: MapboxMap | undefined
+class CustomControl implements IControl {
+    _map: MapLibreMap | undefined
     _container: HTMLDivElement | undefined
     _root: Root | undefined
-    _props: FieldsButtonProps
+    _props: ButtonProps
 
-    constructor(initialProps: FieldsButtonProps) {
+    constructor(initialProps: ButtonProps) {
         this._props = initialProps
     }
 
-    onAdd(map: MapboxMap): HTMLElement {
+    onAdd(map: MapLibreMap): HTMLElement {
         this._map = map
         this._container = document.createElement("div")
-        this._container.className = "mapboxgl-ctrl mapboxgl-ctrl-group"
+        this._container.className = "maplibregl-ctrl maplibregl-ctrl-group"
 
         this._root = createRoot(this._container)
         this._render()
@@ -92,7 +109,10 @@ class CustomFieldsControl implements IControl {
 
     onRemove(): void {
         if (this._root) {
-            this._root.unmount()
+            const root = this._root
+            setTimeout(() => {
+                root.unmount()
+            }, 0)
             this._root = undefined
         }
         this._container?.parentNode?.removeChild(this._container)
@@ -104,14 +124,14 @@ class CustomFieldsControl implements IControl {
         return "top-right"
     }
 
-    updateProps(newProps: FieldsButtonProps) {
+    updateProps(newProps: ButtonProps) {
         this._props = newProps
         this._render()
     }
 
     _render() {
         if (this._root) {
-            this._root.render(<FieldsButton {...this._props} />)
+            this._root.render(<ControlButton {...this._props} />)
         }
     }
 }
@@ -125,14 +145,59 @@ function FieldsControl({
     showFields: boolean
     onToggle: () => void
 }) {
-    const control = useControl<CustomFieldsControl>(
-        () => new CustomFieldsControl({ showFields, onToggle }),
+    const control = useControl<CustomControl>(
+        () =>
+            new CustomControl({
+                active: showFields,
+                onToggle,
+                labelActive: "Verberg percelen",
+                labelInactive: "Toon percelen",
+                Icon: Layers,
+            }),
         CONTROL_OPTIONS,
     )
 
     useEffect(() => {
-        control.updateProps({ showFields, onToggle })
+        control.updateProps({
+            active: showFields,
+            onToggle,
+            labelActive: "Verberg percelen",
+            labelInactive: "Toon percelen",
+            Icon: Layers,
+        })
     }, [control, showFields, onToggle])
+
+    return null
+}
+
+function ElevationControl({
+    showElevation,
+    onToggle,
+}: {
+    showElevation: boolean
+    onToggle: () => void
+}) {
+    const control = useControl<CustomControl>(
+        () =>
+            new CustomControl({
+                active: showElevation,
+                onToggle,
+                labelActive: "Verberg hoogtekaart",
+                labelInactive: "Toon hoogtekaart",
+                Icon: Mountain,
+            }),
+        CONTROL_OPTIONS,
+    )
+
+    useEffect(() => {
+        control.updateProps({
+            active: showElevation,
+            onToggle,
+            labelActive: "Verberg hoogtekaart",
+            labelInactive: "Toon hoogtekaart",
+            Icon: Mountain,
+        })
+    }, [control, showElevation, onToggle])
 
     return null
 }
