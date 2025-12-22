@@ -6,7 +6,7 @@ import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
 import type {
     NL2025NormsInput,
 } from "./types.d"
-import { DierlijkeMestGebruiksnormResult } from "norms/nl/types"
+import { DierlijkeMestGebruiksnormResult } from "../../types"
 
 /**
  * Determines if a field is located within a grondwaterbeschermingsgebied (GWBG) in the Netherlands.

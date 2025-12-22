@@ -1,4 +1,4 @@
-import { LocalFileStorage } from "@remix-run/file-storage/local"
+import { createFsFileStorage } from "@remix-run/file-storage/fs"
 import { type FileUpload, parseFormData } from "@remix-run/form-data-parser"
 import {
     addCultivation,
@@ -103,7 +103,7 @@ interface RvoProperties {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    const fileStorage = new LocalFileStorage("./uploads/shapefiles")
+    const fileStorage = createFsFileStorage("./uploads/shapefiles")
     const storageKeys: string[] = []
 
     try {

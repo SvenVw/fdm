@@ -50,6 +50,7 @@
         "@rollup/plugin-commonjs": "catalog:",
         "@rollup/plugin-node-resolve": "catalog:",
         "@svenvw/fdm-core": "workspace:*",
+        "@types/node": "catalog:",
         "@vitest/coverage-v8": "catalog:",
         "postgres": "^3.4.7",
         "rollup": "catalog:",
@@ -60,5 +61,5 @@
         "typescript": "catalog:",
         "vitest": "catalog:"
     },
-    "packageManager": "pnpm@10.23.0"
+    "packageManager": "pnpm@10.26.0"
 }

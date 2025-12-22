@@ -1,7 +1,6 @@
 import type {
     Cultivation,
     CultivationCatalogue,
-    Fertilizer,
     FertilizerApplication,
     Field,
     SoilAnalysis,
@@ -232,12 +231,11 @@ export type CultivationDetail = Pick<
 /**
  * A subset of `Fertilizer` properties required for the organic matter balance.
  */
-export type FertilizerDetail = Pick<
-    Fertilizer,
-    | "p_id_catalogue"
-    | "p_eom" // Effective Organic Matter content (g EOM/kg product)
-    | "p_type" // The type of fertilizer (e.g., 'manure', 'compost', 'mineral').
->
+export type FertilizerDetail = {
+    p_id_catalogue: string
+    p_eom?: number | null // Effective Organic Matter content (g EOM/kg product)
+    p_type?: string | null // The type of fertilizer (e.g., 'manure', 'compost', 'mineral').
+}
 
 /**
  * Represents the complete input structure required for the organic matter balance calculation for a farm.

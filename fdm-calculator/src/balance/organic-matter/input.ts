@@ -48,7 +48,7 @@ export async function collectInputForOrganicMatterBalance(
         // All data fetching is wrapped in a single database transaction to ensure consistency.
         return await fdm.transaction(async (tx: FdmType) => {
             // 1. Determine which fields to process: a single field or all fields for the farm.
-            let farmFields: fdmSchema.fieldsTypeSelect[]
+            let farmFields: Awaited<ReturnType<typeof getFields>>
             if (b_id) {
                 // Fetch a single specified field.
                 const field = await getField(tx, principal_id, b_id)

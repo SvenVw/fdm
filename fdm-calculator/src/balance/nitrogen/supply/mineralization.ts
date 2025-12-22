@@ -39,7 +39,7 @@ export function calculateNitrogenSupplyBySoilMineralization(
             )
             if (!cultivationDetail) return false
 
-            const cultivationStart = new Date(cultivation.b_lu_start)
+            const cultivationStart = cultivation.b_lu_start ? new Date(cultivation.b_lu_start) : new Date(0) // Default to epoch if null
             const cultivationEnd = cultivation.b_lu_end
                 ? new Date(cultivation.b_lu_end)
                 : new Date("9999-12-31")

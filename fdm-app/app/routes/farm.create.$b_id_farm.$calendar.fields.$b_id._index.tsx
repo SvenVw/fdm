@@ -26,6 +26,7 @@ import {
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess, redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
+import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
@@ -387,6 +388,7 @@ export default function Index() {
                                 interactiveLayerIds={[id]}
                                 ref={mapRef}
                             >
+                                <MapTilerAttribution />
                                 <FieldsSourceNotClickable
                                     id={id}
                                     fieldsData={fields}

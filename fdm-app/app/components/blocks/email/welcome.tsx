@@ -51,8 +51,8 @@ export function WelcomeEmail({
             <Preview>{previewText}</Preview>
             <Tailwind>
                 <Body className="bg-white my-auto mx-auto">
-                    <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] w-[465px]">
-                        <Section className="mt-[32px] text-center">
+                    <Container className="border border-solid border-[#eaeaea] rounded my-10 mx-auto p-5 w-116.25">
+                        <Section className="mt-8 text-center">
                             <Img
                                 src={logoPath}
                                 width="150"
@@ -60,33 +60,33 @@ export function WelcomeEmail({
                                 className="my-0 mx-auto"
                             />
                         </Section>
-                        <Heading className="text-black text-[24px] font-normal text-center p-0 my-[30px] mx-0">
+                        <Heading className="text-black text-[24px] font-normal text-center p-0 my-7.5 mx-0">
                             Welkom bij {appName}, {name}! 👋
                         </Heading>
-                        <Section className="my-[20px] mx-0 p-0">
-                            <Text className="text-black text-[14px] leading-[24px]">
+                        <Section className="my-5 mx-0 p-0">
+                            <Text className="text-black text-[14px] leading-6">
                                 Bedankt voor je aanmelding. Dit is een overzicht
                                 van de belangrijkste functies.
                             </Text>
                         </Section>
 
-                        <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
+                        <Hr className="border border-solid border-[#eaeaea] my-6.5 mx-0 w-full" />
 
                         <Section>
                             <Heading
                                 as="h2"
-                                className="text-black text-[20px] font-normal text-center p-0 my-[30px] mx-0"
+                                className="text-black text-[20px] font-normal text-center p-0 my-7.5 mx-0"
                             >
                                 Wat kun je nu doen?
                             </Heading>
-                            <Text className="text-black text-[16px] font-bold leading-[24px]">
+                            <Text className="text-black text-[16px] font-bold leading-6">
                                 1. Een bedrijf aanmaken
                             </Text>
-                            <Text className="text-black text-[14px] leading-[24px]">
+                            <Text className="text-black text-[14px] leading-6">
                                 Door een bedrijf aan te maken, krijg je toegang
                                 tot de volgende functies:
                             </Text>
-                            <ul className="text-black text-[14px] leading-[24px] ml-4 list-disc pl-5">
+                            <ul className="text-black text-[14px] leading-6 ml-4 list-disc pl-5">
                                 <li>
                                     Stikstofbalans, bemestingsadvies en
                                     gebruiksruimte-apps.
@@ -105,17 +105,20 @@ export function WelcomeEmail({
                                 </li>
                             </ul>
 
-                            <Text className="text-black text-[16px] font-bold leading-[24px] mt-6">
+                            <Text className="text-black text-[16px] font-bold leading-6 mt-6">
                                 2. De Atlas verkennen
                             </Text>
-                            <Text className="text-black text-[14px] leading-[24px]">
+                            <Text className="text-black text-[14px] leading-6">
                                 Je kunt er ook voor kiezen om de Atlas te
                                 verkennen. Hier vind je onder andere:
                             </Text>
-                            <ul className="text-black text-[14px] leading-[24px] ml-4 list-disc pl-5">
+                            <ul className="text-black text-[14px] leading-6 ml-4 list-disc pl-5">
                                 <li>
                                     De volledige gewashistorie van percelen
                                     sinds 2009.
+                                </li>
+                                <li>
+                                    Bekijk het microreliëf van percelen met de hoogtekaart.
                                 </li>
                                 <li>
                                     Of een perceel in een gebied met beperkingen
@@ -128,27 +131,23 @@ export function WelcomeEmail({
                             </ul>
                         </Section>
 
-                        <Section className="text-center mt-[32px] mb-[32px]">
+                        <Section className="text-center mt-8 mb-8">
                             <Button
                                 className="bg-primary rounded text-primary-foreground text-[14px] font-semibold no-underline px-5 py-3"
-                                style={{
-                                    backgroundColor: "#1a73e8",
-                                    color: "#ffffff",
-                                }}
                                 href={absoluteUrl}
                             >
                                 Start met {appName}
                             </Button>
                         </Section>
-                        <Section className="my-[20px] mx-0 p-0">
-                            <Text className="text-black text-[14px] leading-[24px]">
+                        <Section className="my-5 mx-0 p-0">
+                            <Text className="text-black text-[14px] leading-6">
                                 Heb je vragen of suggesties? We horen graag van
                                 je. Je kunt ons ook bereiken door te reageren op
                                 deze mail.
                             </Text>
                         </Section>
-                        <Hr className="border border-solid border-[#eaeaea] my-[26px] mx-0 w-full" />
-                        <Text className="text-[#666666] text-[12px] leading-[24px]">
+                        <Hr className="border border-solid border-[#eaeaea] my-6.5 mx-0 w-full" />
+                        <Text className="text-[#666666] text-[12px] leading-6">
                             Met vriendelijke groet, <br /> Het {appName} team
                         </Text>
                     </Container>

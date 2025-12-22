@@ -85,7 +85,7 @@ describe("Authorization Functions", () => {
                 surname: "Owner",
                 username: organization_owner_username,
                 password: "password",
-            },
+            } as any,
         })
         organization_owner_id = organization_owner.user.id
         organization_id = await createOrganization(
@@ -106,7 +106,7 @@ describe("Authorization Functions", () => {
                 surname: "Member",
                 username: organization_member_username,
                 password: "password",
-            },
+            } as any,
         })
         organization_member_id = organization_member.user.id
     })

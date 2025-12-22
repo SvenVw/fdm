@@ -1,19 +1,20 @@
 import type {
     Cultivation,
+    CultivationCatalogue,
     FdmType,
+    Fertilizer,
     FertilizerApplication,
     Field,
     fdmSchema,
     Harvest,
     PrincipalId,
     SoilAnalysis,
-    Timeframe,
 } from "@svenvw/fdm-core"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { collectInputForNitrogenBalance } from "./input"
 import type {
-    CultivationDetail,
-    FertilizerDetail,
+
+
     FieldInput,
     NitrogenBalanceInput,
 } from "./types"
@@ -35,29 +36,15 @@ vi.mock("@svenvw/fdm-core", async () => {
 
 // Import mocks after vi.mock call
 const fdmCoreMocks = await import("@svenvw/fdm-core")
-const mockedGetFields = fdmCoreMocks.getFields as vi.MockedFunction<
-    typeof fdmCoreMocks.getFields
->
-const mockedGetCultivations = fdmCoreMocks.getCultivations as vi.MockedFunction<
-    typeof fdmCoreMocks.getCultivations
->
-const mockedGetHarvests = fdmCoreMocks.getHarvests as vi.MockedFunction<
-    typeof fdmCoreMocks.getHarvests
->
-const mockedGetSoilAnalyses = fdmCoreMocks.getSoilAnalyses as vi.MockedFunction<
-    typeof fdmCoreMocks.getSoilAnalyses
->
+const mockedGetFields = vi.mocked(fdmCoreMocks.getFields)
+const mockedGetCultivations = vi.mocked(fdmCoreMocks.getCultivations)
+const mockedGetHarvests = vi.mocked(fdmCoreMocks.getHarvests)
+const mockedGetSoilAnalyses = vi.mocked(fdmCoreMocks.getSoilAnalyses)
 const mockedGetFertilizerApplications =
-    fdmCoreMocks.getFertilizerApplications as vi.MockedFunction<
-        typeof fdmCoreMocks.getFertilizerApplications
-    >
-const mockedGetFertilizers = fdmCoreMocks.getFertilizers as vi.MockedFunction<
-    typeof fdmCoreMocks.getFertilizers
->
+    vi.mocked(fdmCoreMocks.getFertilizerApplications)
+const mockedGetFertilizers = vi.mocked(fdmCoreMocks.getFertilizers)
 const mockedGetCultivationsFromCatalogue =
-    fdmCoreMocks.getCultivationsFromCatalogue as vi.MockedFunction<
-        typeof fdmCoreMocks.getCultivationsFromCatalogue
-    >
+    vi.mocked(fdmCoreMocks.getCultivationsFromCatalogue)
 
 describe("collectInputForNitrogenBalance", () => {
     const mockFdm: FdmType = {
@@ -68,7 +55,7 @@ describe("collectInputForNitrogenBalance", () => {
 
     const principal_id: PrincipalId = "test-principal-id"
     const b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"] = "test-farm-id"
-    const timeframe: Timeframe = {
+    const timeframe = {
         start: new Date("2023-01-01"),
         end: new Date("2023-12-31"),
     }
@@ -79,39 +66,55 @@ describe("collectInputForNitrogenBalance", () => {
 
     it("should collect input successfully when all data is available", async () => {
         // Mock data
-        const mockFieldsData: Pick<
-            Field,
-            "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end"
-        >[] = [
+        const mockFieldsData: Field[] = [
             {
                 b_id: "field-1",
-                b_centroid: { type: "Point", coordinates: [0, 0] },
+                b_name: "Field 1",
+                b_id_farm: "test-farm-id",
+                b_id_source: "source-1",
+                b_geometry: { type: "Polygon", coordinates: [] },
+                b_centroid: [0, 0],
                 b_area: 10,
+                b_perimeter: 10,
                 b_start: new Date("2023-01-01"),
                 b_end: new Date("2023-12-31"),
+                b_acquiring_method: "purchase",
+                b_isproductive: true
             },
             {
                 b_id: "field-2",
-                b_centroid: { type: "Point", coordinates: [1, 1] },
+                b_name: "Field 2",
+                b_id_farm: "test-farm-id",
+                b_id_source: "source-2",
+                b_geometry: { type: "Polygon", coordinates: [] },
+                b_centroid: [1, 1],
                 b_area: 20,
+                b_perimeter: 20,
                 b_start: new Date("2023-01-01"),
                 b_end: new Date("2023-12-31"),
+                b_acquiring_method: "purchase",
+                b_isproductive: true
             },
         ]
-        const mockCultivationsData: Pick<
-            Cultivation,
-            | "b_lu"
-            | "b_lu_catalogue"
-            | "m_cropresidue"
-            | "b_lu_start"
-            | "b_lu_end"
-        >[] = [
+        const mockCultivationsData: Cultivation[] = [
             {
                 b_lu: "cult-1",
                 b_lu_catalogue: "cat-cult-1",
                 m_cropresidue: false,
                 b_lu_start: new Date("2023-04-01"),
                 b_lu_end: new Date("2023-09-01"),
+                b_lu_source: "source",
+                b_lu_name: "Cultivation 1",
+                b_lu_name_en: "Cultivation 1",
+                b_lu_hcat3: "hcat3",
+                b_lu_hcat3_name: "Hcat3 Name",
+                b_lu_croprotation: "maize",
+                b_lu_eom: 1,
+                b_lu_eom_residues: 1,
+                b_lu_harvestcat: "HC010",
+                b_lu_harvestable: "once",
+                b_lu_variety: "variety",
+                b_id: "cult-1",
             },
         ]
         const mockHarvestsData: Harvest[] = [
@@ -119,27 +122,19 @@ describe("collectInputForNitrogenBalance", () => {
                 b_id_harvesting: "harvest-1",
                 b_lu: "cult-1",
                 b_lu_harvest_date: new Date(),
-                b_lu_yield: 1000,
-                b_id_field: "field-1",
-                b_id_farm: b_id_farm,
-                b_principal_id_field: principal_id,
-                b_principal_id_farm: principal_id,
+                harvestable: {
+                    b_id_harvestable: "h-1",
+                    harvestable_analyses: [],
+                }
             },
         ]
-        const mockSoilAnalysesData: Pick<
-            SoilAnalysis,
-            | "a_id"
-            | "a_c_of"
-            | "a_cn_fr"
-            | "a_density_sa"
-            | "a_n_rt"
-            | "b_soiltype_agr"
-            | "b_sampling_date"
-            | "a_som_loi"
-            | "b_gwl_class"
-        >[] = [
+        const mockSoilAnalysesData = [
             {
                 a_id: "sa-1",
+                a_date: new Date(),
+                a_depth_upper: 0,
+                a_depth_lower: 30,
+                a_source: "source",
                 a_c_of: 25,
                 a_cn_fr: 10,
                 a_density_sa: 1.5,
@@ -149,7 +144,7 @@ describe("collectInputForNitrogenBalance", () => {
                 a_som_loi: 5,
                 b_gwl_class: "HIGH",
             },
-        ]
+        ] as unknown as SoilAnalysis[]
         const mockFertilizerApplicationsData: FertilizerApplication[] = [
             {
                 p_app_id: "fa-1",
@@ -158,11 +153,12 @@ describe("collectInputForNitrogenBalance", () => {
                 p_app_amount: 100,
                 p_app_method: "broadcasting", // match one of ApplicationMethods
                 p_app_date: new Date(),
+                p_id: ""
             },
         ]
-        const mockFertilizerDetailsData: FertilizerDetail[] = [
+        const mockFertilizerDetailsData = [
             {
-                p_id_catalogue: "fert-cat-1",
+                p_id: "fert-cat-1",
                 p_n_rt: 5,
                 p_type: "manure",
                 p_no3_rt: 1,
@@ -170,8 +166,8 @@ describe("collectInputForNitrogenBalance", () => {
                 p_s_rt: 0,
                 p_ef_nh3: 0.1,
             },
-        ]
-        const mockCultivationDetailsData: CultivationDetail[] = [
+        ] as unknown as Fertilizer[]
+        const mockCultivationDetailsData = [
             {
                 b_lu_catalogue: "cat-cult-1",
                 b_lu_croprotation: "maize",
@@ -181,7 +177,7 @@ describe("collectInputForNitrogenBalance", () => {
                 b_lu_n_residue: 0.8,
                 b_n_fixation: 0,
             },
-        ]
+        ] as unknown as CultivationCatalogue[]
 
         // Setup mocks
         mockedGetFields.mockResolvedValue(mockFieldsData)
@@ -285,16 +281,20 @@ describe("collectInputForNitrogenBalance", () => {
     })
 
     it("should throw an error if getCultivations fails for a field", async () => {
-        const mockFieldsData: Pick<
-            Field,
-            "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end"
-        >[] = [
+        const mockFieldsData: Field[] = [
             {
                 b_id: "field-1",
-                b_centroid: { type: "Point", coordinates: [0, 0] },
+                b_name: "Field 1",
+                b_id_farm: "test-farm-id",
+                b_id_source: "source-1",
+                b_geometry: { type: "Polygon", coordinates: [] },
+                b_centroid: [0, 0],
                 b_area: 10,
+                b_perimeter: 10,
                 b_start: new Date("2023-01-01"),
                 b_end: new Date("2023-12-31"),
+                b_acquiring_method: "purchase",
+                b_isproductive: true
             },
         ]
         mockedGetFields.mockResolvedValue(mockFieldsData)

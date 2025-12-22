@@ -1,4 +1,4 @@
-import { LocalFileStorage } from "@remix-run/file-storage/local"
+import { createFsFileStorage } from "@remix-run/file-storage/fs"
 import { type FileUpload, parseFormData } from "@remix-run/form-data-parser"
 import {
     addSoilAnalysis,
@@ -119,7 +119,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
-        const fileStorage = new LocalFileStorage("./uploads/soil_analyses")
+        const fileStorage = createFsFileStorage("./uploads/soil_analyses")
 
         const uploadHandler = async (fileUpload: FileUpload) => {
             if (

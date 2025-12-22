@@ -1,4 +1,4 @@
-import { type Timeframe, withCalculationCache } from "@svenvw/fdm-core"
+import { withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../package"
 import { convertOrganicMatterBalanceToNumeric } from "../shared/conversion"
@@ -140,7 +140,7 @@ export function calculateOrganicMatterBalanceField(
     soilAnalyses: FieldInput["soilAnalyses"],
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
     cultivationDetailsMap: Map<string, CultivationDetail>,
-    timeFrame: Timeframe,
+    timeFrame: { start: Date; end: Date },
 ): OrganicMatterBalanceFieldResult {
     try {
         const fieldDetails = field
