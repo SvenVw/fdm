@@ -1,5 +1,13 @@
 # Changelog fdm-app
 
+## 0.26.1
+
+### Patch Changes
+
+- 36b1b99: Fix TypeError when `updatePanel` attempts to access `map.getLayer(layer)` before the map is fully initialized
+- 1274a32: Optimize Elevation Atlas stability and performance: implement chunked sampling concurrency, server-side AHN index caching, geometry simplification and WMS layer zoom constraints
+- 067c0de: Fix AggregateError in Elevation Atlas by implementing chunked concurrency for sampling requests to avoid exceeding HTTP/1.1 connection limits
+
 ## 0.26.0
 
 ### Minor Changes
