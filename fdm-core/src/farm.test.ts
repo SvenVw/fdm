@@ -592,12 +592,13 @@ describe("Farm Functions", () => {
             // Create a new principal for this test suite
             const user = await fdmAuth.api.signUpEmail({
                 headers: undefined,
-                            body: {
-                                email: "testuser_removefarm@example.com",
-                                name: "testuser_removefarm",
-                                username: "testuser_removefarm",
-                                password: "password",
-                            } as any,            })
+                body: {
+                    email: "testuser_removefarm@example.com",
+                    name: "testuser_removefarm",
+                    username: "testuser_removefarm",
+                    password: "password",
+                } as any,
+            })
             testPrincipalId = user.user.id
 
             // Create a new farm for testing removal

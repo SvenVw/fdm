@@ -1,5 +1,18 @@
 # Changelog fdm-core
 
+## 0.28.0
+
+### Minor Changes
+
+- 1885f8a: Implement read-safe OTP generation for magic links and add custom rate limiting for the verification endpoint.
+
+### Patch Changes
+
+- 022a347: Cultivation ending date can now be cleared. If the cultivation can only be harvested once, any harvestings are deleted along with the cultivation ending date.
+- 2c5de99: Make fdm-data, fdm-calculator and fdm-data fully type-safe, including inferring dependencies in the monorepo
+- Updated dependencies [2c5de99]
+  - @svenvw/fdm-data@0.19.1
+
 ## 0.27.0
 
 ### Minor Changes

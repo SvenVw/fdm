@@ -1,20 +1,28 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useRef } from "react"
-import { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction, redirect } from "react-router"
-import { Form, useActionData, useLoaderData, useNavigation } from "react-router"
+import {
+    type ActionFunctionArgs,
+    Form,
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    redirect,
+    useActionData,
+    useLoaderData,
+    useNavigation,
+} from "react-router"
 import { useRemixForm } from "remix-hook-form"
-import { z } from "zod"
+import type { z } from "zod"
 import { AuthCard } from "~/components/blocks/auth/auth-card"
 import { AuthCodeField } from "~/components/blocks/auth/auth-code-field"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { AuthLayout } from "~/components/blocks/auth/auth-layout"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import { auth } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { serverConfig } from "~/lib/config.server"
 import { handleLoaderError } from "~/lib/error"
-import { extractFormValuesFromRequest } from "../lib/form"
 import { FormSchema } from "../components/blocks/auth/auth-formschema"
+import { extractFormValuesFromRequest } from "../lib/form"
 
 export const meta: MetaFunction = () => {
     return [
@@ -84,38 +92,37 @@ export default function Verify() {
                 title="Verifieer je code"
                 description="Vul de 8-cijferige code in die je per e-mail hebt ontvangen."
             >
-                         <Form
-                        onSubmit={form.handleSubmit}
-                        method="POST"
-                        className="space-y-6"
-                    >
-                        <input type="hidden" {...form.register("redirectTo")} />
-                        
-                        <AuthCodeField 
-                            control={form.control} 
-                            serverError={actionData?.errors?.code} 
-                        />
+                <Form
+                    onSubmit={form.handleSubmit}
+                    method="POST"
+                    className="space-y-6"
+                >
+                    <input type="hidden" {...form.register("redirectTo")} />
 
-                        <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? (
-                                <div className="flex items-center space-x-2">
-                                    <LoadingSpinner />
-                                    <span>Verifiëren...</span>
-                                </div>
-                            ) : (
-                                "Verifiëren en aanmelden"
-                            )}
-                        </Button>
-                    </Form>          
+                    <AuthCodeField
+                        control={form.control}
+                        serverError={actionData?.errors?.code}
+                    />
+
+                    <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? (
+                            <div className="flex items-center space-x-2">
+                                <LoadingSpinner />
+                                <span>Verifiëren...</span>
+                            </div>
+                        ) : (
+                            "Verifiëren en aanmelden"
+                        )}
+                    </Button>
+                </Form>
             </AuthCard>
         </AuthLayout>
     )
 }
-
 
 export async function action({ request }: ActionFunctionArgs) {
     // Artificial delay to ensure the loading state is visible to the user
@@ -171,13 +178,16 @@ export async function action({ request }: ActionFunctionArgs) {
             if (location) {
                 const locationUrl = new URL(location, serverConfig.url)
                 const error = locationUrl.searchParams.get("error")
-                              
+
                 // Check if redirect is to an error page (exact match) or has error param
-                const isErrorPage = locationUrl.pathname === "/error" || locationUrl.pathname.startsWith("/error/")
-                const isSigninError = locationUrl.pathname === "/signin" && error
-                
+                const isErrorPage =
+                    locationUrl.pathname === "/error" ||
+                    locationUrl.pathname.startsWith("/error/")
+                const isSigninError =
+                    locationUrl.pathname === "/signin" && error
+
                 if (error || isErrorPage || isSigninError) {
-                     return {
+                    return {
                         errors: {
                             code: "Deze code is niet geldig of is verlopen. Vraag een nieuwe code aan.",
                         },
@@ -189,7 +199,6 @@ export async function action({ request }: ActionFunctionArgs) {
         // If success (usually a redirect to callbackURL with set-cookie)
         // We just return the response to the browser
         return response
-
     } catch (error) {
         console.error("Verification error:", error)
         return {

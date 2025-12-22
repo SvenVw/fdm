@@ -33,7 +33,7 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 p_id: "mineral1", // Added p_id
                 p_name_nl: null,
                 p_app_method: null,
-                p_app_date: new Date('2025-03-15'),
+                p_app_date: new Date("2025-03-15"),
             },
             {
                 p_id_catalogue: "manure1",
@@ -42,7 +42,7 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 p_id: "manure1", // Added p_id
                 p_name_nl: null,
                 p_app_method: null,
-                p_app_date: new Date('2025-03-15'),
+                p_app_date: new Date("2025-03-15"),
             },
             {
                 p_id_catalogue: "compost1",
@@ -51,7 +51,7 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 p_id: "compost1", // Added p_id
                 p_name_nl: null,
                 p_app_method: null,
-                p_app_date: new Date('2025-03-15'),
+                p_app_date: new Date("2025-03-15"),
             },
             {
                 p_id_catalogue: "other1",
@@ -60,7 +60,7 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 p_id: "other1", // Added p_id
                 p_name_nl: null,
                 p_app_method: null,
-                p_app_date: new Date('2025-03-15'),
+                p_app_date: new Date("2025-03-15"),
             },
         ]
 
@@ -136,7 +136,7 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 p_id: "mineral1", // Added p_id
                 p_name_nl: null,
                 p_app_method: null,
-                p_app_date: new Date('2025-03-15'),
+                p_app_date: new Date("2025-03-15"),
             },
             {
                 p_id_catalogue: "missing",
@@ -145,7 +145,7 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 p_id: "missing", // Added p_id
                 p_name_nl: null,
                 p_app_method: null,
-                p_app_date: new Date('2025-03-15'),
+                p_app_date: new Date("2025-03-15"),
             },
         ]
 
@@ -181,7 +181,7 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 p_id: "mineral1", // Added p_id
                 p_name_nl: null,
                 p_app_method: null,
-                p_app_date: new Date('2025-03-15'),
+                p_app_date: new Date("2025-03-15"),
             },
         ]
 

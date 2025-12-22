@@ -61,7 +61,13 @@ interface ButtonProps {
     Icon: React.ElementType
 }
 
-function ControlButton({ active, onToggle, labelActive, labelInactive, Icon }: ButtonProps) {
+function ControlButton({
+    active,
+    onToggle,
+    labelActive,
+    labelInactive,
+    Icon,
+}: ButtonProps) {
     return (
         <button
             type="button"
@@ -140,23 +146,24 @@ function FieldsControl({
     onToggle: () => void
 }) {
     const control = useControl<CustomControl>(
-        () => new CustomControl({ 
-            active: showFields, 
-            onToggle, 
-            labelActive: "Verberg percelen", 
-            labelInactive: "Toon percelen",
-            Icon: Layers
-        }),
+        () =>
+            new CustomControl({
+                active: showFields,
+                onToggle,
+                labelActive: "Verberg percelen",
+                labelInactive: "Toon percelen",
+                Icon: Layers,
+            }),
         CONTROL_OPTIONS,
     )
 
     useEffect(() => {
-        control.updateProps({ 
-            active: showFields, 
-            onToggle, 
-            labelActive: "Verberg percelen", 
+        control.updateProps({
+            active: showFields,
+            onToggle,
+            labelActive: "Verberg percelen",
             labelInactive: "Toon percelen",
-            Icon: Layers
+            Icon: Layers,
         })
     }, [control, showFields, onToggle])
 
@@ -171,23 +178,24 @@ function ElevationControl({
     onToggle: () => void
 }) {
     const control = useControl<CustomControl>(
-        () => new CustomControl({ 
-            active: showElevation, 
-            onToggle, 
-            labelActive: "Verberg hoogtekaart", 
-            labelInactive: "Toon hoogtekaart",
-            Icon: Mountain
-        }),
+        () =>
+            new CustomControl({
+                active: showElevation,
+                onToggle,
+                labelActive: "Verberg hoogtekaart",
+                labelInactive: "Toon hoogtekaart",
+                Icon: Mountain,
+            }),
         CONTROL_OPTIONS,
     )
 
     useEffect(() => {
-        control.updateProps({ 
-            active: showElevation, 
-            onToggle, 
-            labelActive: "Verberg hoogtekaart", 
+        control.updateProps({
+            active: showElevation,
+            onToggle,
+            labelActive: "Verberg hoogtekaart",
             labelInactive: "Toon hoogtekaart",
-            Icon: Mountain
+            Icon: Mountain,
         })
     }, [control, showElevation, onToggle])
 

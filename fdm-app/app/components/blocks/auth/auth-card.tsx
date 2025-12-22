@@ -34,7 +34,7 @@ export function AuthCard({
         <Card className="shadow-xl">
             <CardHeader className="text-center">
                 {showLogo && (
-                     <>
+                    <>
                         <div className="flex justify-center mb-4">
                             <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-[#122023]">
                                 <img
@@ -45,7 +45,7 @@ export function AuthCard({
                             </div>
                         </div>
                         <h2 className="text-lg font-semibold tracking-tight text-muted-foreground mb-2">
-                           {clientConfig.name}
+                            {clientConfig.name}
                         </h2>
                     </>
                 )}

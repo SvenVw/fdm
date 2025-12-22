@@ -4,15 +4,14 @@ import { serverConfig } from "~/lib/config.server"
 const MAX_BODY_SIZE = 10 * 1024 * 1024 // 10MB limit
 
 const posthogProxy = async (request: Request) => {
-    
     if (!serverConfig.analytics.posthog) {
         return new Response(null, { status: 204 })
     }
 
     // Validate request size
-    const contentLength = request.headers.get('content-length')
-    if (contentLength && parseInt(contentLength, 10) > MAX_BODY_SIZE) {
-        return new Response('Request too large', { status: 413 })
+    const contentLength = request.headers.get("content-length")
+    if (contentLength && Number.parseInt(contentLength, 10) > MAX_BODY_SIZE) {
+        return new Response("Request too large", { status: 413 })
     }
 
     const API_HOST = serverConfig.analytics.posthog.host.replace("https://", "")
@@ -46,20 +45,20 @@ const posthogProxy = async (request: Request) => {
     try {
         const controller = new AbortController()
         timeoutId = setTimeout(() => controller.abort(), 30000) // 30s timeout
-        
+
         response = await fetch(newUrl, {
             method: request.method,
             headers,
             body: request.body,
             signal: controller.signal,
-            // @ts-ignore - duplex is required for streaming request bodies
-            duplex: 'half',
+            // @ts-expect-error - duplex is required for streaming request bodies
+            duplex: "half",
         })
     } catch (error) {
-        console.error('PostHog proxy error:', error)
-        return new Response('Service unavailable', { 
+        console.error("PostHog proxy error:", error)
+        return new Response("Service unavailable", {
             status: 503,
-            statusText: 'PostHog proxy error'
+            statusText: "PostHog proxy error",
         })
     } finally {
         if (timeoutId) {
@@ -79,7 +78,7 @@ const posthogProxy = async (request: Request) => {
 }
 
 export const loader: LoaderFunction = async ({ request }) =>
-  posthogProxy(request)
+    posthogProxy(request)
 
 export const action: ActionFunction = async ({ request }) =>
-  posthogProxy(request)
+    posthogProxy(request)

@@ -1,8 +1,8 @@
 import { getField } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
+import maplibregl from "maplibre-gl"
 import { useEffect, useRef } from "react"
 import { Layer, Map as MapGL, type MapRef } from "react-map-gl/maplibre"
-import maplibregl from "maplibre-gl"
 import type { MetaFunction } from "react-router"
 import {
     type ActionFunctionArgs,

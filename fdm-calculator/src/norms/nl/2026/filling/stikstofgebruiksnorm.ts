@@ -2,6 +2,7 @@ import { type Cultivation, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { getRegion } from "../../2025/value/stikstofgebruiksnorm"
+import type { NormFilling } from "../../types"
 import type { RegionKey } from "../value/types"
 import { table9 } from "./table-9"
 import { table11Mestcodes } from "./table-11-mestcodes"
@@ -9,7 +10,6 @@ import type {
     NL2026NormsFillingInput,
     WorkingCoefficientDetails,
 } from "./types"
-import type { NormFilling } from "../../types"
 
 /**
  * Calculates the nitrogen utilization norm filling for a set of fertilizer applications.
@@ -38,7 +38,7 @@ export async function calculateNL2026FertilizerApplicationFillingForStikstofGebr
 
     for (const application of applications) {
         const fertilizer = fertilizers.find(
-            (f) => f.p_id === application.p_id_catalogue,
+            (f) => f.p_id_catalogue === application.p_id_catalogue,
         )
         if (!fertilizer) {
             throw new Error(

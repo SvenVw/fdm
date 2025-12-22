@@ -11,9 +11,9 @@ import {
 } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { Plus } from "lucide-react"
+import maplibregl from "maplibre-gl"
 import { useEffect, useRef, useState } from "react"
 import { Layer, Map as MapGL, type MapRef } from "react-map-gl/maplibre"
-import maplibregl from "maplibre-gl"
 import {
     type ActionFunctionArgs,
     data,

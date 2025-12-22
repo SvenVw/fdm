@@ -1,5 +1,6 @@
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
+import maplibregl from "maplibre-gl"
 import { useCallback, useEffect, useRef, useState } from "react"
 import {
     Layer,
@@ -7,7 +8,6 @@ import {
     type ViewState,
     type ViewStateChangeEvent,
 } from "react-map-gl/maplibre"
-import maplibregl from "maplibre-gl"
 import type { MetaFunction } from "react-router"
 import { type LoaderFunctionArgs, useLoaderData } from "react-router"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
@@ -193,7 +193,10 @@ export default function FarmAtlasFieldsBlock() {
                 redirectToDetailsPage={true}
             >
                 <Layer
-                    {...({ ...fieldsAvailableStyle, layout: layerLayout } as any)}
+                    {...({
+                        ...fieldsAvailableStyle,
+                        layout: layerLayout,
+                    } as any)}
                 />
             </FieldsSourceAvailable>
 

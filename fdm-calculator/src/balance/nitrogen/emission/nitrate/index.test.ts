@@ -37,7 +37,7 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu_catalogue: "nl_265",
-                b_lu: 'test-id',
+                b_lu: "test-id",
                 b_lu_start: null,
                 b_lu_end: null,
                 m_cropresidue: null,
@@ -68,7 +68,7 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu_catalogue: "nl_1019",
-                b_lu: 'test-id',
+                b_lu: "test-id",
                 b_lu_start: null,
                 b_lu_end: null,
                 m_cropresidue: null,
@@ -99,7 +99,7 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu_catalogue: "nl_6794",
-                b_lu: 'test-id',
+                b_lu: "test-id",
                 b_lu_start: null,
                 b_lu_end: null,
                 m_cropresidue: null,
@@ -131,7 +131,7 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu_catalogue: "nl_265",
-                b_lu: 'test-id',
+                b_lu: "test-id",
                 b_lu_start: null,
                 b_lu_end: null,
                 m_cropresidue: null,
@@ -162,14 +162,14 @@ describe("calculateNitrogenEmissionViaNitrate", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu_catalogue: "nl_265",
-                b_lu: 'test-id',
+                b_lu: "test-id",
                 b_lu_start: null,
                 b_lu_end: null,
                 m_cropresidue: null,
             },
             {
                 b_lu_catalogue: "nl_1019",
-                b_lu: 'test-id',
+                b_lu: "test-id",
                 b_lu_start: null,
                 b_lu_end: null,
                 m_cropresidue: null,

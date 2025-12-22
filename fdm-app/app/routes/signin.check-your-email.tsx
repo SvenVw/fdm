@@ -3,11 +3,11 @@ import { useEffect, useRef, useState } from "react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
 import { Form, redirect, useNavigation, useSearchParams } from "react-router"
 import { useRemixForm } from "remix-hook-form"
-import { z } from "zod"
+import type { z } from "zod"
 import { AuthCard } from "~/components/blocks/auth/auth-card"
 import { AuthCodeField } from "~/components/blocks/auth/auth-code-field"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { AuthLayout } from "~/components/blocks/auth/auth-layout"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import { auth } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
@@ -56,9 +56,9 @@ export default function SignIn() {
     useEffect(() => {
         return () => {
             if (timeoutRef.current) {
-               clearTimeout(timeoutRef.current)
+                clearTimeout(timeoutRef.current)
             }
-         }
+        }
     }, [])
 
     const isSubmitting =
@@ -96,39 +96,39 @@ export default function SignIn() {
                         </span>
                     </div>
                 </div>
-                    <Form
-                        ref={formRef}
-                        method="POST"
-                        action={verifyActionUrl}
-                        className="space-y-4"
-                        onSubmit={form.handleSubmit}
+                <Form
+                    ref={formRef}
+                    method="POST"
+                    action={verifyActionUrl}
+                    className="space-y-4"
+                    onSubmit={form.handleSubmit}
+                >
+                    <AuthCodeField
+                        control={form.control}
+                        onComplete={() => {
+                            setIsAutoSubmitting(true)
+                            // Trigger programmatic submit which fires onSubmit handler
+                            // 1.5s delay so user sees the completed code
+                            timeoutRef.current = setTimeout(() => {
+                                formRef.current?.requestSubmit()
+                            }, 1500)
+                        }}
+                    />
+                    <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={isSubmitting}
                     >
-                        <AuthCodeField 
-                            control={form.control}
-                            onComplete={() => {
-                                setIsAutoSubmitting(true)
-                                // Trigger programmatic submit which fires onSubmit handler
-                                // 1.5s delay so user sees the completed code
-                                timeoutRef.current = setTimeout(() => {
-                                    formRef.current?.requestSubmit()
-                                }, 1500)
-                            }}
-                        />
-                        <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? (
-                                <div className="flex items-center space-x-2">
-                                    <LoadingSpinner />
-                                    <span>Verifiëren...</span>
-                                </div>
-                            ) : (
-                                "Verifiëren"
-                            )}
-                        </Button>
-                    </Form>
+                        {isSubmitting ? (
+                            <div className="flex items-center space-x-2">
+                                <LoadingSpinner />
+                                <span>Verifiëren...</span>
+                            </div>
+                        ) : (
+                            "Verifiëren"
+                        )}
+                    </Button>
+                </Form>
             </AuthCard>
         </AuthLayout>
     )

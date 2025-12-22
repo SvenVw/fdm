@@ -165,5 +165,4 @@ describe("collectNL2026InputForFertilizerApplicationFilling", () => {
             `Field with id ${mockFieldId} not found for principal ${mockPrincipalId}`,
         )
     })
-
 })
