@@ -11,7 +11,8 @@
         "fdm-data",
         "fdm-docs",
         "fdm-app",
-        "fdm-calculator"
+        "fdm-calculator",
+        "fdm-rvo"
     ],
     "scripts": {
         "test": "turbo run test-coverage --filter=@svenvw/fdm-core --filter=@svenvw/fdm-calculator",

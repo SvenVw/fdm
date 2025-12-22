@@ -23,7 +23,7 @@ import { FieldDetailsAtlasSkeleton } from "~/components/blocks/atlas-fields/skel
 import { SoilTextureCard } from "~/components/blocks/atlas-fields/soil-texture"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { ErrorBlock } from "~/components/custom/error"
-import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
+import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi.server"
 import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
