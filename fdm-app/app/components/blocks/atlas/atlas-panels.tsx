@@ -49,7 +49,9 @@ export function FieldsPanelHover({
                         const layers = Array.isArray(layerExclude)
                             ? layerExclude
                             : [layerExclude]
-                        const validLayers = layers.filter((l) => map.getLayer(l))
+                        const validLayers = layers.filter((l) =>
+                            map.getLayer(l),
+                        )
 
                         if (validLayers.length > 0) {
                             const featuresExclude = map.queryRenderedFeatures(

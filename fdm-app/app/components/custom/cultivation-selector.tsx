@@ -1,13 +1,13 @@
 import type { Cultivation } from "@svenvw/fdm-core"
+import { useSearchParams } from "react-router"
+import { getCultivationColor } from "~/components/custom/cultivation-colors"
+import { Badge } from "~/components/ui/badge"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
 } from "~/components/ui/select"
-import { Badge } from "~/components/ui/badge"
-import { getCultivationColor } from "~/components/custom/cultivation-colors"
-import { useSearchParams } from "react-router"
 import {
     Tooltip,
     TooltipContent,
@@ -26,7 +26,7 @@ export function CultivationSelector({
     selectedCultivationId,
     variant = "default",
 }: CultivationSelectorProps) {
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [_searchParams, setSearchParams] = useSearchParams()
 
     const handleValueChange = (value: string) => {
         setSearchParams((prev) => {

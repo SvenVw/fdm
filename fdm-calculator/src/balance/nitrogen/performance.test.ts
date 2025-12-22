@@ -106,10 +106,10 @@ function generateMockData(numberOfFields: number): NitrogenBalanceInput {
                             b_lu_p_harvestable: null,
                             b_lu_p_residue: null,
                             b_lu_k_harvestable: null,
-                            b_lu_k_residue: null
+                            b_lu_k_residue: null,
                         },
                     ],
-                    b_id_harvestable: ""
+                    b_id_harvestable: "",
                 },
             },
         ]
@@ -132,7 +132,7 @@ function generateMockData(numberOfFields: number): NitrogenBalanceInput {
             {
                 p_app_id: `fa-${fieldId}-1`,
                 // Randomly pick one of the available fertilizer catalogue IDs
-                p_id_catalogue: 'fert-cat-1',
+                p_id_catalogue: "fert-cat-1",
                 p_app_amount: Math.floor(Math.random() * 500 + 100), // 100-600
                 p_app_date: new Date(2023, 4, 1),
                 p_app_method: "broadcasting",

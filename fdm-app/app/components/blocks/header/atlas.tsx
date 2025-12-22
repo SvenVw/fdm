@@ -1,11 +1,10 @@
-import { useCalendarStore } from "@/app/store/calendar"
 import { ChevronDown } from "lucide-react"
-import { useLocation, NavLink } from "react-router"
+import { NavLink, useLocation } from "react-router"
+import { useCalendarStore } from "@/app/store/calendar"
 import {
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbSeparator,
-    BreadcrumbPage,
 } from "~/components/ui/breadcrumb"
 import {
     DropdownMenu,
@@ -38,12 +37,16 @@ export function HeaderAtlas({ b_id_farm }: { b_id_farm: string | undefined }) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
                         <DropdownMenuItem asChild>
-                            <NavLink to={`/farm/${b_id_farm}/${calendar}/atlas/fields`}>
+                            <NavLink
+                                to={`/farm/${b_id_farm}/${calendar}/atlas/fields`}
+                            >
                                 Gewaspercelen
                             </NavLink>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                            <NavLink to={`/farm/${b_id_farm}/${calendar}/atlas/elevation`}>
+                            <NavLink
+                                to={`/farm/${b_id_farm}/${calendar}/atlas/elevation`}
+                            >
                                 Hoogtekaart
                             </NavLink>
                         </DropdownMenuItem>

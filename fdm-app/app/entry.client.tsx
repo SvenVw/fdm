@@ -65,7 +65,6 @@ if (clientConfig.analytics.sentry) {
     })
 }
 
-
 startTransition(() => {
     hydrateRoot(
         document,

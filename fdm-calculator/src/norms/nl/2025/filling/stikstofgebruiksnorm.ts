@@ -1,6 +1,7 @@
 import { type Cultivation, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
+import type { NormFilling } from "../../types"
 import { getRegion } from "../value/stikstofgebruiksnorm"
 import type { RegionKey } from "../value/types"
 import { table9 } from "./table-9"
@@ -9,7 +10,6 @@ import type {
     NL2025NormsFillingInput,
     WorkingCoefficientDetails,
 } from "./types"
-import type { NormFilling } from "../../types"
 
 /**
  * Calculates the nitrogen utilization norm filling for a set of fertilizer applications.

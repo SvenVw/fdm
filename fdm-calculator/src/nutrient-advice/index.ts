@@ -1,3 +1,4 @@
+import type { CurrentSoilData } from "@svenvw/fdm-core"
 import { withCalculationCache } from "@svenvw/fdm-core"
 import pkg from "../package"
 import type {
@@ -5,7 +6,6 @@ import type {
     NutrientAdviceInputs,
     NutrientAdviceResponse,
 } from "./types"
-import type { CurrentSoilData } from "@svenvw/fdm-core"
 
 // Requests nutrient advice from the NMI API based on provided field and soil data.
 //
@@ -87,7 +87,9 @@ export async function requestNutrientAdvice({
     } catch (error) {
         console.error(
             "Error fetching nutrient advice:",
-            error instanceof Error ? error.message : "An unknown error occurred",
+            error instanceof Error
+                ? error.message
+                : "An unknown error occurred",
         )
         throw error
     }

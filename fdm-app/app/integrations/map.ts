@@ -1,5 +1,5 @@
-import { clientConfig } from "@/app/lib/config"
 import type { StyleSpecification } from "maplibre-gl"
+import { clientConfig } from "@/app/lib/config"
 
 export function getMapStyle(
     variant: "satellite" | "standard",

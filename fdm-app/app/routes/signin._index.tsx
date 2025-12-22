@@ -1,9 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { AnimatePresence, motion, useScroll } from "framer-motion"
 import {
-    Info,
+    ArrowDown,
     ArrowRight,
     BadgeCheck,
     BookOpen,
+    Calculator,
     CheckCircle2,
     Droplets,
     ExternalLink,
@@ -11,24 +13,20 @@ import {
     FlaskConical,
     Github,
     History,
-    LineChart,
+    Info,
+    Landmark,
+    LayersIcon,
+    ListChecks,
     Mountain,
     MoveDown,
     Scale,
     ScanText,
+    SearchCheck,
     ShieldCheck,
     Sprout,
     Table2,
     Target,
-    Tractor,
     Users,
-    Wheat,
-    Landmark,
-    LayersIcon,
-    SearchCheck,
-    Calculator,
-    ListChecks,
-    ArrowDown,
 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { FormProvider } from "react-hook-form"
@@ -42,7 +40,6 @@ import { Form, redirect, useSearchParams } from "react-router"
 import { useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { motion, useScroll, AnimatePresence } from "framer-motion"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
     Accordion,
@@ -183,7 +180,7 @@ function getSafeRedirect(address: string | null) {
         : "/farm"
 }
 
-const UIPlaceholder = ({
+const _UIPlaceholder = ({
     className,
     label,
 }: {

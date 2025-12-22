@@ -83,10 +83,11 @@ export async function renderMagicLinkEmail(
     const parsedMagicLinkUrl = new URL(magicLinkUrl)
     const frontendUrl = new URL("/signin/verify", serverConfig.url)
     frontendUrl.searchParams.set("code", code)
-    
+
     // Copy relevant search params (like callbackURL)
     parsedMagicLinkUrl.searchParams.forEach((value, key) => {
-        if (key !== "token") { // We use 'code' instead of 'token'
+        if (key !== "token") {
+            // We use 'code' instead of 'token'
             frontendUrl.searchParams.set(key, value)
         }
     })

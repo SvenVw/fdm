@@ -12,12 +12,7 @@ import type {
 } from "@svenvw/fdm-core"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { collectInputForNitrogenBalance } from "./input"
-import type {
-
-
-    FieldInput,
-    NitrogenBalanceInput,
-} from "./types"
+import type { FieldInput, NitrogenBalanceInput } from "./types"
 
 // Mock the @svenvw/fdm-core module
 vi.mock("@svenvw/fdm-core", async () => {
@@ -40,11 +35,13 @@ const mockedGetFields = vi.mocked(fdmCoreMocks.getFields)
 const mockedGetCultivations = vi.mocked(fdmCoreMocks.getCultivations)
 const mockedGetHarvests = vi.mocked(fdmCoreMocks.getHarvests)
 const mockedGetSoilAnalyses = vi.mocked(fdmCoreMocks.getSoilAnalyses)
-const mockedGetFertilizerApplications =
-    vi.mocked(fdmCoreMocks.getFertilizerApplications)
+const mockedGetFertilizerApplications = vi.mocked(
+    fdmCoreMocks.getFertilizerApplications,
+)
 const mockedGetFertilizers = vi.mocked(fdmCoreMocks.getFertilizers)
-const mockedGetCultivationsFromCatalogue =
-    vi.mocked(fdmCoreMocks.getCultivationsFromCatalogue)
+const mockedGetCultivationsFromCatalogue = vi.mocked(
+    fdmCoreMocks.getCultivationsFromCatalogue,
+)
 
 describe("collectInputForNitrogenBalance", () => {
     const mockFdm: FdmType = {
@@ -79,7 +76,7 @@ describe("collectInputForNitrogenBalance", () => {
                 b_start: new Date("2023-01-01"),
                 b_end: new Date("2023-12-31"),
                 b_acquiring_method: "purchase",
-                b_isproductive: true
+                b_isproductive: true,
             },
             {
                 b_id: "field-2",
@@ -93,7 +90,7 @@ describe("collectInputForNitrogenBalance", () => {
                 b_start: new Date("2023-01-01"),
                 b_end: new Date("2023-12-31"),
                 b_acquiring_method: "purchase",
-                b_isproductive: true
+                b_isproductive: true,
             },
         ]
         const mockCultivationsData: Cultivation[] = [
@@ -125,7 +122,7 @@ describe("collectInputForNitrogenBalance", () => {
                 harvestable: {
                     b_id_harvestable: "h-1",
                     harvestable_analyses: [],
-                }
+                },
             },
         ]
         const mockSoilAnalysesData = [
@@ -153,7 +150,7 @@ describe("collectInputForNitrogenBalance", () => {
                 p_app_amount: 100,
                 p_app_method: "broadcasting", // match one of ApplicationMethods
                 p_app_date: new Date(),
-                p_id: ""
+                p_id: "",
             },
         ]
         const mockFertilizerDetailsData = [
@@ -294,7 +291,7 @@ describe("collectInputForNitrogenBalance", () => {
                 b_start: new Date("2023-01-01"),
                 b_end: new Date("2023-12-31"),
                 b_acquiring_method: "purchase",
-                b_isproductive: true
+                b_isproductive: true,
             },
         ]
         mockedGetFields.mockResolvedValue(mockFieldsData)
