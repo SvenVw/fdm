@@ -4,6 +4,7 @@ import {
     proj4,
 } from "@geomatico/maplibre-cog-protocol"
 import { getFields } from "@svenvw/fdm-core"
+import { simplify } from "@turf/turf"
 import type { FeatureCollection } from "geojson"
 import throttle from "lodash.throttle"
 import maplibregl from "maplibre-gl"
@@ -130,7 +131,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         b_lu_name: field.b_lu_name,
                         b_id_source: field.b_id_source,
                     },
-                    geometry: field.b_geometry,
+                    geometry: simplify(field.b_geometry as any, {
+                        tolerance: 0.00001,
+                        highQuality: true,
+                    }),
                 }
                 return feature
             })
@@ -239,9 +243,9 @@ export default function FarmAtlasElevationBlock() {
                     }
                 }
 
-                const response = await fetch(
-                    "https://service.pdok.nl/rws/ahn/atom/downloads/dtm_05m/kaartbladindex.json",
-                )
+                // Fetch from our server-side cache
+                const response = await fetch("/resources/ahn-index")
+
                 if (!response.ok) throw new Error("Failed to fetch COG index")
                 const data = (await response.json()) as FeatureCollection
                 setIndexData(data)
@@ -566,7 +570,7 @@ export default function FarmAtlasElevationBlock() {
                 <MapTilerAttribution />
 
                 {/* WMS Overview Layer (Zoom < 13) */}
-                {showElevation && (
+                {showElevation && viewState.zoom < 13 && (
                     <Source
                         id="ahn-wms"
                         type="raster"
@@ -574,6 +578,7 @@ export default function FarmAtlasElevationBlock() {
                             "https://service.pdok.nl/rws/ahn/wms/v1_0?service=WMS&request=GetMap&layers=dtm_05m&styles=&format=image/png&transparent=true&version=1.3.0&width=256&height=256&crs=EPSG:3857&bbox={bbox-epsg-3857}",
                         ]}
                         tileSize={256}
+                        maxzoom={13}
                         attribution="&copy; <a href='https://www.pdok.nl/'>PDOK</a>, <a href='https://www.ahn.nl/'>AHN</a>"
                     >
                         <Layer
