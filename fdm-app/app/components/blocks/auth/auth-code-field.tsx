@@ -1,4 +1,5 @@
-import { Controller, type Control } from "react-hook-form"
+import { type Control, Controller } from "react-hook-form"
+import type z from "zod"
 import { AuthCodeInput } from "~/components/blocks/auth/auth-code-input"
 import {
     Field,
@@ -6,12 +7,11 @@ import {
     FieldError,
     FieldLabel,
 } from "~/components/ui/field"
-import { FormSchema } from "./auth-formschema"
-import z from "zod"
+import type { FormSchema } from "./auth-formschema"
 
 interface AuthCodeFieldProps {
-    control:  Control<z.infer<typeof FormSchema>>
-    name?: 'code' | 'redirectTo'
+    control: Control<z.infer<typeof FormSchema>>
+    name?: "code" | "redirectTo"
     onComplete?: (value: string) => void
     serverError?: string
 }
@@ -34,7 +34,9 @@ export function AuthCodeField({
                         <FieldError
                             errors={[
                                 fieldState.error,
-                                serverError ? { message: serverError } : undefined,
+                                serverError
+                                    ? { message: serverError }
+                                    : undefined,
                             ]}
                         />
                     </FieldContent>

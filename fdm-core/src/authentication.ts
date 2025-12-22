@@ -2,12 +2,12 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { betterAuth } from "better-auth/minimal"
 import { magicLink, organization, username } from "better-auth/plugins"
 import { eq } from "drizzle-orm"
+import { customAlphabet } from "nanoid"
 import { generateFromEmail } from "unique-username-generator"
 import type { FdmAuth } from "./authentication.d"
 import * as authNSchema from "./db/schema-authn"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import { customAlphabet } from "nanoid"
 
 export type BetterAuth = FdmAuth
 
@@ -416,6 +416,6 @@ const generateCodeWithNanoId = customAlphabet(ALPHABET, 8)
  *
  * @returns {string} An 8-character read-safe OTP.
  */
-function generateReadSafeOTP(): string {   
+function generateReadSafeOTP(): string {
     return generateCodeWithNanoId()
 }

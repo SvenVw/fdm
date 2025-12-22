@@ -11,7 +11,7 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                 b_lu_catalogue: "catalogue1",
                 m_cropresidue: true,
                 b_lu_start: null,
-                b_lu_end: null
+                b_lu_end: null,
             },
         ]
         const harvests: FieldInput["harvests"] = [
@@ -37,7 +37,7 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                             b_lu_p_harvestable: null,
                             b_lu_p_residue: null,
                             b_lu_k_harvestable: null,
-                            b_lu_k_residue: null
+                            b_lu_k_residue: null,
                         },
                     ],
                 },
@@ -78,7 +78,7 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                 // b_lu_start: new Date(),
                 m_cropresidue: true,
                 b_lu_start: null,
-                b_lu_end: null
+                b_lu_end: null,
             },
         ]
         const harvests: FieldInput["harvests"] = [
@@ -90,7 +90,8 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                     b_id_harvestable: "harvestable1",
                     harvestable_analyses: [
                         {
-                            b_lu_yield: 1000, b_lu_n_harvestable: 20,
+                            b_lu_yield: 1000,
+                            b_lu_n_harvestable: 20,
                             b_id_harvestable_analysis: "",
                             b_lu_yield_fresh: null,
                             b_lu_yield_bruto: null,
@@ -103,10 +104,11 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                             b_lu_p_harvestable: null,
                             b_lu_p_residue: null,
                             b_lu_k_harvestable: null,
-                            b_lu_k_residue: null
+                            b_lu_k_residue: null,
                         },
                         {
-                            b_lu_yield: 1200, b_lu_n_harvestable: 22,
+                            b_lu_yield: 1200,
+                            b_lu_n_harvestable: 22,
                             b_id_harvestable_analysis: "",
                             b_lu_yield_fresh: null,
                             b_lu_yield_bruto: null,
@@ -119,7 +121,7 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                             b_lu_p_harvestable: null,
                             b_lu_p_residue: null,
                             b_lu_k_harvestable: null,
-                            b_lu_k_residue: null
+                            b_lu_k_residue: null,
                         },
                     ],
                 },
@@ -132,7 +134,8 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                     b_id_harvestable: "harvestable2",
                     harvestable_analyses: [
                         {
-                            b_lu_yield: 1100, b_lu_n_harvestable: 21,
+                            b_lu_yield: 1100,
+                            b_lu_n_harvestable: 21,
                             b_id_harvestable_analysis: "",
                             b_lu_yield_fresh: null,
                             b_lu_yield_bruto: null,
@@ -145,7 +148,7 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                             b_lu_p_harvestable: null,
                             b_lu_p_residue: null,
                             b_lu_k_harvestable: null,
-                            b_lu_k_residue: null
+                            b_lu_k_residue: null,
                         },
                     ],
                 },
@@ -189,7 +192,7 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                 // b_lu_start: new Date(),
                 m_cropresidue: true,
                 b_lu_start: null,
-                b_lu_end: null
+                b_lu_end: null,
             },
         ]
         const harvests: FieldInput["harvests"] = [
@@ -199,23 +202,25 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                 b_lu_harvest_date: new Date(),
                 harvestable: {
                     b_id_harvestable: "harvestable1",
-                    harvestable_analyses: [{
-                        b_id_harvestable_analysis: "",
-                        b_lu_yield: null,
-                        b_lu_yield_fresh: null,
-                        b_lu_yield_bruto: null,
-                        b_lu_tarra: null,
-                        b_lu_dm: null,
-                        b_lu_moist: null,
-                        b_lu_uww: null,
-                        b_lu_cp: null,
-                        b_lu_n_harvestable: null,
-                        b_lu_n_residue: null,
-                        b_lu_p_harvestable: null,
-                        b_lu_p_residue: null,
-                        b_lu_k_harvestable: null,
-                        b_lu_k_residue: null
-                    }], // Missing yield and nitrogen
+                    harvestable_analyses: [
+                        {
+                            b_id_harvestable_analysis: "",
+                            b_lu_yield: null,
+                            b_lu_yield_fresh: null,
+                            b_lu_yield_bruto: null,
+                            b_lu_tarra: null,
+                            b_lu_dm: null,
+                            b_lu_moist: null,
+                            b_lu_uww: null,
+                            b_lu_cp: null,
+                            b_lu_n_harvestable: null,
+                            b_lu_n_residue: null,
+                            b_lu_p_harvestable: null,
+                            b_lu_p_residue: null,
+                            b_lu_k_harvestable: null,
+                            b_lu_k_residue: null,
+                        },
+                    ], // Missing yield and nitrogen
                 },
             },
         ]
@@ -257,7 +262,8 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                     b_id_harvestable: "harvestable1",
                     harvestable_analyses: [
                         {
-                            b_lu_yield: 1000, b_lu_n_harvestable: 20,
+                            b_lu_yield: 1000,
+                            b_lu_n_harvestable: 20,
                             b_id_harvestable_analysis: "",
                             b_lu_yield_fresh: null,
                             b_lu_yield_bruto: null,
@@ -270,7 +276,7 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                             b_lu_p_harvestable: null,
                             b_lu_p_residue: null,
                             b_lu_k_harvestable: null,
-                            b_lu_k_residue: null
+                            b_lu_k_residue: null,
                         },
                     ],
                 },
@@ -297,7 +303,7 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                 // b_lu_start: new Date(),
                 m_cropresidue: true,
                 b_lu_start: null,
-                b_lu_end: null
+                b_lu_end: null,
             },
         ]
         const harvests: FieldInput["harvests"] = [
@@ -309,7 +315,8 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                     b_id_harvestable: "harvestable1",
                     harvestable_analyses: [
                         {
-                            b_lu_yield: 1000, b_lu_n_harvestable: 20,
+                            b_lu_yield: 1000,
+                            b_lu_n_harvestable: 20,
                             b_id_harvestable_analysis: "",
                             b_lu_yield_fresh: null,
                             b_lu_yield_bruto: null,
@@ -322,7 +329,7 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                             b_lu_p_harvestable: null,
                             b_lu_p_residue: null,
                             b_lu_k_harvestable: null,
-                            b_lu_k_residue: null
+                            b_lu_k_residue: null,
                         },
                     ],
                 },

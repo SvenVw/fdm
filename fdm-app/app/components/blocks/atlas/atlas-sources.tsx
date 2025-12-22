@@ -5,8 +5,8 @@ import {
 import centroid from "@turf/centroid"
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
-import type { MapLayerMouseEvent } from "maplibre-gl"
 import throttle from "lodash.throttle"
+import type { MapLayerMouseEvent } from "maplibre-gl"
 import {
     type Dispatch,
     type JSX,

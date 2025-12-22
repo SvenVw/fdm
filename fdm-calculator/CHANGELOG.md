@@ -1,5 +1,23 @@
 # fdm-calculator
 
+## 0.10.0
+
+### Minor Changes
+
+- 61966db: Unified the data shape between farm and field nitrogen balance results. Added further breakdown on farm balance result, based on the type of fertilizer, or the contribution of fixation, harvests, and residues.
+- 99a8797: Add calculation support of Dutch norms for fertilizer applications for 2026
+- 6d28fd7: Include at NL Stikstofgebruiksnormen that nl_335 (Natuurterreinen (incl. heide)) is set to be not bouwland
+
+### Patch Changes
+
+- ba2c7dc: Fix calculating korting at stikstofgebruiksnorm when vangewas is sown on October 15th
+- 2c5de99: Make fdm-data, fdm-calculator and fdm-data fully type-safe, including inferring dependencies in the monorepo
+- 67612d7: Fixes target value for nitrogen balance at arable, clay and dry soil to be 115 kg N / ha instead of 125 kg N / ha
+- Updated dependencies [022a347]
+- Updated dependencies [1885f8a]
+- Updated dependencies [2c5de99]
+  - @svenvw/fdm-core@0.28.0
+
 ## 0.9.0
 
 ### Minor Changes

@@ -4,25 +4,25 @@ import {
     proj4,
 } from "@geomatico/maplibre-cog-protocol"
 import { getFields } from "@svenvw/fdm-core"
-import throttle from "lodash.throttle"
 import type { FeatureCollection } from "geojson"
+import throttle from "lodash.throttle"
 import maplibregl from "maplibre-gl"
 import {
+    Fragment,
     useCallback,
     useEffect,
     useMemo,
     useRef,
     useState,
-    Fragment,
 } from "react"
 import {
     Layer,
     Map as MapGL,
-    Source,
+    type MapLayerMouseEvent,
     type MapRef,
+    Source,
     type ViewState,
     type ViewStateChangeEvent,
-    type MapLayerMouseEvent,
 } from "react-map-gl/maplibre"
 import {
     type LoaderFunctionArgs,
@@ -518,7 +518,7 @@ export default function FarmAtlasElevationBlock() {
                         }
                     }
                     setHoverElevation(null)
-                } catch (e) {
+                } catch (_e) {
                     setHoverElevation(null)
                 }
             }, 200),

@@ -121,13 +121,18 @@ async function loadAsyncData(
         const [regionTable2, isNvGebied, isGWBGGebied, isNatura2000Area] =
             fieldDetailsData
 
+        const cultivationCatalogueMap = new Map(
+            cultivationCatalogue.map((item: { b_lu_catalogue: string }) => [
+                item.b_lu_catalogue,
+                item,
+            ]),
+        )
+
         const cultivationHistory = estimates.cultivations.map(
             (cultivation: { year: number; b_lu_brp: string }) => {
                 const b_lu_catalogue = `nl_${cultivation.b_lu_brp}`
-                const catalogueItem = cultivationCatalogue.find(
-                    (item: { b_lu_catalogue: string }) =>
-                        item.b_lu_catalogue === b_lu_catalogue,
-                )
+                const catalogueItem =
+                    cultivationCatalogueMap.get(b_lu_catalogue)
                 return {
                     year: cultivation.year,
                     b_lu_catalogue,
