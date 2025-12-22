@@ -5,7 +5,7 @@ import {
 } from "@geomatico/maplibre-cog-protocol"
 import { getFields } from "@svenvw/fdm-core"
 import { simplify } from "@turf/turf"
-import type { FeatureCollection } from "geojson"
+import type { FeatureCollection, Geometry } from "geojson"
 import throttle from "lodash.throttle"
 import maplibregl from "maplibre-gl"
 import {
@@ -131,7 +131,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         b_lu_name: field.b_lu_name,
                         b_id_source: field.b_id_source,
                     },
-                    geometry: simplify(field.b_geometry as any, {
+                    geometry: simplify(field.b_geometry as Geometry, {
                         tolerance: 0.00001,
                         highQuality: true,
                     }),

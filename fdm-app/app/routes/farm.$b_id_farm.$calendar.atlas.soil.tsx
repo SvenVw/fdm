@@ -1,5 +1,6 @@
 import { getFields } from "@svenvw/fdm-core"
 import { simplify } from "@turf/turf"
+import { Geometry } from "geojson"
 import {
     data,
     type LoaderFunctionArgs,
@@ -68,7 +69,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     b_name: field.b_name,
                     b_area: Math.round(field.b_area * 10) / 10,
                 },
-                geometry: simplify(field.b_geometry as any, {
+                geometry: simplify(field.b_geometry as Geometry, {
                     tolerance: 0.00001,
                     highQuality: true,
                 }),
