@@ -50,14 +50,18 @@ import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { SidebarInset } from "~/components/ui/sidebar"
-import {
-    BreadcrumbItem,
-    BreadcrumbSeparator,
-} from "~/components/ui/breadcrumb"
+import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { getRvoCredentials } from "../integrations/rvo"
 import { RvoErrorAlert } from "~/components/blocks/rvo/rvo-error-alert"
-import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi.server"
-import { addSoilAnalysis, getCultivations, getCultivationsFromCatalogue } from "@svenvw/fdm-core"
+import {
+    getNmiApiKey,
+    getSoilParameterEstimates,
+} from "~/integrations/nmi.server"
+import {
+    addSoilAnalysis,
+    getCultivations,
+    getCultivationsFromCatalogue,
+} from "@svenvw/fdm-core"
 import { RvoConnectCard } from "~/components/blocks/rvo/connect-card"
 import { clientConfig } from "../lib/config"
 
@@ -391,51 +395,61 @@ export default function RvoImportReviewPage() {
                                     </DialogTrigger>
                                     <DialogContent>
                                         <DialogHeader>
-                                            <DialogTitle>Wijzigingen toepassen</DialogTitle>
+                                            <DialogTitle>
+                                                Wijzigingen toepassen
+                                            </DialogTitle>
                                             <DialogDescription>
-                                                U staat op het punt de volgende wijzigingen door te voeren:
+                                                U staat op het punt de volgende
+                                                wijzigingen door te voeren:
                                             </DialogDescription>
                                         </DialogHeader>
                                         <div className="py-4">
                                             <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
                                                 {changes.add > 0 && (
                                                     <li>
-                                                        {changes.add}{" "}
-                                                        perceel
-                                                        {changes.add !== 1 && "en"}{" "}
+                                                        {changes.add} perceel
+                                                        {changes.add !== 1 &&
+                                                            "en"}{" "}
                                                         toevoegen
                                                     </li>
                                                 )}
                                                 {changes.remove > 0 && (
                                                     <li>
-                                                        {changes.remove}{" "}
-                                                        perceel
-                                                        {changes.remove !== 1 && "en"}{" "}
+                                                        {changes.remove} perceel
+                                                        {changes.remove !== 1 &&
+                                                            "en"}{" "}
                                                         verwijderen
                                                     </li>
                                                 )}
                                                 {changes.update > 0 && (
                                                     <li>
-                                                        {changes.update}{" "}
-                                                        perceel
-                                                        {changes.update !== 1 && "en"}{" "}
+                                                        {changes.update} perceel
+                                                        {changes.update !== 1 &&
+                                                            "en"}{" "}
                                                         bijwerken
                                                     </li>
                                                 )}
                                                 {changes.close > 0 && (
                                                     <li>
-                                                        {changes.close}{" "}
-                                                        perceel
-                                                        {changes.close !== 1 && "en"}{" "}
+                                                        {changes.close} perceel
+                                                        {changes.close !== 1 &&
+                                                            "en"}{" "}
                                                         afsluiten
                                                     </li>
                                                 )}
                                             </ul>
-                                            {!hasChanges && <p>Geen wijzigingen geselecteerd.</p>}
+                                            {!hasChanges && (
+                                                <p>
+                                                    Geen wijzigingen
+                                                    geselecteerd.
+                                                </p>
+                                            )}
                                         </div>
                                         <DialogFooter>
                                             <DialogClose asChild>
-                                                <Button variant="outline">Annuleren</Button>
+                                                <Button variant="outline">
+                                                    Annuleren
+                                                </Button>
                                             </DialogClose>
                                             <Form
                                                 method="post"
@@ -449,7 +463,9 @@ export default function RvoImportReviewPage() {
                                                 <input
                                                     type="hidden"
                                                     name="userChoices"
-                                                    value={JSON.stringify(userChoices)}
+                                                    value={JSON.stringify(
+                                                        userChoices,
+                                                    )}
                                                 />
                                                 <input
                                                     type="hidden"
@@ -458,7 +474,10 @@ export default function RvoImportReviewPage() {
                                                         rvoImportReviewData,
                                                     )}
                                                 />
-                                                <Button type="submit" disabled={isApplying}>
+                                                <Button
+                                                    type="submit"
+                                                    disabled={isApplying}
+                                                >
                                                     Bevestigen
                                                 </Button>
                                             </Form>
@@ -548,11 +567,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
                         await addSoilAnalysis(
                             fdm,
                             session.principal_id,
-                            new Date(),
+                            undefined,
                             "nl-other-nmi",
                             b_id,
                             soilEstimates.a_depth_lower ?? 30,
-                            new Date(),
+                            undefined,
                             soilEstimates,
                             soilEstimates.a_depth_upper,
                         )

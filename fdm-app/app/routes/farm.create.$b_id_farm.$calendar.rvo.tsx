@@ -26,7 +26,7 @@ import type {
 import { getItemId } from "@svenvw/fdm-rvo/utils"
 import { processRvoImport } from "@svenvw/fdm-rvo"
 import { RvoImportReviewTable } from "~/components/blocks/rvo/import-review-table"
-import { Cultivation, Field, getFarm } from "@svenvw/fdm-core"
+import { type Cultivation, type Field, getFarm } from "@svenvw/fdm-core"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import { AlertTriangle, Loader2 } from "lucide-react"
@@ -435,11 +435,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
                         await addSoilAnalysis(
                             fdm,
                             session.principal_id,
-                            new Date(),
+                            undefined,
                             "nl-other-nmi",
                             b_id,
                             soilEstimates.a_depth_lower ?? 30,
-                            new Date(),
+                            undefined,
                             soilEstimates,
                             soilEstimates.a_depth_upper,
                         )
