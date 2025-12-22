@@ -1,5 +1,6 @@
 import { getFields } from "@svenvw/fdm-core"
-import type { FeatureCollection } from "geojson"
+import { simplify } from "@turf/turf"
+import type { FeatureCollection, Geometry } from "geojson"
 import maplibregl from "maplibre-gl"
 import { useCallback, useEffect, useRef, useState } from "react"
 import {
@@ -83,7 +84,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         b_lu_name: field.b_lu_name,
                         b_id_source: field.b_id_source,
                     },
-                    geometry: field.b_geometry,
+                    geometry: simplify(field.b_geometry as Geometry, {
+                        tolerance: 0.00001,
+                        highQuality: true,
+                    }),
                 }
                 return feature
             })
