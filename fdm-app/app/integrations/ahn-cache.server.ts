@@ -14,6 +14,7 @@ export async function getAhnIndex(): Promise<FeatureCollection> {
         console.log("Fetching AHN index from PDOK...")
         const response = await fetch(
             "https://service.pdok.nl/rws/ahn/atom/downloads/dtm_05m/kaartbladindex.json",
+            { signal: AbortSignal.timeout(30000) }, // 30 second timeout
         )
 
         if (!response.ok) {
@@ -21,13 +22,19 @@ export async function getAhnIndex(): Promise<FeatureCollection> {
         }
 
         const data = (await response.json()) as FeatureCollection
+        if (!data.features || !Array.isArray(data.features)) {
+            throw new Error("Invalid AHN index format")
+        }
         cache = {
             data,
             expires: now + CACHE_TTL,
         }
         return data
     } catch (error) {
-        console.error("Error fetching AHN index, serving stale cache if available", error)
+        console.error(
+            "Error fetching AHN index, serving stale cache if available",
+            error,
+        )
         if (cache) return cache.data
         throw error
     }

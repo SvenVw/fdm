@@ -1,4 +1,4 @@
-import { type LoaderFunctionArgs, data } from "react-router"
+import { data } from "react-router"
 import { getAhnIndex } from "@/app/integrations/ahn-cache.server"
 
 export async function loader() {

@@ -272,6 +272,10 @@ export default function FarmAtlasElevationBlock() {
     const updateId = useRef(0)
 
     // Function to update visible tiles
+    const activeTilesLengthRef = useRef(activeTiles.length)
+    useEffect(() => {
+        activeTilesLengthRef.current = activeTiles.length
+    }, [activeTiles])
     const updateVisibleTiles = useCallback(async () => {
         if (!mapRef.current || !indexData) return
 
@@ -280,7 +284,7 @@ export default function FarmAtlasElevationBlock() {
 
         // If zoomed out, clear active tiles to save resources (WMS will take over)
         if (zoom < 13) {
-            if (activeTiles.length > 0) {
+            if (activeTilesLengthRef.current > 0) {
                 setActiveTiles([])
             }
             return
@@ -313,7 +317,7 @@ export default function FarmAtlasElevationBlock() {
             ] as [number, number][]
 
             // Find intersecting tiles
-            // Optimization: limit to e.g. 24 tiles to avoid overload
+            // Optimization: limit to 12 tiles to avoid overload
             const visibleFeatures = indexData.features
                 .filter((f) => {
                     if (!f.geometry || f.geometry.type !== "Polygon")
@@ -451,7 +455,7 @@ export default function FarmAtlasElevationBlock() {
             }
             clearTimeout(slowTimer)
         }
-    }, [indexData, activeTiles])
+    }, [indexData])
 
     // Throttle updates
     const updateRef = useRef(updateVisibleTiles)
