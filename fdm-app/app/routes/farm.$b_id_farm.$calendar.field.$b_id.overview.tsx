@@ -307,15 +307,24 @@ export async function action({ request, params }: ActionFunctionArgs) {
 // Form Schema
 const FormSchema = z
     .object({
-        b_name: z.string().min(3, {
-            message: "Naam van perceel moet minimaal 3 karakters bevatten",
+        b_name: z.string().min(2, {
+            message: "Naam van perceel moet minimaal 2 karakters bevatten",
         }),
         b_acquiring_method: z.string({
             required_error:
                 "Selecteer of het perceel in eigendom is of gepacht",
         }),
-        b_start: z.coerce.date().optional(),
-        b_end: z.coerce.date().optional(),
+        b_start: z.coerce.date({
+            required_error: "Kies een startdatum voor het perceel",
+        }),
+        b_end: z
+            .preprocess((value) => {
+                if (typeof value === "string") {
+                    if (value.toLowerCase() === "null") return null
+                }
+                return value
+            }, z.coerce.date().optional().nullable())
+            .default(null),
     })
     .refine(
         (schema) => {
