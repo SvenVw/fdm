@@ -87,7 +87,6 @@ interface ActiveTile {
     id: string
     url: string
     cogUrl: string | null
-    cogUrlHillshade: string | null
 }
 
 // Meta
@@ -318,7 +317,7 @@ export default function FarmAtlasElevationBlock() {
                     const ring = (f.geometry as any).coordinates[0]
                     return polygonIntersectsPolygon(rdCoords, ring)
                 })
-                .slice(0, 24)
+                .slice(0, 12)
 
             // Calculate global min/max for the viewport by sampling
             const samplePoints: { lng: number; lat: number }[] = []
@@ -334,49 +333,60 @@ export default function FarmAtlasElevationBlock() {
             let min = 1000
             let max = -1000
 
-            // Gather values for samples
-            const values = await Promise.all(
-                samplePoints.map(async (p) => {
-                    try {
-                        const rdP = proj4("EPSG:28992").forward([
-                            p.lng,
-                            p.lat,
-                        ]) as [number, number]
-                        // Find which tile contains this point
-                        const feature = visibleFeatures.find((f) => {
-                            if (!f.geometry || f.geometry.type !== "Polygon")
-                                return false
-                            const ring = (f.geometry as any).coordinates[0]
-                            return isPointInPolygon(rdP, ring)
-                        })
-                        if (feature?.properties) {
-                            const url =
-                                feature.properties.url ||
-                                feature.properties.href ||
-                                feature.properties.download_url
-                            if (url) {
-                                // Requesting location value
-                                const vals = await locationValues(url, {
-                                    longitude: p.lng,
-                                    latitude: p.lat,
-                                })
+            // Gather values for samples with concurrency limit
+            const results: (number | null)[] = []
+            const chunkSize = 4
+            for (let i = 0; i < samplePoints.length; i += chunkSize) {
+                const chunk = samplePoints.slice(i, i + chunkSize)
+                const chunkResults = await Promise.all(
+                    chunk.map(async (p) => {
+                        try {
+                            const rdP = proj4("EPSG:28992").forward([
+                                p.lng,
+                                p.lat,
+                            ]) as [number, number]
+                            // Find which tile contains this point
+                            const feature = visibleFeatures.find((f) => {
                                 if (
-                                    vals &&
-                                    vals.length > 0 &&
-                                    !Number.isNaN(vals[0]) &&
-                                    vals[0] > -100 &&
-                                    vals[0] < 1000
-                                ) {
-                                    return vals[0]
+                                    !f.geometry ||
+                                    f.geometry.type !== "Polygon"
+                                )
+                                    return false
+                                const ring = (f.geometry as any).coordinates[0]
+                                return isPointInPolygon(rdP, ring)
+                            })
+                            if (feature?.properties) {
+                                const url =
+                                    feature.properties.url ||
+                                    feature.properties.href ||
+                                    feature.properties.download_url
+                                if (url) {
+                                    // Requesting location value
+                                    const vals = await locationValues(url, {
+                                        longitude: p.lng,
+                                        latitude: p.lat,
+                                    })
+                                    if (
+                                        vals &&
+                                        vals.length > 0 &&
+                                        !Number.isNaN(vals[0]) &&
+                                        vals[0] > -100 &&
+                                        vals[0] < 1000
+                                    ) {
+                                        return vals[0]
+                                    }
                                 }
                             }
+                        } catch {
+                            // Ignore errors for individual points
                         }
-                    } catch {
-                        // Ignore errors for individual points
-                    }
-                    return null
-                }),
-            )
+                        return null
+                    }),
+                )
+                results.push(...chunkResults)
+            }
+
+            const values = results
 
             if (updateId.current !== currentId) return
 
@@ -421,7 +431,6 @@ export default function FarmAtlasElevationBlock() {
                     id,
                     url,
                     cogUrl: `cog://${url}${colorParam}`,
-                    cogUrlHillshade: `cog://${url}#dem`,
                 })
             }
 
@@ -594,31 +603,6 @@ export default function FarmAtlasElevationBlock() {
                                     id={`ahn-layer-${tile.id}`}
                                     type="raster"
                                     paint={{ "raster-opacity": 1 }}
-                                    beforeId={
-                                        fields
-                                            ? "fieldsSavedOutline"
-                                            : undefined
-                                    }
-                                />
-                            </Source>
-                            <Source
-                                id={`ahn-dem-${tile.id}`}
-                                type="raster-dem"
-                                url={tile.cogUrlHillshade!}
-                                tileSize={256}
-                                bounds={[3.3, 50.7, 7.2, 53.7]}
-                                minzoom={0}
-                                maxzoom={16}
-                            >
-                                <Layer
-                                    id={`ahn-hillshade-${tile.id}`}
-                                    type="hillshade"
-                                    paint={{
-                                        "hillshade-exaggeration": 0.3,
-                                        "hillshade-shadow-color": "#000000",
-                                        "hillshade-highlight-color": "#ffffff",
-                                        "hillshade-accent-color": "#000000",
-                                    }}
                                     beforeId={
                                         fields
                                             ? "fieldsSavedOutline"
