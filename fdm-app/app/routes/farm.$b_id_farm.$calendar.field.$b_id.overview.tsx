@@ -6,6 +6,7 @@ import {
     updateField,
 } from "@svenvw/fdm-core"
 import { useEffect } from "react"
+import { Controller } from "react-hook-form"
 import type { MetaFunction } from "react-router"
 import {
     type ActionFunctionArgs,
@@ -17,17 +18,10 @@ import {
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { DatePicker } from "~/components/custom/date-picker"
+import { DatePicker } from "~/components/custom/date-picker-v2"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "~/components/ui/form"
+import { Field, FieldError, FieldLabel } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
 import {
     Select,
@@ -125,7 +119,7 @@ export default function FarmFieldsOverviewBlock() {
         defaultValues: {
             b_name: loaderData.field.b_name,
             b_acquiring_method: loaderData.field.b_acquiring_method,
-            b_start: loaderData.field.b_start,
+            b_start: loaderData.field.b_start ?? new Date(),
             b_end: loaderData.field.b_end,
         },
     })
@@ -134,7 +128,7 @@ export default function FarmFieldsOverviewBlock() {
         form.reset({
             b_name: loaderData.field.b_name,
             b_acquiring_method: loaderData.field.b_acquiring_method,
-            b_start: loaderData.field.b_start,
+            b_start: loaderData.field.b_start ?? new Date(),
             b_end: loaderData.field.b_end,
         })
     }, [loaderData, form.reset])
@@ -155,90 +149,87 @@ export default function FarmFieldsOverviewBlock() {
                     method="post"
                 >
                     <fieldset disabled={form.formState.isSubmitting}>
-                        <div className="grid grid-cols-2 w-full items-center gap-4">
-                            <div className="flex flex-col space-y-1.5 col-span-2">
-                                <FormField
-                                    control={form.control}
-                                    name="b_name"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Perceelsnaam</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="bv. Achter het erf"
-                                                    {...field}
-                                                    required
-                                                />
-                                            </FormControl>
-                                            <FormDescription />
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                            <div className="flex flex-col space-y-1.5 col-span-2">
-                                <FormField
-                                    control={form.control}
-                                    name="b_acquiring_method"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                Is perceel in eigendom of pacht?
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Select
-                                                    onValueChange={
-                                                        field.onChange
-                                                    }
-                                                    value={field.value}
-                                                >
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Selecteer of het perceel in eigendom is of gepacht" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {loaderData.acquiringMethodOptions.map(
-                                                            (option) => (
-                                                                <SelectItem
-                                                                    key={
-                                                                        option.value
-                                                                    }
-                                                                    value={
-                                                                        option.value
-                                                                    }
-                                                                >
-                                                                    {
-                                                                        option.label
-                                                                    }
-                                                                </SelectItem>
-                                                            ),
-                                                        )}
-                                                    </SelectContent>
-                                                </Select>
-                                            </FormControl>
-                                            <FormDescription />
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                            <div className="flex flex-col space-y-1.5">
-                                <DatePicker
-                                    form={form}
-                                    name={"b_start"}
-                                    label={"Vanaf wanneer in gebruik?"}
-                                    description={""}
-                                />
-                            </div>
-                            <div className="flex flex-col space-y-1.5">
-                                <DatePicker
-                                    form={form}
-                                    name={"b_end"}
-                                    label={"Tot wanneer in gebruik?"}
-                                    description={"Optioneel"}
-                                />
-                            </div>
+                        <div className="grid grid-cols-2 w-full gap-4">
+                            <Controller
+                                control={form.control}
+                                name="b_name"
+                                render={({ field, fieldState }) => (
+                                    <Field
+                                        data-invalid={fieldState.invalid}
+                                        className="col-span-2"
+                                    >
+                                        <FieldLabel>Perceelsnaam</FieldLabel>
+                                        <Input
+                                            placeholder="bv. Achter het erf"
+                                            {...field}
+                                            required
+                                        />
+                                        <FieldError
+                                            errors={[fieldState.error]}
+                                        />
+                                    </Field>
+                                )}
+                            />
+                            <Controller
+                                control={form.control}
+                                name="b_acquiring_method"
+                                render={({ field, fieldState }) => (
+                                    <Field
+                                        data-invalid={fieldState.invalid}
+                                        className="col-span-2"
+                                    >
+                                        <FieldLabel>
+                                            Is perceel in eigendom of pacht?
+                                        </FieldLabel>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Selecteer of het perceel in eigendom is of gepacht" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {loaderData.acquiringMethodOptions.map(
+                                                    (option) => (
+                                                        <SelectItem
+                                                            key={option.value}
+                                                            value={option.value}
+                                                        >
+                                                            {option.label}
+                                                        </SelectItem>
+                                                    ),
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                        <FieldError
+                                            errors={[fieldState.error]}
+                                        />
+                                    </Field>
+                                )}
+                            />
+                            <Controller
+                                control={form.control}
+                                name="b_start"
+                                render={({ field, fieldState }) => (
+                                    <DatePicker
+                                        label="Vanaf wanneer in gebruik?"
+                                        field={field}
+                                        fieldState={fieldState}
+                                    />
+                                )}
+                            />
+                            <Controller
+                                control={form.control}
+                                name="b_end"
+                                render={({ field, fieldState }) => (
+                                    <DatePicker
+                                        label="Tot wanneer in gebruik?"
+                                        description="Optioneel"
+                                        field={field}
+                                        fieldState={fieldState}
+                                    />
+                                )}
+                            />
                         </div>
                     </fieldset>
                     <br />
@@ -317,14 +308,7 @@ const FormSchema = z
         b_start: z.coerce.date({
             required_error: "Kies een startdatum voor het perceel",
         }),
-        b_end: z
-            .preprocess((value) => {
-                if (typeof value === "string") {
-                    if (value.toLowerCase() === "null") return null
-                }
-                return value
-            }, z.coerce.date().optional().nullable())
-            .default(null),
+        b_end: z.coerce.date().nullable().optional(),
     })
     .refine(
         (schema) => {
