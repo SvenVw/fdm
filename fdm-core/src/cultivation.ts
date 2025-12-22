@@ -1261,7 +1261,7 @@ export async function updateCultivation(
                         )
                         .limit(1)
 
-                    if (result.length > 0 && b_lu_end) {
+                    if (result.length > 0) {
                         if (
                             result[0].b_lu_start.getTime() >= b_lu_end.getTime()
                         ) {
