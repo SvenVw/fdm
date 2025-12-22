@@ -85,7 +85,10 @@ export async function requestNutrientAdvice({
 
         return response
     } catch (error) {
-        console.error("Error fetching nutrient advice:", error)
+        console.error(
+            "Error fetching nutrient advice:",
+            error instanceof Error ? error.message : "An unknown error occurred",
+        )
         throw error
     }
 }
