@@ -221,33 +221,44 @@ export default function FarmAtlasElevationBlock() {
         async function fetchIndex() {
             const cacheKey = "ahn_kaartbladindex_v1"
             setNetworkStatus("loading")
+
+            // Try cache first
             try {
-                // Try cache
                 if (typeof localStorage !== "undefined") {
                     const cached = localStorage.getItem(cacheKey)
                     if (cached) {
-                        try {
-                            const { timestamp, data } = JSON.parse(cached)
-                            // Cache for 7 days
-                            if (
-                                Date.now() - timestamp <
-                                7 * 24 * 60 * 60 * 1000
-                            ) {
-                                setIndexData(data)
-                                setNetworkStatus("idle")
-                                return
-                            }
-                        } catch {
-                            localStorage.removeItem(cacheKey)
+                        const { timestamp, data } = JSON.parse(cached)
+                        // Cache for 24 hours and ensure data is valid
+                        if (
+                            data?.features?.length > 0 &&
+                            Date.now() - timestamp <
+                            24 * 60 * 60 * 1000
+                        ) {
+                            setIndexData(data)
+                            setNetworkStatus("idle")
+                            return
                         }
                     }
                 }
+            } catch (e) {
+                console.warn("Cache lookup failed, proceeding to fetch:", e)
+                try {
+                    if (typeof localStorage !== "undefined") {
+                        localStorage.removeItem(cacheKey)
+                    }
+                } catch {}
+            }
 
-                // Fetch from our server-side cache
-                const response = await fetch("/resources/ahn-index")
+            // Fetch from our server-side cache
+            try {
+                const response = await fetch("/atlas/ahn-index")
 
                 if (!response.ok) throw new Error("Failed to fetch COG index")
                 const data = (await response.json()) as FeatureCollection
+                if (!data.features || data.features.length === 0) {
+                    throw new Error("Empty AHN index received")
+                }
+
                 setIndexData(data)
                 setNetworkStatus("idle")
 
@@ -263,6 +274,25 @@ export default function FarmAtlasElevationBlock() {
                 }
             } catch (e) {
                 console.error("Error fetching COG index:", e)
+
+                // Final fallback: Use expired cache if network failed but we have something
+                if (typeof localStorage !== "undefined") {
+                    try {
+                        const cached = localStorage.getItem(cacheKey)
+                        if (cached) {
+                            const { data } = JSON.parse(cached)
+                            if (data?.features?.length > 0) {
+                                console.warn(
+                                    "Network failed, using expired cache as fallback",
+                                )
+                                setIndexData(data)
+                                setNetworkStatus("idle")
+                                return
+                            }
+                        }
+                    } catch {}
+                }
+
                 setNetworkStatus("error")
             }
         }
