@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.26.3
+
+### Patch Changes
+
+- 7f69925: Synchronize DatePicker components with available calendar years by deriving boundaries from central calendar configuration, ensuring "next year" selection is supported.
+
 ## 0.26.2
 
 ### Patch Changes
