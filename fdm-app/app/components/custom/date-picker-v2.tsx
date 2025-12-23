@@ -25,6 +25,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "~/components/ui/popover"
+import { endMonth, startMonth } from "~/lib/calendar"
 import { cn } from "~/lib/utils"
 
 type DatePickerProps = {
@@ -151,6 +152,8 @@ export function DatePicker({
                             month={month}
                             onMonthChange={setMonth}
                             onSelect={handleDateSelect}
+                            startMonth={new Date(1970, 0)}
+                            endMonth={endMonth}
                             locale={calenderLocale}
                         />
                     </PopoverContent>
