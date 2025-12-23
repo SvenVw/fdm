@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.26.2
+
+### Patch Changes
+
+- 2a30b7b: Fixed mobile elevation map stability by correcting the cache endpoint path, implementing robust `localStorage` error handling, and adding a "fallback-to-stale" strategy for offline resilience.
+
 ## 0.26.1
 
 ### Patch Changes
