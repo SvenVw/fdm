@@ -1,8 +1,3 @@
-import {
-    acceptInvitation,
-    getPendingInvitation,
-    rejectInvitation,
-} from "@svenvw/fdm-core"
 import { useEffect } from "react"
 import {
     type ActionFunctionArgs,
@@ -25,8 +20,7 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
-import { getSession } from "~/lib/auth.server"
-import { fdm } from "~/lib/fdm.server"
+import { auth, getSession } from "~/lib/auth.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import type { Route } from "../+types/root"
 
@@ -40,30 +34,26 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     // Check for valid invitation
     try {
-        const invitation = await getPendingInvitation(fdm, params.invitation_id)
+        const invitations = await auth.api.listUserInvitations({
+            headers: request.headers,
+        })
 
-        return {
-            invitationId: invitation.invitation_id,
-            inviterFirstName: invitation.inviter_firstname,
-            inviterSurname: invitation.inviter_surname,
-            organizationSlug: invitation.organization_slug,
-            organizationName: invitation.organization_name,
-            role: invitation.role,
+        const invitation = invitations.find(
+            (inv) => inv.id === params.invitation_id,
+        )
+
+        if (!invitation) {
+            throw new Error("Invitation not found")
         }
+
+        return { invitation }
     } catch (_e) {
         throw data("Invitation not found", 404)
     }
 }
 
 export default function Respond() {
-    const {
-        invitationId,
-        inviterFirstName,
-        inviterSurname,
-        organizationSlug,
-        organizationName,
-        role,
-    } = useLoaderData()
+    const { invitation } = useLoaderData()
 
     const [searchParams] = useSearchParams()
     const intentRaw = searchParams.get("intent")
@@ -75,14 +65,14 @@ export default function Respond() {
         if (intent && intent === "accept") {
             submit(
                 {
-                    invitation_id: invitationId,
+                    invitation_id: invitation.id,
                     intent: "accept",
-                    organization_slug: organizationSlug,
+                    organization_slug: invitation.organization.slug,
                 },
                 { method: "POST" },
             )
         }
-    }, [intent, submit, invitationId, organizationSlug])
+    }, [intent, submit, invitation.id, invitation.organization.slug])
 
     if (intent !== "accept" && intent !== "reject") {
         throw failBadRequest(`Invalid intent: ${intent}`)
@@ -105,12 +95,12 @@ export default function Respond() {
                 <CardContent>
                     <Separator />
                     <p className="my-1">
-                        {`${inviterFirstName} ${inviterSurname} heeft je uitgenodigd om lid te worden van de organisatie `}
-                        <span className="font-semibold">{`${organizationName}.`}</span>
+                        {`${invitation.inviter?.name || "Iemand"} heeft je uitgenodigd om lid te worden van de organisatie `}
+                        <span className="font-semibold">{`${invitation.organization.name}.`}</span>
                     </p>
                     <p className="my-1">
                         Je bent uitgenodigd als{" "}
-                        <i className="font-semibold">{role}</i>
+                        <i className="font-semibold">{invitation.role}</i>
                     </p>
                     <p className="my-1">
                         Weet je zeker dat je deze uitnodiging wilt afwijzen?
@@ -121,7 +111,7 @@ export default function Respond() {
                         <input
                             type="hidden"
                             name="invitation_id"
-                            value={invitationId}
+                            value={invitation.id}
                         />
                         <Button
                             variant="destructive"
@@ -153,15 +143,14 @@ const FormSchema = z.object({
 export async function action({ request }: ActionFunctionArgs) {
     const formValues = await extractFormValuesFromRequest(request, FormSchema)
 
-    const session = await getSession(request)
+    await getSession(request)
 
     if (formValues.intent === "accept") {
         try {
-            await acceptInvitation(
-                fdm,
-                formValues.invitation_id,
-                session.user.id,
-            )
+            await auth.api.acceptInvitation({
+                headers: request.headers,
+                body: { invitationId: formValues.invitation_id },
+            })
         } catch (_) {
             throw data("Invitation not found", 404)
         }
@@ -175,11 +164,10 @@ export async function action({ request }: ActionFunctionArgs) {
 
     if (formValues.intent === "reject") {
         try {
-            await rejectInvitation(
-                fdm,
-                formValues.invitation_id,
-                session.user.id,
-            )
+            await auth.api.rejectInvitation({
+                headers: request.headers,
+                body: { invitationId: formValues.invitation_id },
+            })
         } catch (_) {
             throw data("Invitation not found", 404)
         }

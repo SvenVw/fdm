@@ -1,8 +1,3 @@
-import {
-    acceptInvitation,
-    getPendingInvitationsForUser,
-    rejectInvitation,
-} from "@svenvw/fdm-core"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
@@ -28,39 +23,36 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "~/components/ui/dialog"
-import { getSession } from "~/lib/auth.server"
+import { auth, getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 
 // Define the type for a single invitation
 type InvitationType = {
-    invitation_id: string
+    id: string
     organization_name: string
     organization_slug: string
-    inviter_firstname: string
-    inviter_surname: string
+    inviter_name: string
     role: string
     expires_at: Date
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
-        const session = await getSession(request)
-        const invitations = await getPendingInvitationsForUser(
-            fdm,
-            session.user.id,
-        )
-        return { invitations }
+        await getSession(request)
+
+        const invitationsList = await auth.api.listUserInvitations({
+            headers: request.headers,
+        })
+
+        return { invitations: invitationsList }
     } catch (error) {
         throw handleLoaderError(error)
     }
 }
 
 export default function OrganizationsIndex() {
-    const { invitations } = useLoaderData<{
-        invitations: InvitationType[]
-    }>()
+    const { invitations } = useLoaderData()
 
     return (
         <main className="container">
@@ -94,16 +86,15 @@ export default function OrganizationsIndex() {
                     </div>
                 ) : (
                     <div className="grid gap-4 grid-cols-1">
-                        {invitations.map((invitation) => (
-                            <Card key={invitation.invitation_id}>
+                        {invitations.map((invitation: InvitationType) => (
+                            <Card key={invitation.id}>
                                 <CardHeader>
                                     <CardTitle>
                                         {invitation.organization_name}
                                     </CardTitle>
                                     <CardDescription>
                                         Uitgenodigd door{" "}
-                                        {invitation.inviter_firstname}{" "}
-                                        {invitation.inviter_surname}
+                                        {invitation.inviter_name}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
@@ -138,7 +129,7 @@ export default function OrganizationsIndex() {
                                             <input
                                                 type="hidden"
                                                 name="invitation_id"
-                                                value={invitation.invitation_id}
+                                                value={invitation.id}
                                             />
                                             <Button
                                                 name="intent"
@@ -177,7 +168,7 @@ export default function OrganizationsIndex() {
                                                             type="hidden"
                                                             name="invitation_id"
                                                             value={
-                                                                invitation.invitation_id
+                                                                invitation.id
                                                             }
                                                         />
                                                         <Button
@@ -215,24 +206,23 @@ export async function action({ request }: ActionFunctionArgs) {
             FormSchema,
         )
 
-        const session = await getSession(request)
+        // getSession call is important to validate session
+        await getSession(request)
 
         if (formValues.intent === "accept") {
-            await acceptInvitation(
-                fdm,
-                formValues.invitation_id,
-                session.user.id,
-            )
+            await auth.api.acceptInvitation({
+                headers: request.headers,
+                body: { invitationId: formValues.invitation_id },
+            })
             return redirectWithSuccess("/organization", {
                 message: "Uitnodiging geaccepteerd! 🎉",
             })
         }
         if (formValues.intent === "reject") {
-            await rejectInvitation(
-                fdm,
-                formValues.invitation_id,
-                session.user.id,
-            )
+            await auth.api.rejectInvitation({
+                headers: request.headers,
+                body: { invitationId: formValues.invitation_id },
+            })
             return redirectWithSuccess("/organization", {
                 message: "Uitnodiging afgewezen",
             })

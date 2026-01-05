@@ -1,4 +1,3 @@
-import { getOrganizationsForUser } from "@svenvw/fdm-core"
 import type { LoaderFunctionArgs } from "react-router"
 import { NavLink, useLoaderData } from "react-router-dom"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
@@ -12,27 +11,29 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { getSession } from "~/lib/auth.server"
+import { auth, getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
 
-// Define the type for a single organization based on getOrganizationsForUser return type
+// Define the type for a single organization based on query return type
 type OrganizationType = {
-    organization_id: string
+    id: string
     name: string
     slug: string
     role: string
-    is_verified: boolean
-    description: string
+    metadata: {
+        is_verified: boolean
+        description: string
+    }
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
-        const session = await getSession(request)
-        const organizations = await getOrganizationsForUser(
-            fdm,
-            session.user.id,
-        )
+        await getSession(request)
+
+        const organizations = await auth.api.listOrganizations({
+            headers: request.headers,
+        })
+
         return { organizations }
     } catch (error) {
         throw handleLoaderError(error)
@@ -40,9 +41,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function OrganizationsIndex() {
-    const { organizations } = useLoaderData<{
-        organizations: OrganizationType[]
-    }>()
+    const { organizations } = useLoaderData()
 
     return (
         <main className="container">
@@ -81,7 +80,7 @@ export default function OrganizationsIndex() {
                 ) : (
                     <div className="grid gap-4 grid-cols-1">
                         {organizations.map((org: OrganizationType) => (
-                            <Card key={org.organization_id}>
+                            <Card key={org.id}>
                                 <CardHeader>
                                     <CardTitle>
                                         <div className="flex items-center justify-between">
@@ -98,7 +97,7 @@ export default function OrganizationsIndex() {
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-sm text-muted-foreground truncate">
-                                        {org.description}
+                                        {org.metadata.description}
                                     </p>
                                 </CardContent>
                                 <CardFooter>
