@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.26.4
+
+### Patch Changes
+
+- e367ca6: Update dependencies of fdm-app to patch for CVE-2025-15284
+
 ## 0.26.3
 
 ### Patch Changes
