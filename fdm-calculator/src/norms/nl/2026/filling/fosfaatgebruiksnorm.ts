@@ -5,9 +5,9 @@ import {
 } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
-import { table11Mestcodes } from "./table-11-mestcodes"
-import type { NL2026NormsFillingInput} from "./types"
 import type { NormFilling } from "../../types"
+import { table11Mestcodes } from "./table-11-mestcodes"
+import type { NL2026NormsFillingInput } from "./types"
 
 const rvoMestcodesOrganicRich25Percent = ["111", "112"] // Compost, Zeer schone compost
 const rvoMestcodesOrganicRich75Percent = ["110", "10", "61", "25", "56"] // Champost, Rundvee - Vaste mest, Geiten - Vaste mest, Paarden - Vaste mest, Schapen - Mest, alle systemen
@@ -85,18 +85,20 @@ export function calculateNL2026FertilizerApplicationFillingForFosfaatGebruiksNor
 
     applications.forEach((application, index) => {
         const p_app_amount = new Decimal(application.p_app_amount ?? 0)
+        const fertilizer = fertilizersMap.get(application.p_id_catalogue)
+        if (!fertilizer) {
+            throw new Error(
+                `Fertilizer ${application.p_id_catalogue} not found for application ${application.p_app_id}`,
+            )
+        }
         const p_p_rt = new Decimal(
-            fertilizersMap.get(application.p_id_catalogue)?.p_p_rt ??
+            fertilizer.p_p_rt ??
                 table11Mestcodes.find(
-                    (t) =>
-                        t.p_type_rvo ===
-                        fertilizersMap.get(application.p_id_catalogue)
-                            ?.p_type_rvo,
+                    (t) => t.p_type_rvo === fertilizer.p_type_rvo,
                 )?.p_p_rt ??
                 0,
         )
-        const p_type_rvo =
-            fertilizersMap.get(application.p_id_catalogue)?.p_type_rvo ?? ""
+        const p_type_rvo = fertilizer.p_type_rvo ?? ""
 
         if (
             rvoMestcodesOrganicRich25Percent.includes(p_type_rvo) ||

@@ -73,7 +73,7 @@ function useHarvestRemixForm({
     handleConfirmation,
 }: HarvestFormDialogProps) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
-        mode: "onTouched",
+        mode: "onSubmit",
         resolver: async (values, bypass, options) => {
             // Do the validation using Zod
             const validation = await zodResolver(FormSchema)(

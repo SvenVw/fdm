@@ -9,6 +9,7 @@ import {
     getFields,
 } from "@svenvw/fdm-core"
 import type { Feature, FeatureCollection, Polygon } from "geojson"
+import maplibregl from "maplibre-gl"
 import { useState } from "react"
 import {
     Layer,
@@ -16,7 +17,6 @@ import {
     type ViewState,
     type ViewStateChangeEvent,
 } from "react-map-gl/maplibre"
-import maplibregl from "maplibre-gl"
 import {
     type ActionFunctionArgs,
     data,
@@ -27,6 +27,7 @@ import {
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import {
     FieldsPanelHover,
@@ -341,6 +342,8 @@ export default function Index() {
                                         setShowFields(!showFields)
                                     }
                                 />
+
+                                <MapTilerAttribution />
 
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}

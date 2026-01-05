@@ -39,7 +39,7 @@ export function FieldsPanelHover({
                 // Set message about zoom level
                 const zoom = map.getZoom()
                 if (zoom && zoom > zoomLevelFields) {
-                    if (!map.getLayer(layer)) return
+                    if (!map.getStyle() || !map.getLayer(layer)) return
 
                     const features = map.queryRenderedFeatures(evt.point, {
                         layers: [layer],
@@ -49,7 +49,9 @@ export function FieldsPanelHover({
                         const layers = Array.isArray(layerExclude)
                             ? layerExclude
                             : [layerExclude]
-                        const validLayers = layers.filter((l) => map.getLayer(l))
+                        const validLayers = layers.filter((l) =>
+                            map.getLayer(l),
+                        )
 
                         if (validLayers.length > 0) {
                             const featuresExclude = map.queryRenderedFeatures(

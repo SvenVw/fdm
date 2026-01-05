@@ -111,4 +111,3 @@ export type RegionKey = "klei" | "zand_nwc" | "zand_zuid" | "loess" | "veen"
 export type NormsByRegion = {
     [key in RegionKey]: { standard: number; nv_area: number }
 }
-

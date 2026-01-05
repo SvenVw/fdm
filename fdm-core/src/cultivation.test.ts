@@ -455,6 +455,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
+                b_lu_eom: null,
+                b_lu_eom_residues: null,
                 b_date_harvest_default: "09-15",
             })
 
@@ -531,6 +533,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
+                b_lu_eom: null,
+                b_lu_eom_residues: null,
                 b_date_harvest_default: "09-15",
             })
 
@@ -579,6 +583,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
+                b_lu_eom: null,
+                b_lu_eom_residues: null,
                 b_date_harvest_default: "09-15",
             })
 
@@ -633,6 +639,113 @@ describe("Cultivation Data Model", () => {
             )
             expect(updatedCultivation.b_lu_end).toEqual(newTerminateDate)
             expect(updatedCultivation.m_cropresidue).toEqual(false)
+        })
+
+        it("should delete harvests when the terminating date is null if the crop is harvestable only once", async () => {
+            // Add a harvest to the cultivation using the addHarvest function
+            const harvestDate = new Date("2024-01-15")
+            await addHarvest(fdm, principal_id, b_lu, harvestDate)
+
+            // Verify the harvest exists
+            const harvestsBeforeDelete = await fdm
+                .select()
+                .from(schema.cultivationHarvesting)
+                .where(eq(schema.cultivationHarvesting.b_lu, b_lu))
+            expect(harvestsBeforeDelete.length).toBe(1)
+
+            await updateCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+                undefined,
+                undefined,
+                null,
+                undefined,
+            )
+
+            const updatedCultivation = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
+            expect(updatedCultivation.b_lu_end).toEqual(null)
+            expect(updatedCultivation.m_cropresidue).toEqual(null)
+            // Verify the harvest no longer exists
+            const harvestsAfterDelete = await fdm
+                .select()
+                .from(schema.cultivationHarvesting)
+                .where(eq(schema.cultivationHarvesting.b_lu, b_lu))
+            expect(harvestsAfterDelete.length).toBe(0)
+        })
+
+        it("should clear the terminating date and keep the harvests when b_lu_end is null and the cultivation can be harvested multiple times", async () => {
+            const b_lu_catalogue = createId()
+            const b_lu_start = new Date("2024-01-01")
+            await addCultivationToCatalogue(fdm, {
+                b_lu_catalogue,
+                b_lu_source: b_lu_source,
+                b_lu_name: "test-name-harvestable-many",
+                b_lu_name_en: "test-name-harvestable-many-en",
+                b_lu_harvestable: "multiple",
+                b_lu_hcat3: "test-hcat3",
+                b_lu_hcat3_name: "test-hcat3-name",
+                b_lu_croprotation: "cereal",
+                b_lu_harvestcat: "HC010",
+                b_lu_yield: 6000,
+                b_lu_dm: 500,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
+                b_lu_eom: 100,
+                b_lu_eom_residues: 50,
+                b_lu_rest_oravib: false,
+                b_lu_variety_options: ["variety1", "variety2"],
+                b_lu_start_default: "03-01",
+                b_date_harvest_default: "09-15",
+            })
+
+            const b_lu = await addCultivation(
+                fdm,
+                principal_id,
+                b_lu_catalogue,
+                b_id,
+                b_lu_start,
+            )
+
+            // Add a harvest to the cultivation using the addHarvest function
+            const harvestDate = new Date("2024-01-15")
+            await addHarvest(fdm, principal_id, b_lu, harvestDate)
+
+            // Verify the harvest exists
+            const harvestsBeforeDelete = await fdm
+                .select()
+                .from(schema.cultivationHarvesting)
+                .where(eq(schema.cultivationHarvesting.b_lu, b_lu))
+            expect(harvestsBeforeDelete.length).toBe(1)
+            await updateCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+                undefined,
+                undefined,
+                null,
+                undefined,
+            )
+
+            const updatedCultivation = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
+            expect(updatedCultivation.b_lu_end).toEqual(null)
+            expect(updatedCultivation.m_cropresidue).toEqual(null)
+            // Verify the harvest still exists
+            const harvestsAfterDelete = await fdm
+                .select()
+                .from(schema.cultivationHarvesting)
+                .where(eq(schema.cultivationHarvesting.b_lu, b_lu))
+            expect(harvestsAfterDelete.length).toBe(1)
         })
 
         it("should update a cultivation with only the crop residue", async () => {
@@ -829,6 +942,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: b_lu_variety_options,
                 b_lu_start_default: "03-01",
+                b_lu_eom: null,
+                b_lu_eom_residues: null,
                 b_date_harvest_default: "09-15",
             })
 
@@ -870,6 +985,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: ["v1", "v2"],
                     b_lu_start_default: "2024-03-01", // Invalid format
+                    b_lu_eom: null,
+                    b_lu_eom_residues: null,
                     b_date_harvest_default: "09-15",
                 }),
             ).rejects.toThrow("Exception for addCultivationToCatalogue")
@@ -897,6 +1014,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: ["v1", "v2"],
                     b_lu_start_default: "03-01",
+                    b_lu_eom: null,
+                    b_lu_eom_residues: null,
                     b_date_harvest_default: "2024-09-15", // Invalid format
                 }),
             ).rejects.toThrow("Exception for addCultivationToCatalogue")
@@ -925,6 +1044,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: ["v1", "v2"],
                     b_lu_start_default: "03-01",
+                    b_lu_eom: null,
+                    b_lu_eom_residues: null,
                     b_date_harvest_default: "09-15",
                 }),
             ).resolves.not.toThrow()
@@ -953,6 +1074,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: ["v1", "v2"],
                     b_lu_start_default: null,
+                    b_lu_eom: null,
+                    b_lu_eom_residues: null,
                     b_date_harvest_default: null,
                 }),
             ).resolves.not.toThrow()
@@ -994,6 +1117,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: null,
                     b_lu_start_default: "10-15", // October 15th
+                    b_lu_eom: null,
+                    b_lu_eom_residues: null,
                     b_date_harvest_default: "07-20", // July 20th
                 })
 
@@ -1032,6 +1157,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: null,
                     b_lu_start_default: "04-01",
+                    b_lu_eom: null,
+                    b_lu_eom_residues: null,
                     b_date_harvest_default: null,
                 })
 
@@ -1070,6 +1197,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: null,
                     b_lu_start_default: "04-01",
+                    b_lu_eom: null,
+                    b_lu_eom_residues: null,
                     b_date_harvest_default: null,
                 })
 
@@ -1108,6 +1237,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: null,
                     b_lu_start_default: null,
+                    b_lu_eom: null,
+                    b_lu_eom_residues: null,
                     b_date_harvest_default: "09-15",
                 })
 
@@ -1231,6 +1362,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
+                b_lu_eom: null,
+                b_lu_eom_residues: null,
                 b_date_harvest_default: "09-15",
             })
 
@@ -1405,6 +1538,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
+                b_lu_eom: null,
+                b_lu_eom_residues: null,
                 b_date_harvest_default: "09-15",
             })
 
@@ -1554,6 +1689,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
+                b_lu_eom: null,
+                b_lu_eom_residues: null,
                 b_date_harvest_default: "09-15",
             })
 
@@ -1622,6 +1759,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
+                b_lu_eom: null,
+                b_lu_eom_residues: null,
                 b_date_harvest_default: "09-15",
             })
 
@@ -1781,6 +1920,8 @@ describe("Cultivation Data Model", () => {
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
                 b_lu_start_default: "03-01",
+                b_lu_eom: null,
+                b_lu_eom_residues: null,
                 b_date_harvest_default: "09-15",
             })
 
@@ -1929,6 +2070,8 @@ describe("buildCultivationTimeframeCondition", () => {
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
             b_lu_start_default: "03-01",
+            b_lu_eom: null,
+            b_lu_eom_residues: null,
             b_date_harvest_default: "09-15",
         })
     })

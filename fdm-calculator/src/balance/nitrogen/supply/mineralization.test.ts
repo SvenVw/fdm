@@ -19,7 +19,7 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
                 b_lu_n_harvestable: null,
                 b_lu_n_residue: null,
                 b_n_fixation: null,
-            },
+            } as const,
         ],
         [
             "2",
@@ -31,19 +31,19 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
                 b_lu_n_harvestable: null,
                 b_lu_n_residue: null,
                 b_n_fixation: null,
-            },
+            } as const,
         ],
         [
             "3",
             {
                 b_lu_catalogue: "3",
-                b_lu_croprotation: "corn",
+                b_lu_croprotation: "maize",
                 b_lu_yield: null,
                 b_lu_hi: null,
                 b_lu_n_harvestable: null,
                 b_lu_n_residue: null,
                 b_n_fixation: null,
-            },
+            } as const,
         ],
     ])
 
@@ -61,8 +61,8 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu: "c1",
-                b_lu_start: "2023-01-01",
-                b_lu_end: "2023-12-31",
+                b_lu_start: new Date("2023-01-01"),
+                b_lu_end: new Date("2023-12-31"),
                 b_lu_catalogue: "3",
                 m_cropresidue: false,
             },
@@ -86,8 +86,8 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu: "c1",
-                b_lu_start: "2023-01-01",
-                b_lu_end: "2023-12-31",
+                b_lu_start: new Date("2023-01-01"),
+                b_lu_end: new Date("2023-12-31"),
                 b_lu_catalogue: "1",
                 m_cropresidue: false,
             },
@@ -115,8 +115,8 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu: "c1",
-                b_lu_start: "2023-01-01",
-                b_lu_end: "2023-12-31",
+                b_lu_start: new Date("2023-01-01"),
+                b_lu_end: new Date("2023-12-31"),
                 b_lu_catalogue: "1",
                 m_cropresidue: false,
             },
@@ -144,8 +144,8 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu: "c1",
-                b_lu_start: "2023-01-01",
-                b_lu_end: "2023-05-14",
+                b_lu_start: new Date("2023-01-01"),
+                b_lu_end: new Date("2023-05-14"),
                 b_lu_catalogue: "1",
                 m_cropresidue: false,
             },
@@ -169,12 +169,12 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
         expect(result.total.toNumber()).toBeCloseTo(20, 0)
     })
 
-    it("should handle undefined cultivation end date", () => {
+    it("should handle null cultivation end date", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu: "c1",
-                b_lu_start: "2023-01-01",
-                b_lu_end: undefined,
+                b_lu_start: new Date("2023-01-01"),
+                b_lu_end: null,
                 b_lu_catalogue: "1",
                 m_cropresidue: false,
             },
@@ -202,8 +202,8 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu: "c1",
-                b_lu_start: "2023-01-01",
-                b_lu_end: "2023-12-31",
+                b_lu_start: new Date("2023-01-01"),
+                b_lu_end: new Date("2023-12-31"),
                 b_lu_catalogue: "1",
                 m_cropresidue: false,
             },
@@ -231,8 +231,8 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
                 b_lu: "c1",
-                b_lu_start: "2023-01-01",
-                b_lu_end: "2024-12-31",
+                b_lu_start: new Date("2023-01-01"),
+                b_lu_end: new Date("2024-12-31"),
                 b_lu_catalogue: "1",
                 m_cropresidue: false,
             },

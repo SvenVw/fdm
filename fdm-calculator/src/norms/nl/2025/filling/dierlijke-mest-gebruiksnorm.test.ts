@@ -4,42 +4,49 @@ import { calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm
 import type { NL2025NormsFillingInput } from "./types"
 
 describe("calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNorm", () => {
-    const mockFertilizers: Fertilizer[] = [
+    const mockFertilizers = [
         {
+            p_id: "1",
             p_id_catalogue: "1",
             p_type_rvo: "11",
             p_n_rt: 0.5,
         },
         {
+            p_id: "2",
             p_id_catalogue: "2",
             p_type_rvo: "12",
         },
         {
+            p_id: "3",
             p_id_catalogue: "3",
             p_type_rvo: "200", // Not in table11Mestcodes
         },
         {
+            p_id: "4",
             p_id_catalogue: "4",
             // No p_type_rvo
         },
         {
+            p_id: "5",
             p_id_catalogue: "5",
             p_type_rvo: "115", // Not relevant for nitrates directive
         },
-    ]
+    ] as unknown as Fertilizer[]
 
-    const mockApplications: FertilizerApplication[] = [
+    const mockApplications = [
         {
             p_app_id: "app1",
+            p_id: "app1",
             p_id_catalogue: "1",
             p_app_amount: 10000,
         },
         {
             p_app_id: "app2",
+            p_id: "app2",
             p_id_catalogue: "2",
             p_app_amount: 20000,
         },
-    ]
+    ] as unknown as FertilizerApplication[]
 
     it("should calculate the norm filling for a single application", () => {
         const result =
@@ -98,9 +105,10 @@ describe("calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNor
                     applications: [
                         {
                             p_app_id: "app3",
+                            p_id: "app3",
                             p_id_catalogue: "5",
                             p_app_amount: 10,
-                        },
+                        } as unknown as FertilizerApplication,
                     ],
                     fertilizers: mockFertilizers,
                     cultivations: [],
@@ -127,9 +135,10 @@ describe("calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNor
                     applications: [
                         {
                             p_app_id: "app4",
+                            p_id: "app4",
                             p_id_catalogue: "999",
                             p_app_amount: 10,
-                        },
+                        } as unknown as FertilizerApplication,
                     ],
                     fertilizers: mockFertilizers,
                     cultivations: [],
@@ -149,9 +158,10 @@ describe("calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNor
                     applications: [
                         {
                             p_app_id: "app5",
+                            p_id: "app5",
                             p_id_catalogue: "4",
                             p_app_amount: 10,
-                        },
+                        } as unknown as FertilizerApplication,
                     ],
                     fertilizers: mockFertilizers,
                     cultivations: [],
@@ -171,9 +181,10 @@ describe("calculateNL2025FertilizerApplicationFillingForDierlijkeMestGebruiksNor
                     applications: [
                         {
                             p_app_id: "app6",
+                            p_id: "app6",
                             p_id_catalogue: "3",
                             p_app_amount: 10,
-                        },
+                        } as unknown as FertilizerApplication,
                     ],
                     fertilizers: mockFertilizers,
                     cultivations: [],
