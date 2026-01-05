@@ -6,7 +6,7 @@ import {
     splitFullName,
     updateUserProfile,
 } from "./authentication"
-import type { FdmAuth } from "./authentication.d"
+import type { FdmAuth } from "./authentication"
 import * as authNSchema from "./db/schema-authn"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
