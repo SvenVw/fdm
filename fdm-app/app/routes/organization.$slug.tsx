@@ -396,7 +396,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         let organizationId = formValues.organization_id
         let organizationName = ""
 
-        if (!organizationId || !organizationName) {
+        if (!organizationId) {
             const organizations = await auth.api.listOrganizations({
                 headers: request.headers,
             })
