@@ -3,7 +3,6 @@ import { useEffect } from "react"
 import {
     type ActionFunctionArgs,
     Form,
-    type LoaderFunctionArgs,
     type MetaFunction,
 } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
@@ -64,7 +63,7 @@ const FormSchema = z.object({
     description: z.string({}).optional(),
 })
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader() {
     try {
         return {}
     } catch (error) {
@@ -97,7 +96,7 @@ export default function AddOrganizationPage() {
     useEffect(() => {
         const subscription = form.watch((value, { name }) => {
             if (name === "name") {
-                const slug = convertToSlug(value.name)
+                const slug = convertToSlug(value.name ?? "")
                 form.setValue("slug", slug, {
                     shouldDirty: true,
                     shouldValidate: true,
@@ -236,14 +235,14 @@ export async function action({ request }: ActionFunctionArgs) {
         const description = formValues.description || ""
 
         // Check if slug is available
-        const { isAvailable } = await auth.api.checkOrganizationSlug({
+        const { status } = await auth.api.checkOrganizationSlug({
             headers: request.headers,
-            query: {
+            body: {
                 slug: slug,
             },
         })
 
-        if (!isAvailable) {
+        if (!status) {
             return dataWithError(
                 null,
                 "Naam voor organisatie is niet meer beschikbaar. Kies een andere naam",

@@ -61,7 +61,7 @@ export default function OrganizationsIndex() {
                 </div>
 
                 {organizations.length === 0 ? (
-                    <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
+                    <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-87.5">
                         <div className="flex flex-col space-y-2 text-center">
                             <h1 className="text-2xl font-semibold tracking-tight">
                                 Je bent nog geen lid van een organisatie

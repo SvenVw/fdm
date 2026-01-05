@@ -33,11 +33,11 @@ if (serverConfig.mail) {
             create: {
                 ...auth.options.databaseHooks?.user?.create,
                 after: async (
-                    user: ExtendedUser,
+                    user: any,
                     context?: GenericEndpointContext,
                 ) => {
                     if (originalUserCreateAfter) {
-                        await originalUserCreateAfter(user, context)
+                        await originalUserCreateAfter(user)
                     }
                     try {
                         const email = await renderWelcomeEmail(user)
@@ -75,10 +75,11 @@ export async function getSession(request: Request): Promise<FdmSession> {
     }
 
     // Determine userName
-    let displayUserName = user.displayUsername
-    if (!displayUserName) {
-        displayUserName = createDisplayUsername(user.firstname, user.surname)
-    }
+    const displayUserName =
+        user.displayUsername ||
+        createDisplayUsername(user.firstname, user.surname) ||
+        user.name ||
+        user.email
 
     // Expand session
     const sessionWithUserName = {

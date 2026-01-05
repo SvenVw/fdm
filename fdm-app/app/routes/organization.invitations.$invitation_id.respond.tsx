@@ -80,7 +80,7 @@ export default function Respond() {
 
     if (intent === "accept") {
         return (
-            <h1 className="font-semibold mt-[200px] text-3xl text-center text-primary">
+            <h1 className="font-semibold mt-50 text-3xl text-center text-primary">
                 Uitnodiging wordt geaccepteerd...
             </h1>
         )

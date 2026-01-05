@@ -1,3 +1,4 @@
+import type { Invitation, Member, Organization } from "better-auth/plugins"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
@@ -51,14 +52,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             organizationId: organization.id,
         },
     })
-    const members = Array.isArray(membersListResponse)
-        ? membersListResponse
-        : (membersListResponse as any)?.members || []
+    const members = membersListResponse.members
 
     // Determine permissions
-    const currentUserMember = members.find(
-        (m: any) => m.userId === session.user.id,
-    )
+    const currentUserMember = members.find((m) => m.userId === session.user.id)
     const role = currentUserMember?.role || "viewer"
     const permissions = {
         canEdit: role === "owner" || role === "admin",
@@ -69,7 +66,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get pending invitations of organization
-    let invitations: any[] = []
+    let invitations: Invitation[] = []
     if (permissions.canInvite) {
         const invitationsListResponse = await auth.api.listInvitations({
             headers: request.headers,
@@ -80,8 +77,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         invitations = (
             Array.isArray(invitationsListResponse)
                 ? invitationsListResponse
-                : (invitationsListResponse as any)?.invitations || []
-        ).filter((inv: any) => inv.status === "pending")
+                : []
+        ).filter((inv) => inv.status === "pending")
     }
 
     return {
@@ -126,7 +123,7 @@ export default function OrganizationIndex() {
                                     {/* People with access */}
                                 </div>
                                 <div className="grid gap-6">
-                                    {members.map((member: any) => (
+                                    {members.map((member) => (
                                         <MemberRow
                                             key={member.id}
                                             member={member}
@@ -164,14 +161,12 @@ export default function OrganizationIndex() {
                                         </div>
                                     ) : (
                                         <div className="grid gap-6">
-                                            {invitations.map(
-                                                (invitation: any) => (
-                                                    <InvitationRow
-                                                        key={invitation.id}
-                                                        invitation={invitation}
-                                                    />
-                                                ),
-                                            )}
+                                            {invitations.map((invitation) => (
+                                                <InvitationRow
+                                                    key={invitation.id}
+                                                    invitation={invitation}
+                                                />
+                                            ))}
                                         </div>
                                     )}
                                 </div>
@@ -184,11 +179,20 @@ export default function OrganizationIndex() {
     )
 }
 
+type MemberWithUser = Member & {
+    user: {
+        id: string
+        name: string
+        email: string
+        image?: string | null
+    }
+}
+
 const MemberRow = ({
     member,
     permissions,
 }: {
-    member: any
+    member: MemberWithUser
     permissions: {
         canEdit: boolean
         canDelete: boolean
@@ -197,7 +201,7 @@ const MemberRow = ({
         canRemoveUser: boolean
     }
 }) => {
-    const initials = (member.user?.name || "?").charAt(0).toUpperCase()
+    const initials = (member.user.name || "?").charAt(0).toUpperCase()
     return (
         <div
             key={member.id}
@@ -205,7 +209,7 @@ const MemberRow = ({
         >
             <div className="flex items-center space-x-4">
                 <Avatar>
-                    <AvatarImage src={member.user?.image} />
+                    <AvatarImage src={member.user.image ?? undefined} />
                     <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
                 <div>
@@ -230,7 +234,7 @@ const MemberAction = ({
     member,
     permissions,
 }: {
-    member: any
+    member: MemberWithUser
     permissions: {
         canEdit: boolean
         canDelete: boolean
@@ -243,7 +247,7 @@ const MemberAction = ({
         <form method="post" className="flex items-center space-x-4">
             <input type="hidden" name="memberId" value={member.id} />
             <Select defaultValue={member.role} name="role">
-                <SelectTrigger className="ml-auto w-[110px]">
+                <SelectTrigger className="ml-auto w-27.5">
                     <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
@@ -274,7 +278,7 @@ const MemberAction = ({
     )
 }
 
-const InvitationRow = ({ invitation }: { invitation: any }) => {
+const InvitationRow = ({ invitation }: { invitation: Invitation }) => {
     return (
         <div
             key={invitation.id}
@@ -323,7 +327,11 @@ const InvitationRow = ({ invitation }: { invitation: any }) => {
     )
 }
 
-const InvitationForm = ({ organizationId }: { organizationId: string }) => {
+const InvitationForm = ({
+    organizationId,
+}: {
+    organizationId: Organization["id"]
+}) => {
     return (
         <form method="post" className="flex space-x-2">
             <input
@@ -337,7 +345,7 @@ const InvitationForm = ({ organizationId }: { organizationId: string }) => {
                 name="email"
             />
             <Select defaultValue="member" name="role">
-                <SelectTrigger className="ml-auto w-[110px]">
+                <SelectTrigger className="ml-auto w-27.5">
                     <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
@@ -427,10 +435,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (invitation) {
                 const invitationEmail = await renderInvitationEmail(
                     formValues.email,
-                    {
-                        firstname: session.user.firstname,
-                        surname: session.user.surname,
-                    },
+                    session.user,
                     organizationName,
                     invitation.id,
                 )
@@ -468,12 +473,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
             await auth.api.removeMember({
                 headers: request.headers,
                 body: {
-                    memberId: formValues.memberId,
+                    memberIdOrEmail: formValues.memberId,
                     organizationId: organizationId,
                 },
             })
             return dataWithSuccess(null, {
-                message: `Gebruiker is verwijderd`,
+                message: "Gebruiker is verwijderd",
             })
         }
         if (formValues.intent === "cancel_invite") {
