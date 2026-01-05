@@ -1,3 +1,5 @@
+import type { User } from "better-auth"
+import type { Invitation, Organization } from "better-auth/plugins/organization"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
@@ -26,20 +28,6 @@ import {
 import { auth, getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { extractFormValuesFromRequest } from "~/lib/form"
-
-// Define the type for a single invitation
-type InvitationType = {
-    id: string
-    organization: {
-        name: string
-        slug: string
-    }
-    inviter: {
-        name: string
-    }
-    role: string
-    expiresAt: Date
-}
 
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
@@ -90,107 +78,121 @@ export default function OrganizationsIndex() {
                     </div>
                 ) : (
                     <div className="grid gap-4 grid-cols-1">
-                        {invitations.map((invitation: InvitationType) => (
-                            <Card key={invitation.id}>
-                                <CardHeader>
-                                    <CardTitle>
-                                        {invitation.organization.name}
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Uitgenodigd door{" "}
-                                        {invitation.inviter.name}
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-lg leading-none">
-                                        Je bent uitgenodigd als{" "}
-                                        <i className="font-semibold">
-                                            {invitation.role}
-                                        </i>
-                                    </p>
-                                    <br />
-                                    <p className="text-sm text-muted-foreground mt-2">
-                                        Verloopt{" "}
-                                        {formatDistanceToNow(
-                                            new Date(invitation.expiresAt),
-                                            {
-                                                addSuffix: true,
-                                                locale: nl,
-                                            },
-                                        )}
-                                    </p>
-                                </CardContent>
-                                <CardFooter className="flex justify-between">
-                                    <Button asChild variant="outline" size="sm">
-                                        <NavLink
-                                            to={`/organization/${invitation.organization.slug}`}
+                        {invitations.map(
+                            (
+                                invitation: Invitation & {
+                                    organization: Organization
+                                    inviter: User
+                                },
+                            ) => (
+                                <Card key={invitation.id}>
+                                    <CardHeader>
+                                        <CardTitle>
+                                            {invitation.organization.name}
+                                        </CardTitle>
+                                        <CardDescription>
+                                            Uitgenodigd door{" "}
+                                            {invitation.inviter?.name ||
+                                                "Onbekend"}
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-lg leading-none">
+                                            Je bent uitgenodigd als{" "}
+                                            <i className="font-semibold">
+                                                {invitation.role}
+                                            </i>
+                                        </p>
+                                        <br />
+                                        <p className="text-sm text-muted-foreground mt-2">
+                                            Verloopt{" "}
+                                            {formatDistanceToNow(
+                                                new Date(invitation.expiresAt),
+                                                {
+                                                    addSuffix: true,
+                                                    locale: nl,
+                                                },
+                                            )}
+                                        </p>
+                                    </CardContent>
+                                    <CardFooter className="flex justify-between">
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
                                         >
-                                            Meer info
-                                        </NavLink>
-                                    </Button>
-                                    <div className="flex gap-2">
-                                        <form method="post">
-                                            <input
-                                                type="hidden"
-                                                name="invitation_id"
-                                                value={invitation.id}
-                                            />
-                                            <Button
-                                                name="intent"
-                                                value="accept"
-                                                size="sm"
+                                            <NavLink
+                                                to={`/organization/${invitation.organization.slug}`}
                                             >
-                                                Accepteren
-                                            </Button>
-                                        </form>
-                                        <Dialog>
-                                            <DialogTrigger asChild>
+                                                Meer info
+                                            </NavLink>
+                                        </Button>
+                                        <div className="flex gap-2">
+                                            <form method="post">
+                                                <input
+                                                    type="hidden"
+                                                    name="invitation_id"
+                                                    value={invitation.id}
+                                                />
                                                 <Button
-                                                    variant="outline"
+                                                    name="intent"
+                                                    value="accept"
                                                     size="sm"
                                                 >
-                                                    Afwijzen
+                                                    Accepteren
                                                 </Button>
-                                            </DialogTrigger>
-                                            <DialogContent>
-                                                <DialogHeader>
-                                                    <DialogTitle>
-                                                        Uitnodiging afwijzen
-                                                    </DialogTitle>
-                                                    <DialogDescription>
-                                                        Weet je zeker dat je de
-                                                        uitnodiging van{" "}
-                                                        {
-                                                            invitation.organization.name
-                                                        }{" "}
-                                                        wilt afwijzen?
-                                                    </DialogDescription>
-                                                </DialogHeader>
-                                                <DialogFooter>
-                                                    <form method="post">
-                                                        <input
-                                                            type="hidden"
-                                                            name="invitation_id"
-                                                            value={
-                                                                invitation.id
-                                                            }
-                                                        />
-                                                        <Button
-                                                            variant="default"
-                                                            name="intent"
-                                                            value="reject"
-                                                            size="sm"
-                                                        >
-                                                            Ja, afwijzen
-                                                        </Button>
-                                                    </form>
-                                                </DialogFooter>
-                                            </DialogContent>
-                                        </Dialog>
-                                    </div>
-                                </CardFooter>
-                            </Card>
-                        ))}
+                                            </form>
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                    >
+                                                        Afwijzen
+                                                    </Button>
+                                                </DialogTrigger>
+                                                <DialogContent>
+                                                    <DialogHeader>
+                                                        <DialogTitle>
+                                                            Uitnodiging afwijzen
+                                                        </DialogTitle>
+                                                        <DialogDescription>
+                                                            Weet je zeker dat je
+                                                            de uitnodiging van{" "}
+                                                            {
+                                                                invitation
+                                                                    .organization
+                                                                    .name
+                                                            }{" "}
+                                                            wilt afwijzen?
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    <DialogFooter>
+                                                        <form method="post">
+                                                            <input
+                                                                type="hidden"
+                                                                name="invitation_id"
+                                                                value={
+                                                                    invitation.id
+                                                                }
+                                                            />
+                                                            <Button
+                                                                variant="default"
+                                                                name="intent"
+                                                                value="reject"
+                                                                size="sm"
+                                                            >
+                                                                Ja, afwijzen
+                                                            </Button>
+                                                        </form>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+                                        </div>
+                                    </CardFooter>
+                                </Card>
+                            ),
+                        )}
                     </div>
                 )}
             </div>
