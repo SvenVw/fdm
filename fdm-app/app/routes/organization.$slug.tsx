@@ -349,9 +349,9 @@ const InvitationForm = ({
                     <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="owner">Owner</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="member">Member</SelectItem>
+                    <SelectItem value="owner">Eigenaar</SelectItem>
+                    <SelectItem value="admin">Beheerder</SelectItem>
+                    <SelectItem value="member">Lid</SelectItem>
                 </SelectContent>
             </Select>
             <Button
