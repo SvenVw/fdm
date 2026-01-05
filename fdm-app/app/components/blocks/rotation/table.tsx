@@ -495,13 +495,15 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                     return (
                                         <TableHead
                                             key={header.id}
-                                            className={cn({
+                                            className={cn("box-border", {
                                                 "sticky left-0 bg-background":
                                                     header.column.id ===
                                                     "select",
                                                 "sticky right-0 bg-background":
                                                     header.column.id ===
                                                     "actions",
+                                                "min-w-35":
+                                                    header.column.id === "name",
                                             })}
                                         >
                                             {header.isPlaceholder
@@ -544,16 +546,6 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                                     cell.column.id ===
                                                     "actions",
                                             })}
-                                            // This is cleaner than using Tailwind due to class priority issues
-                                            style={{
-                                                ...(row.original.type ===
-                                                "field"
-                                                    ? {
-                                                          padding:
-                                                              "calc(0.5 * var(--spacing)) calc(2 * var(--spacing))",
-                                                      }
-                                                    : {}),
-                                            }}
                                         >
                                             {flexRender(
                                                 cell.column.columnDef.cell,
