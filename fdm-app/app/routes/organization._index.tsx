@@ -20,10 +20,10 @@ type OrganizationType = {
     name: string
     slug: string
     role: string
-    metadata: {
-        isVerified: boolean
-        description: string
-    }
+    metadata?: {
+        isVerified?: boolean
+        description?: string
+    } | null
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -97,7 +97,8 @@ export default function OrganizationsIndex() {
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-sm text-muted-foreground truncate">
-                                        {org.metadata.description}
+                                        {org.metadata?.description ??
+                                            "Geen beschrijving"}
                                     </p>
                                 </CardContent>
                                 <CardFooter>
