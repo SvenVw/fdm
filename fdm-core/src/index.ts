@@ -21,7 +21,7 @@ export {
     createFdmAuth,
     updateUserProfile,
 } from "./authentication"
-export type { FdmAuth } from "./authentication.d"
+export type { FdmAuth } from "./authentication"
 export { checkPermission } from "./authorization"
 export type { PrincipalId } from "./authorization.d"
 export {
