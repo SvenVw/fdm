@@ -1,8 +1,8 @@
 import { getField } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
+import maplibregl from "maplibre-gl"
 import { useEffect, useRef } from "react"
 import { Layer, Map as MapGL, type MapRef } from "react-map-gl/maplibre"
-import maplibregl from "maplibre-gl"
 import type { MetaFunction } from "react-router"
 import {
     type ActionFunctionArgs,
@@ -11,6 +11,7 @@ import {
     useLoaderData,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
+import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
@@ -144,6 +145,7 @@ export default function FarmFieldAtlasBlock() {
                             interactiveLayerIds={[id]}
                             ref={mapRef}
                         >
+                            <MapTilerAttribution />
                             <FieldsSourceNotClickable
                                 id={id}
                                 fieldsData={fields}

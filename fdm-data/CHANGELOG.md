@@ -1,5 +1,11 @@
 # fdm-data
 
+## 0.19.1
+
+### Patch Changes
+
+- 2c5de99: Make fdm-data, fdm-calculator and fdm-data fully type-safe, including inferring dependencies in the monorepo
+
 ## 0.19.0
 
 ### Minor Changes

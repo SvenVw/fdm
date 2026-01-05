@@ -9,26 +9,28 @@ import type { NL2025NormsInput, NL2025NormsInputForCultivation } from "./types"
 
 describe("stikstofgebruiksnorm helpers", () => {
     it("should correctly identify a field in an NV Gebied", async () => {
-        const centroidInNV = [5.654709, 51.987605]
+        const centroidInNV: [number, number] = [5.654709, 51.987605]
         // Known point in NV Gebied
         const result = await isFieldInNVGebied(centroidInNV)
         expect(result).toBe(true)
     })
 
     it("should correctly identify a field not in an NV Gebied", async () => {
-        const centroidOutsideNV = [5.1, 52.1] // Known point outside NV Gebied
+        const centroidOutsideNV: [number, number] = [5.1, 52.1] // Known point outside NV Gebied
         const result = await isFieldInNVGebied(centroidOutsideNV)
         expect(result).toBe(false)
     })
 
     it("should correctly identify a field not in an NV Gebied, but with single array response (see #205)", async () => {
-        const centroidOutsideNV = [5.5527872994244785, 52.92595151470198] // Known point outside NV Gebied
+        const centroidOutsideNV: [number, number] = [
+            5.5527872994244785, 52.92595151470198,
+        ] // Known point outside NV Gebied
         const result = await isFieldInNVGebied(centroidOutsideNV)
         expect(result).toBe(false)
     })
 
     it("should correctly identify the region for a field", async () => {
-        const centroidInKlei = [5.64188724, 51.977587] // Known point in Klei
+        const centroidInKlei: [number, number] = [5.64188724, 51.977587] // Known point in Klei
         const region = await getRegion(centroidInKlei)
         expect(region).toBe("klei")
     })

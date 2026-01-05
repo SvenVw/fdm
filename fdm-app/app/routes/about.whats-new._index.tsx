@@ -24,6 +24,22 @@ export const meta: MetaFunction = () => {
 
 export const changelogEntries: ChangelogEntry[] = [
     {
+        version: "v0.26.0",
+        date: "22 december 2025",
+        title: "Hoogtekaart in Atlas, meer details in stikstofbalans, 2026 is beschikbaar",
+        description: `Deze update bereidt ${clientConfig.name} voor op 2026 met de voorlopige gebruiksnormen en voegt de AHN4 hoogtekaart toe in de Atlas. De stikstofbalans biedt nu diepgaand inzicht met interactieve grafieken en details per mestgift.`,
+        items: [
+            "AHN4 Hoogtekaart in Atlas: De AHN4 hoogtekaart is nu beschikbaar in Atlas. Hiermee kunt u tot in detail het microreliëf op uw percelen analyseren, wat waardevolle inzichten geeft voor bijvoorbeeld waterhuishouding.",
+            "Voorbereiding op 2026: U kunt nu alvast aan de slag met het aanmaken van uw bedrijf en bouwplan voor 2026. De gebruiksnormen zijn voorlopig gebaseerd op de regels van 2025 (zonder derogatie), in afwachting van definitieve politieke besluitvorming.",
+            "Interactieve stikstofbalans: De grafieken voor de stikstofbalans zijn vernieuwd en interactief. Door over de balken te bewegen ziet u direct hoeveel elke bron bijdraagt aan de stikstofbalance. Ook hebben posten zoals bemesiting, oogt en depositie nu duidelijke, onderscheidende kleuren.",
+            "Bijdrage van bemesting in stikstofbalans: De stikstofbalans op perceelsniveau toont nu de bijdrage van elke individuele mestgift. Door in de grafiek over de balken te bewegen, ziet u direct details zoals hoeveel stikstof deze bemesting bijdraagt, maar ook de naam van de meststof en de datum van toediening.",
+            "Inloggen met een code: Het inloggen via de aanmeldlink is verbeterd. In de email die u dan ontvangt staat een code die u kunt gebruiken om in te loggen. Daarnaast bevat de mail nog steeds een knop om te inloggen en wordt de code al voor u ingevuld.",
+            "Bemestingsadvies per gewas: Het bemestingsadvies is nu duidelijker gespecificeerd per gewas. U kunt nu zelf het gewas selecteren waarvoor u het advies wilt inzien, wat vooral bij percelen met meerdere teelten direct inzicht geeft.",
+            "Vernieuwde homepage: De homepage is vernieuwd en uitgebreid met meer informatie over de mogelijkheden. Ook is de weergave op mobiele apparaten verder verbeterd.",
+            "Overstap naar MapTiler: We zijn overgestapt van Mapbox naar MapTiler als leverancier voor onze kaarten en zoekfuncties. MapTiler verzamelt minder gebruikersdata (geen tracking/telemetrie) en host de data binnen de EU.",
+        ],
+    },
+    {
         version: "v0.25.0",
         date: "27 november 2025",
         title: "Nieuw: Bouwplan & OS Balans. Oogstregistratie is verbeterd",

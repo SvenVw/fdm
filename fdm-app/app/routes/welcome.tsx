@@ -16,6 +16,7 @@ import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
+    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
@@ -121,143 +122,129 @@ export default function Welcome() {
     })
 
     return (
-        <div>
-            <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
-                <div className="flex h-screen items-center justify-center py-12">
-                    <div className="mx-auto grid w-[350px] gap-6">
-                        <div className="flex items-center justify-center gap-2">
-                            <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-[#122023]">
-                                <img
-                                    className="size-12"
-                                    src={clientConfig.logomark}
-                                    alt={clientConfig.name}
-                                />
+        <div className="w-full h-screen lg:grid lg:grid-cols-2 overflow-hidden">
+            <div className="flex h-full items-start justify-center overflow-y-auto py-6">
+                <div className="mx-auto grid w-[350px] gap-6">
+                    <Card className="shadow-xl">
+                        <CardHeader className="text-center">
+                            <div className="flex justify-center mb-2">
+                                <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-[#122023]">
+                                    <img
+                                        className="size-12"
+                                        src={clientConfig.logomark}
+                                        alt={clientConfig.name}
+                                    />
+                                </div>
                             </div>
-                            <div className="flex flex-col gap-0.5 leading-none">
-                                <span className="font-semibold text-4xl">
-                                    {clientConfig.name}
-                                </span>
-                            </div>
-                        </div>
-                        {/* End logo and title fix */}
-                        <p className="text-center text-muted-foreground">
-                            {`Welkom bij ${clientConfig.name}. Om verder te gaan maken we eerst je profiel compleet.`}
-                        </p>
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Profiel voltooien</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <RemixFormProvider {...form}>
-                                    <Form
-                                        id="formWelcome"
-                                        onSubmit={form.handleSubmit}
-                                        method="POST"
+                            <h2 className="text-lg font-semibold tracking-tight text-muted-foreground mb-2">
+                                {clientConfig.name}
+                            </h2>
+                            <CardTitle className="text-xl">
+                                Profiel voltooien
+                            </CardTitle>
+                            <CardDescription>
+                                {`Welkom bij ${clientConfig.name}. Om verder te gaan maken we eerst je profiel compleet.`}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <RemixFormProvider {...form}>
+                                <Form
+                                    id="formWelcome"
+                                    onSubmit={form.handleSubmit}
+                                    method="POST"
+                                >
+                                    <fieldset
+                                        disabled={form.formState.isSubmitting}
                                     >
-                                        <fieldset
-                                            disabled={
-                                                form.formState.isSubmitting
-                                            }
-                                        >
-                                            <div className="grid w-full items-center gap-4">
-                                                {loaderData.image ? (
-                                                    <div className="flex flex-col justify-self-center">
-                                                        <Avatar className="h-12 w-12 rounded-lg">
-                                                            <AvatarImage
-                                                                src={
-                                                                    loaderData.image
-                                                                }
-                                                            />
-                                                        </Avatar>
-                                                    </div>
-                                                ) : null}
-                                                <div className="flex flex-col space-y-1.5">
-                                                    <FormField
-                                                        control={form.control}
-                                                        name="firstname"
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormLabel>
-                                                                    Voornaam
-                                                                </FormLabel>
-                                                                <FormControl>
-                                                                    <Input
-                                                                        placeholder="bv. Jan"
-                                                                        aria-required="true"
-                                                                        required
-                                                                        {...field}
-                                                                    />
-                                                                </FormControl>
-                                                                <FormDescription />
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
+                                        <div className="grid w-full items-center gap-4">
+                                            {loaderData.image ? (
+                                                <div className="flex flex-col justify-self-center">
+                                                    <Avatar className="h-12 w-12 rounded-lg">
+                                                        <AvatarImage
+                                                            src={
+                                                                loaderData.image
+                                                            }
+                                                        />
+                                                    </Avatar>
                                                 </div>
-                                                <div className="flex flex-col space-y-1.5">
-                                                    <FormField
-                                                        control={form.control}
-                                                        name="surname"
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormLabel>
-                                                                    Achternaam
-                                                                </FormLabel>
-                                                                <FormControl>
-                                                                    <Input
-                                                                        placeholder="bv. de Vries"
-                                                                        aria-required="true"
-                                                                        required
-                                                                        {...field}
-                                                                    />
-                                                                </FormControl>
-                                                                <FormDescription />
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )}
-                                                    />
-                                                </div>
-                                                <Button
-                                                    type="submit"
-                                                    className="w-full"
-                                                >
-                                                    {form.formState
-                                                        .isSubmitting ? (
-                                                        <div className="flex items-center space-x-2">
-                                                            <LoadingSpinner />
-                                                            <span>
-                                                                Opslaan...
-                                                            </span>
-                                                        </div>
-                                                    ) : (
-                                                        "Doorgaan"
+                                            ) : null}
+                                            <div className="flex flex-col space-y-1.5">
+                                                <FormField
+                                                    control={form.control}
+                                                    name="firstname"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>
+                                                                Voornaam
+                                                            </FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    placeholder="bv. Jan"
+                                                                    aria-required="true"
+                                                                    required
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormDescription />
+                                                            <FormMessage />
+                                                        </FormItem>
                                                     )}
-                                                </Button>
+                                                />
                                             </div>
-                                        </fieldset>
-                                    </Form>
-                                </RemixFormProvider>
-                            </CardContent>
-                            <CardFooter className="flex justify-center" />
-                        </Card>
-                        {/* <div className="mb-4 text-center text-sm">
-                            <Button variant={"outline"}>
-                                {`Lees meer over ${clientConfig.name}`}{" "}
-                                <MoveDown />
-                            </Button>
-                        </div> */}
-                    </div>
+                                            <div className="flex flex-col space-y-1.5">
+                                                <FormField
+                                                    control={form.control}
+                                                    name="surname"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>
+                                                                Achternaam
+                                                            </FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    placeholder="bv. de Vries"
+                                                                    aria-required="true"
+                                                                    required
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormDescription />
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                            <Button
+                                                type="submit"
+                                                className="w-full"
+                                            >
+                                                {form.formState.isSubmitting ? (
+                                                    <div className="flex items-center space-x-2">
+                                                        <LoadingSpinner />
+                                                        <span>Opslaan...</span>
+                                                    </div>
+                                                ) : (
+                                                    "Doorgaan"
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </fieldset>
+                                </Form>
+                            </RemixFormProvider>
+                        </CardContent>
+                        <CardFooter className="flex justify-center" />
+                    </Card>
                 </div>
-                <div className="hidden bg-muted lg:block">
-                    <img
-                        src="https://images.unsplash.com/photo-1625565570971-e6b404974366?q=80&w=1930&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                        alt="Herd of cows on green grass field during daytime by Rickie-Tom Schünemann on Unsplash"
-                        width="1920"
-                        height="1080"
-                        loading="lazy"
-                        className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-                    />
-                </div>
+            </div>
+            <div className="hidden bg-muted lg:block">
+                <img
+                    src="https://images.unsplash.com/photo-1625565570971-e6b404974366?q=80&w=1930&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                    alt="Herd of cows on green grass field during daytime by Rickie-Tom Schünemann on Unsplash"
+                    width="1920"
+                    height="1080"
+                    loading="lazy"
+                    className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+                />
             </div>
             <div className="fixed bottom-3 left-3 z-50">
                 <Button

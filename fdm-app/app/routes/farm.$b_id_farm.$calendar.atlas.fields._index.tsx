@@ -1,5 +1,7 @@
 import { getFields } from "@svenvw/fdm-core"
-import type { FeatureCollection } from "geojson"
+import { simplify } from "@turf/turf"
+import type { FeatureCollection, Geometry } from "geojson"
+import maplibregl from "maplibre-gl"
 import { useCallback, useEffect, useRef, useState } from "react"
 import {
     Layer,
@@ -7,10 +9,10 @@ import {
     type ViewState,
     type ViewStateChangeEvent,
 } from "react-map-gl/maplibre"
-import maplibregl from "maplibre-gl"
 import type { MetaFunction } from "react-router"
 import { type LoaderFunctionArgs, useLoaderData } from "react-router"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
 import {
@@ -28,7 +30,7 @@ import { fdm } from "~/lib/fdm.server"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: `Percelen - Kaart | ${clientConfig.name}` },
+        { title: `Percelen - Atlas | ${clientConfig.name}` },
         {
             name: "description",
             content:
@@ -82,7 +84,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         b_lu_name: field.b_lu_name,
                         b_id_source: field.b_id_source,
                     },
-                    geometry: field.b_geometry,
+                    geometry: simplify(field.b_geometry as Geometry, {
+                        tolerance: 0.00001,
+                        highQuality: true,
+                    }),
                 }
                 return feature
             })
@@ -183,6 +188,8 @@ export default function FarmAtlasFieldsBlock() {
                 onToggleFields={() => setShowFields(!showFields)}
             />
 
+            <MapTilerAttribution />
+
             <FieldsSourceAvailable
                 id={fieldsAvailableId}
                 calendar={loaderData.calendar}
@@ -190,7 +197,10 @@ export default function FarmAtlasFieldsBlock() {
                 redirectToDetailsPage={true}
             >
                 <Layer
-                    {...({ ...fieldsAvailableStyle, layout: layerLayout } as any)}
+                    {...({
+                        ...fieldsAvailableStyle,
+                        layout: layerLayout,
+                    } as any)}
                 />
             </FieldsSourceAvailable>
 

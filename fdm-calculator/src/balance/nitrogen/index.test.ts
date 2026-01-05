@@ -34,6 +34,19 @@ describe("calculateNitrogenBalance", () => {
                                     {
                                         b_lu_yield: 1000,
                                         b_lu_n_harvestable: 20,
+                                        b_id_harvestable_analysis: "",
+                                        b_lu_yield_fresh: null,
+                                        b_lu_yield_bruto: null,
+                                        b_lu_tarra: null,
+                                        b_lu_dm: null,
+                                        b_lu_moist: null,
+                                        b_lu_uww: null,
+                                        b_lu_cp: null,
+                                        b_lu_n_residue: null,
+                                        b_lu_p_harvestable: null,
+                                        b_lu_p_residue: null,
+                                        b_lu_k_harvestable: null,
+                                        b_lu_k_residue: null,
                                     },
                                 ],
                             },
@@ -57,6 +70,10 @@ describe("calculateNitrogenBalance", () => {
                             p_id_catalogue: "fertilizer1",
                             p_app_amount: 100,
                             p_app_id: "fertilizerApp1",
+                            p_id: "",
+                            p_name_nl: null,
+                            p_app_method: null,
+                            p_app_date: new Date("2025-03-15"),
                         },
                     ],
                 },
@@ -91,12 +108,34 @@ describe("calculateNitrogenBalance", () => {
 
         const result = await calculateNitrogenBalance(mockNitrogenBalanceInput)
 
+        function assertValidFertilizerBreakdown(
+            obj: { total: number } & Record<
+                "mineral" | "manure" | "compost" | "other",
+                number
+            >,
+        ) {
+            expect(typeof obj.total).toBe("number")
+            expect(typeof obj.mineral).toBe("number")
+            expect(typeof obj.manure).toBe("number")
+            expect(typeof obj.compost).toBe("number")
+            expect(typeof obj.other).toBe("number")
+        }
         expect(result).toBeDefined()
         expect(typeof result.balance).toBe("number")
-        expect(typeof result.supply).toBe("number")
-        expect(typeof result.removal).toBe("number")
+
+        expect(result.supply).toBeDefined()
+        expect(typeof result.supply.total).toBe("number")
+        expect(typeof result.supply.deposition).toBe("number")
+        expect(typeof result.supply.fixation).toBe("number")
+        expect(typeof result.supply.mineralisation).toBe("number")
+        expect(result.supply.fertilizers).toBeDefined()
+        assertValidFertilizerBreakdown(result.supply.fertilizers)
         expect(typeof result.emission.total).toBe("number")
-        expect(typeof result.emission.ammonia).toBe("number")
+        expect(result.emission.ammonia).toBeDefined()
+        expect(typeof result.emission.ammonia.total).toBe("number")
+        expect(result.emission.ammonia.fertilizers).toBeDefined()
+        assertValidFertilizerBreakdown(result.emission.ammonia.fertilizers)
+        expect(typeof result.emission.ammonia.residues).toBe("number")
         expect(typeof result.emission.nitrate).toBe("number")
         expect(typeof result.target).toBe("number")
         expect(Array.isArray(result.fields)).toBe(true)

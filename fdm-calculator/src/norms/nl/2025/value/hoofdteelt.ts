@@ -32,7 +32,9 @@ export function determineNLHoofdteelt(
     }
 
     for (const cultivation of cultivations) {
-        const cultivationStart = new Date(cultivation.b_lu_start)
+        const cultivationStart = cultivation.b_lu_start
+            ? new Date(cultivation.b_lu_start)
+            : new Date(0)
         const cultivationEnd = cultivation.b_lu_end
             ? new Date(cultivation.b_lu_end)
             : HOOFDTEELT_END

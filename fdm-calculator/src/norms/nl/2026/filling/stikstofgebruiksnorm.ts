@@ -2,6 +2,7 @@ import { type Cultivation, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { getRegion } from "../../2025/value/stikstofgebruiksnorm"
+import type { NormFilling } from "../../types"
 import type { RegionKey } from "../value/types"
 import { table9 } from "./table-9"
 import { table11Mestcodes } from "./table-11-mestcodes"
@@ -9,7 +10,6 @@ import type {
     NL2026NormsFillingInput,
     WorkingCoefficientDetails,
 } from "./types"
-import type { NormFilling } from "norms/nl/types"
 
 /**
  * Calculates the nitrogen utilization norm filling for a set of fertilizer applications.
@@ -77,7 +77,7 @@ export async function calculateNL2026FertilizerApplicationFillingForStikstofGebr
         )
 
         // Calculate norm filling: amount * nitrogen content * (working coefficient / 100) / 1000
-        const p_app_amount = new Decimal(application.p_app_amount)
+        const p_app_amount = new Decimal(application.p_app_amount ?? 0)
         const normFilling = p_app_amount
             .times(p_n_rt)
             .times(workingCoefficientDetails.p_n_wcl)
@@ -119,8 +119,9 @@ export function isBouwland(
     const nonBouwlandCodes = ["nl_265", "nl_266", "nl_331", "nl_332", "nl_335"]
 
     const activeCultivation = cultivations.find((c) => {
-        const startDate = new Date(c.b_start)
-        const endDate = c.b_end ? new Date(c.b_end) : undefined
+        if (!c.b_lu_start) return false // Ensure b_lu_start exists
+        const startDate = new Date(c.b_lu_start)
+        const endDate = c.b_lu_end ? new Date(c.b_lu_end) : undefined
         return (
             p_app_date >= startDate &&
             (endDate === undefined || p_app_date <= endDate)

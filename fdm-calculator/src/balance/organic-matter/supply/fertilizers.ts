@@ -46,7 +46,7 @@ export function calculateOrganicMatterSupplyByFertilizers(
             if (!fertilizerDetail) {
                 // This indicates a data integrity issue, as all applications should have corresponding details.
                 throw new Error(
-                    `Fertilizer application ${application.p_id} has no fertilizerDetails`,
+                    `Fertilizer application ${application.p_app_id} has no fertilizerDetails for fertilizer ${application.p_id_catalogue}`,
                 )
             }
             // Skip fertilizers that do not contribute to organic matter (e.g., most mineral fertilizers).
@@ -58,7 +58,7 @@ export function calculateOrganicMatterSupplyByFertilizers(
             }
 
             const p_eom = new Decimal(fertilizerDetail.p_eom) // g EOM / kg product
-            const p_amount = new Decimal(application.p_amount ?? 0) // kg product / ha
+            const p_amount = new Decimal(application.p_app_amount ?? 0) // kg product / ha
 
             // Calculate the EOM supply for this specific application.
             // (g EOM / kg product) * (kg product / ha) / (1000 g / kg) = kg EOM / ha

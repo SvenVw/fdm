@@ -7,12 +7,15 @@ import {
     getFarm,
     getFields,
 } from "@svenvw/fdm-core"
+import { simplify } from "@turf/turf"
 import type {
     Feature,
     FeatureCollection,
     GeoJsonProperties,
+    Geometry,
     Polygon,
 } from "geojson"
+import maplibregl from "maplibre-gl"
 import { useCallback, useState } from "react"
 import {
     Layer,
@@ -20,7 +23,6 @@ import {
     type ViewState,
     type ViewStateChangeEvent,
 } from "react-map-gl/maplibre"
-import maplibregl from "maplibre-gl"
 import {
     type ActionFunctionArgs,
     data,
@@ -31,6 +33,7 @@ import {
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { generateFeatureClass } from "~/components/blocks/atlas/atlas-functions"
 import {
@@ -147,7 +150,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         b_lu_name: cultivation,
                         b_id_source: field.b_id_source,
                     },
-                    geometry: field.b_geometry,
+                    geometry: simplify(field.b_geometry as Geometry, {
+                        tolerance: 0.00001,
+                        highQuality: true,
+                    }),
                 }
                 return feature
             }),
@@ -301,6 +307,8 @@ export default function Index() {
                                         setShowFields(!showFields)
                                     }
                                 />
+
+                                <MapTilerAttribution />
 
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}

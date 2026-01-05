@@ -60,7 +60,7 @@ describe("collectNL2026InputForFertilizerApplicationFilling", () => {
             { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 1000 },
         ] as FertilizerApplication[])
         vi.mocked(getFertilizers).mockResolvedValue([
-            { p_id_catalogue: "fert1", p_n_rt: 5, p_type_rvo: "115" },
+            { p_id: "fert1", p_n_rt: 5, p_type_rvo: "115" },
         ] as Fertilizer[])
     })
 
@@ -75,10 +75,18 @@ describe("collectNL2026InputForFertilizerApplicationFilling", () => {
             },
         ]
         const expectedApplications: FertilizerApplication[] = [
-            { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 1000 },
+            {
+                p_app_id: "app1",
+                p_id_catalogue: "fert1",
+                p_app_amount: 1000,
+            } as FertilizerApplication,
         ]
         const expectedFertilizers: Fertilizer[] = [
-            { p_id_catalogue: "fert1", p_n_rt: 5, p_type_rvo: "115" },
+            {
+                p_id: "fert1",
+                p_n_rt: 5,
+                p_type_rvo: "115",
+            } as Fertilizer,
         ]
 
         const result = await collectNL2026InputForFertilizerApplicationFilling(
@@ -143,6 +151,7 @@ describe("collectNL2026InputForFertilizerApplicationFilling", () => {
     })
 
     it("should throw an error if the field is not found", async () => {
+        // @ts-expect-error
         vi.mocked(getField).mockResolvedValue(null) // Simulate field not found
 
         await expect(
@@ -156,12 +165,4 @@ describe("collectNL2026InputForFertilizerApplicationFilling", () => {
             `Field with id ${mockFieldId} not found for principal ${mockPrincipalId}`,
         )
     })
-
-    // Add more tests for edge cases and different scenarios as needed
-    // For example:
-    // - No cultivations
-    // - No applications
-    // - No fertilizers
-    // - Different grazing intention / organic certification status
-    // - Empty b_centroid (if getField returns a field without centroid, though current mock ensures it has one)
 })
