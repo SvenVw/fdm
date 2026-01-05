@@ -21,7 +21,7 @@ type OrganizationType = {
     slug: string
     role: string
     metadata: {
-        is_verified: boolean
+        isVerified: boolean
         description: string
     }
 }

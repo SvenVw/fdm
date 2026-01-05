@@ -55,19 +55,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         ? membersListResponse
         : (membersListResponse as any)?.members || []
 
-    // Get pending invitations of organization
-    const invitationsListResponse = await auth.api.listInvitations({
-        headers: request.headers,
-        query: {
-            organizationId: organization.id,
-        },
-    })
-    const invitations = (
-        Array.isArray(invitationsListResponse)
-            ? invitationsListResponse
-            : (invitationsListResponse as any)?.invitations || []
-    ).filter((inv: any) => inv.status === "pending")
-
     // Determine permissions
     const currentUserMember = members.find(
         (m: any) => m.userId === session.user.id,
@@ -79,6 +66,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         canInvite: role === "owner" || role === "admin",
         canUpdateRoleUser: role === "owner" || role === "admin",
         canRemoveUser: role === "owner" || role === "admin",
+    }
+
+    // Get pending invitations of organization
+    let invitations: any[] = []
+    if (permissions.canInvite) {
+        const invitationsListResponse = await auth.api.listInvitations({
+            headers: request.headers,
+            query: {
+                organizationId: organization.id,
+            },
+        })
+        invitations = (
+            Array.isArray(invitationsListResponse)
+                ? invitationsListResponse
+                : (invitationsListResponse as any)?.invitations || []
+        ).filter((inv: any) => inv.status === "pending")
     }
 
     return {

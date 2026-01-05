@@ -30,11 +30,15 @@ import { extractFormValuesFromRequest } from "~/lib/form"
 // Define the type for a single invitation
 type InvitationType = {
     id: string
-    organization_name: string
-    organization_slug: string
-    inviter_name: string
+    organization: {
+        name: string
+        slug: string
+    }
+    inviter: {
+        name: string
+    }
     role: string
-    expires_at: Date
+    expiresAt: Date
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -90,11 +94,11 @@ export default function OrganizationsIndex() {
                             <Card key={invitation.id}>
                                 <CardHeader>
                                     <CardTitle>
-                                        {invitation.organization_name}
+                                        {invitation.organization.name}
                                     </CardTitle>
                                     <CardDescription>
                                         Uitgenodigd door{" "}
-                                        {invitation.inviter_name}
+                                        {invitation.inviter.name}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
@@ -108,7 +112,7 @@ export default function OrganizationsIndex() {
                                     <p className="text-sm text-muted-foreground mt-2">
                                         Verloopt{" "}
                                         {formatDistanceToNow(
-                                            invitation.expires_at,
+                                            new Date(invitation.expiresAt),
                                             {
                                                 addSuffix: true,
                                                 locale: nl,
@@ -119,7 +123,7 @@ export default function OrganizationsIndex() {
                                 <CardFooter className="flex justify-between">
                                     <Button asChild variant="outline" size="sm">
                                         <NavLink
-                                            to={`/organization/${invitation.organization_slug}`}
+                                            to={`/organization/${invitation.organization.slug}`}
                                         >
                                             Meer info
                                         </NavLink>
@@ -157,7 +161,7 @@ export default function OrganizationsIndex() {
                                                         Weet je zeker dat je de
                                                         uitnodiging van{" "}
                                                         {
-                                                            invitation.organization_name
+                                                            invitation.organization.name
                                                         }{" "}
                                                         wilt afwijzen?
                                                     </DialogDescription>
