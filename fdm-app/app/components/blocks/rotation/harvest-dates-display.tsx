@@ -19,7 +19,7 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
                 : cultivation.fields.flatMap((field) => field.b_lu_harvest_date)
         if (b_lu_harvest_date.length === 1) {
             return (
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground whitespace-nowrap">
                     {format(b_lu_harvest_date[0], "PP", { locale: nl })}
                 </p>
             )
@@ -37,7 +37,7 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
                 b_lu_harvest_date_sorted[b_lu_harvest_date_sorted.length - 1]
 
             return (
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground whitespace-nowrap">
                     {`${format(firstDate, "PP", { locale: nl })} - ${format(lastDate, "PP", { locale: nl })}`}
                 </p>
             )
@@ -70,20 +70,28 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
                         // harvestDates are already sorted from the previous loop
                         if (harvestDates.length === 1) {
                             return (
-                                <p key={idx} className="text-muted-foreground">
-                                    {`${idx + 1}e ${cultivation.b_lu_croprotation === "grass" ? "snede" : "oogst"}: ${format(
-                                        harvestDates[0],
-                                        "PP",
-                                        { locale: nl },
-                                    )}`}
+                                <p
+                                    key={idx}
+                                    className="text-muted-foreground whitespace-nowrap"
+                                >
+                                    {`${idx + 1}e ${cultivation.b_lu_croprotation === "grass" ? "snede" : "oogst"}:`}
+                                    <br />
+                                    {format(harvestDates[0], "PP", {
+                                        locale: nl,
+                                    })}
                                 </p>
                             )
                         }
                         const firstDate = harvestDates[0]
                         const lastDate = harvestDates[harvestDates.length - 1]
                         return (
-                            <p key={idx} className="text-muted-foreground">
-                                {`${idx + 1}e ${cultivation.b_lu_croprotation === "grass" ? "snede" : "oogst"}: ${format(firstDate, "PP", { locale: nl })} - ${format(lastDate, "PP", { locale: nl })}`}
+                            <p
+                                key={idx}
+                                className="text-muted-foreground whitespace-nowrap"
+                            >
+                                {`${idx + 1}e ${cultivation.b_lu_croprotation === "grass" ? "snede" : "oogst"}:`}
+                                <br />
+                                {`${format(firstDate, "PP", { locale: nl })} - ${format(lastDate, "PP", { locale: nl })}`}
                             </p>
                         )
                     })}

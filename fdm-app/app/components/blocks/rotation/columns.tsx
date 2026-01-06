@@ -222,17 +222,18 @@ export const columns: ColumnDef<RotationExtended>[] = [
                     <DateRangeDisplay
                         range={row.original.b_lu_end}
                         emptyContent="Geen"
+                        // The padding is intended to be larger than the horizontal size of the tooltip trigger below
+                        className="pr-6"
                     />
                 )
             }
             const cultivation = (row.getParentRow() ?? row).original as CropRow
             return cultivation.b_lu_harvestable !== "multiple" ? (
-                <>
+                <span className="whitespace-nowrap">
                     <DateRangeDisplay
                         range={row.original.b_lu_end}
                         emptyContent="Geen"
                     />
-                    &nbsp;
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <CircleQuestionMark className="inline-block text-muted-foreground h-4" />
@@ -241,7 +242,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
                             U zou in plaats daarvan een oogst moeten toevoegen.
                         </TooltipContent>
                     </Tooltip>
-                </>
+                </span>
             ) : (
                 <TableDateSelector name="b_lu_end" row={row} cellId={cell.id} />
             )
