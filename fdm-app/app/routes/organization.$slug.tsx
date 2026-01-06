@@ -203,10 +203,7 @@ const MemberRow = ({
 }) => {
     const initials = (member.user.name || "?").charAt(0).toUpperCase()
     return (
-        <div
-            key={member.id}
-            className="flex items-center justify-between space-x-4"
-        >
+        <div className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
                 <Avatar>
                     <AvatarImage src={member.user.image ?? undefined} />
@@ -214,7 +211,7 @@ const MemberRow = ({
                 </Avatar>
                 <div>
                     <p className="text-sm font-medium leading-none">
-                        {member.user?.name}
+                        {member.user.name}
                     </p>
                     {!permissions.canUpdateRoleUser ? (
                         <p className="text-sm text-muted-foreground">
