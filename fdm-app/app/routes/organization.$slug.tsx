@@ -314,6 +314,7 @@ const InvitationRow = ({ invitation }: { invitation: Invitation }) => {
                     name="invitation_id"
                     value={invitation.id}
                 />
+                <input type="hidden" name="email" value={invitation.email} />
                 <Button
                     variant="destructive"
                     className="shrink-0"
@@ -385,6 +386,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
         if (!params.slug) {
             throw handleActionError("not found: organization")
         }
+
+        const formValues = await extractFormValuesFromRequest(
+            request,
+            FormSchema,
+        )
+        const session = await getSession(request)
 
         const organizations = await auth.api.listOrganizations({
             headers: request.headers,
