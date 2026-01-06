@@ -9,7 +9,7 @@ import {
     useSearchParams,
     useSubmit,
 } from "react-router"
-import { redirectWithSuccess } from "remix-toast"
+import { dataWithError, redirectWithSuccess } from "remix-toast"
 import z from "zod"
 import { Button } from "~/components/ui/button"
 import {
@@ -28,32 +28,31 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     await getSession(request)
 
     // Check for valid invitation id
-    if (!params.invitation_id) {
-        throw failBadRequest("Bad Request: invitation id missing")
-    }
-
-    // Check for valid invitation
-    try {
-        const invitations = await auth.api.listUserInvitations({
-            headers: request.headers,
+    const invitationId = params.invitation_id
+    if (!invitationId) {
+        throw data("Invitation not found", {
+            status: 404,
+            statusText: "Invitation not found",
         })
-
-        const invitation = invitations.find(
-            (inv) => inv.id === params.invitation_id,
-        )
-
-        if (!invitation) {
-            throw new Error("Invitation not found")
-        }
-
-        return { invitation }
-    } catch (_e) {
-        throw data("Invitation not found", 404)
     }
+    const invitation = await auth.api.getInvitation({
+        query: {
+            id: invitationId,
+        },
+        headers: request.headers,
+    })
+
+    if (!invitation) {
+        throw dataWithError("Invitation not found", {
+            message: "Uitnodiging niet gevonden",
+        })
+    }
+
+    return invitation
 }
 
 export default function Respond() {
-    const { invitation } = useLoaderData()
+    const invitation = useLoaderData<typeof loader>()
 
     const [searchParams] = useSearchParams()
     const intentRaw = searchParams.get("intent")
@@ -65,17 +64,15 @@ export default function Respond() {
         if (intent && intent === "accept") {
             submit(
                 {
-                    invitation_id: invitation.id,
                     intent: "accept",
-                    organization_slug: invitation.organization.slug,
                 },
                 { method: "POST" },
             )
         }
-    }, [intent, submit, invitation.id, invitation.organization.slug])
+    }, [intent, submit])
 
-    if (intent !== "accept" && intent !== "reject") {
-        throw failBadRequest(`Invalid intent: ${intent}`)
+    if (intent !== "accept" && intent !== "reject" && intent !== "do_nothing") {
+        throw dataWithError("Invalid intent", { message: "Ongeldige keuze" })
     }
 
     if (intent === "accept") {
@@ -95,8 +92,8 @@ export default function Respond() {
                 <CardContent>
                     <Separator />
                     <p className="my-1">
-                        {`${invitation.inviter?.name || "Iemand"} heeft je uitgenodigd om lid te worden van de organisatie `}
-                        <span className="font-semibold">{`${invitation.organization.name}.`}</span>
+                        {`${invitation.inviterEmail} heeft je uitgenodigd om lid te worden van de organisatie `}
+                        <span className="font-semibold">{`${invitation.organizationName}.`}</span>
                     </p>
                     <p className="my-1">
                         Je bent uitgenodigd als{" "}
@@ -135,38 +132,65 @@ export default function Respond() {
 }
 
 const FormSchema = z.object({
-    invitation_id: z.string(),
     intent: z.enum(["accept", "reject", "do_nothing"]),
-    organization_slug: z.string().optional(),
 })
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request, params }: ActionFunctionArgs) {
     const formValues = await extractFormValuesFromRequest(request, FormSchema)
 
     await getSession(request)
+
+    const invitationId = params.invitation_id
+    if (!invitationId) {
+        throw data("Invitation not found", {
+            status: 404,
+            statusText: "Invitation not found",
+        })
+    }
+    const invitation = await auth.api.getInvitation({
+        query: {
+            id: invitationId,
+        },
+        headers: request.headers,
+    })
+
+    if (!invitation) {
+        throw dataWithError("Invitation not found", {
+            message: "Uitnodiging niet gevonden",
+        })
+    }
 
     if (formValues.intent === "accept") {
         try {
             await auth.api.acceptInvitation({
                 headers: request.headers,
-                body: { invitationId: formValues.invitation_id },
+                body: { invitationId: invitationId },
             })
         } catch (_) {
             throw data("Invitation not found", 404)
         }
-        return redirectWithSuccess(
-            `/organization/${formValues.organization_slug}`,
-            {
-                message: "Uitnodiging geaccepteerd! 🎉",
+
+        const organization = await auth.api.getFullOrganization({
+            query: {
+                organizationId: invitation.organizationId,
             },
-        )
+            headers: request.headers,
+        })
+        if (!organization) {
+            throw data("Organization not found", 404)
+        }
+        const organizationSlug = organization.slug
+
+        return redirectWithSuccess(`/organization/${organizationSlug}`, {
+            message: "Uitnodiging geaccepteerd! 🎉",
+        })
     }
 
     if (formValues.intent === "reject") {
         try {
             await auth.api.rejectInvitation({
                 headers: request.headers,
-                body: { invitationId: formValues.invitation_id },
+                body: { invitationId: invitationId },
             })
         } catch (_) {
             throw data("Invitation not found", 404)
@@ -225,13 +249,4 @@ export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
     }
 
     throw error
-}
-
-function failBadRequest(message: string) {
-    // Not 400 because 400 currently hits the Not Found error page
-    return fail(message, 500)
-}
-
-function fail(message: string, status: number) {
-    return data(message, { statusText: message, status: status })
 }
