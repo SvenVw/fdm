@@ -266,22 +266,22 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                 // Get all unique b_lu_start of cultivation
                 const b_lu_start = [
                     ...new Set(
-                        cultivationsForCatalogue.map(
-                            (cultivation: { b_lu_start: Date }) =>
-                                cultivation.b_lu_start.getTime(),
-                        ),
+                        cultivationsForCatalogue
+                            .filter(
+                                (cultivation) => cultivation.b_lu_start != null,
+                            )
+                            .map((cultivation) =>
+                                (cultivation.b_lu_start as Date).getTime(),
+                            ),
                     ),
                 ].map((timestamp) => new Date(timestamp))
 
                 const b_lu_end = [
                     ...new Set(
                         cultivationsForCatalogue
-                            .filter(
-                                (cultivation: { b_lu_end: Date | null }) =>
-                                    cultivation.b_lu_end,
-                            )
-                            .map((cultivation: { b_lu_end: Date }) =>
-                                cultivation.b_lu_end.getTime(),
+                            .filter((cultivation) => cultivation.b_lu_end)
+                            .map((cultivation) =>
+                                (cultivation.b_lu_end as Date).getTime(),
                             ),
                     ),
                 ].map((timestamp) => new Date(timestamp))
@@ -355,6 +355,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     b_lu_end: b_lu_end,
                     calendar: calendar,
                     m_cropresidue: aggr_m_crop_residue,
+                    b_isproductive: fieldsWithThisCultivation.some(
+                        (field) => field.b_isproductive,
+                    ),
                     fields: fieldsWithThisCultivation.map((field, i) => ({
                         // TODO: Define a proper type for field
                         type: "field",

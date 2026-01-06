@@ -250,7 +250,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
     }, [data])
     type MemoizedTData = (typeof memoizedData)[number]
 
-    const fuzzySearchAndProductivityFilter: FilterFn<TData> = (
+    const fuzzySearchAndProductivityFilter: FilterFn<MemoizedTData> = (
         row,
         _columnId,
         { searchTerms, showProductiveOnly },
