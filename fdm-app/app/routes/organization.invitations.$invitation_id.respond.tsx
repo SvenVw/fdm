@@ -43,8 +43,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     })
 
     if (!invitation) {
-        throw dataWithError("Invitation not found", {
-            message: "Uitnodiging niet gevonden",
+        throw data("Uitnodiging niet gevonden", {
+            status: 404,
+            statusText: "Invitation not found",
         })
     }
 
@@ -72,7 +73,7 @@ export default function Respond() {
     }, [intent, submit])
 
     if (intent !== "accept" && intent !== "reject" && intent !== "do_nothing") {
-        throw dataWithError("Invalid intent", { message: "Ongeldige keuze" })
+        throw new Error(`Invalid intent: ${intent}`)
     }
 
     if (intent === "accept") {
@@ -166,8 +167,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 headers: request.headers,
                 body: { invitationId: invitationId },
             })
-        } catch (_) {
-            throw data("Invitation not found", 404)
+        } catch (error) {
+            console.error("Failed to accept invitation:", error)
+            throw data("Failed to accept invitation", { status: 400 })
         }
 
         const organization = await auth.api.getFullOrganization({
