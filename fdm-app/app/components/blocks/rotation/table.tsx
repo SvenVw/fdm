@@ -107,7 +107,6 @@ export function DataTable<TData extends RotationExtended, TValue>({
         }
 
         clearActiveForm()
-        console.log(lastSelectedRowIndex)
         if (event.shiftKey) {
             document.getSelection()?.removeAllRanges()
             const lastSelectedRow =
