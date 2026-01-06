@@ -1,7 +1,6 @@
 import type { LoaderFunctionArgs } from "react-router"
 import { NavLink, useLoaderData } from "react-router-dom"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -13,18 +12,6 @@ import {
 } from "~/components/ui/card"
 import { auth, getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
-
-// Define the type for a single organization based on query return type
-type OrganizationType = {
-    id: string
-    name: string
-    slug: string
-    role: string
-    metadata?: {
-        isVerified?: boolean
-        description?: string
-    } | null
-}
 
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
@@ -41,7 +28,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function OrganizationsIndex() {
-    const { organizations } = useLoaderData()
+    const { organizations } = useLoaderData<typeof loader>()
 
     return (
         <main className="container">
@@ -79,18 +66,12 @@ export default function OrganizationsIndex() {
                     </div>
                 ) : (
                     <div className="grid gap-4 grid-cols-1">
-                        {organizations.map((org: OrganizationType) => (
+                        {organizations.map((org) => (
                             <Card key={org.id}>
                                 <CardHeader>
                                     <CardTitle>
                                         <div className="flex items-center justify-between">
-                                            {org.name}
-                                            <Badge
-                                                className="ml-auto"
-                                                variant="secondary"
-                                            >
-                                                {org.role}
-                                            </Badge>
+                                            {org.name}                                          
                                         </div>
                                     </CardTitle>
                                     <CardDescription />
