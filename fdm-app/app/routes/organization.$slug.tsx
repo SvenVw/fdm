@@ -1,3 +1,4 @@
+import type { User } from "better-auth"
 import type { Invitation, Member, Organization } from "better-auth/plugins"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
@@ -277,10 +278,7 @@ const MemberAction = ({
 
 const InvitationRow = ({ invitation }: { invitation: Invitation }) => {
     return (
-        <div
-            key={invitation.id}
-            className="flex items-center justify-between space-x-4"
-        >
+        <div className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
                 <Avatar>
                     <AvatarFallback>
@@ -424,7 +422,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
             // better-auth might not send email by default depending on config.
             // We'll send it manually using our template.
-            if (invitation) {
+            if (invitation?.id) {
                 const invitationEmail = await renderInvitationEmail(
                     formValues.email,
                     session.user,
