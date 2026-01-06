@@ -282,6 +282,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             ), // All fields for selection
             cultivationName: cultivationName,
             cultivationIds: cultivationIds,
+            create: url.searchParams.has("create"),
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -342,7 +343,9 @@ export default function FarmRotationFertilizerAddIndex() {
         <SidebarInset>
             <Header
                 action={{
-                    to: `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`,
+                    to: loaderData.create
+                        ? `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations`
+                        : `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`,
                     label: "Terug naar bouwplan",
                     disabled: false,
                 }}
@@ -718,9 +721,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
             ),
         )
 
-        return redirectWithSuccess(`/farm/${b_id_farm}/${calendar}/rotation`, {
-            message: `Bemesting succesvol toegevoegd aan ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
-        })
+        return redirectWithSuccess(
+            url.searchParams.has("create")
+                ? `/farm/create/${b_id_farm}/${calendar}/cultivations`
+                : `/farm/${b_id_farm}/${calendar}/rotation`,
+            {
+                message: `Bemesting succesvol toegevoegd aan ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
+            },
+        )
     } catch (error) {
         if (error instanceof z.ZodError) {
             return dataWithError(

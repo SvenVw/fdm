@@ -1,20 +1,16 @@
-import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
-import {
-    data,
-    type LoaderFunctionArgs,
-    type MetaFunction,
-    Outlet,
-    useLoaderData,
-} from "react-router"
-import { CultivationListPlan } from "~/components/blocks/cultivation/list-plan"
-import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { NavLink, useLoaderData, type MetaFunction } from "react-router"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
-import { getSession } from "~/lib/auth.server"
-import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
-import { handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
+import {
+    action as originalAction,
+    loader as originalLoader,
+} from "./farm.$b_id_farm.$calendar.rotation._index"
+import { FarmTitle } from "../components/blocks/farm/farm-title"
+import { Button } from "../components/ui/button"
+import { FarmContent } from "../components/blocks/farm/farm-content"
+import { DataTable } from "../components/blocks/rotation/table"
+import { columns } from "../components/blocks/rotation/columns"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -43,93 +39,80 @@ export const meta: MetaFunction = () => {
  * @throws {Response} 400 if the farm ID is missing.
  * @throws {Response} 404 if the farm is not found.
  */
-export async function loader({ request, params }: LoaderFunctionArgs) {
-    try {
-        // Get the Id of the farm
-        const b_id_farm = params.b_id_farm
-        if (!b_id_farm) {
-            throw data("Farm ID is required", {
-                status: 400,
-                statusText: "Farm ID is required",
-            })
-        }
-
-        // Get the session
-        const session = await getSession(request)
-
-        // Get timeframe from calendar store
-        const calendar = getCalendar(params)
-        const timeframe = getTimeframe(params)
-
-        const farm = await getFarm(fdm, session.principal_id, b_id_farm).catch(
-            (error) => {
-                throw data(`Failed to fetch farm: ${error.message}`, {
-                    status: 404,
-                    statusText: "Farm not found",
-                })
-            },
-        )
-
-        if (!farm) {
-            throw data("Farm not found", {
-                status: 404,
-                statusText: "Farm not found",
-            })
-        }
-
-        // Get the cultivationPlan
-        const cultivationPlan = await getCultivationPlan(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            timeframe,
-        )
-
-        return {
-            cultivationPlan: cultivationPlan,
-            b_id_farm: b_id_farm,
-            b_name_farm: farm.b_name_farm,
-            calendar: calendar,
-        }
-    } catch (error) {
-        throw handleLoaderError(error)
-    }
+export async function loader(props) {
+    return originalLoader(props)
 }
 
-// Main
-export default function Index() {
-    const loaderData = useLoaderData<typeof loader>()
-
+export default function FarmCreateRotationIndex() {
+    const loaderData = useLoaderData()
+    const currentFarmName =
+        loaderData.farmOptions.find(
+            (farm) => farm.b_id_farm === loaderData.b_id_farm,
+        )?.b_name_farm ?? ""
     return (
         <>
-            <Header action={undefined}>
+            <Header
+                action={{
+                    to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/fertilizers`,
+                    label: "Doorgaan",
+                }}
+            >
                 <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
             </Header>
             <main>
-                <FarmTitle
-                    title={"Gewassen in bouwplan"}
-                    description={
-                        "Werk de eigenschappen per gewas in je bouwplan bij."
-                    }
-                    action={{
-                        to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/fertilizers`,
-                        label: "Doorgaan",
-                    }}
-                />
-                <div className="space-y-6 px-8">
-                    <div className="grid xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-6">
-                        <CultivationListPlan
-                            cultivationPlan={loaderData.cultivationPlan}
-                            b_id_farm={loaderData.b_id_farm}
-                            calendar={loaderData.calendar}
-                            basePath="cultivations"
+                {loaderData.fieldOptions.length === 0 ? (
+                    <>
+                        <FarmTitle
+                            title={`Bouwplan van ${currentFarmName}`}
+                            description="Dit bedrijf heeft nog geen bouwplan"
                         />
-                        <div className="xl:col-span-2">
-                            <Outlet />
+                        <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
+                            <div className="flex flex-col space-y-2 text-center">
+                                <h1 className="text-2xl font-semibold tracking-tight">
+                                    Het lijkt erop dat je nog geen bouwplan hebt
+                                    :(
+                                </h1>
+                            </div>
+                            <div className="flex flex-col items-center relative">
+                                <Button
+                                    asChild
+                                    className={cn(
+                                        !loaderData.farmWritePermission
+                                            ? "invisible"
+                                            : "",
+                                    )}
+                                >
+                                    <NavLink to="../field/new">
+                                        Maak een perceel
+                                    </NavLink>
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </>
+                ) : (
+                    <>
+                        <div className="flex items-center justify-between">
+                            <FarmTitle
+                                title={`Bouwplan van ${currentFarmName}`}
+                                description="Bekijk het bouwplan en voeg gegevens toe."
+                            />
+                        </div>
+                        <FarmContent>
+                            <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
+                                <DataTable
+                                    columns={columns}
+                                    data={loaderData.rotationExtended}
+                                    canAddItem={loaderData.farmWritePermission}
+                                />
+                            </div>
+                        </FarmContent>
+                    </>
+                )}
             </main>
         </>
     )
+}
+
+export async function action(props) {
+    return originalAction(props)
 }

@@ -19,8 +19,9 @@ import { nl } from "date-fns/locale/nl"
 import fuzzysort from "fuzzysort"
 import { ChevronDown, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { NavLink, useParams } from "react-router-dom"
+import { NavLink, useLocation, useParams } from "react-router-dom"
 import { toast as notify } from "sonner"
+import { modifySearchParams } from "@/app/lib/url-utils"
 import { useActiveTableFormStore } from "@/app/store/active-table-form"
 import { useFieldFilterStore } from "@/app/store/field-filter"
 import { Button } from "~/components/ui/button"
@@ -72,6 +73,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
     )
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
     const lastSelectedRowIndex = useRef<string | null>(null)
+    const location = useLocation()
 
     useEffect(() => {
         setColumnVisibility(
@@ -316,6 +318,14 @@ export function DataTable<TData extends RotationExtended, TValue>({
               ? harvestErrorMessage
               : "Oogst toevoegen aan geselecteerd gewas"
 
+    function makeWizardUrl(url: string) {
+        return modifySearchParams(url, (searchParams) => {
+            searchParams.set("cultivationIds", selectedCultivationIds.join(","))
+            searchParams.set("fieldIds", selectedFieldIds.join(","))
+            if (location.pathname.toLowerCase().startsWith("/farm/create"))
+                searchParams.set("create", "")
+        })
+    }
     return (
         <div className="w-full flex flex-col h-full">
             <div className="sticky top-0 z-10 bg-background py-4 flex flex-col sm:flex-row gap-2 items-center">
@@ -384,7 +394,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                         </Button>
                                     ) : (
                                         <NavLink
-                                            to={`/farm/${b_id_farm}/${calendar}/rotation/fertilizer?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}&fieldIds=${selectedFieldIds.map(encodeURIComponent).join(",")}`}
+                                            to={makeWizardUrl(
+                                                `/farm/${b_id_farm}/${calendar}/rotation/fertilizer`,
+                                            )}
                                         >
                                             <Button>
                                                 <Plus className="mr-2 h-4 w-4" />
@@ -425,7 +437,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                         </Button>
                                     ) : (
                                         <NavLink
-                                            to={`/farm/${b_id_farm}/${calendar}/rotation/harvest?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}&fieldIds=${selectedFieldIds.map(encodeURIComponent).join(",")}`}
+                                            to={makeWizardUrl(
+                                                `/farm/${b_id_farm}/${calendar}/rotation/harvest`,
+                                            )}
                                         >
                                             <Button>
                                                 <Plus className="mr-2 h-4 w-4" />
