@@ -107,96 +107,53 @@ export function DataTable<TData extends RotationExtended, TValue>({
         }
 
         clearActiveForm()
-
-        if (event.shiftKey && lastSelectedRowIndex.current !== null) {
+        console.log(lastSelectedRowIndex)
+        if (event.shiftKey) {
             document.getSelection()?.removeAllRanges()
-
-            const parentRowModel = table.getFilteredRowModel()
-            const lastSelectedRowId = lastSelectedRowIndex.current
-            lastSelectedRowIndex.current = null
-            const lastSelectedRow = table.getRow(lastSelectedRowId)
+            const lastSelectedRow =
+                lastSelectedRowIndex.current &&
+                table.getRow(lastSelectedRowIndex.current)
             if (lastSelectedRow) {
-                const mode = lastSelectedRow.getIsSelected()
-                const currentSelectedParentIndex =
-                    row.getParentRow()?.index ?? row.index
-                const lastSelectedParentIndex =
-                    lastSelectedRow.getParentRow()?.index ??
-                    lastSelectedRow.index
-                const startRow =
-                    currentSelectedParentIndex < lastSelectedParentIndex
-                        ? row
-                        : currentSelectedParentIndex > lastSelectedParentIndex
-                          ? lastSelectedRow
-                          : row.index < lastSelectedRow.index
-                            ? row
-                            : lastSelectedRow
-                const endRow =
-                    lastSelectedRow.id !== startRow.id ? lastSelectedRow : row
-                const parentRowStart = startRow.getParentRow() ?? startRow
-                const parentRowEnd = endRow.getParentRow() ?? endRow
-
                 const newRowSelection = { ...rowSelection }
-                // Select-deselect all rows in between
-                for (
-                    let i = parentRowStart.index + 1;
-                    i < parentRowEnd.index;
-                    i++
-                ) {
-                    const row = parentRowModel.rows[i]
-                    newRowSelection[row.id] = mode
-                    row.subRows.forEach((subRow) => {
-                        newRowSelection[subRow.id] = mode
-                    })
+                const visibleRows = table.getRowModel().flatRows
+
+                // Select or deselect everything in between
+                const mode = lastSelectedRow.getIsSelected()
+                const lastIndex = visibleRows.findIndex(
+                    (r) => r.id === lastSelectedRow.id,
+                )
+                const currentIndex = visibleRows.findIndex(
+                    (r) => r.id === row.id,
+                )
+
+                const start = Math.min(lastIndex, currentIndex)
+                const end = Math.max(lastIndex, currentIndex)
+
+                const affectedCropRows = []
+                for (let i = start; i <= end; i++) {
+                    const parentRow = visibleRows[i].getParentRow()
+                    if (parentRow) {
+                        affectedCropRows.push(parentRow)
+                        newRowSelection[visibleRows[i].id] = mode
+                    }
                 }
-                if (parentRowStart.id === parentRowEnd.id) {
-                    // Select within one parent row
-                    const cutoffStart = startRow.getParentRow()
-                        ? startRow.index
-                        : 0
-                    const cutoffEnd = endRow.getParentRow()
-                        ? endRow.index
-                        : endRow.subRows.length - 1
-                    for (let i = cutoffStart; i <= cutoffEnd; i++) {
-                        const row = parentRowStart.subRows[i]
-                        newRowSelection[row.id] = mode
-                    }
-                    newRowSelection[parentRowStart.id] =
-                        parentRowStart.subRows.every(
-                            (row) => newRowSelection[row.id],
-                        )
-                } else {
-                    // For the start row, select only ones greater than the index
-                    const cutoffStart = startRow.getParentRow()
-                        ? startRow.index
-                        : 0
-                    for (
-                        let i = cutoffStart;
-                        i < parentRowStart.subRows.length;
-                        i++
-                    ) {
-                        const row = parentRowStart.subRows[i]
-                        newRowSelection[row.id] = mode
-                    }
-                    newRowSelection[parentRowStart.id] =
-                        parentRowStart.subRows.every(
-                            (row) => newRowSelection[row.id],
-                        )
-                    // For the end row, select only ones greater than the index
-                    const cutoffEnd = endRow.getParentRow()
-                        ? endRow.index
-                        : endRow.subRows.length - 1
-                    for (let i = 0; i <= cutoffEnd; i++) {
-                        const row = parentRowEnd.subRows[i]
-                        newRowSelection[row.id] = mode
-                    }
-                    newRowSelection[parentRowEnd.id] =
-                        parentRowEnd.subRows.every(
-                            (row) => newRowSelection[row.id],
-                        )
+
+                // Toggle selection of the currently clicked row
+                // This behavior can be removed as needed
+                if (row.getIsSelected() === mode) {
+                    newRowSelection[row.id] = !mode
+                }
+
+                // Update the derived selection state of crop rows
+                for (const row of affectedCropRows) {
+                    newRowSelection[row.id] = row.subRows.every(
+                        (subRow) => newRowSelection[subRow.id],
+                    )
                 }
                 setRowSelection(newRowSelection)
             }
         } else {
+            lastSelectedRowIndex.current = null
             const newIsSelected = !row.getIsSelected()
             row.toggleSelected(newIsSelected)
             const parentRow = row.getParentRow()
@@ -212,8 +169,8 @@ export function DataTable<TData extends RotationExtended, TValue>({
                     })
                 }
             }
-            lastSelectedRowIndex.current = row.id
         }
+        lastSelectedRowIndex.current = row.id
     }
 
     const memoizedData = useMemo(() => {
