@@ -494,6 +494,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         // Return user information from loader
         return {
             b_id_farm: b_id_farm,
+            calendar: calendar,
             farmOptions: farmOptions,
             fieldOptions: fieldOptions,
             rotationExtended: rotationExtended, // Return filtered data

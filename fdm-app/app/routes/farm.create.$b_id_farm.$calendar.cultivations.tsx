@@ -51,12 +51,7 @@ export default function FarmCreateRotationIndex() {
         )?.b_name_farm ?? ""
     return (
         <>
-            <Header
-                action={{
-                    to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/fertilizers`,
-                    label: "Doorgaan",
-                }}
-            >
+            <Header action={undefined}>
                 <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
             </Header>
             <main>
@@ -65,6 +60,10 @@ export default function FarmCreateRotationIndex() {
                         <FarmTitle
                             title={`Bouwplan van ${currentFarmName}`}
                             description="Dit bedrijf heeft nog geen bouwplan"
+                            action={{
+                                to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/fertilizers`,
+                                label: "Doorgaan",
+                            }}
                         />
                         <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
                             <div className="flex flex-col space-y-2 text-center">
@@ -74,15 +73,10 @@ export default function FarmCreateRotationIndex() {
                                 </h1>
                             </div>
                             <div className="flex flex-col items-center relative">
-                                <Button
-                                    asChild
-                                    className={cn(
-                                        !loaderData.farmWritePermission
-                                            ? "invisible"
-                                            : "",
-                                    )}
-                                >
-                                    <NavLink to="../field/new">
+                                <Button asChild>
+                                    <NavLink
+                                        to={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/fields`}
+                                    >
                                         Maak een perceel
                                     </NavLink>
                                 </Button>
@@ -91,12 +85,14 @@ export default function FarmCreateRotationIndex() {
                     </>
                 ) : (
                     <>
-                        <div className="flex items-center justify-between">
-                            <FarmTitle
-                                title={`Bouwplan van ${currentFarmName}`}
-                                description="Bekijk het bouwplan en voeg gegevens toe."
-                            />
-                        </div>
+                        <FarmTitle
+                            title={`Bouwplan van ${currentFarmName}`}
+                            description="Dit bedrijf heeft nog geen bouwplan"
+                            action={{
+                                to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/fertilizers`,
+                                label: "Doorgaan",
+                            }}
+                        />
                         <FarmContent>
                             <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
                                 <DataTable
