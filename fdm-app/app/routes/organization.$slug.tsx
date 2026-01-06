@@ -385,30 +385,18 @@ export async function action({ request, params }: ActionFunctionArgs) {
         if (!params.slug) {
             throw handleActionError("not found: organization")
         }
-        const formValues = await extractFormValuesFromRequest(
-            request,
-            FormSchema,
+
+        const organizations = await auth.api.listOrganizations({
+            headers: request.headers,
+        })
+        const organization = organizations.find(
+            (org) => org.slug === params.slug,
         )
-        const session = await getSession(request)
-
-        // We need organizationId. We can get it from formValues if passed, or fetch by slug again.
-        // It's safer to fetch by slug to ensure user has access (listOrganizations checks this).
-        let organizationId = formValues.organization_id
-        let organizationName = ""
-
-        if (!organizationId) {
-            const organizations = await auth.api.listOrganizations({
-                headers: request.headers,
-            })
-            const organization = organizations.find(
-                (org) => org.slug === params.slug,
-            )
-            if (!organization) {
-                throw handleActionError("not found: organization")
-            }
-            organizationId = organization.id
-            organizationName = organization.name
+        if (!organization) {
+            throw handleActionError("not found: organization")
         }
+        const organizationId = organization.id
+        const organizationName = organization.name
 
         if (formValues.intent === "invite_user") {
             if (!formValues.email) {
