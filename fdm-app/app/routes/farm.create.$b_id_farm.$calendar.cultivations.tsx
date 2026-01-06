@@ -1,16 +1,17 @@
-import { NavLink, useLoaderData, type MetaFunction } from "react-router"
+import { type MetaFunction, NavLink, useLoaderData } from "react-router"
+import { FarmContent } from "~/components/blocks/farm/farm-content"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
+import { columns } from "~/components/blocks/rotation/columns"
+import { DataTable } from "~/components/blocks/rotation/table"
+import { Button } from "~/components/ui/button"
 import { clientConfig } from "~/lib/config"
+import type { Route as UpstreamRoute } from "./+types/farm.$b_id_farm.$calendar.rotation._index"
 import {
     action as originalAction,
     loader as originalLoader,
 } from "./farm.$b_id_farm.$calendar.rotation._index"
-import { FarmTitle } from "../components/blocks/farm/farm-title"
-import { Button } from "../components/ui/button"
-import { FarmContent } from "../components/blocks/farm/farm-content"
-import { DataTable } from "../components/blocks/rotation/table"
-import { columns } from "../components/blocks/rotation/columns"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -39,7 +40,7 @@ export const meta: MetaFunction = () => {
  * @throws {Response} 400 if the farm ID is missing.
  * @throws {Response} 404 if the farm is not found.
  */
-export async function loader(props) {
+export async function loader(props: UpstreamRoute.LoaderArgs) {
     return originalLoader(props)
 }
 
@@ -109,6 +110,6 @@ export default function FarmCreateRotationIndex() {
     )
 }
 
-export async function action(props) {
+export async function action(props: UpstreamRoute.ActionArgs) {
     return originalAction(props)
 }
