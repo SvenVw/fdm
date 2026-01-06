@@ -452,10 +452,10 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                         <TableHead
                                             key={header.id}
                                             className={cn("box-border", {
-                                                "sticky left-0 bg-background":
+                                                "sticky left-0":
                                                     header.column.id ===
                                                     "select",
-                                                "sticky right-0 bg-background":
+                                                "sticky right-0":
                                                     header.column.id ===
                                                     "actions",
                                                 "min-w-35":
@@ -480,25 +480,25 @@ export function DataTable<TData extends RotationExtended, TValue>({
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     key={row.id}
-                                    data-state={
-                                        row.getIsSelected()
-                                            ? "selected"
-                                            : row.original.type === "crop" &&
-                                              row.getIsSomeSelected() &&
-                                              "indeterminate"
-                                    }
                                     onClick={(event) =>
                                         handleRowClick(row, event)
                                     }
-                                    className="data-[state=selected]:bg-muted data-[state=indeterminate]:bg-muted/50"
+                                    className={cn(
+                                        "data-[state=selected]:bg-muted data-[state=indeterminate]:bg-muted/50",
+                                        row.getIsSelected()
+                                            ? "bg-green-100 hover:bg-green-300/50"
+                                            : row.original.type === "crop" &&
+                                                  row.getIsSomeSelected() &&
+                                                  "bg-green-50 hover:bg-green-300/25",
+                                    )}
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell
                                             key={cell.id}
                                             className={cn({
-                                                "sticky left-0 bg-background":
+                                                "sticky left-0":
                                                     cell.column.id === "select",
-                                                "sticky right-0 bg-background":
+                                                "sticky right-0":
                                                     cell.column.id ===
                                                     "actions",
                                             })}
