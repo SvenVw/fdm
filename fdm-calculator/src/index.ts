@@ -1,12 +1,14 @@
 import pkg from "./package"
 export const fdmCalculator = pkg
 export {
+    calculateNitrogenBalance,
     calculateNitrogenBalanceField,
     getNitrogenBalanceField,
 } from "./balance/nitrogen/index"
 export { collectInputForNitrogenBalance } from "./balance/nitrogen/input"
 export type {
     FieldInput,
+    NitrogenBalanceFieldInput,
     NitrogenBalanceFieldNumeric,
     NitrogenBalanceFieldResultNumeric,
     NitrogenBalanceInput,

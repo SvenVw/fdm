@@ -521,9 +521,22 @@ export type FertilizerDetail = Pick<
 >
 
 /**
- * Represents the overall input structure required for nitrogen balance calculation.
+ * Represents the overall input structure required for nitrogen balance calculation for an entire farm.
  */
 export type NitrogenBalanceInput = {
+    fields: FieldInput[]
+    fertilizerDetails: FertilizerDetail[]
+    cultivationDetails: CultivationDetail[]
+    timeFrame: {
+        start: Date
+        end: Date
+    }
+}
+
+/**
+ * Represents the input structure required for nitrogen balance calculation for a single field.
+ */
+export type NitrogenBalanceFieldInput = {
     fieldInput: FieldInput
     fertilizerDetails: FertilizerDetail[]
     cultivationDetails: CultivationDetail[]

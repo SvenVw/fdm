@@ -2,12 +2,11 @@ import {
     collectInputForNitrogenBalance,
     createFunctionsForFertilizerApplicationFilling,
     createFunctionsForNorms,
-    getNitrogenBalance,
+    getNitrogenBalanceField,
     getNutrientAdvice,
-    type NitrogenBalanceNumeric,
+    type NitrogenBalanceFieldResultNumeric,
 } from "@svenvw/fdm-calculator"
 import {
-    type Cultivation,
     type FdmType,
     type Field,
     type fdmSchema,
@@ -31,8 +30,8 @@ export async function getNitrogenBalanceforField({
     b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"]
     b_id: Field["b_id"]
     timeframe: Timeframe
-}): Promise<NitrogenBalanceNumeric> {
-    const nitrogenBalanceInput = await collectInputForNitrogenBalance(
+}): Promise<NitrogenBalanceFieldResultNumeric> {
+    const { fields, ...rest } = await collectInputForNitrogenBalance(
         fdm,
         principal_id,
         b_id_farm,
@@ -40,10 +39,10 @@ export async function getNitrogenBalanceforField({
         b_id,
     )
 
-    const nitrogenBalanceResult = await getNitrogenBalance(
-        fdm,
-        nitrogenBalanceInput,
-    )
+    const nitrogenBalanceResult = await getNitrogenBalanceField(fdm, {
+        fieldInput: fields[0],
+        ...rest,
+    })
     return nitrogenBalanceResult
 }
 
