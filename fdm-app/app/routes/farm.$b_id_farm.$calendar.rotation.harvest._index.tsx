@@ -444,7 +444,7 @@ export default function FarmRotationHarvestAddIndex() {
     }
 
     const backlink = loaderData.create
-        ? `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations`
+        ? `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`
         : `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`
     return (
         <SidebarInset>
@@ -1008,7 +1008,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         return redirectWithSuccess(
             url.searchParams.has("create")
-                ? `/farm/create/${b_id_farm}/${calendar}/cultivations`
+                ? `/farm/create/${b_id_farm}/${calendar}/rotation`
                 : `/farm/${b_id_farm}/${calendar}/rotation`,
             {
                 message: `Oogst succesvol toegevoegd aan ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,

@@ -344,7 +344,7 @@ export default function FarmRotationFertilizerAddIndex() {
             <Header
                 action={{
                     to: loaderData.create
-                        ? `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations`
+                        ? `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`
                         : `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`,
                     label: "Terug naar bouwplan",
                     disabled: false,
@@ -723,7 +723,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         return redirectWithSuccess(
             url.searchParams.has("create")
-                ? `/farm/create/${b_id_farm}/${calendar}/cultivations`
+                ? `/farm/create/${b_id_farm}/${calendar}/rotation`
                 : `/farm/${b_id_farm}/${calendar}/rotation`,
             {
                 message: `Bemesting succesvol toegevoegd aan ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
