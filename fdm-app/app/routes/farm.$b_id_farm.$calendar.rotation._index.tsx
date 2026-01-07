@@ -628,7 +628,7 @@ export async function action({ params, request }: Route.ActionArgs) {
         if (
             Object.keys(cultivationUpdates).length > 0 &&
             Object.values(cultivationUpdates).some(
-                (val) => typeof val !== "undefined" && val !== null,
+                (val) => typeof val !== "undefined",
             )
         ) {
             // Perform the cultivation updates
