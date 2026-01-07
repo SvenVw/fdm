@@ -78,9 +78,17 @@ export function ErrorBlock({
 
             {status === 404 ? (
                 <div className="flex flex-col sm:flex-row gap-4">
-                    <Button onClick={() => navigate(-1)}>
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Terug naar
-                        vorige pagina
+                    <Button
+                        onClick={() => {
+                            if (window.history.length > 1) {
+                                navigate(-1)
+                            } else {
+                                navigate("/")
+                            }
+                        }}
+                    >
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Terug naar vorige
+                        pagina
                     </Button>
                     <Button variant="outline" asChild>
                         <NavLink to="/">
