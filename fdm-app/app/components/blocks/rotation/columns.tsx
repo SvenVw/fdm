@@ -40,6 +40,7 @@ export type CropRow = {
     calendar: string
     b_lu_start: Date[]
     b_lu_end: Date[]
+    b_isproductive: boolean
     fields: FieldRow[]
 }
 

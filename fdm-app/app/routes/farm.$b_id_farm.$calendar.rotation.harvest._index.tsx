@@ -902,7 +902,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
             }
 
             return redirectWithSuccess(
-                `/farm/${b_id_farm}/${calendar}/rotation`,
+                url.searchParams.has("create")
+                    ? `/farm/create/${b_id_farm}/${calendar}/rotation`
+                    : `/farm/${b_id_farm}/${calendar}/rotation`,
                 {
                     message: `Oogst succesvol verwijderd van ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
                 },
