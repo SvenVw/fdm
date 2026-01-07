@@ -53,7 +53,7 @@ export default function FarmCreateRotationIndex() {
     return (
         <>
             <Header action={undefined}>
-                <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
+                <HeaderFarmCreate b_name_farm={currentFarmName} />
             </Header>
             <main>
                 {loaderData.fieldOptions.length === 0 ? (
