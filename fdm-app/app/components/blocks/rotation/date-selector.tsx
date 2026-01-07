@@ -16,15 +16,16 @@ type AllowedFormSchemaType = Pick<
     "b_lu_start" | "b_lu_end"
 >
 function TableDateSelectorForm({
+    fetcher,
     name,
     row,
     onHide,
 }: {
+    fetcher: ReturnType<typeof useFetcher>
     name: keyof AllowedFormSchemaType
     row: Row<RotationExtended>
     onHide?: () => unknown
 }) {
-    const fetcher = useFetcher()
     const value = row.original[name]
     const form = useForm({
         defaultValues: {
@@ -99,11 +100,16 @@ export function TableDateSelector({
     row: Row<RotationExtended>
     cellId: string
 }) {
+    const fetcher = useFetcher()
     const activeTableFormStore = useActiveTableFormStore()
     const value = row.original[name]
-    if (activeTableFormStore.activeForm === cellId) {
+    if (
+        fetcher.state !== "idle" ||
+        activeTableFormStore.activeForm === cellId
+    ) {
         return (
             <TableDateSelectorForm
+                fetcher={fetcher}
                 name={name}
                 row={row}
                 onHide={() => {
