@@ -62,7 +62,7 @@ export default function FarmCreateRotationIndex() {
                             title={`Bouwplan van ${currentFarmName}`}
                             description="Dit bedrijf heeft nog geen bouwplan"
                             action={{
-                                to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/fertilizers`,
+                                to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/access`,
                                 label: "Doorgaan",
                             }}
                         />
@@ -90,7 +90,7 @@ export default function FarmCreateRotationIndex() {
                             title={`Bouwplan van ${currentFarmName}`}
                             description="Dit bedrijf heeft nog geen bouwplan"
                             action={{
-                                to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/fertilizers`,
+                                to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/access`,
                                 label: "Doorgaan",
                             }}
                         />
