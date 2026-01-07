@@ -24,12 +24,10 @@ import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import {
     columns,
+    CropRow,
     type RotationExtended,
 } from "~/components/blocks/rotation/columns"
-import {
-    RotationTableFormSchema,
-    RotationTableFormSchemaType,
-} from "~/components/blocks/rotation/schema"
+import { RotationTableFormSchema } from "~/components/blocks/rotation/schema"
 import { DataTable } from "~/components/blocks/rotation/table"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
@@ -123,7 +121,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
             return {
                 b_id: field.b_id,
                 b_name: field.b_name,
-                b_area: Math.round(field.b_area * 10) / 10,
+                b_area: Math.round((field.b_area ?? 0) * 10) / 10,
             }
         })
 
@@ -172,9 +170,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
                         return {
                             b_lu: cultivation.b_lu,
-                            b_lu_harvest_date: harvests.map(
-                                (harvest) => harvest.b_lu_harvest_date,
-                            ),
+                            b_lu_harvest_date: harvests
+                                .filter((harvest) => harvest.b_lu_harvest_date)
+                                .map(
+                                    (harvest) =>
+                                        harvest.b_lu_harvest_date as Date,
+                                ),
                         }
                     }),
                 )
@@ -220,7 +221,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     fertilizers: fertilizersFiltered,
                     a_som_loi: a_som_loi,
                     b_soiltype_agr: b_soiltype_agr,
-                    b_area: Math.round(field.b_area * 10) / 10,
+                    b_area: Math.round((field.b_area ?? 0) * 10) / 10,
                     b_isproductive: field.b_isproductive ?? true,
                 }
             }),
@@ -230,8 +231,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
         const transformFieldsToRotationExtended = (
             fieldsExtended: FieldsExtended, // TODO: Define a proper type for fieldsExtended
-            _cultivationCatalogue: CultivationCatalogue,
-        ): RotationExtended[] => {
+            _cultivationCatalogue: CultivationCatalogue[],
+        ): CropRow[] => {
             const cultivationsInRotation: string[] = [
                 ...new Set(
                     fieldsExtended.flatMap(
@@ -371,9 +372,12 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                             .filter(
                                 (cultivation) =>
                                     cultivation.b_lu_catalogue ===
-                                    b_lu_catalogue,
+                                        b_lu_catalogue &&
+                                    cultivation.b_lu_start,
                             )
-                            .map((cultivation) => cultivation.b_lu_start),
+                            .map(
+                                (cultivation) => cultivation.b_lu_start as Date,
+                            ),
                         b_lu_end: field.cultivations
                             .filter(
                                 (cultivation) =>
@@ -389,10 +393,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                             .filter((harvest: { b_lu: string }) =>
                                 b_lu.includes(harvest.b_lu),
                             )
-                            .flatMap(
-                                (harvest: { b_lu_harvest_date: Date[] }) =>
-                                    harvest.b_lu_harvest_date,
-                            ),
+                            .flatMap((harvest) => harvest.b_lu_harvest_date),
                         b_lu_variety: Object.fromEntries(
                             Object.entries(
                                 field.cultivations
@@ -442,34 +443,22 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                                         (cultivation) => cultivation.b_lu_end,
                                     )
                                     .map((cultivation) => [
-                                        cultivation.b_lu_end,
-                                        cultivation.m_cropresidue,
+                                        cultivation.b_lu_end as Date,
+                                        cultivation.m_cropresidue ?? false,
                                     ]),
                             }
                         })(),
+                        calendar: calendar,
                         fertilizerApplications:
-                            field.fertilizerApplications.map(
-                                (app: {
-                                    p_name_nl: string
-                                    p_id: string
-                                    p_type: string
-                                }) => ({
-                                    p_name_nl: app.p_name_nl,
-                                    p_id: app.p_id,
-                                    p_type: app.p_type,
-                                }),
-                            ),
-                        fertilizers: field.fertilizers.map(
-                            (app: {
-                                p_name_nl: string
-                                p_id: string
-                                p_type: string
-                            }) => ({
+                            field.fertilizerApplications.map((app) => ({
                                 p_name_nl: app.p_name_nl,
                                 p_id: app.p_id,
-                                p_type: app.p_type,
-                            }),
-                        ),
+                            })),
+                        fertilizers: field.fertilizers.map((app) => ({
+                            p_name_nl: app.p_name_nl,
+                            p_id: app.p_id,
+                            p_type: app.p_type,
+                        })),
                     })),
                 }
             })
@@ -601,7 +590,7 @@ export default function FarmRotationIndex() {
 export async function action({ params, request }: Route.ActionArgs) {
     try {
         const session = await getSession(request)
-        const timeframe = await getTimeframe(params)
+        const timeframe = getTimeframe(params)
         const b_id_farm = params.b_id_farm
 
         const searchParams = new URL(request.url).searchParams

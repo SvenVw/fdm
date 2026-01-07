@@ -49,28 +49,25 @@ export type FieldRow = {
     b_name: string
     b_area: number
     b_isproductive: boolean
-    a_som_loi: number
-    b_soiltype_agr: string
+    a_som_loi: string | number
+    b_soiltype_agr: string | number
     m_cropresidue: "all" | "some" | "none"
     m_cropresidue_ending: [Date, boolean][]
     b_lu_variety: Record<string, number>
     b_lu_harvest_date: Date[]
-    b_lu_croprotation: string
-    b_lu_harvestable: "once" | "multiple" | "none"
     calendar: string
     b_lu_start: Date[]
     b_lu_end: Date[]
     fertilizerApplications: {
-        p_name_nl: string
+        p_name_nl: string | null
         p_id: string
-        p_type: string
     }[]
     fertilizers: {
-        p_name_nl: string
+        p_name_nl: string | null
         p_id: string
-        p_type: string
+        p_type: string | null
     }[]
-    fields: undefined
+    fields?: undefined
 }
 
 export type RotationExtended = CropRow | FieldRow
