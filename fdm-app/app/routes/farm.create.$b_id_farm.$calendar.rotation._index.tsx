@@ -45,7 +45,7 @@ export async function loader(props: UpstreamRoute.LoaderArgs) {
 }
 
 export default function FarmCreateRotationIndex() {
-    const loaderData = useLoaderData()
+    const loaderData = useLoaderData<typeof loader>()
     const currentFarmName =
         loaderData.farmOptions.find(
             (farm) => farm.b_id_farm === loaderData.b_id_farm,
@@ -88,7 +88,7 @@ export default function FarmCreateRotationIndex() {
                     <>
                         <FarmTitle
                             title={`Bouwplan van ${currentFarmName}`}
-                            description="Dit bedrijf heeft nog geen bouwplan"
+                            description="Bekijk het bouwplan en voeg gegevens toe."
                             action={{
                                 to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/access`,
                                 label: "Doorgaan",

@@ -617,14 +617,6 @@ export async function action({ params, request }: Route.ActionArgs) {
             RotationTableFormSchema,
         )
 
-        let fields: Awaited<ReturnType<typeof getFields>> | null
-        async function loadFields() {
-            fields ??= (
-                await getFields(fdm, session.principal_id, b_id_farm, timeframe)
-            ).filter((field) => fieldIds.has(field.b_id))
-            return fields
-        }
-
         if (
             Object.keys(cultivationUpdates).length > 0 &&
             Object.values(cultivationUpdates).some(
@@ -632,7 +624,9 @@ export async function action({ params, request }: Route.ActionArgs) {
             )
         ) {
             // Perform the cultivation updates
-            const fields = await loadFields()
+            const fields = (
+                await getFields(fdm, session.principal_id, b_id_farm, timeframe)
+            ).filter((field) => fieldIds.has(field.b_id))
             await Promise.all(
                 fields.map(async (field) => {
                     const cultivations = (
