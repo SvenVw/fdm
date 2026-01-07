@@ -32,7 +32,7 @@ import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import { SoilDataCards } from "~/components/blocks/soil/cards"
 import { Combobox } from "~/components/custom/combobox"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -361,7 +361,7 @@ export default function Index() {
                                             >
                                                 {form.formState
                                                     .isSubmitting && (
-                                                    <LoadingSpinner />
+                                                    <Spinner />
                                                 )}
                                                 Bijwerken
                                             </Button>

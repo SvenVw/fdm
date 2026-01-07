@@ -1,5 +1,5 @@
 import { Form } from "react-router"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import {
     AlertDialog,
     AlertDialogCancel,
@@ -51,7 +51,7 @@ export function FarmDeleteDialog({
                         >
                             {isSubmitting ? (
                                 <div className="flex items-center space-x-2">
-                                    <LoadingSpinner />
+                                    <Spinner />
                                     <span>Verwijderen</span>
                                 </div>
                             ) : (

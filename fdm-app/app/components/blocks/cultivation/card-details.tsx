@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import { Form, useFetcher, useLocation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { DatePicker } from "~/components/custom/date-picker"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Checkbox } from "~/components/ui/checkbox"
@@ -88,7 +88,7 @@ export function CultivationDetailsCard({
                             {form.formState.isSubmitting ||
                             fetcher.state === "submitting" ? (
                                 <div className="flex items-center space-x-2">
-                                    <LoadingSpinner />
+                                    <Spinner />
                                 </div>
                             ) : null}
                             Verwijderen
@@ -220,7 +220,7 @@ export function CultivationDetailsCard({
                                     {form.formState.isSubmitting ||
                                     fetcher.state === "submitting" ? (
                                         <div className="flex items-center space-x-2">
-                                            <LoadingSpinner />{" "}
+                                            <Spinner />{" "}
                                             <p>Bijwerken...</p>
                                         </div>
                                     ) : (

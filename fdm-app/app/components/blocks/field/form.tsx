@@ -5,7 +5,7 @@ import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { Combobox } from "~/components/custom/combobox"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Dialog,
@@ -131,7 +131,7 @@ export default function FieldDetailsDialog({
                                 >
                                     {form.formState.isSubmitting ? (
                                         <div className="flex items-center space-x-2">
-                                            <LoadingSpinner />
+                                            <Spinner />
                                             <span>Opslaan...</span>
                                         </div>
                                     ) : (
