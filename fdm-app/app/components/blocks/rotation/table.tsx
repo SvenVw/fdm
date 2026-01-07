@@ -502,8 +502,19 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                         row.getIsSelected()
                                             ? "bg-green-100 hover:bg-green-300/50"
                                             : row.original.type === "crop" &&
-                                                  row.getIsSomeSelected() &&
-                                                  "bg-green-50 hover:bg-green-300/25",
+                                                row.getIsSomeSelected()
+                                              ? "bg-green-50 hover:bg-green-300/25"
+                                              : row.original.type === "field" &&
+                                                "bg-muted/50 hover:bg-muted",
+                                        row.original.type === "field" &&
+                                            row.index === 0
+                                            ? "shadow-[inset_0_1em_2em_-2em_#00000088]"
+                                            : row.index ===
+                                                  (
+                                                      row.getParentRow() as Row<TData>
+                                                  )?.subRows.length -
+                                                      1 &&
+                                                  "shadow-[inset_0_-1em_2em_-2em_#00000088]",
                                     )}
                                 >
                                     {row.getVisibleCells().map((cell) => (
