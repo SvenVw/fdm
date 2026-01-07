@@ -5,7 +5,7 @@ import {
     CircleQuestionMark,
 } from "lucide-react"
 import React from "react"
-import { NavLink, useFetcher, useParams } from "react-router-dom"
+import { NavLink, useFetcher, useLocation, useParams } from "react-router-dom"
 import { cn } from "@/app/lib/utils"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
@@ -158,6 +158,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
         cell: ({ row }) => {
             const original = row.original
             const params = useParams()
+            const location = useLocation()
             return original.type === "crop" ? (
                 <Badge
                     style={{
@@ -172,7 +173,11 @@ export const columns: ColumnDef<RotationExtended>[] = [
                 </Badge>
             ) : (
                 <NavLink
-                    to={`/farm/${params.b_id_farm}/${params.calendar}/field/${original.b_id}`}
+                    to={
+                        location.pathname.includes("/farm/create")
+                            ? `/farm/create/${params.b_id_farm}/${params.calendar}/fields/${original.b_id}`
+                            : `/farm/${params.b_id_farm}/${params.calendar}/field/${original.b_id}`
+                    }
                     className="group flex items-center hover:underline w-fit"
                 >
                     <div className="group flex items-center hover:underline w-fit ps-4">
