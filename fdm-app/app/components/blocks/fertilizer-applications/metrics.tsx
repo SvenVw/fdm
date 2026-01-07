@@ -1,7 +1,7 @@
 import type {
     Dose,
     GebruiksnormResult,
-    NitrogenBalanceNumeric,
+    NitrogenBalanceFieldResultNumeric,
     NormFilling,
     NutrientAdvice,
 } from "@svenvw/fdm-calculator"
@@ -46,7 +46,7 @@ interface FertilizerApplicationMetricsData {
             nitrogen: NormFilling
         }
     }>
-    nitrogenBalance: Promise<NitrogenBalanceNumeric> | undefined
+    nitrogenBalance: Promise<NitrogenBalanceFieldResultNumeric> | undefined
     nutrientAdvice: NutrientAdvice
     dose: Dose
     b_id: string
@@ -327,11 +327,19 @@ export function FertilizerApplicationMetricsCard({
                                             resolve={nitrogenBalance}
                                         >
                                             {(resolvedNitrogenBalance) => {
+                                                const balance =
+                                                    resolvedNitrogenBalance?.balance
+                                                if (!balance) {
+                                                    return (
+                                                        <div>
+                                                            Geen balans
+                                                            beschikbaar
+                                                        </div>
+                                                    )
+                                                }
                                                 const task =
-                                                    resolvedNitrogenBalance
-                                                        .balance.target -
-                                                    resolvedNitrogenBalance
-                                                        .balance.balance
+                                                    balance.target -
+                                                    balance.balance
                                                 return (
                                                     <div className="flex flex-col space-y-1">
                                                         {/* Simplified Flow (Top Section) */}
@@ -360,10 +368,10 @@ export function FertilizerApplicationMetricsCard({
 
                                                             <span className="font-semibold text-right whitespace-nowrap px-2">
                                                                 {Math.round(
-                                                                    resolvedNitrogenBalance
-                                                                        .balance
+                                                                    balance
                                                                         .supply
-                                                                        .total,
+                                                                        ?.total ??
+                                                                        0,
                                                                 )}{" "}
                                                                 kg N
                                                             </span>
@@ -389,10 +397,10 @@ export function FertilizerApplicationMetricsCard({
                                                             </Tooltip>
                                                             <span className="font-semibold text-right whitespace-nowrap px-2">
                                                                 {Math.round(
-                                                                    resolvedNitrogenBalance
-                                                                        .balance
+                                                                    balance
                                                                         .removal
-                                                                        .total,
+                                                                        ?.total ??
+                                                                        0,
                                                                 )}{" "}
                                                                 kg N
                                                             </span>
@@ -420,11 +428,11 @@ export function FertilizerApplicationMetricsCard({
                                                             </Tooltip>
                                                             <span className="font-semibold text-right whitespace-nowrap px-2">
                                                                 {Math.round(
-                                                                    resolvedNitrogenBalance
-                                                                        .balance
+                                                                    balance
                                                                         .emission
-                                                                        .ammonia
-                                                                        .total,
+                                                                        ?.ammonia
+                                                                        ?.total ??
+                                                                        0,
                                                                 )}{" "}
                                                                 kg N
                                                             </span>

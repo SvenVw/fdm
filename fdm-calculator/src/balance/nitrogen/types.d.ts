@@ -472,7 +472,13 @@ export type FieldInput = {
     field: Pick<Field, "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end">
     cultivations: Pick<
         Cultivation,
-        "b_lu" | "b_lu_start" | "b_lu_end" | "b_lu_catalogue" | "m_cropresidue"
+        | "b_lu"
+        | "b_lu_start"
+        | "b_lu_end"
+        | "b_lu_catalogue"
+        | "m_cropresidue"
+        | "b_lu_name"
+        | "b_lu_croprotation"
     >[]
     harvests: Harvest[]
     soilAnalyses: Pick<

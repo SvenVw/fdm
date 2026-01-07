@@ -1,10 +1,12 @@
 import {
+    calculateNitrogenBalance,
     collectInputForNitrogenBalance,
     createFunctionsForFertilizerApplicationFilling,
     createFunctionsForNorms,
     getNitrogenBalanceField,
     getNutrientAdvice,
     type NitrogenBalanceFieldResultNumeric,
+    type NitrogenBalanceNumeric,
 } from "@svenvw/fdm-calculator"
 import {
     type FdmType,
@@ -43,7 +45,32 @@ export async function getNitrogenBalanceforField({
         fieldInput: fields[0],
         ...rest,
     })
-    return nitrogenBalanceResult
+    return {
+        b_id: b_id,
+        b_area: fields[0].field.b_area ?? 0,
+        balance: nitrogenBalanceResult,
+    }
+}
+
+export async function getNitrogenBalanceForFarm({
+    fdm,
+    principal_id,
+    b_id_farm,
+    timeframe,
+}: {
+    fdm: FdmType
+    principal_id: PrincipalId
+    b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"]
+    timeframe: Timeframe
+}): Promise<NitrogenBalanceNumeric> {
+    const input = await collectInputForNitrogenBalance(
+        fdm,
+        principal_id,
+        b_id_farm,
+        timeframe,
+    )
+
+    return calculateNitrogenBalance(fdm, input)
 }
 
 export async function getNutrientAdviceForField({
@@ -55,8 +82,8 @@ export async function getNutrientAdviceForField({
 }: {
     fdm: FdmType
     principal_id: PrincipalId
-    b_id: Field.b_id
-    b_centroid: Field.b_centroid
+    b_id: Field["b_id"]
+    b_centroid: Field["b_centroid"]
     timeframe: Timeframe
 }) {
     const nmiApiKey = getNmiApiKey()
@@ -69,7 +96,7 @@ export async function getNutrientAdviceForField({
         b_id,
         timeframe,
     )
-    let b_lu_catalogue: Cultivation.b_lu_catalogue
+    let b_lu_catalogue: string | null
 
     if (!cultivations.length) {
         b_lu_catalogue = null
@@ -96,7 +123,7 @@ export async function getNorms({
 }: {
     fdm: FdmType
     principal_id: PrincipalId
-    b_id: Field.b_id
+    b_id: Field["b_id"]
 }) {
     const functionsForNorms = createFunctionsForNorms("NL", "2025")
     const functionsForFilling = createFunctionsForFertilizerApplicationFilling(

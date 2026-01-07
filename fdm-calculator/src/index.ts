@@ -16,6 +16,7 @@ export type {
     NitrogenEmissionAmmoniaFertilizersNumeric,
     NitrogenEmissionAmmoniaNumeric,
     NitrogenEmissionAmmoniaResiduesNumeric,
+    NitrogenEmissionNumeric,
     NitrogenRemovalHarvestsNumeric,
     NitrogenRemovalNumeric,
     NitrogenRemovalResiduesNumeric,
