@@ -1,7 +1,10 @@
 import Decimal from "decimal.js"
 import type {
     NitrogenBalance,
+    NitrogenBalanceField,
     NitrogenBalanceFieldNumeric,
+    NitrogenBalanceFieldResult,
+    NitrogenBalanceFieldResultNumeric,
     NitrogenBalanceNumeric,
 } from "../nitrogen/types"
 import type {
@@ -30,34 +33,6 @@ export function convertDecimalToNumberRecursive(data: unknown): unknown {
         return newData
     }
     return data
-}
-
-// Main conversion function for NitrogenBalance
-export function convertNitrogenBalanceToNumeric(
-    balance: NitrogenBalance,
-): NitrogenBalanceNumeric {
-    const numericBalance = convertDecimalToNumberRecursive(
-        balance,
-    ) as NitrogenBalanceNumeric
-
-    numericBalance.fields = balance.fields.map((fieldResult) => {
-        if (fieldResult.balance) {
-            return {
-                b_id: fieldResult.b_id,
-                b_area: fieldResult.b_area,
-                balance: convertDecimalToNumberRecursive(
-                    fieldResult.balance,
-                ) as NitrogenBalanceFieldNumeric,
-            }
-        }
-        return {
-            b_id: fieldResult.b_id,
-            b_area: fieldResult.b_area,
-            errorMessage: fieldResult.errorMessage,
-        }
-    })
-
-    return numericBalance
 }
 
 // Main conversion function for OrganicMatterBalance

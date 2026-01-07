@@ -18,7 +18,7 @@ import {
 } from "@svenvw/fdm-core"
 import { getNmiApiKey } from "./nmi"
 
-// Get nitrogen balance for the field
+// Get nitrogen balance for a field
 export async function getNitrogenBalanceforField({
     fdm,
     principal_id,
@@ -29,7 +29,7 @@ export async function getNitrogenBalanceforField({
     fdm: FdmType
     principal_id: PrincipalId
     b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"]
-    b_id: Field.b_id
+    b_id: Field["b_id"]
     timeframe: Timeframe
 }): Promise<NitrogenBalanceNumeric> {
     const nitrogenBalanceInput = await collectInputForNitrogenBalance(
@@ -44,14 +44,7 @@ export async function getNitrogenBalanceforField({
         fdm,
         nitrogenBalanceInput,
     )
-    const nitrogenBalance = nitrogenBalanceResult.fields.find(
-        (field: { b_id: string }) => field.b_id === b_id,
-    )
-    if (!nitrogenBalance) {
-        throw new Error(`Nitrogen balance not found for field ${b_id}`)
-    }
-
-    return nitrogenBalance
+    return nitrogenBalanceResult
 }
 
 export async function getNutrientAdviceForField({
