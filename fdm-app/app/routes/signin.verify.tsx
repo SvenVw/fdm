@@ -15,7 +15,7 @@ import type { z } from "zod"
 import { AuthCard } from "~/components/blocks/auth/auth-card"
 import { AuthCodeField } from "~/components/blocks/auth/auth-code-field"
 import { AuthLayout } from "~/components/blocks/auth/auth-layout"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import { auth } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
@@ -111,7 +111,7 @@ export default function Verify() {
                     >
                         {isSubmitting ? (
                             <div className="flex items-center space-x-2">
-                                <LoadingSpinner />
+                                <Spinner />
                                 <span>Verifiëren...</span>
                             </div>
                         ) : (

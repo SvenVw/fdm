@@ -19,7 +19,7 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { DatePicker } from "~/components/custom/date-picker-v2"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import { Field, FieldError, FieldLabel } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
@@ -242,7 +242,7 @@ export default function FarmFieldsOverviewBlock() {
                                 !loaderData.fieldWritePermission && "invisible",
                             )}
                         >
-                            {form.formState.isSubmitting && <LoadingSpinner />}
+                            {form.formState.isSubmitting && <Spinner />}
                             Bijwerken
                         </Button>
                     </div>
