@@ -93,7 +93,7 @@ export type NitrogenSupplyFixation = {
 }
 
 /**
- * Represents the nitrogen supply derived from atmospheric depostion.
+ * Represents the nitrogen supply derived from atmospheric deposition.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
 export type NitrogenSupplyDeposition = {
