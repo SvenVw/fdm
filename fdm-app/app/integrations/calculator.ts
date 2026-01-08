@@ -47,6 +47,10 @@ export async function getNitrogenBalanceforField({
         b_id,
     )
 
+    if (fields.length === 0) {
+        throw new Error(`Field ${b_id} not found for farm ${b_id_farm}`)
+    }
+
     const nitrogenBalanceResult = await getNitrogenBalanceField(fdm, {
         fieldInput: fields[0],
         ...rest,
@@ -103,6 +107,10 @@ export async function getOrganicMatterBalanceForField({
         timeframe,
         b_id,
     )
+
+    if (fields.length === 0) {
+        throw new Error(`Field ${b_id} not found for farm ${b_id_farm}`)
+    }
 
     const organicMatterBalanceResult = await getOrganicMatterBalanceField(fdm, {
         fieldInput: fields[0],
