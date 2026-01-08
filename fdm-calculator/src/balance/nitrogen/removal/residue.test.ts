@@ -296,6 +296,8 @@ describe("calculateNitrogenRemovalByResidue", () => {
                 b_lu_start: new Date("2022-01-01"),
                 b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: true,
+                b_lu_name: "test",
+                b_lu_croprotation: null
             },
         ]
         const harvests: FieldInput["harvests"] = []

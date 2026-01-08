@@ -9,8 +9,6 @@ import {
 } from "./index"
 import * as supply from "./supply"
 import type {
-    CultivationDetail,
-    FertilizerDetail,
     FieldInput,
     OrganicMatterBalanceFieldNumeric,
     OrganicMatterBalanceFieldResultNumeric,
@@ -33,8 +31,6 @@ describe("Organic Matter Balance Calculation", () => {
     const mockCultivations: FieldInput["cultivations"] = []
     const mockFertilizerApplications: FieldInput["fertilizerApplications"] = []
     const mockSoilAnalyses: FieldInput["soilAnalyses"] = []
-    const mockCultivationDetailsMap = new Map<string, CultivationDetail>()
-    const mockFertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
     describe("calculateOrganicMatterBalanceField", () => {
         it("should calculate balance as supply - degradation", () => {
