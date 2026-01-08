@@ -85,10 +85,6 @@ describe("Organic Matter Balance Calculation", () => {
                     } as OrganicMatterBalanceFieldNumeric,
                 },
             ]
-            const fields: FieldInput[] = [
-                { field: { b_id: "field1", b_area: 10 } } as FieldInput,
-                { field: { b_id: "field2", b_area: 5 } } as FieldInput,
-            ]
 
             const farmBalance = calculateOrganicMatterBalancesFieldToFarm(
                 results,
@@ -116,10 +112,6 @@ describe("Organic Matter Balance Calculation", () => {
                     } as OrganicMatterBalanceFieldNumeric,
                 },
                 { b_id: "field2", b_area: 5, errorMessage: "Failed" },
-            ]
-            const fields: FieldInput[] = [
-                { field: { b_id: "field1", b_area: 10 } } as FieldInput,
-                { field: { b_id: "field2", b_area: 5 } } as FieldInput,
             ]
             const farmBalance = calculateOrganicMatterBalancesFieldToFarm(
                 results,
