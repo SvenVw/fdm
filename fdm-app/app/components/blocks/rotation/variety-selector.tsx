@@ -29,7 +29,11 @@ function TableVarietySelectorForm({
     onHide?: () => unknown
 }) {
     const fetcher = useFetcher()
-    const currentSortedValues = Object.keys(row.original[name])
+    const currentSortedValues = (
+        Object.entries(row.original[name]) as [string, number][]
+    )
+        .sort((a, b) => b[1] - a[1])
+        .map(([key]) => key)
     const value = currentSortedValues?.length ? currentSortedValues[0] : null
     const form = useForm({
         defaultValues: {

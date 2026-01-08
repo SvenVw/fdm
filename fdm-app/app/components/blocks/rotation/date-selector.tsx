@@ -29,7 +29,7 @@ function TableDateSelectorForm({
     const value = row.original[name]
     const form = useForm({
         defaultValues: {
-            [name]: value ? value[0]?.toISOString() : undefined,
+            [name]: value?.length ? value[0].toISOString() : undefined,
         },
     })
     return (
