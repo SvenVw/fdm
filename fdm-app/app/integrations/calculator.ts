@@ -1,12 +1,18 @@
 import {
     calculateNitrogenBalance,
+    calculateOrganicMatterBalance,
     collectInputForNitrogenBalance,
+    collectInputForOrganicMatterBalance,
     createFunctionsForFertilizerApplicationFilling,
     createFunctionsForNorms,
     getNitrogenBalanceField,
     getNutrientAdvice,
+    getOrganicMatterBalanceField,
+    type FieldInput,
     type NitrogenBalanceFieldResultNumeric,
     type NitrogenBalanceNumeric,
+    type OrganicMatterBalanceFieldResultNumeric,
+    type OrganicMatterBalanceNumeric,
 } from "@svenvw/fdm-calculator"
 import {
     type FdmType,
@@ -71,6 +77,66 @@ export async function getNitrogenBalanceForFarm({
     )
 
     return calculateNitrogenBalance(fdm, input)
+}
+
+// Get organic matter balance for a field
+export async function getOrganicMatterBalanceForField({
+    fdm,
+    principal_id,
+    b_id_farm,
+    b_id,
+    timeframe,
+}: {
+    fdm: FdmType
+    principal_id: PrincipalId
+    b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"]
+    b_id: Field["b_id"]
+    timeframe: Timeframe
+}): Promise<{
+    fieldResult: OrganicMatterBalanceFieldResultNumeric
+    fieldInput: FieldInput
+}> {
+    const { fields, ...rest } = await collectInputForOrganicMatterBalance(
+        fdm,
+        principal_id,
+        b_id_farm,
+        timeframe,
+        b_id,
+    )
+
+    const organicMatterBalanceResult = await getOrganicMatterBalanceField(fdm, {
+        fieldInput: fields[0],
+        ...rest,
+    })
+    return {
+        fieldResult: {
+            b_id: b_id,
+            b_area: fields[0].field.b_area ?? 0,
+            balance: organicMatterBalanceResult,
+        },
+        fieldInput: fields[0],
+    }
+}
+
+export async function getOrganicMatterBalanceForFarm({
+    fdm,
+    principal_id,
+    b_id_farm,
+    timeframe,
+}: {
+    fdm: FdmType
+    principal_id: PrincipalId
+    b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"]
+    timeframe: Timeframe
+}): Promise<OrganicMatterBalanceNumeric> {
+    const input = await collectInputForOrganicMatterBalance(
+        fdm,
+        principal_id,
+        b_id_farm,
+        timeframe,
+    )
+
+    return calculateOrganicMatterBalance(fdm, input)
 }
 
 export async function getNutrientAdviceForField({

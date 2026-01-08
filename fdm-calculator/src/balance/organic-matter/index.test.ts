@@ -12,8 +12,8 @@ import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
-    OrganicMatterBalanceField,
-    OrganicMatterBalanceFieldResult,
+    OrganicMatterBalanceFieldNumeric,
+    OrganicMatterBalanceFieldResultNumeric,
     OrganicMatterBalanceInput,
 } from "./types"
 
@@ -49,64 +49,44 @@ describe("Organic Matter Balance Calculation", () => {
             })
             vi.spyOn(shared, "combineSoilAnalyses").mockReturnValue({} as any)
 
-            const result = calculateOrganicMatterBalanceField(
-                mockField,
-                mockCultivations,
-                mockFertilizerApplications,
-                mockSoilAnalyses,
-                mockFertilizerDetailsMap,
-                mockCultivationDetailsMap,
-                timeFrame,
-            )
-
-            expect(result.balance?.balance.toNumber()).toBe(300)
-            expect(result.balance?.supply.total.toNumber()).toBe(500)
-            expect(result.balance?.degradation.total.toNumber()).toBe(-200)
-        })
-
-        it("should return an error message if a sub-calculation fails", () => {
-            vi.spyOn(supply, "calculateOrganicMatterSupply").mockImplementation(
-                () => {
-                    throw new Error("Supply calculation failed")
+            const result = calculateOrganicMatterBalanceField({
+                fieldInput: {
+                    field: mockField,
+                    cultivations: mockCultivations,
+                    fertilizerApplications: mockFertilizerApplications,
+                    soilAnalyses: mockSoilAnalyses,
                 },
-            )
-            vi.spyOn(shared, "combineSoilAnalyses").mockReturnValue({} as any)
-
-            const result = calculateOrganicMatterBalanceField(
-                mockField,
-                mockCultivations,
-                mockFertilizerApplications,
-                mockSoilAnalyses,
-                mockFertilizerDetailsMap,
-                mockCultivationDetailsMap,
+                fertilizerDetails: [],
+                cultivationDetails: [],
                 timeFrame,
-            )
+            })
 
-            expect(result.errorMessage).toBe("Supply calculation failed")
-            expect(result.balance).toBeUndefined()
+            expect(result.balance).toBe(300)
+            expect(result.supply.total).toBe(500)
+            expect(result.degradation.total).toBe(-200)
         })
     })
 
     describe("calculateOrganicMatterBalancesFieldToFarm", () => {
         it("should aggregate field results to a weighted farm average", () => {
-            const results: OrganicMatterBalanceFieldResult[] = [
+            const results: OrganicMatterBalanceFieldResultNumeric[] = [
                 {
                     b_id: "field1",
                     b_area: 10,
                     balance: {
-                        supply: { total: new Decimal(500) },
-                        degradation: { total: new Decimal(-200) },
-                        balance: new Decimal(300),
-                    } as OrganicMatterBalanceField,
+                        supply: { total: 500 },
+                        degradation: { total: -200 },
+                        balance: 300,
+                    } as OrganicMatterBalanceFieldNumeric,
                 },
                 {
                     b_id: "field2",
                     b_area: 5,
                     balance: {
-                        supply: { total: new Decimal(400) },
-                        degradation: { total: new Decimal(-300) },
-                        balance: new Decimal(100),
-                    } as OrganicMatterBalanceField,
+                        supply: { total: 400 },
+                        degradation: { total: -300 },
+                        balance: 100,
+                    } as OrganicMatterBalanceFieldNumeric,
                 },
             ]
             const fields: FieldInput[] = [
@@ -121,24 +101,24 @@ describe("Organic Matter Balance Calculation", () => {
                 [],
             )
 
-            // Total Supply = (500*10 + 400*5) / (10+5) = 7000 / 15 = 466.67
-            // Total Degradation = (200*10 + 300*5) / (10+5) = 3500 / 15 = 233.33
-            // Total Balance = 466.67 - 233.33 = 233.34
-            expect(farmBalance.supply.toNumber()).toBeCloseTo(466.67, 2)
-            expect(farmBalance.degradation.toNumber()).toBeCloseTo(-233.33, 2)
-            expect(farmBalance.balance.toNumber()).toBeCloseTo(233.33, 2)
+            // Total Supply = (500*10 + 400*5) / (10+5) = 7000 / 15 = 466.67 -> 467
+            // Total Degradation = (200*10 + 300*5) / (10+5) = 3500 / 15 = 233.33 -> 233
+            // Total Balance = 466.67 - 233.33 = 233.34 -> 233
+            expect(farmBalance.supply).toBe(467)
+            expect(farmBalance.degradation).toBe(-233)
+            expect(farmBalance.balance).toBe(233)
         })
 
         it("should handle cases with calculation errors", () => {
-            const results: OrganicMatterBalanceFieldResult[] = [
+            const results: OrganicMatterBalanceFieldResultNumeric[] = [
                 {
                     b_id: "field1",
                     b_area: 10,
                     balance: {
-                        balance: new Decimal(300),
-                        supply: { total: new Decimal(500) },
-                        degradation: { total: new Decimal(-200) },
-                    } as OrganicMatterBalanceField,
+                        balance: 300,
+                        supply: { total: 500 },
+                        degradation: { total: -200 },
+                    } as OrganicMatterBalanceFieldNumeric,
                 },
                 { b_id: "field2", b_area: 5, errorMessage: "Failed" },
             ]
@@ -155,9 +135,9 @@ describe("Organic Matter Balance Calculation", () => {
             expect(farmBalance.hasErrors).toBe(true)
             expect(farmBalance.fieldErrorMessages).toEqual(["Error"])
             // Check that only the successful field is aggregated
-            expect(farmBalance.supply.toNumber()).toBeCloseTo(500)
-            expect(farmBalance.degradation.toNumber()).toBeCloseTo(-200)
-            expect(farmBalance.balance.toNumber()).toBeCloseTo(300)
+            expect(farmBalance.supply).toBeCloseTo(500)
+            expect(farmBalance.degradation).toBeCloseTo(-200)
+            expect(farmBalance.balance).toBeCloseTo(300)
         })
     })
 

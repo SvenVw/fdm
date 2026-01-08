@@ -254,6 +254,24 @@ export type OrganicMatterBalanceInput = {
     }
 }
 
+/**
+ * Represents the necessary input data for a single field for the organic matter balance calculation.
+ * This includes the field-specific data as well as the shared catalogue details.
+ */
+export type OrganicMatterBalanceFieldInput = {
+    /** The input data for the specific field. */
+    fieldInput: FieldInput
+    /** A list of all available fertilizer details from the farm's catalogue. */
+    fertilizerDetails: FertilizerDetail[]
+    /** A list of all available cultivation details from the farm's catalogue. */
+    cultivationDetails: CultivationDetail[]
+    /** The calculation period. */
+    timeFrame: {
+        start: Date
+        end: Date
+    }
+}
+
 // --- Numeric Types ---
 // The following types are numeric-only versions of the types above,
 // intended for final outputs where `Decimal` objects are converted to numbers.
