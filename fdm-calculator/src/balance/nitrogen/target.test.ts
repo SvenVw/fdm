@@ -15,6 +15,7 @@ describe("calculateTargetForNitrogenBalance", () => {
 
     const createCultivation = (
         b_lu_catalogue: string,
+        b_lu_croprotation: "cereal" | "grass" | "maize" | "other",
     ): FieldInput["cultivations"][0] => ({
         b_lu: "test_lu",
         b_lu_catalogue,
@@ -22,7 +23,7 @@ describe("calculateTargetForNitrogenBalance", () => {
         b_lu_start: new Date("2023-01-01"),
         b_lu_end: new Date("2023-12-31"),
         b_lu_name: "Test Cultivation",
-        b_lu_croprotation: "cereal",
+        b_lu_croprotation,
     })
 
     const createSoilAnalysis = (
@@ -58,7 +59,7 @@ describe("calculateTargetForNitrogenBalance", () => {
         ])
 
     it("should calculate target for grassland on dry sandy soil", () => {
-        const cultivations = [createCultivation("grass1")]
+        const cultivations = [createCultivation("grass1", "grass")]
         const soilAnalysis = createSoilAnalysis("duinzand", "VIIo")
         const cultivationDetailsMap = createCultivationDetailsMap(
             "grass1",
@@ -74,7 +75,7 @@ describe("calculateTargetForNitrogenBalance", () => {
     })
 
     it("should calculate target for grassland on other soil types", () => {
-        const cultivations = [createCultivation("grass1")]
+        const cultivations = [createCultivation("grass1", "grass")]
         const soilAnalysis = createSoilAnalysis("zeeklei", "V")
         const cultivationDetailsMap = createCultivationDetailsMap(
             "grass1",
@@ -91,7 +92,7 @@ describe("calculateTargetForNitrogenBalance", () => {
 
     it("should calculate target for arable land on dry sandy soil", () => {
         const cultivations: FieldInput["cultivations"] = [
-            createCultivation("crop1"),
+            createCultivation("crop1", "cereal"),
         ]
         const soilAnalysis = createSoilAnalysis("dekzand", "VIIo")
         const cultivationDetailsMap = createCultivationDetailsMap(
@@ -109,7 +110,7 @@ describe("calculateTargetForNitrogenBalance", () => {
 
     it("should calculate target for arable land on average sandy soil", () => {
         const cultivations: FieldInput["cultivations"] = [
-            createCultivation("crop1"),
+            createCultivation("crop1", "cereal"),
         ]
         const soilAnalysis = createSoilAnalysis("loess", "Vb")
         const cultivationDetailsMap = createCultivationDetailsMap(
@@ -127,7 +128,7 @@ describe("calculateTargetForNitrogenBalance", () => {
 
     it("should calculate target for arable land on wet sandy soil", () => {
         const cultivations: FieldInput["cultivations"] = [
-            createCultivation("crop1"),
+            createCultivation("crop1", "cereal"),
         ]
         const soilAnalysis = createSoilAnalysis("dalgrond", "III")
         const cultivationDetailsMap = createCultivationDetailsMap(
@@ -145,7 +146,7 @@ describe("calculateTargetForNitrogenBalance", () => {
 
     it("should calculate target for arable land on dry clay soil", () => {
         const cultivations: FieldInput["cultivations"] = [
-            createCultivation("crop1"),
+            createCultivation("crop1", "cereal"),
         ]
         const soilAnalysis = createSoilAnalysis("rivierklei", "VIIo")
         const cultivationDetailsMap = createCultivationDetailsMap(
@@ -163,7 +164,7 @@ describe("calculateTargetForNitrogenBalance", () => {
 
     it("should calculate target for arable land on other clay soil", () => {
         const cultivations: FieldInput["cultivations"] = [
-            createCultivation("crop1"),
+            createCultivation("crop1", "cereal"),
         ]
         const soilAnalysis = createSoilAnalysis("veen", "Va")
         const cultivationDetailsMap = createCultivationDetailsMap(
@@ -181,7 +182,7 @@ describe("calculateTargetForNitrogenBalance", () => {
 
     it("should adjust target value based on time frame", () => {
         const cultivations: FieldInput["cultivations"] = [
-            createCultivation("grass1"),
+            createCultivation("grass1", "grass"),
         ]
         const soilAnalysis = createSoilAnalysis("duinzand", "VIIo")
         const cultivationDetailsMap = createCultivationDetailsMap(
