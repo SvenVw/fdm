@@ -59,7 +59,10 @@ export async function calculateNitrogenBalance(
                     return {
                         b_id: fieldInput.field.b_id,
                         b_area: fieldInput.field.b_area ?? 0,
-                        errorMessage: String(error).replace("Error: ", ""),
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : String(error),
                     }
                 }
             }),

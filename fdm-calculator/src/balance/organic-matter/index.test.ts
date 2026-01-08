@@ -93,8 +93,8 @@ describe("Organic Matter Balance Calculation", () => {
             )
 
             // Total Supply = (500*10 + 400*5) / (10+5) = 7000 / 15 = 466.67 -> 467
-            // Total Degradation = (200*10 + 300*5) / (10+5) = 3500 / 15 = 233.33 -> 233
-            // Total Balance = 466.67 - 233.33 = 233.34 -> 233
+            // Total Degradation = ((-200)*10 + (-300)*5) / (10+5) = -3500 / 15 = -233.33 -> -233
+            // Total Balance = 466.67 + (-233.33) = 233.34 -> 233 (supply + degradation, since degradation is negative)
             expect(farmBalance.supply).toBe(467)
             expect(farmBalance.degradation).toBe(-233)
             expect(farmBalance.balance).toBe(233)

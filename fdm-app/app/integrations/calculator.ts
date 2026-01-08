@@ -26,7 +26,7 @@ import {
 import { getNmiApiKey } from "./nmi"
 
 // Get nitrogen balance for a field
-export async function getNitrogenBalanceforField({
+export async function getNitrogenBalanceForField({
     fdm,
     principal_id,
     b_id_farm,
