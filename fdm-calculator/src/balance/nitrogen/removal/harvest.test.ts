@@ -79,6 +79,8 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                 m_cropresidue: true,
                 b_lu_start: null,
                 b_lu_end: null,
+                b_lu_name: "Cultivation 1",
+                b_lu_croprotation: "cereal",
             },
         ]
         const harvests: FieldInput["harvests"] = [
@@ -193,6 +195,8 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                 m_cropresidue: true,
                 b_lu_start: null,
                 b_lu_end: null,
+                b_lu_name: "Cultivation 1",
+                b_lu_croprotation: "cereal",
             },
         ]
         const harvests: FieldInput["harvests"] = [
@@ -304,6 +308,8 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                 m_cropresidue: true,
                 b_lu_start: null,
                 b_lu_end: null,
+                b_lu_name: "Cultivation 1",
+                b_lu_croprotation: "cereal",
             },
         ]
         const harvests: FieldInput["harvests"] = [

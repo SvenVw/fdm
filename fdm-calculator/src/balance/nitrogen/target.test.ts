@@ -21,6 +21,8 @@ describe("calculateTargetForNitrogenBalance", () => {
         m_cropresidue: true,
         b_lu_start: new Date("2023-01-01"),
         b_lu_end: new Date("2023-12-31"),
+        b_lu_name: "Test Cultivation",
+        b_lu_croprotation: "cereal",
     })
 
     const createSoilAnalysis = (

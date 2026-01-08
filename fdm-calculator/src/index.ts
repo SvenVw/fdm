@@ -28,7 +28,6 @@ export type {
 export {
     calculateOrganicMatterBalance,
     calculateOrganicMatterBalanceField,
-    getOrganicMatterBalance,
     getOrganicMatterBalanceField,
 } from "./balance/organic-matter/index"
 export { collectInputForOrganicMatterBalance } from "./balance/organic-matter/input"

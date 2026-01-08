@@ -1,10 +1,7 @@
 import { type FdmType, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../package"
-import {
-    convertDecimalToNumberRecursive,
-    convertOrganicMatterBalanceToNumeric,
-} from "../shared/conversion"
+import { convertDecimalToNumberRecursive } from "../shared/conversion"
 import { combineSoilAnalyses } from "../shared/soil"
 import { calculateOrganicMatterDegradation } from "./degradation"
 import { calculateOrganicMatterSupply } from "./supply"
@@ -12,10 +9,8 @@ import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
-    OrganicMatterBalance,
     OrganicMatterBalanceFieldInput,
     OrganicMatterBalanceFieldNumeric,
-    OrganicMatterBalanceFieldResult,
     OrganicMatterBalanceFieldResultNumeric,
     OrganicMatterBalanceInput,
     OrganicMatterBalanceNumeric,
@@ -86,24 +81,6 @@ export async function calculateOrganicMatterBalance(
         fieldErrorMessages,
     )
 }
-
-/**
- * A cached version of the `calculateOrganicMatterBalance` function.
- *
- * This wrapper provides caching capabilities to the main calculation function,
- * returning a stored result if the same input has been processed before. This can
- * significantly improve performance for repeated requests with identical data.
- * The cache is versioned using the calculator's package version to ensure data integrity
- * after updates.
- *
- * @param organicMatterBalanceInput - The input data for the organic matter balance calculation.
- * @returns A promise that resolves with the calculated `OrganicMatterBalanceNumeric`.
- */
-export const getOrganicMatterBalance = withCalculationCache(
-    calculateOrganicMatterBalance,
-    "calculateOrganicMatterBalance",
-    pkg.calculatorVersion,
-)
 
 /**
  * Calculates the organic matter balance for a single field.
@@ -254,17 +231,12 @@ export function calculateOrganicMatterBalancesFieldToFarm(
     // The final farm balance is the difference between the average supply and average degradation.
     const avgFarmBalance = avgFarmSupply.plus(avgFarmDegradation)
 
-    // Construct the final farm-level balance object.
-    const farmWithBalance: OrganicMatterBalance = {
-        balance: avgFarmBalance,
-        supply: avgFarmSupply,
-        degradation: avgFarmDegradation,
-        fields: fieldsWithBalanceResults, // Include results for all fields, even those with errors.
-        hasErrors:
-            hasErrors ||
-            fieldsWithBalanceResults.length !== successfulFieldBalances.length,
-        fieldErrorMessages: fieldErrorMessages,
+    return {
+        balance: avgFarmBalance.round().toNumber(),
+        supply: avgFarmSupply.round().toNumber(),
+        degradation: avgFarmDegradation.round().toNumber(),
+        fields: fieldsWithBalanceResults,
+        hasErrors,
+        fieldErrorMessages,
     }
-
-    return convertOrganicMatterBalanceToNumeric(farmWithBalance)
 }
