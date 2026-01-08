@@ -182,14 +182,30 @@ export function withCalculationCache<T_Input extends object, T_Output>(
         // Sanitize input if sensitive keys are provided
         let inputForCache = input
         if (sensitiveKeys.length > 0) {
-            inputForCache = { ...input }
-            for (const key of sensitiveKeys) {
-                // Redact sensitive keys in the input used for caching and logging
-                if (key in inputForCache) {
-                    // @ts-ignore - Dynamic key access on generic object
-                    inputForCache[key] = "REDACTED"
+            const redact = (obj: unknown): unknown => {
+                if (typeof obj !== "object" || obj === null) {
+                    return obj
                 }
+                if (Array.isArray(obj)) {
+                    return obj.map(redact)
+                }
+                // Check if it's a plain object or similar to avoid breaking classes/Dates if they shouldn't be touched
+                // Ideally input is a plain object for hashing/json.
+                if (obj instanceof Date) {
+                    return obj
+                }
+
+                const newObj = { ...(obj as object) } as Record<string, unknown>
+                for (const key of Object.keys(newObj)) {
+                    if (sensitiveKeys.includes(key)) {
+                        newObj[key] = "REDACTED"
+                    } else {
+                        newObj[key] = redact(newObj[key])
+                    }
+                }
+                return newObj
             }
+            inputForCache = redact(input) as T_Input
         }
 
         // Generate a unique hash for the current calculation based on function name, version, and input.
