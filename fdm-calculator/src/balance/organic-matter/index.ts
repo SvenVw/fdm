@@ -42,29 +42,36 @@ export async function calculateOrganicMatterBalance(
 
     // Process fields in batches to avoid overwhelming the system with concurrent promises,
     // especially for farms with a large number of fields.
-    const fieldsWithBalanceResults = await Promise.all(
-        fields.map(async (fieldInput) => {
-            try {
-                const balance = await getOrganicMatterBalanceField(fdm, {
-                    fieldInput,
-                    fertilizerDetails,
-                    cultivationDetails,
-                    timeFrame,
-                })
-                return {
-                    b_id: fieldInput.field.b_id,
-                    b_area: fieldInput.field.b_area ?? 0,
-                    balance,
+    const fieldsWithBalanceResults: OrganicMatterBalanceFieldResultNumeric[] = []
+    const batchSize = 50
+
+    for (let i = 0; i < fields.length; i += batchSize) {
+        const batch = fields.slice(i, i + batchSize)
+        const batchResults = await Promise.all(
+            batch.map(async (fieldInput) => {
+                try {
+                    const balance = await getOrganicMatterBalanceField(fdm, {
+                        fieldInput,
+                        fertilizerDetails,
+                        cultivationDetails,
+                        timeFrame,
+                    })
+                    return {
+                        b_id: fieldInput.field.b_id,
+                        b_area: fieldInput.field.b_area ?? 0,
+                        balance,
+                    }
+                } catch (error) {
+                    return {
+                        b_id: fieldInput.field.b_id,
+                        b_area: fieldInput.field.b_area ?? 0,
+                        errorMessage: String(error).replace("Error: ", ""),
+                    }
                 }
-            } catch (error) {
-                return {
-                    b_id: fieldInput.field.b_id,
-                    b_area: fieldInput.field.b_area ?? 0,
-                    errorMessage: String(error).replace("Error: ", ""),
-                }
-            }
-        }),
-    )
+            }),
+        )
+        fieldsWithBalanceResults.push(...batchResults)
+    }
 
     const hasErrors = fieldsWithBalanceResults.some(
         (result) => result.errorMessage !== undefined,
