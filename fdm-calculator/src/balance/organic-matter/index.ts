@@ -83,7 +83,6 @@ export async function calculateOrganicMatterBalance(
     // Aggregate the results from all individual fields into a single farm-level balance.
     return calculateOrganicMatterBalancesFieldToFarm(
         fieldsWithBalanceResults,
-        fields,
         hasErrors,
         fieldErrorMessages,
     )
@@ -182,14 +181,12 @@ export const getOrganicMatterBalanceField = withCalculationCache(
  * using the area of each field as the weight.
  *
  * @param fieldsWithBalanceResults - An array of `OrganicMatterBalanceFieldResultNumeric` objects.
- * @param fields - The original array of `FieldInput` objects, used to retrieve field areas.
  * @param hasErrors - A boolean flag indicating if any field calculations failed.
  * @param fieldErrorMessages - An array of error messages from failed calculations.
  * @returns A single `OrganicMatterBalanceNumeric` object representing the aggregated farm-level results.
  */
 export function calculateOrganicMatterBalancesFieldToFarm(
     fieldsWithBalanceResults: OrganicMatterBalanceFieldResultNumeric[],
-    fields: FieldInput[],
     hasErrors: boolean,
     fieldErrorMessages: string[],
 ): OrganicMatterBalanceNumeric {
@@ -206,16 +203,7 @@ export function calculateOrganicMatterBalancesFieldToFarm(
 
     // Calculate the total supply and degradation across the farm, weighted by field area.
     for (const fieldResult of successfulFieldBalances) {
-        const fieldInput = fields.find((f) => f.field.b_id === fieldResult.b_id)
-
-        if (!fieldInput) {
-            // This should not happen in a normal flow but is a safeguard.
-            console.warn(
-                `Could not find field input for field balance ${fieldResult.b_id}`,
-            )
-            continue
-        }
-        const fieldArea = new Decimal(fieldInput.field.b_area ?? 0)
+        const fieldArea = new Decimal(fieldResult.b_area ?? 0)
         totalFarmArea = totalFarmArea.add(fieldArea)
 
         // Add the area-weighted supply and degradation to the farm totals.

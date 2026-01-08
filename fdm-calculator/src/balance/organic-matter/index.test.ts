@@ -92,7 +92,6 @@ describe("Organic Matter Balance Calculation", () => {
 
             const farmBalance = calculateOrganicMatterBalancesFieldToFarm(
                 results,
-                fields,
                 false,
                 [],
             )
@@ -124,7 +123,6 @@ describe("Organic Matter Balance Calculation", () => {
             ]
             const farmBalance = calculateOrganicMatterBalancesFieldToFarm(
                 results,
-                fields,
                 true,
                 ["Error"],
             )
