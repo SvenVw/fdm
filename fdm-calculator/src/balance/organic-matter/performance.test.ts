@@ -1,5 +1,4 @@
 import type { FdmType } from "@svenvw/fdm-core"
-import Decimal from "decimal.js"
 import { describe, expect, it, vi } from "vitest"
 import { calculateOrganicMatterBalance } from "./index"
 import type {
