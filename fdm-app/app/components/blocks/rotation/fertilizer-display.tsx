@@ -73,35 +73,40 @@ export const FertilizerDisplay: React.FC<FertilizerDisplayProps> = ({
                             ? "600"
                             : "300"
 
-                    return (
+                    const component = (
+                        <Badge
+                            key={fertilizer.p_id}
+                            variant="outline"
+                            className="gap-1 text-muted-foreground"
+                        >
+                            <span>
+                                {fertilizer.p_type === "manure" ? (
+                                    <Square
+                                        className={`size-3 ${fertilizerIconClassMap.manure.text} ${fertilizerIconClassMap.manure.fill[fertilizerIconFillShade]}`}
+                                    />
+                                ) : fertilizer.p_type === "mineral" ? (
+                                    <Circle
+                                        className={`size-3 ${fertilizerIconClassMap.mineral.text} ${fertilizerIconClassMap.mineral.fill[fertilizerIconFillShade]}`}
+                                    />
+                                ) : fertilizer.p_type === "compost" ? (
+                                    <Triangle
+                                        className={`size-3 ${fertilizerIconClassMap.compost.text} ${fertilizerIconClassMap.compost.fill[fertilizerIconFillShade]}`}
+                                    />
+                                ) : (
+                                    <Diamond
+                                        className={`size-3 ${fertilizerIconClassMap.other.text} ${fertilizerIconClassMap.other.fill[fertilizerIconFillShade]}`}
+                                    />
+                                )}
+                            </span>
+                            {fertilizer.p_name_nl}
+                        </Badge>
+                    )
+
+                    return cultivation.type === "field" ? (
+                        component
+                    ) : (
                         <Tooltip key={fertilizer.p_id}>
-                            <TooltipTrigger>
-                                <Badge
-                                    variant="outline"
-                                    className="gap-1 text-muted-foreground"
-                                >
-                                    <span>
-                                        {fertilizer.p_type === "manure" ? (
-                                            <Square
-                                                className={`size-3 ${fertilizerIconClassMap.manure.text} ${fertilizerIconClassMap.manure.fill[fertilizerIconFillShade]}`}
-                                            />
-                                        ) : fertilizer.p_type === "mineral" ? (
-                                            <Circle
-                                                className={`size-3 ${fertilizerIconClassMap.mineral.text} ${fertilizerIconClassMap.mineral.fill[fertilizerIconFillShade]}`}
-                                            />
-                                        ) : fertilizer.p_type === "compost" ? (
-                                            <Triangle
-                                                className={`size-3 ${fertilizerIconClassMap.compost.text} ${fertilizerIconClassMap.compost.fill[fertilizerIconFillShade]}`}
-                                            />
-                                        ) : (
-                                            <Diamond
-                                                className={`size-3 ${fertilizerIconClassMap.other.text} ${fertilizerIconClassMap.other.fill[fertilizerIconFillShade]}`}
-                                            />
-                                        )}
-                                    </span>
-                                    {fertilizer.p_name_nl}
-                                </Badge>
-                            </TooltipTrigger>
+                            <TooltipTrigger>{component}</TooltipTrigger>
                             <TooltipContent>
                                 {isFertilizerUsedOnAllFieldsForThisCultivation
                                     ? "Deze meststof is toegepast op alle percelen met dit gewas"

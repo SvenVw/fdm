@@ -227,6 +227,16 @@ export async function loader({ request, params }: Route.LoaderArgs) {
             }),
         )
 
+        const farmWritePermission = await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            session.principal_id,
+            new URL(request.url).pathname,
+            false,
+        )
+
         type FieldsExtended = typeof fieldsExtended
 
         const transformFieldsToRotationExtended = (
@@ -304,8 +314,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     : cropResidue.some((a) => a)
                       ? "some"
                       : "none"
+                const b_lu_harvestable =
+                    getHarvestabilityFromCatalogue(b_lu_catalogue)
                 return {
                     type: "crop",
+                    canModify: farmWritePermission,
                     b_lu_catalogue: b_lu_catalogue,
                     b_lu: b_lu,
                     b_lu_name: cultivationsForCatalogue[0]?.b_lu_name ?? "",
@@ -350,8 +363,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                             })) ?? null,
                     b_lu_croprotation:
                         cultivationsForCatalogue[0]?.b_lu_croprotation ?? "",
-                    b_lu_harvestable:
-                        getHarvestabilityFromCatalogue(b_lu_catalogue),
+                    b_lu_harvestable: b_lu_harvestable,
                     b_lu_start: b_lu_start,
                     b_lu_end: b_lu_end,
                     calendar: calendar,
@@ -362,6 +374,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     fields: fieldsWithThisCultivation.map((field, i) => ({
                         // TODO: Define a proper type for field
                         type: "field",
+                        canModify: farmWritePermission,
                         b_id: field.b_id,
                         b_name: field.b_name,
                         b_area: field.b_area,
@@ -394,6 +407,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                                 b_lu.includes(harvest.b_lu),
                             )
                             .flatMap((harvest) => harvest.b_lu_harvest_date),
+                        b_lu_harvestable: b_lu_harvestable,
                         b_lu_variety: Object.fromEntries(
                             Object.entries(
                                 field.cultivations
@@ -420,34 +434,37 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                                     ),
                             ).sort((a, b) => b[1] - a[1]),
                         ),
-                        ...(() => {
+                        b_lu_croprotation:
+                            cultivationsForCatalogue[0]?.b_lu_croprotation ??
+                            "",
+                        m_cropresidue: (() => {
                             const cultivations = field.cultivations.filter(
                                 (cultivation) =>
                                     cultivation.b_lu_catalogue ===
                                     b_lu_catalogue,
                             )
 
-                            return {
-                                m_cropresidue: cultivations.every(
-                                    (cultivation) => cultivation.m_cropresidue,
-                                )
-                                    ? "all"
-                                    : cultivations.some(
-                                            (cultivation) =>
-                                                cultivation.m_cropresidue,
-                                        )
-                                      ? "some"
-                                      : "none",
-                                m_cropresidue_ending: cultivations
-                                    .filter(
-                                        (cultivation) => cultivation.b_lu_end,
+                            return cultivations.every(
+                                (cultivation) => cultivation.m_cropresidue,
+                            )
+                                ? "all"
+                                : cultivations.some(
+                                        (cultivation) =>
+                                            cultivation.m_cropresidue,
                                     )
-                                    .map((cultivation) => [
-                                        cultivation.b_lu_end as Date,
-                                        cultivation.m_cropresidue ?? false,
-                                    ]),
-                            }
+                                  ? "some"
+                                  : "none"
                         })(),
+                        m_cropresidue_ending: field.cultivations
+                            .filter(
+                                (cultivation) =>
+                                    cultivation.b_lu_catalogue ===
+                                        b_lu_catalogue && cultivation.b_lu_end,
+                            )
+                            .map((cultivation) => [
+                                cultivation.b_lu_end as Date,
+                                cultivation.m_cropresidue ?? false,
+                            ]),
                         calendar: calendar,
                         fertilizerApplications:
                             field.fertilizerApplications.map((app) => ({
@@ -469,16 +486,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                 fieldsExtended,
                 cultivationCatalogue,
             )
-
-        const farmWritePermission = await checkPermission(
-            fdm,
-            "farm",
-            "write",
-            b_id_farm,
-            session.principal_id,
-            new URL(request.url).pathname,
-            false,
-        )
 
         // Return user information from loader
         return {

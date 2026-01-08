@@ -79,7 +79,7 @@ function TableVarietySelectorForm({
                             value={field.value ?? undefined}
                             disabled={b_lu_variety_options.length === 0}
                         >
-                            <SelectTrigger>
+                            <SelectTrigger disabled={!row.original.canModify}>
                                 <SelectValue
                                     placeholder={
                                         b_lu_variety_options.length === 0

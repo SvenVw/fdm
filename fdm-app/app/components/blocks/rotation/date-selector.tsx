@@ -33,7 +33,7 @@ function TableDateSelectorForm({
         },
     })
     return (
-        <div className="flex flex-row items-center">
+        <div className="absolute w-50 flex flex-row items-center">
             <RemixFormProvider {...form}>
                 <Controller
                     name={name as string}
@@ -103,34 +103,35 @@ export function TableDateSelector({
     const fetcher = useFetcher()
     const activeTableFormStore = useActiveTableFormStore()
     const value = row.original[name]
-    if (
-        fetcher.state !== "idle" ||
-        activeTableFormStore.activeForm === cellId
-    ) {
-        return (
-            <TableDateSelectorForm
-                fetcher={fetcher}
-                name={name}
-                row={row}
-                onHide={() => {
-                    const currentState = useActiveTableFormStore.getState()
-                    if (currentState.activeForm === cellId)
-                        currentState.clearActiveForm()
-                }}
-            />
-        )
-    }
 
+    const showForm =
+        fetcher.state !== "idle" || activeTableFormStore.activeForm === cellId
     return (
         <Button
             variant="link"
-            className="px-0"
+            className="relative px-0"
             onClick={(e) => {
                 e.stopPropagation()
                 activeTableFormStore.setActiveForm(cellId)
             }}
         >
-            <DateRangeDisplay range={value} emptyContent="Geen" />
+            <DateRangeDisplay
+                range={value}
+                emptyContent="Geen"
+                className={cn(showForm && "invisible")}
+            />
+            {showForm && (
+                <TableDateSelectorForm
+                    fetcher={fetcher}
+                    name={name}
+                    row={row}
+                    onHide={() => {
+                        const currentState = useActiveTableFormStore.getState()
+                        if (currentState.activeForm === cellId)
+                            currentState.clearActiveForm()
+                    }}
+                />
+            )}
         </Button>
     )
 }

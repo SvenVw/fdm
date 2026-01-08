@@ -1,9 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import {
-    ArrowUpRightFromSquare,
-    ChevronRight,
-    CircleQuestionMark,
-} from "lucide-react"
+import { ArrowUpRightFromSquare, ChevronRight } from "lucide-react"
 import React from "react"
 import { NavLink, useFetcher, useLocation, useParams } from "react-router-dom"
 import { cn } from "@/app/lib/utils"
@@ -29,6 +25,7 @@ import { TableVarietySelector } from "./variety-selector"
 
 export type CropRow = {
     type: "crop"
+    canModify: boolean
     b_lu_catalogue: string
     b_lu: string[]
     b_lu_name: string
@@ -46,6 +43,7 @@ export type CropRow = {
 
 export type FieldRow = {
     type: "field"
+    canModify: boolean
     b_id: string
     b_name: string
     b_area: number
@@ -55,7 +53,9 @@ export type FieldRow = {
     m_cropresidue: "all" | "some" | "none"
     m_cropresidue_ending: [Date, boolean][]
     b_lu_variety: Record<string, number>
+    b_lu_croprotation: string
     b_lu_harvest_date: Date[]
+    b_lu_harvestable: "once" | "multiple" | "none"
     calendar: string
     b_lu_start: Date[]
     b_lu_end: Date[]
@@ -76,6 +76,7 @@ export type RotationExtended = CropRow | FieldRow
 export const columns: ColumnDef<RotationExtended>[] = [
     {
         id: "Children",
+        enableHiding: false,
         cell: ({ row }) => {
             return row.getCanExpand() ? (
                 <button
@@ -85,7 +86,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
                 >
                     <ChevronRight
                         className={cn(
-                            "transition-transform duration-300",
+                            "transition-transform duration-300 text-muted-foreground",
                             row.getIsExpanded()
                                 ? "rotate-90"
                                 : "transform-none",
@@ -143,6 +144,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
                         }
                     }}
                     aria-label="Selecteer deze rij"
+                    className="text-muted-foreground"
                 />
             </div>
         ),
@@ -198,7 +200,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
         },
         enableHiding: true, // Enable hiding for mobile
         cell: ({ cell, row }) =>
-            row.original.type === "crop" ? (
+            row.original.type === "crop" || !row.original.canModify ? (
                 <DateRangeDisplay
                     range={row.original.b_lu_start}
                     emptyContent="Geen"
@@ -220,26 +222,23 @@ export const columns: ColumnDef<RotationExtended>[] = [
         },
         enableHiding: true, // Enable hiding for mobile
         cell: ({ cell, row }) => {
-            if (row.original.type === "crop") {
+            if (row.original.type === "crop" || !row.original.canModify) {
                 return (
                     <DateRangeDisplay
                         range={row.original.b_lu_end}
                         emptyContent="Geen"
-                        // The padding is intended to be larger than the horizontal size of the tooltip trigger below
-                        className="pr-6"
                     />
                 )
             }
             const cultivation = (row.getParentRow() ?? row).original as CropRow
             return cultivation.b_lu_harvestable !== "multiple" ? (
                 <span className="whitespace-nowrap">
-                    <DateRangeDisplay
-                        range={row.original.b_lu_end}
-                        emptyContent="Geen"
-                    />
                     <Tooltip>
-                        <TooltipTrigger asChild>
-                            <CircleQuestionMark className="inline-block text-muted-foreground h-4" />
+                        <TooltipTrigger>
+                            <DateRangeDisplay
+                                range={row.original.b_lu_end}
+                                emptyContent="Geen"
+                            />
                         </TooltipTrigger>
                         <TooltipContent>
                             U zou in plaats daarvan een oogst moeten toevoegen.
@@ -316,20 +315,36 @@ export const columns: ColumnDef<RotationExtended>[] = [
             return fetcher.state !== "idle" ? (
                 <LoadingSpinner />
             ) : (
-                <div className="flex flex-row items-center gap-1">
-                    <Checkbox
-                        id={inputId}
-                        checked={
-                            (
-                                {
-                                    all: true,
-                                    some: "indeterminate",
-                                    none: false,
-                                } as const
-                            )[row.original.m_cropresidue]
-                        }
-                        onCheckedChange={(value) => submit(!!value)}
-                    />
+                <div className="flex flex-row items-center gap-1 text-muted-foreground">
+                    {row.original.canModify ? (
+                        <Checkbox
+                            id={inputId}
+                            checked={
+                                (
+                                    {
+                                        all: true,
+                                        some: "indeterminate",
+                                        none: false,
+                                    } as const
+                                )[row.original.m_cropresidue]
+                            }
+                            onCheckedChange={(value) => submit(!!value)}
+                        />
+                    ) : (
+                        <Checkbox
+                            id={inputId}
+                            checked={
+                                (
+                                    {
+                                        all: true,
+                                        some: "indeterminate",
+                                        none: false,
+                                    } as const
+                                )[row.original.m_cropresidue]
+                            }
+                            disabled={true}
+                        />
+                    )}
                     <label htmlFor={inputId}>
                         {" "}
                         {
@@ -382,7 +397,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
                 return (
                     cultivation.type === "crop" && (
                         <DropdownMenu>
-                            <DropdownMenuTrigger>
+                            <DropdownMenuTrigger asChild>
                                 <Button variant="ghost">
                                     <p className="text-muted-foreground">
                                         {fieldsSorted.length === 1
