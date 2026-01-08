@@ -8,7 +8,6 @@ import { calculateOrganicMatterSupply } from "./supply"
 import type {
     CultivationDetail,
     FertilizerDetail,
-    FieldInput,
     OrganicMatterBalanceFieldInput,
     OrganicMatterBalanceFieldNumeric,
     OrganicMatterBalanceFieldResultNumeric,
