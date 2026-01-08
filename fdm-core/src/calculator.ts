@@ -164,6 +164,7 @@ export function withCalculationCache<T_Input extends object, T_Output>(
     calculationFunction: (inputs: T_Input) => T_Output | Promise<T_Output>,
     calculationFunctionName: string,
     calculatorVersion: string,
+    sensitiveKeys: string[] = [],
 ) {
     return async (fdm: FdmType, input: T_Input) => {
         if (!calculationFunctionName) {
@@ -178,11 +179,24 @@ export function withCalculationCache<T_Input extends object, T_Output>(
             )
         }
 
+        // Sanitize input if sensitive keys are provided
+        let inputForCache = input
+        if (sensitiveKeys.length > 0) {
+            inputForCache = { ...input }
+            for (const key of sensitiveKeys) {
+                // Redact sensitive keys in the input used for caching and logging
+                if (key in inputForCache) {
+                    // @ts-ignore - Dynamic key access on generic object
+                    inputForCache[key] = "REDACTED"
+                }
+            }
+        }
+
         // Generate a unique hash for the current calculation based on function name, version, and input.
         const calculationHash = generateCalculationHash(
             calculationFunctionName,
             calculatorVersion,
-            input,
+            inputForCache,
         )
 
         let cachedResult: T_Output | null = null
@@ -230,7 +244,7 @@ export function withCalculationCache<T_Input extends object, T_Output>(
                         calculationHash,
                         calculationFunctionName,
                         calculatorVersion,
-                        input,
+                        inputForCache,
                         result,
                     )
                 } catch (e: unknown) {
@@ -263,7 +277,7 @@ export function withCalculationCache<T_Input extends object, T_Output>(
                     fdm,
                     calculationFunctionName,
                     calculatorVersion,
-                    input,
+                    inputForCache,
                     errorMessage,
                     stackTrace,
                 )
