@@ -446,9 +446,7 @@ export function FertilizerApplicationMetricsCard({
                                                             </p>
                                                             <span className="text-xl font-bold text-right whitespace-nowrap px-2">
                                                                 {Math.round(
-                                                                    resolvedNitrogenBalance
-                                                                        .balance
-                                                                        .balance,
+                                                                    balance.balance,
                                                                 )}{" "}
                                                                 kg N
                                                             </span>
@@ -459,9 +457,7 @@ export function FertilizerApplicationMetricsCard({
                                                             </p>
                                                             <span className="font-semibold text-right whitespace-nowrap px-2">
                                                                 {Math.round(
-                                                                    resolvedNitrogenBalance
-                                                                        .balance
-                                                                        .target,
+                                                                    balance.target,
                                                                 )}{" "}
                                                                 kg N
                                                             </span>

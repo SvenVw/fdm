@@ -42,7 +42,8 @@ export async function calculateOrganicMatterBalance(
 
     // Process fields in batches to avoid overwhelming the system with concurrent promises,
     // especially for farms with a large number of fields.
-    const fieldsWithBalanceResults: OrganicMatterBalanceFieldResultNumeric[] = []
+    const fieldsWithBalanceResults: OrganicMatterBalanceFieldResultNumeric[] =
+        []
     const batchSize = 50
 
     for (let i = 0; i < fields.length; i += batchSize) {
@@ -226,12 +227,12 @@ export function calculateOrganicMatterBalancesFieldToFarm(
     // The final farm balance is the difference between the average supply and average degradation.
     const avgFarmBalance = avgFarmSupply.plus(avgFarmDegradation)
 
-    return {
-        balance: avgFarmBalance.round().toNumber(),
-        supply: avgFarmSupply.round().toNumber(),
-        degradation: avgFarmDegradation.round().toNumber(),
+    return convertDecimalToNumberRecursive({
+        balance: avgFarmBalance,
+        supply: avgFarmSupply,
+        degradation: avgFarmDegradation,
         fields: fieldsWithBalanceResults,
         hasErrors,
         fieldErrorMessages,
-    }
+    }) as OrganicMatterBalanceNumeric
 }
