@@ -177,8 +177,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        console.log(sidebarPageItems)
-
         const fieldWritePermission = await checkPermission(
             fdm,
             "field",
