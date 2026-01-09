@@ -1,11 +1,18 @@
 import { getCultivations } from "@svenvw/fdm-core"
-import { data, type LoaderFunctionArgs, redirect } from "react-router"
+import {
+    data,
+    isRouteErrorResponse,
+    type LoaderFunctionArgs,
+    redirect,
+} from "react-router"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import type { Route } from "./+types/farm.$b_id_farm.$calendar.field.$b_id.cultivation._index"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+    let cultivations: Awaited<ReturnType<typeof getCultivations>> = []
     try {
         // Get the farm id
         const b_id_farm = params.b_id_farm
@@ -32,17 +39,35 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const timeframe = getTimeframe(params)
 
         // Get cultivations for the field
-        const cultivations = await getCultivations(
+        cultivations = await getCultivations(
             fdm,
             session.principal_id,
             b_id,
             timeframe,
         )
-
-        // Redirect to overview page
-        const url = new URL(request.url)
-        return redirect(`./${cultivations[0].b_lu}${url.search}`)
     } catch (error) {
         return handleLoaderError(error)
     }
+
+    if (cultivations.length === 0) {
+        throw data("No cultivations found for this field", {
+            status: 404,
+            statusText: "No cultivations found",
+        })
+    }
+
+    // Redirect to overview page
+    const url = new URL(request.url)
+    return redirect(`./${cultivations[0].b_lu}${url.search}`)
+}
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+    if (
+        isRouteErrorResponse(error) &&
+        error.statusText === "No cultivations found"
+    ) {
+        return
+    }
+
+    throw error
 }
