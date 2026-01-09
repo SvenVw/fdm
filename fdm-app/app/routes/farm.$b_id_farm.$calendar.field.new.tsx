@@ -2,20 +2,22 @@ import {
     addCultivation,
     addField,
     addSoilAnalysis,
-    getCultivationsFromCatalogue,
+    getCultivations,
     getDefaultDatesOfCultivation,
     getFarm,
     getFarms,
     getFields,
 } from "@svenvw/fdm-core"
+import { simplify } from "@turf/turf"
 import type {
     Feature,
     FeatureCollection,
     GeoJsonProperties,
+    Geometry,
     Polygon,
 } from "geojson"
 import maplibregl from "maplibre-gl"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import {
     Layer,
     Map as MapGL,
@@ -29,7 +31,7 @@ import {
     type MetaFunction,
     useLoaderData,
 } from "react-router"
-import { dataWithError, redirectWithSuccess } from "remix-toast"
+import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
 import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
@@ -61,7 +63,6 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { useCalendarStore } from "~/store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -97,10 +98,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
-        // Get timeframe from calendar store
-        const calendar = getCalendar(params)
-        const timeframe = getTimeframe(params)
-
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
         const farmOptions = farms.map((farm) => {
@@ -122,6 +119,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
+        // Get timeframe from calendar store
+        const calendar = getCalendar(params)
+        const timeframe = getTimeframe(params)
+
         // Get the fields of the farm
         const fields = await getFields(
             fdm,
@@ -129,56 +130,52 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm,
             timeframe,
         )
-        const features = fields.map((field) => {
-            const feature: Feature = {
-                type: "Feature" as const,
-                properties: {
-                    b_id: field.b_id,
-                    b_name: field.b_name,
-                    b_area: Math.round(field.b_area * 10) / 10,
-                    b_lu_name: field.b_lu_name,
-                    b_id_source: field.b_id_source,
-                },
-                geometry: field.b_geometry,
-            }
-            return feature
-        })
+        const features = await Promise.all(
+            fields.map(async (field) => {
+                // Get field cultivation if available or get the first cultivation created by the farmer
+                let cultivation = field.b_lu_name
+                if (!cultivation) {
+                    try {
+                        const cultivations = await getCultivations(
+                            fdm,
+                            session.principal_id,
+                            field.b_id,
+                            timeframe,
+                        )
 
-        const featureCollection: FeatureCollection = {
-            type: "FeatureCollection",
-            features: features,
-        }
+                        if (cultivations.length > 0) {
+                            cultivation = cultivations[0].b_lu_name
+                        } else {
+                            cultivation = "geen gewassen"
+                        }
+                    } catch (e) {
+                        console.warn(e)
+                        cultivation = "gewassen onbekend"
+                    }
+                }
+
+                const feature: Feature = {
+                    type: "Feature" as const,
+                    properties: {
+                        b_id: field.b_id,
+                        b_name: field.b_name,
+                        b_area: Math.round(field.b_area * 10) / 10,
+                        b_lu_name: cultivation,
+                        b_id_source: field.b_id_source,
+                    },
+                    geometry: simplify(field.b_geometry as Geometry, {
+                        tolerance: 0.00001,
+                        highQuality: true,
+                    }),
+                }
+                return feature
+            }),
+        )
 
         const fieldsSaved: FeatureCollection = {
             type: "FeatureCollection",
             features: features,
         }
-
-        // Get the available cultivations
-        let cultivationOptions = []
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-        )
-        cultivationOptions = cultivationsCatalogue
-            .filter(
-                (cultivation) =>
-                    cultivation?.b_lu_catalogue && cultivation?.b_lu_name,
-            )
-            .map((cultivation) => ({
-                value: cultivation.b_lu_catalogue,
-                label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
-            }))
-        if (!cultivationOptions.length) {
-            throw dataWithError(
-                "No cultivations are available",
-                "Er zijn nog geen gewassen beschikbaar.",
-            )
-        }
-
-        // Create default field name
-        const fieldNameDefault = `Perceel ${fields.length + 1}`
 
         // Get Map Style
         const mapStyle = getMapStyle("satellite")
@@ -189,9 +186,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_name_farm: farm.b_name_farm,
             fieldsSaved: fieldsSaved,
             calendar: calendar,
-            featureCollection: featureCollection,
-            fieldNameDefault: fieldNameDefault,
-            cultivationOptions: cultivationOptions,
             mapStyle: mapStyle,
             continueTo: `/farm/${b_id_farm}/${calendar}/field`,
         }
@@ -203,29 +197,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
-    const calendar = useCalendarStore((state) => state.calendar)
 
-    const fieldsSavedId = "fieldsSaved"
-    const fieldsSaved = loaderData.featureCollection
-    const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
+    const fieldsAvailableId = "fieldsAvailable"
 
-    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
-
-    const initialViewState =
-        fieldsSaved.features.length > 0
-            ? getViewState(fieldsSaved)
-            : getViewState(null)
+    const initialViewState = getViewState(loaderData.fieldsSaved)
+    const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
 
     const [viewState, setViewState] = useState<ViewState>(
         initialViewState as ViewState,
     )
 
-    const fieldsAvailableId = "fieldsAvailable"
-    const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
+    // onViewportChange handler as Controls requires it
+    const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
+        setViewState(event.viewState)
+    }, [])
 
     const [open, setOpen] = useState(false)
-    const [showFields, setShowFields] = useState(true) // Added showFields state
-    const layerLayout = { visibility: showFields ? "visible" : "none" } as const // Define layerLayout
 
     const [selectedField, setSelectedField] = useState<Feature<Polygon> | null>(
         null,
@@ -239,15 +226,20 @@ export default function Index() {
     const fieldsSelectedId = "fieldsSelected"
     const fieldsSelectedStyle = getFieldsStyle(fieldsSelectedId)
 
+    const fieldsSavedId = "fieldsSaved"
+    const fieldsSaved = loaderData.fieldsSaved
+    const calendar = loaderData.calendar
+    const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
+
+    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
+
     // Set selected fields
     const [selectedFieldsData, setSelectedFieldsData] = useState(
         generateFeatureClass(),
     )
 
-    // onViewportChange handler as Controls requires it
-    const onViewportChange = (event: ViewStateChangeEvent) => {
-        setViewState(event.viewState)
-    }
+    const [showFields, setShowFields] = useState(true) // Added showFields state
+    const layerLayout = { visibility: showFields ? "visible" : "none" } as const // Define layerLayout
 
     return (
         <SidebarInset>
@@ -448,24 +440,24 @@ export default function Index() {
  * or soil analysis) fails.
  */
 export async function action({ request, params }: ActionFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
     try {
         const formData = await request.formData()
+
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
+        }
 
         // Get the session
         const session = await getSession(request)
 
-        // Get the timeframe
-        const timeframe = getTimeframe(params)
+        // Get the timeframe from calendar store
         const calendar = getCalendar(params)
+        const timeframe = getTimeframe(params)
         let firstFieldIndex: number
         try {
             firstFieldIndex =
@@ -501,8 +493,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     }
                     const b_name = `Perceel ${firstFieldIndex + index}`
                     const b_id_source = field.properties.b_id_source
+                    if (!b_id_source)
+                        throw new Error("missing: field.properties.b_id_source")
                     const b_lu_catalogue = field.properties.b_lu_catalogue
+                    if (!b_id_source)
+                        throw new Error(
+                            "missing: field.properties.b_lu_catalogue",
+                        )
                     const b_geometry = field.geometry
+                    if (!b_geometry) {
+                        throw new Error("missing: b_geometry")
+                    }
 
                     const parsedYear = Number.parseInt(
                         String(calendar ?? ""),
@@ -513,7 +514,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
                         parsedYear >= 1970 &&
                         parsedYear < 2100
                             ? parsedYear
-                            : timeframe.start.getFullYear()
+                            : timeframe.start?.getFullYear()
+                    if (!currentYear && currentYear !== 0) {
+                        throw new Error("missing: year")
+                    }
                     const cultivationDefaultDates =
                         await getDefaultDatesOfCultivation(
                             fdm,
