@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.26.5
+
+### Patch Changes
+
+- 5c2b843: Patch for CVE-2026-21884, CVE-2026-22029 and CVE-2026-22030
+
 ## 0.26.4
 
 ### Patch Changes
