@@ -22,7 +22,9 @@ describe("stikstofgebruiksnorm helpers", () => {
     })
 
     it("should correctly identify a field not in an NV Gebied, but with single array response (see #205)", async () => {
-        const centroidOutsideNV: [number, number] = [5.5527872994244785, 52.92595151470198] // Known point outside NV Gebied
+        const centroidOutsideNV: [number, number] = [
+            5.5527872994244785, 52.92595151470198,
+        ] // Known point outside NV Gebied
         const result = await isFieldInNVGebied(centroidOutsideNV)
         expect(result).toBe(false)
     })

@@ -62,9 +62,7 @@ export function calculateNitrogenRemovalByResidue(
                 // Prioritize the specific yield if available
                 const analysisWithYield =
                     harvest.harvestable.harvestable_analyses.find(
-                        (analysis: {
-                            b_lu_yield: number | null | undefined
-                        }) =>
+                        (analysis: { b_lu_yield: number | null | undefined }) =>
                             analysis.b_lu_yield !== undefined &&
                             analysis.b_lu_yield !== null,
                     )

@@ -13,28 +13,39 @@ import type {
 } from "react-hook-form"
 import { Button } from "~/components/ui/button"
 import { Calendar } from "~/components/ui/calendar"
-import { Field, FieldError, FieldLabel } from "~/components/ui/field"
+import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldLabel,
+} from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "~/components/ui/popover"
+import { endMonth, startMonth } from "~/lib/calendar"
+import { cn } from "~/lib/utils"
 
 type DatePickerProps = {
     label: string
+    description?: string
     defaultValue?: Date
     field: ControllerRenderProps<FieldValues, string>
     fieldState: ControllerFieldState
     required?: boolean
+    className?: string
 }
 
 export function DatePicker({
     label,
+    description,
     defaultValue,
     field,
     fieldState,
     required,
+    className,
 }: DatePickerProps) {
     const [open, setOpen] = useState(false)
     const initialDate =
@@ -81,7 +92,7 @@ export function DatePicker({
             field.onChange(date.toISOString()) // Submit ISO string
         } else {
             setSelectedDate(undefined)
-            field.onChange("")
+            field.onChange(null)
         }
         field.onBlur()
     }
@@ -90,12 +101,15 @@ export function DatePicker({
         setSelectedDate(date)
         const formattedDate = formatDate(date)
         setInputValue(formattedDate)
-        field.onChange(date ? date.toISOString() : "") // Submit ISO string
+        field.onChange(date ? date.toISOString() : null) // Submit ISO string
         setOpen(false)
     }
 
     return (
-        <Field data-invalid={fieldState.invalid} className="gap-1">
+        <Field
+            data-invalid={fieldState.invalid}
+            className={cn("gap-1", className)}
+        >
             <FieldLabel>{label}</FieldLabel>
             <div className="flex relative gap-2">
                 <Input
@@ -138,11 +152,14 @@ export function DatePicker({
                             month={month}
                             onMonthChange={setMonth}
                             onSelect={handleDateSelect}
+                            startMonth={new Date(1970, 0)}
+                            endMonth={endMonth}
                             locale={calenderLocale}
                         />
                     </PopoverContent>
                 </Popover>
             </div>
+            {description && <FieldDescription>{description}</FieldDescription>}
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
         </Field>
     )

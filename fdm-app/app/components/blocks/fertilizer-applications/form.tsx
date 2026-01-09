@@ -9,7 +9,7 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { useFieldFertilizerFormStore } from "@/app/store/field-fertilizer-form"
 import { Combobox } from "~/components/custom/combobox"
 import { DatePicker } from "~/components/custom/date-picker"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     FormControl,
@@ -293,7 +293,7 @@ export function FertilizerApplicationForm({
                             <Button type="submit">
                                 {isSubmitting ? (
                                     <div className="flex items-center space-x-2">
-                                        <LoadingSpinner />
+                                        <Spinner />
                                         <span>Opslaan...</span>
                                     </div>
                                 ) : fertilizerApplication ? (

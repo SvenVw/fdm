@@ -14,7 +14,7 @@ import { toast as notify } from "sonner"
 import { z } from "zod"
 import { cn } from "@/app/lib/utils"
 import { Dropzone } from "~/components/custom/dropzone"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import {
     Accordion,
     AccordionContent,
@@ -386,7 +386,7 @@ export function MijnPercelenUploadForm({
                                             >
                                                 {isSubmitting ? (
                                                     <div className="flex items-center space-x-2">
-                                                        <LoadingSpinner />
+                                                        <Spinner />
                                                         <span>Uploaden...</span>
                                                     </div>
                                                 ) : (

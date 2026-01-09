@@ -13,7 +13,7 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import validator from "validator"
 import { z } from "zod"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     FormControl,
@@ -267,7 +267,7 @@ Wageningen"
                                 ),
                             )}
                         >
-                            {form.formState.isSubmitting && <LoadingSpinner />}
+                            {form.formState.isSubmitting && <Spinner />}
                             Bijwerken
                         </Button>
                     </div>

@@ -1,5 +1,71 @@
 # Changelog fdm-app
 
+## 0.26.5
+
+### Patch Changes
+
+- 5c2b843: Patch for CVE-2026-21884, CVE-2026-22029 and CVE-2026-22030
+
+## 0.26.4
+
+### Patch Changes
+
+- e367ca6: Update dependencies of fdm-app to patch for CVE-2025-15284
+
+## 0.26.3
+
+### Patch Changes
+
+- 7f69925: Synchronize DatePicker components with available calendar years by deriving boundaries from central calendar configuration, ensuring "next year" selection is supported.
+
+## 0.26.2
+
+### Patch Changes
+
+- 2a30b7b: Fixed mobile elevation map stability by correcting the cache endpoint path, implementing robust `localStorage` error handling, and adding a "fallback-to-stale" strategy for offline resilience.
+
+## 0.26.1
+
+### Patch Changes
+
+- 36b1b99: Fix TypeError when `updatePanel` attempts to access `map.getLayer(layer)` before the map is fully initialized
+- 1274a32: Optimize Elevation Atlas stability and performance: implement chunked sampling concurrency, server-side AHN index caching, geometry simplification and WMS layer zoom constraints
+- 067c0de: Fix AggregateError in Elevation Atlas by implementing chunked concurrency for sampling requests to avoid exceeding HTTP/1.1 connection limits
+
+## 0.26.0
+
+### Minor Changes
+
+- 22f53dd: Update and expand the landing page. Add a "read more" section explaining what fdm-app can do and how it can be used. Also improve the mobile responsiveness
+- b27b097: Enable to select the cultivation for the Nutrient Advice view at the Fertilizer Application Metrics
+- c8a6e65: At Gebruiksruimte make 2026 also available
+- d9f6711: Add implementation of the AHN4 via the elevation layer in Atlas
+- 1885f8a: Implement OTP verification flow including a new verification page with typing animations, updated email templates, and improved accessibility for sign-in.
+- bc6bf16: Add farm overview page at Nutrient Advice to easily select the field and cultivation
+- b4ff19a: Enable to create a farm for next year
+- 4796549: Make next year also available
+- 61966db: Extended the nitrogen balance chart with breakdown into fixation, deposition, mineralization. Split removal into removal from harvests and crop residues. Added emission and supply breakdown for different fertilizer types.
+- bc6bf16: Enable at Nutrient Advice to select the cultivation for which the nutrient advice is calculated and displayed
+
+### Patch Changes
+
+- 022a347: Cultivation ending date can now be cleared. If the cultivation can only be harvested once, any harvestings are deleted along with the cultivation ending date.
+- 6095e65: Replace mapbox with maplibre
+- a3cc042: Now, only first-time social provider logins redirect to the onboarding (/welcome) page. Other social provider logins redirect directly to the redirectTo search param value, or /farm by default.
+- 99999e0: Add improvements and optimizations to the docker build process
+- 06d5ff7: Setup a reverse proxy for posthog
+- Updated dependencies [022a347]
+- Updated dependencies [61966db]
+- Updated dependencies [1885f8a]
+- Updated dependencies [ba2c7dc]
+- Updated dependencies [99a8797]
+- Updated dependencies [2c5de99]
+- Updated dependencies [6d28fd7]
+- Updated dependencies [67612d7]
+  - @svenvw/fdm-core@0.28.0
+  - @svenvw/fdm-calculator@0.10.0
+  - @svenvw/fdm-data@0.19.1
+
 ## 0.25.4
 
 ### Patch Changes

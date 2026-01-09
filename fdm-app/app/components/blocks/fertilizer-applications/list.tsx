@@ -4,7 +4,7 @@ import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import { Circle, Diamond, Square, Trash, Triangle } from "lucide-react"
 import { useFetcher } from "react-router"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Empty,
@@ -156,7 +156,7 @@ export function FertilizerApplicationsList({
                                                     >
                                                         {fetcher.state ===
                                                         "submitting" ? (
-                                                            <LoadingSpinner />
+                                                            <Spinner />
                                                         ) : (
                                                             <Trash className="size-4" />
                                                         )}

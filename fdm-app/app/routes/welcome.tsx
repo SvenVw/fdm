@@ -10,16 +10,16 @@ import { Form, useLoaderData } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Avatar, AvatarImage } from "~/components/ui/avatar"
 import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
+    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
-    CardDescription,
 } from "~/components/ui/card"
 import {
     FormControl,
@@ -220,7 +220,7 @@ export default function Welcome() {
                                             >
                                                 {form.formState.isSubmitting ? (
                                                     <div className="flex items-center space-x-2">
-                                                        <LoadingSpinner />
+                                                        <Spinner />
                                                         <span>Opslaan...</span>
                                                     </div>
                                                 ) : (

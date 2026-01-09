@@ -1,10 +1,10 @@
 import { withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
+import type { FosfaatGebruiksnormResult } from "../../types"
 import { fosfaatNormsData } from "./fosfaatgebruiksnorm-data"
 import { determineNLHoofdteelt } from "./hoofdteelt"
 import type { FosfaatKlasse, NL2025NormsInput } from "./types.d"
-import type { FosfaatGebruiksnormResult } from "../../types"
 
 /**
  * Determines if a cultivation is a type of grassland based on its catalogue entry.

@@ -118,7 +118,8 @@ export function WelcomeEmail({
                                     sinds 2009.
                                 </li>
                                 <li>
-                                    Bekijk het microreliëf van percelen met de hoogtekaart.
+                                    Bekijk het microreliëf van percelen met de
+                                    hoogtekaart.
                                 </li>
                                 <li>
                                     Of een perceel in een gebied met beperkingen

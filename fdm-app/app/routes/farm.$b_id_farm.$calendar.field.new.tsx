@@ -2,7 +2,6 @@ import {
     addCultivation,
     addField,
     addSoilAnalysis,
-    getCultivations,
     getCultivationsFromCatalogue,
     getDefaultDatesOfCultivation,
     getFarm,
@@ -35,6 +34,7 @@ import { ClientOnly } from "remix-utils/client-only"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
 import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
+import { generateFeatureClass } from "~/components/blocks/atlas/atlas-functions"
 import {
     FieldsPanelHover,
     FieldsPanelSelection,
@@ -47,6 +47,7 @@ import {
 } from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
+import FieldDetailsInfoPopup from "~/components/blocks/field/popup"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { HeaderField } from "~/components/blocks/header/field"
@@ -61,8 +62,6 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
-import FieldDetailsInfoPopup from "~/components/blocks/field/popup"
-import { generateFeatureClass } from "~/components/blocks/atlas/atlas-functions"
 
 // Meta
 export const meta: MetaFunction = () => {

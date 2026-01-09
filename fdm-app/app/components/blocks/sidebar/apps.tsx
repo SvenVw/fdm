@@ -104,7 +104,11 @@ export function SidebarApps() {
                         <SidebarMenuItem>
                             {atlasLink ? (
                                 <CollapsibleTrigger asChild>
-                                    <SidebarMenuButton isActive={location.pathname.includes("/atlas")}>
+                                    <SidebarMenuButton
+                                        isActive={location.pathname.includes(
+                                            "/atlas",
+                                        )}
+                                    >
                                         <MapIcon />
                                         <span>Atlas</span>
                                         <Plus className="ml-auto group-data-[state=open]/collapsible:hidden" />
@@ -146,7 +150,9 @@ export function SidebarApps() {
                                                     atlasElevationLink,
                                                 )}
                                             >
-                                                <NavLink to={atlasElevationLink}>
+                                                <NavLink
+                                                    to={atlasElevationLink}
+                                                >
                                                     <span>Hoogtekaart</span>
                                                 </NavLink>
                                             </SidebarMenuSubButton>

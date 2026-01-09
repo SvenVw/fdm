@@ -38,7 +38,7 @@ describe("calculateTargetForNitrogenBalance", () => {
 
     const createCultivationDetailsMap = (
         b_lu_catalogue: string,
-        b_lu_croprotation: 'cereal' | 'grass' | 'maize' | 'other',
+        b_lu_croprotation: "cereal" | "grass" | "maize" | "other",
     ): Map<string, CultivationDetail> =>
         new Map([
             [

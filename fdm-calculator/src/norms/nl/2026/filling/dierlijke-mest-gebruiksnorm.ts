@@ -1,9 +1,9 @@
 import { withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../../../package"
+import type { NormFilling } from "../../types"
 import { table11Mestcodes } from "./table-11-mestcodes"
 import type { NL2026NormsFillingInput } from "./types"
-import type { NormFilling } from "../../types"
 
 /**
  * Calculates the nitrogen usage from animal manure for a list of fertilizer applications.
@@ -24,7 +24,10 @@ export function calculateNL2026FertilizerApplicationFillingForDierlijkeMestGebru
     // Create maps for efficient lookups of fertilizers and RVO types.
     // This avoids iterating over the arrays repeatedly in a loop.
     const fertilizersMap = new Map(
-        fertilizers.map((fertilizer) => [fertilizer.p_id_catalogue, fertilizer]),
+        fertilizers.map((fertilizer) => [
+            fertilizer.p_id_catalogue,
+            fertilizer,
+        ]),
     )
     const rvoTypeMap = new Map(
         table11Mestcodes.map((rvoType) => [rvoType.p_type_rvo, rvoType]),

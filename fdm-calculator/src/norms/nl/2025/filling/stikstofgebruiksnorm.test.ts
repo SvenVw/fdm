@@ -28,7 +28,12 @@ describe("isBouwland", () => {
             },
         ] as unknown as Cultivation[]
         const applicationDate = new Date("2025-06-15")
-        expect(isBouwland(cultivations as unknown as Cultivation[], applicationDate)).toBe(true)
+        expect(
+            isBouwland(
+                cultivations as unknown as Cultivation[],
+                applicationDate,
+            ),
+        ).toBe(true)
     })
 
     it("should return false if cultivation is in non-bouwland codes", () => {
@@ -40,7 +45,12 @@ describe("isBouwland", () => {
             },
         ] as unknown as Cultivation[]
         const applicationDate = new Date("2025-06-15")
-        expect(isBouwland(cultivations as unknown as Cultivation[], applicationDate)).toBe(false)
+        expect(
+            isBouwland(
+                cultivations as unknown as Cultivation[],
+                applicationDate,
+            ),
+        ).toBe(false)
     })
 
     it("should return false if no active cultivation exists", () => {
@@ -53,7 +63,12 @@ describe("isBouwland", () => {
             },
         ] as unknown as Cultivation[]
         const applicationDate = new Date("2025-06-15")
-        expect(isBouwland(cultivations as unknown as Cultivation[], applicationDate)).toBe(false)
+        expect(
+            isBouwland(
+                cultivations as unknown as Cultivation[],
+                applicationDate,
+            ),
+        ).toBe(false)
     })
 
     it("should return true for a cultivation spanning the application date", () => {
@@ -62,10 +77,15 @@ describe("isBouwland", () => {
                 b_lu: "cult1",
                 b_lu_start: new Date("2025-01-01"),
                 b_lu_catalogue: "nl_2014",
-            }
+            },
         ] as unknown as Cultivation[]
         const applicationDate = new Date("2025-07-01")
-        expect(isBouwland(cultivations as unknown as Cultivation[], applicationDate)).toBe(true)
+        expect(
+            isBouwland(
+                cultivations as unknown as Cultivation[],
+                applicationDate,
+            ),
+        ).toBe(true)
     })
 
     it("should return false for a cultivation ending before the application date", () => {
@@ -78,7 +98,12 @@ describe("isBouwland", () => {
             },
         ] as unknown as Cultivation[]
         const applicationDate = new Date("2025-07-01")
-        expect(isBouwland(cultivations as unknown as Cultivation[], applicationDate)).toBe(false)
+        expect(
+            isBouwland(
+                cultivations as unknown as Cultivation[],
+                applicationDate,
+            ),
+        ).toBe(false)
     })
 
     it("should return false for a cultivation starting after the application date", () => {
@@ -91,7 +116,12 @@ describe("isBouwland", () => {
             },
         ] as unknown as Cultivation[]
         const applicationDate = new Date("2025-07-01")
-        expect(isBouwland(cultivations as unknown as Cultivation[], applicationDate)).toBe(false)
+        expect(
+            isBouwland(
+                cultivations as unknown as Cultivation[],
+                applicationDate,
+            ),
+        ).toBe(false)
     })
 })
 
@@ -514,6 +544,7 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 5, // 5 kg N per ton
                 p_type_rvo: "115", // Kunstmest (working coefficient 1.0)
             },
@@ -563,11 +594,13 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 5, // 5 kg N per ton
                 p_type_rvo: "115", // Kunstmest (working coefficient 1.0)
             },
             {
                 p_id: "fert2",
+                p_id_catalogue: "fert2",
                 p_n_rt: 10, // 10 kg N per ton
                 p_type_rvo: "111", // Compost (working coefficient 0.1)
             },
@@ -616,6 +649,7 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 0, // Nitrogen content not directly known
                 p_type_rvo: "14", // Drijfmest rundvee (Table 11: 4.0 kg N/ton)
             },
@@ -689,6 +723,7 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 0, // Nitrogen content not directly known
                 p_type_rvo: "14", // Drijfmest rundvee (Table 11: 4.0 kg N/ton)
             },
@@ -735,6 +770,7 @@ describe("calculateNL2025FertilizerApplicationFillingForStikstofGebruiksNorm", (
         const fertilizers = [
             {
                 p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 10, // 10 kg N per ton
                 p_type_rvo: "10",
             },

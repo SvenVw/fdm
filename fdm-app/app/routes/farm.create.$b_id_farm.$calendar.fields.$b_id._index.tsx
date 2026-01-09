@@ -11,9 +11,9 @@ import {
 } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { Plus } from "lucide-react"
+import maplibregl from "maplibre-gl"
 import { useEffect, useRef, useState } from "react"
 import { Layer, Map as MapGL, type MapRef } from "react-map-gl/maplibre"
-import maplibregl from "maplibre-gl"
 import {
     type ActionFunctionArgs,
     data,
@@ -32,7 +32,7 @@ import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import { SoilDataCards } from "~/components/blocks/soil/cards"
 import { Combobox } from "~/components/custom/combobox"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -361,7 +361,7 @@ export default function Index() {
                                             >
                                                 {form.formState
                                                     .isSubmitting && (
-                                                    <LoadingSpinner />
+                                                    <Spinner />
                                                 )}
                                                 Bijwerken
                                             </Button>

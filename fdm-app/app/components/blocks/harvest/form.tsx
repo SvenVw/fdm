@@ -8,7 +8,7 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { cn } from "@/app/lib/utils"
 import { DatePicker } from "~/components/custom/date-picker-v2"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Collapsible,
@@ -73,7 +73,7 @@ function useHarvestRemixForm({
     handleConfirmation,
 }: HarvestFormDialogProps) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
-        mode: "onTouched",
+        mode: "onSubmit",
         resolver: async (values, bypass, options) => {
             // Do the validation using Zod
             const validation = await zodResolver(FormSchema)(
@@ -548,7 +548,7 @@ export function HarvestFormDialog(props: HarvestFormDialogProps) {
                                 >
                                     {fetcher.state === "submitting" ? (
                                         <div className="flex items-center space-x-2">
-                                            <LoadingSpinner />
+                                            <Spinner />
                                         </div>
                                     ) : null}
                                     Verwijderen
@@ -569,7 +569,7 @@ export function HarvestFormDialog(props: HarvestFormDialogProps) {
                                 >
                                     {form.formState.isSubmitting ? (
                                         <div className="flex items-center space-x-2">
-                                            <LoadingSpinner />
+                                            <Spinner />
                                             <span>Opslaan...</span>
                                         </div>
                                     ) : isHarvestUpdate ? (
@@ -638,7 +638,7 @@ export function HarvestForm(props: HarvestFormDialogProps) {
                                 {form.formState.isSubmitting ||
                                 fetcher.state === "submitting" ? (
                                     <div className="flex items-center space-x-2">
-                                        <LoadingSpinner />
+                                        <Spinner />
                                     </div>
                                 ) : null}
                                 Verwijderen
@@ -646,7 +646,7 @@ export function HarvestForm(props: HarvestFormDialogProps) {
                             <Button type="submit" className="ml-auto">
                                 {form.formState.isSubmitting ? (
                                     <div className="flex items-center space-x-2">
-                                        <LoadingSpinner />
+                                        <Spinner />
                                         <span>Opslaan...</span>
                                     </div>
                                 ) : isHarvestUpdate ? (
