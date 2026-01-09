@@ -45,14 +45,9 @@ export function FieldDropdown({ className, fieldOptions }: FieldDropdownProps) {
     }
     const advanceField = (amount: number) => () => {
         if (currentIndex > -1) {
-            const currentIndex = fieldOptions.findIndex(
-                (option) => option.b_id === b_id,
-            )
-            if (currentIndex > -1) {
-                const newIndex = amount + currentIndex
-                if (newIndex >= 0 && newIndex < fieldOptions.length) {
-                    setFieldId(fieldOptions[newIndex].b_id)
-                }
+            const newIndex = amount + currentIndex
+            if (newIndex >= 0 && newIndex < fieldOptions.length) {
+                setFieldId(fieldOptions[newIndex].b_id)
             }
         }
     }
