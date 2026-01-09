@@ -14,6 +14,7 @@ import {
 } from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { FieldDropdown } from "~/components/blocks/field/field-dropdown"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { HeaderField } from "~/components/blocks/header/field"
@@ -23,8 +24,8 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { modifySearchParams } from "~/lib/url-utils"
 import { useCalendarStore } from "~/store/calendar"
-import { modifySearchParams } from "../lib/url-utils"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -123,7 +124,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             return {
                 b_id: field.b_id,
                 b_name: field.b_name,
-                b_area: Math.round(field.b_area * 10) / 10,
+                b_area: Math.round((field.b_area ?? 0) * 10) / 10,
             }
         })
         if (wantedFieldIds) {
@@ -259,10 +260,13 @@ export default function FarmFieldIndex() {
                     description={`Beheer hier de gegevens van ${loaderData.fieldOptionsLocation === "sidebar" && loaderData.fieldOptions.length !== 1 ? "deze percelen" : "dit perceel"}.`}
                 />
                 <FarmContent
-                    fieldOptions={
-                        loaderData.fieldOptionsLocation === "sidebar"
-                            ? loaderData.fieldOptions
-                            : undefined
+                    beforeTabs={
+                        loaderData.fieldOptionsLocation === "sidebar" && (
+                            <FieldDropdown
+                                fieldOptions={loaderData.fieldOptions}
+                                className="mb-2"
+                            />
+                        )
                     }
                     sidebarItems={loaderData.sidebarPageItems}
                 >

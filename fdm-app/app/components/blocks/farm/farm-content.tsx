@@ -4,17 +4,16 @@ import {
     SidebarPage,
     type SidebarPageProps,
 } from "~/components/custom/sidebar-page"
-import { FieldDropdown, type FieldDropdownProps } from "./field-dropdown"
 
 interface FarmContentProps {
     sidebarItems?: SidebarPageProps["items"]
-    fieldOptions?: FieldDropdownProps["fieldOptions"]
+    beforeTabs?: ReactNode
     children?: ReactNode
 }
 
 export function FarmContent({
     sidebarItems,
-    fieldOptions,
+    beforeTabs = null,
     children,
 }: FarmContentProps) {
     return (
@@ -22,12 +21,7 @@ export function FarmContent({
             <div className="flex flex-col space-y-0 lg:flex-row lg:space-x-4 lg:space-y-0">
                 {sidebarItems && (
                     <aside className="lg:w-1/5">
-                        {fieldOptions && (
-                            <FieldDropdown
-                                fieldOptions={fieldOptions}
-                                className="mb-2"
-                            />
-                        )}
+                        {beforeTabs}
                         <SidebarPage items={sidebarItems} />
                     </aside>
                 )}
