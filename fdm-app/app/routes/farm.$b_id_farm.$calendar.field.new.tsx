@@ -193,6 +193,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fieldNameDefault: fieldNameDefault,
             cultivationOptions: cultivationOptions,
             mapStyle: mapStyle,
+            continueTo: `/farm/${b_id_farm}/${calendar}/field`,
         }
     } catch (error) {
         throw handleLoaderError(error)
