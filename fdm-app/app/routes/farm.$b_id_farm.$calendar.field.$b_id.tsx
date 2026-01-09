@@ -11,7 +11,6 @@ import {
     Outlet,
     redirect,
     useLoaderData,
-    useLocation,
 } from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
@@ -224,9 +223,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmFieldIndex() {
     const loaderData = useLoaderData<typeof loader>()
     const calendar = useCalendarStore((state) => state.calendar)
-    const location = useLocation()
 
-    if (location.pathname.includes("fertilizer/manage")) return <Outlet />
     return (
         <SidebarInset>
             <Header
@@ -252,8 +249,14 @@ export default function FarmFieldIndex() {
             </Header>
             <main>
                 <FarmTitle
-                    title={loaderData.field?.b_name}
-                    description={"Beheer hier de gegevens van dit perceel"}
+                    title={
+                        loaderData.fieldOptionsLocation === "sidebar"
+                            ? loaderData.fieldOptions.length === 1
+                                ? "Nieuwe Perceel"
+                                : "Nieuwe Percelen"
+                            : loaderData.field?.b_name
+                    }
+                    description={`Beheer hier de gegevens van ${loaderData.fieldOptionsLocation === "sidebar" && loaderData.fieldOptions.length !== 1 ? "deze percelen" : "dit perceel"}.`}
                 />
                 <FarmContent
                     fieldOptions={

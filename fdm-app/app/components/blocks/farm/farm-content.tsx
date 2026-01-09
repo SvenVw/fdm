@@ -23,7 +23,10 @@ export function FarmContent({
                 {sidebarItems && (
                     <aside className="lg:w-1/5">
                         {fieldOptions && (
-                            <FieldDropdown fieldOptions={fieldOptions} />
+                            <FieldDropdown
+                                fieldOptions={fieldOptions}
+                                className="mb-2"
+                            />
                         )}
                         <SidebarPage items={sidebarItems} />
                     </aside>

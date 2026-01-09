@@ -8,20 +8,27 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../../ui/select"
+import { cn } from "@/app/lib/utils"
 
 export interface FieldDropdownProps {
     fieldOptions: { b_name: string; b_id: string }[]
+    className: string
 }
 
-export function FieldDropdown({ fieldOptions }: FieldDropdownProps) {
+export function FieldDropdown({ className, fieldOptions }: FieldDropdownProps) {
     const params = useParams()
     const matches = useMatches()
     const navigate = useNavigate()
 
+    const b_id = params.b_id
+    const currentIndex = b_id
+        ? fieldOptions?.findIndex((option) => option.b_id === b_id)
+        : -1
     const setFieldId = (b_id: string) => {
         for (const match of matches) {
+            // The capturing group ([^.]+) will be something like overview, fertilizer, cultivation, etc.
             const regexMatch =
-                /^routes\/farm\.\$b_id_farm\.\$calendar\.field\.\$b_id\.([^\.]+)(?:\._index)?$/.exec(
+                /^routes\/farm\.\$b_id_farm\.\$calendar\.field\.\$b_id\.([^.]+)(?:\._index)?$/.exec(
                     match.id,
                 )
             if (regexMatch) {
@@ -33,8 +40,7 @@ export function FieldDropdown({ fieldOptions }: FieldDropdownProps) {
         }
     }
     const advanceField = (amount: number) => () => {
-        const b_id = params.b_id
-        if (fieldOptions && b_id) {
+        if (currentIndex > -1) {
             const currentIndex = fieldOptions.findIndex(
                 (option) => option.b_id === b_id,
             )
@@ -52,8 +58,14 @@ export function FieldDropdown({ fieldOptions }: FieldDropdownProps) {
     )
 
     return (
-        <div className="flex flex-row items-center">
-            <Button type="button" variant="ghost" onClick={advanceField(-1)}>
+        <div className={cn("flex flex-row items-center", className)}>
+            <Button
+                type="button"
+                variant="ghost"
+                onClick={advanceField(-1)}
+                disabled={currentIndex <= 0}
+                className="me-1"
+            >
                 <ChevronLeft />
             </Button>
             <Select value={currentOption?.b_id} onValueChange={setFieldId}>
@@ -68,7 +80,13 @@ export function FieldDropdown({ fieldOptions }: FieldDropdownProps) {
                     ))}
                 </SelectContent>
             </Select>
-            <Button type="button" variant="ghost" onClick={advanceField(1)}>
+            <Button
+                type="button"
+                variant="ghost"
+                onClick={advanceField(1)}
+                disabled={currentIndex >= fieldOptions.length - 1}
+                className="ms-1"
+            >
                 <ChevronRight />
             </Button>
         </div>
