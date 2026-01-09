@@ -11,6 +11,7 @@ import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import type { Route } from "./+types/farm.$b_id_farm.$calendar.field.$b_id.cultivation._index"
 
+export const noCultivationsFoundStatusText = "No cultivations found"
 export async function loader({ request, params }: LoaderFunctionArgs) {
     let cultivations: Awaited<ReturnType<typeof getCultivations>> = []
     try {
@@ -46,13 +47,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             timeframe,
         )
     } catch (error) {
-        return handleLoaderError(error)
+        throw handleLoaderError(error)
     }
 
     if (cultivations.length === 0) {
         throw data("No cultivations found for this field", {
             status: 404,
-            statusText: "No cultivations found",
+            statusText: noCultivationsFoundStatusText,
         })
     }
 
@@ -64,9 +65,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     if (
         isRouteErrorResponse(error) &&
-        error.statusText === "No cultivations found"
+        error.statusText === noCultivationsFoundStatusText
     ) {
-        return
+        // The parent route will see that there are no cultivations, and show a message to the user
+        // This route can just be rendered blank.
+        return null
     }
 
     throw error
