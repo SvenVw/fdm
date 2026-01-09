@@ -419,7 +419,7 @@ export default function Index() {
                     open={open}
                     setOpen={setOpen}
                     field={selectedField}
-                    hint="Dit perceel is al opgeslagen. U kunt percelen verwijderen op de volgende pagina."
+                    hint="Dit perceel is al opgeslagen. U kunt bestaande percelen beheren op de pagina Percelen."
                 />
             )}
         </SidebarInset>
