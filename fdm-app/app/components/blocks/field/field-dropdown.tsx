@@ -35,6 +35,9 @@ export function FieldDropdown({ className, fieldOptions }: FieldDropdownProps) {
             if (regexMatch) {
                 navigate(
                     `/farm/${params.b_id_farm}/${params.calendar}/field/${b_id}/${regexMatch[1]}${location.search}`,
+                    {
+                        replace: true,
+                    },
                 )
                 return
             }
