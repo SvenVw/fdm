@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { useMatches, useNavigate, useParams } from "react-router"
+import { useLocation, useMatches, useNavigate, useParams } from "react-router"
+import { cn } from "@/app/lib/utils"
 import { Button } from "~/components/ui/button"
 import {
     Select,
@@ -7,8 +8,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "../../ui/select"
-import { cn } from "@/app/lib/utils"
+} from "~/components/ui/select"
 
 export interface FieldDropdownProps {
     fieldOptions: { b_name: string; b_id: string }[]
@@ -19,6 +19,7 @@ export function FieldDropdown({ className, fieldOptions }: FieldDropdownProps) {
     const params = useParams()
     const matches = useMatches()
     const navigate = useNavigate()
+    const location = useLocation()
 
     const b_id = params.b_id
     const currentIndex = b_id
@@ -33,7 +34,7 @@ export function FieldDropdown({ className, fieldOptions }: FieldDropdownProps) {
                 )
             if (regexMatch) {
                 navigate(
-                    `/farm/${params.b_id_farm}/${params.calendar}/field/${b_id}/${regexMatch[1]}?fieldIds=${fieldOptions.map((option) => encodeURIComponent(option.b_id)).join(",")}`,
+                    `/farm/${params.b_id_farm}/${params.calendar}/field/${b_id}/${regexMatch[1]}${location.search}`,
                 )
                 return
             }
