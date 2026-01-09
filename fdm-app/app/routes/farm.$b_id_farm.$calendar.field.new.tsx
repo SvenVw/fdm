@@ -496,14 +496,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     if (!b_id_source)
                         throw new Error("missing: field.properties.b_id_source")
                     const b_lu_catalogue = field.properties.b_lu_catalogue
-                    if (!b_id_source)
+                    if (!b_lu_catalogue)
                         throw new Error(
                             "missing: field.properties.b_lu_catalogue",
                         )
                     const b_geometry = field.geometry
-                    if (!b_geometry) {
-                        throw new Error("missing: b_geometry")
-                    }
+                    if (!b_geometry) throw new Error("missing: b_geometry")
 
                     const parsedYear = Number.parseInt(
                         String(calendar ?? ""),
