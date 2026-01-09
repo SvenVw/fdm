@@ -293,7 +293,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             }
             await removeHarvest(fdm, session.principal_id, b_id_harvesting)
             return redirectWithSuccess(
-                `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}${url}${url.search}`,
+                `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}${url.search}`,
                 {
                     message: "Oogst is verwijderd! 🎉",
                 },
