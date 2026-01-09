@@ -572,7 +572,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         )
 
         return redirectWithSuccess(
-            `/farm/${b_id_farm}/${calendar}/field/${fieldIds[0]}/overview?fieldIds=${encodeURIComponent(fieldIds.map(encodeURIComponent).join(","))}`,
+            `/farm/${b_id_farm}/${calendar}/field/${fieldIds[0]}/overview?fieldIds=${fieldIds.map(encodeURIComponent).join(",")}`,
             {
                 message: `${fieldIds.length} ${fieldIds.length === 1 ? "perceel is" : "percelen zijn"} toegevoegd! 🎉`,
             },
