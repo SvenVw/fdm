@@ -27,7 +27,7 @@ import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applic
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Badge } from "~/components/ui/badge"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
@@ -243,7 +243,7 @@ export default function FarmFieldFertilizerAddIndex() {
                     {isSubmitting && (
                         <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
                             <div className="flex items-center text-sm text-muted-foreground">
-                                <LoadingSpinner className="mr-2" />
+                                <Spinner className="mr-2" />
                                 <span>Bemesting wordt toegevoegd...</span>
                             </div>
                         </div>

@@ -1,8 +1,4 @@
-import {
-    collectInputForOrganicMatterBalance,
-    getOrganicMatterBalance,
-    type OrganicMatterBalanceFieldResultNumeric,
-} from "@svenvw/fdm-calculator"
+import { type OrganicMatterBalanceFieldResultNumeric } from "@svenvw/fdm-calculator"
 import { getFarm, getFields } from "@svenvw/fdm-core"
 import {
     ArrowDownToLine,
@@ -30,6 +26,7 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
+import { getOrganicMatterBalanceForFarm } from "~/integrations/calculator"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -73,18 +70,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fields = await getFields(fdm, session.principal_id, b_id_farm)
 
         const asyncData = (async () => {
-            const organicMatterBalanceInput =
-                await collectInputForOrganicMatterBalance(
+            const organicMatterBalanceResult =
+                await getOrganicMatterBalanceForFarm({
                     fdm,
-                    session.principal_id,
+                    principal_id: session.principal_id,
                     b_id_farm,
                     timeframe,
-                )
-
-            const organicMatterBalanceResult = await getOrganicMatterBalance(
-                fdm,
-                organicMatterBalanceInput,
-            )
+                })
 
             if (organicMatterBalanceResult.hasErrors) {
                 reportError(

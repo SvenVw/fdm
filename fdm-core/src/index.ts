@@ -21,7 +21,7 @@ export {
     createFdmAuth,
     updateUserProfile,
 } from "./authentication"
-export type { FdmAuth } from "./authentication.d"
+export type { FdmAuth } from "./authentication"
 export { checkPermission } from "./authorization"
 export type { PrincipalId } from "./authorization.d"
 export {
@@ -144,24 +144,6 @@ export {
     removeOrganicCertification,
 } from "./organic"
 export type { OrganicCertification } from "./organic.d"
-export {
-    acceptInvitation,
-    cancelPendingInvitation,
-    checkOrganizationSlugForAvailability,
-    createOrganization,
-    deleteOrganization,
-    getOrganization,
-    getOrganizationsForUser,
-    getPendingInvitation,
-    getPendingInvitationsForOrganization,
-    getPendingInvitationsForUser,
-    getUsersInOrganization,
-    inviteUserToOrganization,
-    rejectInvitation,
-    removeUserFromOrganization,
-    updateOrganization,
-    updateRoleOfUserAtOrganization,
-} from "./organization"
 export { lookupPrincipal } from "./principal"
 export {
     addSoilAnalysis,

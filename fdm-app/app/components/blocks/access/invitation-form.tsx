@@ -5,7 +5,7 @@ import { Form } from "react-router-dom"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { AutoComplete } from "~/components/custom/autocomplete"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Select,
@@ -101,7 +101,7 @@ export const InvitationForm = ({ principals }: InvitationFormProps) => {
                             type="submit"
                         >
                             {form.formState.isSubmitting ? (
-                                <LoadingSpinner />
+                                <Spinner />
                             ) : (
                                 "Uitnodigen"
                             )}
