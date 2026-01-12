@@ -1,13 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-    checkOrganizationSlugForAvailability,
-    createOrganization,
-} from "@svenvw/fdm-core"
 import { useEffect } from "react"
 import {
     type ActionFunctionArgs,
     Form,
-    type LoaderFunctionArgs,
     type MetaFunction,
 } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
@@ -33,10 +28,9 @@ import {
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
 import { Textarea } from "~/components/ui/textarea"
-import { getSession } from "~/lib/auth.server"
+import { auth, getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 
 export const meta: MetaFunction = () => {
@@ -69,7 +63,7 @@ const FormSchema = z.object({
     description: z.string({}).optional(),
 })
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader() {
     try {
         return {}
     } catch (error) {
@@ -102,7 +96,7 @@ export default function AddOrganizationPage() {
     useEffect(() => {
         const subscription = form.watch((value, { name }) => {
             if (name === "name") {
-                const slug = convertToSlug(value.name)
+                const slug = convertToSlug(value.name ?? "")
                 form.setValue("slug", slug, {
                     shouldDirty: true,
                     shouldValidate: true,
@@ -229,8 +223,7 @@ export default function AddOrganizationPage() {
 export async function action({ request }: ActionFunctionArgs) {
     try {
         // Get the session
-        const session = await getSession(request)
-        const user_id = session.user.id
+        await getSession(request)
 
         // Get the form values
         const formValues = await extractFormValuesFromRequest(
@@ -242,11 +235,14 @@ export async function action({ request }: ActionFunctionArgs) {
         const description = formValues.description || ""
 
         // Check if slug is available
-        const slugIsAvailable = await checkOrganizationSlugForAvailability(
-            fdm,
-            slug,
-        )
-        if (!slugIsAvailable) {
+        const { status } = await auth.api.checkOrganizationSlug({
+            headers: request.headers,
+            body: {
+                slug: slug,
+            },
+        })
+
+        if (!status) {
             return dataWithError(
                 null,
                 "Naam voor organisatie is niet meer beschikbaar. Kies een andere naam",
@@ -254,7 +250,16 @@ export async function action({ request }: ActionFunctionArgs) {
         }
 
         // Create the organization
-        await createOrganization(fdm, user_id, name, slug, description)
+        await auth.api.createOrganization({
+            headers: request.headers,
+            body: {
+                name,
+                slug,
+                metadata: {
+                    description,
+                },
+            },
+        })
 
         return redirectWithSuccess(`/organization/${formValues.slug}`, {
             message: `Organisatie ${formValues.name} is aangemaakt! 🎉`,
