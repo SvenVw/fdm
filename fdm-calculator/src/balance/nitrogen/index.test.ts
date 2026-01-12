@@ -1,6 +1,19 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import { calculateNitrogenBalance } from "."
 import type { NitrogenBalanceInput } from "./types"
+import type { FdmType } from "@svenvw/fdm-core"
+import Decimal from "decimal.js"
+
+// Mock FdmType
+const mockFdm = {
+    select: vi.fn().mockReturnThis(),
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
+    then: vi.fn((resolve) => resolve ? Promise.resolve(resolve([])) : Promise.resolve([])), // Simulate cache miss
+    insert: vi.fn().mockReturnThis(),
+    values: vi.fn().mockResolvedValue(undefined),
+} as unknown as FdmType
 
 describe("calculateNitrogenBalance", () => {
     it("should calculate nitrogen balance correctly with mock input", async () => {
@@ -21,6 +34,8 @@ describe("calculateNitrogenBalance", () => {
                             m_cropresidue: true,
                             b_lu_start: new Date("2023-01-01"),
                             b_lu_end: new Date("2023-12-31"),
+                            b_lu_name: "Cultivation 1",
+                            b_lu_croprotation: "cereal",
                         },
                     ],
                     harvests: [
@@ -76,6 +91,9 @@ describe("calculateNitrogenBalance", () => {
                             p_app_date: new Date("2025-03-15"),
                         },
                     ],
+                    depositionSupply: {
+                        total: new Decimal(0),
+                    },
                 },
             ],
             fertilizerDetails: [
@@ -106,7 +124,10 @@ describe("calculateNitrogenBalance", () => {
             },
         }
 
-        const result = await calculateNitrogenBalance(mockNitrogenBalanceInput)
+        const result = await calculateNitrogenBalance(
+            mockFdm,
+            mockNitrogenBalanceInput,
+        )
 
         function assertValidFertilizerBreakdown(
             obj: { total: number } & Record<
@@ -156,6 +177,9 @@ describe("calculateNitrogenBalance", () => {
                     harvests: [],
                     soilAnalyses: [],
                     fertilizerApplications: [],
+                    depositionSupply: {
+                        total: new Decimal(0),
+                    },
                 },
             ],
             fertilizerDetails: [],
@@ -166,7 +190,10 @@ describe("calculateNitrogenBalance", () => {
             },
         }
 
-        const result = await calculateNitrogenBalance(mockNitrogenBalanceInput)
+        const result = await calculateNitrogenBalance(
+            mockFdm,
+            mockNitrogenBalanceInput,
+        )
 
         expect(result.hasErrors).toBe(true)
         expect(result.fieldErrorMessages.length).toBeGreaterThan(0)

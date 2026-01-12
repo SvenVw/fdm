@@ -1,3 +1,12 @@
+import {
+    getCultivations,
+    getCultivationsFromCatalogue,
+    getFertilizerApplications,
+    getFertilizers,
+    getFields,
+    getHarvests,
+    getSoilAnalyses,
+} from "@svenvw/fdm-core"
 import type {
     Cultivation,
     CultivationCatalogue,
@@ -13,6 +22,8 @@ import type {
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { collectInputForNitrogenBalance } from "./input"
 import type { FieldInput, NitrogenBalanceInput } from "./types"
+import { calculateAllFieldsNitrogenSupplyByDeposition } from "./supply/deposition"
+import Decimal from "decimal.js"
 
 // Mock the @svenvw/fdm-core module
 vi.mock("@svenvw/fdm-core", async () => {
@@ -29,18 +40,23 @@ vi.mock("@svenvw/fdm-core", async () => {
     }
 })
 
+// Mock the deposition supply calculation
+vi.mock("./supply/deposition", () => ({
+    calculateAllFieldsNitrogenSupplyByDeposition: vi.fn(),
+}))
+
 // Import mocks after vi.mock call
-const fdmCoreMocks = await import("@svenvw/fdm-core")
-const mockedGetFields = vi.mocked(fdmCoreMocks.getFields)
-const mockedGetCultivations = vi.mocked(fdmCoreMocks.getCultivations)
-const mockedGetHarvests = vi.mocked(fdmCoreMocks.getHarvests)
-const mockedGetSoilAnalyses = vi.mocked(fdmCoreMocks.getSoilAnalyses)
-const mockedGetFertilizerApplications = vi.mocked(
-    fdmCoreMocks.getFertilizerApplications,
-)
-const mockedGetFertilizers = vi.mocked(fdmCoreMocks.getFertilizers)
+const mockedGetFields = vi.mocked(getFields)
+const mockedGetCultivations = vi.mocked(getCultivations)
+const mockedGetHarvests = vi.mocked(getHarvests)
+const mockedGetSoilAnalyses = vi.mocked(getSoilAnalyses)
+const mockedGetFertilizerApplications = vi.mocked(getFertilizerApplications)
+const mockedGetFertilizers = vi.mocked(getFertilizers)
 const mockedGetCultivationsFromCatalogue = vi.mocked(
-    fdmCoreMocks.getCultivationsFromCatalogue,
+    getCultivationsFromCatalogue,
+)
+const mockedCalculateAllFieldsNitrogenSupplyByDeposition = vi.mocked(
+    calculateAllFieldsNitrogenSupplyByDeposition,
 )
 
 describe("collectInputForNitrogenBalance", () => {
@@ -175,6 +191,10 @@ describe("collectInputForNitrogenBalance", () => {
                 b_n_fixation: 0,
             },
         ] as unknown as CultivationCatalogue[]
+        const mockDepositionSupplyMap = new Map([
+            ["field-1", { total: new Decimal(10) }],
+            ["field-2", { total: new Decimal(20) }],
+        ])
 
         // Setup mocks
         mockedGetFields.mockResolvedValue(mockFieldsData)
@@ -188,6 +208,9 @@ describe("collectInputForNitrogenBalance", () => {
         mockedGetCultivationsFromCatalogue.mockResolvedValue(
             mockCultivationDetailsData,
         )
+        mockedCalculateAllFieldsNitrogenSupplyByDeposition.mockResolvedValue(
+            mockDepositionSupplyMap,
+        )
 
         const result = await collectInputForNitrogenBalance(
             mockFdm,
@@ -197,12 +220,13 @@ describe("collectInputForNitrogenBalance", () => {
         )
 
         const expectedFieldInputs: FieldInput[] = mockFieldsData.map(
-            (field) => ({
-                field: field,
+            (fieldData) => ({
+                field: fieldData,
                 cultivations: mockCultivationsData,
                 harvests: mockHarvestsData,
                 soilAnalyses: mockSoilAnalysesData,
                 fertilizerApplications: mockFertilizerApplicationsData,
+                depositionSupply: mockDepositionSupplyMap.get(fieldData.b_id)!,
             }),
         )
 
@@ -260,6 +284,13 @@ describe("collectInputForNitrogenBalance", () => {
             mockFdm,
             principal_id,
             b_id_farm,
+        )
+        expect(
+            mockedCalculateAllFieldsNitrogenSupplyByDeposition,
+        ).toHaveBeenCalledWith(
+            expect.anything(),
+            timeframe,
+            expect.any(String),
         )
     })
 

@@ -15,6 +15,8 @@ import {
     getSoilAnalyses,
 } from "@svenvw/fdm-core"
 import type { NitrogenBalanceInput } from "./types"
+import { calculateAllFieldsNitrogenSupplyByDeposition } from "./supply/deposition"
+import { getFdmPublicDataUrl } from "../../shared/public-data-url"
 
 /**
  * Collects necessary input data from a FDM instance for calculating the nitrogen balance.
@@ -58,6 +60,17 @@ export async function collectInputForNitrogenBalance(
                     timeframe,
                 )
             }
+
+            // Set the link to location of FDM public data
+            const fdmPublicDataUrl = getFdmPublicDataUrl()
+
+            // Fetch all deposition data in a single, batched request to avoid requesting the GeoTIIF for every field
+            const depositionByField =
+                await calculateAllFieldsNitrogenSupplyByDeposition(
+                    farmFields,
+                    timeframe,
+                    fdmPublicDataUrl,
+                )
 
             // Collect the details per field
             const fields = await Promise.all(
@@ -113,6 +126,7 @@ export async function collectInputForNitrogenBalance(
                         harvests: harvestsFiltered,
                         fertilizerApplications: fertilizerApplications,
                         soilAnalyses: soilAnalyses,
+                        depositionSupply: depositionByField.get(field.b_id),
                     }
                 }),
             )
