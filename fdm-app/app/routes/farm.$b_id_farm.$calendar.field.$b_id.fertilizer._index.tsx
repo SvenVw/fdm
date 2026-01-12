@@ -35,7 +35,7 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import {
-    getNitrogenBalanceforField,
+    getNitrogenBalanceForField,
     getNorms,
 } from "../integrations/calculator"
 
@@ -186,7 +186,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 principal_id,
                 b_id,
             }),
-            nitrogenBalance: getNitrogenBalanceforField({
+            nitrogenBalance: getNitrogenBalanceForField({
                 fdm,
                 principal_id,
                 b_id_farm,

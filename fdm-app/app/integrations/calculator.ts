@@ -1,13 +1,20 @@
 import {
+    calculateNitrogenBalance,
+    calculateOrganicMatterBalance,
     collectInputForNitrogenBalance,
+    collectInputForOrganicMatterBalance,
     createFunctionsForFertilizerApplicationFilling,
     createFunctionsForNorms,
-    getNitrogenBalance,
+    getNitrogenBalanceField,
     getNutrientAdvice,
+    getOrganicMatterBalanceField,
+    type FieldInput,
+    type NitrogenBalanceFieldResultNumeric,
     type NitrogenBalanceNumeric,
+    type OrganicMatterBalanceFieldResultNumeric,
+    type OrganicMatterBalanceNumeric,
 } from "@svenvw/fdm-calculator"
 import {
-    type Cultivation,
     type FdmType,
     type Field,
     type fdmSchema,
@@ -18,8 +25,8 @@ import {
 } from "@svenvw/fdm-core"
 import { getNmiApiKey } from "./nmi"
 
-// Get nitrogen balance for the field
-export async function getNitrogenBalanceforField({
+// Get nitrogen balance for a field
+export async function getNitrogenBalanceForField({
     fdm,
     principal_id,
     b_id_farm,
@@ -29,10 +36,10 @@ export async function getNitrogenBalanceforField({
     fdm: FdmType
     principal_id: PrincipalId
     b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"]
-    b_id: Field.b_id
+    b_id: Field["b_id"]
     timeframe: Timeframe
-}): Promise<NitrogenBalanceNumeric> {
-    const nitrogenBalanceInput = await collectInputForNitrogenBalance(
+}): Promise<NitrogenBalanceFieldResultNumeric> {
+    const { fields, ...rest } = await collectInputForNitrogenBalance(
         fdm,
         principal_id,
         b_id_farm,
@@ -40,18 +47,104 @@ export async function getNitrogenBalanceforField({
         b_id,
     )
 
-    const nitrogenBalanceResult = await getNitrogenBalance(
-        fdm,
-        nitrogenBalanceInput,
-    )
-    const nitrogenBalance = nitrogenBalanceResult.fields.find(
-        (field: { b_id: string }) => field.b_id === b_id,
-    )
-    if (!nitrogenBalance) {
-        throw new Error(`Nitrogen balance not found for field ${b_id}`)
+    if (fields.length === 0) {
+        throw new Error(`Field ${b_id} not found for farm ${b_id_farm}`)
     }
 
-    return nitrogenBalance
+    const nitrogenBalanceResult = await getNitrogenBalanceField(fdm, {
+        fieldInput: fields[0],
+        ...rest,
+    })
+    return {
+        b_id: b_id,
+        b_area: fields[0].field.b_area ?? 0,
+        balance: nitrogenBalanceResult,
+    }
+}
+
+export async function getNitrogenBalanceForFarm({
+    fdm,
+    principal_id,
+    b_id_farm,
+    timeframe,
+}: {
+    fdm: FdmType
+    principal_id: PrincipalId
+    b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"]
+    timeframe: Timeframe
+}): Promise<NitrogenBalanceNumeric> {
+    const input = await collectInputForNitrogenBalance(
+        fdm,
+        principal_id,
+        b_id_farm,
+        timeframe,
+    )
+
+    return calculateNitrogenBalance(fdm, input)
+}
+
+// Get organic matter balance for a field
+export async function getOrganicMatterBalanceForField({
+    fdm,
+    principal_id,
+    b_id_farm,
+    b_id,
+    timeframe,
+}: {
+    fdm: FdmType
+    principal_id: PrincipalId
+    b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"]
+    b_id: Field["b_id"]
+    timeframe: Timeframe
+}): Promise<{
+    fieldResult: OrganicMatterBalanceFieldResultNumeric
+    fieldInput: FieldInput
+}> {
+    const { fields, ...rest } = await collectInputForOrganicMatterBalance(
+        fdm,
+        principal_id,
+        b_id_farm,
+        timeframe,
+        b_id,
+    )
+
+    if (fields.length === 0) {
+        throw new Error(`Field ${b_id} not found for farm ${b_id_farm}`)
+    }
+
+    const organicMatterBalanceResult = await getOrganicMatterBalanceField(fdm, {
+        fieldInput: fields[0],
+        ...rest,
+    })
+    return {
+        fieldResult: {
+            b_id: b_id,
+            b_area: fields[0].field.b_area ?? 0,
+            balance: organicMatterBalanceResult,
+        },
+        fieldInput: fields[0],
+    }
+}
+
+export async function getOrganicMatterBalanceForFarm({
+    fdm,
+    principal_id,
+    b_id_farm,
+    timeframe,
+}: {
+    fdm: FdmType
+    principal_id: PrincipalId
+    b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"]
+    timeframe: Timeframe
+}): Promise<OrganicMatterBalanceNumeric> {
+    const input = await collectInputForOrganicMatterBalance(
+        fdm,
+        principal_id,
+        b_id_farm,
+        timeframe,
+    )
+
+    return calculateOrganicMatterBalance(fdm, input)
 }
 
 export async function getNutrientAdviceForField({
@@ -63,8 +156,8 @@ export async function getNutrientAdviceForField({
 }: {
     fdm: FdmType
     principal_id: PrincipalId
-    b_id: Field.b_id
-    b_centroid: Field.b_centroid
+    b_id: Field["b_id"]
+    b_centroid: Field["b_centroid"]
     timeframe: Timeframe
 }) {
     const nmiApiKey = getNmiApiKey()
@@ -77,7 +170,7 @@ export async function getNutrientAdviceForField({
         b_id,
         timeframe,
     )
-    let b_lu_catalogue: Cultivation.b_lu_catalogue
+    let b_lu_catalogue: string | null
 
     if (!cultivations.length) {
         b_lu_catalogue = null
@@ -104,7 +197,7 @@ export async function getNorms({
 }: {
     fdm: FdmType
     principal_id: PrincipalId
-    b_id: Field.b_id
+    b_id: Field["b_id"]
 }) {
     const functionsForNorms = createFunctionsForNorms("NL", "2025")
     const functionsForFilling = createFunctionsForFertilizerApplicationFilling(

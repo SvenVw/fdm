@@ -1,6 +1,4 @@
 import {
-    collectInputForNitrogenBalance,
-    getNitrogenBalance,
     type NitrogenBalanceFieldResultNumeric,
 } from "@svenvw/fdm-calculator"
 import { getFarm, getFields } from "@svenvw/fdm-core"
@@ -37,6 +35,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
+import { getNitrogenBalanceForFarm } from "~/integrations/calculator"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -87,18 +86,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fields = await getFields(fdm, session.principal_id, b_id_farm)
 
         const asyncData = (async () => {
-            // Collect input data for nutrient balance calculation
-            const nitrogenBalanceInput = await collectInputForNitrogenBalance(
+            const nitrogenBalanceResult = await getNitrogenBalanceForFarm({
                 fdm,
-                session.principal_id,
+                principal_id: session.principal_id,
                 b_id_farm,
                 timeframe,
-            )
-
-            const nitrogenBalanceResult = await getNitrogenBalance(
-                fdm,
-                nitrogenBalanceInput,
-            )
+            })
 
             if (nitrogenBalanceResult.hasErrors) {
                 reportError(
