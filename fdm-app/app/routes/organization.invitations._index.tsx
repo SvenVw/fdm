@@ -1,8 +1,3 @@
-import {
-    acceptInvitation,
-    getPendingInvitationsForUser,
-    rejectInvitation,
-} from "@svenvw/fdm-core"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
@@ -28,39 +23,37 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "~/components/ui/dialog"
-import { getSession } from "~/lib/auth.server"
+import { auth, getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-
-// Define the type for a single invitation
-type InvitationType = {
-    invitation_id: string
-    organization_name: string
-    organization_slug: string
-    inviter_firstname: string
-    inviter_surname: string
-    role: string
-    expires_at: Date
-}
 
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
-        const session = await getSession(request)
-        const invitations = await getPendingInvitationsForUser(
-            fdm,
-            session.user.id,
+        await getSession(request)
+
+        const invitationsList = await auth.api.listUserInvitations({
+            headers: request.headers,
+        })
+
+        const invitations = await Promise.all(
+            invitationsList.map(async (invitation) => {
+                return await auth.api.getInvitation({
+                    query: {
+                        id: invitation.id,
+                    },
+                    headers: request.headers,
+                })
+            }),
         )
-        return { invitations }
+
+        return { invitations: invitations }
     } catch (error) {
         throw handleLoaderError(error)
     }
 }
 
 export default function OrganizationsIndex() {
-    const { invitations } = useLoaderData<{
-        invitations: InvitationType[]
-    }>()
+    const { invitations } = useLoaderData<typeof loader>()
 
     return (
         <main className="container">
@@ -75,7 +68,7 @@ export default function OrganizationsIndex() {
                 </div>
 
                 {invitations.length === 0 ? (
-                    <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
+                    <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-87.5">
                         <div className="flex flex-col space-y-2 text-center">
                             <h1 className="text-2xl font-semibold tracking-tight">
                                 Je hebt op dit moment geen uitnodigingen open
@@ -95,15 +88,14 @@ export default function OrganizationsIndex() {
                 ) : (
                     <div className="grid gap-4 grid-cols-1">
                         {invitations.map((invitation) => (
-                            <Card key={invitation.invitation_id}>
+                            <Card key={invitation.id}>
                                 <CardHeader>
                                     <CardTitle>
-                                        {invitation.organization_name}
+                                        {invitation.organizationName}
                                     </CardTitle>
                                     <CardDescription>
                                         Uitgenodigd door{" "}
-                                        {invitation.inviter_firstname}{" "}
-                                        {invitation.inviter_surname}
+                                        {invitation.inviterEmail}
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent>
@@ -117,7 +109,7 @@ export default function OrganizationsIndex() {
                                     <p className="text-sm text-muted-foreground mt-2">
                                         Verloopt{" "}
                                         {formatDistanceToNow(
-                                            invitation.expires_at,
+                                            new Date(invitation.expiresAt),
                                             {
                                                 addSuffix: true,
                                                 locale: nl,
@@ -128,7 +120,7 @@ export default function OrganizationsIndex() {
                                 <CardFooter className="flex justify-between">
                                     <Button asChild variant="outline" size="sm">
                                         <NavLink
-                                            to={`/organization/${invitation.organization_slug}`}
+                                            to={`/organization/${invitation.organizationId}`}
                                         >
                                             Meer info
                                         </NavLink>
@@ -138,7 +130,7 @@ export default function OrganizationsIndex() {
                                             <input
                                                 type="hidden"
                                                 name="invitation_id"
-                                                value={invitation.invitation_id}
+                                                value={invitation.id}
                                             />
                                             <Button
                                                 name="intent"
@@ -166,7 +158,7 @@ export default function OrganizationsIndex() {
                                                         Weet je zeker dat je de
                                                         uitnodiging van{" "}
                                                         {
-                                                            invitation.organization_name
+                                                            invitation.organizationName
                                                         }{" "}
                                                         wilt afwijzen?
                                                     </DialogDescription>
@@ -177,7 +169,7 @@ export default function OrganizationsIndex() {
                                                             type="hidden"
                                                             name="invitation_id"
                                                             value={
-                                                                invitation.invitation_id
+                                                                invitation.id
                                                             }
                                                         />
                                                         <Button
@@ -215,24 +207,23 @@ export async function action({ request }: ActionFunctionArgs) {
             FormSchema,
         )
 
-        const session = await getSession(request)
+        // getSession call is important to validate session
+        await getSession(request)
 
         if (formValues.intent === "accept") {
-            await acceptInvitation(
-                fdm,
-                formValues.invitation_id,
-                session.user.id,
-            )
+            await auth.api.acceptInvitation({
+                headers: request.headers,
+                body: { invitationId: formValues.invitation_id },
+            })
             return redirectWithSuccess("/organization", {
                 message: "Uitnodiging geaccepteerd! 🎉",
             })
         }
         if (formValues.intent === "reject") {
-            await rejectInvitation(
-                fdm,
-                formValues.invitation_id,
-                session.user.id,
-            )
+            await auth.api.rejectInvitation({
+                headers: request.headers,
+                body: { invitationId: formValues.invitation_id },
+            })
             return redirectWithSuccess("/organization", {
                 message: "Uitnodiging afgewezen",
             })
