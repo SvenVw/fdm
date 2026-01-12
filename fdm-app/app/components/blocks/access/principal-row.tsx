@@ -3,7 +3,7 @@ import type React from "react"
 import { useFetcher } from "react-router-dom"
 import { useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
@@ -100,7 +100,7 @@ export const PrincipalRow = ({
                         className="flex items-center space-x-4"
                     >
                         {/* Show spinner during submission */}
-                        {fetcher.state !== "idle" ? <LoadingSpinner /> : null}
+                        {fetcher.state !== "idle" ? <Spinner /> : null}
 
                         <Select
                             defaultValue={role}

@@ -9,7 +9,7 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -205,7 +205,7 @@ export default function AddOrganizationPage() {
                                             className="m-auto"
                                         >
                                             {form.formState.isSubmitting && (
-                                                <LoadingSpinner />
+                                                <Spinner />
                                             )}
                                             Aanmaken
                                         </Button>

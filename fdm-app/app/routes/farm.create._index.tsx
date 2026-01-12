@@ -18,7 +18,7 @@ import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -326,7 +326,7 @@ export default function AddFarmPage() {
                                         <Button type="submit">
                                             {form.formState.isSubmitting ? (
                                                 <div className="flex items-center space-x-2">
-                                                    <LoadingSpinner />
+                                                    <Spinner />
                                                     <span>Opslaan...</span>
                                                 </div>
                                             ) : (
