@@ -556,3 +556,219 @@ describe("calculateNL2026StikstofGebruiksNorm", () => {
         )
     })
 })
+
+const sandCentroid: [number, number] = [5.656346970245633, 51.987872886419524] // zand_nwc
+const clayCentroid: [number, number] = [5.64188724, 51.977587] // klei
+
+describe("calculateNL2026StikstofGebruiksNorm - Korting Logic", () => {
+    describe("Grassland Renewal (Gras-na-Gras) - 50 kg N/ha", () => {
+        it("should apply 50 discount on Sand (June 1 - Aug 31)", async () => {
+            const mockInput: NL2026NormsInput = {
+                farm: {
+                    has_grazing_intention: false,
+                },
+                field: {
+                    b_id: "1",
+                    b_centroid: sandCentroid,
+                } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_265", // Grass
+                        b_lu_start: new Date(2026, 0, 1),
+                        b_lu_end: new Date(2026, 5, 15), // June 15
+                    },
+                    {
+                        b_lu_catalogue: "nl_265", // Grass
+                        b_lu_start: new Date(2026, 5, 16),
+                        b_lu_end: new Date(2026, 11, 31),
+                    },
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+            expect(result.normSource).toContain(
+                "Korting: 50kg N/ha: graslandvernieuwing",
+            )
+        })
+
+        it("should NOT apply discount on Clay", async () => {
+            const mockInput: NL2026NormsInput = {
+                farm: {
+                    has_grazing_intention: false,
+                },
+                field: {
+                    b_id: "1",
+                    b_centroid: clayCentroid,
+                } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_265", // Grass
+                        b_lu_start: new Date(2026, 0, 1),
+                        b_lu_end: new Date(2026, 5, 15),
+                    },
+                    {
+                        b_lu_catalogue: "nl_265", // Grass
+                        b_lu_start: new Date(2026, 5, 16),
+                        b_lu_end: new Date(2026, 11, 31),
+                    },
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+            expect(result.normSource).not.toContain("graslandvernieuwing")
+        })
+
+        it("should throw error for invalid renewal date on Sand", async () => {
+            const mockInput: NL2026NormsInput = {
+                farm: {
+                    has_grazing_intention: false,
+                },
+                field: {
+                    b_id: "1",
+                    b_centroid: sandCentroid,
+                } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_265", // Grass
+                        b_lu_start: new Date(2026, 0, 1),
+                        b_lu_end: new Date(2026, 4, 15), // May 15 (Too early)
+                    },
+                    {
+                        b_lu_catalogue: "nl_265", // Grass
+                        b_lu_start: new Date(2026, 4, 16),
+                        b_lu_end: new Date(2026, 11, 31),
+                    },
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            await expect(
+                calculateNL2026StikstofGebruiksNorm(mockInput),
+            ).rejects.toThrow(
+                "Graslandvernieuwing op zand- en lössgrond is alleen toegestaan tussen 1 juni en 31 augustus.",
+            )
+        })
+    })
+
+    describe("Grassland Destruction (Gras-naar-Bouwland) - 65 kg N/ha", () => {
+        it("should apply 65 discount on Sand (Maize, Feb 1 - May 10)", async () => {
+            const mockInput: NL2026NormsInput = {
+                farm: {
+                    has_grazing_intention: false,
+                },
+                field: {
+                    b_id: "1",
+                    b_centroid: sandCentroid,
+                } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_265", // Grass
+                        b_lu_start: new Date(2026, 0, 1),
+                        b_lu_end: new Date(2026, 1, 15), // Feb 15
+                    },
+                    {
+                        b_lu_catalogue: "nl_259", // Maize (Snijmais)
+                        b_lu_start: new Date(2026, 1, 16),
+                        b_lu_end: new Date(2026, 9, 1),
+                    },
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+            expect(result.normSource).toContain(
+                "Korting: 65kg N/ha: graslandvernietiging",
+            )
+        })
+
+        it("should NOT apply discount if previous crop was a Catch Crop (sown in Autumn)", async () => {
+            const mockInput: NL2026NormsInput = {
+                farm: {
+                    has_grazing_intention: false,
+                },
+                field: {
+                    b_id: "1",
+                    b_centroid: sandCentroid,
+                } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_266", // Tijdelijk Grass
+                        b_lu_start: new Date(2025, 9, 1), // Oct 1, 2025 (Autumn) -> Catch Crop
+                        b_lu_end: new Date(2026, 1, 15), // Feb 15
+                    },
+                    {
+                        b_lu_catalogue: "nl_259", // Maize
+                        b_lu_start: new Date(2026, 1, 16),
+                        b_lu_end: new Date(2026, 9, 1),
+                    },
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+            expect(result.normSource).not.toContain("graslandvernietiging")
+        })
+
+        it("should NOT apply discount for Seed Potatoes", async () => {
+            const mockInput: NL2026NormsInput = {
+                farm: {
+                    has_grazing_intention: false,
+                },
+                field: {
+                    b_id: "1",
+                    b_centroid: sandCentroid,
+                } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_265", // Grass
+                        b_lu_start: new Date(2026, 0, 1),
+                        b_lu_end: new Date(2026, 1, 15), // Feb 15
+                    },
+                    {
+                        b_lu_catalogue: "nl_2015", // Seed Potato
+                        b_lu_variety: "Adora",
+                        b_lu_start: new Date(2026, 1, 16),
+                        b_lu_end: new Date(2026, 9, 1),
+                    },
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+            expect(result.normSource).not.toContain("graslandvernietiging")
+        })
+
+        it("should throw error for invalid destruction date on Sand", async () => {
+            const mockInput: NL2026NormsInput = {
+                farm: {
+                    has_grazing_intention: false,
+                },
+                field: {
+                    b_id: "1",
+                    b_centroid: sandCentroid,
+                } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_265", // Grass
+                        b_lu_start: new Date(2026, 0, 1),
+                        b_lu_end: new Date(2026, 5, 1), // June 1 (Too late)
+                    },
+                    {
+                        b_lu_catalogue: "nl_259", // Maize
+                        b_lu_start: new Date(2026, 5, 2),
+                        b_lu_end: new Date(2026, 9, 1),
+                    },
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            await expect(
+                calculateNL2026StikstofGebruiksNorm(mockInput),
+            ).rejects.toThrow(
+                "Graslandvernietiging op zand- en lössgrond is alleen toegestaan tussen 1 februari en 10 mei.",
+            )
+        })
+    })
+})
