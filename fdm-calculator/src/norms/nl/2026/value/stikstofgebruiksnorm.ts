@@ -109,18 +109,22 @@ function getNormsForCultivation(
                     endPeriod.setFullYear(endDate.getFullYear() + 1)
                 }
 
-                // Special handling for "vanaf 15 oktober" (Late sowing)
-                // If period starts late in the year (Oct 15), it implies checking start date
-                if (
-                    sub.period_start_month === 10 &&
-                    sub.period_start_day === 15 &&
-                    sub.period_end_month === 12
-                ) {
-                    return startDate >= startPeriod && endDate <= endPeriod
+                // Special handling for "vanaf" (Late sowing or summer/autumn teelten)
+                // For "vanaf" periods, the crop must start on or after the startPeriod.
+                const isVanaf =
+                    sub.period_start_month && sub.period_start_month > 1
+
+                if (isVanaf) {
+                    // If it's a "tot minstens" period (implied by end month < 12), it must also last until endPeriod.
+                    if (sub.period_end_month && sub.period_end_month < 12) {
+                        return startDate >= startPeriod && endDate >= endPeriod
+                    }
+                    // For "vanaf X" (without "tot minstens", e.g. "vanaf 15 oktober"), we only check if it starts on or after X.
+                    return startDate >= startPeriod
                 }
 
-                // Standard logic: Crop must be present from startPeriod (or earlier) to at least endPeriod
-                // "van 1 januari tot minstens 15 april" -> startDate <= Jan 1 AND endDate >= Apr 15
+                // Standard "van 1 januari tot minstens X" logic:
+                // Crop must be present from startPeriod (or earlier) to at least endPeriod.
                 return startDate <= startPeriod && endDate >= endPeriod
             }
             return false
@@ -364,7 +368,7 @@ function calculateKorting(
     if (nonBouwlandCodes.includes(hoofdteelt2026)) {
         return {
             amount: new Decimal(0),
-            description: ". ",
+            description: ".",
         }
     }
 

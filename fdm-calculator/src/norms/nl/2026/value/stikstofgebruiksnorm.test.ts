@@ -95,7 +95,7 @@ describe("calculateNL2026StikstofGebruiksNorm", () => {
         // The base norm for Grasland in zand_nwc is 200 in nv-gebied.
         expect(result.normValue).toBe(200)
         expect(result.normSource).toEqual(
-            "Grasland (beweiden). ",
+            "Grasland (beweiden).",
         )
     })
 
@@ -660,6 +660,25 @@ describe("calculateNL2026StikstofGebruiksNorm", () => {
 
             const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
             expect(result.normValue).toBe(250) // Klei standard for "van 1 jan tot minstens 15 aug"
+        })
+
+        it("should select the correct norm for a summer crop (vanaf 15 april tot minstens 15 oktober)", async () => {
+            // Matches "vanaf 15 april tot minstens 15 oktober" -> 310 (Klei)
+            const mockInput: NL2026NormsInput = {
+                farm: { has_grazing_intention: false },
+                field: { b_id: "1", b_centroid: kleiCentroid } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_266", // Tijdelijk grasland
+                        b_lu_start: new Date(2026, 3, 20), // April 20
+                        b_lu_end: new Date(2026, 9, 20), // Oct 20
+                    } as Partial<NL2026NormsInputForCultivation>,
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+            expect(result.normValue).toBe(310)
         })
     })
 })
