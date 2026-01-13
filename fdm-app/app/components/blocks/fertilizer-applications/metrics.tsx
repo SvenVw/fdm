@@ -6,9 +6,11 @@ import type {
     NutrientAdvice,
 } from "@svenvw/fdm-calculator"
 import type { Cultivation } from "@svenvw/fdm-core"
+import { Sprout } from "lucide-react"
 import { Suspense } from "react"
 import { Await, NavLink } from "react-router-dom"
 import { CultivationSelector } from "~/components/custom/cultivation-selector"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -16,6 +18,14 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
+import {
+    Empty,
+    EmptyContent,
+    EmptyDescription,
+    EmptyHeader,
+    EmptyMedia,
+    EmptyTitle,
+} from "~/components/ui/empty"
 import {
     Item,
     ItemContent,
@@ -32,16 +42,6 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
-import { Button } from "~/components/ui/button"
-import {
-    Empty,
-    EmptyContent,
-    EmptyDescription,
-    EmptyHeader,
-    EmptyMedia,
-    EmptyTitle,
-} from "~/components/ui/empty"
-import { Sprout } from "lucide-react"
 
 interface FertilizerApplicationMetricsData {
     norms: Promise<{
