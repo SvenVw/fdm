@@ -1,10 +1,8 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpRightFromSquare, ChevronRight } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 import React from "react"
-import { NavLink, useFetcher, useLocation, useParams } from "react-router-dom"
+import { NavLink, useFetcher } from "react-router-dom"
 import { cn } from "@/app/lib/utils"
-import { getCultivationColor } from "~/components/custom/cultivation-colors"
-import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Checkbox } from "~/components/ui/checkbox"
 import {
@@ -25,6 +23,7 @@ import { DateRangeDisplay } from "./date-range-display"
 import { TableDateSelector } from "./date-selector"
 import { FertilizerDisplay } from "./fertilizer-display"
 import { HarvestDatesDisplay } from "./harvest-dates-display"
+import { NameCell } from "./name-cell"
 import { TableVarietySelector } from "./variety-selector"
 
 export type CropRow = {
@@ -33,7 +32,7 @@ export type CropRow = {
     b_lu_catalogue: string
     b_lu: string[]
     b_lu_name: string
-    m_cropresidue: string
+    m_cropresidue: "all" | "some" | "none"
     b_lu_variety: Record<string, number>
     b_lu_variety_options: { label: string; value: string }[] | null
     b_lu_croprotation: string
@@ -162,38 +161,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
         header: ({ column }) => {
             return <DataTableColumnHeader column={column} title="Gewas" />
         },
-        cell: ({ row }) => {
-            const original = row.original
-            const params = useParams()
-            const location = useLocation()
-            return original.type === "crop" ? (
-                <Badge
-                    style={{
-                        backgroundColor: getCultivationColor(
-                            original.b_lu_croprotation,
-                        ),
-                    }}
-                    className={"text-white"}
-                    variant="default"
-                >
-                    {original.b_lu_name}
-                </Badge>
-            ) : (
-                <NavLink
-                    to={
-                        location.pathname.includes("/farm/create")
-                            ? `/farm/create/${params.b_id_farm}/${params.calendar}/fields/${original.b_id}`
-                            : `/farm/${params.b_id_farm}/${params.calendar}/field/${original.b_id}`
-                    }
-                    className="group flex items-center hover:underline w-fit"
-                >
-                    <div className="group flex items-center hover:underline w-fit ps-4">
-                        {original.b_name}
-                        <ArrowUpRightFromSquare className="ml-2 h-4 w-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                </NavLink>
-            )
-        },
+        cell: (context) => <NameCell {...context} />,
     },
     {
         accessorKey: "b_lu_start",
