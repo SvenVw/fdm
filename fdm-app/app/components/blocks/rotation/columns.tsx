@@ -4,7 +4,6 @@ import React from "react"
 import { NavLink, useFetcher, useLocation, useParams } from "react-router-dom"
 import { cn } from "@/app/lib/utils"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
-import { Spinner } from "~/components/ui/spinner"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Checkbox } from "~/components/ui/checkbox"
@@ -15,7 +14,12 @@ import {
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
 import { ScrollArea } from "~/components/ui/scroll-area"
-import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip"
+import { Spinner } from "~/components/ui/spinner"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "~/components/ui/tooltip"
 import { DataTableColumnHeader } from "./column-header"
 import { DateRangeDisplay } from "./date-range-display"
 import { TableDateSelector } from "./date-selector"
@@ -312,6 +316,14 @@ export const columns: ColumnDef<RotationExtended>[] = [
 
             const inputId = `${cell.id}_checkbox`
 
+            const checkedState = (
+                {
+                    all: true,
+                    some: "indeterminate",
+                    none: false,
+                } as const
+            )[row.original.m_cropresidue]
+
             return fetcher.state !== "idle" ? (
                 <Spinner />
             ) : (
@@ -319,29 +331,13 @@ export const columns: ColumnDef<RotationExtended>[] = [
                     {row.original.canModify ? (
                         <Checkbox
                             id={inputId}
-                            checked={
-                                (
-                                    {
-                                        all: true,
-                                        some: "indeterminate",
-                                        none: false,
-                                    } as const
-                                )[row.original.m_cropresidue]
-                            }
+                            checked={checkedState}
                             onCheckedChange={(value) => submit(!!value)}
                         />
                     ) : (
                         <Checkbox
                             id={inputId}
-                            checked={
-                                (
-                                    {
-                                        all: true,
-                                        some: "indeterminate",
-                                        none: false,
-                                    } as const
-                                )[row.original.m_cropresidue]
-                            }
+                            checked={checkedState}
                             disabled={true}
                         />
                     )}
