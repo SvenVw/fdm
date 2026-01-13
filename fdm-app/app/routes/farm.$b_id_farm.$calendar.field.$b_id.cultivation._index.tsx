@@ -39,9 +39,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             timeframe,
         )
 
-        // Redirect to overview page
-        return redirect(`./${cultivations[0].b_lu}`)
+        // Redirect to overview page if we have cultivations
+        if (cultivations.length > 0) {
+            return redirect(`./${cultivations[0].b_lu}`)
+        }
+
+        return null
     } catch (error) {
         return handleLoaderError(error)
     }
+}
+
+export default function CultivationIndex() {
+    return null
 }
