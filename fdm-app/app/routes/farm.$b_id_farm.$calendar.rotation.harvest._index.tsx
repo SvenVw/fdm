@@ -35,7 +35,6 @@ import { HarvestForm } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
-import { Spinner } from "~/components/ui/spinner"
 import { Badge } from "~/components/ui/badge"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
@@ -59,6 +58,7 @@ import {
 } from "~/components/ui/dialog"
 import { Label } from "~/components/ui/label"
 import { SidebarInset } from "~/components/ui/sidebar"
+import { Spinner } from "~/components/ui/spinner"
 import {
     Tooltip,
     TooltipContent,
@@ -149,24 +149,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const allFieldsWithCultivations = await Promise.all(
             (
                 await getFields(fdm, session.principal_id, b_id_farm, timeframe)
-            ).map(
-                async (field: {
-                    b_id: string
-                    b_name: string
-                    b_area: number
-                }) => {
-                    const cultivations = await getCultivations(
-                        fdm,
-                        session.principal_id,
-                        field.b_id,
-                        timeframe,
-                    )
-                    return {
-                        ...field,
-                        cultivations: cultivations,
-                    }
-                },
-            ),
+            ).map(async (field) => {
+                const cultivations = await getCultivations(
+                    fdm,
+                    session.principal_id,
+                    field.b_id,
+                    timeframe,
+                )
+                return {
+                    ...field,
+                    cultivations: cultivations,
+                }
+            }),
         )
 
         // Get fieldIds from search params (if any)
@@ -863,6 +857,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
             return dataWithError(null, "Dit gewas is niet oogstbaar.")
         }
 
+        const redirectURL = url.searchParams.has("create")
+            ? `/farm/create/${b_id_farm}/${calendar}/rotation`
+            : `/farm/${b_id_farm}/${calendar}/rotation`
+
         if (request.method === "DELETE") {
             for (const fieldId of fieldIds) {
                 const cultivationsForField = await getCultivations(
@@ -901,14 +899,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 }
             }
 
-            return redirectWithSuccess(
-                url.searchParams.has("create")
-                    ? `/farm/create/${b_id_farm}/${calendar}/rotation`
-                    : `/farm/${b_id_farm}/${calendar}/rotation`,
-                {
-                    message: `Oogst succesvol verwijderd van ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
-                },
-            )
+            return redirectWithSuccess(redirectURL, {
+                message: `Oogst succesvol verwijderd van ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
+            })
         }
 
         const formValues = await extractFormValuesFromRequest(
@@ -1008,14 +1001,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
 
-        return redirectWithSuccess(
-            url.searchParams.has("create")
-                ? `/farm/create/${b_id_farm}/${calendar}/rotation`
-                : `/farm/${b_id_farm}/${calendar}/rotation`,
-            {
-                message: `Oogst succesvol toegevoegd aan ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
-            },
-        )
+        return redirectWithSuccess(redirectURL, {
+            message: `Oogst succesvol toegevoegd aan ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
+        })
     } catch (error) {
         if (error instanceof z.ZodError) {
             return dataWithError(
