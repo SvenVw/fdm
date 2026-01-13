@@ -9,6 +9,7 @@ import {
     Landmark,
     MapIcon,
     ScrollText,
+    FileText,
     Shapes,
     Sprout,
     Square,
@@ -409,6 +410,20 @@ export default function FarmDashboardIndex() {
                                 <Card>
                                     <CardContent className="pt-6">
                                         <div className="space-y-1">
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-start text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                asChild
+                                            >
+                                                <a
+                                                    href={`/farm/${loaderData.b_id_farm}/${calendar}/bemestingsplan.pdf`}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                >
+                                                    <FileText className="mr-2 h-4 w-4" />
+                                                    Export Bemestingsplan
+                                                </a>
+                                            </Button>
                                             <Button
                                                 variant="ghost"
                                                 className="w-full justify-start"
