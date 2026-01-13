@@ -56,6 +56,7 @@ import type {
 function getNormsForCultivation(
     selectedStandard: NitrogenStandard,
     b_lu_end: Date,
+    b_lu_start: Date | null | undefined,
     subTypeOmschrijving?: string,
 ): NormsByRegion | undefined {
     if (selectedStandard.sub_types) {
@@ -74,25 +75,86 @@ function getNormsForCultivation(
 
         // 2. Fallback to time-based logic for temporary grasslands if no omschrijving match
         const endDate = new Date(b_lu_end)
-        matchingSubType = selectedStandard.sub_types.find((sub) => {
+        endDate.setHours(12, 0, 0, 0) // Avoid timezone issues at midnight
+        const startDate = b_lu_start ? new Date(b_lu_start) : new Date(endDate.getFullYear(), 0, 1)
+        startDate.setHours(12, 0, 0, 0)
+
+        // Find all matching sub-types
+        const potentialMatches = selectedStandard.sub_types.filter((sub) => {
             if (sub.period_start_month && sub.period_end_month) {
                 const startPeriod = new Date(
                     endDate.getFullYear(),
                     sub.period_start_month - 1,
                     sub.period_start_day || 1,
+                    12, 0, 0, 0
                 )
                 const endPeriod = new Date(
                     endDate.getFullYear(),
                     sub.period_end_month - 1,
                     sub.period_end_day || 1,
+                    12, 0, 0, 0
                 )
+                
+                // Handle periods that might wrap (though none currently do in the data)
                 if (sub.period_start_month > sub.period_end_month) {
                     endPeriod.setFullYear(endDate.getFullYear() + 1)
                 }
-                return endDate >= startPeriod && endDate <= endPeriod
+                
+                // Special handling for "vanaf 15 oktober" (Late sowing)
+                // If period starts late in the year (Oct 15), it implies checking start date
+                if (sub.period_start_month === 10 && sub.period_start_day === 15 && sub.period_end_month === 12) {
+                     return startDate >= startPeriod && endDate <= endPeriod
+                }
+
+                // Standard logic: Crop must be present from startPeriod (or earlier) to at least endPeriod
+                // "van 1 januari tot minstens 15 april" -> startDate <= Jan 1 AND endDate >= Apr 15
+                return startDate <= startPeriod && endDate >= endPeriod
             }
             return false
         })
+
+        // Select the best match
+        // Prefer the one with the *earliest* period_start (most specific start requirement)
+        // If tied, prefer the one with the *latest* period_end (longest mandated duration = typically higher norm)
+        if (potentialMatches.length > 0) {
+             potentialMatches.sort((a, b) => {
+                const aStart = (a.period_start_month || 0) * 100 + (a.period_start_day || 0)
+                const bStart = (b.period_start_month || 0) * 100 + (b.period_start_day || 0)
+                if (aStart !== bStart) {
+                    return aStart - bStart
+                }
+                const aEnd = (a.period_end_month || 0) * 100 + (a.period_end_day || 0)
+                const bEnd = (b.period_end_month || 0) * 100 + (b.period_end_day || 0)
+                return bEnd - aEnd
+            })
+            matchingSubType = potentialMatches[0]
+        }
+        
+        // If no match found using the stricter "minstens" logic, fallback to the original bucket logic 
+        // to prevent "undefined" regressions for edge cases, but with timezone fix.
+        if (!matchingSubType) {
+             matchingSubType = selectedStandard.sub_types.find((sub) => {
+                if (sub.period_start_month && sub.period_end_month) {
+                    const startPeriod = new Date(
+                        endDate.getFullYear(),
+                        sub.period_start_month - 1,
+                        sub.period_start_day || 1,
+                        12, 0, 0, 0
+                    )
+                    const endPeriod = new Date(
+                        endDate.getFullYear(),
+                        sub.period_end_month - 1,
+                        sub.period_end_day || 1,
+                        12, 0, 0, 0
+                    )
+                    if (sub.period_start_month > sub.period_end_month) {
+                        endPeriod.setFullYear(endDate.getFullYear() + 1)
+                    }
+                    return endDate >= startPeriod && endDate <= endPeriod
+                }
+                return false
+            })
+        }
 
         return matchingSubType?.norms
     }
@@ -532,6 +594,7 @@ export async function calculateNL2026StikstofGebruiksNorm(
     const applicableNorms = getNormsForCultivation(
         selectedStandard,
         cultivation.b_lu_end ?? new Date("2026-12-31"),
+        cultivation.b_lu_start,
         subTypeOmschrijving,
     )
 
