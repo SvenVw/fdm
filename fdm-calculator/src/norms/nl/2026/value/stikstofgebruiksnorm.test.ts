@@ -92,11 +92,36 @@ describe("calculateNL2026StikstofGebruiksNorm", () => {
 
         const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
 
-        // The base norm for Grasland in zand_nwc is 200 in nv-gebied. With winterteelt, korting should be 0.
+        // The base norm for Grasland in zand_nwc is 200 in nv-gebied.
         expect(result.normValue).toBe(200)
         expect(result.normSource).toEqual(
-            "Grasland (beweiden). Geen korting: winterteelt aanwezig",
+            "Grasland (beweiden). ",
         )
+    })
+
+    it("should apply 0 korting if Tijdelijk grasland is present in zand_nwc region", async () => {
+        const mockInput: NL2026NormsInput = {
+            farm: { has_grazing_intention: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_266", // Tijdelijk grasland
+                    b_lu_start: new Date(2026, 0, 1),
+                    b_lu_end: new Date(2026, 5, 1),
+                } as Partial<NL2026NormsInputForCultivation>,
+            ] as NL2026NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+
+        // Tijdelijk grasland "van 1 jan tot minstens 15 mei" -> 90 (zand_nwc standard), 72 (zand_nwc nv_area)
+        // Should have no korting applied
+        expect(result.normValue).toBe(72)
+        expect(result.normSource).toContain("Tijdelijk grasland.")
     })
 
     it("should apply 0 korting if vanggewas is present (sown <= Oct 1st)", async () => {

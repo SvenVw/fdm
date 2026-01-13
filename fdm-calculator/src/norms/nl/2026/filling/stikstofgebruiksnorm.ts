@@ -10,6 +10,7 @@ import type {
     NL2026NormsFillingInput,
     WorkingCoefficientDetails,
 } from "./types"
+import { nonBouwlandCodes } from "../../constant"
 
 /**
  * Calculates the nitrogen utilization norm filling for a set of fertilizer applications.
@@ -116,8 +117,6 @@ export function isBouwland(
     cultivations: Cultivation[],
     p_app_date: Date,
 ): boolean {
-    const nonBouwlandCodes = ["nl_265", "nl_266", "nl_331", "nl_332", "nl_335"]
-
     const activeCultivation = cultivations.find((c) => {
         if (!c.b_lu_start) return false // Ensure b_lu_start exists
         const startDate = new Date(c.b_lu_start)
