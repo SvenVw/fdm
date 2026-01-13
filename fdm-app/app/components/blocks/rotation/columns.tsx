@@ -4,7 +4,7 @@ import React from "react"
 import { NavLink, useFetcher, useLocation, useParams } from "react-router-dom"
 import { cn } from "@/app/lib/utils"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Checkbox } from "~/components/ui/checkbox"
@@ -200,7 +200,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
         },
         enableHiding: true, // Enable hiding for mobile
         cell: ({ cell, row }) =>
-            row.original.type === "crop" || !row.original.canModify ? (
+            !row.original.canModify ? (
                 <DateRangeDisplay
                     range={row.original.b_lu_start}
                     emptyContent="Geen"
@@ -222,7 +222,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
         },
         enableHiding: true, // Enable hiding for mobile
         cell: ({ cell, row }) => {
-            if (row.original.type === "crop" || !row.original.canModify) {
+            if (!row.original.canModify) {
                 return (
                     <DateRangeDisplay
                         range={row.original.b_lu_end}
@@ -313,7 +313,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
             const inputId = `${cell.id}_checkbox`
 
             return fetcher.state !== "idle" ? (
-                <LoadingSpinner />
+                <Spinner />
             ) : (
                 <div className="flex flex-row items-center gap-1 text-muted-foreground">
                     {row.original.canModify ? (

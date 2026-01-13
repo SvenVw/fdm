@@ -4,7 +4,7 @@ import { useFetcher } from "react-router"
 import { RemixFormProvider } from "remix-hook-form"
 import { Button } from "~/components/ui/button"
 import { DatePicker } from "../../custom/date-picker-v2"
-import { LoadingSpinner } from "../../custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import type { RotationTableFormSchemaType } from "./schema"
 import type { CropRow, RotationExtended } from "./columns"
 import { DateRangeDisplay } from "./date-range-display"
@@ -81,7 +81,7 @@ function TableDateSelectorForm({
                     )}
                 />
             </RemixFormProvider>
-            <LoadingSpinner
+            <Spinner
                 className={cn(
                     "inline-block",
                     fetcher.state === "idle" && "invisible",

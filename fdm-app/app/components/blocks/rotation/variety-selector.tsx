@@ -4,7 +4,7 @@ import { useFetcher } from "react-router"
 import { RemixFormProvider } from "remix-hook-form"
 import { cn } from "@/app/lib/utils"
 import { useActiveTableFormStore } from "@/app/store/active-table-form"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Select,
@@ -106,7 +106,7 @@ function TableVarietySelectorForm({
                     )}
                 />
             </RemixFormProvider>
-            <LoadingSpinner
+            <Spinner
                 className={cn(
                     "inline-block",
                     fetcher.state === "idle" && "invisible",
