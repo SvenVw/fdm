@@ -1,11 +1,20 @@
 import type { Field } from "@svenvw/fdm-core"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi, afterEach } from "vitest"
+import * as GeoTiff from "../../../../shared/geotiff"
 import {
     calculateNL2025StikstofGebruiksNorm,
     getRegion,
     isFieldInNVGebied,
 } from "./stikstofgebruiksnorm"
 import type { NL2025NormsInput, NL2025NormsInputForCultivation } from "./types"
+
+vi.mock("../../../../shared/geotiff", async (importActual) => {
+    const actual = await importActual<typeof import("../../../../shared/geotiff")>()
+    return {
+        ...actual,
+        getGeoTiffValue: vi.fn(actual.getGeoTiffValue),
+    }
+})
 
 describe("stikstofgebruiksnorm helpers", () => {
     it("should correctly identify a field in an NV Gebied", async () => {
@@ -957,5 +966,279 @@ describe("calculateNL2025StikstofGebruiksNorm - Korting Logic", () => {
                 "Graslandvernietiging op zand- en lössgrond is alleen toegestaan tussen 1 februari en 10 mei.",
             )
         })
+    })
+})
+
+describe("calculateNL2025StikstofGebruiksNorm - Additional Korting Edge Cases", () => {
+    afterEach(() => {
+        vi.mocked(GeoTiff.getGeoTiffValue).mockClear()
+    })
+
+    // Helper to mock Region and NV status
+    const setupMock = (regionCode: number, nvCode: number) => {
+        vi.mocked(GeoTiff.getGeoTiffValue).mockImplementation(
+            async (url: string) => {
+                if (url.includes("grondsoorten")) return regionCode // 1=Klei, 4=Zand
+                if (url.includes("nv.tiff")) return nvCode // 1=NV, 0=Non-NV
+                return 0
+            },
+        )
+    }
+
+    const sandCentroid: [number, number] = [
+        5.656346970245633, 51.987872886419524,
+    ]
+
+    it("should apply 20 korting if vanggewas is removed before Feb 1st", async () => {
+        setupMock(4, 0) // Sand, Non-NV
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
+            field: {
+                b_id: "1",
+                b_centroid: sandCentroid,
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_2751", // Vruchtgewassen
+                    b_lu_start: new Date(2025, 0, 1),
+                    b_lu_end: new Date(2025, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+                {
+                    b_lu_catalogue: "nl_428", // Gele mosterd (vanggewas)
+                    b_lu_start: new Date(2024, 9, 1), // Oct 1
+                    b_lu_end: new Date(2025, 0, 15), // Jan 15 (Removed before Feb 1)
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await calculateNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normSource).toContain(
+            "Korting: 20kg N/ha: vanggewas staat niet tot 1 februari",
+        )
+    })
+
+    it("should apply 20 korting if vanggewas is sown too early (before July 15)", async () => {
+        setupMock(4, 0) // Sand, Non-NV
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
+            field: {
+                b_id: "1",
+                b_centroid: sandCentroid,
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_2751", // Vruchtgewassen
+                    b_lu_start: new Date(2025, 0, 1),
+                    b_lu_end: new Date(2025, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+                {
+                    b_lu_catalogue: "nl_428", // Gele mosterd
+                    b_lu_start: new Date(2024, 6, 10), // July 10 (Too early)
+                    b_lu_end: new Date(2025, 1, 15),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await calculateNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normSource).toContain(
+            "Korting: 20kg N/ha: geen vanggewas of winterteelt",
+        )
+    })
+
+    it("should apply 50 discount for Graslandvernieuwing on Clay (No Derogation) - Valid Date (Feb 10)", async () => {
+        setupMock(1, 0) // Clay, Non-NV
+        const mockInput: NL2025NormsInput = {
+            farm: {
+                is_derogatie_bedrijf: false,
+                has_grazing_intention: false,
+            },
+            field: {
+                b_id: "1",
+                b_centroid: sandCentroid,
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_265", // Grass
+                    b_lu_start: new Date(2025, 0, 1),
+                    b_lu_end: new Date(2025, 1, 10), // Feb 10
+                },
+                {
+                    b_lu_catalogue: "nl_265", // Grass
+                    b_lu_start: new Date(2025, 1, 11),
+                    b_lu_end: new Date(2025, 11, 31),
+                },
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await calculateNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normSource).toContain(
+            "Korting: 50kg N/ha: graslandvernieuwing",
+        )
+    })
+
+    it("should throw error for Graslandvernieuwing on Clay (No Derogation) - Invalid Date (Jan 20)", async () => {
+        setupMock(1, 0) // Clay, Non-NV
+        const mockInput: NL2025NormsInput = {
+            farm: {
+                is_derogatie_bedrijf: false,
+                has_grazing_intention: false,
+            },
+            field: {
+                b_id: "1",
+                b_centroid: sandCentroid,
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_265", // Grass
+                    b_lu_start: new Date(2025, 0, 1),
+                    b_lu_end: new Date(2025, 0, 20), // Jan 20 (Too early, starts Feb 1)
+                },
+                {
+                    b_lu_catalogue: "nl_265", // Grass
+                    b_lu_start: new Date(2025, 0, 21),
+                    b_lu_end: new Date(2025, 11, 31),
+                },
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        await expect(
+            calculateNL2025StikstofGebruiksNorm(mockInput),
+        ).rejects.toThrow(
+            "Graslandvernieuwing op klei- en veengrond (geen derogatie) is alleen toegestaan tussen 1 februari en 15 september.",
+        )
+    })
+
+    it("should apply 50 discount for Graslandvernieuwing on Clay (Derogation + NV) - Valid Date (Aug 15)", async () => {
+        setupMock(1, 1) // Clay, NV
+        const mockInput: NL2025NormsInput = {
+            farm: {
+                is_derogatie_bedrijf: true,
+                has_grazing_intention: false,
+            },
+            field: {
+                b_id: "1",
+                b_centroid: sandCentroid,
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_265", // Grass
+                    b_lu_start: new Date(2025, 0, 1),
+                    b_lu_end: new Date(2025, 7, 15), // Aug 15
+                },
+                {
+                    b_lu_catalogue: "nl_265", // Grass
+                    b_lu_start: new Date(2025, 7, 16),
+                    b_lu_end: new Date(2025, 11, 31),
+                },
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await calculateNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normSource).toContain(
+            "Korting: 50kg N/ha: graslandvernieuwing",
+        )
+    })
+
+    it("should throw error for Graslandvernieuwing on Clay (Derogation + NV) - Invalid Date (Sep 10)", async () => {
+        setupMock(1, 1) // Clay, NV
+        const mockInput: NL2025NormsInput = {
+            farm: {
+                is_derogatie_bedrijf: true,
+                has_grazing_intention: false,
+            },
+            field: {
+                b_id: "1",
+                b_centroid: sandCentroid,
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_265", // Grass
+                    b_lu_start: new Date(2025, 0, 1),
+                    b_lu_end: new Date(2025, 8, 10), // Sep 10 (Too late, ends Aug 31)
+                },
+                {
+                    b_lu_catalogue: "nl_265", // Grass
+                    b_lu_start: new Date(2025, 8, 11),
+                    b_lu_end: new Date(2025, 11, 31),
+                },
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        await expect(
+            calculateNL2025StikstofGebruiksNorm(mockInput),
+        ).rejects.toThrow(
+            "Graslandvernieuwing op klei- en veengrond (derogatie + NV-gebied) is alleen toegestaan tussen 1 juni en 31 augustus.",
+        )
+    })
+
+    it("should apply 65 discount for Graslandvernietiging on Clay (NV) - Valid Date (Mar 10)", async () => {
+        setupMock(1, 1) // Clay, NV
+        const mockInput: NL2025NormsInput = {
+            farm: {
+                is_derogatie_bedrijf: false,
+                has_grazing_intention: false,
+            },
+            field: {
+                b_id: "1",
+                b_centroid: sandCentroid,
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_265", // Grass
+                    b_lu_start: new Date(2025, 0, 1),
+                    b_lu_end: new Date(2025, 2, 10), // Mar 10
+                },
+                {
+                    b_lu_catalogue: "nl_259", // Maize (as example of relevant crop)
+                    b_lu_start: new Date(2025, 2, 11),
+                    b_lu_end: new Date(2025, 9, 1),
+                },
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await calculateNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normSource).toContain(
+            "Korting: 65kg N/ha: graslandvernietiging",
+        )
+    })
+
+    it("should throw error for Graslandvernietiging on Clay (NV) - Invalid Date (Mar 20)", async () => {
+        setupMock(1, 1) // Clay, NV
+        const mockInput: NL2025NormsInput = {
+            farm: {
+                is_derogatie_bedrijf: false,
+                has_grazing_intention: false,
+            },
+            field: {
+                b_id: "1",
+                b_centroid: sandCentroid,
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_265", // Grass
+                    b_lu_start: new Date(2025, 0, 1),
+                    b_lu_end: new Date(2025, 2, 20), // Mar 20 (Too late, ends Mar 15)
+                },
+                {
+                    b_lu_catalogue: "nl_259", // Maize
+                    b_lu_start: new Date(2025, 2, 21),
+                    b_lu_end: new Date(2025, 9, 1),
+                },
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        await expect(
+            calculateNL2025StikstofGebruiksNorm(mockInput),
+        ).rejects.toThrow(
+            "Graslandvernietiging op klei- en veengrond (NV-gebied) is alleen toegestaan tussen 1 februari en 15 maart.",
+        )
     })
 })
