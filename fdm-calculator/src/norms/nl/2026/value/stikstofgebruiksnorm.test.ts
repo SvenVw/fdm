@@ -94,9 +94,7 @@ describe("calculateNL2026StikstofGebruiksNorm", () => {
 
         // The base norm for Grasland in zand_nwc is 200 in nv-gebied.
         expect(result.normValue).toBe(200)
-        expect(result.normSource).toEqual(
-            "Grasland (beweiden).",
-        )
+        expect(result.normSource).toEqual("Grasland (beweiden).")
     })
 
     it("should apply 0 korting if Tijdelijk grasland is present in zand_nwc region", async () => {
@@ -604,8 +602,8 @@ describe("calculateNL2026StikstofGebruiksNorm", () => {
         })
 
         it("should select the correct norm for a period ending in May (tot minstens 15 mei)", async () => {
-             // Matches "van 1 jan tot minstens 15 mei" -> 110 (Klei)
-             // Should NOT match "tot minstens 15 augustus"
+            // Matches "van 1 jan tot minstens 15 mei" -> 110 (Klei)
+            // Should NOT match "tot minstens 15 augustus"
             const mockInput: NL2026NormsInput = {
                 farm: { has_grazing_intention: false },
                 field: { b_id: "1", b_centroid: kleiCentroid } as Field,
@@ -623,7 +621,7 @@ describe("calculateNL2026StikstofGebruiksNorm", () => {
             expect(result.normValue).toBe(110) // Klei standard for "van 1 jan tot minstens 15 mei"
         })
 
-         it("should select the correct norm for a late sown crop (vanaf 15 oktober)", async () => {
+        it("should select the correct norm for a late sown crop (vanaf 15 oktober)", async () => {
             // Matches "vanaf 15 oktober" -> 0 (Klei)
             const mockInput: NL2026NormsInput = {
                 farm: { has_grazing_intention: false },
@@ -641,11 +639,11 @@ describe("calculateNL2026StikstofGebruiksNorm", () => {
             const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
             expect(result.normValue).toBe(0) // Klei standard for "vanaf 15 oktober"
         })
-        
+
         it("should handle start dates from previous year correctly (van 1 januari)", async () => {
-             // Started in 2025, still present in 2026 until Aug 20.
-             // Matches "van 1 jan tot minstens 15 aug" -> 250 (Klei)
-             const mockInput: NL2026NormsInput = {
+            // Started in 2025, still present in 2026 until Aug 20.
+            // Matches "van 1 jan tot minstens 15 aug" -> 250 (Klei)
+            const mockInput: NL2026NormsInput = {
                 farm: { has_grazing_intention: false },
                 field: { b_id: "1", b_centroid: kleiCentroid } as Field,
                 cultivations: [
@@ -894,6 +892,35 @@ describe("calculateNL2026StikstofGebruiksNorm - Korting Logic", () => {
                 calculateNL2026StikstofGebruiksNorm(mockInput),
             ).rejects.toThrow(
                 "Graslandvernietiging op zand- en lössgrond is alleen toegestaan tussen 1 februari en 10 mei.",
+            )
+        })
+
+        it("should apply 65 discount on Sand (Consumption Potato, Feb 1 - May 10)", async () => {
+            const mockInput: NL2026NormsInput = {
+                farm: { has_grazing_intention: false },
+                field: {
+                    b_id: "1",
+                    b_centroid: sandCentroid,
+                } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_265", // Grass
+                        b_lu_start: new Date(2026, 0, 1),
+                        b_lu_end: new Date(2026, 2, 15), // March 15
+                    },
+                    {
+                        b_lu_catalogue: "nl_2014", // Consumption Potato
+                        b_lu_variety: "Agria",
+                        b_lu_start: new Date(2026, 2, 16),
+                        b_lu_end: new Date(2026, 9, 1),
+                    },
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+            expect(result.normSource).toContain(
+                "Korting: 65kg N/ha: graslandvernietiging",
             )
         })
     })
