@@ -44,9 +44,14 @@ export function CultivationHistoryCard({
         )
         const tsv = [header, ...rows].join("\n")
 
-        navigator.clipboard.writeText(tsv).then(() => {
-            toast.success("Gekopieerd naar klembord")
-        })
+        navigator.clipboard.writeText(tsv).then(
+            () => {
+                toast.success("Gekopieerd naar klembord")
+            },
+            () => {
+                toast.error("Kopiëren naar klembord mislukt")
+            },
+        )
     }
 
     return (
