@@ -192,13 +192,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
             Number(soilAnalysis.a_depth_upper),
         )
 
-        const url = new URL(request.url)
-        return redirectWithSuccess(
-            `../soil/analysis/${soilAnalysisId}${url.search}`,
-            {
-                message: "Bodemanalyse is toegevoegd! 🎉",
-            },
-        )
+        return redirectWithSuccess(`../soil/analysis/${soilAnalysisId}`, {
+            message: "Bodemanalyse is toegevoegd! 🎉",
+        })
     } catch (error) {
         if (
             error instanceof Error &&

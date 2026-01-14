@@ -11,10 +11,10 @@ import {
     Outlet,
     redirect,
     useLoaderData,
+    useLocation,
 } from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { FieldDropdown } from "~/components/blocks/field/field-dropdown"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { HeaderField } from "~/components/blocks/header/field"
@@ -24,7 +24,6 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { modifySearchParams } from "~/lib/url-utils"
 import { useCalendarStore } from "~/store/calendar"
 
 // Meta
@@ -78,9 +77,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        const url = new URL(request.url)
-        const fieldIdsStr = url.searchParams.get("fieldIds")
-
         // Get the session
         const session = await getSession(request)
 
@@ -114,25 +110,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm,
             timeframe,
         )
-        const wantedFieldIds = fieldIdsStr?.length
-            ? fieldIdsStr.split(",")
-            : null
-        let fieldOptions = fields.map((field) => {
+        const fieldOptions = fields.map((field) => {
             if (!field?.b_id || !field?.b_name) {
                 throw new Error("Invalid field data structure")
             }
             return {
                 b_id: field.b_id,
                 b_name: field.b_name,
-                b_area: Math.round((field.b_area ?? 0) * 10) / 10,
+                b_area: Math.round(field.b_area * 10) / 10,
             }
         })
-        if (wantedFieldIds) {
-            const fieldIdsSet = new Set(wantedFieldIds)
-            fieldOptions = fieldOptions.filter((field) =>
-                fieldIdsSet.has(field.b_id),
-            )
-        }
 
         // Sort fields by name alphabetically
         fieldOptions.sort((a, b) => a.b_name.localeCompare(b.b_name))
@@ -169,13 +156,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 title: "Kaart",
             },
         ]
-        if (fieldIdsStr) {
-            sidebarPageItems.forEach((conf) => {
-                conf.to = modifySearchParams(conf.to, (searchParams) =>
-                    searchParams.set("fieldIds", fieldIdsStr),
-                )
-            })
-        }
 
         const fieldWritePermission = await checkPermission(
             fdm,
@@ -203,7 +183,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id: b_id,
             sidebarPageItems: sidebarPageItems,
             user: session.user,
-            fieldOptionsLocation: wantedFieldIds ? "sidebar" : "header",
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -222,7 +201,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmFieldIndex() {
     const loaderData = useLoaderData<typeof loader>()
     const calendar = useCalendarStore((state) => state.calendar)
+    const location = useLocation()
 
+    if (location.pathname.includes("fertilizer/manage")) return <Outlet />
     return (
         <SidebarInset>
             <Header
@@ -238,36 +219,16 @@ export default function FarmFieldIndex() {
                 />
                 <HeaderField
                     b_id_farm={loaderData.b_id_farm}
-                    fieldOptions={
-                        loaderData.fieldOptionsLocation === "header"
-                            ? loaderData.fieldOptions
-                            : []
-                    }
+                    fieldOptions={loaderData.fieldOptions}
                     b_id={loaderData.b_id}
                 />
             </Header>
             <main>
                 <FarmTitle
-                    title={
-                        loaderData.fieldOptionsLocation === "sidebar"
-                            ? loaderData.fieldOptions.length === 1
-                                ? "Nieuwe Perceel"
-                                : "Nieuwe Percelen"
-                            : loaderData.field?.b_name
-                    }
-                    description={`Beheer hier de gegevens van ${loaderData.fieldOptionsLocation === "sidebar" && loaderData.fieldOptions.length !== 1 ? "deze percelen" : "dit perceel"}.`}
+                    title={loaderData.field?.b_name}
+                    description={"Beheer hier de gegevens van dit perceel"}
                 />
-                <FarmContent
-                    beforeTabs={
-                        loaderData.fieldOptionsLocation === "sidebar" && (
-                            <FieldDropdown
-                                fieldOptions={loaderData.fieldOptions}
-                                className="mb-2"
-                            />
-                        )
-                    }
-                    sidebarItems={loaderData.sidebarPageItems}
-                >
+                <FarmContent sidebarItems={loaderData.sidebarPageItems}>
                     <Outlet />
                 </FarmContent>
             </main>

@@ -14,7 +14,6 @@ import {
     NavLink,
     useFetcher,
     useLoaderData,
-    useLocation,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { SoilDataCards } from "~/components/blocks/soil/cards"
@@ -151,7 +150,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmFieldSoilOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
     const fetcher = useFetcher()
-    const location = useLocation()
 
     return (
         <Tabs defaultValue="parameters" className="space-y-6">
@@ -174,7 +172,7 @@ export default function FarmFieldSoilOverviewBlock() {
                             !loaderData.fieldWritePermission ? "invisible" : "",
                         )}
                     >
-                        <NavLink to={`./analysis/new${location.search}`}>
+                        <NavLink to="./analysis/new">
                             <Plus />
                             Bodemanalyse toevoegen
                         </NavLink>
@@ -203,9 +201,7 @@ export default function FarmFieldSoilOverviewBlock() {
                                         : "",
                                 )}
                             >
-                                <NavLink
-                                    to={`./analysis/new${location.search}`}
-                                >
+                                <NavLink to="./analysis/new">
                                     Bodemanalyse toevoegen
                                 </NavLink>
                             </Button>
@@ -271,8 +267,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
             // Remove the analysis
             await removeSoilAnalysis(fdm, session.principal_id, a_id)
-            const url = new URL(request.url)
-            return redirectWithSuccess(url.search.length ? url.search : "./", {
+            return redirectWithSuccess("./", {
                 message: "Bodemanalyse is verwijderd! 🎉",
             })
         }

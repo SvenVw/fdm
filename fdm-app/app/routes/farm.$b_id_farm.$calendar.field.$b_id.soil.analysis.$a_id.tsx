@@ -211,8 +211,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         //update Soilanalysis
         await updateSoilAnalysis(fdm, session.principal_id, a_id, formValues)
 
-        const url = new URL(request.url)
-        return redirectWithSuccess(`../soil${url.search}`, {
+        return redirectWithSuccess("../soil", {
             message: "Bodemanalyse is bijgewerkt! 🎉",
         })
     } catch (error) {

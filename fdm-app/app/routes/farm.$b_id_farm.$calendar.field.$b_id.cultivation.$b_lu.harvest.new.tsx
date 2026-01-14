@@ -183,8 +183,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             harvestProperties,
         )
 
-        const url = new URL(request.url)
-        return redirectWithSuccess(`..${url.search}`, {
+        return redirectWithSuccess("..", {
             message: "Oogst succesvol toegevoegd! 🎉",
         })
     } catch (error) {

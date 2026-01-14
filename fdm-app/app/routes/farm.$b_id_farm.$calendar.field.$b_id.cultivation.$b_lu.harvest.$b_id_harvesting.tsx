@@ -200,8 +200,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             throw new Error("missing: b_lu")
         }
 
-        const url = new URL(request.url)
-
         // Get the session
         const session = await getSession(request)
         const calendar = await getCalendar(params)
@@ -280,7 +278,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
 
             return redirectWithSuccess(
-                `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}${url.search}`,
+                `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}`,
                 {
                     message: "Oogst is gewijzigd! 🎉",
                 },
@@ -293,7 +291,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             }
             await removeHarvest(fdm, session.principal_id, b_id_harvesting)
             return redirectWithSuccess(
-                `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}${url.search}`,
+                `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}`,
                 {
                     message: "Oogst is verwijderd! 🎉",
                 },

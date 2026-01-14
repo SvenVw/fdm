@@ -180,19 +180,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
         await removeField(fdm, session.principal_id, b_id)
 
         // Redirect to the farm page after successful deletion
-        let redirectSearch = ""
-        const url = new URL(request.url)
-        const fieldIdsStr = url.searchParams.get("fieldIds")
-        if (fieldIdsStr?.length) {
-            // Remove the deleted field from the fields shown
-            redirectSearch = `?fieldIds=${fieldIdsStr
-                .split(",")
-                .filter((b_id) => b_id !== field.b_id)
-                .map(encodeURIComponent)
-                .join(",")}`
-        }
         return redirectWithSuccess(
-            `/farm/${b_id_farm}/${calendar}/field${redirectSearch}`,
+            `/farm/${b_id_farm}/${calendar}/field`,
             `${field.b_name} is verwijderd`,
         )
     } catch (error) {
