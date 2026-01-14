@@ -66,6 +66,7 @@ export function CultivationHistoryCard({
                                 variant="outline"
                                 size="icon"
                                 onClick={handleCopy}
+                                aria-label="Kopieer naar klembord"
                             >
                                 <Copy className="h-4 w-4" />
                             </Button>
