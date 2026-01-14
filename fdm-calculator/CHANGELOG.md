@@ -1,5 +1,13 @@
 # fdm-calculator
 
+## 0.10.1
+
+### Patch Changes
+
+- bc23b79: Fix calculating stikstofgebruiksnorm for snijmais in 2026
+- 3053340: Fix nitrogen usage norms calculation for temporary grasslands in 2025 and 2026 by improving time-based period matching and handling timezone edge cases.
+- 005de6d: Fix that the nitrogen discount (korting) for catch crops is not applied to grasslands
+
 ## 0.10.0
 
 ### Minor Changes

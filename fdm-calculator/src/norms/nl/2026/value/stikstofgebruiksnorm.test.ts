@@ -92,11 +92,36 @@ describe("calculateNL2026StikstofGebruiksNorm", () => {
 
         const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
 
-        // The base norm for Grasland in zand_nwc is 200 in nv-gebied. With winterteelt, korting should be 0.
+        // The base norm for Grasland in zand_nwc is 200 in nv-gebied.
         expect(result.normValue).toBe(200)
         expect(result.normSource).toEqual(
-            "Grasland (beweiden). Geen korting: winterteelt aanwezig",
+            "Grasland (beweiden).",
         )
+    })
+
+    it("should apply 0 korting if Tijdelijk grasland is present in zand_nwc region", async () => {
+        const mockInput: NL2026NormsInput = {
+            farm: { has_grazing_intention: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_266", // Tijdelijk grasland
+                    b_lu_start: new Date(2026, 0, 1),
+                    b_lu_end: new Date(2026, 5, 1),
+                } as Partial<NL2026NormsInputForCultivation>,
+            ] as NL2026NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+
+        // Tijdelijk grasland "van 1 jan tot minstens 15 mei" -> 90 (zand_nwc standard), 72 (zand_nwc nv_area)
+        // Should have no korting applied
+        expect(result.normValue).toBe(72)
+        expect(result.normSource).toContain("Tijdelijk grasland.")
     })
 
     it("should apply 0 korting if vanggewas is present (sown <= Oct 1st)", async () => {
@@ -554,6 +579,107 @@ describe("calculateNL2026StikstofGebruiksNorm", () => {
         expect(result.normSource).toEqual(
             "Bladgewassen, Andijvie eerste teelt volgteelt (1e teelt).",
         )
+    })
+
+    describe("Tijdelijk grasland time-based matching", () => {
+        const kleiCentroid: [number, number] = [5.6279889, 51.975571] // Klei region
+
+        it("should select the highest norm (longest period) for full-year temporary grassland", async () => {
+            // Matches "van 1 jan tot minstens 15 okt" -> 310 (Klei)
+            const mockInput: NL2026NormsInput = {
+                farm: { has_grazing_intention: false },
+                field: { b_id: "1", b_centroid: kleiCentroid } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_266", // Tijdelijk grasland
+                        b_lu_start: new Date(2026, 0, 1), // Jan 1
+                        b_lu_end: new Date(2026, 11, 31), // Dec 31
+                    } as Partial<NL2026NormsInputForCultivation>,
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+            expect(result.normValue).toBe(310) // Klei standard for "van 1 jan tot minstens 15 okt"
+        })
+
+        it("should select the correct norm for a period ending in May (tot minstens 15 mei)", async () => {
+             // Matches "van 1 jan tot minstens 15 mei" -> 110 (Klei)
+             // Should NOT match "tot minstens 15 augustus"
+            const mockInput: NL2026NormsInput = {
+                farm: { has_grazing_intention: false },
+                field: { b_id: "1", b_centroid: kleiCentroid } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_266", // Tijdelijk grasland
+                        b_lu_start: new Date(2026, 0, 1), // Jan 1
+                        b_lu_end: new Date(2026, 4, 20), // May 20
+                    } as Partial<NL2026NormsInputForCultivation>,
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+            expect(result.normValue).toBe(110) // Klei standard for "van 1 jan tot minstens 15 mei"
+        })
+
+         it("should select the correct norm for a late sown crop (vanaf 15 oktober)", async () => {
+            // Matches "vanaf 15 oktober" -> 0 (Klei)
+            const mockInput: NL2026NormsInput = {
+                farm: { has_grazing_intention: false },
+                field: { b_id: "1", b_centroid: kleiCentroid } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_266", // Tijdelijk grasland
+                        b_lu_start: new Date(2026, 9, 20), // Oct 20
+                        b_lu_end: new Date(2026, 11, 31), // Dec 31
+                    } as Partial<NL2026NormsInputForCultivation>,
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+            expect(result.normValue).toBe(0) // Klei standard for "vanaf 15 oktober"
+        })
+        
+        it("should handle start dates from previous year correctly (van 1 januari)", async () => {
+             // Started in 2025, still present in 2026 until Aug 20.
+             // Matches "van 1 jan tot minstens 15 aug" -> 250 (Klei)
+             const mockInput: NL2026NormsInput = {
+                farm: { has_grazing_intention: false },
+                field: { b_id: "1", b_centroid: kleiCentroid } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_266", // Tijdelijk grasland
+                        b_lu_start: new Date(2025, 8, 1), // Sept 1, 2025
+                        b_lu_end: new Date(2026, 7, 20), // Aug 20, 2026
+                    } as Partial<NL2026NormsInputForCultivation>,
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+            expect(result.normValue).toBe(250) // Klei standard for "van 1 jan tot minstens 15 aug"
+        })
+
+        it("should select the correct norm for a summer crop (vanaf 15 april tot minstens 15 oktober)", async () => {
+            // Matches "vanaf 15 april tot minstens 15 oktober" -> 310 (Klei)
+            const mockInput: NL2026NormsInput = {
+                farm: { has_grazing_intention: false },
+                field: { b_id: "1", b_centroid: kleiCentroid } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_266", // Tijdelijk grasland
+                        b_lu_start: new Date(2026, 3, 20), // April 20
+                        b_lu_end: new Date(2026, 9, 20), // Oct 20
+                    } as Partial<NL2026NormsInputForCultivation>,
+                ] as NL2026NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
+
+            const result = await calculateNL2026StikstofGebruiksNorm(mockInput)
+            expect(result.normValue).toBe(310)
+        })
     })
 })
 
