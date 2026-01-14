@@ -182,7 +182,15 @@ const soilTypeLabels: Record<string, string> = {
 
 const FrontPage = ({ data }: { data: BemestingsplanData }) => (
     <Page size="A4" style={pdfStyles.frontPage}>
-        <View style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}>
+        <View
+            style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+            }}
+        >
             <Image
                 src="https://images.unsplash.com/photo-1685708358097-02cc97289561?q=80&w=2070&auto=format&fit=crop"
                 style={{ width: "100%", height: "100%", objectFit: "cover" }}
@@ -456,8 +464,17 @@ const TableOfContents = ({ data }: { data: BemestingsplanData }) => (
             ))}
         </View>
 
-        <View style={{ marginTop: 20, borderTopWidth: 1, borderTopColor: "#e2e8f0", paddingTop: 10 }}>
-            <Text style={{ fontSize: 10, fontWeight: "bold", marginBottom: 5 }}>Disclaimer</Text>
+        <View
+            style={{
+                marginTop: 20,
+                borderTopWidth: 1,
+                borderTopColor: "#e2e8f0",
+                paddingTop: 10,
+            }}
+        >
+            <Text style={{ fontSize: 10, fontWeight: "bold", marginBottom: 5 }}>
+                Disclaimer
+            </Text>
             <Text
                 style={{
                     fontSize: 8,
@@ -474,11 +491,11 @@ const TableOfContents = ({ data }: { data: BemestingsplanData }) => (
                 er geen rechten worden ontleend aan de gepresenteerde waarden.
                 De uiteindelijke verantwoordelijkheid for de naleving van de
                 mestwetgeving ligt bij de landbouwer. Raadpleeg bij twijfel
-                altijd de officiële publicaties van de Rijksdienst for
+                altijd de officiële publicaties van de Rijksdienst voor
                 Ondernemend Nederland (RVO) en uw adviseur.
             </Text>
         </View>
-        
+
         <Footer config={data.config} />
     </Page>
 )
@@ -608,22 +625,84 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                         <SectionHeader>OS Balans (gem. per ha)</SectionHeader>
                         <PdfCard style={{ padding: 8 }}>
                             <View style={{ paddingVertical: 2, gap: 4 }}>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                    <Text style={{ fontSize: 8 }}>Aanvoer (EOS)</Text>
-                                    <Text style={[pdfStyles.value, { fontSize: 9 }]}>
-                                        {data.omBalance ? Math.round(data.omBalance.supply) : 0} kg
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        justifyContent: "space-between",
+                                    }}
+                                >
+                                    <Text style={{ fontSize: 8 }}>
+                                        Aanvoer (EOS)
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            pdfStyles.value,
+                                            { fontSize: 9 },
+                                        ]}
+                                    >
+                                        {data.omBalance
+                                            ? Math.round(data.omBalance.supply)
+                                            : 0}{" "}
+                                        kg
                                     </Text>
                                 </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                    <Text style={{ fontSize: 8 }}>Afbraak (OS)</Text>
-                                    <Text style={[pdfStyles.value, { fontSize: 9 }]}>
-                                        {data.omBalance ? Math.round(data.omBalance.degradation) : 0} kg
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        justifyContent: "space-between",
+                                    }}
+                                >
+                                    <Text style={{ fontSize: 8 }}>
+                                        Afbraak (OS)
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            pdfStyles.value,
+                                            { fontSize: 9 },
+                                        ]}
+                                    >
+                                        {data.omBalance
+                                            ? Math.round(
+                                                  data.omBalance.degradation,
+                                              )
+                                            : 0}{" "}
+                                        kg
                                     </Text>
                                 </View>
-                                <View style={{ flexDirection: "row", justifyContent: "space-between", borderTopWidth: 1, borderTopColor: "#f1f5f9", paddingTop: 2 }}>
-                                    <Text style={{ fontSize: 8, fontWeight: "bold" }}>Balans</Text>
-                                    <Text style={[pdfStyles.value, { fontSize: 9, color: (data.omBalance?.balance ?? 0) >= 0 ? "#22c55e" : "#ef4444" }]}>
-                                        {data.omBalance ? Math.round(data.omBalance.balance) : 0} kg OS
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        justifyContent: "space-between",
+                                        borderTopWidth: 1,
+                                        borderTopColor: "#f1f5f9",
+                                        paddingTop: 2,
+                                    }}
+                                >
+                                    <Text
+                                        style={{
+                                            fontSize: 8,
+                                            fontWeight: "bold",
+                                        }}
+                                    >
+                                        Balans
+                                    </Text>
+                                    <Text
+                                        style={[
+                                            pdfStyles.value,
+                                            {
+                                                fontSize: 9,
+                                                color:
+                                                    (data.omBalance?.balance ??
+                                                        0) >= 0
+                                                        ? "#22c55e"
+                                                        : "#ef4444",
+                                            },
+                                        ]}
+                                    >
+                                        {data.omBalance
+                                            ? Math.round(data.omBalance.balance)
+                                            : 0}{" "}
+                                        kg OS
                                     </Text>
                                 </View>
                             </View>
@@ -633,64 +712,168 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                         <SectionHeader>Gewasoverzicht</SectionHeader>
                         <PdfCard style={{ padding: 8 }}>
                             {(() => {
-                                const crops = data.fields.reduce((acc, f) => {
-                                    const crop = f.mainCrop || "Onbekend";
-                                    acc[crop] = (acc[crop] || 0) + f.area;
-                                    return acc;
-                                }, {} as Record<string, number>);
-                                
+                                const crops = data.fields.reduce(
+                                    (acc, f) => {
+                                        const crop = f.mainCrop || "Onbekend"
+                                        acc[crop] = (acc[crop] || 0) + f.area
+                                        return acc
+                                    },
+                                    {} as Record<string, number>,
+                                )
+
                                 return (
                                     <View style={{ gap: 2 }}>
-                                        {Object.entries(crops).sort((a, b) => b[1] - a[1]).map(([crop, area]) => (
-                                            <View key={crop} style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                                <Text style={{ fontSize: 8 }}>{crop}</Text>
-                                                <Text style={[pdfStyles.value, { fontSize: 9 }]}>{area.toFixed(2)} ha</Text>
-                                            </View>
-                                        ))}
-                                        <View style={{ flexDirection: "row", justifyContent: "space-between", borderTopWidth: 1, borderTopColor: "#f1f5f9", paddingTop: 2 }}>
-                                            <Text style={{ fontSize: 8, fontWeight: "bold" }}>Totaal</Text>
-                                            <Text style={[pdfStyles.value, { fontSize: 9 }]}>{data.totalArea.toFixed(2)} ha</Text>
+                                        {Object.entries(crops)
+                                            .sort((a, b) => b[1] - a[1])
+                                            .map(([crop, area]) => (
+                                                <View
+                                                    key={crop}
+                                                    style={{
+                                                        flexDirection: "row",
+                                                        justifyContent:
+                                                            "space-between",
+                                                    }}
+                                                >
+                                                    <Text
+                                                        style={{ fontSize: 8 }}
+                                                    >
+                                                        {crop}
+                                                    </Text>
+                                                    <Text
+                                                        style={[
+                                                            pdfStyles.value,
+                                                            { fontSize: 9 },
+                                                        ]}
+                                                    >
+                                                        {area.toFixed(2)} ha
+                                                    </Text>
+                                                </View>
+                                            ))}
+                                        <View
+                                            style={{
+                                                flexDirection: "row",
+                                                justifyContent: "space-between",
+                                                borderTopWidth: 1,
+                                                borderTopColor: "#f1f5f9",
+                                                paddingTop: 2,
+                                            }}
+                                        >
+                                            <Text
+                                                style={{
+                                                    fontSize: 8,
+                                                    fontWeight: "bold",
+                                                }}
+                                            >
+                                                Totaal
+                                            </Text>
+                                            <Text
+                                                style={[
+                                                    pdfStyles.value,
+                                                    { fontSize: 9 },
+                                                ]}
+                                            >
+                                                {data.totalArea.toFixed(2)} ha
+                                            </Text>
                                         </View>
                                     </View>
-                                );
+                                )
                             })()}
                         </PdfCard>
                     </View>
                 </View>
 
                 {/* New Section: Fertilizer Totals */}
-                <View style={{ marginTop: 5 }} wrap={false} id="fertilizer-totals">
-                    <SectionHeader>Benodigde Meststoffen (Totaal)</SectionHeader>
+                <View
+                    style={{ marginTop: 5 }}
+                    wrap={false}
+                    id="fertilizer-totals"
+                >
+                    <SectionHeader>
+                        Benodigde Meststoffen (Totaal)
+                    </SectionHeader>
                     <PdfCard style={{ padding: 0 }}>
-                        <PdfTable style={{ marginTop: 0, borderTopWidth: 0, borderRightWidth: 0, borderBottomWidth: 0, borderLeftWidth: 0 }}>
-                            <View style={[pdfStyles.tableHeader, { backgroundColor: "#f8fafc", borderBottomWidth: 1, borderBottomColor: "#e2e8f0" }]}>
-                                <PdfTableCell weight={2}><Text>Product</Text></PdfTableCell>
-                                <PdfTableCell><Text>Totaal</Text></PdfTableCell>
-                                <PdfTableCell><Text>N</Text></PdfTableCell>
-                                <PdfTableCell><Text>P2O5</Text></PdfTableCell>
-                                <PdfTableCell><Text>K2O</Text></PdfTableCell>
+                        <PdfTable
+                            style={{
+                                marginTop: 0,
+                                borderTopWidth: 0,
+                                borderRightWidth: 0,
+                                borderBottomWidth: 0,
+                                borderLeftWidth: 0,
+                            }}
+                        >
+                            <View
+                                style={[
+                                    pdfStyles.tableHeader,
+                                    {
+                                        backgroundColor: "#f8fafc",
+                                        borderBottomWidth: 1,
+                                        borderBottomColor: "#e2e8f0",
+                                    },
+                                ]}
+                            >
+                                <PdfTableCell weight={2}>
+                                    <Text>Product</Text>
+                                </PdfTableCell>
+                                <PdfTableCell>
+                                    <Text>Totaal (kg)</Text>
+                                </PdfTableCell>
+                                <PdfTableCell>
+                                    <Text>N (kg)</Text>
+                                </PdfTableCell>
+                                <PdfTableCell>
+                                    <Text>P2O5 (kg)</Text>
+                                </PdfTableCell>
+                                <PdfTableCell>
+                                    <Text>K2O (kg)</Text>
+                                </PdfTableCell>
                             </View>
                             {(() => {
-                                const fertilizers = data.fields.reduce((acc, f) => {
-                                    f.applications.forEach(app => {
-                                        if (!acc[app.product]) {
-                                            acc[app.product] = { amount: 0, n: 0, p: 0, k: 0 };
+                                const fertilizers = data.fields.reduce(
+                                    (acc, f) => {
+                                        f.applications.forEach((app) => {
+                                            if (!acc[app.product]) {
+                                                acc[app.product] = {
+                                                    amount: 0,
+                                                    n: 0,
+                                                    p: 0,
+                                                    k: 0,
+                                                }
+                                            }
+                                            // app.quantity is per ha, so multiply by area
+                                            acc[app.product].amount +=
+                                                app.quantity * f.area
+                                            // app.n/p/k is per ha? Let's check the loader logic.
+                                            // In loader: n: appDose.p_dose_n. This is TOTAL N per ha.
+                                            acc[app.product].n += app.n * f.area
+                                            acc[app.product].p +=
+                                                app.p2o5 * f.area
+                                            acc[app.product].k +=
+                                                app.k2o * f.area
+                                        })
+                                        return acc
+                                    },
+                                    {} as Record<
+                                        string,
+                                        {
+                                            amount: number
+                                            n: number
+                                            p: number
+                                            k: number
                                         }
-                                        // app.quantity is per ha, so multiply by area
-                                        acc[app.product].amount += app.quantity * f.area;
-                                        // app.n/p/k is per ha? Let's check the loader logic. 
-                                        // In loader: n: appDose.p_dose_n. This is TOTAL N per ha.
-                                        acc[app.product].n += app.n * f.area;
-                                        acc[app.product].p += app.p2o5 * f.area;
-                                        acc[app.product].k += app.k2o * f.area;
-                                    });
-                                    return acc;
-                                }, {} as Record<string, { amount: number, n: number, p: number, k: number }>);
+                                    >,
+                                )
 
                                 if (Object.keys(fertilizers).length === 0) {
                                     return (
                                         <View style={{ padding: 10 }}>
-                                            <Text style={{ fontSize: 8, color: "#64748b" }}>Geen bemesting gepland.</Text>
+                                            <Text
+                                                style={{
+                                                    fontSize: 8,
+                                                    color: "#64748b",
+                                                }}
+                                            >
+                                                Geen bemesting gepland.
+                                            </Text>
                                         </View>
                                     )
                                 }
@@ -698,14 +881,64 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                 return Object.entries(fertilizers)
                                     .sort(([, a], [, b]) => b.amount - a.amount)
                                     .map(([name, stats], i) => (
-                                    <View key={name} style={[pdfStyles.tableRow, { borderBottomWidth: i === Object.keys(fertilizers).length - 1 ? 0 : 1 }]}>
-                                        <PdfTableCell weight={2}><Text style={{fontWeight:'bold', fontSize: 8}}>{name}</Text></PdfTableCell>
-                                        <PdfTableCell><Text>{Math.round(stats.amount).toLocaleString('nl-NL')} kg</Text></PdfTableCell>
-                                        <PdfTableCell><Text>{Math.round(stats.n).toLocaleString('nl-NL')}</Text></PdfTableCell>
-                                        <PdfTableCell><Text>{Math.round(stats.p).toLocaleString('nl-NL')}</Text></PdfTableCell>
-                                        <PdfTableCell><Text>{Math.round(stats.k).toLocaleString('nl-NL')}</Text></PdfTableCell>
-                                    </View>
-                                ));
+                                        <View
+                                            key={name}
+                                            style={[
+                                                pdfStyles.tableRow,
+                                                {
+                                                    borderBottomWidth:
+                                                        i ===
+                                                        Object.keys(fertilizers)
+                                                            .length -
+                                                            1
+                                                            ? 0
+                                                            : 1,
+                                                },
+                                            ]}
+                                        >
+                                            <PdfTableCell weight={2}>
+                                                <Text
+                                                    style={{
+                                                        fontWeight: "bold",
+                                                        fontSize: 8,
+                                                    }}
+                                                >
+                                                    {name}
+                                                </Text>
+                                            </PdfTableCell>
+                                            <PdfTableCell>
+                                                <Text>
+                                                    {Math.round(
+                                                        stats.amount,
+                                                    ).toLocaleString(
+                                                        "nl-NL",
+                                                    )}{" "}
+                                                    kg
+                                                </Text>
+                                            </PdfTableCell>
+                                            <PdfTableCell>
+                                                <Text>
+                                                    {Math.round(
+                                                        stats.n,
+                                                    ).toLocaleString("nl-NL")}
+                                                </Text>
+                                            </PdfTableCell>
+                                            <PdfTableCell>
+                                                <Text>
+                                                    {Math.round(
+                                                        stats.p,
+                                                    ).toLocaleString("nl-NL")}
+                                                </Text>
+                                            </PdfTableCell>
+                                            <PdfTableCell>
+                                                <Text>
+                                                    {Math.round(
+                                                        stats.k,
+                                                    ).toLocaleString("nl-NL")}
+                                                </Text>
+                                            </PdfTableCell>
+                                        </View>
+                                    ))
                             })()}
                         </PdfTable>
                     </PdfCard>
@@ -748,7 +981,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                     letterSpacing: 0.5,
                                 }}
                             >
-                                Gebruiksruimte (gepland / ruimte)
+                                Gebruiksruimte (gepland / ruimte) (kg/ha)
                             </Text>
                         </PdfTableCell>
                         <PdfTableCell
@@ -766,7 +999,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                     letterSpacing: 0.5,
                                 }}
                             >
-                                Bemestingsadvies (gepland / advies)
+                                Bemestingsadvies (gepland / advies) (kg/ha)
                             </Text>
                         </PdfTableCell>
                     </View>
@@ -778,19 +1011,18 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                             <Text>Opp (ha)</Text>
                         </PdfTableCell>
                         <PdfTableCell>
-                            <Text>N-tot</Text>
+                            <Text>N-werkzaam</Text>
                         </PdfTableCell>
                         <PdfTableCell>
-                            <Text>Dierl. mest</Text>
+                            <Text>N-dierlijk</Text>
                         </PdfTableCell>
                         <PdfTableCell>
                             <Text>
                                 <Chemical symbol="P2O5" />
-                                -tot
                             </Text>
                         </PdfTableCell>
                         <PdfTableCell>
-                            <Text>Advies N</Text>
+                            <Text>N</Text>
                         </PdfTableCell>
                         <PdfTableCell>
                             <Text>
@@ -805,7 +1037,11 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                     </View>
                 </View>
                 {data.fields.map((field) => (
-                    <View key={field.id} wrap={false} style={pdfStyles.tableRow}>
+                    <View
+                        key={field.id}
+                        wrap={false}
+                        style={pdfStyles.tableRow}
+                    >
                         <PdfTableCell weight={1.5}>
                             <Text style={{ fontWeight: "bold" }}>
                                 {field.name}
@@ -1236,16 +1472,20 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                 <Text>Datum / product</Text>
                             </PdfTableCell>
                             <PdfTableCell weight={0.8}>
-                                <Text>Hoeveelheid</Text>
+                                <Text>Hoeveelheid (kg/ha)</Text>
                             </PdfTableCell>
                             <PdfTableCell>
-                                <Text>N tot. / w.</Text>
+                                <Text>N tot. / w. (kg/ha)</Text>
                             </PdfTableCell>
                             <PdfTableCell>
-                                <Chemical symbol="P2O5" />
+                                <Text>
+                                    <Chemical symbol="P2O5" /> (kg/ha)
+                                </Text>
                             </PdfTableCell>
                             <PdfTableCell>
-                                <Chemical symbol="K2O" />
+                                <Text>
+                                    <Chemical symbol="K2O" /> (kg/ha)
+                                </Text>
                             </PdfTableCell>
                         </PdfTableHeader>
                         {field.applications.length > 0 ? (

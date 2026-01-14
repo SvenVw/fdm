@@ -5,7 +5,9 @@ const fontFamily = "Helvetica"
 
 export const pdfStyles = StyleSheet.create({
     page: {
-        padding: 40,
+        paddingTop: 40,
+        paddingHorizontal: 40,
+        paddingBottom: 80,
         fontFamily: fontFamily,
         fontSize: 10,
         lineHeight: 1.5,
