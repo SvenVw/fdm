@@ -405,6 +405,19 @@ const TableOfContents = ({ data }: { data: BemestingsplanData }) => (
                 <Text>Overzicht percelen</Text>
                 <Text>4</Text>
             </Link>
+            <Link
+                src="#fertilizer-totals"
+                style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    paddingVertical: 5,
+                    textDecoration: "none",
+                    color: "#020617",
+                }}
+            >
+                <Text>Benodigde meststoffen</Text>
+                <Text>3</Text>
+            </Link>
             <View
                 style={{
                     marginTop: 15,
@@ -533,7 +546,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
 
             <View style={{ marginTop: 10 }}>
                 <View style={pdfStyles.grid}>
-                    <View style={{ width: "50%", paddingRight: 10 }}>
+                    <View style={{ width: "50%", paddingRight: 5 }}>
                         <SectionHeader>
                             Gebruiksruimte (gepland / ruimte)
                         </SectionHeader>
@@ -560,7 +573,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                             </View>
                         </PdfCard>
                     </View>
-                    <View style={{ width: "50%", paddingLeft: 10 }}>
+                    <View style={{ width: "50%", paddingLeft: 5 }}>
                         <SectionHeader>
                             Bemestingsadvies (gepland / advies)
                         </SectionHeader>
@@ -588,37 +601,113 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                         </PdfCard>
                     </View>
                 </View>
-                <View style={{ marginTop: 10 }}>
-                    <SectionHeader>OS Balans (gem. per ha)</SectionHeader>
-                    <PdfCard style={{ padding: 8 }}>
-                        <View style={{ paddingVertical: 2, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                            <View style={{ width: "30%" }}>
-                                <Text style={{ fontSize: 8, color: "#64748b" }}>Aanvoer (EOS)</Text>
-                                <Text style={[pdfStyles.value, { fontSize: 12 }]}>
-                                    {data.omBalance ? Math.round(data.omBalance.supply) : 0} kg
-                                </Text>
+
+                {/* New Section: OS Balans & Crop Summary */}
+                <View style={[pdfStyles.grid, { marginTop: 5 }]}>
+                    <View style={{ width: "50%", paddingRight: 5 }}>
+                        <SectionHeader>OS Balans (gem. per ha)</SectionHeader>
+                        <PdfCard style={{ padding: 8 }}>
+                            <View style={{ paddingVertical: 2, gap: 4 }}>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                                    <Text style={{ fontSize: 8 }}>Aanvoer (EOS)</Text>
+                                    <Text style={[pdfStyles.value, { fontSize: 9 }]}>
+                                        {data.omBalance ? Math.round(data.omBalance.supply) : 0} kg
+                                    </Text>
+                                </View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                                    <Text style={{ fontSize: 8 }}>Afbraak (OS)</Text>
+                                    <Text style={[pdfStyles.value, { fontSize: 9 }]}>
+                                        {data.omBalance ? Math.round(data.omBalance.degradation) : 0} kg
+                                    </Text>
+                                </View>
+                                <View style={{ flexDirection: "row", justifyContent: "space-between", borderTopWidth: 1, borderTopColor: "#f1f5f9", paddingTop: 2 }}>
+                                    <Text style={{ fontSize: 8, fontWeight: "bold" }}>Balans</Text>
+                                    <Text style={[pdfStyles.value, { fontSize: 9, color: (data.omBalance?.balance ?? 0) >= 0 ? "#22c55e" : "#ef4444" }]}>
+                                        {data.omBalance ? Math.round(data.omBalance.balance) : 0} kg OS
+                                    </Text>
+                                </View>
                             </View>
-                            <View style={{ width: "30%" }}>
-                                <Text style={{ fontSize: 8, color: "#64748b" }}>Afbraak (OS)</Text>
-                                <Text style={[pdfStyles.value, { fontSize: 12 }]}>
-                                    {data.omBalance ? Math.round(data.omBalance.degradation) : 0} kg
-                                </Text>
+                        </PdfCard>
+                    </View>
+                    <View style={{ width: "50%", paddingLeft: 5 }}>
+                        <SectionHeader>Gewasoverzicht</SectionHeader>
+                        <PdfCard style={{ padding: 8 }}>
+                            {(() => {
+                                const crops = data.fields.reduce((acc, f) => {
+                                    const crop = f.mainCrop || "Onbekend";
+                                    acc[crop] = (acc[crop] || 0) + f.area;
+                                    return acc;
+                                }, {} as Record<string, number>);
+                                
+                                return (
+                                    <View style={{ gap: 2 }}>
+                                        {Object.entries(crops).sort((a, b) => b[1] - a[1]).map(([crop, area]) => (
+                                            <View key={crop} style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                                                <Text style={{ fontSize: 8 }}>{crop}</Text>
+                                                <Text style={[pdfStyles.value, { fontSize: 9 }]}>{area.toFixed(2)} ha</Text>
+                                            </View>
+                                        ))}
+                                        <View style={{ flexDirection: "row", justifyContent: "space-between", borderTopWidth: 1, borderTopColor: "#f1f5f9", paddingTop: 2 }}>
+                                            <Text style={{ fontSize: 8, fontWeight: "bold" }}>Totaal</Text>
+                                            <Text style={[pdfStyles.value, { fontSize: 9 }]}>{data.totalArea.toFixed(2)} ha</Text>
+                                        </View>
+                                    </View>
+                                );
+                            })()}
+                        </PdfCard>
+                    </View>
+                </View>
+
+                {/* New Section: Fertilizer Totals */}
+                <View style={{ marginTop: 5 }} wrap={false} id="fertilizer-totals">
+                    <SectionHeader>Benodigde Meststoffen (Totaal)</SectionHeader>
+                    <PdfCard style={{ padding: 0 }}>
+                        <PdfTable style={{ marginTop: 0, borderTopWidth: 0, borderRightWidth: 0, borderBottomWidth: 0, borderLeftWidth: 0 }}>
+                            <View style={[pdfStyles.tableHeader, { backgroundColor: "#f8fafc", borderBottomWidth: 1, borderBottomColor: "#e2e8f0" }]}>
+                                <PdfTableCell weight={2}><Text>Product</Text></PdfTableCell>
+                                <PdfTableCell><Text>Totaal</Text></PdfTableCell>
+                                <PdfTableCell><Text>N</Text></PdfTableCell>
+                                <PdfTableCell><Text>P2O5</Text></PdfTableCell>
+                                <PdfTableCell><Text>K2O</Text></PdfTableCell>
                             </View>
-                            <View style={{ width: "30%", borderLeftWidth: 1, borderLeftColor: "#e2e8f0", paddingLeft: 10 }}>
-                                <Text style={{ fontSize: 8, fontWeight: "bold" }}>Balans</Text>
-                                <Text
-                                    style={[
-                                        pdfStyles.value,
-                                        {
-                                            fontSize: 14,
-                                            color: (data.omBalance?.balance ?? 0) >= 0 ? "#22c55e" : "#ef4444",
-                                        },
-                                    ]}
-                                >
-                                    {data.omBalance ? Math.round(data.omBalance.balance) : 0} kg OS
-                                </Text>
-                            </View>
-                        </View>
+                            {(() => {
+                                const fertilizers = data.fields.reduce((acc, f) => {
+                                    f.applications.forEach(app => {
+                                        if (!acc[app.product]) {
+                                            acc[app.product] = { amount: 0, n: 0, p: 0, k: 0 };
+                                        }
+                                        // app.quantity is per ha, so multiply by area
+                                        acc[app.product].amount += app.quantity * f.area;
+                                        // app.n/p/k is per ha? Let's check the loader logic. 
+                                        // In loader: n: appDose.p_dose_n. This is TOTAL N per ha.
+                                        acc[app.product].n += app.n * f.area;
+                                        acc[app.product].p += app.p2o5 * f.area;
+                                        acc[app.product].k += app.k2o * f.area;
+                                    });
+                                    return acc;
+                                }, {} as Record<string, { amount: number, n: number, p: number, k: number }>);
+
+                                if (Object.keys(fertilizers).length === 0) {
+                                    return (
+                                        <View style={{ padding: 10 }}>
+                                            <Text style={{ fontSize: 8, color: "#64748b" }}>Geen bemesting gepland.</Text>
+                                        </View>
+                                    )
+                                }
+
+                                return Object.entries(fertilizers)
+                                    .sort(([, a], [, b]) => b.amount - a.amount)
+                                    .map(([name, stats], i) => (
+                                    <View key={name} style={[pdfStyles.tableRow, { borderBottomWidth: i === Object.keys(fertilizers).length - 1 ? 0 : 1 }]}>
+                                        <PdfTableCell weight={2}><Text style={{fontWeight:'bold', fontSize: 8}}>{name}</Text></PdfTableCell>
+                                        <PdfTableCell><Text>{Math.round(stats.amount).toLocaleString('nl-NL')} kg</Text></PdfTableCell>
+                                        <PdfTableCell><Text>{Math.round(stats.n).toLocaleString('nl-NL')}</Text></PdfTableCell>
+                                        <PdfTableCell><Text>{Math.round(stats.p).toLocaleString('nl-NL')}</Text></PdfTableCell>
+                                        <PdfTableCell><Text>{Math.round(stats.k).toLocaleString('nl-NL')}</Text></PdfTableCell>
+                                    </View>
+                                ));
+                            })()}
+                        </PdfTable>
                     </PdfCard>
                 </View>
             </View>
@@ -1208,30 +1297,5 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                 <Footer config={data.config} />
             </Page>
         ))}
-
-        <Page size="A4" style={pdfStyles.page}>
-            <SectionHeader>Disclaimer</SectionHeader>
-            <Text
-                style={{
-                    fontSize: 9,
-                    color: "#64748b",
-                    marginTop: 10,
-                    lineHeight: 1.4,
-                }}
-            >
-                De berekeningen van de gebruiksruimte en het bemestingsadvies in
-                dit document zijn gebaseerd op de door de gebruiker verstrekte
-                gegevens en de op het moment van genereren geldende wet- en
-                regelgeving. Deze getallen zijn uitsluitend bedoeld for
-                informatieve doeleinden en dienen als indicatie. Hoewel{" "}
-                {data.config.name} streeft naar maximale nauwkeurigheid, kunnen
-                er geen rechten worden ontleend aan de gepresenteerde waarden.
-                De uiteindelijke verantwoordelijkheid for de naleving van de
-                mestwetgeving ligt bij de landbouwer. Raadpleeg bij twijfel
-                altijd de officiële publicaties van de Rijksdienst for
-                Ondernemend Nederland (RVO) en uw adviseur.
-            </Text>
-            <Footer config={data.config} />
-        </Page>
     </Document>
 )
