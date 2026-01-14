@@ -69,9 +69,9 @@ When grassland is directly followed by new grassland, a reduction of **50 kg N/h
 
 * **Sand and Loess Soils**: June 1st – August 31st.
 * **Clay and Peat Soils**:
-    * **Derogation Farm + NV-Area**: June 1st – August 31st.
-    * **Derogation Farm + Non-NV-Area**: June 1st – September 15th.
-    * **Non-Derogation Farm**: February 1st – September 15th.
+  * **Derogation Farm + NV-Area**: June 1st – August 31st.
+  * **Derogation Farm + Non-NV-Area**: June 1st – September 15th.
+  * **Non-Derogation Farm**: February 1st – September 15th.
 
 ### 2. Grassland Destruction (Gras-naar-Bouwland)
 
@@ -80,10 +80,10 @@ When grassland is replaced by Maize or specific Potato types, a reduction of **6
 * **Eligible Crops**: Maize, Consumption Potatoes, and Factory Potatoes.
 * **Excluded Crops**: **Seed Potatoes (`Pootaardappelen`)** do not trigger this reduction.
 * **Allowed Periods**:
-    * **Sand and Loess Soils**: February 1st – May 10th.
-    * **Clay and Peat Soils**:
-        * **NV-Area**: February 1st – March 15th.
-        * **Non-NV-Area**: February 1st – May 31st.
+  * **Sand and Loess Soils**: February 1st – May 10th.
+  * **Clay and Peat Soils**:
+    * **NV-Area**: February 1st – March 15th.
+    * **Non-NV-Area**: February 1st – May 31st.
 
 ### How the FDM Calculator Implements These Rules
 
