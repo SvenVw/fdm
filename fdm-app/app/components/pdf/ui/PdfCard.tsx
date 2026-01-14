@@ -1,4 +1,4 @@
-import { View } from "@react-pdf/renderer"
+import { type Style, View } from "@react-pdf/renderer"
 import { pdfStyles } from "../styles"
 
 export const PdfCard = ({
@@ -6,5 +6,5 @@ export const PdfCard = ({
     style,
 }: {
     children: React.ReactNode
-    style?: any
+    style?: Style | Style[]
 }) => <View style={[pdfStyles.card, style]}>{children}</View>

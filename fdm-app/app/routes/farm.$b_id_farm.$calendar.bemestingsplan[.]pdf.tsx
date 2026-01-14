@@ -4,26 +4,28 @@ import {
   getFields,
   getCultivations,
   getCurrentSoilData,
-  getFertilizerApplications,
-  getFertilizers,
 } from "@svenvw/fdm-core";
 import {
-  createFunctionsForNorms,
-  createFunctionsForFertilizerApplicationFilling,
-  calculateDose,
-  getNutrientAdvice,
-  getOrganicMatterBalanceField,
   collectInputForOrganicMatterBalance,
+  aggregateNormsToFarmLevel,
+  aggregateNormFillingsToFarmLevel,
+  getOrganicMatterBalanceField,
 } from "@svenvw/fdm-calculator";
 import { data, type LoaderFunctionArgs } from "react-router";
 import { Readable } from "node:stream";
+import path from "node:path";
 import { getSession } from "~/lib/auth.server";
 import { getTimeframe, getCalendar } from "~/lib/calendar";
 import { fdm } from "~/lib/fdm.server";
-import { getNmiApiKey } from "~/integrations/nmi";
 import { BemestingsplanPDF, BemestingsplanData } from "~/components/pdf/BemestingsplanPDF";
 import { getDefaultCultivation } from "~/lib/cultivation-helpers";
 import { handleLoaderError } from "~/lib/error";
+import { clientConfig } from "~/lib/config";
+import {
+    getNorms,
+    getNutrientAdviceForField,
+    getPlannedDosesForField,
+} from "~/integrations/calculator";
 
 const formatDate = (date: Date | null | undefined) => {
   if (!date) return "-";
@@ -42,7 +44,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     const session = await getSession(request);
-    const nmiApiKey = getNmiApiKey();
 
     // 1. Fetch Farm Info
     const farm = await getFarm(fdm, session.principal_id, b_id_farm);
@@ -53,21 +54,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // 2. Fetch Fields
     const fields = await getFields(fdm, session.principal_id, b_id_farm, timeframe);
 
-    // 3. Prepare data for PDF
-    const functionsForNorms = createFunctionsForNorms("NL", calendar);
-    const functionsForFilling = createFunctionsForFertilizerApplicationFilling("NL", calendar);
-
     // Get input for OM balance
     const omInput = await collectInputForOrganicMatterBalance(fdm, session.principal_id, b_id_farm, timeframe);
 
     const pdfFieldsData = await Promise.all(
       fields.map(async (field) => {
         try {
-          const [cultivations, currentSoilData, applications, fertilizers] = await Promise.all([
+          // Fetch display data (and data needed for OM balance if not using integration for it completely)
+          const [cultivations, currentSoilData] = await Promise.all([
             getCultivations(fdm, session.principal_id, field.b_id, timeframe),
             getCurrentSoilData(fdm, session.principal_id, field.b_id),
-            getFertilizerApplications(fdm, session.principal_id, field.b_id, timeframe),
-            getFertilizers(fdm, session.principal_id, b_id_farm),
           ]);
 
           const mainCultivation = getDefaultCultivation(cultivations, calendar) || cultivations[0];
@@ -85,7 +81,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             });
           }
 
-          // Extract soil parameters
+          // Extract soil parameters for display
           const soilParams: Record<string, any> = {};
           let samplingDate: Date | undefined;
           if (Array.isArray(currentSoilData)) {
@@ -97,46 +93,51 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
           }
 
-          // Calculate Norms (returns total kg for the field)
-          const normInput = await functionsForNorms.collectInputForNorms(fdm, session.principal_id, field.b_id);
-          const [normManure, normPhosphate, normNitrogen] = await Promise.all([
-            functionsForNorms.calculateNormForManure(fdm, normInput),
-            functionsForNorms.calculateNormForPhosphate(fdm, normInput),
-            functionsForNorms.calculateNormForNitrogen(fdm, normInput),
-          ]);
+          // 3. Use Integration Functions for Calculations
 
-          // Calculate Advice (NMI returns kg/ha)
-          let adviceKgHa = { n: 0, p2o5: 0, k2o: 0, mg: 0, s: 0, om: 0 };
-          if (mainCultivation) {
-            try {
-              const result = await getNutrientAdvice(fdm, {
-                b_lu_catalogue: mainCultivation.b_lu_catalogue,
-                b_centroid: field.b_centroid as [number, number],
-                currentSoilData: currentSoilData,
-                nmiApiKey: nmiApiKey,
-              });
+          // Calculate Norms & Filling
+          const normsResult = await getNorms({
+             fdm,
+             principal_id: session.principal_id,
+             b_id: field.b_id
+          });
 
-              const yearAdvice = (result as any).data?.year || (result as any).year || result;
+          // Calculate Nutrient Advice
+          let adviceKgHa = { n: 0, nw: 0, p2o5: 0, k2o: 0, mg: 0, s: 0, om: 0 };
+          try {
+              if (mainCultivation) {
+                  const result = await getNutrientAdviceForField({
+                      fdm,
+                      principal_id: session.principal_id,
+                      b_id: field.b_id,
+                      b_centroid: field.b_centroid as [number, number],
+                      timeframe
+                  });
 
-              if (yearAdvice && typeof yearAdvice === "object") {
-                adviceKgHa = {
-                  n: yearAdvice.d_n_req || 0,
-                  p2o5: yearAdvice.d_p_req || 0,
-                  k2o: yearAdvice.d_k_req || 0,
-                  mg: yearAdvice.d_mg_req || 0,
-                  s: yearAdvice.d_s_req || 0,
-                  om: 0,
-                };
+                  const yearAdvice = (result as any).data?.year || (result as any).year || result;
+                  if (yearAdvice && typeof yearAdvice === "object") {
+                      adviceKgHa = {
+                          n: yearAdvice.d_n_req || 0,
+                          nw: yearAdvice.d_n_req || 0,
+                          p2o5: yearAdvice.d_p_req || 0,
+                          k2o: yearAdvice.d_k_req || 0,
+                          mg: yearAdvice.d_mg_req || 0,
+                          s: yearAdvice.d_s_req || 0,
+                          om: 0,
+                      };
+                  }
               }
-            } catch (e) {
+          } catch (e) {
               console.error(`Failed to get nutrient advice for field ${field.b_id}:`, e);
-            }
           }
 
-          // Calculate Doses (Planned) (Returns kg/ha)
-          const dosesResult = calculateDose({
-            applications: applications,
-            fertilizers: fertilizers,
+          // Calculate Doses (Planned)
+          const { doses: dosesResult, applications, fertilizers } = await getPlannedDosesForField({
+              fdm,
+              principal_id: session.principal_id,
+              b_id: field.b_id,
+              b_id_farm,
+              timeframe
           });
 
           const plannedKgHa = {
@@ -166,9 +167,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
               silt: soilParams.a_silt_mi,
             },
             norms: {
-              nitrogen: normNitrogen.normValue,
-              manure: normManure.normValue,
-              phosphate: normPhosphate.normValue,
+              nitrogen: normsResult.value.nitrogen,
+              manure: normsResult.value.manure,
+              phosphate: normsResult.value.phosphate,
+            },
+            normsFilling: {
+              nitrogen: normsResult.filling.nitrogen,
+              manure: normsResult.filling.manure,
+              phosphate: normsResult.filling.phosphate,
             },
             advice: adviceKgHa,
             planned: plannedKgHa,
@@ -206,6 +212,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             mainCrop: "Fout bij laden",
             soil: {},
             norms: { nitrogen: 0, manure: 0, phosphate: 0 },
+            normsFilling: { nitrogen: 0, manure: 0, phosphate: 0 },
             advice: { n: 0, p2o5: 0, k2o: 0, mg: 0, s: 0, om: 0 },
             planned: { n: 0, nw: 0, p2o5: 0, k2o: 0, om: 0 },
             applications: [],
@@ -216,26 +223,40 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     // Aggregates for farm level (Total kg)
     const totalArea = fields.reduce((acc, f) => acc + f.b_area, 0);
-    const totalNormsKg = pdfFieldsData.reduce(
-      (acc, f) => ({
-        nitrogen: acc.nitrogen + f.norms.nitrogen,
-        manure: acc.manure + f.norms.manure,
-        phosphate: acc.phosphate + f.norms.phosphate,
-      }),
-      { nitrogen: 0, manure: 0, phosphate: 0 },
-    );
+    
+    // Correctly aggregate norms and fillings using calculator functions
+    const totalNormsKg = aggregateNormsToFarmLevel(pdfFieldsData.map(f => ({
+        b_id: f.id,
+        b_area: f.area,
+        norms: {
+            manure: { normValue: f.norms.manure, normSource: "" },
+            nitrogen: { normValue: f.norms.nitrogen, normSource: "" },
+            phosphate: { normValue: f.norms.phosphate, normSource: "" },
+        }
+    })));
+
+    const totalNormsFillingKg = aggregateNormFillingsToFarmLevel(pdfFieldsData.map(f => ({
+        b_id: f.id,
+        b_area: f.area,
+        normsFilling: {
+            manure: { normFilling: f.normsFilling?.manure || 0, applicationFillings: [] },
+            nitrogen: { normFilling: f.normsFilling?.nitrogen || 0, applicationFillings: [] },
+            phosphate: { normFilling: f.normsFilling?.phosphate || 0, applicationFillings: [] },
+        }
+    })));
 
     const totalAdviceKg = pdfFieldsData.reduce(
       (acc, f) => ({
         n: acc.n + (f.advice.n * f.area),
+        nw: acc.nw + (f.advice.nw * f.area),
         p2o5: acc.p2o5 + (f.advice.p2o5 * f.area),
         k2o: acc.k2o + (f.advice.k2o * f.area),
         om: acc.om + (f.advice.om * f.area),
       }),
-      { n: 0, p2o5: 0, k2o: 0, om: 0 },
+      { n: 0, nw: 0, p2o5: 0, k2o: 0, om: 0 },
     );
 
-    const totalPlannedKg = pdfFieldsData.reduce(
+    const totalPlannedUsageKg = pdfFieldsData.reduce(
       (acc, f) => ({
         n: acc.n + (f.planned.n * f.area),
         nw: acc.nw + (f.planned.nw * f.area),
@@ -246,23 +267,62 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       { n: 0, nw: 0, p2o5: 0, k2o: 0, om: 0 },
     );
 
+    // Calculate aggregate OM balance (weighted average per ha)
+    const totalOmBalance = totalArea > 0 ? pdfFieldsData.reduce((acc, f) => {
+        if (f.omBalance) {
+            return {
+                balance: acc.balance + (f.omBalance.balance * f.area),
+                supply: acc.supply + (f.omBalance.supply * f.area),
+                degradation: acc.degradation + (f.omBalance.degradation * f.area),
+            };
+        }
+        return acc;
+    }, { balance: 0, supply: 0, degradation: 0 }) : { balance: 0, supply: 0, degradation: 0 };
+
+    const farmOmBalance = {
+        balance: totalArea > 0 ? totalOmBalance.balance / totalArea : 0,
+        supply: totalArea > 0 ? totalOmBalance.supply / totalArea : 0,
+        degradation: totalArea > 0 ? totalOmBalance.degradation / totalArea : 0,
+    };
+
+    // Get absolute path for logo
+    const publicDir = path.resolve(process.cwd(), "fdm-app", "public");
+    
+    const relativeLogoPath = clientConfig.logo?.startsWith("/")
+        ? clientConfig.logo.substring(1)
+        : clientConfig.logo
+    const logoPath = relativeLogoPath
+        ? path.join(publicDir, relativeLogoPath)
+        : undefined
+
+    const logoInverted = path.join(
+        publicDir,
+        "fdm-high-resolution-logo-grayscale-transparent.png",
+    )
+
     const bemestingsplanData: BemestingsplanData = {
-      farm: {
+        config: {
+            name: clientConfig.name,
+            logo: logoPath,
+            logoInverted: logoInverted,
+        },
+        farm: {
         name: farm.b_name_farm || "Onbekend",
         kvk: farm.b_businessid_farm || undefined,
       },
       year: calendar,
       totalArea,
       norms: totalNormsKg,
+      normsFilling: totalNormsFillingKg,
       totalAdvice: totalAdviceKg,
-      plannedUsage: totalPlannedKg,
+      plannedUsage: totalPlannedUsageKg,
+      omBalance: farmOmBalance,
       fields: pdfFieldsData,
     };
 
-    // Render PDF to stream
     const stream = await renderToStream(<BemestingsplanPDF data={bemestingsplanData} />);
 
-    return new Response(Readable.toWeb(stream) as any, {
+    return new Response(Readable.toWeb(stream) as unknown as ReadableStream, {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="Bemestingsplan_${farm.b_name_farm || b_id_farm}_${calendar}.pdf"`,

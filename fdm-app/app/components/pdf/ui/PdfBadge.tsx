@@ -1,4 +1,4 @@
-import { Text, View } from "@react-pdf/renderer"
+import { type Style, Text, View } from "@react-pdf/renderer"
 import { pdfStyles } from "../styles"
 
 export const PdfBadge = ({
@@ -6,7 +6,7 @@ export const PdfBadge = ({
     style,
 }: {
     children: string
-    style?: any
+    style?: Style | Style[]
 }) => (
     <View style={[pdfStyles.badge, style]}>
         <Text>{children}</Text>

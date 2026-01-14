@@ -1,4 +1,5 @@
 import {
+    calculateDose,
     calculateNitrogenBalance,
     calculateOrganicMatterBalance,
     collectInputForNitrogenBalance,
@@ -20,6 +21,8 @@ import {
     type fdmSchema,
     getCultivations,
     getCurrentSoilData,
+    getFertilizerApplications,
+    getFertilizers,
     type PrincipalId,
     type Timeframe,
 } from "@svenvw/fdm-core"
@@ -255,4 +258,34 @@ export async function getNorms({
     }
 
     return norms
+}
+
+export async function getPlannedDosesForField({
+    fdm,
+    principal_id,
+    b_id,
+    b_id_farm,
+    timeframe,
+}: {
+    fdm: FdmType
+    principal_id: PrincipalId
+    b_id: Field["b_id"]
+    b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"]
+    timeframe: Timeframe
+}) {
+    const [applications, fertilizers] = await Promise.all([
+        getFertilizerApplications(fdm, principal_id, b_id, timeframe),
+        getFertilizers(fdm, principal_id, b_id_farm),
+    ])
+
+    const dosesResult = calculateDose({
+        applications: applications,
+        fertilizers: fertilizers,
+    })
+
+    return {
+        doses: dosesResult,
+        applications,
+        fertilizers,
+    }
 }
