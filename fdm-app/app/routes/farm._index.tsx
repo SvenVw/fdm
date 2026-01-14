@@ -30,7 +30,7 @@ import { getTimeBasedGreeting } from "~/lib/greetings"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Bedrijf | ${clientConfig.name}` },
+        { title: `Bedrijven | ${clientConfig.name}` },
         {
             name: "description",
             content: "Selecteer een bedrijf.",
@@ -310,18 +310,22 @@ export default function AppIndex() {
                                                             </p>
                                                         )}
                                                     </div>
-                                                    {farm.b_businessid_farm && (
-                                                        <div className="flex items-center">
-                                                            <p className="text-muted-foreground">
-                                                                KvK-nummer:
-                                                            </p>
-                                                            <p className="font-medium ml-auto">
+                                                    <div className="flex items-center text-sm text-muted-foreground">
+                                                        <p>
+                                                            KvK-nummer:
+                                                        </p>
+                                                        {farm.b_businessid_farm ? (
+                                                            <p className="ml-auto">
                                                                 {
                                                                     farm.b_businessid_farm
                                                                 }
                                                             </p>
-                                                        </div>
-                                                    )}
+                                                        ) : (
+                                                            <p className="ml-auto">
+                                                                {"Onbekend"}
+                                                            </p>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </CardContent>
                                             <CardFooter>
