@@ -256,7 +256,10 @@ export function calculateOrganicMatterBalancesFieldToFarm(
         supply: avgFarmSupply,
         degradation: avgFarmDegradation,
         fields: fieldsWithBalanceResults,
-        hasErrors,
+        hasErrors:
+            hasErrors ||
+            fieldsWithBalanceResults.filter((result) => !result.b_bufferstrip)
+                .length !== successfulFieldBalances.length,
         fieldErrorMessages,
     }) as OrganicMatterBalanceNumeric
 }

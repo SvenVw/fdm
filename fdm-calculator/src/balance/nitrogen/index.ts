@@ -527,7 +527,8 @@ export function calculateNitrogenBalancesFieldToFarm(
         fields: fieldsWithBalanceResults,
         hasErrors:
             hasErrors ||
-            fieldsWithBalanceResults.length !== successfulFieldBalances.length,
+            fieldsWithBalanceResults.filter((result) => !result.b_bufferstrip)
+                .length !== successfulFieldBalances.length,
         fieldErrorMessages: fieldErrorMessages,
     }
 
