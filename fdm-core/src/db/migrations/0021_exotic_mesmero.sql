@@ -1,0 +1,1 @@
+ALTER TABLE "fdm"."fields" ADD COLUMN "b_buffer" boolean DEFAULT false NOT NULL;
