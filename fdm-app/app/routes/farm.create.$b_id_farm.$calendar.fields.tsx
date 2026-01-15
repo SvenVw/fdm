@@ -107,7 +107,7 @@ export default function Index() {
         () =>
             fields
                 .filter((field) =>
-                    showProductiveOnly ? field.b_isproductive : true,
+                    showProductiveOnly ? field.b_bufferstrip === false : true,
                 )
                 .slice()
                 .sort((a, b) => b.b_area - a.b_area) // Sort by area in descending order

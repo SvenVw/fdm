@@ -21,6 +21,7 @@ import { z } from "zod"
 import { DatePicker } from "~/components/custom/date-picker-v2"
 import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
+import { Switch } from "~/components/ui/switch"
 import { Field, FieldError, FieldLabel } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
 import {
@@ -121,6 +122,7 @@ export default function FarmFieldsOverviewBlock() {
             b_acquiring_method: loaderData.field.b_acquiring_method,
             b_start: loaderData.field.b_start ?? new Date(),
             b_end: loaderData.field.b_end,
+            b_bufferstrip: loaderData.field.b_bufferstrip ?? false,
         },
     })
 
@@ -130,6 +132,7 @@ export default function FarmFieldsOverviewBlock() {
             b_acquiring_method: loaderData.field.b_acquiring_method,
             b_start: loaderData.field.b_start ?? new Date(),
             b_end: loaderData.field.b_end,
+            b_bufferstrip: loaderData.field.b_bufferstrip ?? false,
         })
     }, [loaderData, form.reset])
 
@@ -176,7 +179,7 @@ export default function FarmFieldsOverviewBlock() {
                                 render={({ field, fieldState }) => (
                                     <Field
                                         data-invalid={fieldState.invalid}
-                                        className="col-span-2"
+                                        className="col-span-1"
                                     >
                                         <FieldLabel>
                                             Is perceel in eigendom of pacht?
@@ -205,6 +208,26 @@ export default function FarmFieldsOverviewBlock() {
                                             errors={[fieldState.error]}
                                         />
                                     </Field>
+                                )}
+                            />
+                            <Controller
+                                control={form.control}
+                                name="b_bufferstrip"
+                                render={({ field }) => (
+                                    <div className="col-span-1 flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                                        <div className="space-y-0.5">
+                                            <FieldLabel className="text-base">
+                                                Bufferstrook
+                                            </FieldLabel>
+                                            <p className="text-sm text-muted-foreground">
+                                                Is dit perceel een bufferstrook?{" "}
+                                            </p>
+                                        </div>
+                                        <Switch
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </div>
                                 )}
                             />
                             <Controller
@@ -285,6 +308,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             formValues.b_start,
             formValues.b_acquiring_method,
             formValues.b_end,
+            formValues.b_bufferstrip,
         )
 
         return dataWithSuccess("field is updated", {
@@ -309,6 +333,7 @@ const FormSchema = z
             required_error: "Kies een startdatum voor het perceel",
         }),
         b_end: z.coerce.date().nullable().optional(),
+        b_bufferstrip: z.boolean().optional(),
     })
     .refine(
         (schema) => {

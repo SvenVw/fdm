@@ -61,6 +61,7 @@ interface FertilizerApplicationMetricsData {
     dose: Dose
     b_id: string
     b_id_farm: string
+    b_bufferstrip: boolean
     calendar: string
     cultivations: Cultivation[]
     activeCultivation: Cultivation | undefined
@@ -148,7 +149,7 @@ export function FertilizerApplicationMetricsCard({
                                         </NavLink>
                                     </ItemTitle>
                                 </ItemContent>
-                                <ItemDescription>
+                                <ItemDescription className="line-clamp-none">
                                     {isSubmitting ? (
                                         <NormsSkeleton />
                                     ) : (
@@ -166,9 +167,9 @@ export function FertilizerApplicationMetricsCard({
                                                 {(resolvedNorms) => {
                                                     if (!resolvedNorms) {
                                                         return (
-                                                            <div className="text-sm text-muted-foreground">
+                                                            <span>
                                                                 Geen gebruiksnormen beschikbaar voor dit jaar.
-                                                            </div>
+                                                            </span>
                                                         )
                                                     }
                                                     return (
@@ -357,7 +358,7 @@ export function FertilizerApplicationMetricsCard({
                                     </NavLink>
                                 </ItemTitle>
                             </ItemContent>
-                            <ItemDescription>
+                            <ItemDescription className="line-clamp-none">
                                 {isSubmitting ? (
                                     <NitrogenBalanceSkeleton />
                                 ) : (
@@ -374,14 +375,25 @@ export function FertilizerApplicationMetricsCard({
                                             resolve={nitrogenBalance}
                                         >
                                             {(resolvedNitrogenBalance) => {
+                                                if (
+                                                    fertilizerApplicationMetricsData.b_bufferstrip
+                                                ) {
+                                                    return (
+                                                        <span>
+                                                            Geen stikstofbalans
+                                                            beschikbaar voor
+                                                            bufferstrook.
+                                                        </span>
+                                                    )
+                                                }
                                                 const balance =
                                                     resolvedNitrogenBalance?.balance
                                                 if (!balance) {
                                                     return (
-                                                        <div>
+                                                        <span>
                                                             Geen balans
                                                             beschikbaar
-                                                        </div>
+                                                        </span>
                                                     )
                                                 }
                                                 return (
@@ -483,7 +495,7 @@ export function FertilizerApplicationMetricsCard({
                                         )}
                                     </div>
                                 </ItemContent>
-                                <ItemDescription>
+                                <ItemDescription className="line-clamp-none">
                                     {isSubmitting ? (
                                         <NutrientAdviceSkeleton />
                                     ) : (
@@ -505,10 +517,10 @@ export function FertilizerApplicationMetricsCard({
                                                 {(resolvedNutrientAdvice) => {
                                                     if (!resolvedNutrientAdvice) {
                                                         return (
-                                                            <div>
+                                                            <span>
                                                                 Geen advies
                                                                 beschikbaar
-                                                            </div>
+                                                            </span>
                                                         )
                                                     }
                                                     return (

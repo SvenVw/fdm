@@ -18,7 +18,7 @@ import {
 } from "react-router"
 import { OrganicMatterBalanceChart } from "~/components/blocks/balance/organic-matter-chart"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons" // Can be reused
-import { FieldFilterToggle } from "~/components/custom/field-filter-toggle"
+import { BufferStripInfo } from "~/components/blocks/balance/buffer-strip-info"
 import {
     Card,
     CardContent,
@@ -129,7 +129,6 @@ function FarmBalanceOrganicMatterOverview({
     asyncData,
 }: Awaited<ReturnType<typeof loader>>) {
     const { organicMatterBalanceResult } = use(asyncData)
-    const { showProductiveOnly } = useFieldFilterStore()
 
     if (organicMatterBalanceResult.errorMessage) {
         return (
@@ -172,9 +171,8 @@ function FarmBalanceOrganicMatterOverview({
     const fieldsMap = new Map(fields.map((f) => [f.b_id, f]))
     const filteredFields = organicMatterBalanceResult.fields.filter(
         (fieldResult: OrganicMatterBalanceFieldResultNumeric) => {
-            if (!showProductiveOnly) return true
             const fieldData = fieldsMap.get(fieldResult.b_id)
-            return fieldData ? fieldData.b_isproductive === true : false
+            return fieldData ? !fieldData.b_bufferstrip : false
         },
     )
 
@@ -252,7 +250,7 @@ function FarmBalanceOrganicMatterOverview({
                     <CardHeader>
                         <CardTitle className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <p>Percelen</p>
-                            <FieldFilterToggle />
+                            <BufferStripInfo />
                         </CardTitle>
                         <CardDescription />
                     </CardHeader>

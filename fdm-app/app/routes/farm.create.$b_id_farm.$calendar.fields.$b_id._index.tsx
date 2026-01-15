@@ -34,6 +34,7 @@ import { SoilDataCards } from "~/components/blocks/soil/cards"
 import { Combobox } from "~/components/custom/combobox"
 import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
+import { Checkbox } from "~/components/ui/checkbox"
 import {
     Card,
     CardContent,
@@ -87,6 +88,7 @@ const FormSchema = z.object({
     b_lu_catalogue: z.string({
         required_error: "Hoofdgewas is verplicht",
     }),
+    b_bufferstrip: z.boolean().optional(),
 })
 
 /**
@@ -207,6 +209,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             currentSoilData: currentSoilData,
             soilParameterDescription: soilParameterDescription,
             b_area: field.b_area,
+            b_bufferstrip: field.b_bufferstrip,
             featureCollection: featureCollection,
             cultivationOptions: cultivationOptions,
             mapStyle: mapStyle,
@@ -236,6 +239,7 @@ export default function Index() {
             b_name: loaderData.b_name ?? "",
             b_area: Math.round(loaderData.b_area * 10) / 10,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
+            b_bufferstrip: loaderData.b_bufferstrip ?? false,
         },
     })
 
@@ -244,6 +248,7 @@ export default function Index() {
             b_name: loaderData.b_name ?? "",
             b_area: Math.round(loaderData.b_area * 10) / 10,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
+            b_bufferstrip: loaderData.b_bufferstrip ?? false,
         })
     }, [loaderData, form.reset])
 
@@ -345,6 +350,34 @@ export default function Index() {
                                                         />
                                                         <FormDescription />
                                                         <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="b_bufferstrip"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-row col-span-2 items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={
+                                                                    field.value
+                                                                }
+                                                                onCheckedChange={
+                                                                    field.onChange
+                                                                }
+                                                            />
+                                                        </FormControl>
+                                                        <div className="space-y-1 leading-none">
+                                                            <FormLabel>
+                                                                Bufferstrook
+                                                            </FormLabel>
+                                                            <FormDescription>
+                                                                Is dit perceel
+                                                                een
+                                                                bufferstrook?
+                                                            </FormDescription>
+                                                        </div>
                                                     </FormItem>
                                                 )}
                                             />
@@ -494,6 +527,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 undefined,
                 undefined,
                 undefined,
+                formValues.b_bufferstrip,
             )
 
             const cultivations = await getCultivations(

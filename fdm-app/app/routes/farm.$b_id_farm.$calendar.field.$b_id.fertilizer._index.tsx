@@ -177,6 +177,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 b_centroid: b_centroid,
                 currentSoilData: currentSoilData,
                 nmiApiKey: nmiApiKey,
+                b_bufferstrip: field.b_bufferstrip,
             })
         }
 
@@ -190,7 +191,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                           calendar,
                       })
                     : Promise.resolve(null),
-            nitrogenBalance: getNitrogenBalanceforField({
+            nitrogenBalance: getNitrogenBalanceForField({
                 fdm,
                 principal_id,
                 b_id_farm,
@@ -201,6 +202,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             dose: dose.dose,
             b_id: b_id,
             b_id_farm: b_id_farm,
+            b_bufferstrip: field.b_bufferstrip,
             calendar: calendar,
             cultivations,
             activeCultivation,

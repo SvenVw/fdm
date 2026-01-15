@@ -157,7 +157,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
     ) => {
         if (
             showProductiveOnly &&
-            !row.original.fields.some((field) => field.b_isproductive)
+            row.original.fields.some((field) => field.b_bufferstrip)
         ) {
             return false
         }

@@ -164,6 +164,8 @@ export async function getNutrientAdviceForField({
 
     const currentSoilData = await getCurrentSoilData(fdm, principal_id, b_id)
 
+    const field = await getField(fdm, principal_id, b_id)
+
     const cultivations = await getCultivations(
         fdm,
         principal_id,
@@ -185,6 +187,7 @@ export async function getNutrientAdviceForField({
         b_centroid: b_centroid,
         currentSoilData: currentSoilData,
         nmiApiKey: nmiApiKey,
+        b_bufferstrip: field.b_bufferstrip,
     })
 
     return nutrientAdvice
