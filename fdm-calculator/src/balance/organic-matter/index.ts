@@ -59,12 +59,14 @@ export async function calculateOrganicMatterBalance(
                     return {
                         b_id: fieldInput.field.b_id,
                         b_area: fieldInput.field.b_area ?? 0,
+                        b_buffer: fieldInput.field.b_buffer ?? false,
                         balance,
                     }
                 } catch (error) {
                     return {
                         b_id: fieldInput.field.b_id,
                         b_area: fieldInput.field.b_area ?? 0,
+                        b_buffer: fieldInput.field.b_buffer ?? false,
                         errorMessage:
                             error instanceof Error
                                 ? error.message
@@ -110,6 +112,25 @@ export function calculateOrganicMatterBalanceField(
 
     const { field, cultivations, fertilizerApplications, soilAnalyses } =
         fieldInput
+
+    if (field.b_buffer) {
+        return {
+            b_id: field.b_id,
+            balance: 0,
+            supply: {
+                total: 0,
+                fertilizers: {
+                    total: 0,
+                    manure: { total: 0, applications: [] },
+                    compost: { total: 0, applications: [] },
+                    other: { total: 0, applications: [] },
+                },
+                cultivations: { total: 0, cultivations: [] },
+                residues: { total: 0, cultivations: [] },
+            },
+            degradation: { total: 0 },
+        } as OrganicMatterBalanceFieldNumeric
+    }
 
     const fertilizerDetailsMap = new Map<string, FertilizerDetail>(
         fertilizerDetails.map((detail: FertilizerDetail) => [
@@ -194,8 +215,9 @@ export function calculateOrganicMatterBalancesFieldToFarm(
     fieldErrorMessages: string[],
 ): OrganicMatterBalanceNumeric {
     // Filter out fields that have errors to ensure they are not included in the aggregation.
+    // Also filter out buffer strips as they should be ignored in the farm-level aggregation
     const successfulFieldBalances = fieldsWithBalanceResults.filter(
-        (result) => result.balance !== undefined,
+        (result) => result.balance !== undefined && !result.b_buffer,
     ) as (OrganicMatterBalanceFieldResultNumeric & {
         balance: OrganicMatterBalanceFieldNumeric
     })[]

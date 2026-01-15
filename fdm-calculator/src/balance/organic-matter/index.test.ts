@@ -61,6 +61,24 @@ describe("Organic Matter Balance Calculation", () => {
             expect(result.supply.total).toBe(500)
             expect(result.degradation.total).toBe(-200)
         })
+
+        it("should return zero balance for buffer strips", () => {
+            const result = calculateOrganicMatterBalanceField({
+                fieldInput: {
+                    field: { ...mockField, b_buffer: true },
+                    cultivations: mockCultivations,
+                    fertilizerApplications: mockFertilizerApplications,
+                    soilAnalyses: mockSoilAnalyses,
+                },
+                fertilizerDetails: [],
+                cultivationDetails: [],
+                timeFrame,
+            })
+
+            expect(result.balance).toBe(0)
+            expect(result.supply.total).toBe(0)
+            expect(result.degradation.total).toBe(0)
+        })
     })
 
     describe("calculateOrganicMatterBalancesFieldToFarm", () => {
@@ -124,6 +142,42 @@ describe("Organic Matter Balance Calculation", () => {
             expect(farmBalance.supply).toBeCloseTo(500)
             expect(farmBalance.degradation).toBeCloseTo(-200)
             expect(farmBalance.balance).toBeCloseTo(300)
+        })
+
+        it("should ignore buffer strips in farm-level aggregation", () => {
+            const results: OrganicMatterBalanceFieldResultNumeric[] = [
+                {
+                    b_id: "field1",
+                    b_area: 10,
+                    b_buffer: false,
+                    balance: {
+                        supply: { total: 500 },
+                        degradation: { total: -200 },
+                        balance: 300,
+                    } as OrganicMatterBalanceFieldNumeric,
+                },
+                {
+                    b_id: "buffer1",
+                    b_area: 100,
+                    b_buffer: true,
+                    balance: {
+                        supply: { total: 0 },
+                        degradation: { total: 0 },
+                        balance: 0,
+                    } as OrganicMatterBalanceFieldNumeric,
+                },
+            ]
+
+            const farmBalance = calculateOrganicMatterBalancesFieldToFarm(
+                results,
+                false,
+                [],
+            )
+
+            // Should match field1 values exactly
+            expect(farmBalance.supply).toBe(500)
+            expect(farmBalance.degradation).toBe(-200)
+            expect(farmBalance.balance).toBe(300)
         })
     })
 

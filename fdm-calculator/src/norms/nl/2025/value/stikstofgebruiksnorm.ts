@@ -814,6 +814,14 @@ export async function calculateNL2025StikstofGebruiksNorm(
     const field = input.field
     const cultivations = input.cultivations
 
+    // Check for buffer strip
+    if (field.b_buffer) {
+        return {
+            normValue: 0,
+            normSource: "Bufferstrook: geen plaatsingsruimte",
+        }
+    }
+
     // Determine hoofdteelt
     const b_lu_catalogue = determineNLHoofdteelt(cultivations, 2025)
     let cultivation = cultivations.find(

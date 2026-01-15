@@ -469,7 +469,10 @@ export type SoilAnalysisPicked = Pick<
  * Represents the structure of fields with related entities for nitrogen balance calculation
  */
 export type FieldInput = {
-    field: Pick<Field, "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end">
+    field: Pick<
+        Field,
+        "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end" | "b_buffer"
+    >
     cultivations: Pick<
         Cultivation,
         | "b_lu"
@@ -670,6 +673,7 @@ export type NitrogenBalanceFieldNumeric = {
 export type NitrogenBalanceFieldResultNumeric = {
     b_id: string
     b_area: number
+    b_buffer: boolean
     balance?: NitrogenBalanceFieldNumeric
     errorMessage?: string
 }

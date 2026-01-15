@@ -113,6 +113,22 @@ describe("calculateNL2025DierlijkeMestGebruiksNorm", () => {
         expect(result.normSource).toBe("Derogatie - Natura2000 Gebied")
     })
 
+    it("should return 0 for buffer strips", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: true, has_grazing_intention: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.641351453912945, 51.97755938887036],
+                b_buffer: true,
+            },
+            cultivations: [],
+            soilAnalysis: { a_p_cc: 0, a_p_al: 0 },
+        }
+        const result = await calculateNL2025DierlijkeMestGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(0)
+        expect(result.normSource).toBe("Bufferstrook: geen plaatsingsruimte")
+    })
+
     describe("isFieldInDerogatieVrijeZone", () => {
         it("should return true for a location inside the derogatie-vrije zone", async () => {
             const locationInside: [number, number] = [

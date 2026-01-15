@@ -90,6 +90,29 @@ describe(" calculateNL2025StikstofGebruiksNorm", () => {
         expect(result.normSource).toEqual("Grasland (volledig maaien).")
     })
 
+    it("should return 0 for buffer strips", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571],
+                b_buffer: true,
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_265",
+                    b_lu_start: new Date(2025, 0, 1),
+                    b_lu_end: new Date(2025, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await calculateNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(0)
+        expect(result.normSource).toEqual("Bufferstrook: geen plaatsingsruimte")
+    })
+
     it("should return the correct norm for potatoes", async () => {
         const mockInput: NL2025NormsInput = {
             farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
