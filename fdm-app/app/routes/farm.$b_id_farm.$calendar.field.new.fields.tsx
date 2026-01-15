@@ -133,7 +133,7 @@ export default function Index() {
                     title: field.b_name,
                     to: `/farm/${b_id_farm}/${calendar}/field/new/fields/${field.b_id}${location.search}`,
                 })),
-        [fields, showProductiveOnly, b_id_farm, calendar],
+        [fields, showProductiveOnly, b_id_farm, calendar, location.search],
     )
 
     return (

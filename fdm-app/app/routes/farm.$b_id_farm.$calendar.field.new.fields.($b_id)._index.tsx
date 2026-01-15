@@ -535,14 +535,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
             // Delete field
             const field = await getField(fdm, session.principal_id, b_id)
             await removeField(fdm, session.principal_id, b_id)
-            url.searchParams.get("fieldIds")
             const fieldIds = url.searchParams.get("fieldIds")?.split(",") ?? []
             url.searchParams.set(
                 "fieldIds",
                 fieldIds.filter((id) => id !== b_id).join(","),
             )
             return redirectWithSuccess(
-                `/farm/${b_id_farm}/${calendar}/field/new/fields?${url.search}`,
+                `/farm/${b_id_farm}/${calendar}/field/new/fields${url.search}`,
                 {
                     message: `${field.b_name} is verwijderd! 🎉`,
                 },
