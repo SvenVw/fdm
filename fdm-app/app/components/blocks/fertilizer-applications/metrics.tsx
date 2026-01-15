@@ -55,7 +55,7 @@ interface FertilizerApplicationMetricsData {
             phosphate: NormFilling
             nitrogen: NormFilling
         }
-    }>
+    } | null>
     nitrogenBalance: Promise<NitrogenBalanceFieldResultNumeric> | undefined
     nutrientAdvice: NutrientAdvice
     dose: Dose
@@ -163,8 +163,16 @@ export function FertilizerApplicationMetricsCard({
                                                     </div>
                                                 }
                                             >
-                                                {(resolvedNorms) => (
-                                                    <div className="flex flex-col space-y-1">
+                                                {(resolvedNorms) => {
+                                                    if (!resolvedNorms) {
+                                                        return (
+                                                            <div className="text-sm text-muted-foreground">
+                                                                Geen gebruiksnormen beschikbaar voor dit jaar.
+                                                            </div>
+                                                        )
+                                                    }
+                                                    return (
+                                                    <div className="flex flex-col space-y-2">
                                                         <div className="grid grid-cols-[1fr_auto] items-center">
                                                             <Tooltip>
                                                                 <TooltipTrigger
@@ -330,7 +338,7 @@ export function FertilizerApplicationMetricsCard({
                                                             className="h-2"
                                                         />
                                                     </div>
-                                                )}
+                                                )}}
                                             </Await>
                                         </Suspense>
                                     )}

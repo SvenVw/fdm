@@ -181,12 +181,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         const fertilizerApplicationMetricsData = {
-            norms: getNorms({
-                fdm,
-                principal_id,
-                b_id,
-            }),
-            nitrogenBalance: getNitrogenBalanceForField({
+            norms:
+                calendar === "2025" || calendar === "2026"
+                    ? getNorms({
+                          fdm,
+                          principal_id,
+                          b_id,
+                          calendar,
+                      })
+                    : Promise.resolve(null),
+            nitrogenBalance: getNitrogenBalanceforField({
                 fdm,
                 principal_id,
                 b_id_farm,
