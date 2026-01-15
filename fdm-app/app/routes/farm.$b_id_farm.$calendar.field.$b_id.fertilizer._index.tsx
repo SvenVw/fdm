@@ -185,6 +185,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 fdm,
                 principal_id,
                 b_id,
+                calendar,
             }),
             nitrogenBalance: getNitrogenBalanceforField({
                 fdm,
