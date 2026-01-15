@@ -6,7 +6,7 @@ import type {
     NutrientAdvice,
 } from "@svenvw/fdm-calculator"
 import type { Cultivation } from "@svenvw/fdm-core"
-import { Sprout } from "lucide-react"
+import { CircleAlert, CircleCheck, CircleX, Sprout } from "lucide-react"
 import { Suspense } from "react"
 import { Await, NavLink } from "react-router-dom"
 import { CultivationSelector } from "~/components/custom/cultivation-selector"
@@ -136,12 +136,12 @@ export function FertilizerApplicationMetricsCard({
                         </EmptyContent>
                     </Empty>
                 ) : (
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-                        <ItemGroup>
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 2xl:grid-cols-3">
+                        <ItemGroup className="min-w-0">
                             <ItemSeparator />
-                            <Item>
-                                <ItemContent>
-                                    <ItemTitle className="hover:underline">
+                            <Item className="flex-col items-stretch px-0 py-4">
+                                <ItemContent className="flex-none mb-4">
+                                    <ItemTitle className="hover:underline text-base font-semibold">
                                         <NavLink
                                             to={`/farm/${b_id_farm}/${calendar}/norms/${b_id}`}
                                         >
@@ -149,7 +149,7 @@ export function FertilizerApplicationMetricsCard({
                                         </NavLink>
                                     </ItemTitle>
                                 </ItemContent>
-                                <ItemDescription className="line-clamp-none">
+                                <ItemDescription className="line-clamp-none min-w-0 w-full">
                                     {isSubmitting ? (
                                         <NormsSkeleton />
                                     ) : (
@@ -157,187 +157,190 @@ export function FertilizerApplicationMetricsCard({
                                             <Await
                                                 resolve={norms}
                                                 errorElement={
-                                                    <div>
-                                                        Helaas, er is wat
-                                                        misgegaan met de
-                                                        berekening
+                                                    <div className="text-destructive text-sm">
+                                                        Fout bij berekening
                                                     </div>
                                                 }
                                             >
                                                 {(resolvedNorms) => {
                                                     if (!resolvedNorms) {
                                                         return (
-                                                            <span>
+                                                            <span className="text-xs">
                                                                 Geen gebruiksnormen beschikbaar voor dit jaar.
                                                             </span>
                                                         )
                                                     }
                                                     return (
-                                                    <div className="flex flex-col space-y-2">
-                                                        <div className="grid grid-cols-[1fr_auto] items-center">
-                                                            <Tooltip>
-                                                                <TooltipTrigger
-                                                                    asChild
-                                                                >
-                                                                    <p className="whitespace-nowrap px-2">
-                                                                        Stikstof
-                                                                    </p>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent>
-                                                                    <p>
-                                                                        Werkzame
-                                                                        stikstof
-                                                                        volgens
-                                                                        forfaitaire
-                                                                        gehalten
-                                                                    </p>
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                            <span className="text-right whitespace-nowrap px-2">
-                                                                {Math.round(
+                                                    <div className="flex flex-col space-y-4 min-w-0">
+                                                        <div className="space-y-1.5 min-w-0">
+                                                            <div className="flex justify-between items-center gap-2">
+                                                                <Tooltip>
+                                                                    <TooltipTrigger
+                                                                        asChild
+                                                                    >
+                                                                        <p className="truncate text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                                                                            Stikstof
+                                                                        </p>
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent>
+                                                                        <p>
+                                                                            Werkzame
+                                                                            stikstof
+                                                                            volgens
+                                                                            forfaitaire
+                                                                            gehalten
+                                                                        </p>
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                                <span className="text-right text-xs font-bold whitespace-nowrap shrink-0">
+                                                                    {Math.round(
+                                                                        resolvedNorms
+                                                                            .filling
+                                                                            .nitrogen,
+                                                                    )}{" "}
+                                                                    /{" "}
+                                                                    {Math.round(
+                                                                        resolvedNorms
+                                                                            .value
+                                                                            .nitrogen,
+                                                                    )}{" "}
+                                                                    kg N
+                                                                </span>
+                                                            </div>
+                                                            <Progress
+                                                                value={
+                                                                    (resolvedNorms
+                                                                        .filling
+                                                                        .nitrogen /
+                                                                        resolvedNorms
+                                                                            .value
+                                                                            .nitrogen) *
+                                                                    100
+                                                                }
+                                                                colorBar={getNormsProgressColor(
                                                                     resolvedNorms
                                                                         .filling
                                                                         .nitrogen,
-                                                                )}{" "}
-                                                                /{" "}
-                                                                {Math.round(
                                                                     resolvedNorms
                                                                         .value
                                                                         .nitrogen,
-                                                                )}{" "}
-                                                                kg N
-                                                            </span>
+                                                                )}
+                                                                className="h-2"
+                                                            />
                                                         </div>
-                                                        <Progress
-                                                            value={
-                                                                (resolvedNorms
-                                                                    .filling
-                                                                    .nitrogen /
-                                                                    resolvedNorms
-                                                                        .value
-                                                                        .nitrogen) *
-                                                                100
-                                                            }
-                                                            colorBar={getNormsProgressColor(
-                                                                resolvedNorms
-                                                                    .filling
-                                                                    .nitrogen,
-                                                                resolvedNorms
-                                                                    .value
-                                                                    .nitrogen,
-                                                            )}
-                                                            className="h-2"
-                                                        />
 
-                                                        <div className="grid grid-cols-[1fr_auto] items-center">
-                                                            <Tooltip>
-                                                                <TooltipTrigger
-                                                                    asChild
-                                                                >
-                                                                    <p className="whitespace-nowrap px-2">
-                                                                        Fosfaat
-                                                                    </p>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent>
-                                                                    <p>
-                                                                        Fosfaataanvoer
-                                                                        incl.
-                                                                        mogelijke
-                                                                        stimuleringsregeling
-                                                                    </p>
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                            <span className="text-right whitespace-nowrap px-2">
-                                                                {Math.round(
+                                                        <div className="space-y-1.5 min-w-0">
+                                                            <div className="flex justify-between items-center gap-2">
+                                                                <Tooltip>
+                                                                    <TooltipTrigger
+                                                                        asChild
+                                                                    >
+                                                                        <p className="truncate text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                                                                            Fosfaat
+                                                                        </p>
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent>
+                                                                        <p>
+                                                                            Fosfaataanvoer
+                                                                            incl.
+                                                                            mogelijke
+                                                                            stimuleringsregeling
+                                                                        </p>
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                                <span className="text-right text-xs font-bold whitespace-nowrap shrink-0">
+                                                                    {Math.round(
+                                                                        resolvedNorms
+                                                                            .filling
+                                                                            .phosphate,
+                                                                    )}{" "}
+                                                                    /{" "}
+                                                                    {Math.round(
+                                                                        resolvedNorms
+                                                                            .value
+                                                                            .phosphate,
+                                                                    )}{" "}
+                                                                    kg P₂O₅
+                                                                </span>
+                                                            </div>
+                                                            <Progress
+                                                                value={
+                                                                    (resolvedNorms
+                                                                        .filling
+                                                                        .phosphate /
+                                                                        resolvedNorms
+                                                                            .value
+                                                                            .phosphate) *
+                                                                    100
+                                                                }
+                                                                colorBar={getNormsProgressColor(
                                                                     resolvedNorms
                                                                         .filling
                                                                         .phosphate,
-                                                                )}{" "}
-                                                                /{" "}
-                                                                {Math.round(
                                                                     resolvedNorms
                                                                         .value
                                                                         .phosphate,
-                                                                )}{" "}
-                                                                kg P₂O₅
-                                                            </span>
+                                                                )}
+                                                                className="h-2"
+                                                            />
                                                         </div>
-                                                        <Progress
-                                                            value={
-                                                                (resolvedNorms
-                                                                    .filling
-                                                                    .phosphate /
-                                                                    resolvedNorms
-                                                                        .value
-                                                                        .phosphate) *
-                                                                100
-                                                            }
-                                                            colorBar={getNormsProgressColor(
-                                                                resolvedNorms
-                                                                    .filling
-                                                                    .phosphate,
-                                                                resolvedNorms
-                                                                    .value
-                                                                    .phosphate,
-                                                            )}
-                                                            className="h-2"
-                                                        />
 
-                                                        <div className="grid grid-cols-[1fr_auto] items-center">
-                                                            <Tooltip>
-                                                                <TooltipTrigger
-                                                                    asChild
-                                                                >
-                                                                    <p className="whitespace-nowrap px-2">
-                                                                        Dierlijke
-                                                                        mest
-                                                                    </p>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent>
-                                                                    <p>
-                                                                        Totaal
-                                                                        stikstof
-                                                                        via
-                                                                        dierlijke
-                                                                        mest
-                                                                    </p>
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                            <span className="text-right whitespace-nowrap px-2">
-                                                                {Math.round(
+                                                        <div className="space-y-1.5 min-w-0">
+                                                            <div className="flex justify-between items-center gap-2">
+                                                                <Tooltip>
+                                                                    <TooltipTrigger
+                                                                        asChild
+                                                                    >
+                                                                        <p className="truncate text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                                                                            Dierlijk
+                                                                        </p>
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent>
+                                                                        <p>
+                                                                            Totaal
+                                                                            stikstof
+                                                                            via
+                                                                            dierlijke
+                                                                            mest
+                                                                        </p>
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                                <span className="text-right text-xs font-bold whitespace-nowrap shrink-0">
+                                                                    {Math.round(
+                                                                        resolvedNorms
+                                                                            .filling
+                                                                            .manure,
+                                                                    )}{" "}
+                                                                    /{" "}
+                                                                    {Math.round(
+                                                                        resolvedNorms
+                                                                            .value
+                                                                            .manure,
+                                                                    )}{" "}
+                                                                    kg N
+                                                                </span>
+                                                            </div>
+                                                            <Progress
+                                                                value={
+                                                                    (resolvedNorms
+                                                                        .filling
+                                                                        .manure /
+                                                                        resolvedNorms
+                                                                            .value
+                                                                            .manure) *
+                                                                    100
+                                                                }
+                                                                colorBar={getNormsProgressColor(
                                                                     resolvedNorms
                                                                         .filling
                                                                         .manure,
-                                                                )}{" "}
-                                                                /{" "}
-                                                                {Math.round(
                                                                     resolvedNorms
                                                                         .value
                                                                         .manure,
-                                                                )}{" "}
-                                                                kg N
-                                                            </span>
+                                                                )}
+                                                                className="h-2"
+                                                            />
                                                         </div>
-                                                        <Progress
-                                                            value={
-                                                                (resolvedNorms
-                                                                    .filling
-                                                                    .manure /
-                                                                    resolvedNorms
-                                                                        .value
-                                                                        .manure) *
-                                                                100
-                                                            }
-                                                            colorBar={getNormsProgressColor(
-                                                                resolvedNorms
-                                                                    .filling
-                                                                    .manure,
-                                                                resolvedNorms
-                                                                    .value
-                                                                    .manure,
-                                                            )}
-                                                            className="h-2"
-                                                        />
                                                     </div>
                                                 )}}
                                             </Await>
@@ -346,11 +349,11 @@ export function FertilizerApplicationMetricsCard({
                                 </ItemDescription>
                             </Item>
                         </ItemGroup>
-                    <ItemGroup>
+                    <ItemGroup className="min-w-0">
                         <ItemSeparator />
-                        <Item>
-                            <ItemContent>
-                                <ItemTitle className="hover:underline">
+                        <Item className="flex-col items-stretch px-0 py-4">
+                            <ItemContent className="flex-none mb-4">
+                                <ItemTitle className="hover:underline text-base font-semibold">
                                     <NavLink
                                         to={`/farm/${b_id_farm}/${calendar}/balance/nitrogen/${b_id}`}
                                     >
@@ -358,7 +361,7 @@ export function FertilizerApplicationMetricsCard({
                                     </NavLink>
                                 </ItemTitle>
                             </ItemContent>
-                            <ItemDescription className="line-clamp-none">
+                            <ItemDescription className="line-clamp-none min-w-0 w-full">
                                 {isSubmitting ? (
                                     <NitrogenBalanceSkeleton />
                                 ) : (
@@ -367,9 +370,8 @@ export function FertilizerApplicationMetricsCard({
                                     >
                                         <Await
                                             errorElement={
-                                                <div>
-                                                    Helaas, er is wat misgegaan
-                                                    met de berekening
+                                                <div className="text-destructive text-sm">
+                                                    Fout bij berekening
                                                 </div>
                                             }
                                             resolve={nitrogenBalance}
@@ -379,30 +381,33 @@ export function FertilizerApplicationMetricsCard({
                                                     fertilizerApplicationMetricsData.b_bufferstrip
                                                 ) {
                                                     return (
-                                                        <span>
+                                                        <span className="text-xs text-muted-foreground">
                                                             Geen stikstofbalans
                                                             beschikbaar voor
                                                             bufferstrook.
                                                         </span>
                                                     )
                                                 }
-                                                const balance =
-                                                    resolvedNitrogenBalance?.balance
-                                                if (!balance) {
+                                                
+                                                if (!resolvedNitrogenBalance?.balance) {
                                                     return (
-                                                        <span>
-                                                            Geen balans
-                                                            beschikbaar
-                                                        </span>
+                                                        <div className="flex items-center gap-2 text-orange-500">
+                                                            <CircleAlert className="size-4 shrink-0" />
+                                                            <span className="text-xs">
+                                                                Geen balans beschikbaar
+                                                            </span>
+                                                        </div>
                                                     )
                                                 }
+
+                                                const balance = resolvedNitrogenBalance.balance
                                                 return (
-                                                    <div className="flex flex-col space-y-1">
-                                                        <div className="grid grid-cols-[1fr_auto] items-center">
-                                                            <p className="whitespace-nowrap px-2">
+                                                    <div className="flex flex-col space-y-1.5 min-w-0">
+                                                        <div className="flex justify-between items-center gap-2 min-w-0">
+                                                            <p className="truncate text-xs text-muted-foreground">
                                                                 Aanvoer
                                                             </p>
-                                                            <span className="text-right whitespace-nowrap px-2 font-semibold">
+                                                            <span className="text-right text-xs font-medium whitespace-nowrap shrink-0">
                                                                 {Math.round(
                                                                     balance
                                                                         .supply
@@ -412,11 +417,11 @@ export function FertilizerApplicationMetricsCard({
                                                                 kg N
                                                             </span>
                                                         </div>
-                                                        <div className="grid grid-cols-[1fr_auto] items-center">
-                                                            <p className="whitespace-nowrap px-2">
+                                                        <div className="flex justify-between items-center gap-2 min-w-0">
+                                                            <p className="truncate text-xs text-muted-foreground">
                                                                 Afvoer
                                                             </p>
-                                                            <span className="text-right whitespace-nowrap px-2 font-semibold">
+                                                            <span className="text-right text-xs font-medium whitespace-nowrap shrink-0">
                                                                 {Math.round(
                                                                     balance
                                                                         .removal
@@ -426,11 +431,11 @@ export function FertilizerApplicationMetricsCard({
                                                                 kg N
                                                             </span>
                                                         </div>
-                                                        <div className="grid grid-cols-[1fr_auto] items-center">
-                                                            <p className="whitespace-nowrap px-2">
+                                                        <div className="flex justify-between items-center gap-2 min-w-0">
+                                                            <p className="truncate text-xs text-muted-foreground">
                                                                 Emissie
                                                             </p>
-                                                            <span className="text-right whitespace-nowrap px-2 font-semibold">
+                                                            <span className="text-right text-xs font-medium whitespace-nowrap shrink-0">
                                                                 {Math.round(
                                                                     balance
                                                                         .emission
@@ -440,23 +445,31 @@ export function FertilizerApplicationMetricsCard({
                                                                 kg N
                                                             </span>
                                                         </div>
-                                                        <ItemSeparator className="my-1" />
-                                                        <div className="grid grid-cols-[1fr_auto] items-center">
-                                                            <p className="text-xl font-bold whitespace-nowrap px-2">
+                                                        <ItemSeparator className="my-1 opacity-50" />
+                                                        <div className="flex justify-between items-center gap-2 min-w-0">
+                                                            <p className="text-sm font-bold truncate text-muted-foreground uppercase tracking-tight">
                                                                 Balans
                                                             </p>
-                                                            <span className="text-xl font-bold text-right whitespace-nowrap px-2">
-                                                                {Math.round(
-                                                                    balance.balance,
-                                                                )}{" "}
-                                                                kg N
-                                                            </span>
+                                                            <div className="flex items-center gap-1.5">
+                                                                <span className="text-base font-black text-right whitespace-nowrap shrink-0">
+                                                                    {Math.round(
+                                                                        balance.balance,
+                                                                    )}{" "}
+                                                                    kg N
+                                                                </span>
+                                                                {balance.balance <=
+                                                                balance.target ? (
+                                                                    <CircleCheck className="text-green-500 size-4 shrink-0" />
+                                                                ) : (
+                                                                    <CircleX className="text-red-500 size-4 shrink-0" />
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                        <div className="grid grid-cols-[1fr_auto] items-center">
-                                                            <p className="whitespace-nowrap px-2">
+                                                        <div className="flex justify-between items-center gap-2 min-w-0">
+                                                            <p className="truncate text-[10px] text-muted-foreground">
                                                                 Streefwaarde
                                                             </p>
-                                                            <span className="font-semibold text-right whitespace-nowrap px-2">
+                                                            <span className="text-right text-[10px] font-medium whitespace-nowrap shrink-0">
                                                                 {Math.round(
                                                                     balance.target,
                                                                 )}{" "}
@@ -472,12 +485,12 @@ export function FertilizerApplicationMetricsCard({
                             </ItemDescription>
                             </Item>
                         </ItemGroup>
-                        <ItemGroup>
+                        <ItemGroup className="min-w-0">
                             <ItemSeparator />
-                            <Item>
-                                <ItemContent>
-                                    <div className="flex items-center justify-between w-full">
-                                        <ItemTitle className="hover:underline">
+                            <Item className="flex-col items-stretch px-0 py-4">
+                                <ItemContent className="flex-none mb-4">
+                                    <div className="flex items-center justify-between w-full gap-2">
+                                        <ItemTitle className="hover:underline text-base font-semibold">
                                             <NavLink
                                                 to={`/farm/${b_id_farm}/${calendar}/nutrient_advice/${b_id}`}
                                             >
@@ -485,6 +498,7 @@ export function FertilizerApplicationMetricsCard({
                                             </NavLink>
                                         </ItemTitle>
                                         {activeCultivation && (
+                                            <div className="shrink-0">
                                             <CultivationSelector
                                                 cultivations={cultivations}
                                                 selectedCultivationId={
@@ -492,10 +506,11 @@ export function FertilizerApplicationMetricsCard({
                                                 }
                                                 variant="icon"
                                             />
+                                            </div>
                                         )}
                                     </div>
                                 </ItemContent>
-                                <ItemDescription className="line-clamp-none">
+                                <ItemDescription className="line-clamp-none min-w-0 w-full">
                                     {isSubmitting ? (
                                         <NutrientAdviceSkeleton />
                                     ) : (
@@ -506,10 +521,8 @@ export function FertilizerApplicationMetricsCard({
                                         >
                                             <Await
                                                 errorElement={
-                                                    <div>
-                                                        Helaas, er is wat
-                                                        misgegaan met de
-                                                        berekening
+                                                    <div className="text-destructive text-sm">
+                                                        Fout bij berekening
                                                     </div>
                                                 }
                                                 resolve={nutrientAdvice}
@@ -517,112 +530,118 @@ export function FertilizerApplicationMetricsCard({
                                                 {(resolvedNutrientAdvice) => {
                                                     if (!resolvedNutrientAdvice) {
                                                         return (
-                                                            <span>
+                                                            <span className="text-xs">
                                                                 Geen advies
                                                                 beschikbaar
                                                             </span>
                                                         )
                                                     }
                                                     return (
-                                                        <div className="flex flex-col space-y-2">
-                                                            <div className="grid grid-cols-[1fr_auto] items-center">
-                                                                <Tooltip>
-                                                                    <TooltipTrigger
-                                                                        asChild
-                                                                    >
-                                                                        <p className="whitespace-nowrap px-2">
-                                                                            Stikstof
-                                                                        </p>
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent>
-                                                                        <p>
-                                                                            Werkzame
-                                                                            stikstof
-                                                                        </p>
-                                                                    </TooltipContent>
-                                                                </Tooltip>
-                                                                <span className="text-right whitespace-nowrap px-2">
-                                                                    {Math.round(
+                                                        <div className="flex flex-col space-y-4 min-w-0">
+                                                            <div className="space-y-1.5 min-w-0">
+                                                                <div className="flex justify-between items-center gap-2">
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger
+                                                                            asChild
+                                                                        >
+                                                                            <p className="truncate text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                                                                                Stikstof
+                                                                            </p>
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent>
+                                                                            <p>
+                                                                                Werkzame
+                                                                                stikstof
+                                                                            </p>
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                    <span className="text-right text-xs font-bold whitespace-nowrap shrink-0">
+                                                                        {Math.round(
+                                                                            dose.p_dose_n,
+                                                                        )}{" "}
+                                                                        /{" "}
+                                                                        {Math.round(
+                                                                            resolvedNutrientAdvice.d_n_req,
+                                                                        )}{" "}
+                                                                        kg N
+                                                                    </span>
+                                                                </div>
+                                                                <Progress
+                                                                    key={`n-${dose.p_dose_n}`}
+                                                                    value={
+                                                                        (dose.p_dose_n /
+                                                                            resolvedNutrientAdvice.d_n_req) *
+                                                                        100
+                                                                    }
+                                                                    colorBar={getAdviceProgressColor(
                                                                         dose.p_dose_n,
-                                                                    )}{" "}
-                                                                    /{" "}
-                                                                    {Math.round(
                                                                         resolvedNutrientAdvice.d_n_req,
-                                                                    )}{" "}
-                                                                    kg N
-                                                                </span>
+                                                                    )}
+                                                                    className="h-2"
+                                                                />
                                                             </div>
-                                                            <Progress
-                                                                key={`n-${dose.p_dose_n}`}
-                                                                value={
-                                                                    (dose.p_dose_n /
-                                                                        resolvedNutrientAdvice.d_n_req) *
-                                                                    100
-                                                                }
-                                                                colorBar={getAdviceProgressColor(
-                                                                    dose.p_dose_n,
-                                                                    resolvedNutrientAdvice.d_n_req,
-                                                                )}
-                                                                className="h-2"
-                                                            />
 
-                                                            <div className="grid grid-cols-[1fr_auto] items-center">
-                                                                <p className="whitespace-nowrap px-2">
-                                                                    Fosfaat
-                                                                </p>
-                                                                <span className="text-right whitespace-nowrap px-2">
-                                                                    {Math.round(
+                                                            <div className="space-y-1.5 min-w-0">
+                                                                <div className="flex justify-between items-center gap-2">
+                                                                    <p className="truncate text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                                                                        Fosfaat
+                                                                    </p>
+                                                                    <span className="text-right text-xs font-bold whitespace-nowrap shrink-0">
+                                                                        {Math.round(
+                                                                            dose.p_dose_p,
+                                                                        )}{" "}
+                                                                        /{" "}
+                                                                        {Math.round(
+                                                                            resolvedNutrientAdvice.d_p_req,
+                                                                        )}{" "}
+                                                                        kg P₂O₅
+                                                                    </span>
+                                                                </div>
+                                                                <Progress
+                                                                    key={`p-${dose.p_dose_p}`}
+                                                                    value={
+                                                                        (dose.p_dose_p /
+                                                                            resolvedNutrientAdvice.d_p_req) *
+                                                                        100
+                                                                    }
+                                                                    colorBar={getAdviceProgressColor(
                                                                         dose.p_dose_p,
-                                                                    )}{" "}
-                                                                    /{" "}
-                                                                    {Math.round(
                                                                         resolvedNutrientAdvice.d_p_req,
-                                                                    )}{" "}
-                                                                    kg P₂O₅
-                                                                </span>
+                                                                    )}
+                                                                    className="h-2"
+                                                                />
                                                             </div>
-                                                            <Progress
-                                                                key={`p-${dose.p_dose_p}`}
-                                                                value={
-                                                                    (dose.p_dose_p /
-                                                                        resolvedNutrientAdvice.d_p_req) *
-                                                                    100
-                                                                }
-                                                                colorBar={getAdviceProgressColor(
-                                                                    dose.p_dose_p,
-                                                                    resolvedNutrientAdvice.d_p_req,
-                                                                )}
-                                                                className="h-2"
-                                                            />
 
-                                                            <div className="grid grid-cols-[1fr_auto] items-center">
-                                                                <p className="whitespace-nowrap px-2">
-                                                                    Kalium
-                                                                </p>
-                                                                <span className="text-right whitespace-nowrap px-2">
-                                                                    {Math.round(
+                                                            <div className="space-y-1.5 min-w-0">
+                                                                <div className="flex justify-between items-center gap-2">
+                                                                    <p className="truncate text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                                                                        Kalium
+                                                                    </p>
+                                                                    <span className="text-right text-xs font-bold whitespace-nowrap shrink-0">
+                                                                        {Math.round(
+                                                                            dose.p_dose_k,
+                                                                        )}{" "}
+                                                                        /{" "}
+                                                                        {Math.round(
+                                                                            resolvedNutrientAdvice.d_k_req,
+                                                                        )}{" "}
+                                                                        kg K₂O
+                                                                    </span>
+                                                                </div>
+                                                                <Progress
+                                                                    key={`k-${dose.p_dose_k}`}
+                                                                    value={
+                                                                        (dose.p_dose_k /
+                                                                            resolvedNutrientAdvice.d_k_req) *
+                                                                        100
+                                                                    }
+                                                                    colorBar={getAdviceProgressColor(
                                                                         dose.p_dose_k,
-                                                                    )}{" "}
-                                                                    /{" "}
-                                                                    {Math.round(
                                                                         resolvedNutrientAdvice.d_k_req,
-                                                                    )}{" "}
-                                                                    kg K₂O
-                                                                </span>
+                                                                    )}
+                                                                    className="h-2"
+                                                                />
                                                             </div>
-                                                            <Progress
-                                                                key={`k-${dose.p_dose_k}`}
-                                                                value={
-                                                                    (dose.p_dose_k /
-                                                                        resolvedNutrientAdvice.d_k_req) *
-                                                                    100
-                                                                }
-                                                                colorBar={getAdviceProgressColor(
-                                                                    dose.p_dose_k,
-                                                                    resolvedNutrientAdvice.d_k_req,
-                                                                )}
-                                                                className="h-2"
-                                                            />
                                                         </div>
                                                     )
                                                 }}
@@ -640,105 +659,120 @@ export function FertilizerApplicationMetricsCard({
 }
 
 const NormsSkeleton = () => (
-    <div className="flex flex-col space-y-2">
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Stikstof</p>
-            <span className="text-right whitespace-nowrap px-2">
-                {<Spinner className="h-3" />} kg N
-            </span>
+    <div className="flex flex-col space-y-4">
+        <div className="space-y-1.5">
+            <div className="flex justify-between items-center gap-2">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                    Stikstof
+                </p>
+                <span className="text-right text-xs font-bold whitespace-nowrap">
+                    {<Spinner className="h-3" />} kg N
+                </span>
+            </div>
+            <Skeleton className="h-2 w-full" />
         </div>
-        <Skeleton className="h-2 w-full" />
 
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Fosfaat</p>
-            <span className="text-right whitespace-nowrap px-2">
-                {<Spinner className="h-3" />} kg P₂O₅
-            </span>
+        <div className="space-y-1.5">
+            <div className="flex justify-between items-center gap-2">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                    Fosfaat
+                </p>
+                <span className="text-right text-xs font-bold whitespace-nowrap">
+                    {<Spinner className="h-3" />} kg P₂O₅
+                </span>
+            </div>
+            <Skeleton className="h-2 w-full" />
         </div>
-        <Skeleton className="h-2 w-full" />
 
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Dierlijke mest</p>
-            <span className="text-right whitespace-nowrap px-2">
-                {<Spinner className="h-3" />} kg N
-            </span>
+        <div className="space-y-1.5">
+            <div className="flex justify-between items-center gap-2">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                    Dierlijk
+                </p>
+                <span className="text-right text-xs font-bold whitespace-nowrap">
+                    {<Spinner className="h-3" />} kg N
+                </span>
+            </div>
+            <Skeleton className="h-2 w-full" />
         </div>
-        <Skeleton className="h-2 w-full" />
     </div>
 )
 const NitrogenBalanceSkeleton = () => (
-    <div className="flex flex-col space-y-2">
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Aanvoer</p>
-            <span className="font-semibold text-right whitespace-nowrap px-2">
-                <Spinner />
+    <div className="flex flex-col space-y-1.5 min-w-0">
+        <div className="flex justify-between items-center gap-2 min-w-0">
+            <p className="truncate text-xs text-muted-foreground">Aanvoer</p>
+            <span className="text-right text-xs font-medium whitespace-nowrap shrink-0">
+                <Spinner className="h-3" /> kg N
             </span>
         </div>
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Afvoer</p>
-            <span className="font-semibold text-right whitespace-nowrap px-2">
-                <Spinner />
+        <div className="flex justify-between items-center gap-2 min-w-0">
+            <p className="truncate text-xs text-muted-foreground">Afvoer</p>
+            <span className="text-right text-xs font-medium whitespace-nowrap shrink-0">
+                <Spinner className="h-3" /> kg N
             </span>
         </div>
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Emissie</p>
-            <span className="font-semibold text-right whitespace-nowrap px-2">
-                <Spinner />
+        <div className="flex justify-between items-center gap-2 min-w-0">
+            <p className="truncate text-xs text-muted-foreground">Emissie</p>
+            <span className="text-right text-xs font-medium whitespace-nowrap shrink-0">
+                <Spinner className="h-3" /> kg N
             </span>
         </div>
-        <ItemSeparator className="col-span-2" />
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="text-xl font-bold whitespace-nowrap px-2">Balans</p>
-            <span className="text-xl font-bold text-right whitespace-nowrap px-2">
-                <Spinner />
-            </span>
-        </div>
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Streefwaarde</p>
-            <span className="font-semibold text-right whitespace-nowrap px-2">
-                <Spinner />
-            </span>
-        </div>
-        <ItemSeparator className="col-span-2" />{" "}
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="text-xl font-bold whitespace-nowrap px-2 invisible">
-                Opgave
+        <ItemSeparator className="my-1 opacity-50" />
+        <div className="flex justify-between items-center gap-2 min-w-0">
+            <p className="text-sm font-bold truncate text-primary uppercase tracking-tight">
+                Balans
             </p>
-            <span
-                className={
-                    "text-xl font-bold text-right whitespace-nowrap px-2"
-                }
-            >
-                <Spinner />
+            <span className="text-base font-black text-right whitespace-nowrap shrink-0">
+                <Spinner className="h-4" /> kg N
+            </span>
+        </div>
+        <div className="flex justify-between items-center gap-2 min-w-0">
+            <p className="truncate text-[10px] text-muted-foreground">
+                Streefwaarde
+            </p>
+            <span className="text-right text-[10px] font-medium whitespace-nowrap shrink-0">
+                <Spinner className="h-3" /> kg N
             </span>
         </div>
     </div>
 )
 
 const NutrientAdviceSkeleton = () => (
-    <div className="flex flex-col space-y-2">
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Stikstof</p>
-            <span className="text-right px-2">
-                {<Spinner className="h-3" />} kg N
-            </span>
+    <div className="flex flex-col space-y-4">
+        <div className="space-y-1.5">
+            <div className="flex justify-between items-center gap-2">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                    Stikstof
+                </p>
+                <span className="text-right text-xs font-bold whitespace-nowrap">
+                    {<Spinner className="h-3" />} kg N
+                </span>
+            </div>
+            <Skeleton className="h-2 w-full" />
         </div>
-        <Skeleton className="h-2 w-full" />
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Fosfaat</p>
-            <span className="text-right px-2">
-                {<Spinner className="h-4" />} kg P₂O₅
-            </span>
+        <div className="space-y-1.5">
+            <div className="flex justify-between items-center gap-2">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                    Fosfaat
+                </p>
+                <span className="text-right text-xs font-bold whitespace-nowrap">
+                    {<Spinner className="h-4" />} kg P₂O₅
+                </span>
+            </div>
+            <Skeleton className="h-2 w-full" />
         </div>
-        <Skeleton className="h-2 w-full" />
 
-        <div className="grid grid-cols-[1fr_auto] items-center">
-            <p className="whitespace-nowrap px-2">Kalium</p>
-            <span className="text-right px-2">
-                {<Spinner className="h-4" />}
-                kg K₂O
-            </span>
+        <div className="space-y-1.5">
+            <div className="flex justify-between items-center gap-2">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                    Kalium
+                </p>
+                <span className="text-right text-xs font-bold whitespace-nowrap">
+                    {<Spinner className="h-4" />}
+                    kg K₂O
+                </span>
+            </div>
+            <Skeleton className="h-2 w-full" />
         </div>
-        <Skeleton className="h-2 w-full" />
     </div>
 )

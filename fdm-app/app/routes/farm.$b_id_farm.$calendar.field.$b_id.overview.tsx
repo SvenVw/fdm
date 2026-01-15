@@ -31,7 +31,13 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import { Separator } from "~/components/ui/separator"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
@@ -137,141 +143,157 @@ export default function FarmFieldsOverviewBlock() {
     }, [loaderData, form.reset])
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h3 className="text-lg font-medium">Overzicht</h3>
-                <p className="text-sm text-muted-foreground">
-                    Werk de gegevens bij van dit perceel
-                </p>
-            </div>
-            <Separator />
-            <RemixFormProvider {...form}>
-                <Form
-                    id="formFieldOverview"
-                    onSubmit={form.handleSubmit}
-                    method="post"
-                >
-                    <fieldset disabled={form.formState.isSubmitting}>
-                        <div className="grid grid-cols-2 w-full gap-4">
-                            <Controller
-                                control={form.control}
-                                name="b_name"
-                                render={({ field, fieldState }) => (
-                                    <Field
-                                        data-invalid={fieldState.invalid}
-                                        className="col-span-2"
-                                    >
-                                        <FieldLabel>Perceelsnaam</FieldLabel>
-                                        <Input
-                                            placeholder="bv. Achter het erf"
-                                            {...field}
-                                            required
-                                        />
-                                        <FieldError
-                                            errors={[fieldState.error]}
-                                        />
-                                    </Field>
-                                )}
-                            />
-                            <Controller
-                                control={form.control}
-                                name="b_acquiring_method"
-                                render={({ field, fieldState }) => (
-                                    <Field
-                                        data-invalid={fieldState.invalid}
-                                        className="col-span-1"
-                                    >
-                                        <FieldLabel>
-                                            Is perceel in eigendom of pacht?
-                                        </FieldLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            value={field.value}
+        <Card>
+            <CardHeader>
+                <CardTitle>Overzicht</CardTitle>
+                <CardDescription>
+                    Beheer de algemene gegevens van dit perceel
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <RemixFormProvider {...form}>
+                    <Form
+                        id="formFieldOverview"
+                        onSubmit={form.handleSubmit}
+                        method="post"
+                    >
+                        <fieldset disabled={form.formState.isSubmitting}>
+                            <div className="grid grid-cols-1 xl:grid-cols-2 w-full gap-6">
+                                <Controller
+                                    control={form.control}
+                                    name="b_name"
+                                    render={({ field, fieldState }) => (
+                                        <Field
+                                            data-invalid={fieldState.invalid}
+                                            className="col-span-1 xl:col-span-2"
                                         >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Selecteer of het perceel in eigendom is of gepacht" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {loaderData.acquiringMethodOptions.map(
-                                                    (option) => (
-                                                        <SelectItem
-                                                            key={option.value}
-                                                            value={option.value}
-                                                        >
-                                                            {option.label}
-                                                        </SelectItem>
-                                                    ),
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                        <FieldError
-                                            errors={[fieldState.error]}
-                                        />
-                                    </Field>
-                                )}
-                            />
-                            <Controller
-                                control={form.control}
-                                name="b_bufferstrip"
-                                render={({ field }) => (
-                                    <div className="col-span-1 flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
-                                        <div className="space-y-0.5">
-                                            <FieldLabel className="text-base">
-                                                Bufferstrook
+                                            <FieldLabel>
+                                                Perceelsnaam
                                             </FieldLabel>
-                                            <p className="text-sm text-muted-foreground">
-                                                Is dit perceel een bufferstrook?{" "}
-                                            </p>
+                                            <Input
+                                                placeholder="bv. Achter het erf"
+                                                {...field}
+                                                required
+                                            />
+                                            <FieldError
+                                                errors={[fieldState.error]}
+                                            />
+                                        </Field>
+                                    )}
+                                />
+                                <Controller
+                                    control={form.control}
+                                    name="b_acquiring_method"
+                                    render={({ field, fieldState }) => (
+                                        <Field
+                                            data-invalid={fieldState.invalid}
+                                            className="col-span-1"
+                                        >
+                                            <FieldLabel>
+                                                Eigendom of pacht?
+                                            </FieldLabel>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                value={field.value}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Maak een keuze..." />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {loaderData.acquiringMethodOptions.map(
+                                                        (option) => (
+                                                            <SelectItem
+                                                                key={
+                                                                    option.value
+                                                                }
+                                                                value={
+                                                                    option.value
+                                                                }
+                                                            >
+                                                                {option.label}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
+                                                </SelectContent>
+                                            </Select>
+                                            <FieldError
+                                                errors={[fieldState.error]}
+                                            />
+                                        </Field>
+                                    )}
+                                />
+                                <Controller
+                                    control={form.control}
+                                    name="b_bufferstrip"
+                                    render={({ field }) => (
+                                        <div className="col-span-1 flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm gap-4">
+                                            <div className="space-y-0.5 min-w-0">
+                                                <FieldLabel
+                                                    className="text-base cursor-pointer"
+                                                    htmlFor="b_bufferstrip"
+                                                >
+                                                    Bufferstrook
+                                                </FieldLabel>
+                                                <p className="text-sm text-muted-foreground break-words">
+                                                    Is dit perceel een
+                                                    bufferstrook?{" "}
+                                                </p>
+                                            </div>
+                                            <div className="flex-shrink-0">
+                                                <Switch
+                                                    id="b_bufferstrip"
+                                                    checked={field.value}
+                                                    onCheckedChange={field.onChange}
+                                                />
+                                            </div>
                                         </div>
-                                        <Switch
-                                            checked={field.value}
-                                            onCheckedChange={field.onChange}
+                                    )}
+                                />
+                                <Controller
+                                    control={form.control}
+                                    name="b_start"
+                                    render={({ field, fieldState }) => (
+                                        <DatePicker
+                                            label="Vanaf wanneer in gebruik?"
+                                            field={field}
+                                            fieldState={fieldState}
+                                            className="col-span-1"
                                         />
-                                    </div>
+                                    )}
+                                />
+                                <Controller
+                                    control={form.control}
+                                    name="b_end"
+                                    render={({ field, fieldState }) => (
+                                        <DatePicker
+                                            label="Tot wanneer in gebruik?"
+                                            description="Optioneel"
+                                            field={field}
+                                            fieldState={fieldState}
+                                            className="col-span-1"
+                                        />
+                                    )}
+                                />
+                            </div>
+                        </fieldset>
+
+                        <div className="flex justify-end pt-6">
+                            <Button
+                                type="submit"
+                                disabled={form.formState.isSubmitting}
+                                className={cn(
+                                    !loaderData.fieldWritePermission &&
+                                        "invisible",
                                 )}
-                            />
-                            <Controller
-                                control={form.control}
-                                name="b_start"
-                                render={({ field, fieldState }) => (
-                                    <DatePicker
-                                        label="Vanaf wanneer in gebruik?"
-                                        field={field}
-                                        fieldState={fieldState}
-                                    />
-                                )}
-                            />
-                            <Controller
-                                control={form.control}
-                                name="b_end"
-                                render={({ field, fieldState }) => (
-                                    <DatePicker
-                                        label="Tot wanneer in gebruik?"
-                                        description="Optioneel"
-                                        field={field}
-                                        fieldState={fieldState}
-                                    />
-                                )}
-                            />
+                            >
+                                {form.formState.isSubmitting && <Spinner />}
+                                Bijwerken
+                            </Button>
                         </div>
-                    </fieldset>
-                    <br />
-                    <div className="ml-auto">
-                        <Button
-                            type="submit"
-                            disabled={form.formState.isSubmitting}
-                            className={cn(
-                                "m-auto",
-                                !loaderData.fieldWritePermission && "invisible",
-                            )}
-                        >
-                            {form.formState.isSubmitting && <Spinner />}
-                            Bijwerken
-                        </Button>
-                    </div>
-                </Form>
-            </RemixFormProvider>
-        </div>
+                    </Form>
+                </RemixFormProvider>
+            </CardContent>
+        </Card>
     )
 }
 
