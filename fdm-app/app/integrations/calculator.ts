@@ -106,13 +106,8 @@ export async function getNorms({
     fdm: FdmType
     principal_id: PrincipalId
     b_id: Field.b_id
-    calendar: string
+    calendar: "2025" | "2026"
 }) {
-    // Currently only 2025 and 2026 are supported
-    if (calendar !== "2025" && calendar !== "2026") {
-        return null
-    }
-
     const functionsForNorms = createFunctionsForNorms("NL", calendar)
     const functionsForFilling = createFunctionsForFertilizerApplicationFilling(
         "NL",
