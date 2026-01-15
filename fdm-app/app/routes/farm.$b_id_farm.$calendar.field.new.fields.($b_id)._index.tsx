@@ -124,7 +124,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const b_id = params.b_id
         let fieldIds: string[] = b_id ? [b_id] : []
         const fieldIdsParam = url.searchParams.get("fieldIds")
-        if (fieldIdsParam) fieldIds = fieldIdsParam.split(",")
+        if (fieldIdsParam && fieldIdsParam.length > 0)
+            fieldIds = fieldIdsParam.split(",")
         if (!b_id) {
             if (fieldIds.length === 0) {
                 // Redirect to the fields table if no field can be shown at all.
@@ -138,7 +139,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
-        const timeframe = await getTimeframe(params)
+        const timeframe = getTimeframe(params)
 
         // Get the field data
         const field = await getField(fdm, session.principal_id, b_id)
@@ -526,11 +527,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     undefined,
                     undefined,
                 )
-
-                return dataWithSuccess("fields have been updated", {
-                    message: `${formValues.b_name} is bijgewerkt! 🎉`,
-                })
             }
+
+            return dataWithSuccess("fields have been updated", {
+                message: `${formValues.b_name} is bijgewerkt! 🎉`,
+            })
+            // biome-ignore lint/style/noUselessElse: for low maintenance
         } else if (request.method === "DELETE") {
             // Delete field
             const field = await getField(fdm, session.principal_id, b_id)
@@ -546,9 +548,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     message: `${field.b_name} is verwijderd! 🎉`,
                 },
             )
-        } else {
-            throw new Error("invalid method")
         }
+
+        throw new Error("invalid method")
     } catch (error) {
         throw handleActionError(error)
     }
