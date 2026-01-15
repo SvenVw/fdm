@@ -38,7 +38,9 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
 
             return (
                 <p className="text-muted-foreground whitespace-nowrap">
-                    {`${format(firstDate, "PP", { locale: nl })} - ${format(lastDate, "PP", { locale: nl })}`}
+                    {firstDate.getTime() === lastDate.getTime()
+                        ? `${format(firstDate, "PP", { locale: nl })}`
+                        : `${format(firstDate, "PP", { locale: nl })} - ${format(lastDate, "PP", { locale: nl })}`}
                 </p>
             )
         }
@@ -68,7 +70,12 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
                 <div className="flex items-start flex-col space-y-2">
                     {harvestsByOrder.map((harvestDates, idx) => {
                         // harvestDates are already sorted from the previous loop
-                        if (harvestDates.length === 1) {
+                        const firstDate = harvestDates[0]
+                        const lastDate = harvestDates[harvestDates.length - 1]
+                        if (
+                            harvestDates.length === 1 ||
+                            firstDate.getTime() === lastDate.getTime()
+                        ) {
                             return (
                                 <p
                                     key={idx}
@@ -76,14 +83,12 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
                                 >
                                     {`${idx + 1}e ${cultivation.b_lu_croprotation === "grass" ? "snede" : "oogst"}:`}
                                     <br />
-                                    {format(harvestDates[0], "PP", {
+                                    {format(firstDate, "PP", {
                                         locale: nl,
                                     })}
                                 </p>
                             )
                         }
-                        const firstDate = harvestDates[0]
-                        const lastDate = harvestDates[harvestDates.length - 1]
                         return (
                             <p
                                 key={idx}
