@@ -124,10 +124,12 @@ export function TableVarietySelector({
     name,
     row,
     cellId,
+    canModify,
 }: {
     name: keyof AllowedFormSchemaType
     row: Row<RotationExtended>
     cellId: string
+    canModify: boolean
 }) {
     const activeTableFormStore = useActiveTableFormStore()
     const fetcher = useFetcher()
@@ -137,16 +139,20 @@ export function TableVarietySelector({
     ).b_lu_variety_options
 
     function renderText() {
-        return !b_lu_variety_options?.length
-            ? ""
-            : !value?.length
-              ? "niet aangegeven"
-              : value.length <= 5
-                ? value.join(", ")
-                : `${value.slice(0, 5).join(", ")} en meer`
+        return (
+            <span className="text-muted-foreground">
+                {!b_lu_variety_options?.length
+                    ? ""
+                    : !value?.length
+                      ? "niet aangegeven"
+                      : value.length <= 5
+                        ? value.join(", ")
+                        : `${value.slice(0, 5).join(", ")} en meer`}
+            </span>
+        )
     }
 
-    if (!b_lu_variety_options?.length) {
+    if (!canModify || !b_lu_variety_options?.length) {
         return renderText()
     }
 

@@ -246,6 +246,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
                 name="b_lu_variety"
                 row={row}
                 cellId={cell.id}
+                canModify={row.original.canModify}
             />
         ),
     },
