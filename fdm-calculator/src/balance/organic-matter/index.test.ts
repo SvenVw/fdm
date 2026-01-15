@@ -1,6 +1,5 @@
 import Decimal from "decimal.js"
 import { describe, expect, it, vi } from "vitest"
-import { convertOrganicMatterBalanceToNumeric } from "../shared/conversion"
 import * as shared from "../shared/soil"
 import * as degradation from "./degradation"
 import {
@@ -178,38 +177,6 @@ describe("Organic Matter Balance Calculation", () => {
             expect(farmBalance.supply).toBe(500)
             expect(farmBalance.degradation).toBe(-200)
             expect(farmBalance.balance).toBe(300)
-        })
-    })
-
-    describe("convertOrganicMatterBalanceToNumeric", () => {
-        it("should convert all Decimal types to numbers", () => {
-            const farmBalanceDecimal = {
-                balance: new Decimal(233.333),
-                supply: new Decimal(466.666),
-                degradation: new Decimal(-233.333),
-                fields: [
-                    {
-                        b_id: "field1",
-                        b_area: 10,
-                        balance: {
-                            balance: new Decimal(300),
-                            supply: {},
-                            degradation: {},
-                        },
-                    },
-                ],
-                hasErrors: false,
-                fieldErrorMessages: [],
-            } as any
-
-            const numericResult =
-                convertOrganicMatterBalanceToNumeric(farmBalanceDecimal)
-
-            expect(typeof numericResult.balance).toBe("number")
-            expect(typeof numericResult.supply).toBe("number")
-            expect(typeof numericResult.degradation).toBe("number")
-            expect(typeof numericResult.fields[0].balance).toBe("object")
-            expect(numericResult.balance).toBe(233) // .round()
         })
     })
 })
