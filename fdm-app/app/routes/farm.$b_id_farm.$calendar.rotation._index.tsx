@@ -239,6 +239,14 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
         type FieldsExtended = typeof fieldsExtended
 
+        const collectUniqueDates = (dates: (Date | null | undefined)[]) => {
+            return [
+                ...new Set(
+                    dates.flatMap((date) => (date ? [date.getTime()] : [])),
+                ),
+            ].map((timestamp) => new Date(timestamp))
+        }
+
         const transformFieldsToRotationExtended = (
             fieldsExtended: FieldsExtended, // TODO: Define a proper type for fieldsExtended
             _cultivationCatalogue: CultivationCatalogue[],
@@ -275,27 +283,16 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                 )
 
                 // Get all unique b_lu_start of cultivation
-                const b_lu_start = [
-                    ...new Set(
-                        cultivationsForCatalogue
-                            .filter(
-                                (cultivation) => cultivation.b_lu_start != null,
-                            )
-                            .map((cultivation) =>
-                                (cultivation.b_lu_start as Date).getTime(),
-                            ),
-                    ),
-                ].map((timestamp) => new Date(timestamp))
-
-                const b_lu_end = [
-                    ...new Set(
-                        cultivationsForCatalogue
-                            .filter((cultivation) => cultivation.b_lu_end)
-                            .map((cultivation) =>
-                                (cultivation.b_lu_end as Date).getTime(),
-                            ),
-                    ),
-                ].map((timestamp) => new Date(timestamp))
+                const b_lu_start = collectUniqueDates(
+                    cultivationsForCatalogue
+                        .filter((cultivation) => cultivation.b_lu_start != null)
+                        .map((cultivation) => cultivation.b_lu_start),
+                )
+                const b_lu_end = collectUniqueDates(
+                    cultivationsForCatalogue
+                        .filter((cultivation) => cultivation.b_lu_end)
+                        .map((cultivation) => cultivation.b_lu_end),
+                )
 
                 const b_lu = cultivationsForCatalogue.map(
                     (cultivation: { b_lu: string }) => cultivation.b_lu,
@@ -381,27 +378,25 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                         b_isproductive: field.b_isproductive,
                         a_som_loi: field.a_som_loi ?? 0,
                         b_soiltype_agr: field.b_soiltype_agr ?? "",
-                        b_lu_start: field.cultivations
-                            .filter(
-                                (cultivation) =>
-                                    cultivation.b_lu_catalogue ===
-                                        b_lu_catalogue &&
-                                    cultivation.b_lu_start,
-                            )
-                            .map(
-                                (cultivation) => cultivation.b_lu_start as Date,
-                            ),
-                        b_lu_end: field.cultivations
-                            .filter(
-                                (cultivation) =>
-                                    cultivation.b_lu_catalogue ===
-                                    b_lu_catalogue,
-                            )
-                            .flatMap((cultivation) =>
-                                cultivation.b_lu_end
-                                    ? [cultivation.b_lu_end]
-                                    : [],
-                            ),
+                        b_lu_start: collectUniqueDates(
+                            field.cultivations
+                                .filter(
+                                    (cultivation) =>
+                                        cultivation.b_lu_catalogue ===
+                                            b_lu_catalogue &&
+                                        cultivation.b_lu_start,
+                                )
+                                .map((cultivation) => cultivation.b_lu_start),
+                        ),
+                        b_lu_end: collectUniqueDates(
+                            field.cultivations
+                                .filter(
+                                    (cultivation) =>
+                                        cultivation.b_lu_catalogue ===
+                                        b_lu_catalogue,
+                                )
+                                .map((cultivation) => cultivation.b_lu_end),
+                        ),
                         b_lu_harvest_date: field.harvests
                             .filter((harvest: { b_lu: string }) =>
                                 b_lu.includes(harvest.b_lu),
