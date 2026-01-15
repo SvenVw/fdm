@@ -55,7 +55,7 @@ interface FertilizerApplicationMetricsData {
             phosphate: NormFilling
             nitrogen: NormFilling
         }
-    }>
+    } | null>
     nitrogenBalance: Promise<NitrogenBalanceNumeric> | undefined
     nutrientAdvice: NutrientAdvice
     dose: Dose
@@ -163,7 +163,15 @@ export function FertilizerApplicationMetricsCard({
                                                 }
                                                 resolve={norms}
                                             >
-                                                {(resolvedNorms) => (
+                                                {(resolvedNorms) => {
+                                                    if (!resolvedNorms) {
+                                                        return (
+                                                            <div className="text-sm text-muted-foreground">
+                                                                Geen gebruiksnormen beschikbaar voor dit jaar.
+                                                            </div>
+                                                        )
+                                                    }
+                                                    return (
                                                     <div className="flex flex-col space-y-2">
                                                         <div className="grid grid-cols-[1fr_auto] items-center">
                                                             <Tooltip>
@@ -330,7 +338,7 @@ export function FertilizerApplicationMetricsCard({
                                                             className="h-2"
                                                         />
                                                     </div>
-                                                )}
+                                                )}}
                                             </Await>
                                         </Suspense>
                                     )}

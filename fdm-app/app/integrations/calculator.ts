@@ -101,15 +101,17 @@ export async function getNorms({
     fdm,
     principal_id,
     b_id,
+    calendar,
 }: {
     fdm: FdmType
     principal_id: PrincipalId
     b_id: Field.b_id
+    calendar: "2025" | "2026"
 }) {
-    const functionsForNorms = createFunctionsForNorms("NL", "2025")
+    const functionsForNorms = createFunctionsForNorms("NL", calendar)
     const functionsForFilling = createFunctionsForFertilizerApplicationFilling(
         "NL",
-        "2025",
+        calendar,
     )
 
     const normsInput = await functionsForNorms.collectInputForNorms(
