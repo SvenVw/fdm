@@ -705,7 +705,7 @@ export async function getCultivations(
  *       b_id: string;        // Unique ID of the field
  *       b_name: string;      // Name of the field
  *       b_area: number;      // Area of the field
- *       b_isproductive: boolean; // Whether the field is productive
+ *       b_bufferstrip: boolean; // Whether the field is a bufferstrip
  *       fertilizer_applications: [
  *         {
  *           p_id_catalogue: string; // Fertilizer catalogue ID
