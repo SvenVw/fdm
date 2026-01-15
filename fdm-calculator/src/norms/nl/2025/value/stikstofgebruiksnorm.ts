@@ -468,19 +468,14 @@ function calculateKorting(
         // Check if transition happens in 2025
         if (prevCult.b_lu_end.getFullYear() !== currentYear) continue
 
-        const prevStandard = nitrogenStandardsData.find((ns) =>
-            ns.b_lu_catalogue_match.includes(prevCult.b_lu_catalogue),
-        )
         const currStandard = nitrogenStandardsData.find((ns) =>
             ns.b_lu_catalogue_match.includes(currCult.b_lu_catalogue),
         )
 
         // 1. Grassland Renewal (Gras-na-Gras) -> 50 kg N/ha korting
         if (
-            (prevStandard?.type === "grasland" ||
-                prevStandard?.type === "grasland_tijdelijk") &&
-            (currStandard?.type === "grasland" ||
-                currStandard?.type === "grasland_tijdelijk")
+            nonBouwlandCodes.includes(prevCult.b_lu_catalogue) &&
+            nonBouwlandCodes.includes(currCult.b_lu_catalogue)
         ) {
             const renewalDate = prevCult.b_lu_end
             let isValidRenewal = false
@@ -558,8 +553,7 @@ function calculateKorting(
             currStandard?.cultivation_rvo_table2.includes("uitgroeiteelt")
 
         if (
-            (prevStandard?.type === "grasland" ||
-                prevStandard?.type === "grasland_tijdelijk") &&
+            nonBouwlandCodes.includes(prevCult.b_lu_catalogue) &&
             (isMaize || (isPotato && !isSeedPotato))
         ) {
             const destructionDate = prevCult.b_lu_end

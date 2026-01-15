@@ -387,12 +387,8 @@ function calculateKorting(
             ns.b_lu_catalogue_match.includes(currCult.b_lu_catalogue),
         )
 
-        const isPrevGrass =
-            prevStandard?.type === "grasland" ||
-            prevStandard?.type === "grasland_tijdelijk"
-        const isCurrGrass =
-            currStandard?.type === "grasland" ||
-            currStandard?.type === "grasland_tijdelijk"
+        const isPrevGrass = nonBouwlandCodes.includes(prevCult.b_lu_catalogue)
+        const isCurrGrass = nonBouwlandCodes.includes(currCult.b_lu_catalogue)
 
         // 1. Grassland Renewal (Gras-na-Gras) -> 50 kg N/ha korting
         // Only applies on Sand/Loess (already checked above)
