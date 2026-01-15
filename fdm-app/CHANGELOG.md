@@ -1,5 +1,16 @@
 # Changelog fdm-app
 
+## 0.26.6
+
+### Patch Changes
+
+- e7a369b: Fix a crash in the fertilizer metrics dashboard when no active cultivation is present for a field. Added an empty state with a call to action to add a cultivation.
+- 4a32710: Improve design of empty state at cultivations page of field
+- Updated dependencies [bc23b79]
+- Updated dependencies [3053340]
+- Updated dependencies [005de6d]
+  - @svenvw/fdm-calculator@0.10.1
+
 ## 0.26.5
 
 ### Patch Changes

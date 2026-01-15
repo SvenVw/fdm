@@ -867,7 +867,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     fdm,
                     session.principal_id,
                     fieldId,
-                    { start: new Date(0), end: new Date() }, // Get all cultivations for the field
                 )
 
                 const targetCultivationInstance = cultivationsForField.find(
@@ -914,7 +913,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 fdm,
                 session.principal_id,
                 fieldId,
-                { start: new Date(0), end: new Date() }, // Get all cultivations for the field
             )
 
             const targetCultivationInstance = cultivationsForField.find(
