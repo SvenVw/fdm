@@ -156,14 +156,15 @@ export function TableVarietySelector({
                 className={cn(
                     "block px-0 max-w-2xs h-auto whitespace-break-spaces",
                     !value?.length && "text-muted-foreground",
-                    showForm && "invisible",
                 )}
                 onClick={(e) => {
                     e.stopPropagation()
                     activeTableFormStore.setActiveForm(cellId)
                 }}
             >
-                {renderText()}
+                <span className={cn(showForm && "invisible")}>
+                    {renderText()}
+                </span>
             </Button>
             {showForm && (
                 <TableVarietySelectorForm
