@@ -22,13 +22,14 @@ function TableVarietySelectorForm({
     row,
     b_lu_variety_options,
     onHide,
+    fetcher,
 }: {
     name: keyof AllowedFormSchemaType
     row: Row<RotationExtended>
     b_lu_variety_options: { label: string; value: string }[]
     onHide?: () => unknown
+    fetcher: ReturnType<typeof useFetcher>
 }) {
-    const fetcher = useFetcher()
     const currentSortedValues = (
         Object.entries(row.original[name]) as [string, number][]
     )
@@ -42,7 +43,7 @@ function TableVarietySelectorForm({
     })
 
     return (
-        <div className="flex flex-row items-center">
+        <div className="absolute top-1/2 left-1/2 -translate-1/2 flex flex-row items-center">
             <RemixFormProvider {...form}>
                 <Controller
                     name={name as string}
@@ -126,6 +127,7 @@ export function TableVarietySelector({
     cellId: string
 }) {
     const activeTableFormStore = useActiveTableFormStore()
+    const fetcher = useFetcher()
     const value = row.original[name] ? Object.keys(row.original[name]) : null
     const b_lu_variety_options = (
         (row.getParentRow() ?? row).original as CropRow
@@ -141,38 +143,41 @@ export function TableVarietySelector({
                 : `${value.slice(0, 5).join(", ")} en meer`
     }
 
-    if (row.original.type === "crop" || !b_lu_variety_options?.length) {
+    if (!b_lu_variety_options?.length) {
         return renderText()
     }
 
-    if (activeTableFormStore.activeForm === cellId) {
-        return (
-            <TableVarietySelectorForm
-                name={name}
-                row={row}
-                b_lu_variety_options={b_lu_variety_options}
-                onHide={() => {
-                    const currentState = useActiveTableFormStore.getState()
-                    if (currentState.activeForm === cellId)
-                        currentState.clearActiveForm()
-                }}
-            />
-        )
-    }
-
+    const showForm =
+        fetcher.state !== "idle" || activeTableFormStore.activeForm === cellId
     return (
-        <Button
-            variant="link"
-            className={cn(
-                "block px-0 max-w-2xs h-auto whitespace-break-spaces",
-                !value?.length && "text-muted-foreground",
+        <div className="relative text-center">
+            <Button
+                variant="link"
+                className={cn(
+                    "block px-0 max-w-2xs h-auto whitespace-break-spaces",
+                    !value?.length && "text-muted-foreground",
+                    showForm && "invisible",
+                )}
+                onClick={(e) => {
+                    e.stopPropagation()
+                    activeTableFormStore.setActiveForm(cellId)
+                }}
+            >
+                {renderText()}
+            </Button>
+            {showForm && (
+                <TableVarietySelectorForm
+                    name={name}
+                    row={row}
+                    b_lu_variety_options={b_lu_variety_options}
+                    onHide={() => {
+                        const currentState = useActiveTableFormStore.getState()
+                        if (currentState.activeForm === cellId)
+                            currentState.clearActiveForm()
+                    }}
+                    fetcher={fetcher}
+                />
             )}
-            onClick={(e) => {
-                e.stopPropagation()
-                activeTableFormStore.setActiveForm(cellId)
-            }}
-        >
-            {renderText()}
-        </Button>
+        </div>
     )
 }
