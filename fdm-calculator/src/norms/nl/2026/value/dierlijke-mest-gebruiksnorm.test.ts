@@ -6,7 +6,7 @@ describe("calculateNL2026DierlijkeMestGebruiksNorm", () => {
     it("should return the default norm value", async () => {
         const input = {
             field: {
-                b_buffer: false,
+                b_bufferstrip: false,
             },
         } as NL2026NormsInput
         const result = await calculateNL2026DierlijkeMestGebruiksNorm(input)
@@ -17,7 +17,7 @@ describe("calculateNL2026DierlijkeMestGebruiksNorm", () => {
     it("should return 0 for buffer strips", async () => {
         const input = {
             field: {
-                b_buffer: true,
+                b_bufferstrip: true,
             },
         } as NL2026NormsInput
         const result = await calculateNL2026DierlijkeMestGebruiksNorm(input)

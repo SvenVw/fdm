@@ -53,14 +53,14 @@ export async function calculateNitrogenBalance(
                     return {
                         b_id: fieldInput.field.b_id,
                         b_area: fieldInput.field.b_area ?? 0,
-                        b_buffer: fieldInput.field.b_buffer ?? false,
+                        b_bufferstrip: fieldInput.field.b_bufferstrip ?? false,
                         balance,
                     }
                 } catch (error) {
                     return {
                         b_id: fieldInput.field.b_id,
                         b_area: fieldInput.field.b_area ?? 0,
-                        b_buffer: fieldInput.field.b_buffer ?? false,
+                        b_bufferstrip: fieldInput.field.b_bufferstrip ?? false,
                         errorMessage:
                             error instanceof Error
                                 ? error.message
@@ -123,7 +123,7 @@ export function calculateNitrogenBalanceField(
         throw new Error("Timeframe start and end dates must be provided.")
     }
 
-    if (field.b_buffer) {
+    if (field.b_bufferstrip) {
         return {
             b_id: field.b_id,
             balance: 0,
@@ -307,7 +307,7 @@ export function calculateNitrogenBalancesFieldToFarm(
     // Filter out fields that have errors for aggregation
     // Also filter out buffer strips as they should be ignored in the farm-level aggregation
     const successfulFieldBalances = fieldsWithBalanceResults.filter(
-        (result) => result.balance !== undefined && !result.b_buffer,
+        (result) => result.balance !== undefined && !result.b_bufferstrip,
     ) as (NitrogenBalanceFieldResultNumeric & {
         balance: NitrogenBalanceFieldNumeric
     })[]

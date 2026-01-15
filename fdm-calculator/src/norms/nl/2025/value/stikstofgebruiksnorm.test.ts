@@ -9,7 +9,8 @@ import {
 import type { NL2025NormsInput, NL2025NormsInputForCultivation } from "./types"
 
 vi.mock("../../../../shared/geotiff", async (importActual) => {
-    const actual = await importActual<typeof import("../../../../shared/geotiff")>()
+    const actual =
+        await importActual<typeof import("../../../../shared/geotiff")>()
     return {
         ...actual,
         getGeoTiffValue: vi.fn(actual.getGeoTiffValue),
@@ -96,7 +97,7 @@ describe(" calculateNL2025StikstofGebruiksNorm", () => {
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571],
-                b_buffer: true,
+                b_bufferstrip: true,
             } as Field,
             cultivations: [
                 {

@@ -119,7 +119,7 @@ describe("calculateNL2025DierlijkeMestGebruiksNorm", () => {
             field: {
                 b_id: "1",
                 b_centroid: [5.641351453912945, 51.97755938887036],
-                b_buffer: true,
+                b_bufferstrip: true,
             },
             cultivations: [],
             soilAnalysis: { a_p_cc: 0, a_p_al: 0 },

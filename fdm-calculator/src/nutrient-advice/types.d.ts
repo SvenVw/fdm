@@ -85,5 +85,5 @@ export type NutrientAdviceInputs = {
     /** NMI API key for authentication */
     nmiApiKey: string | undefined
     /** Indicates if the field is a buffer strip */
-    b_buffer?: boolean
+    b_bufferstrip?: boolean
 }

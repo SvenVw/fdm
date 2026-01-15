@@ -162,7 +162,7 @@ describe("requestNutrientAdvice", () => {
             b_centroid: [4.3, 52.4],
             currentSoilData: mockCurrentSoilData,
             nmiApiKey: "mock-api-key",
-            b_buffer: true,
+            b_bufferstrip: true,
         }
 
         const result = await requestNutrientAdvice(inputs)

@@ -54,7 +54,7 @@ describe("calculateNL2026StikstofGebruiksNorm", () => {
             field: {
                 b_id: "1",
                 b_centroid: [5.6279889, 51.975571],
-                b_buffer: true,
+                b_bufferstrip: true,
             } as Field,
             cultivations: [
                 {

@@ -1549,8 +1549,8 @@
                     "primaryKey": false,
                     "notNull": false
                 },
-                "b_buffer": {
-                    "name": "b_buffer",
+                "b_bufferstrip": {
+                    "name": "b_bufferstrip",
                     "type": "boolean",
                     "primaryKey": false,
                     "notNull": true,

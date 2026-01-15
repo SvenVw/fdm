@@ -65,7 +65,7 @@ describe("Organic Matter Balance Calculation", () => {
         it("should return zero balance for buffer strips", () => {
             const result = calculateOrganicMatterBalanceField({
                 fieldInput: {
-                    field: { ...mockField, b_buffer: true },
+                    field: { ...mockField, b_bufferstrip: true },
                     cultivations: mockCultivations,
                     fertilizerApplications: mockFertilizerApplications,
                     soilAnalyses: mockSoilAnalyses,
@@ -149,7 +149,7 @@ describe("Organic Matter Balance Calculation", () => {
                 {
                     b_id: "field1",
                     b_area: 10,
-                    b_buffer: false,
+                    b_bufferstrip: false,
                     balance: {
                         supply: { total: 500 },
                         degradation: { total: -200 },
@@ -159,7 +159,7 @@ describe("Organic Matter Balance Calculation", () => {
                 {
                     b_id: "buffer1",
                     b_area: 100,
-                    b_buffer: true,
+                    b_bufferstrip: true,
                     balance: {
                         supply: { total: 0 },
                         degradation: { total: 0 },

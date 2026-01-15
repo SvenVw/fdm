@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from "vitest"
-import { calculateNitrogenBalance, calculateNitrogenBalancesFieldToFarm } from "."
-import type { NitrogenBalanceInput, NitrogenBalanceFieldResultNumeric } from "./types"
+import {
+    calculateNitrogenBalance,
+    calculateNitrogenBalancesFieldToFarm,
+} from "."
+import type {
+    NitrogenBalanceInput,
+    NitrogenBalanceFieldResultNumeric,
+} from "./types"
 import type { FdmType } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 
@@ -10,7 +16,9 @@ const mockFdm = {
     from: vi.fn().mockReturnThis(),
     where: vi.fn().mockReturnThis(),
     limit: vi.fn().mockReturnThis(),
-    then: vi.fn((resolve) => resolve ? Promise.resolve(resolve([])) : Promise.resolve([])), // Simulate cache miss
+    then: vi.fn((resolve) =>
+        resolve ? Promise.resolve(resolve([])) : Promise.resolve([]),
+    ), // Simulate cache miss
     insert: vi.fn().mockReturnThis(),
     values: vi.fn().mockResolvedValue(undefined),
 } as unknown as FdmType
@@ -209,7 +217,7 @@ describe("calculateNitrogenBalance", () => {
                         b_area: 100,
                         b_start: new Date("2023-01-01"),
                         b_end: new Date("2023-12-31"),
-                        b_buffer: true,
+                        b_bufferstrip: true,
                     },
                     cultivations: [],
                     harvests: [],
@@ -244,7 +252,7 @@ describe("calculateNitrogenBalance", () => {
             {
                 b_id: "field1",
                 b_area: 10,
-                b_buffer: false,
+                b_bufferstrip: false,
                 balance: {
                     balance: 100,
                     supply: {
@@ -286,7 +294,7 @@ describe("calculateNitrogenBalance", () => {
             {
                 b_id: "buffer1",
                 b_area: 100,
-                b_buffer: true,
+                b_bufferstrip: true,
                 balance: {
                     balance: 0,
                     supply: {

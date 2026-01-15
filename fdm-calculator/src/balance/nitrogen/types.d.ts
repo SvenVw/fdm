@@ -471,7 +471,7 @@ export type SoilAnalysisPicked = Pick<
 export type FieldInput = {
     field: Pick<
         Field,
-        "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end" | "b_buffer"
+        "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end" | "b_bufferstrip"
     >
     cultivations: Pick<
         Cultivation,
@@ -673,7 +673,7 @@ export type NitrogenBalanceFieldNumeric = {
 export type NitrogenBalanceFieldResultNumeric = {
     b_id: string
     b_area: number
-    b_buffer: boolean
+    b_bufferstrip: boolean
     balance?: NitrogenBalanceFieldNumeric
     errorMessage?: string
 }

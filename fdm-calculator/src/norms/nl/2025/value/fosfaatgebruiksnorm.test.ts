@@ -47,7 +47,7 @@ describe("calculateNL2025FosfaatGebruiksNorm", () => {
             field: {
                 b_id: "1",
                 b_centroid: [5.0, 52.0],
-                b_buffer: true,
+                b_bufferstrip: true,
             },
             cultivations: [
                 {

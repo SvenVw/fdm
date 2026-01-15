@@ -53,7 +53,7 @@ export async function addField(
     b_start: schema.fieldAcquiringTypeInsert["b_start"],
     b_acquiring_method: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
     b_end?: schema.fieldDiscardingTypeInsert["b_end"],
-    b_buffer?: schema.fieldsTypeInsert["b_buffer"],
+    b_bufferstrip?: schema.fieldsTypeInsert["b_bufferstrip"],
 ): Promise<schema.fieldsTypeInsert["b_id"]> {
     try {
         await checkPermission(
@@ -75,7 +75,7 @@ export async function addField(
                 b_name: b_name,
                 b_id_source: b_id_source,
                 b_geometry: b_geometry,
-                b_buffer: b_buffer ?? false,
+                b_bufferstrip: b_bufferstrip ?? false,
             }
             await tx.insert(schema.fields).values(fieldData)
 
@@ -114,7 +114,7 @@ export async function addField(
             await tx.insert(schema.fieldDiscarding).values(fieldDiscardingData)
 
             // If buffer status is not provided try to determine
-            if (b_buffer === undefined) {
+            if (b_bufferstrip === undefined) {
                 const field = await tx
                     .select({
                         b_id: schema.fields.b_id,
@@ -136,7 +136,7 @@ export async function addField(
 
                     await tx
                         .update(schema.fields)
-                        .set({ b_buffer: isBuffer })
+                        .set({ b_bufferstrip: isBuffer })
                         .where(eq(schema.fields.b_id, b_id))
                 }
             }
@@ -152,7 +152,7 @@ export async function addField(
             b_start,
             b_acquiring_method,
             b_end,
-            b_buffer,
+            b_bufferstrip,
         })
     }
 }
@@ -194,7 +194,7 @@ export async function getField(
                 b_id_farm: schema.fieldAcquiring.b_id_farm,
                 b_id_source: schema.fields.b_id_source,
                 b_geometry: schema.fields.b_geometry,
-                b_buffer: schema.fields.b_buffer,
+                b_bufferstrip: schema.fields.b_bufferstrip,
                 b_centroid_x: sql<number>`ST_X(ST_Centroid(b_geometry))`,
                 b_centroid_y: sql<number>`ST_Y(ST_Centroid(b_geometry))`,
                 b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
@@ -303,7 +303,7 @@ export async function getFields(
                 b_id_farm: schema.fieldAcquiring.b_id_farm,
                 b_id_source: schema.fields.b_id_source,
                 b_geometry: schema.fields.b_geometry,
-                b_buffer: schema.fields.b_buffer,
+                b_bufferstrip: schema.fields.b_bufferstrip,
                 b_centroid_x: sql<number>`ST_X(ST_Centroid(b_geometry))`,
                 b_centroid_y: sql<number>`ST_Y(ST_Centroid(b_geometry))`,
                 b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
@@ -367,7 +367,7 @@ export async function updateField(
     b_start?: schema.fieldAcquiringTypeInsert["b_start"],
     b_acquiring_method?: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
     b_end?: schema.fieldDiscardingTypeInsert["b_end"],
-    b_buffer?: schema.fieldsTypeInsert["b_buffer"],
+    b_bufferstrip?: schema.fieldsTypeInsert["b_bufferstrip"],
 ): Promise<Field> {
     return await fdm.transaction(async (tx: FdmType) => {
         try {
@@ -392,8 +392,8 @@ export async function updateField(
             if (b_geometry !== undefined) {
                 setFields.b_geometry = b_geometry
             }
-            if (b_buffer !== undefined) {
-                setFields.b_buffer = b_buffer
+            if (b_bufferstrip !== undefined) {
+                setFields.b_bufferstrip = b_bufferstrip
             }
             setFields.updated = updated
 
@@ -436,7 +436,7 @@ export async function updateField(
                     b_id_farm: schema.fieldAcquiring.b_id_farm,
                     b_id_source: schema.fields.b_id_source,
                     b_geometry: schema.fields.b_geometry,
-                    b_buffer: schema.fields.b_buffer,
+                    b_bufferstrip: schema.fields.b_bufferstrip,
                     b_start: schema.fieldAcquiring.b_start,
                     b_acquiring_method:
                         schema.fieldAcquiring.b_acquiring_method,

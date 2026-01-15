@@ -135,7 +135,7 @@ export async function calculateNL2025FosfaatGebruiksNorm(
 ): Promise<FosfaatGebruiksnormResult> {
     const field = input.field
     // Check for buffer strip
-    if (field.b_buffer) {
+    if (field.b_bufferstrip) {
         return {
             normValue: 0,
             normSource: "Bufferstrook: geen plaatsingsruimte",

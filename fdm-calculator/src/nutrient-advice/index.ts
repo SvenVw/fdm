@@ -21,10 +21,10 @@ export async function requestNutrientAdvice({
     b_centroid,
     currentSoilData,
     nmiApiKey,
-    b_buffer,
+    b_bufferstrip,
 }: NutrientAdviceInputs): Promise<NutrientAdvice> {
     try {
-        if (b_buffer) {
+        if (b_bufferstrip) {
             return {
                 d_n_req: 0,
                 d_n_norm: 0,
