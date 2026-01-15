@@ -47,7 +47,10 @@ function TableVarietySelectorForm({
             <RemixFormProvider {...form}>
                 <Controller
                     name={name as string}
-                    disabled={fetcher.state !== "idle"}
+                    disabled={
+                        b_lu_variety_options.length === 0 ||
+                        fetcher.state !== "idle"
+                    }
                     render={({ field }) => (
                         <Select
                             defaultOpen={true}
@@ -82,7 +85,7 @@ function TableVarietySelectorForm({
                                 field.onChange(value)
                             }}
                             value={field.value ?? undefined}
-                            disabled={b_lu_variety_options.length === 0}
+                            disabled={field.disabled}
                         >
                             <SelectTrigger disabled={!row.original.canModify}>
                                 <SelectValue
