@@ -9,7 +9,7 @@ describe("calculateNL2026DierlijkeMestGebruiksNorm", () => {
             field: {
                 b_id: "field-1",
                 b_centroid: [0, 0],
-                b_bufferstrip: false,
+                b_bufferstrip: true,
             },
             cultivations: [],
             soilAnalysis: { a_p_al: 0, a_p_cc: 0 },

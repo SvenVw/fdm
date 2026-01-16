@@ -12,13 +12,13 @@ import Decimal from "decimal.js"
 
 // Mock FdmType
 const mockFdm = {
-    select: vi.fn().mockReturnThis(),
-    from: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
-    limit: vi.fn().mockReturnThis(),
-    execute: vi.fn().mockResolvedValue([]), // Simulate cache miss
-    insert: vi.fn().mockReturnThis(),
-    values: vi.fn().mockResolvedValue(undefined),
+    select: () => mockFdm,
+    from: () => mockFdm,
+    where: () => mockFdm,
+    limit: () => mockFdm,
+    execute: async () => [], // Simulate cache miss
+    insert: () => mockFdm,
+    values: async () => undefined,
 } as unknown as FdmType
 
 describe("calculateNitrogenBalance", () => {
@@ -241,6 +241,8 @@ describe("calculateNitrogenBalance", () => {
             mockNitrogenBalanceInput,
         )
 
+        expect(result.hasErrors).toBe(false)
+        expect(result.fieldErrorMessages.length).toBe(0)
         expect(result.balance).toBe(0)
         expect(result.supply.total).toBe(0)
         expect(result.removal.total).toBe(0)
