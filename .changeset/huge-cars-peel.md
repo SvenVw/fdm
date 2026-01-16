@@ -2,4 +2,4 @@
 "@svenvw/fdm-core": minor
 ---
 
-Replace at field the derived parameter `b_isproductive` with the stored parameter `b_bufferstrip` to allow users setting the value explicitly
+Replace the derived field parameter `b_isproductive` with the stored parameter `b_bufferstrip` so users can set it explicitly.
