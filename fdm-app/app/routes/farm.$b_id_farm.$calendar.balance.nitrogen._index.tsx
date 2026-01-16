@@ -191,7 +191,6 @@ function FarmBalanceNitrogenOverview({
     }
 
     const { hasErrors } = resolvedNitrogenBalanceResult
-    console.log(hasErrors)
 
     const fieldsMap = new Map(fields.map((f) => [f.b_id, f]))
     const filteredFields = resolvedNitrogenBalanceResult.fields.filter(
