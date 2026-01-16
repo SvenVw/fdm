@@ -167,7 +167,7 @@ export function FertilizerApplicationForm({
             >
                 <fieldset disabled={isSubmitting}>
                     <div className="grid grid-cols-1 md:grid-cols-2 items-end gap-x-8 gap-y-4">
-                        <div className="flex flex-row items-baseline [&>*]:grow min-w-0">
+                        <div className="flex flex-row items-baseline min-w-0">
                             <div className="min-w-0 flex-1">
                                 <Combobox
                                     options={options}
@@ -176,12 +176,14 @@ export function FertilizerApplicationForm({
                                     label={
                                         <span>
                                             Meststof
-                                            <span className="text-red-500">*</span>
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
                                         </span>
                                     }
                                 />
                             </div>
-                            <div className="py-2 shrink-0">
+                            <div className="py-2 shrink-0 grow-0">
                                 <p className="invisible">&nbsp;</p>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
