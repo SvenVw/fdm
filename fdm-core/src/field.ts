@@ -701,6 +701,10 @@ export function determineIfFieldIsBuffer(
     b_perimeter: number,
     b_name: schema.fieldsTypeSelect["b_name"],
 ) {
+    if (!b_area || b_area <= 0 || !b_perimeter || b_perimeter <= 0) {
+        return (b_name ?? "").toLowerCase().includes("buffer")
+    }
+
     // Sven found that a ratio for a field with Perimeter (m) / SQRT(Area (m^2)) usually differentiates buffferstrips from "normal"  fields when the ratio is larger than 20 and area smaller than 2.5 ha
     const BUFFERSTROKEN_CONSTANT = 20
     const bufferAssumedByShape =
@@ -708,7 +712,7 @@ export function determineIfFieldIsBuffer(
         b_area < 2.5
 
     // Check if name contains 'buffer'
-    const bufferAssumedByName = b_name.toLowerCase().includes("buffer")
+    const bufferAssumedByName = (b_name ?? "").toLowerCase().includes("buffer")
 
     return bufferAssumedByShape || bufferAssumedByName
 }
