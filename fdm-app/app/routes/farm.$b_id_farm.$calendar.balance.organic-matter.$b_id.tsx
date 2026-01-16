@@ -18,6 +18,7 @@ import {
 import { OrganicMatterBalanceChart } from "~/components/blocks/balance/organic-matter-chart"
 import OrganicMatterBalanceDetails from "~/components/blocks/balance/organic-matter-details"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons"
+import { BufferStripWarning } from "~/components/blocks/balance/buffer-strip-warning"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -139,6 +140,10 @@ function OrganicMatterBalance({
     const location = useLocation()
     const page = location.pathname
     const calendar = useCalendarStore((state) => state.calendar)
+
+    if (field.b_bufferstrip) {
+        return <BufferStripWarning b_id={field.b_id} />
+    }
 
     if (fieldResult.errorMessage) {
         return (

@@ -17,7 +17,7 @@ export type NL2026NormsInput = {
         has_grazing_intention: boolean
     }
     /** The field record from fdm-core, including its ID and centroid for location-based checks. */
-    field: Pick<Field, "b_id" | "b_centroid">
+    field: Pick<Field, "b_id" | "b_centroid" | "b_bufferstrip">
     /** An array of all cultivations on the field with their required norm inputs. */
     cultivations: NL2026NormsInputForCultivation[]
     /** The most recent soil analysis data available before the start of the cultivation. */

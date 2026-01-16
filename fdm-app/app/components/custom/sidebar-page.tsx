@@ -20,7 +20,7 @@ export function SidebarPage({
     return (
         <nav
             className={cn(
-                "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1 max-w-xs",
+                "flex space-x-2 overflow-x-auto pb-2 lg:overflow-visible lg:pb-0 lg:flex-col lg:space-x-0 lg:space-y-1",
                 className,
             )}
             {...props}
@@ -32,7 +32,7 @@ export function SidebarPage({
                     aria-current={pathname === item.to ? "page" : undefined}
                     aria-label={item.title}
                     className={cn(
-                        buttonVariants({ variant: "ghost" }),
+                        buttonVariants({ variant: "ghost", size: "sm" }),
                         pathname.startsWith(item.to)
                             ? "bg-muted hover:bg-muted "
                             : "hover:bg-transparent hover:underline",

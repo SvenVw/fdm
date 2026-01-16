@@ -9,7 +9,8 @@ import {
 import type { NL2025NormsInput, NL2025NormsInputForCultivation } from "./types"
 
 vi.mock("../../../../shared/geotiff", async (importActual) => {
-    const actual = await importActual<typeof import("../../../../shared/geotiff")>()
+    const actual =
+        await importActual<typeof import("../../../../shared/geotiff")>()
     return {
         ...actual,
         getGeoTiffValue: vi.fn(actual.getGeoTiffValue),
@@ -88,6 +89,29 @@ describe(" calculateNL2025StikstofGebruiksNorm", () => {
         const result = await calculateNL2025StikstofGebruiksNorm(mockInput)
         expect(result.normValue).toBe(385)
         expect(result.normSource).toEqual("Grasland (volledig maaien).")
+    })
+
+    it("should return 0 for buffer strips", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false, has_grazing_intention: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571],
+                b_bufferstrip: true,
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_265",
+                    b_lu_start: new Date(2025, 0, 1),
+                    b_lu_end: new Date(2025, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await calculateNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(0)
+        expect(result.normSource).toEqual("Bufferstrook: geen plaatsingsruimte")
     })
 
     it("should return the correct norm for potatoes", async () => {

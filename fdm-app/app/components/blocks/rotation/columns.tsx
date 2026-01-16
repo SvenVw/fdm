@@ -31,7 +31,7 @@ export type RotationExtended = {
         b_id: string
         b_name: string
         b_area: number
-        b_isproductive: boolean
+        b_bufferstrip: boolean
         a_som_loi: number
         b_soiltype_agr: string
         b_lu_harvest_date: Date[]

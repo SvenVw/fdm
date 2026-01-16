@@ -147,6 +147,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     b_centroid: field.b_centroid,
                     currentSoilData: resolvedCurrentSoilData,
                     nmiApiKey: nmiApiKey,
+                    b_bufferstrip: field.b_bufferstrip,
                 })
 
                 return {

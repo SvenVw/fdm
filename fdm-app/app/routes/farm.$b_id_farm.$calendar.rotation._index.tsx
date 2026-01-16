@@ -214,7 +214,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     a_som_loi: a_som_loi,
                     b_soiltype_agr: b_soiltype_agr,
                     b_area: Math.round(field.b_area * 10) / 10,
-                    b_isproductive: field.b_isproductive ?? true,
+                    b_bufferstrip: field.b_bufferstrip,
                 }
             }),
         )
@@ -297,7 +297,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         b_id: field.b_id,
                         b_name: field.b_name,
                         b_area: field.b_area,
-                        b_isproductive: field.b_isproductive,
+                        b_bufferstrip: field.b_bufferstrip,
                         a_som_loi: field.a_som_loi ?? 0,
                         b_soiltype_agr: field.b_soiltype_agr ?? "",
                         b_lu_harvest_date: field.harvests

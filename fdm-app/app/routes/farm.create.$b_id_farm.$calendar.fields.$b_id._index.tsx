@@ -34,6 +34,7 @@ import { SoilDataCards } from "~/components/blocks/soil/cards"
 import { Combobox } from "~/components/custom/combobox"
 import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
+import { Checkbox } from "~/components/ui/checkbox"
 import {
     Card,
     CardContent,
@@ -87,6 +88,7 @@ const FormSchema = z.object({
     b_lu_catalogue: z.string({
         required_error: "Hoofdgewas is verplicht",
     }),
+    b_bufferstrip: z.boolean().optional(),
 })
 
 /**
@@ -207,6 +209,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             currentSoilData: currentSoilData,
             soilParameterDescription: soilParameterDescription,
             b_area: field.b_area,
+            b_bufferstrip: field.b_bufferstrip,
             featureCollection: featureCollection,
             cultivationOptions: cultivationOptions,
             mapStyle: mapStyle,
@@ -236,6 +239,7 @@ export default function Index() {
             b_name: loaderData.b_name ?? "",
             b_area: Math.round(loaderData.b_area * 10) / 10,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
+            b_bufferstrip: loaderData.b_bufferstrip ?? false,
         },
     })
 
@@ -244,6 +248,7 @@ export default function Index() {
             b_name: loaderData.b_name ?? "",
             b_area: Math.round(loaderData.b_area * 10) / 10,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
+            b_bufferstrip: loaderData.b_bufferstrip ?? false,
         })
     }, [loaderData, form.reset])
 
@@ -269,17 +274,17 @@ export default function Index() {
             <div className="grid lg:grid-cols-4 gap-6">
                 <div className="col-span-2">
                     <RemixFormProvider {...form}>
-                        <Form
-                            id="formField"
-                            method="POST"
-                            onSubmit={form.handleSubmit}
-                        >
-                            <fieldset disabled={form.formState.isSubmitting}>
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Perceel</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
+                        <fieldset disabled={form.formState.isSubmitting}>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Perceel</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <Form
+                                        id="formField"
+                                        method="POST"
+                                        onSubmit={form.handleSubmit}
+                                    >
                                         <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
                                             <FormField
                                                 control={form.control}
@@ -348,32 +353,66 @@ export default function Index() {
                                                     </FormItem>
                                                 )}
                                             />
-                                        </div>
-                                    </CardContent>
-                                    <CardFooter>
-                                        <div className="ml-auto">
-                                            <Button
-                                                type="submit"
-                                                disabled={
-                                                    form.formState.isSubmitting
-                                                }
-                                                className="m-auto"
-                                            >
-                                                {form.formState
-                                                    .isSubmitting && (
-                                                    <Spinner />
+                                            <FormField
+                                                control={form.control}
+                                                name="b_bufferstrip"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-row col-span-2 items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={
+                                                                    field.value
+                                                                }
+                                                                onCheckedChange={
+                                                                    field.onChange
+                                                                }
+                                                            />
+                                                        </FormControl>
+                                                        <div className="space-y-1 leading-none">
+                                                            <FormLabel>
+                                                                Bufferstrook
+                                                            </FormLabel>
+                                                            <FormDescription>
+                                                                Is dit perceel
+                                                                een
+                                                                bufferstrook?
+                                                            </FormDescription>
+                                                        </div>
+                                                    </FormItem>
                                                 )}
-                                                Bijwerken
-                                            </Button>
+                                            />
                                         </div>
-                                    </CardFooter>
-                                </Card>
-                            </fieldset>
-                        </Form>
+                                    </Form>
+                                </CardContent>
+                                <CardFooter>
+                                    <FieldDeleteDialog
+                                        key={loaderData.b_id}
+                                        fieldName={loaderData.b_name}
+                                        isSubmitting={
+                                            form.formState.isSubmitting
+                                        }
+                                        buttonText="Verwijderen"
+                                    />
+                                    <Button
+                                        type="submit"
+                                        form="formField"
+                                        disabled={
+                                            form.formState.isSubmitting
+                                        }
+                                        className="ml-auto"
+                                    >
+                                        {form.formState.isSubmitting && (
+                                            <Spinner />
+                                        )}
+                                        Bijwerken
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        </fieldset>
                     </RemixFormProvider>
                 </div>
                 <div className="col-span-2 space-y-5">
-                    <div ref={mapContainerRef} className="h-[250px] w-full">
+                    <div ref={mapContainerRef} className="h-full w-full">
                         {mapIsLoaded ? (
                             <MapGL
                                 {...viewState}
@@ -400,12 +439,6 @@ export default function Index() {
                         ) : (
                             <Skeleton className="h-full w-full rounded-xl" />
                         )}
-                    </div>
-                    <div className="flex justify-end">
-                        <FieldDeleteDialog
-                            fieldName={loaderData.b_name}
-                            isSubmitting={form.formState.isSubmitting}
-                        />
                     </div>
                 </div>
             </div>
@@ -494,6 +527,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 undefined,
                 undefined,
                 undefined,
+                formValues.b_bufferstrip,
             )
 
             const cultivations = await getCultivations(

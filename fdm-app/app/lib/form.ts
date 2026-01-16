@@ -46,8 +46,17 @@ export async function extractFormValuesFromRequest<T extends ZodSchema>(
                     formObject[key] = value.replace(/['"]+/g, "").trim()
                 }
 
+                const cleanedValue = formObject[key]
+
+                // Parse boolean values
+                if (cleanedValue === "true" || cleanedValue === "on") {
+                    formObject[key] = true
+                } else if (cleanedValue === "false") {
+                    formObject[key] = false
+                }
+
                 // Parse null values at formData
-                if (value === "null") {
+                if (value === "null" || cleanedValue === "null") {
                     formObject[key] = null
                 }
 

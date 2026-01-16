@@ -1,6 +1,4 @@
-import {
-    type NitrogenBalanceFieldResultNumeric,
-} from "@svenvw/fdm-calculator"
+import { type NitrogenBalanceFieldResultNumeric } from "@svenvw/fdm-calculator"
 import { getFarm, getFields } from "@svenvw/fdm-core"
 import {
     ArrowDown,
@@ -22,7 +20,7 @@ import {
 } from "react-router"
 import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons"
-import { FieldFilterToggle } from "~/components/custom/field-filter-toggle"
+import { BufferStripInfo } from "~/components/blocks/balance/buffer-strip-info"
 import {
     Card,
     CardContent,
@@ -41,7 +39,6 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError, reportError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { useFieldFilterStore } from "~/store/field-filter"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -153,7 +150,6 @@ function FarmBalanceNitrogenOverview({
     asyncData,
 }: Awaited<ReturnType<typeof loader>>) {
     const { nitrogenBalanceResult } = use(asyncData)
-    const { showProductiveOnly } = useFieldFilterStore()
 
     const resolvedNitrogenBalanceResult = nitrogenBalanceResult
 
@@ -199,9 +195,8 @@ function FarmBalanceNitrogenOverview({
     const fieldsMap = new Map(fields.map((f) => [f.b_id, f]))
     const filteredFields = resolvedNitrogenBalanceResult.fields.filter(
         (fieldResult: NitrogenBalanceFieldResultNumeric) => {
-            if (!showProductiveOnly) return true
             const fieldData = fieldsMap.get(fieldResult.b_id)
-            return fieldData ? fieldData.b_isproductive === true : false
+            return fieldData ? !fieldData.b_bufferstrip : false
         },
     )
 
@@ -335,7 +330,7 @@ function FarmBalanceNitrogenOverview({
                     <CardHeader>
                         <CardTitle className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <p>Percelen</p>
-                            <FieldFilterToggle />
+                            <BufferStripInfo />
                         </CardTitle>
                         <CardDescription />
                     </CardHeader>

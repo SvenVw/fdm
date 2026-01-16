@@ -92,7 +92,7 @@ describe("collectInputForNitrogenBalance", () => {
                 b_start: new Date("2023-01-01"),
                 b_end: new Date("2023-12-31"),
                 b_acquiring_method: "purchase",
-                b_isproductive: true,
+                b_bufferstrip: false,
             },
             {
                 b_id: "field-2",
@@ -106,7 +106,7 @@ describe("collectInputForNitrogenBalance", () => {
                 b_start: new Date("2023-01-01"),
                 b_end: new Date("2023-12-31"),
                 b_acquiring_method: "purchase",
-                b_isproductive: true,
+                b_bufferstrip: false,
             },
         ]
         const mockCultivationsData: Cultivation[] = [
@@ -287,11 +287,7 @@ describe("collectInputForNitrogenBalance", () => {
         )
         expect(
             mockedCalculateAllFieldsNitrogenSupplyByDeposition,
-        ).toHaveBeenCalledWith(
-            expect.anything(),
-            timeframe,
-            expect.any(String),
-        )
+        ).toHaveBeenCalledWith(expect.anything(), timeframe, expect.any(String))
     })
 
     it("should throw an error if getFields fails", async () => {
@@ -322,7 +318,7 @@ describe("collectInputForNitrogenBalance", () => {
                 b_start: new Date("2023-01-01"),
                 b_end: new Date("2023-12-31"),
                 b_acquiring_method: "purchase",
-                b_isproductive: true,
+                b_bufferstrip: false,
             },
         ]
         mockedGetFields.mockResolvedValue(mockFieldsData)

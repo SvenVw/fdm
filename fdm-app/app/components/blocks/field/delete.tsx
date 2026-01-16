@@ -1,4 +1,5 @@
-import { Form } from "react-router"
+import { Form, useNavigation } from "react-router"
+import { useEffect, useRef, useState } from "react"
 import { Spinner } from "~/components/ui/spinner"
 import {
     AlertDialog,
@@ -15,17 +16,40 @@ import { Button } from "~/components/ui/button"
 interface FieldDeleteDialogProps {
     fieldName: string
     isSubmitting: boolean
+    buttonText?: string
 }
 
 export function FieldDeleteDialog({
     fieldName,
-    isSubmitting,
+    isSubmitting: isParentSubmitting,
+    buttonText,
 }: FieldDeleteDialogProps) {
+    const [open, setOpen] = useState(false)
+    const navigation = useNavigation()
+    const isDeleting =
+        navigation.state === "submitting" && navigation.formMethod === "DELETE"
+
+    const isSubmitting = isParentSubmitting || isDeleting
+
+    const wasDeleting = useRef(false)
+    useEffect(() => {
+        if (isDeleting) {
+            wasDeleting.current = true
+        } else if (wasDeleting.current) {
+            setOpen(false)
+            wasDeleting.current = false
+        }
+    }, [isDeleting])
+
     return (
-        <AlertDialog>
+        <AlertDialog open={open} onOpenChange={setOpen}>
             <AlertDialogTrigger asChild>
-                <Button variant="destructive" disabled={isSubmitting}>
-                    Perceel verwijderen
+                <Button
+                    variant="destructive"
+                    disabled={isSubmitting}
+                    type="button"
+                >
+                    {buttonText ?? "Perceel verwijderen"}
                 </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -49,7 +73,7 @@ export function FieldDeleteDialog({
                             disabled={isSubmitting}
                             className="w-full"
                         >
-                            {isSubmitting ? (
+                            {isDeleting ? (
                                 <div className="flex items-center space-x-2">
                                     <Spinner />
                                     <span>Verwijderen</span>
