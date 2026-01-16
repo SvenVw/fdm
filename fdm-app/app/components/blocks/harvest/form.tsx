@@ -34,6 +34,8 @@ import {
 import { Input } from "~/components/ui/input"
 import { getHarvestParameterLabel } from "./parameters"
 import { FormSchema } from "./schema"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale"
 
 type HarvestFormDialogProps = {
     harvestParameters: HarvestParameters
@@ -50,6 +52,7 @@ type HarvestFormDialogProps = {
     b_lu_harvestable: "once" | "multiple" | "none"
     b_lu_start: Date | undefined | null
     b_lu_end: Date | undefined | null
+    mixedDates?: boolean
     action?: string
     handleConfirmation?: (data: z.infer<typeof FormSchema>) => Promise<boolean>
     editable?: boolean
@@ -140,6 +143,9 @@ function useHarvestRemixForm({
 }
 
 function HarvestFields({
+    b_lu_start,
+    b_lu_end,
+    mixedDates,
     b_lu_harvest_date,
     harvestParameters,
     form,
@@ -148,30 +154,68 @@ function HarvestFields({
     form: ReturnType<typeof useHarvestRemixForm>
     className: React.ComponentProps<typeof FieldGroup>["className"]
 }) {
+    const fmt_b_lu_start =
+        b_lu_start && format(b_lu_start, "PP", { locale: nl })
+    const fmt_b_lu_end = b_lu_end && format(b_lu_end, "PP", { locale: nl })
+    const fmt_mixed_dates_start = mixedDates
+        ? "Laatste zaaidatum: "
+        : "Zaaidatum: "
+    const fmt_mixed_dates_end = mixedDates
+        ? "Vroegste einddatum: "
+        : "Einddatum: "
+
+    const startMessage =
+        fmt_b_lu_start && fmt_b_lu_end ? (
+            <>
+                {fmt_mixed_dates_start}
+                <span className="whitespace-nowrap">{fmt_b_lu_start}</span>,{" "}
+                {fmt_mixed_dates_end}
+                <span className="whitespace-nowrap">{fmt_b_lu_end}</span>
+            </>
+        ) : fmt_b_lu_start ? (
+            <>
+                {fmt_mixed_dates_start}
+                <span className="whitespace-nowrap">{fmt_b_lu_start}</span>. Nog
+                geen einddatum opgegeven.
+            </>
+        ) : fmt_b_lu_end ? (
+            <>
+                {fmt_mixed_dates_end}
+                <span className="whitespace-nowrap">{fmt_b_lu_end}</span>. Nog
+                geen zaaidatum opgegeven.
+            </>
+        ) : null
     return (
         <FieldGroup className={cn("gap-5", className)}>
-            <Controller
-                name="b_lu_harvest_date"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                    <DatePicker
-                        label="Oogstdatum"
-                        defaultValue={
-                            b_lu_harvest_date instanceof Date
-                                ? b_lu_harvest_date
-                                : b_lu_harvest_date
-                                  ? new Date(b_lu_harvest_date)
-                                  : undefined
-                        }
-                        field={{
-                            ...field,
-                            value: field.value,
-                        }}
-                        fieldState={fieldState}
-                        required={true}
-                    />
+            <div>
+                <Controller
+                    name="b_lu_harvest_date"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                        <DatePicker
+                            label="Oogstdatum"
+                            defaultValue={
+                                b_lu_harvest_date instanceof Date
+                                    ? b_lu_harvest_date
+                                    : b_lu_harvest_date
+                                      ? new Date(b_lu_harvest_date)
+                                      : undefined
+                            }
+                            field={{
+                                ...field,
+                                value: field.value,
+                            }}
+                            fieldState={fieldState}
+                            required={true}
+                        />
+                    )}
+                />
+                {startMessage && (
+                    <p className="text-sm text-muted-foreground">
+                        {startMessage}
+                    </p>
                 )}
-            />
+            </div>
             <Controller
                 name="b_lu_yield"
                 control={form.control}
@@ -616,7 +660,7 @@ export function HarvestForm(props: HarvestFormDialogProps) {
                         <HarvestFields
                             {...props}
                             form={form}
-                            className="grid lg:grid-cols-2 items-center gap-y-6 gap-x-8"
+                            className="grid lg:grid-cols-2 items-start gap-y-6 gap-x-8"
                         />
                         <HarvestFormExplainer />
                         <div className="grid grid-cols-2 items">
