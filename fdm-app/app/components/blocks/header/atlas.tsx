@@ -31,7 +31,7 @@ export function HeaderAtlas({ b_id_farm }: { b_id_farm: string | undefined }) {
             <BreadcrumbSeparator />
             <BreadcrumbItem>
                 <DropdownMenu>
-                    <DropdownMenuTrigger className="flex items-center gap-1 max-w-[120px] sm:max-w-[200px] md:max-w-none outline-none">
+                    <DropdownMenuTrigger className="flex items-center gap-1 max-w-30 sm:max-w-50 md:max-w-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                         <span className="truncate">{currentName}</span>
                         <ChevronDown className="h-4 w-4 shrink-0" />
                     </DropdownMenuTrigger>
