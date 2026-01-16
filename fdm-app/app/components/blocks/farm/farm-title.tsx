@@ -26,9 +26,9 @@ export function FarmTitle({ title, description, action }: FarmTitleProps) {
                 </div>
                 {action && (
                     <div className="ml-auto">
-                        <NavLink to={action.to}>
-                            <Button>{action.label}</Button>
-                        </NavLink>
+                        <Button asChild>
+                            <NavLink to={action.to}>{action.label}</NavLink>
+                        </Button>
                     </div>
                 )}
             </div>
