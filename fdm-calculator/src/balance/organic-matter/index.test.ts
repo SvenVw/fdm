@@ -26,6 +26,7 @@ describe("Organic Matter Balance Calculation", () => {
     const mockField: FieldInput["field"] = {
         b_id: "field1",
         b_area: 10,
+        b_bufferstrip: false,
     } as FieldInput["field"]
     const mockCultivations: FieldInput["cultivations"] = []
     const mockFertilizerApplications: FieldInput["fertilizerApplications"] = []
@@ -86,6 +87,7 @@ describe("Organic Matter Balance Calculation", () => {
                 {
                     b_id: "field1",
                     b_area: 10,
+                    b_bufferstrip: false,
                     balance: {
                         supply: { total: 500 },
                         degradation: { total: -200 },
@@ -95,6 +97,7 @@ describe("Organic Matter Balance Calculation", () => {
                 {
                     b_id: "field2",
                     b_area: 5,
+                    b_bufferstrip: false,
                     balance: {
                         supply: { total: 400 },
                         degradation: { total: -300 },
@@ -122,13 +125,14 @@ describe("Organic Matter Balance Calculation", () => {
                 {
                     b_id: "field1",
                     b_area: 10,
+                    b_bufferstrip: false,
                     balance: {
                         balance: 300,
                         supply: { total: 500 },
                         degradation: { total: -200 },
                     } as OrganicMatterBalanceFieldNumeric,
                 },
-                { b_id: "field2", b_area: 5, errorMessage: "Failed" },
+                { b_id: "field2", b_area: 5, errorMessage: "Failed", b_bufferstrip: false },
             ]
             const farmBalance = calculateOrganicMatterBalancesFieldToFarm(
                 results,

@@ -34,6 +34,7 @@ describe("calculateNitrogenBalance", () => {
                         b_area: 100,
                         b_start: new Date("2023-01-01"),
                         b_end: new Date("2023-12-31"),
+                        b_bufferstrip: false,
                     },
                     cultivations: [
                         {
@@ -180,6 +181,7 @@ describe("calculateNitrogenBalance", () => {
                         b_area: 100,
                         b_start: new Date("2023-01-01"),
                         b_end: new Date("2023-12-31"),
+                        b_bufferstrip: false,
                     },
                     cultivations: [],
                     harvests: [],
