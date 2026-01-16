@@ -708,7 +708,7 @@ export function determineIfFieldIsBuffer(
         b_area < 2.5
 
     // Check if name contains 'buffer'
-    const bufferAssumedByName = !b_name.toLowerCase().includes("buffer")
+    const bufferAssumedByName = b_name.toLowerCase().includes("buffer")
 
-    return bufferAssumedByShape || !bufferAssumedByName
+    return bufferAssumedByShape || bufferAssumedByName
 }

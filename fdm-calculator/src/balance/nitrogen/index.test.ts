@@ -16,9 +16,7 @@ const mockFdm = {
     from: vi.fn().mockReturnThis(),
     where: vi.fn().mockReturnThis(),
     limit: vi.fn().mockReturnThis(),
-    then: vi.fn((resolve) =>
-        resolve ? Promise.resolve(resolve([])) : Promise.resolve([]),
-    ), // Simulate cache miss
+    execute: vi.fn().mockResolvedValue([]), // Simulate cache miss
     insert: vi.fn().mockReturnThis(),
     values: vi.fn().mockResolvedValue(undefined),
 } as unknown as FdmType

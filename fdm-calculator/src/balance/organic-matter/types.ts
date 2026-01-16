@@ -153,6 +153,8 @@ export type OrganicMatterBalanceFieldResult = {
     b_id: string
     /** The area of the field in hectares. */
     b_area: number
+    /** Whether the field is a buffer strip */
+    b_bufferstrip: boolean
     /** The detailed organic matter balance for the field. Undefined if an error occurred. */
     balance?: OrganicMatterBalanceField
     /** An error message if the calculation for this field failed. */

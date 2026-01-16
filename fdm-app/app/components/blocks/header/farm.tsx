@@ -36,14 +36,13 @@ export function HeaderFarm({
             <BreadcrumbSeparator className="hidden xl:block" />
             <BreadcrumbItem>
                 <DropdownMenu>
-                    <DropdownMenuTrigger className="flex items-center gap-1 max-w-[120px] sm:max-w-[200px] md:max-w-none outline-none">
+                    <DropdownMenuTrigger className="flex items-center gap-1 max-w-30 sm:max-w-50 md:max-w-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                         <span className="truncate">
                             {b_id_farm && farmOptions
                                 ? (farmOptions.find(
                                       (option) =>
                                           option.b_id_farm === b_id_farm,
-                                  )?.b_name_farm ??
-                                  "Geen bedrijf geselecteerd")
+                                  )?.b_name_farm ?? "Geen bedrijf geselecteerd")
                                 : "Kies een bedrijf"}
                         </span>
                         {farmOptions && farmOptions.length > 0 ? (

@@ -20,7 +20,7 @@ export function Header({
                 <BreadcrumbList>{children}</BreadcrumbList>
             </Breadcrumb>
             {action ? (
-                <div className="ml-auto flex-shrink-0">
+                <div className="shrink-0">
                     <HeaderAction
                         label={action.label}
                         to={action.to}

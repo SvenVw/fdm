@@ -22,6 +22,7 @@ import {
     getCurrentSoilData,
     type PrincipalId,
     type Timeframe,
+    getField,
 } from "@svenvw/fdm-core"
 import { getNmiApiKey } from "./nmi"
 

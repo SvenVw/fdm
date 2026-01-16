@@ -20,11 +20,13 @@ export function FarmTitle({ title, description, action }: FarmTitleProps) {
                     <h2 className="text-2xl font-bold tracking-tight truncate xl:whitespace-normal">
                         {title}
                     </h2>
-                    <p className="text-muted-foreground break-words">{description}</p>
+                    <p className="text-muted-foreground wrap-break-word">
+                        {description}
+                    </p>
                 </div>
                 {action && (
                     <div className="ml-auto">
-                        <NavLink to={action.to} className="ml-auto">
+                        <NavLink to={action.to}>
                             <Button>{action.label}</Button>
                         </NavLink>
                     </div>

@@ -41,7 +41,7 @@ export function HeaderNutrientAdvice({
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
                         <DropdownMenu>
-                            <DropdownMenuTrigger className="flex items-center gap-1 max-w-[120px] sm:max-w-[200px] md:max-w-none outline-none">
+                            <DropdownMenuTrigger className="flex items-center gap-1 max-w-30 sm:max-w-50 md:max-w-none outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                 <span className="truncate">
                                     {b_id && fieldOptions
                                         ? (fieldOptions.find(

@@ -32,7 +32,6 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError, reportError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { useFieldFilterStore } from "~/store/field-filter"
 
 // Meta
 export const meta: MetaFunction = () => {
