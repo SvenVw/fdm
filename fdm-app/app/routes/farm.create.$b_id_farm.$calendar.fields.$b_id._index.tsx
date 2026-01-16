@@ -274,17 +274,17 @@ export default function Index() {
             <div className="grid lg:grid-cols-4 gap-6">
                 <div className="col-span-2">
                     <RemixFormProvider {...form}>
-                        <Form
-                            id="formField"
-                            method="POST"
-                            onSubmit={form.handleSubmit}
-                        >
-                            <fieldset disabled={form.formState.isSubmitting}>
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Perceel</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
+                        <fieldset disabled={form.formState.isSubmitting}>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Perceel</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <Form
+                                        id="formField"
+                                        method="POST"
+                                        onSubmit={form.handleSubmit}
+                                    >
                                         <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
                                             <FormField
                                                 control={form.control}
@@ -382,31 +382,37 @@ export default function Index() {
                                                 )}
                                             />
                                         </div>
-                                    </CardContent>
-                                    <CardFooter>
-                                        <div className="ml-auto">
-                                            <Button
-                                                type="submit"
-                                                disabled={
-                                                    form.formState.isSubmitting
-                                                }
-                                                className="m-auto"
-                                            >
-                                                {form.formState
-                                                    .isSubmitting && (
-                                                    <Spinner />
-                                                )}
-                                                Bijwerken
-                                            </Button>
-                                        </div>
-                                    </CardFooter>
-                                </Card>
-                            </fieldset>
-                        </Form>
+                                    </Form>
+                                </CardContent>
+                                <CardFooter>
+                                    <FieldDeleteDialog
+                                        key={loaderData.b_id}
+                                        fieldName={loaderData.b_name}
+                                        isSubmitting={
+                                            form.formState.isSubmitting
+                                        }
+                                        buttonText="Verwijderen"
+                                    />
+                                    <Button
+                                        type="submit"
+                                        form="formField"
+                                        disabled={
+                                            form.formState.isSubmitting
+                                        }
+                                        className="ml-auto"
+                                    >
+                                        {form.formState.isSubmitting && (
+                                            <Spinner />
+                                        )}
+                                        Bijwerken
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        </fieldset>
                     </RemixFormProvider>
                 </div>
                 <div className="col-span-2 space-y-5">
-                    <div ref={mapContainerRef} className="h-[250px] w-full">
+                    <div ref={mapContainerRef} className="h-full w-full">
                         {mapIsLoaded ? (
                             <MapGL
                                 {...viewState}
@@ -433,12 +439,6 @@ export default function Index() {
                         ) : (
                             <Skeleton className="h-full w-full rounded-xl" />
                         )}
-                    </div>
-                    <div className="flex justify-end">
-                        <FieldDeleteDialog
-                            fieldName={loaderData.b_name}
-                            isSubmitting={form.formState.isSubmitting}
-                        />
                     </div>
                 </div>
             </div>
