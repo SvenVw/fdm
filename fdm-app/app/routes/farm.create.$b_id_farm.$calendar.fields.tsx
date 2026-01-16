@@ -138,7 +138,7 @@ export default function Index() {
 
                         <div className="ml-auto">
                             <NavLink
-                                to={`/farm/create/${b_id_farm}/${calendar}/cultivations`}
+                                to={`/farm/create/${b_id_farm}/${calendar}/rotation`}
                                 className={cn("ml-auto", {
                                     "pointer-events-none":
                                         sidebarPageItems.length === 0,

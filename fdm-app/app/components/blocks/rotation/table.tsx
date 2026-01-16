@@ -4,6 +4,7 @@ import {
     type FilterFn,
     flexRender,
     getCoreRowModel,
+    getExpandedRowModel,
     getFacetedRowModel,
     getFilteredRowModel,
     getSortedRowModel,
@@ -18,8 +19,10 @@ import { nl } from "date-fns/locale/nl"
 import fuzzysort from "fuzzysort"
 import { ChevronDown, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { NavLink, useParams } from "react-router-dom"
+import { NavLink, useLocation, useParams } from "react-router-dom"
 import { toast as notify } from "sonner"
+import { modifySearchParams } from "@/app/lib/url-utils"
+import { useActiveTableFormStore } from "@/app/store/active-table-form"
 import { useFieldFilterStore } from "@/app/store/field-filter"
 import { Button } from "~/components/ui/button"
 import {
@@ -46,7 +49,7 @@ import {
 import { useIsMobile } from "~/hooks/use-mobile"
 import { cn } from "~/lib/utils"
 import { FieldFilterToggle } from "../../custom/field-filter-toggle"
-import type { RotationExtended } from "./columns"
+import type { CropRow, FieldRow, RotationExtended } from "./columns"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -69,7 +72,8 @@ export function DataTable<TData extends RotationExtended, TValue>({
             : {},
     )
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-    const lastSelectedRowIndex = useRef<number | null>(null)
+    const lastSelectedRowIndex = useRef<string | null>(null)
+    const location = useLocation()
 
     useEffect(() => {
         setColumnVisibility(
@@ -82,6 +86,10 @@ export function DataTable<TData extends RotationExtended, TValue>({
     const params = useParams()
     const b_id_farm = params.b_id_farm
     const calendar = params.calendar
+
+    const clearActiveForm = useActiveTableFormStore(
+        (store) => store.clearActiveForm,
+    )
 
     const handleRowClick = (
         row: Row<TData>,
@@ -100,71 +108,125 @@ export function DataTable<TData extends RotationExtended, TValue>({
             return
         }
 
-        if (event.shiftKey && lastSelectedRowIndex.current !== null) {
-            const currentIndex = row.index
-            const start = Math.min(currentIndex, lastSelectedRowIndex.current)
-            const end = Math.max(currentIndex, lastSelectedRowIndex.current)
+        clearActiveForm()
+        if (event.shiftKey) {
+            document.getSelection()?.removeAllRanges()
+            const lastSelectedRow =
+                lastSelectedRowIndex.current &&
+                table.getRow(lastSelectedRowIndex.current)
+            if (lastSelectedRow) {
+                const newRowSelection = { ...rowSelection }
+                const visibleRows = table.getRowModel().flatRows
 
-            const rowsToSelect = table
-                .getRowModel()
-                .rows.slice(start, end + 1)
-                .map((r) => r.id)
+                // Select or deselect everything in between
+                const mode = lastSelectedRow.getIsSelected()
+                const lastIndex = visibleRows.findIndex(
+                    (r) => r.id === lastSelectedRow.id,
+                )
+                const currentIndex = visibleRows.findIndex(
+                    (r) => r.id === row.id,
+                )
 
-            const newRowSelection = { ...rowSelection }
-            rowsToSelect.forEach((id) => {
-                newRowSelection[id] = true
-            })
-            setRowSelection(newRowSelection)
+                const start = Math.min(lastIndex, currentIndex)
+                const end = Math.max(lastIndex, currentIndex)
+
+                const affectedCropRows = []
+                for (let i = start; i <= end; i++) {
+                    const parentRow = visibleRows[i].getParentRow()
+                    if (parentRow) {
+                        affectedCropRows.push(parentRow)
+                        newRowSelection[visibleRows[i].id] = mode
+                    }
+                }
+
+                // Toggle selection of the currently clicked row
+                // This behavior can be removed as needed
+                if (row.getIsSelected() === mode) {
+                    newRowSelection[row.id] = !mode
+                }
+
+                // Update the derived selection state of crop rows
+                for (const row of affectedCropRows) {
+                    newRowSelection[row.id] = row.subRows.every(
+                        (subRow) => newRowSelection[subRow.id],
+                    )
+                }
+                setRowSelection(newRowSelection)
+            }
         } else {
-            row.toggleSelected()
+            lastSelectedRowIndex.current = null
+            const newIsSelected = !row.getIsSelected()
+            row.toggleSelected(newIsSelected)
+            const parentRow = row.getParentRow()
+            if (parentRow) {
+                const wantedValue = parentRow?.subRows.every((otherRow) =>
+                    otherRow.id === row.id
+                        ? newIsSelected
+                        : otherRow.getIsSelected(),
+                )
+                if (parentRow.getIsSelected() !== wantedValue) {
+                    parentRow.toggleSelected(wantedValue, {
+                        selectChildren: false,
+                    })
+                }
+            }
         }
-        lastSelectedRowIndex.current = row.index
+        lastSelectedRowIndex.current = row.id
     }
 
     const memoizedData = useMemo(() => {
-        return data.map((item) => ({
-            ...item,
-            searchTarget: `${item.b_lu_name} ${[
-                ...new Set(
-                    item.b_lu_start.map((date: Date) =>
-                        format(date, "d MMMM yyy", { locale: nl }),
-                    ),
-                ),
-            ].join(" ")} ${[
-                ...new Set(
-                    item.fields.flatMap((field) =>
-                        field.b_lu_harvest_date.map((date: Date) =>
-                            format(date, "d MMMM yyy", { locale: nl }),
-                        ),
-                    ),
-                ),
-            ].join(" ")} ${[
-                ...new Set(
-                    item.fields.flatMap((field) =>
-                        field.fertilizers.map(
-                            (fertilizer) => fertilizer.p_name_nl,
-                        ),
-                    ),
-                ),
-            ].join(" ")}`,
-        }))
-    }, [data])
+        return data.map((item) => {
+            const commonTerms = (item as CropRow).b_lu_name
+            const crop_b_lu_start = new Set<string>()
+            const crop_b_lu_end = new Set<string>()
+            const crop_b_lu_harvest_date = new Set<string>()
 
-    const fuzzySearchAndProductivityFilter: FilterFn<TData> = (
+            const formatDate = (date: Date) =>
+                format(date, "d MMMM yyyy", { locale: nl })
+            const dateTermsArr = (dates: Date[]) =>
+                [...new Set(dates.map(formatDate))].join(" ")
+
+            const fields = (item as CropRow).fields.map((field) => {
+                field.b_lu_start.map((v) => crop_b_lu_start.add(formatDate(v)))
+                field.b_lu_end.map((v) => crop_b_lu_end.add(formatDate(v)))
+                field.b_lu_harvest_date.map((v) =>
+                    crop_b_lu_harvest_date.add(formatDate(v)),
+                )
+
+                return {
+                    ...field,
+                    searchTarget: `${field.b_name} ${commonTerms} ${dateTermsArr(field.b_lu_start)} ${dateTermsArr(field.b_lu_end)} ${dateTermsArr(field.b_lu_harvest_date)}`,
+                }
+            })
+
+            return {
+                ...item,
+                fields: fields,
+                searchTarget: `${commonTerms} ${[...crop_b_lu_start].join(" ")} ${[...crop_b_lu_end].join(" ")} ${[...crop_b_lu_harvest_date].join(" ")}`,
+            }
+        })
+    }, [data])
+    type MemoizedTData = (typeof memoizedData)[number]
+
+    const fuzzySearchAndProductivityFilter: FilterFn<MemoizedTData> = (
         row,
         _columnId,
         { searchTerms, showProductiveOnly },
     ) => {
         if (
             showProductiveOnly &&
-            !row.original.fields.some((field) => field.b_isproductive)
+            !(row.original.type === "crop"
+                ? row.original.fields.some((field) => field.b_isproductive)
+                : row.original.b_isproductive)
         ) {
             return false
         }
+
         return (
             searchTerms === "" ||
-            fuzzysort.go(searchTerms, [(row.original as any).searchTarget])
-                .length > 0
+            fuzzysort.go(searchTerms, [
+                (row.original as MemoizedTData).searchTarget,
+            ]).length > 0
         )
     }
 
@@ -182,6 +244,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
         getFacetedRowModel: getFacetedRowModel(),
+        getExpandedRowModel: getExpandedRowModel(),
+        getSubRows: (row) =>
+            row.type === "crop" ? (row.fields as TData[]) : undefined,
         onColumnVisibilityChange: setColumnVisibility,
         onGlobalFilterChange: (globalFilter) => {
             if (globalFilter?.searchTerms ?? "" !== searchTerms)
@@ -189,6 +254,11 @@ export function DataTable<TData extends RotationExtended, TValue>({
         },
         onRowSelectionChange: setRowSelection,
         globalFilterFn: fuzzySearchAndProductivityFilter,
+        // There are nulls in the columns which can cause false assumptions if this is not provided
+        // The global filter checks the searchTarget field anyways
+        // Filter only one of the columns to gain performance
+        getColumnCanGlobalFilter: (column) => column.id === "name",
+        filterFromLeafRows: true,
         state: {
             sorting,
             columnFilters,
@@ -198,18 +268,36 @@ export function DataTable<TData extends RotationExtended, TValue>({
         },
     })
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Bemesting button activation
+    // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Oogst button activation
     const selectedCultivations = useMemo(() => {
-        return table
-            .getFilteredSelectedRowModel()
-            .rows.map((row) => row.original)
+        return (
+            table
+                .getFilteredRowModel()
+                .rows.filter(
+                    (row) =>
+                        row.original.type === "crop" &&
+                        (row.getIsSelected() || row.getIsSomeSelected()),
+                ) as Row<CropRow>[]
+        ).map((row) => row.original)
+    }, [table, rowSelection])
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Bemesting button activation
+    const selectedFields = useMemo(() => {
+        return (
+            table
+                .getFilteredSelectedRowModel()
+                .flatRows.filter(
+                    (row) => row.original.type === "field",
+                ) as Row<FieldRow>[]
+        ).map((row) => row.original)
     }, [table, rowSelection])
 
     const selectedCultivationIds = selectedCultivations.map(
-        (field) => field.b_lu_catalogue,
+        (cultivation) => cultivation.b_lu_catalogue,
     )
+    const selectedFieldIds = selectedFields.map((field) => field.b_id)
 
-    const isFertilizerButtonDisabled = selectedCultivationIds.length === 0
+    const isFertilizerButtonDisabled = selectedFieldIds.length === 0
     const fertilizerTooltipContent = isFertilizerButtonDisabled
         ? "Selecteer één of meerdere gewassen om bemesting toe te voegen"
         : "Bemesting toevoegen aan geselecteerd gewas"
@@ -230,6 +318,14 @@ export function DataTable<TData extends RotationExtended, TValue>({
               ? harvestErrorMessage
               : "Oogst toevoegen aan geselecteerd gewas"
 
+    function makeWizardUrl(url: string) {
+        return modifySearchParams(url, (searchParams) => {
+            searchParams.set("cultivationIds", selectedCultivationIds.join(","))
+            searchParams.set("fieldIds", selectedFieldIds.join(","))
+            if (location.pathname.toLowerCase().startsWith("/farm/create"))
+                searchParams.set("create", "")
+        })
+    }
     return (
         <div className="w-full flex flex-col h-full">
             <div className="sticky top-0 z-10 bg-background py-4 flex flex-col sm:flex-row gap-2 items-center">
@@ -256,7 +352,10 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                         {
                                             b_lu_name: "Gewas",
                                             b_lu_start: "Zaaidatum",
+                                            b_lu_end: "Einddatum",
                                             b_harvest_date: "Oogstdata",
+                                            b_lu_variety: "Variëteit",
+                                            m_cropresidue: "Gewasresten",
                                             fertilizers: "Bemesting",
                                             b_name: "Percelen",
                                             b_area: "Oppervlakte",
@@ -295,7 +394,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                         </Button>
                                     ) : (
                                         <NavLink
-                                            to={`/farm/${b_id_farm}/${calendar}/rotation/fertilizer?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}`}
+                                            to={makeWizardUrl(
+                                                `/farm/${b_id_farm}/${calendar}/rotation/fertilizer`,
+                                            )}
                                         >
                                             <Button>
                                                 <Plus className="mr-2 h-4 w-4" />
@@ -336,7 +437,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                         </Button>
                                     ) : (
                                         <NavLink
-                                            to={`/farm/${b_id_farm}/${calendar}/rotation/harvest?cultivationIds=${selectedCultivationIds.map(encodeURIComponent).join(",")}`}
+                                            to={makeWizardUrl(
+                                                `/farm/${b_id_farm}/${calendar}/rotation/harvest`,
+                                            )}
                                         >
                                             <Button>
                                                 <Plus className="mr-2 h-4 w-4" />
@@ -362,13 +465,15 @@ export function DataTable<TData extends RotationExtended, TValue>({
                                     return (
                                         <TableHead
                                             key={header.id}
-                                            className={cn({
-                                                "sticky left-0 bg-background":
+                                            className={cn("box-border", {
+                                                "sticky left-0":
                                                     header.column.id ===
                                                     "select",
-                                                "sticky right-0 bg-background":
+                                                "sticky right-0":
                                                     header.column.id ===
                                                     "actions",
+                                                "min-w-35":
+                                                    header.column.id === "name",
                                             })}
                                         >
                                             {header.isPlaceholder
@@ -389,20 +494,39 @@ export function DataTable<TData extends RotationExtended, TValue>({
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     key={row.id}
-                                    data-state={
-                                        row.getIsSelected() && "selected"
-                                    }
                                     onClick={(event) =>
                                         handleRowClick(row, event)
                                     }
+                                    className={cn(
+                                        "data-[state=selected]:bg-muted data-[state=indeterminate]:bg-muted/50",
+                                        row.getIsSelected()
+                                            ? "bg-green-100 hover:bg-green-300/50"
+                                            : row.original.type === "crop" &&
+                                                row.getIsSomeSelected()
+                                              ? "bg-green-50 hover:bg-green-300/25"
+                                              : row.original.type === "field" &&
+                                                "bg-muted/50 hover:bg-muted",
+                                        row.original.type === "field" &&
+                                            ((row.getParentRow() as Row<TData>)
+                                                ?.subRows.length === 1
+                                                ? "shadow-[inset_0_1em_2em_-2em_#00000088,inset_0_-1em_2em_-2em_#00000088]"
+                                                : row.index === 0
+                                                  ? "shadow-[inset_0_1em_2em_-2em_#00000088]"
+                                                  : row.index ===
+                                                        (
+                                                            row.getParentRow() as Row<TData>
+                                                        )?.subRows.length -
+                                                            1 &&
+                                                    "shadow-[inset_0_-1em_2em_-2em_#00000088]"),
+                                    )}
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell
                                             key={cell.id}
                                             className={cn({
-                                                "sticky left-0 bg-background":
+                                                "sticky left-0":
                                                     cell.column.id === "select",
-                                                "sticky right-0 bg-background":
+                                                "sticky right-0":
                                                     cell.column.id ===
                                                     "actions",
                                             })}

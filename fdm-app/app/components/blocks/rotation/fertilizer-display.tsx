@@ -6,7 +6,7 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
-import type { RotationExtended } from "./columns"
+import type { FieldRow, RotationExtended } from "./columns"
 
 type FertilizerDisplayProps = {
     cultivation: RotationExtended
@@ -46,11 +46,15 @@ const fertilizerIconClassMap = {
 export const FertilizerDisplay: React.FC<FertilizerDisplayProps> = ({
     cultivation,
 }) => {
+    const resolvedFertilizers =
+        cultivation.type === "field" ? cultivation.fertilizers : null
     const uniqueFertilizers = React.useMemo(() => {
         const fields = cultivation.fields
-        const fertilizers = fields.flatMap((field) => field.fertilizers)
+        const fertilizers =
+            resolvedFertilizers ??
+            (fields as FieldRow[]).flatMap((field) => field.fertilizers)
         return Array.from(new Map(fertilizers.map((f) => [f.p_id, f])).values())
-    }, [cultivation.fields])
+    }, [resolvedFertilizers, cultivation.fields])
 
     const fertilizerDisplay = React.useMemo(() => {
         const fields = cultivation.fields
@@ -58,7 +62,8 @@ export const FertilizerDisplay: React.FC<FertilizerDisplayProps> = ({
             <div className="flex items-start flex-col space-y-2">
                 {uniqueFertilizers.map((fertilizer) => {
                     const isFertilizerUsedOnAllFieldsForThisCultivation =
-                        fields.every((field) =>
+                        cultivation.type === "field" ||
+                        (fields as FieldRow[]).every((field) =>
                             field.fertilizers.some(
                                 (f) => f.p_id === fertilizer.p_id,
                             ),
@@ -68,35 +73,40 @@ export const FertilizerDisplay: React.FC<FertilizerDisplayProps> = ({
                             ? "600"
                             : "300"
 
-                    return (
+                    const component = (
+                        <Badge
+                            key={fertilizer.p_id}
+                            variant="outline"
+                            className="gap-1 text-muted-foreground"
+                        >
+                            <span>
+                                {fertilizer.p_type === "manure" ? (
+                                    <Square
+                                        className={`size-3 ${fertilizerIconClassMap.manure.text} ${fertilizerIconClassMap.manure.fill[fertilizerIconFillShade]}`}
+                                    />
+                                ) : fertilizer.p_type === "mineral" ? (
+                                    <Circle
+                                        className={`size-3 ${fertilizerIconClassMap.mineral.text} ${fertilizerIconClassMap.mineral.fill[fertilizerIconFillShade]}`}
+                                    />
+                                ) : fertilizer.p_type === "compost" ? (
+                                    <Triangle
+                                        className={`size-3 ${fertilizerIconClassMap.compost.text} ${fertilizerIconClassMap.compost.fill[fertilizerIconFillShade]}`}
+                                    />
+                                ) : (
+                                    <Diamond
+                                        className={`size-3 ${fertilizerIconClassMap.other.text} ${fertilizerIconClassMap.other.fill[fertilizerIconFillShade]}`}
+                                    />
+                                )}
+                            </span>
+                            {fertilizer.p_name_nl}
+                        </Badge>
+                    )
+
+                    return cultivation.type === "field" ? (
+                        component
+                    ) : (
                         <Tooltip key={fertilizer.p_id}>
-                            <TooltipTrigger>
-                                <Badge
-                                    variant="outline"
-                                    className="gap-1 text-muted-foreground"
-                                >
-                                    <span>
-                                        {fertilizer.p_type === "manure" ? (
-                                            <Square
-                                                className={`size-3 ${fertilizerIconClassMap.manure.text} ${fertilizerIconClassMap.manure.fill[fertilizerIconFillShade]}`}
-                                            />
-                                        ) : fertilizer.p_type === "mineral" ? (
-                                            <Circle
-                                                className={`size-3 ${fertilizerIconClassMap.mineral.text} ${fertilizerIconClassMap.mineral.fill[fertilizerIconFillShade]}`}
-                                            />
-                                        ) : fertilizer.p_type === "compost" ? (
-                                            <Triangle
-                                                className={`size-3 ${fertilizerIconClassMap.compost.text} ${fertilizerIconClassMap.compost.fill[fertilizerIconFillShade]}`}
-                                            />
-                                        ) : (
-                                            <Diamond
-                                                className={`size-3 ${fertilizerIconClassMap.other.text} ${fertilizerIconClassMap.other.fill[fertilizerIconFillShade]}`}
-                                            />
-                                        )}
-                                    </span>
-                                    {fertilizer.p_name_nl}
-                                </Badge>
-                            </TooltipTrigger>
+                            <TooltipTrigger>{component}</TooltipTrigger>
                             <TooltipContent>
                                 {isFertilizerUsedOnAllFieldsForThisCultivation
                                     ? "Deze meststof is toegepast op alle percelen met dit gewas"
@@ -107,7 +117,7 @@ export const FertilizerDisplay: React.FC<FertilizerDisplayProps> = ({
                 })}
             </div>
         )
-    }, [uniqueFertilizers, cultivation.fields])
+    }, [uniqueFertilizers, cultivation.type, cultivation.fields])
 
     return fertilizerDisplay
 }
