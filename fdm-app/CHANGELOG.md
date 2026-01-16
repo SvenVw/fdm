@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.26.7
+
+### Patch Changes
+
+- e5f322f: Fix incorrect norms in fertilizer dashboard by using the selected calendar year.
+
 ## 0.26.6
 
 ### Patch Changes
