@@ -22,18 +22,18 @@ export function HeaderAtlas({ b_id_farm }: { b_id_farm: string | undefined }) {
 
     return (
         <>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem className="hidden md:block">
+            <BreadcrumbSeparator className="hidden xl:block" />
+            <BreadcrumbItem className="hidden xl:block">
                 <BreadcrumbLink href={`/farm/${b_id_farm}/${calendar}/atlas`}>
                     Atlas
                 </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
-            <BreadcrumbItem className="hidden md:block">
+            <BreadcrumbItem>
                 <DropdownMenu>
-                    <DropdownMenuTrigger className="flex items-center gap-1">
-                        {currentName}
-                        <ChevronDown className="h-4 w-4" />
+                    <DropdownMenuTrigger className="flex items-center gap-1 max-w-[120px] sm:max-w-[200px] md:max-w-none outline-none">
+                        <span className="truncate">{currentName}</span>
+                        <ChevronDown className="h-4 w-4 shrink-0" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
                         <DropdownMenuItem asChild>
