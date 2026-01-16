@@ -77,6 +77,7 @@ export function FertilizerApplicationMetricsCard({
     isSubmitting,
 }: FertilizerApplicationMetricsCardProps) {
     const getNormsProgressColor = (current: number, total: number) => {
+        if (total === 0) return "gray-500"
         const percentage = (current / total) * 100
         if (percentage > 100) return "red-500"
         return "green-500"
@@ -100,6 +101,7 @@ export function FertilizerApplicationMetricsCard({
         calendar,
         cultivations,
         activeCultivation,
+        b_bufferstrip,
     } = fertilizerApplicationMetricsData
 
     return (
@@ -209,21 +211,15 @@ export function FertilizerApplicationMetricsCard({
                                                             </div>
                                                             <Progress
                                                                 value={
-                                                                    (resolvedNorms
-                                                                        .filling
-                                                                        .nitrogen /
-                                                                        resolvedNorms
-                                                                            .value
-                                                                            .nitrogen) *
-                                                                    100
+                                                                    resolvedNorms.value.nitrogen === 0
+                                                                        ? 0
+                                                                        : (resolvedNorms.filling.nitrogen /
+                                                                              resolvedNorms.value.nitrogen) *
+                                                                          100
                                                                 }
                                                                 colorBar={getNormsProgressColor(
-                                                                    resolvedNorms
-                                                                        .filling
-                                                                        .nitrogen,
-                                                                    resolvedNorms
-                                                                        .value
-                                                                        .nitrogen,
+                                                                    resolvedNorms.filling.nitrogen,
+                                                                    resolvedNorms.value.nitrogen,
                                                                 )}
                                                                 className="h-2"
                                                             />
@@ -265,21 +261,15 @@ export function FertilizerApplicationMetricsCard({
                                                             </div>
                                                             <Progress
                                                                 value={
-                                                                    (resolvedNorms
-                                                                        .filling
-                                                                        .phosphate /
-                                                                        resolvedNorms
-                                                                            .value
-                                                                            .phosphate) *
-                                                                    100
+                                                                    resolvedNorms.value.phosphate === 0
+                                                                        ? 0
+                                                                        : (resolvedNorms.filling.phosphate /
+                                                                              resolvedNorms.value.phosphate) *
+                                                                          100
                                                                 }
                                                                 colorBar={getNormsProgressColor(
-                                                                    resolvedNorms
-                                                                        .filling
-                                                                        .phosphate,
-                                                                    resolvedNorms
-                                                                        .value
-                                                                        .phosphate,
+                                                                    resolvedNorms.filling.phosphate,
+                                                                    resolvedNorms.value.phosphate,
                                                                 )}
                                                                 className="h-2"
                                                             />
@@ -322,21 +312,15 @@ export function FertilizerApplicationMetricsCard({
                                                             </div>
                                                             <Progress
                                                                 value={
-                                                                    (resolvedNorms
-                                                                        .filling
-                                                                        .manure /
-                                                                        resolvedNorms
-                                                                            .value
-                                                                            .manure) *
-                                                                    100
+                                                                    resolvedNorms.value.manure === 0
+                                                                        ? 0
+                                                                        : (resolvedNorms.filling.manure /
+                                                                              resolvedNorms.value.manure) *
+                                                                          100
                                                                 }
                                                                 colorBar={getNormsProgressColor(
-                                                                    resolvedNorms
-                                                                        .filling
-                                                                        .manure,
-                                                                    resolvedNorms
-                                                                        .value
-                                                                        .manure,
+                                                                    resolvedNorms.filling.manure,
+                                                                    resolvedNorms.value.manure,
                                                                 )}
                                                                 className="h-2"
                                                             />
@@ -378,7 +362,7 @@ export function FertilizerApplicationMetricsCard({
                                         >
                                             {(resolvedNitrogenBalance) => {
                                                 if (
-                                                    fertilizerApplicationMetricsData.b_bufferstrip
+                                                    b_bufferstrip
                                                 ) {
                                                     return (
                                                         <span className="text-xs text-muted-foreground">
