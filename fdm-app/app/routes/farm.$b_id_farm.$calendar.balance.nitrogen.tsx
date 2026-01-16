@@ -102,7 +102,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 return {
                     b_id: field.b_id,
                     b_name: field.b_name,
-                    b_area: Math.round(field.b_area * 10) / 10,
+                    b_area:
+                        field.b_area != null
+                            ? Math.round(field.b_area * 10) / 10
+                            : 0,
                 }
             })
 
