@@ -711,6 +711,7 @@ export default function FarmRotationHarvestAddIndex() {
                                         </div>
                                     ) : loaderData.fieldAmount > 0 ? (
                                         <HarvestForm
+                                            key={selectedFieldIds.join(",")}
                                             harvestParameters={
                                                 loaderData.harvestParameters
                                             }
@@ -760,6 +761,7 @@ export default function FarmRotationHarvestAddIndex() {
                                             }
                                             b_lu_start={loaderData.b_lu_start}
                                             b_lu_end={loaderData.b_lu_end}
+                                            key={selectedFieldIds.join(",")}
                                             action={modifySearchParams(
                                                 `${location.pathname}${location.search}`,
                                                 (searchParams) =>
