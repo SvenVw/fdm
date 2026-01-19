@@ -316,7 +316,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 min && date ? (min < date ? min : date) : min || date,
             undefined,
         )
-        const mixedDates = b_lu_starts.length > 1 || b_lu_ends.length > 1
 
         const fieldOptions = allFieldsWithCultivations.map((field) => {
             if (!field?.b_id || !field?.b_name) {
@@ -359,7 +358,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             harvestParameters: harvestParameters,
             b_lu_start: b_lu_start,
             b_lu_end: b_lu_end,
-            mixedDates: mixedDates,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -766,7 +764,6 @@ export default function FarmRotationHarvestAddIndex() {
                                             }
                                             b_lu_start={loaderData.b_lu_start}
                                             b_lu_end={loaderData.b_lu_end}
-                                            mixedDates={loaderData.mixedDates}
                                             action={modifySearchParams(
                                                 `${location.pathname}${location.search}`,
                                                 (searchParams) =>

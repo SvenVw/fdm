@@ -1,3 +1,5 @@
+import { format } from "date-fns"
+import { nl } from "date-fns/locale"
 import { z } from "zod"
 
 export const FormSchema = z
@@ -216,7 +218,7 @@ export const FormSchema = z
         ) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: "Oogstdatum moet na de zaaidatum van de teelt liggen",
+                message: `Oogstdatum moet na de zaaidatum van de teelt (${format(data.b_lu_start, "PP", { locale: nl })}) liggen`,
                 path: ["b_lu_harvest_date"],
             })
         }
@@ -228,8 +230,7 @@ export const FormSchema = z
         ) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message:
-                    "Oogstdatum mag niet na de einddatum van de teelt liggen",
+                message: `Oogstdatum mag niet na de einddatum van de teelt (${format(data.b_lu_end, "PP", { locale: nl })}) liggen`,
                 path: ["b_lu_harvest_date"],
             })
         }
