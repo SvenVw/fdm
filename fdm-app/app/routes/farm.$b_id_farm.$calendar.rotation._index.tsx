@@ -221,7 +221,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     fertilizers: fertilizersFiltered,
                     a_som_loi: a_som_loi,
                     b_soiltype_agr: b_soiltype_agr,
-                    b_area: Math.round(field.b_area * 10) / 10,
+                    b_area: Math.round((field.b_area ?? 0) * 10) / 10,
                     b_bufferstrip: field.b_bufferstrip,
                 }
             }),
