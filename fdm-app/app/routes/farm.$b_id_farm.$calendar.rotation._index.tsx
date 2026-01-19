@@ -24,7 +24,7 @@ import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import {
     columns,
-    CropRow,
+    type CropRow,
     type RotationExtended,
 } from "~/components/blocks/rotation/columns"
 import { RotationTableFormSchema } from "~/components/blocks/rotation/schema"
@@ -365,8 +365,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     b_lu_end: b_lu_end,
                     calendar: calendar,
                     m_cropresidue: aggr_m_crop_residue,
-                    b_isproductive: fieldsWithThisCultivation.some(
-                        (field) => field.b_isproductive,
+                    b_bufferstrip: fieldsWithThisCultivation.some(
+                        (field) => field.b_bufferstrip,
                     ),
                     fields: fieldsWithThisCultivation.map((field, i) => ({
                         // TODO: Define a proper type for field
