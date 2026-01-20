@@ -376,8 +376,8 @@ export default function FarmDashboardIndex() {
                                                         Download bemestingsplan
                                                     </CardTitle>
                                                     <CardDescription>
-                                                        Een pdf met uw
-                                                        gebuiksruimte en
+                                                        pdf met
+                                                        gebruiksruimte en
                                                         bemestingsadvies op
                                                         bedrijfs- en
                                                         perceelsniveau.
