@@ -288,6 +288,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             )
         }
 
+        const b_lu_starts = selectedFields.map(
+            (field) =>
+                field.cultivations.find((cultivation) =>
+                    cultivationIds.includes(cultivation.b_lu_catalogue),
+                )?.b_lu_start,
+        )
+        const b_lu_ends = selectedFields.map(
+            (field) =>
+                field.cultivations.find((cultivation) =>
+                    cultivationIds.includes(cultivation.b_lu_catalogue),
+                )?.b_lu_end,
+        )
+        const b_lu_start = b_lu_starts.reduce(
+            (max, date) =>
+                max && date ? (max > date ? max : date) : max || date,
+            undefined,
+        )
+        const b_lu_end = b_lu_ends.reduce(
+            (min, date) =>
+                min && date ? (min < date ? min : date) : min || date,
+            undefined,
+        )
+
         const fieldOptions = allFieldsWithCultivations.map((field) => {
             if (!field?.b_id || !field?.b_name) {
                 throw new Error("Invalid field data structure")
@@ -327,6 +350,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             harvestApplication: harvestApplication,
             harvestableAnalysis: harvestableAnalysis,
             harvestParameters: harvestParameters,
+            b_lu_start: b_lu_start,
+            b_lu_end: b_lu_end,
             create: url.searchParams.has("create"),
         }
     } catch (error) {
@@ -686,6 +711,7 @@ export default function FarmRotationHarvestAddIndex() {
                                         </div>
                                     ) : loaderData.fieldAmount > 0 ? (
                                         <HarvestForm
+                                            key={selectedFieldIds.join(",")}
                                             harvestParameters={
                                                 loaderData.harvestParameters
                                             }
@@ -733,13 +759,8 @@ export default function FarmRotationHarvestAddIndex() {
                                                 loaderData.cultivation
                                                     .b_lu_harvestable
                                             }
-                                            b_lu_start={
-                                                loaderData.cultivation
-                                                    .b_lu_start
-                                            }
-                                            b_lu_end={
-                                                loaderData.cultivation.b_lu_end
-                                            }
+                                            b_lu_start={loaderData.b_lu_start}
+                                            b_lu_end={loaderData.b_lu_end}
                                             action={modifySearchParams(
                                                 `${location.pathname}${location.search}`,
                                                 (searchParams) =>

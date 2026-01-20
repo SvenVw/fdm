@@ -1,21 +1,20 @@
+import { format } from "date-fns"
+import { nl } from "date-fns/locale"
 import { z } from "zod"
 
 export const FormSchema = z
     .object({
         b_lu_harvest_date: z
             .string({
-                required_error:
-                    "Geef een datum op voor wanneer dit gewas is geoogst",
-                invalid_type_error:
-                    "Geef een datum op voor wanneer dit gewas is geoogst",
+                required_error: "Selecteer een oogstdatum",
+                invalid_type_error: "Selecteer een geldige oogstdatum",
             })
             .transform((val, ctx) => {
                 const date = new Date(val)
                 if (Number.isNaN(date.getTime())) {
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,
-                        message:
-                            "Geef een datum op voor wanneer dit gewas is geoogst",
+                        message: "Selecteer een geldige oogstdatum",
                     })
                     return z.NEVER
                 }
@@ -25,20 +24,20 @@ export const FormSchema = z
             (val) => (val === "" ? undefined : val),
             z.coerce
                 .number({
-                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                    invalid_type_error: "De waarde moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet groter zijn dan 0",
+                    message: "De waarde moet groter zijn dan 0",
                 })
                 .finite({
-                    message: "Hoeveelheid moet een geheel getal zijn",
+                    message: "De waarde moet een geldig getal zijn",
                 })
                 .max(250000, {
                     message:
-                        "Hoeveelheid mag niet groter zijn dan 250.000 kg DS / ha",
+                        "Opbrengst mag niet groter zijn dan 250.000 kg DS / ha",
                 })
                 .safe({
-                    message: "Hoeveelheid moet een safe getal zijn",
+                    message: "De waarde is buiten het toegestane bereik",
                 })
                 .optional(),
         ),
@@ -46,20 +45,20 @@ export const FormSchema = z
             (val) => (val === "" ? undefined : val),
             z.coerce
                 .number({
-                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                    invalid_type_error: "De waarde moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet groter zijn dan 0",
+                    message: "De waarde moet groter zijn dan 0",
                 })
                 .finite({
-                    message: "Hoeveelheid moet een geheel getal zijn",
+                    message: "De waarde moet een geldig getal zijn",
                 })
                 .max(250000, {
                     message:
-                        "Hoeveelheid mag niet groter zijn dan 250.000 kg versproduct / ha",
+                        "Opbrengst mag niet groter zijn dan 250.000 kg versproduct / ha",
                 })
                 .safe({
-                    message: "Hoeveelheid moet een safe getal zijn",
+                    message: "De waarde is buiten het toegestane bereik",
                 })
                 .optional(),
         ),
@@ -67,20 +66,20 @@ export const FormSchema = z
             (val) => (val === "" ? undefined : val),
             z.coerce
                 .number({
-                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                    invalid_type_error: "De waarde moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet groter zijn dan 0",
+                    message: "De waarde moet groter zijn dan 0",
                 })
                 .finite({
-                    message: "Hoeveelheid moet een geheel getal zijn",
+                    message: "De waarde moet een geldig getal zijn",
                 })
                 .max(250000, {
                     message:
-                        "Hoeveelheid mag niet groter zijn dan 250.000 kg versproduct (incl. tarra) / ha",
+                        "Opbrengst mag niet groter zijn dan 250.000 kg versproduct (incl. tarra) / ha",
                 })
                 .safe({
-                    message: "Hoeveelheid moet een safe getal zijn",
+                    message: "De waarde is buiten het toegestane bereik",
                 })
                 .optional(),
         ),
@@ -88,20 +87,20 @@ export const FormSchema = z
             (val) => (val === "" ? undefined : val),
             z.coerce
                 .number({
-                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                    invalid_type_error: "De waarde moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet groter zijn dan 0",
+                    message: "De waarde moet groter zijn dan 0",
                 })
                 .finite({
-                    message: "Hoeveelheid moet een geheel getal zijn",
+                    message: "De waarde moet een geldig getal zijn",
                 })
                 .max(1000, {
                     message:
-                        "Hoeveelheid mag niet groter zijn dan 1.000 g Ds / kg versproduct",
+                        "Het droge stof gehalte mag niet groter zijn dan 1.000 g / kg",
                 })
                 .safe({
-                    message: "Hoeveelheid moet een safe getal zijn",
+                    message: "De waarde is buiten het toegestane bereik",
                 })
                 .optional(),
         ),
@@ -109,13 +108,14 @@ export const FormSchema = z
             (val) => (val === "" ? undefined : val),
             z.coerce
                 .number({
-                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                    invalid_type_error: "De waarde moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet groter zijn dan 0",
+                    message: "De waarde moet groter zijn dan 0",
                 })
                 .max(1000, {
-                    message: "Hoeveelheid mag niet groter zijn dan 1000",
+                    message:
+                        "De stikstofopbrengst mag niet groter zijn dan 1.000 kg N / ha",
                 })
                 .optional(),
         ),
@@ -123,19 +123,19 @@ export const FormSchema = z
             (val) => (val === "" ? undefined : val),
             z.coerce
                 .number({
-                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                    invalid_type_error: "De waarde moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet groter zijn dan 0",
+                    message: "De waarde moet groter zijn dan 0",
                 })
                 .finite({
-                    message: "Hoeveelheid moet een geheel getal zijn",
+                    message: "De waarde moet een geldig getal zijn",
                 })
                 .max(25, {
-                    message: "Hoeveelheid mag niet groter zijn dan 25 %",
+                    message: "Het tarra-percentage mag niet hoger zijn dan 25%",
                 })
                 .safe({
-                    message: "Hoeveelheid moet een safe getal zijn",
+                    message: "De waarde is buiten het toegestane bereik",
                 })
                 .optional(),
         ),
@@ -143,23 +143,24 @@ export const FormSchema = z
             (val) => (val === "" ? undefined : val),
             z.coerce
                 .number({
-                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                    invalid_type_error: "De waarde moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet groter zijn dan 0",
+                    message: "De waarde moet groter zijn dan 0",
                 })
                 .finite({
-                    message: "Hoeveelheid moet een geheel getal zijn",
+                    message: "De waarde moet een geldig getal zijn",
                 })
                 .min(100, {
-                    message: "Hoeveelheid mag niet kleiner zijn dan 100",
+                    message:
+                        "Het onderwatergewicht mag niet kleiner zijn dan 100 g / 5 kg",
                 })
                 .max(1000, {
                     message:
-                        "Hoeveelheid mag niet groter zijn dan 1.000 g / 5 kg",
+                        "Het onderwatergewicht mag niet groter zijn dan 1.000 g / 5 kg",
                 })
                 .safe({
-                    message: "Hoeveelheid moet een safe getal zijn",
+                    message: "De waarde is buiten het toegestane bereik",
                 })
                 .optional(),
         ),
@@ -167,19 +168,19 @@ export const FormSchema = z
             (val) => (val === "" ? undefined : val),
             z.coerce
                 .number({
-                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                    invalid_type_error: "De waarde moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet groter zijn dan 0",
+                    message: "De waarde moet groter zijn dan 0",
                 })
                 .finite({
-                    message: "Hoeveelheid moet een geheel getal zijn",
+                    message: "De waarde moet een geldig getal zijn",
                 })
                 .max(100, {
-                    message: "Hoeveelheid mag niet groter zijn dan 100 %",
+                    message: "Het vochtpercentage mag niet hoger zijn dan 100%",
                 })
                 .safe({
-                    message: "Hoeveelheid moet een safe getal zijn",
+                    message: "De waarde is buiten het toegestane bereik",
                 })
                 .optional(),
         ),
@@ -187,20 +188,20 @@ export const FormSchema = z
             (val) => (val === "" ? undefined : val),
             z.coerce
                 .number({
-                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                    invalid_type_error: "De waarde moet een getal zijn",
                 })
                 .positive({
-                    message: "Hoeveelheid moet groter zijn dan 0",
+                    message: "De waarde moet groter zijn dan 0",
                 })
                 .finite({
-                    message: "Hoeveelheid moet een geheel getal zijn",
+                    message: "De waarde moet een geldig getal zijn",
                 })
                 .max(500, {
                     message:
-                        "Hoeveelheid mag niet groter zijn dan 500 g RE / kg DS",
+                        "Het ruw eiwit gehalte mag niet groter zijn dan 500 g / kg DS",
                 })
                 .safe({
-                    message: "Hoeveelheid moet een safe getal zijn",
+                    message: "De waarde is buiten het toegestane bereik",
                 })
                 .optional(),
         ),
@@ -216,7 +217,7 @@ export const FormSchema = z
         ) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message: "Oogstdatum moet na de zaaidatum van de teelt liggen",
+                message: `De oogstdatum mag niet vóór de start van de teelt (${format(data.b_lu_start, "PP", { locale: nl })}) vallen`,
                 path: ["b_lu_harvest_date"],
             })
         }
@@ -228,8 +229,7 @@ export const FormSchema = z
         ) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
-                message:
-                    "Oogstdatum mag niet na de einddatum van de teelt liggen",
+                message: `De oogstdatum mag niet ná het einde van de teelt (${format(data.b_lu_end, "PP", { locale: nl })}) vallen`,
                 path: ["b_lu_harvest_date"],
             })
         }
