@@ -216,8 +216,8 @@ export function DataTable<TData extends RotationExtended, TValue>({
         if (
             showProductiveOnly &&
             !(row.original.type === "crop"
-                ? row.original.fields.some((field) => field.b_isproductive)
-                : row.original.b_isproductive)
+                ? row.original.fields.some((field) => !field.b_bufferstrip)
+                : !row.original.b_bufferstrip)
         ) {
             return false
         }

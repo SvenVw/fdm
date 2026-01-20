@@ -53,12 +53,14 @@ export async function calculateNitrogenBalance(
                     return {
                         b_id: fieldInput.field.b_id,
                         b_area: fieldInput.field.b_area ?? 0,
+                        b_bufferstrip: fieldInput.field.b_bufferstrip ?? false,
                         balance,
                     }
                 } catch (error) {
                     return {
                         b_id: fieldInput.field.b_id,
                         b_area: fieldInput.field.b_area ?? 0,
+                        b_bufferstrip: fieldInput.field.b_bufferstrip ?? false,
                         errorMessage:
                             error instanceof Error
                                 ? error.message
@@ -119,6 +121,48 @@ export function calculateNitrogenBalanceField(
 
     if (!timeFrame.start || !timeFrame.end) {
         throw new Error("Timeframe start and end dates must be provided.")
+    }
+
+    if (field.b_bufferstrip) {
+        return {
+            b_id: field.b_id,
+            balance: 0,
+            supply: {
+                total: 0,
+                fertilizers: {
+                    total: 0,
+                    mineral: { total: 0, applications: [] },
+                    manure: { total: 0, applications: [] },
+                    compost: { total: 0, applications: [] },
+                    other: { total: 0, applications: [] },
+                },
+                fixation: { total: 0, cultivations: [] },
+                deposition: { total: 0 },
+                mineralisation: { total: 0 },
+            },
+            removal: {
+                total: 0,
+                harvests: { total: 0, harvests: [] },
+                residues: { total: 0, cultivations: [] },
+            },
+            emission: {
+                total: 0,
+                ammonia: {
+                    total: 0,
+                    fertilizers: {
+                        total: 0,
+                        mineral: { total: 0, applications: [] },
+                        manure: { total: 0, applications: [] },
+                        compost: { total: 0, applications: [] },
+                        other: { total: 0, applications: [] },
+                    },
+                    residues: { total: 0, cultivations: [] },
+                    grazing: undefined,
+                },
+                nitrate: { total: 0 },
+            },
+            target: 0,
+        }
     }
 
     const fertilizerDetailsMap = new Map<string, FertilizerDetail>(
@@ -261,8 +305,9 @@ export function calculateNitrogenBalancesFieldToFarm(
     fieldErrorMessages: string[],
 ): NitrogenBalanceNumeric {
     // Filter out fields that have errors for aggregation
+    // Also filter out buffer strips as they should be ignored in the farm-level aggregation
     const successfulFieldBalances = fieldsWithBalanceResults.filter(
-        (result) => result.balance !== undefined,
+        (result) => result.balance !== undefined && !result.b_bufferstrip,
     ) as (NitrogenBalanceFieldResultNumeric & {
         balance: NitrogenBalanceFieldNumeric
     })[]
@@ -482,7 +527,8 @@ export function calculateNitrogenBalancesFieldToFarm(
         fields: fieldsWithBalanceResults,
         hasErrors:
             hasErrors ||
-            fieldsWithBalanceResults.length !== successfulFieldBalances.length,
+            fieldsWithBalanceResults.filter((result) => !result.b_bufferstrip)
+                .length !== successfulFieldBalances.length,
         fieldErrorMessages: fieldErrorMessages,
     }
 
