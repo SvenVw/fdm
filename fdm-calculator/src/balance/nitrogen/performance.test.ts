@@ -86,6 +86,7 @@ function generateMockData(numberOfFields: number): NitrogenBalanceInput {
             b_area: Math.floor(Math.random() * 50 + 10), // Random area between 10 and 60
             b_start: fieldStart,
             b_end: fieldEnd,
+            b_bufferstrip: false,
         }
 
         const cultivations: FieldInput["cultivations"] = [

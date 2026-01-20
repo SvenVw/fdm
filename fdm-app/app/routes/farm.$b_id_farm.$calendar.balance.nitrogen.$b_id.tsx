@@ -24,6 +24,7 @@ import {
 import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 import NitrogenBalanceDetails from "~/components/blocks/balance/nitrogen-details"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons"
+import { BufferStripWarning } from "~/components/blocks/balance/buffer-strip-warning"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -191,6 +192,10 @@ function NitrogenBalance({
     const location = useLocation()
     const page = location.pathname
     const calendar = useCalendarStore((state) => state.calendar)
+
+    if (field.b_bufferstrip) {
+        return <BufferStripWarning b_id={field.b_id} />
+    }
 
     if (fieldResult.errorMessage) {
         return (

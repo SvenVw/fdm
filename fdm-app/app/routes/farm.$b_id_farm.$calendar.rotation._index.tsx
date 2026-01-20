@@ -24,7 +24,7 @@ import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import {
     columns,
-    CropRow,
+    type CropRow,
     type RotationExtended,
 } from "~/components/blocks/rotation/columns"
 import { RotationTableFormSchema } from "~/components/blocks/rotation/schema"
@@ -222,7 +222,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     a_som_loi: a_som_loi,
                     b_soiltype_agr: b_soiltype_agr,
                     b_area: Math.round((field.b_area ?? 0) * 10) / 10,
-                    b_isproductive: field.b_isproductive ?? true,
+                    b_bufferstrip: field.b_bufferstrip,
                 }
             }),
         )
@@ -365,8 +365,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     b_lu_end: b_lu_end,
                     calendar: calendar,
                     m_cropresidue: aggr_m_crop_residue,
-                    b_isproductive: fieldsWithThisCultivation.some(
-                        (field) => field.b_isproductive,
+                    b_bufferstrip: fieldsWithThisCultivation.some(
+                        (field) => field.b_bufferstrip,
                     ),
                     fields: fieldsWithThisCultivation.map((field, i) => ({
                         // TODO: Define a proper type for field
@@ -375,7 +375,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                         b_id: field.b_id,
                         b_name: field.b_name,
                         b_area: field.b_area,
-                        b_isproductive: field.b_isproductive,
+                        b_bufferstrip: field.b_bufferstrip,
                         a_som_loi: field.a_som_loi ?? 0,
                         b_soiltype_agr: field.b_soiltype_agr ?? "",
                         b_lu_start: collectUniqueDates(

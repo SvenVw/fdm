@@ -225,11 +225,11 @@ export default function FarmFieldFertilizerAddIndex() {
                     b_id_farm={loaderData.b_id_farm}
                     farmOptions={loaderData.farmOptions}
                 />
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem className="hidden md:block">
                     Percelen
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem className="hidden md:block">
                     Bemesting toevoegen
                 </BreadcrumbItem>
@@ -249,8 +249,8 @@ export default function FarmFieldFertilizerAddIndex() {
                         </div>
                     )}
                     <FarmContent>
-                        <div className="flex flex-col space-y-8 pb-10 md:flex-row md:space-x-12 md:space-y-0">
-                            <Card className="md:w-1/3">
+                        <div className="flex flex-col xl:flex-row gap-6 pb-10">
+                            <Card className="w-full xl:w-64 h-fit shrink-0">
                                 <CardHeader>
                                     <CardTitle>
                                         Geselecteerde percelen
@@ -262,17 +262,17 @@ export default function FarmFieldFertilizerAddIndex() {
                                 </CardHeader>
                                 <CardContent>
                                     {loaderData.selectedFields.length > 0 ? (
-                                        <div className="max-h-[60vh] space-y-2 overflow-y-auto">
+                                        <div className="max-h-[60vh] space-y-2 overflow-y-auto pr-1">
                                             {loaderData.selectedFields.map(
                                                 (field) => (
                                                     <div
                                                         key={field.b_id}
-                                                        className="flex items-center justify-between rounded-md border p-3"
+                                                        className="flex items-center justify-between rounded-md border p-3 gap-2"
                                                     >
-                                                        <p className="text-sm font-medium">
+                                                        <p className="text-sm font-medium truncate min-w-0">
                                                             {field.b_name}
                                                         </p>
-                                                        <Badge variant="secondary">
+                                                        <Badge variant="secondary" className="shrink-0">
                                                             {field.b_area} ha
                                                         </Badge>
                                                     </div>

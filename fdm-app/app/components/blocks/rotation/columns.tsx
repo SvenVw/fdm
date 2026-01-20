@@ -40,7 +40,7 @@ export type CropRow = {
     calendar: string
     b_lu_start: Date[]
     b_lu_end: Date[]
-    b_isproductive: boolean
+    b_bufferstrip: boolean
     fields: FieldRow[]
 }
 
@@ -50,7 +50,7 @@ export type FieldRow = {
     b_id: string
     b_name: string
     b_area: number
-    b_isproductive: boolean
+    b_bufferstrip: boolean
     a_som_loi: string | number
     b_soiltype_agr: string | number
     m_cropresidue: "all" | "some" | "none"

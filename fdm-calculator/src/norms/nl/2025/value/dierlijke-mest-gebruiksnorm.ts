@@ -151,6 +151,14 @@ export async function calculateNL2025DierlijkeMestGebruiksNorm(
     const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf || false
     const field = input.field
 
+    // Check for buffer strip
+    if (field.b_bufferstrip) {
+        return {
+            normValue: 0,
+            normSource: "Bufferstrook: geen plaatsingsruimte",
+        }
+    }
+
     const [
         is_nv_gebied,
         is_gwbg_gebied,
