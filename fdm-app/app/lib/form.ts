@@ -22,7 +22,7 @@ export async function extractFormValuesFromRequest<T extends ZodSchema>(
         const formData = await request.formData()
         const formObject = Object.fromEntries(formData) as Record<
             string,
-            FormDataEntryValue | unknown[] | null
+            FormDataEntryValue | unknown[] | null | boolean | undefined
         >
 
         // Trim all values and remove quotation marks
