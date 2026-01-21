@@ -508,7 +508,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                         <PdfCard style={{ padding: 8 }}>
                             <View style={{ paddingVertical: 2 }}>
                                 <UsageBar
-                                    label="Stikstof totaal"
+                                    label="Stikstof werkzaam (N-w)"
                                     planned={data.normsFilling.nitrogen}
                                     limit={data.norms.nitrogen}
                                     unit="kg N"
@@ -842,10 +842,10 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                     <Text>Totaal (kg)</Text>
                                 </PdfTableCell>
                                 <PdfTableCell>
-                                    <Text>N-tot (kg)</Text>
+                                    <Text>N-totaal (kg)</Text>
                                 </PdfTableCell>
                                 <PdfTableCell>
-                                    <Text>N-w (kg)</Text>
+                                    <Text>N-werkzaam (kg)</Text>
                                 </PdfTableCell>
                                 <PdfTableCell>
                                     <Text>P2O5 (kg)</Text>
@@ -1052,7 +1052,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                             </Text>
                         </PdfTableCell>
                         <PdfTableCell>
-                            <Text>N</Text>
+                            <Text>N-werkzaam</Text>
                         </PdfTableCell>
                         <PdfTableCell>
                             <Text>
@@ -1448,7 +1448,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                     }}
                                 >
                                     <UsageBar
-                                        label="Stikstof tot."
+                                        label="Stikstof (N-w)"
                                         planned={field.normsFilling.nitrogen}
                                         limit={field.norms.nitrogen}
                                         unit="kg/ha"
