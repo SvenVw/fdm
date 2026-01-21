@@ -1,7 +1,6 @@
 import { Document, Image, Link, Page, Text, View } from "@react-pdf/renderer"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
-import { pdfStyles } from "./styles"
 import { PdfCard } from "../PdfCard"
 import {
     PdfTable,
@@ -9,6 +8,7 @@ import {
     PdfTableHeader,
     PdfTableRow,
 } from "../PdfTable"
+import { pdfStyles } from "./styles"
 import type { BemestingsplanData } from "./types"
 
 const Footer = ({ config }: { config: { name: string } }) => (
@@ -679,6 +679,10 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                     (sum, f) => sum + f.area,
                                     0,
                                 )
+                                const farmTotal = data.fields.reduce(
+                                    (sum, f) => sum + f.area,
+                                    0,
+                                )
 
                                 const renderCropList = (
                                     crops: Record<string, number>,
@@ -725,7 +729,12 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                                             { fontSize: 9 },
                                                         ]}
                                                     >
-                                                        {area.toFixed(2)} ha
+                                                        {area.toFixed(2)} ha (
+                                                        {(
+                                                            (area / farmTotal) *
+                                                            100
+                                                        ).toFixed(1)}
+                                                        %)
                                                     </Text>
                                                 </View>
                                             ))}
@@ -752,7 +761,12 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                                     { fontSize: 9 },
                                                 ]}
                                             >
-                                                {total.toFixed(2)} ha
+                                                {total.toFixed(2)} ha (
+                                                {(
+                                                    (total / farmTotal) *
+                                                    100
+                                                ).toFixed(1)}
+                                                %)
                                             </Text>
                                         </View>
                                     </View>
