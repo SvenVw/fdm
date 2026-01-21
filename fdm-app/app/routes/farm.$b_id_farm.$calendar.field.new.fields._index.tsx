@@ -28,10 +28,10 @@ export function loader({ params, request }: LoaderFunctionArgs) {
                 // Redirect to the fields table if no field can be shown at all.
                 return redirect(`/farm/${b_id_farm}/${calendar}/field`)
             }
-            return redirect(
-                `/farm/${b_id_farm}/${calendar}/field/new/fields/${fieldIds[0]}${url.search}`,
-            )
         }
+        return redirect(
+            `/farm/${b_id_farm}/${calendar}/field/new/fields/${fieldIds[0]}${url.search}`,
+        )
     } catch (e) {
         throw handleLoaderError(e)
     }
