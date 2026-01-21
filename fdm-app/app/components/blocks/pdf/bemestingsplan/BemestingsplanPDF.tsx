@@ -1,149 +1,15 @@
-import {
-    Document,
-    Image,
-    Link,
-    Page,
-    type Style,
-    Text,
-    View,
-} from "@react-pdf/renderer"
+import { Document, Image, Link, Page, Text, View } from "@react-pdf/renderer"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import { pdfStyles } from "./styles"
-import { PdfCard } from "./ui/PdfCard"
+import { PdfCard } from "../PdfCard"
 import {
     PdfTable,
     PdfTableCell,
     PdfTableHeader,
     PdfTableRow,
-} from "./ui/PdfTable"
-
-export interface BemestingsplanData {
-    config: {
-        name: string
-        logo?: string
-        logoInverted?: string
-    }
-    farm: {
-        name: string
-        kvk?: string
-    }
-    year: string
-    totalArea: number
-    productiveArea: number
-    norms: {
-        nitrogen: number
-        manure: number
-        phosphate: number
-    }
-    normsFilling: {
-        nitrogen: number
-        manure: number
-        phosphate: number
-    }
-    totalAdvice: {
-        n: number
-        nw: number
-        p2o5: number
-        k2o: number
-        om: number
-    }
-    plannedUsage: {
-        n: number
-        nw: number
-        p2o5: number
-        k2o: number
-        om: number
-    }
-    omBalance?: {
-        balance: number
-        supply: number
-        degradation: number
-    }
-    fields: Array<{
-        id: string
-        name: string
-        area: number
-        isBufferstrip: boolean
-        mainCrop: string
-        catchCrop?: string
-        soil: {
-            date?: string
-            pAl?: number
-            pCaCl?: number
-            kCc?: number
-            ph?: number
-            om?: number
-            soilTypeAgr?: string
-            clay?: number
-            sand?: number
-            silt?: number
-        }
-        norms: {
-            nitrogen: number
-            manure: number
-            phosphate: number
-        }
-        normsFilling: {
-            nitrogen: number
-            manure: number
-            phosphate: number
-        }
-        advice: {
-            n: number
-            nw: number
-            p2o5: number
-            k2o: number
-            mg: number
-            s: number
-            ca: number
-            na: number
-            cu: number
-            zn: number
-            co: number
-            mn: number
-            mo: number
-            b: number
-            om?: number
-        }
-        planned: {
-            n: number
-            nw: number
-            p2o5: number
-            k2o: number
-            om: number
-            mg: number
-            s: number
-            ca: number
-            na: number
-            cu: number
-            zn: number
-            co: number
-            mn: number
-            mo: number
-            b: number
-        }
-        omBalance?: {
-            balance: number
-            supply: number
-            supplyManure: number
-            supplyCompost: number
-            supplyCultivations: number
-            supplyResidues: number
-            degradation: number
-        }
-        applications: Array<{
-            date: string
-            product: string
-            quantity: number
-            n: number
-            nw: number
-            p2o5: number
-            k2o: number
-            om: number
-        }>
-    }>
-}
+} from "../PdfTable"
+import type { BemestingsplanData } from "./types"
 
 const Footer = ({ config }: { config: { name: string } }) => (
     <View style={pdfStyles.footer} fixed>
@@ -167,13 +33,7 @@ const SectionHeader = ({ children }: { children: string }) => (
  * Renders a chemical symbol with subscripts using nested Text components.
  * This is the most reliable way to achieve subscripts in react-pdf with standard fonts.
  */
-const Chemical = ({
-    symbol,
-    style,
-}: {
-    symbol: string
-    style?: Style | Style[]
-}) => {
+const Chemical = ({ symbol, style }: { symbol: string; style?: any }) => {
     const parts = symbol.split(/(\d+)/)
     return (
         <Text style={style}>
@@ -324,7 +184,7 @@ const UsageBar = ({
     }
 
     const safePercentage = Number.isNaN(percentage) ? 0 : percentage
-    
+
     // Orange if over limit (including if limit is 0 and planned > 0), else Blue
     const color = planned > limit ? "#f97316" : "#3b82f6"
 
@@ -474,24 +334,26 @@ const TableOfContents = ({ data }: { data: BemestingsplanData }) => (
                     PERCEELSVERSLAGEN
                 </Text>
             </View>
-            {data.fields.filter(f => !f.isBufferstrip).map((field, i) => (
-                <Link
-                    key={field.id}
-                    src={`#field-${field.id}`}
-                    style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        paddingVertical: 3,
-                        paddingLeft: 10,
-                        textDecoration: "none",
-                        color: "#020617",
-                    }}
-                >
-                    <Text style={{ fontSize: 9 }}>{field.name}</Text>
-                    <Text style={{ fontSize: 9 }}>{5 + i}</Text>
-                </Link>
-            ))}
-            {data.fields.some(f => f.isBufferstrip) && (
+            {data.fields
+                .filter((f) => !f.isBufferstrip)
+                .map((field, i) => (
+                    <Link
+                        key={field.id}
+                        src={`#field-${field.id}`}
+                        style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            paddingVertical: 3,
+                            paddingLeft: 10,
+                            textDecoration: "none",
+                            color: "#020617",
+                        }}
+                    >
+                        <Text style={{ fontSize: 9 }}>{field.name}</Text>
+                        <Text style={{ fontSize: 9 }}>{5 + i}</Text>
+                    </Link>
+                ))}
+            {data.fields.some((f) => f.isBufferstrip) && (
                 <>
                     <View
                         style={{
@@ -523,7 +385,12 @@ const TableOfContents = ({ data }: { data: BemestingsplanData }) => (
                         }}
                     >
                         <Text>Bufferstroken</Text>
-                        <Text>{4 + data.fields.filter(f => !f.isBufferstrip).length + 1}</Text>
+                        <Text>
+                            {4 +
+                                data.fields.filter((f) => !f.isBufferstrip)
+                                    .length +
+                                1}
+                        </Text>
                     </Link>
                 </>
             )}
@@ -669,20 +536,20 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                             <View style={{ paddingVertical: 2 }}>
                                 <UsageBar
                                     label="Stikstof werkzaam (N-w)"
-                                    planned={data.plannedUsage.nw}
-                                    limit={data.totalAdvice.nw}
+                                    planned={data.plannedUsage.p_dose_nw}
+                                    limit={data.totalAdvice.d_n_req}
                                     unit="kg"
                                 />
                                 <UsageBar
                                     label="Fosfaat (P2O5)"
-                                    planned={data.plannedUsage.p2o5}
-                                    limit={data.totalAdvice.p2o5}
+                                    planned={data.plannedUsage.p_dose_p}
+                                    limit={data.totalAdvice.d_p_req}
                                     unit="kg"
                                 />
                                 <UsageBar
                                     label="Kalium (K2O)"
-                                    planned={data.plannedUsage.k2o}
-                                    limit={data.totalAdvice.k2o}
+                                    planned={data.plannedUsage.p_dose_k}
+                                    limit={data.totalAdvice.d_k_req}
                                     unit="kg"
                                 />
                             </View>
@@ -961,7 +828,10 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                     <Text>Totaal (kg)</Text>
                                 </PdfTableCell>
                                 <PdfTableCell>
-                                    <Text>N (kg)</Text>
+                                    <Text>N-tot (kg)</Text>
+                                </PdfTableCell>
+                                <PdfTableCell>
+                                    <Text>N-w (kg)</Text>
                                 </PdfTableCell>
                                 <PdfTableCell>
                                     <Text>P2O5 (kg)</Text>
@@ -971,40 +841,43 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                 </PdfTableCell>
                             </View>
                             {(() => {
-                                const fertilizers = data.fields.filter(f => !f.isBufferstrip).reduce(
-                                    (acc, f) => {
-                                        f.applications.forEach((app) => {
-                                            if (!acc[app.product]) {
-                                                acc[app.product] = {
-                                                    amount: 0,
-                                                    n: 0,
-                                                    p: 0,
-                                                    k: 0,
+                                const fertilizers = data.fields
+                                    .filter((f) => !f.isBufferstrip)
+                                    .reduce(
+                                        (acc, f) => {
+                                            f.applications.forEach((app) => {
+                                                if (!acc[app.product]) {
+                                                    acc[app.product] = {
+                                                        amount: 0,
+                                                        n: 0,
+                                                        nw: 0,
+                                                        p: 0,
+                                                        k: 0,
+                                                    }
                                                 }
+                                                // app.quantity is per ha, so multiply by area
+                                                acc[app.product].amount +=
+                                                    app.quantity * f.area
+                                                acc[app.product].n +=
+                                                    app.p_dose_n * f.area
+                                                acc[app.product].p +=
+                                                    app.p_dose_p * f.area
+                                                acc[app.product].k +=
+                                                    app.p_dose_k * f.area
+                                            })
+                                            return acc
+                                        },
+                                        {} as Record<
+                                            string,
+                                            {
+                                                amount: number
+                                                n: number
+                                                nw: number
+                                                p: number
+                                                k: number
                                             }
-                                            // app.quantity is per ha, so multiply by area
-                                            acc[app.product].amount +=
-                                                app.quantity * f.area
-                                            // app.n/p/k is per ha? Let's check the loader logic.
-                                            // In loader: n: appDose.p_dose_n. This is TOTAL N per ha.
-                                            acc[app.product].n += app.n * f.area
-                                            acc[app.product].p +=
-                                                app.p2o5 * f.area
-                                            acc[app.product].k +=
-                                                app.k2o * f.area
-                                        })
-                                        return acc
-                                    },
-                                    {} as Record<
-                                        string,
-                                        {
-                                            amount: number
-                                            n: number
-                                            p: number
-                                            k: number
-                                        }
-                                    >,
-                                )
+                                        >,
+                                    )
 
                                 if (Object.keys(fertilizers).length === 0) {
                                     return (
@@ -1179,710 +1052,740 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                         </PdfTableCell>
                     </View>
                 </View>
-                {data.fields.filter(f => !f.isBufferstrip).map((field) => (
-                    <View
-                        key={field.id}
-                        wrap={false}
-                        style={pdfStyles.tableRow}
-                    >
-                        <PdfTableCell weight={1.5}>
-                            <Text style={{ fontWeight: "bold" }}>
-                                {field.name}
-                            </Text>
-                            <Text style={{ fontSize: 7, color: "#64748b" }}>
-                                {field.mainCrop}
-                            </Text>
-                        </PdfTableCell>
-                        <PdfTableCell weight={0.6}>
-                            <Text>{field.area.toFixed(2)}</Text>
-                        </PdfTableCell>
-                        <PdfTableCell>
-                            <Text>
-                                {Math.round(field.normsFilling.nitrogen)} /{" "}
-                                {Math.round(field.norms.nitrogen)}
-                            </Text>
-                        </PdfTableCell>
-                        <PdfTableCell>
-                            <Text>
-                                {Math.round(field.normsFilling.manure)} /{" "}
-                                {Math.round(field.norms.manure)}
-                            </Text>
-                        </PdfTableCell>
-                        <PdfTableCell>
-                            <Text>
-                                {Math.round(field.normsFilling.phosphate)} /{" "}
-                                {Math.round(field.norms.phosphate)}
-                            </Text>
-                        </PdfTableCell>
-                        <PdfTableCell>
-                            <Text>
-                                {Math.round(field.planned.nw)} /{" "}
-                                {Math.round(field.advice.nw)}
-                            </Text>
-                        </PdfTableCell>
-                        <PdfTableCell>
-                            <Text>
-                                {Math.round(field.planned.p2o5)} /{" "}
-                                {Math.round(field.advice.p2o5)}
-                            </Text>
-                        </PdfTableCell>
-                        <PdfTableCell>
-                            <Text>
-                                {Math.round(field.planned.k2o)} /{" "}
-                                {Math.round(field.advice.k2o)}
-                            </Text>
-                        </PdfTableCell>
-                    </View>
-                ))}
+                {data.fields
+                    .filter((f) => !f.isBufferstrip)
+                    .map((field) => (
+                        <View
+                            key={field.id}
+                            wrap={false}
+                            style={pdfStyles.tableRow}
+                        >
+                            <PdfTableCell weight={1.5}>
+                                <Text style={{ fontWeight: "bold" }}>
+                                    {field.name}
+                                </Text>
+                                <Text style={{ fontSize: 7, color: "#64748b" }}>
+                                    {field.mainCrop}
+                                </Text>
+                            </PdfTableCell>
+                            <PdfTableCell weight={0.6}>
+                                <Text>{field.area.toFixed(2)}</Text>
+                            </PdfTableCell>
+                            <PdfTableCell>
+                                <Text>
+                                    {Math.round(field.normsFilling.nitrogen)} /{" "}
+                                    {Math.round(field.norms.nitrogen)}
+                                </Text>
+                            </PdfTableCell>
+                            <PdfTableCell>
+                                <Text>
+                                    {Math.round(field.normsFilling.manure)} /{" "}
+                                    {Math.round(field.norms.manure)}
+                                </Text>
+                            </PdfTableCell>
+                            <PdfTableCell>
+                                <Text>
+                                    {Math.round(field.normsFilling.phosphate)} /{" "}
+                                    {Math.round(field.norms.phosphate)}
+                                </Text>
+                            </PdfTableCell>
+                            <PdfTableCell>
+                                <Text>
+                                    {Math.round(field.planned.p_dose_nw)} /{" "}
+                                    {Math.round(field.advice.d_n_req)}
+                                </Text>
+                            </PdfTableCell>
+                            <PdfTableCell>
+                                <Text>
+                                    {Math.round(field.planned.p_dose_p)} /{" "}
+                                    {Math.round(field.advice.d_p_req)}
+                                </Text>
+                            </PdfTableCell>
+                            <PdfTableCell>
+                                <Text>
+                                    {Math.round(field.planned.p_dose_k)} /{" "}
+                                    {Math.round(field.advice.d_k_req)}
+                                </Text>
+                            </PdfTableCell>
+                        </View>
+                    ))}
             </PdfTable>
             <Footer config={data.config} />
         </Page>
 
         {/* Detailed Field Reports */}
-        {data.fields.filter(f => !f.isBufferstrip).map((field) => (
-            <Page
-                key={field.id}
-                size="A4"
-                style={pdfStyles.page}
-                id={`field-${field.id}`}
-            >
-                <Text style={[pdfStyles.miniHeader, { opacity: 0.6 }]} fixed>
-                    {field.name} ({field.area.toFixed(2)} ha)
-                </Text>
+        {data.fields
+            .filter((f) => !f.isBufferstrip)
+            .map((field) => (
+                <Page
+                    key={field.id}
+                    size="A4"
+                    style={pdfStyles.page}
+                    id={`field-${field.id}`}
+                >
+                    <Text
+                        style={[pdfStyles.miniHeader, { opacity: 0.6 }]}
+                        fixed
+                    >
+                        {field.name} ({field.area.toFixed(2)} ha)
+                    </Text>
 
-                <View style={pdfStyles.header}>
-                    <View>
-                        <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-                            {field.name}
-                        </Text>
-                        <Text style={{ color: "#64748b", fontSize: 10 }}>
-                            {field.area.toFixed(2)} ha — {field.mainCrop}
-                        </Text>
-                    </View>
-                    {data.config.logo && (
-                        <Image src={data.config.logo} style={{ width: 40 }} />
-                    )}
-                </View>
-
-                <View style={pdfStyles.grid}>
-                    <View style={{ width: "50%", paddingRight: 5 }}>
-                        <SectionHeader>Bodem</SectionHeader>
-                        <PdfCard style={{ padding: 8 }}>
-                            <View style={{ gap: 3 }}>
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        justifyContent: "space-between",
-                                    }}
-                                >
-                                    <Text style={{ fontSize: 8 }}>
-                                        Organische stof (%)
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            pdfStyles.value,
-                                            { fontSize: 9 },
-                                        ]}
-                                    >
-                                        {field.soil.om !== undefined
-                                            ? field.soil.om.toFixed(1)
-                                            : "-"}
-                                    </Text>
-                                </View>
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        justifyContent: "space-between",
-                                    }}
-                                >
-                                    <Text style={{ fontSize: 8 }}>
-                                        Bodemtype
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            pdfStyles.value,
-                                            { fontSize: 9 },
-                                        ]}
-                                    >
-                                        {field.soil.soilTypeAgr
-                                            ? soilTypeLabels[
-                                                  field.soil.soilTypeAgr
-                                              ] || field.soil.soilTypeAgr
-                                            : "-"}
-                                    </Text>
-                                </View>
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        justifyContent: "space-between",
-                                    }}
-                                >
-                                    <Text style={{ fontSize: 8 }}>
-                                        Klei / Silt / Zand (%)
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            pdfStyles.value,
-                                            { fontSize: 9 },
-                                        ]}
-                                    >
-                                        {field.soil.clay ?? "-"} /{" "}
-                                        {field.soil.silt ?? "-"} /{" "}
-                                        {field.soil.sand ?? "-"}
-                                    </Text>
-                                </View>
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        justifyContent: "space-between",
-                                    }}
-                                >
-                                    <Text style={{ fontSize: 8 }}>
-                                        Fosfaat (P-Al / P-CaCl)
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            pdfStyles.value,
-                                            { fontSize: 9 },
-                                        ]}
-                                    >
-                                        {field.soil.pAl ?? "-"} /{" "}
-                                        {field.soil.pCaCl ?? "-"}
-                                    </Text>
-                                </View>
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        justifyContent: "space-between",
-                                    }}
-                                >
-                                    <Text style={{ fontSize: 8 }}>
-                                        Kalium (K-CaCl)
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            pdfStyles.value,
-                                            { fontSize: 9 },
-                                        ]}
-                                    >
-                                        {field.soil.kCc ?? "-"}
-                                    </Text>
-                                </View>
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        justifyContent: "space-between",
-                                    }}
-                                >
-                                    <Text style={{ fontSize: 8 }}>
-                                        Zuurgraad (pH-CaCl)
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            pdfStyles.value,
-                                            { fontSize: 9 },
-                                        ]}
-                                    >
-                                        {field.soil.ph !== undefined
-                                            ? field.soil.ph.toFixed(1)
-                                            : "-"}
-                                    </Text>
-                                </View>
-                            </View>
-                        </PdfCard>
+                    <View style={pdfStyles.header}>
+                        <View>
+                            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                                {field.name}
+                            </Text>
+                            <Text style={{ color: "#64748b", fontSize: 10 }}>
+                                {field.area.toFixed(2)} ha — {field.mainCrop}
+                            </Text>
+                        </View>
+                        {data.config.logo && (
+                            <Image
+                                src={data.config.logo}
+                                style={{ width: 40 }}
+                            />
+                        )}
                     </View>
 
-                    <View style={{ width: "50%", paddingLeft: 5 }}>
-                        <SectionHeader>Teeltplan</SectionHeader>
-                        <PdfCard style={{ padding: 8 }}>
-                            <View style={{ gap: 3 }}>
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        justifyContent: "space-between",
-                                    }}
-                                >
-                                    <Text style={{ fontSize: 8 }}>
-                                        Hoofdteelt
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            pdfStyles.value,
-                                            {
-                                                fontSize: 9,
-                                                textAlign: "right",
-                                            },
-                                        ]}
+                    <View style={pdfStyles.grid}>
+                        <View style={{ width: "50%", paddingRight: 5 }}>
+                            <SectionHeader>Bodem</SectionHeader>
+                            <PdfCard style={{ padding: 8 }}>
+                                <View style={{ gap: 3 }}>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                        }}
                                     >
-                                        {field.mainCrop}
-                                    </Text>
-                                </View>
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        justifyContent: "space-between",
-                                    }}
-                                >
-                                    <Text style={{ fontSize: 8 }}>
-                                        Vanggewas
-                                    </Text>
-                                    <Text
-                                        style={[
-                                            pdfStyles.value,
-                                            {
-                                                fontSize: 9,
-                                                textAlign: "right",
-                                            },
-                                        ]}
+                                        <Text style={{ fontSize: 8 }}>
+                                            Organische stof (%)
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                pdfStyles.value,
+                                                { fontSize: 9 },
+                                            ]}
+                                        >
+                                            {field.soil.a_som_loi !== undefined
+                                                ? field.soil.a_som_loi.toFixed(
+                                                      1,
+                                                  )
+                                                : "-"}
+                                        </Text>
+                                    </View>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                        }}
                                     >
-                                        {field.catchCrop || "-"}
-                                    </Text>
+                                        <Text style={{ fontSize: 8 }}>
+                                            Bodemtype
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                pdfStyles.value,
+                                                { fontSize: 9 },
+                                            ]}
+                                        >
+                                            {field.soil.b_soiltype_agr
+                                                ? soilTypeLabels[
+                                                      field.soil.b_soiltype_agr
+                                                  ] || field.soil.b_soiltype_agr
+                                                : "-"}
+                                        </Text>
+                                    </View>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 8 }}>
+                                            Klei / Silt / Zand (%)
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                pdfStyles.value,
+                                                { fontSize: 9 },
+                                            ]}
+                                        >
+                                            {field.soil.a_clay_mi ?? "-"} /{" "}
+                                            {field.soil.a_silt_mi ?? "-"} /{" "}
+                                            {field.soil.a_sand_mi ?? "-"}
+                                        </Text>
+                                    </View>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 8 }}>
+                                            Fosfaat (P-Al / P-CaCl)
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                pdfStyles.value,
+                                                { fontSize: 9 },
+                                            ]}
+                                        >
+                                            {field.soil.a_p_al ?? "-"} /{" "}
+                                            {field.soil.a_p_cc ?? "-"}
+                                        </Text>
+                                    </View>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 8 }}>
+                                            Kalium (K-CaCl)
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                pdfStyles.value,
+                                                { fontSize: 9 },
+                                            ]}
+                                        >
+                                            {field.soil.a_k_cc ?? "-"}
+                                        </Text>
+                                    </View>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 8 }}>
+                                            Zuurgraad (pH-CaCl)
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                pdfStyles.value,
+                                                { fontSize: 9 },
+                                            ]}
+                                        >
+                                            {field.soil.a_ph_cc !== undefined
+                                                ? field.soil.a_ph_cc.toFixed(1)
+                                                : "-"}
+                                        </Text>
+                                    </View>
                                 </View>
-                            </View>
-                        </PdfCard>
+                            </PdfCard>
+                        </View>
 
-                        {field.omBalance && (
-                            <View style={{ marginTop: 2 }}>
-                                <SectionHeader>
-                                    Organische stofbalans
-                                </SectionHeader>
-                                <PdfCard style={{ padding: 8 }}>
-                                    <View style={{ gap: 2 }}>
-                                        <View
-                                            style={{
-                                                flexDirection: "row",
-                                                justifyContent: "space-between",
-                                            }}
+                        <View style={{ width: "50%", paddingLeft: 5 }}>
+                            <SectionHeader>Teeltplan</SectionHeader>
+                            <PdfCard style={{ padding: 8 }}>
+                                <View style={{ gap: 3 }}>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 8 }}>
+                                            Hoofdteelt
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                pdfStyles.value,
+                                                {
+                                                    fontSize: 9,
+                                                    textAlign: "right",
+                                                },
+                                            ]}
                                         >
-                                            <Text style={{ fontSize: 8 }}>
-                                                Aanvoer (EOS)
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    pdfStyles.value,
-                                                    { fontSize: 9 },
-                                                ]}
-                                            >
-                                                {Math.round(
-                                                    field.omBalance.supply,
-                                                )}{" "}
-                                                kg/ha
-                                            </Text>
-                                        </View>
-                                        <View
-                                            style={{
-                                                flexDirection: "row",
-                                                justifyContent: "space-between",
-                                            }}
+                                            {field.mainCrop}
+                                        </Text>
+                                    </View>
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                            justifyContent: "space-between",
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 8 }}>
+                                            Vanggewas
+                                        </Text>
+                                        <Text
+                                            style={[
+                                                pdfStyles.value,
+                                                {
+                                                    fontSize: 9,
+                                                    textAlign: "right",
+                                                },
+                                            ]}
                                         >
-                                            <Text style={{ fontSize: 8 }}>
-                                                Afbraak (OS)
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    pdfStyles.value,
-                                                    { fontSize: 9 },
-                                                ]}
-                                            >
-                                                {Math.round(
-                                                    field.omBalance.degradation,
-                                                )}{" "}
-                                                kg/ha
-                                            </Text>
-                                        </View>
-                                        <View
-                                            style={{
-                                                flexDirection: "row",
-                                                justifyContent: "space-between",
-                                                borderTopWidth: 1,
-                                                borderTopColor: "#f1f5f9",
-                                                paddingTop: 2,
-                                            }}
-                                        >
-                                            <Text
+                                            {field.catchCrop || "-"}
+                                        </Text>
+                                    </View>
+                                </View>
+                            </PdfCard>
+
+                            {field.omBalance && (
+                                <View style={{ marginTop: 2 }}>
+                                    <SectionHeader>
+                                        Organische stofbalans
+                                    </SectionHeader>
+                                    <PdfCard style={{ padding: 8 }}>
+                                        <View style={{ gap: 2 }}>
+                                            <View
                                                 style={{
-                                                    fontSize: 8,
-                                                    fontWeight: "bold",
+                                                    flexDirection: "row",
+                                                    justifyContent:
+                                                        "space-between",
                                                 }}
                                             >
-                                                Balans
-                                            </Text>
-                                            <Text
-                                                style={[
-                                                    pdfStyles.value,
-                                                    {
-                                                        fontSize: 9,
-                                                        color:
-                                                            field.omBalance
-                                                                .balance >= 0
-                                                                ? "#22c55e"
-                                                                : "#ef4444",
-                                                    },
-                                                ]}
+                                                <Text style={{ fontSize: 8 }}>
+                                                    Aanvoer (EOS)
+                                                </Text>
+                                                <Text
+                                                    style={[
+                                                        pdfStyles.value,
+                                                        { fontSize: 9 },
+                                                    ]}
+                                                >
+                                                    {Math.round(
+                                                        field.omBalance.supply,
+                                                    )}{" "}
+                                                    kg/ha
+                                                </Text>
+                                            </View>
+                                            <View
+                                                style={{
+                                                    flexDirection: "row",
+                                                    justifyContent:
+                                                        "space-between",
+                                                }}
                                             >
-                                                {Math.round(
-                                                    field.omBalance.balance,
-                                                )}{" "}
-                                                kg OS/ha
-                                            </Text>
+                                                <Text style={{ fontSize: 8 }}>
+                                                    Afbraak (OS)
+                                                </Text>
+                                                <Text
+                                                    style={[
+                                                        pdfStyles.value,
+                                                        { fontSize: 9 },
+                                                    ]}
+                                                >
+                                                    {Math.round(
+                                                        field.omBalance
+                                                            .degradation,
+                                                    )}{" "}
+                                                    kg/ha
+                                                </Text>
+                                            </View>
+                                            <View
+                                                style={{
+                                                    flexDirection: "row",
+                                                    justifyContent:
+                                                        "space-between",
+                                                    borderTopWidth: 1,
+                                                    borderTopColor: "#f1f5f9",
+                                                    paddingTop: 2,
+                                                }}
+                                            >
+                                                <Text
+                                                    style={{
+                                                        fontSize: 8,
+                                                        fontWeight: "bold",
+                                                    }}
+                                                >
+                                                    Balans
+                                                </Text>
+                                                <Text
+                                                    style={[
+                                                        pdfStyles.value,
+                                                        {
+                                                            fontSize: 9,
+                                                            color:
+                                                                field.omBalance
+                                                                    .balance >=
+                                                                0
+                                                                    ? "#22c55e"
+                                                                    : "#ef4444",
+                                                        },
+                                                    ]}
+                                                >
+                                                    {Math.round(
+                                                        field.omBalance.balance,
+                                                    )}{" "}
+                                                    kg OS/ha
+                                                </Text>
+                                            </View>
                                         </View>
-                                    </View>
-                                </PdfCard>
-                            </View>
-                        )}
-                    </View>
-                </View>
-
-                <View style={{ marginTop: 5 }} wrap={false}>
-                    <SectionHeader>Gebruiksruimte (kg/ha)</SectionHeader>
-                    <PdfCard>
-                        <View style={pdfStyles.grid}>
-                            <View style={{ width: "33.33%", paddingRight: 10 }}>
-                                <UsageBar
-                                    label="Stikstof tot."
-                                    planned={field.normsFilling.nitrogen}
-                                    limit={field.norms.nitrogen}
-                                    unit="kg/ha"
-                                />
-                            </View>
-                            <View
-                                style={{
-                                    width: "33.33%",
-                                    paddingHorizontal: 5,
-                                }}
-                            >
-                                <UsageBar
-                                    label="Dierl. mest"
-                                    planned={field.normsFilling.manure}
-                                    limit={field.norms.manure}
-                                    unit="kg/ha"
-                                />
-                            </View>
-                            <View style={{ width: "33.33%", paddingLeft: 10 }}>
-                                <UsageBar
-                                    label="Fosfaat"
-                                    planned={field.normsFilling.phosphate}
-                                    limit={field.norms.phosphate}
-                                    unit="kg/ha"
-                                />
-                            </View>
+                                    </PdfCard>
+                                </View>
+                            )}
                         </View>
-                    </PdfCard>
-                </View>
+                    </View>
 
-                <View style={{ marginTop: 5 }}>
-                    <SectionHeader>Bemestingsadvies</SectionHeader>
-
-                    {/* Primary Nutrients */}
-                    <View wrap={false}>
-                        <Text
-                            style={[
-                                pdfStyles.label,
-                                {
-                                    marginBottom: 2,
-                                    marginTop: 4,
-                                    fontWeight: "bold",
-                                },
-                            ]}
-                        >
-                            Hoofdelementen
-                        </Text>
+                    <View style={{ marginTop: 5 }} wrap={false}>
+                        <SectionHeader>Gebruiksruimte (kg/ha)</SectionHeader>
                         <PdfCard>
                             <View style={pdfStyles.grid}>
-                                {[
-                                    {
-                                        key: "nw",
-                                        label: "Stikstof werkzaam (N-w)",
-                                        unit: "kg/ha",
-                                        factor: 1,
-                                    },
-                                    {
-                                        key: "p2o5",
-                                        label: "Fosfaat (P2O5)",
-                                        unit: "kg/ha",
-                                        factor: 1,
-                                    },
-                                    {
-                                        key: "k2o",
-                                        label: "Kalium (K2O)",
-                                        unit: "kg/ha",
-                                        factor: 1,
-                                    },
-                                ].map((n, i) => (
-                                    <View
-                                        key={n.key}
-                                        style={{
-                                            width: "33.33%",
-                                            paddingLeft: i % 3 === 0 ? 0 : 5,
-                                            paddingRight: i % 3 === 2 ? 0 : 5,
-                                        }}
-                                    >
-                                        <UsageBar
-                                            label={n.label}
-                                            planned={
-                                                (field.planned[
-                                                    n.key as keyof typeof field.planned
-                                                ] || 0) * n.factor
-                                            }
-                                            limit={
-                                                (field.advice[
-                                                    n.key as keyof typeof field.advice
-                                                ] || 0) * n.factor
-                                            }
-                                            unit={n.unit}
-                                        />
-                                    </View>
-                                ))}
-                            </View>
-                        </PdfCard>
-                    </View>
-
-                    {/* Secondary Nutrients */}
-                    <View wrap={false}>
-                        <Text
-                            style={[
-                                pdfStyles.label,
-                                {
-                                    marginBottom: 2,
-                                    marginTop: 6,
-                                    fontWeight: "bold",
-                                },
-                            ]}
-                        >
-                            Secundaire elementen
-                        </Text>
-                        <PdfCard>
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    flexWrap: "wrap",
-                                    marginHorizontal: -5,
-                                }}
-                            >
-                                {[
-                                    {
-                                        key: "om",
-                                        label: "Organische koolstof (EOC)",
-                                        unit: "kg/ha",
-                                        factor: 1,
-                                    },
-                                    {
-                                        key: "mg",
-                                        label: "Magnesium (MgO)",
-                                        unit: "kg/ha",
-                                        factor: 1,
-                                    },
-                                    {
-                                        key: "s",
-                                        label: "Zwavel (S)",
-                                        unit: "kg/ha",
-                                        factor: 1,
-                                    },
-                                    {
-                                        key: "ca",
-                                        label: "Calcium (CaO)",
-                                        unit: "kg/ha",
-                                        factor: 1,
-                                    },
-                                    {
-                                        key: "na",
-                                        label: "Natrium (Na2O)",
-                                        unit: "kg/ha",
-                                        factor: 1,
-                                    },
-                                ].map((n) => (
-                                    <View
-                                        key={n.key}
-                                        style={{
-                                            width: "33.33%",
-                                            paddingHorizontal: 5,
-                                            marginTop: 4,
-                                            marginBottom: 4,
-                                        }}
-                                    >
-                                        <UsageBar
-                                            label={n.label}
-                                            planned={
-                                                (field.planned[
-                                                    n.key as keyof typeof field.planned
-                                                ] || 0) * n.factor
-                                            }
-                                            limit={
-                                                (field.advice[
-                                                    n.key as keyof typeof field.advice
-                                                ] || 0) * n.factor
-                                            }
-                                            unit={n.unit}
-                                        />
-                                    </View>
-                                ))}
-                            </View>
-                        </PdfCard>
-                    </View>
-
-                    {/* Trace Elements */}
-                    <View wrap={false}>
-                        <Text
-                            style={[
-                                pdfStyles.label,
-                                {
-                                    marginBottom: 2,
-                                    marginTop: 6,
-                                    fontWeight: "bold",
-                                },
-                            ]}
-                        >
-                            Sporenelementen
-                        </Text>
-                        <PdfCard>
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    flexWrap: "wrap",
-                                    marginHorizontal: -5,
-                                }}
-                            >
-                                {[
-                                    {
-                                        key: "cu",
-                                        label: "Koper (Cu)",
-                                        unit: "g/ha",
-                                        factor: 1000,
-                                    },
-                                    {
-                                        key: "zn",
-                                        label: "Zink (Zn)",
-                                        unit: "g/ha",
-                                        factor: 1000,
-                                    },
-                                    {
-                                        key: "co",
-                                        label: "Kobalt (Co)",
-                                        unit: "g/ha",
-                                        factor: 1000,
-                                    },
-                                    {
-                                        key: "mn",
-                                        label: "Mangaan (Mn)",
-                                        unit: "g/ha",
-                                        factor: 1000,
-                                    },
-                                    {
-                                        key: "mo",
-                                        label: "Molybdeen (Mo)",
-                                        unit: "g/ha",
-                                        factor: 1000,
-                                    },
-                                    {
-                                        key: "b",
-                                        label: "Borium (B)",
-                                        unit: "g/ha",
-                                        factor: 1000,
-                                    },
-                                ].map((n) => (
-                                    <View
-                                        key={n.key}
-                                        style={{
-                                            width: "33.33%",
-                                            paddingHorizontal: 5,
-                                            marginTop: 4,
-                                            marginBottom: 4,
-                                        }}
-                                    >
-                                        <UsageBar
-                                            label={n.label}
-                                            planned={
-                                                (field.planned[
-                                                    n.key as keyof typeof field.planned
-                                                ] || 0) * n.factor
-                                            }
-                                            limit={
-                                                (field.advice[
-                                                    n.key as keyof typeof field.advice
-                                                ] || 0) * n.factor
-                                            }
-                                            unit={n.unit}
-                                        />
-                                    </View>
-                                ))}
-                            </View>
-                        </PdfCard>
-                    </View>
-                </View>
-
-                <View style={{ marginTop: 5 }} wrap={false}>
-                    <SectionHeader>Geplande bemestingen</SectionHeader>
-                    <PdfTable>
-                        <PdfTableHeader>
-                            <PdfTableCell weight={1.2}>
-                                <Text>Datum / product</Text>
-                            </PdfTableCell>
-                            <PdfTableCell weight={0.8}>
-                                <Text>Hoeveelheid (kg/ha)</Text>
-                            </PdfTableCell>
-                            <PdfTableCell>
-                                <Text>N tot. / w. (kg/ha)</Text>
-                            </PdfTableCell>
-                            <PdfTableCell>
-                                <Text>
-                                    <Chemical symbol="P2O5" /> (kg/ha)
-                                </Text>
-                            </PdfTableCell>
-                            <PdfTableCell>
-                                <Text>
-                                    <Chemical symbol="K2O" /> (kg/ha)
-                                </Text>
-                            </PdfTableCell>
-                        </PdfTableHeader>
-                        {field.applications.length > 0 ? (
-                            field.applications.map((app, idx) => (
-                                <PdfTableRow
-                                    key={`${app.date}-${app.product}-${idx}`}
+                                <View
+                                    style={{
+                                        width: "33.33%",
+                                        paddingRight: 10,
+                                    }}
                                 >
-                                    <PdfTableCell weight={1.2}>
-                                        <Text>{app.date}</Text>
-                                        <Text
+                                    <UsageBar
+                                        label="Stikstof tot."
+                                        planned={field.normsFilling.nitrogen}
+                                        limit={field.norms.nitrogen}
+                                        unit="kg/ha"
+                                    />
+                                </View>
+                                <View
+                                    style={{
+                                        width: "33.33%",
+                                        paddingHorizontal: 5,
+                                    }}
+                                >
+                                    <UsageBar
+                                        label="Dierl. mest"
+                                        planned={field.normsFilling.manure}
+                                        limit={field.norms.manure}
+                                        unit="kg/ha"
+                                    />
+                                </View>
+                                <View
+                                    style={{ width: "33.33%", paddingLeft: 10 }}
+                                >
+                                    <UsageBar
+                                        label="Fosfaat"
+                                        planned={field.normsFilling.phosphate}
+                                        limit={field.norms.phosphate}
+                                        unit="kg/ha"
+                                    />
+                                </View>
+                            </View>
+                        </PdfCard>
+                    </View>
+
+                    <View style={{ marginTop: 5 }}>
+                        <SectionHeader>Bemestingsadvies</SectionHeader>
+
+                        {/* Primary Nutrients */}
+                        <View wrap={false}>
+                            <Text
+                                style={[
+                                    pdfStyles.label,
+                                    {
+                                        marginBottom: 2,
+                                        marginTop: 4,
+                                        fontWeight: "bold",
+                                    },
+                                ]}
+                            >
+                                Hoofdelementen
+                            </Text>
+                            <PdfCard>
+                                <View style={pdfStyles.grid}>
+                                    {[
+                                        {
+                                            key: "nw",
+                                            label: "Stikstof werkzaam (N-w)",
+                                            unit: "kg/ha",
+                                            factor: 1,
+                                        },
+                                        {
+                                            key: "p2o5",
+                                            label: "Fosfaat (P2O5)",
+                                            unit: "kg/ha",
+                                            factor: 1,
+                                        },
+                                        {
+                                            key: "k2o",
+                                            label: "Kalium (K2O)",
+                                            unit: "kg/ha",
+                                            factor: 1,
+                                        },
+                                    ].map((n, i) => (
+                                        <View
+                                            key={n.key}
                                             style={{
-                                                fontSize: 7,
-                                                color: "#64748b",
+                                                width: "33.33%",
+                                                paddingLeft:
+                                                    i % 3 === 0 ? 0 : 5,
+                                                paddingRight:
+                                                    i % 3 === 2 ? 0 : 5,
                                             }}
                                         >
-                                            {app.product}
-                                        </Text>
-                                    </PdfTableCell>
-                                    <PdfTableCell weight={0.8}>
-                                        <Text>
-                                            {Math.round(app.quantity)} kg/ha
-                                        </Text>
-                                    </PdfTableCell>
-                                    <PdfTableCell>
-                                        <Text>
-                                            {Math.round(app.n)} /{" "}
-                                            {Math.round(app.nw)}
-                                        </Text>
-                                    </PdfTableCell>
-                                    <PdfTableCell>
-                                        <Text>{Math.round(app.p2o5)}</Text>
-                                    </PdfTableCell>
-                                    <PdfTableCell>
-                                        <Text>{Math.round(app.k2o)}</Text>
-                                    </PdfTableCell>
-                                </PdfTableRow>
-                            ))
-                        ) : (
-                            <PdfTableRow>
-                                <PdfTableCell weight={5}>
+                                            <UsageBar
+                                                label={n.label}
+                                                planned={
+                                                    (field.planned[
+                                                        n.key as keyof typeof field.planned
+                                                    ] || 0) * n.factor
+                                                }
+                                                limit={
+                                                    (field.advice[
+                                                        n.key as keyof typeof field.advice
+                                                    ] || 0) * n.factor
+                                                }
+                                                unit={n.unit}
+                                            />
+                                        </View>
+                                    ))}
+                                </View>
+                            </PdfCard>
+                        </View>
+
+                        {/* Secondary Nutrients */}
+                        <View wrap={false}>
+                            <Text
+                                style={[
+                                    pdfStyles.label,
+                                    {
+                                        marginBottom: 2,
+                                        marginTop: 6,
+                                        fontWeight: "bold",
+                                    },
+                                ]}
+                            >
+                                Secundaire elementen
+                            </Text>
+                            <PdfCard>
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        flexWrap: "wrap",
+                                        marginHorizontal: -5,
+                                    }}
+                                >
+                                    {[
+                                        {
+                                            key: "om",
+                                            label: "Organische koolstof (EOC)",
+                                            unit: "kg/ha",
+                                            factor: 1,
+                                        },
+                                        {
+                                            key: "mg",
+                                            label: "Magnesium (MgO)",
+                                            unit: "kg/ha",
+                                            factor: 1,
+                                        },
+                                        {
+                                            key: "s",
+                                            label: "Zwavel (S)",
+                                            unit: "kg/ha",
+                                            factor: 1,
+                                        },
+                                        {
+                                            key: "ca",
+                                            label: "Calcium (CaO)",
+                                            unit: "kg/ha",
+                                            factor: 1,
+                                        },
+                                        {
+                                            key: "na",
+                                            label: "Natrium (Na2O)",
+                                            unit: "kg/ha",
+                                            factor: 1,
+                                        },
+                                    ].map((n) => (
+                                        <View
+                                            key={n.key}
+                                            style={{
+                                                width: "33.33%",
+                                                paddingHorizontal: 5,
+                                                marginTop: 4,
+                                                marginBottom: 4,
+                                            }}
+                                        >
+                                            <UsageBar
+                                                label={n.label}
+                                                planned={
+                                                    (field.planned[
+                                                        n.key as keyof typeof field.planned
+                                                    ] || 0) * n.factor
+                                                }
+                                                limit={
+                                                    (field.advice[
+                                                        n.key as keyof typeof field.advice
+                                                    ] || 0) * n.factor
+                                                }
+                                                unit={n.unit}
+                                            />
+                                        </View>
+                                    ))}
+                                </View>
+                            </PdfCard>
+                        </View>
+
+                        {/* Trace Elements */}
+                        <View wrap={false}>
+                            <Text
+                                style={[
+                                    pdfStyles.label,
+                                    {
+                                        marginBottom: 2,
+                                        marginTop: 6,
+                                        fontWeight: "bold",
+                                    },
+                                ]}
+                            >
+                                Sporenelementen
+                            </Text>
+                            <PdfCard>
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        flexWrap: "wrap",
+                                        marginHorizontal: -5,
+                                    }}
+                                >
+                                    {[
+                                        {
+                                            key: "cu",
+                                            label: "Koper (Cu)",
+                                            unit: "g/ha",
+                                            factor: 1000,
+                                        },
+                                        {
+                                            key: "zn",
+                                            label: "Zink (Zn)",
+                                            unit: "g/ha",
+                                            factor: 1000,
+                                        },
+                                        {
+                                            key: "co",
+                                            label: "Kobalt (Co)",
+                                            unit: "g/ha",
+                                            factor: 1000,
+                                        },
+                                        {
+                                            key: "mn",
+                                            label: "Mangaan (Mn)",
+                                            unit: "g/ha",
+                                            factor: 1000,
+                                        },
+                                        {
+                                            key: "mo",
+                                            label: "Molybdeen (Mo)",
+                                            unit: "g/ha",
+                                            factor: 1000,
+                                        },
+                                        {
+                                            key: "b",
+                                            label: "Borium (B)",
+                                            unit: "g/ha",
+                                            factor: 1000,
+                                        },
+                                    ].map((n) => (
+                                        <View
+                                            key={n.key}
+                                            style={{
+                                                width: "33.33%",
+                                                paddingHorizontal: 5,
+                                                marginTop: 4,
+                                                marginBottom: 4,
+                                            }}
+                                        >
+                                            <UsageBar
+                                                label={n.label}
+                                                planned={
+                                                    (field.planned[
+                                                        n.key as keyof typeof field.planned
+                                                    ] || 0) * n.factor
+                                                }
+                                                limit={
+                                                    (field.advice[
+                                                        n.key as keyof typeof field.advice
+                                                    ] || 0) * n.factor
+                                                }
+                                                unit={n.unit}
+                                            />
+                                        </View>
+                                    ))}
+                                </View>
+                            </PdfCard>
+                        </View>
+                    </View>
+
+                    <View style={{ marginTop: 5 }} wrap={false}>
+                        <SectionHeader>Geplande bemestingen</SectionHeader>
+                        <PdfTable>
+                            <PdfTableHeader>
+                                <PdfTableCell weight={1.2}>
+                                    <Text>Datum / product</Text>
+                                </PdfTableCell>
+                                <PdfTableCell weight={0.8}>
+                                    <Text>Hoeveelheid (kg/ha)</Text>
+                                </PdfTableCell>
+                                <PdfTableCell>
+                                    <Text>N tot. / w. (kg/ha)</Text>
+                                </PdfTableCell>
+                                <PdfTableCell>
                                     <Text>
-                                        Geen geplande bemestingen gevonden.
+                                        <Chemical symbol="P2O5" /> (kg/ha)
                                     </Text>
                                 </PdfTableCell>
-                            </PdfTableRow>
-                        )}
-                    </PdfTable>
-                </View>
-                <Footer config={data.config} />
-            </Page>
-        ))}
+                                <PdfTableCell>
+                                    <Text>
+                                        <Chemical symbol="K2O" /> (kg/ha)
+                                    </Text>
+                                </PdfTableCell>
+                            </PdfTableHeader>
+                            {field.applications.length > 0 ? (
+                                field.applications.map((app, idx) => (
+                                    <PdfTableRow
+                                        key={`${app.date}-${app.product}-${idx}`}
+                                    >
+                                        <PdfTableCell weight={1.2}>
+                                            <Text>{app.date}</Text>
+                                            <Text
+                                                style={{
+                                                    fontSize: 7,
+                                                    color: "#64748b",
+                                                }}
+                                            >
+                                                {app.product}
+                                            </Text>
+                                        </PdfTableCell>
+                                        <PdfTableCell weight={0.8}>
+                                            <Text>
+                                                {Math.round(app.quantity)} kg/ha
+                                            </Text>
+                                        </PdfTableCell>
+                                        <PdfTableCell>
+                                            <Text>
+                                                {Math.round(app.p_dose_n)} /{" "}
+                                                {Math.round(app.p_dose_nw)}
+                                            </Text>
+                                        </PdfTableCell>
+                                        <PdfTableCell>
+                                            <Text>
+                                                {Math.round(app.p_dose_p)}
+                                            </Text>
+                                        </PdfTableCell>
+                                        <PdfTableCell>
+                                            <Text>
+                                                {Math.round(app.p_dose_k)}
+                                            </Text>
+                                        </PdfTableCell>
+                                    </PdfTableRow>
+                                ))
+                            ) : (
+                                <PdfTableRow>
+                                    <PdfTableCell weight={5}>
+                                        <Text>
+                                            Geen geplande bemestingen gevonden.
+                                        </Text>
+                                    </PdfTableCell>
+                                </PdfTableRow>
+                            )}
+                        </PdfTable>
+                    </View>
+                    <Footer config={data.config} />
+                </Page>
+            ))}
 
         {/* Bufferstrips Section */}
         {data.fields.some((f) => f.isBufferstrip) && (

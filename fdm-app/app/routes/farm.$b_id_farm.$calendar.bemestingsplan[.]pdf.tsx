@@ -1,38 +1,39 @@
-import { renderToStream } from "@react-pdf/renderer";
+import { renderToStream } from "@react-pdf/renderer"
 import {
-  getFarm,
-  getFields,
-  getCultivations,
-  getCurrentSoilData,
-} from "@svenvw/fdm-core";
+    getFarm,
+    getFields,
+    getCultivations,
+    getCurrentSoilData,
+} from "@svenvw/fdm-core"
 import {
-  collectInputForOrganicMatterBalance,
-  aggregateNormsToFarmLevel,
-  aggregateNormFillingsToFarmLevel,
-  getOrganicMatterBalanceField,
-} from "@svenvw/fdm-calculator";
-import { data, type LoaderFunctionArgs } from "react-router";
-import { Readable } from "node:stream";
-import path from "node:path";
-import { format } from "date-fns";
-import { nl } from "date-fns/locale";
-import { getSession } from "~/lib/auth.server";
-import { getTimeframe, getCalendar } from "~/lib/calendar";
-import { fdm } from "~/lib/fdm.server";
-import { BemestingsplanPDF, BemestingsplanData } from "~/components/pdf/BemestingsplanPDF";
-import { getDefaultCultivation } from "~/lib/cultivation-helpers";
-import { handleLoaderError } from "~/lib/error";
-import { clientConfig } from "~/lib/config";
+    collectInputForOrganicMatterBalance,
+    aggregateNormsToFarmLevel,
+    aggregateNormFillingsToFarmLevel,
+    getOrganicMatterBalanceField,
+} from "@svenvw/fdm-calculator"
+import { data, type LoaderFunctionArgs } from "react-router"
+import { Readable } from "node:stream"
+import path from "node:path"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale"
+import { getSession } from "~/lib/auth.server"
+import { getTimeframe, getCalendar } from "~/lib/calendar"
+import { fdm } from "~/lib/fdm.server"
+import { getDefaultCultivation } from "~/lib/cultivation-helpers"
+import { handleLoaderError } from "~/lib/error"
+import { clientConfig } from "~/lib/config"
 import {
     getNorms,
     getNutrientAdviceForField,
     getPlannedDosesForField,
-} from "~/integrations/calculator";
+} from "~/integrations/calculator"
+import type { BemestingsplanData } from "~/components/blocks/pdf/bemestingsplan/types"
+import { BemestingsplanPDF } from "~/components/blocks/pdf/bemestingsplan/BemestingsplanPDF"
 
 const formatDate = (date: Date | null | undefined) => {
-  if (!date) return "-";
-  return format(date, "d MMM", { locale: nl });
-};
+    if (!date) return "-"
+    return format(date, "d MMM", { locale: nl })
+}
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -138,21 +139,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
                     // Calculate Nutrient Advice
                     let adviceKgHa = {
-                        n: 0,
-                        nw: 0,
-                        p2o5: 0,
-                        k2o: 0,
-                        mg: 0,
-                        s: 0,
-                        om: 0,
-                        ca: 0,
-                        na: 0,
-                        cu: 0,
-                        zn: 0,
-                        co: 0,
-                        mn: 0,
-                        mo: 0,
-                        b: 0,
+                        d_n_req: 0,
+                        d_p_req: 0,
+                        d_k_req: 0,
+                        d_mg_req: 0,
+                        d_s_req: 0,
+                        d_c_req: 0,
+                        d_ca_req: 0,
+                        d_na_req: 0,
+                        d_cu_req: 0,
+                        d_zn_req: 0,
+                        d_co_req: 0,
+                        d_mn_req: 0,
+                        d_mo_req: 0,
+                        d_b_req: 0,
                     }
                     try {
                         if (mainCultivation) {
@@ -173,21 +173,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                                 result
                             if (yearAdvice && typeof yearAdvice === "object") {
                                 adviceKgHa = {
-                                    n: yearAdvice.d_n_req || 0,
-                                    nw: yearAdvice.d_n_req || 0,
-                                    p2o5: yearAdvice.d_p_req || 0,
-                                    k2o: yearAdvice.d_k_req || 0,
-                                    mg: yearAdvice.d_mg_req || 0,
-                                    s: yearAdvice.d_s_req || 0,
-                                    om: 0,
-                                    ca: yearAdvice.d_ca_req || 0,
-                                    na: yearAdvice.d_na_req || 0,
-                                    cu: yearAdvice.d_cu_req || 0,
-                                    zn: yearAdvice.d_zn_req || 0,
-                                    co: yearAdvice.d_co_req || 0,
-                                    mn: yearAdvice.d_mn_req || 0,
-                                    mo: yearAdvice.d_mo_req || 0,
-                                    b: yearAdvice.d_b_req || 0,
+                                    d_n_req: yearAdvice.d_n_req || 0,
+                                    d_p_req: yearAdvice.d_p_req || 0,
+                                    d_k_req: yearAdvice.d_k_req || 0,
+                                    d_mg_req: yearAdvice.d_mg_req || 0,
+                                    d_s_req: yearAdvice.d_s_req || 0,
+                                    d_c_req: yearAdvice.d_c_req || 0,
+                                    d_ca_req: yearAdvice.d_ca_req || 0,
+                                    d_na_req: yearAdvice.d_na_req || 0,
+                                    d_cu_req: yearAdvice.d_cu_req || 0,
+                                    d_zn_req: yearAdvice.d_zn_req || 0,
+                                    d_co_req: yearAdvice.d_co_req || 0,
+                                    d_mn_req: yearAdvice.d_mn_req || 0,
+                                    d_mo_req: yearAdvice.d_mo_req || 0,
+                                    d_b_req: yearAdvice.d_b_req || 0,
                                 }
                             }
                         }
@@ -211,23 +210,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         timeframe,
                     })
 
-                    const plannedKgHa = {
-                        n: dosesResult.dose.p_dose_n || 0,
-                        nw: dosesResult.dose.p_dose_nw || 0,
-                        p2o5: dosesResult.dose.p_dose_p || 0,
-                        k2o: dosesResult.dose.p_dose_k || 0,
-                        om: dosesResult.dose.p_dose_eoc || 0,
-                        mg: dosesResult.dose.p_dose_mg || 0,
-                        s: dosesResult.dose.p_dose_s || 0,
-                        ca: dosesResult.dose.p_dose_ca || 0,
-                        na: dosesResult.dose.p_dose_na || 0,
-                        cu: dosesResult.dose.p_dose_cu || 0,
-                        zn: dosesResult.dose.p_dose_zn || 0,
-                        co: dosesResult.dose.p_dose_co || 0,
-                        mn: dosesResult.dose.p_dose_mn || 0,
-                        mo: dosesResult.dose.p_dose_mo || 0,
-                        b: dosesResult.dose.p_dose_b || 0,
-                    }
+                    const plannedKgHa = dosesResult.dose
 
                     return {
                         id: field.b_id,
@@ -237,16 +220,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         mainCrop: mainCultivation?.b_lu_name || "Geen gewas",
                         catchCrop: catchCrop?.b_lu_name,
                         soil: {
-                            date: formatDate(samplingDate),
-                            ph: soilParams.a_ph_cc,
-                            pAl: soilParams.a_p_al,
-                            pCaCl: soilParams.a_p_cc,
-                            kCc: soilParams.a_k_cc,
-                            om: soilParams.a_som_loi,
-                            soilTypeAgr: soilParams.b_soiltype_agr,
-                            clay: soilParams.a_clay_mi,
-                            sand: soilParams.a_sand_mi,
-                            silt: soilParams.a_silt_mi,
+                            b_sampling_date: formatDate(samplingDate),
+                            a_ph_ccc: soilParams.a_ph_cc,
+                            a_p_al: soilParams.a_p_al,
+                            a_p_cc: soilParams.a_p_cc,
+                            a_k_cc: soilParams.a_k_cc,
+                            a_som_loi: soilParams.a_som_loi,
+                            b_soiltype_agr: soilParams.b_soiltype_agr,
+                            a_clay_mi: soilParams.a_clay_mi,
+                            a_sand_mi: soilParams.a_sand_mi,
+                            a_silt_mi: soilParams.a_silt_mi,
                         },
                         norms: {
                             nitrogen: normsResult.value.nitrogen,
@@ -288,11 +271,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                                 date: formatDate(app.p_app_date),
                                 product: fert?.p_name_nl || app.p_id,
                                 quantity: app.p_app_amount || 0,
-                                n: appDose.p_dose_n || 0,
-                                nw: appDose.p_dose_nw || 0,
-                                p2o5: appDose.p_dose_p || 0,
-                                k2o: appDose.p_dose_k || 0,
-                                om: appDose.p_dose_eoc || 0,
+                                p_dose_n: appDose.p_dose_n || 0,
+                                p_dose_nw: appDose.p_dose_nw || 0,
+                                p_dose_p: appDose.p_dose_p || 0,
+                                p_dose_k: appDose.p_dose_k || 0,
+                                p_dose_eoc: appDose.p_dose_eoc || 0,
+                                p_dose_mg: appDose.p_dose_mg || 0,
+                                p_dose_s: appDose.p_dose_s || 0,
+                                p_dose_ca: appDose.p_dose_ca || 0,
+                                p_dose_na: appDose.p_dose_na || 0,
+                                p_dose_cu: appDose.p_dose_cu || 0,
+                                p_dose_zn: appDose.p_dose_zn || 0,
+                                p_dose_co: appDose.p_dose_co || 0,
+                                p_dose_mn: appDose.p_dose_mn || 0,
+                                p_dose_mo: appDose.p_dose_mo || 0,
+                                p_dose_b: appDose.p_dose_b || 0,
                             }
                         }),
                     }
@@ -311,38 +304,37 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         norms: { nitrogen: 0, manure: 0, phosphate: 0 },
                         normsFilling: { nitrogen: 0, manure: 0, phosphate: 0 },
                         advice: {
-                            n: 0,
-                            nw: 0,
-                            p2o5: 0,
-                            k2o: 0,
-                            mg: 0,
-                            s: 0,
-                            om: 0,
-                            ca: 0,
-                            na: 0,
-                            cu: 0,
-                            zn: 0,
-                            co: 0,
-                            mn: 0,
-                            mo: 0,
-                            b: 0,
+                            d_n_req: 0,
+                            d_p_req: 0,
+                            d_k_req: 0,
+                            d_mg_req: 0,
+                            d_s_req: 0,
+                            d_c_req: 0,
+                            d_ca_req: 0,
+                            d_na_req: 0,
+                            d_cu_req: 0,
+                            d_zn_req: 0,
+                            d_co_req: 0,
+                            d_mn_req: 0,
+                            d_mo_req: 0,
+                            d_b_req: 0,
                         },
                         planned: {
-                            n: 0,
-                            nw: 0,
-                            p2o5: 0,
-                            k2o: 0,
-                            om: 0,
-                            mg: 0,
-                            s: 0,
-                            ca: 0,
-                            na: 0,
-                            cu: 0,
-                            zn: 0,
-                            co: 0,
-                            mn: 0,
-                            mo: 0,
-                            b: 0,
+                            p_dose_n: 0,
+                            p_dose_nw: 0,
+                            p_dose_p: 0,
+                            p_dose_k: 0,
+                            p_dose_eoc: 0,
+                            p_dose_mg: 0,
+                            p_dose_s: 0,
+                            p_dose_ca: 0,
+                            p_dose_na: 0,
+                            p_dose_cu: 0,
+                            p_dose_zn: 0,
+                            p_dose_co: 0,
+                            p_dose_mn: 0,
+                            p_dose_mo: 0,
+                            p_dose_b: 0,
                         },
                         applications: [],
                     }
@@ -393,24 +385,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         const totalAdviceKg = pdfFieldsData.reduce(
             (acc, f) => ({
-                n: acc.n + f.advice.n * f.area,
-                nw: acc.nw + f.advice.nw * f.area,
-                p2o5: acc.p2o5 + f.advice.p2o5 * f.area,
-                k2o: acc.k2o + f.advice.k2o * f.area,
-                om: acc.om + f.advice.om * f.area,
+                d_n_req: acc.d_n_req + f.advice.d_n_req * f.area,
+                d_p_req: acc.d_p_req + f.advice.d_p_req * f.area,
+                d_k_req: acc.d_k_req + f.advice.d_k_req * f.area,
+                d_c_req: acc.d_c_req + f.advice.d_c_req * f.area,
             }),
-            { n: 0, nw: 0, p2o5: 0, k2o: 0, om: 0 },
+            { d_n_req: 0, d_p_req: 0, d_k_req: 0, d_c_req: 0 },
         )
 
         const totalPlannedUsageKg = pdfFieldsData.reduce(
             (acc, f) => ({
-                n: acc.n + f.planned.n * f.area,
-                nw: acc.nw + f.planned.nw * f.area,
-                p2o5: acc.p2o5 + f.planned.p2o5 * f.area,
-                k2o: acc.k2o + f.planned.k2o * f.area,
-                om: acc.om + f.planned.om * f.area,
+                p_dose_n: acc.p_dose_n + f.planned.p_dose_n * f.area,
+                p_dose_nw: acc.p_dose_nw + f.planned.p_dose_nw * f.area,
+                p_dose_p: acc.p_dose_p + f.planned.p_dose_p * f.area,
+                p_dose_k: acc.p_dose_k + f.planned.p_dose_k * f.area,
+                p_dose_eoc: acc.p_dose_eoc + f.planned.p_dose_eoc * f.area,
             }),
-            { n: 0, nw: 0, p2o5: 0, k2o: 0, om: 0 },
+            {
+                p_dose_n: 0,
+                p_dose_nw: 0,
+                p_dose_p: 0,
+                p_dose_k: 0,
+                p_dose_eoc: 0,
+            },
         )
 
         // Calculate aggregate OM balance (weighted average per ha)

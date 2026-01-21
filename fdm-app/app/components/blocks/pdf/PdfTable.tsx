@@ -1,12 +1,12 @@
-import { type Style, Text, View } from "@react-pdf/renderer"
-import { pdfStyles } from "../styles"
+import { Text, View } from "@react-pdf/renderer"
+import { pdfStyles } from "./bemestingsplan/styles"
 
 export const PdfTable = ({
     children,
     style,
 }: {
     children: React.ReactNode
-    style?: Style | Style[]
+    style?: any
 }) => <View style={[pdfStyles.table, style]}>{children}</View>
 
 export const PdfTableHeader = ({
@@ -14,7 +14,7 @@ export const PdfTableHeader = ({
     style,
 }: {
     children: React.ReactNode
-    style?: Style | Style[]
+    style?: any
 }) => <View style={[pdfStyles.tableHeader, style]}>{children}</View>
 
 export const PdfTableRow = ({
@@ -22,7 +22,7 @@ export const PdfTableRow = ({
     style,
 }: {
     children: React.ReactNode
-    style?: Style | Style[]
+    style?: any
 }) => <View style={[pdfStyles.tableRow, style]}>{children}</View>
 
 export const PdfTableCell = ({
@@ -31,7 +31,7 @@ export const PdfTableCell = ({
     weight = 1,
 }: {
     children: React.ReactNode
-    style?: Style | Style[]
+    style?: any
     weight?: number
 }) => (
     <View style={[pdfStyles.tableCell, { flex: weight }, style]}>
