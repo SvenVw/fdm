@@ -1,0 +1,113 @@
+import { getFarms, getFields, listPrincipalsForFarm } from "@svenvw/fdm-core"
+import { data, useLoaderData } from "react-router"
+import { FarmContent } from "~/components/blocks/farm/farm-content"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { columns } from "~/components/blocks/farms/columns"
+import { DataTable } from "~/components/blocks/farms/table"
+import { auth } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
+
+import { fdm } from "~/lib/fdm.server"
+import type { Route } from "./+types/organization.$slug.farms"
+
+export async function loader({ params, request }: Route.LoaderArgs) {
+    try {
+        const organizations = await auth.api.listOrganizations({
+            headers: request.headers,
+        })
+        const organization = organizations.find(
+            (org) => org.slug === params.slug,
+        )
+
+        if (!organization) {
+            throw data("Organisatie niet gevonden.", 404)
+        }
+
+        const farms = await getFarms(fdm, organization.id)
+
+        const allFarms = await Promise.all(
+            farms.map(async (farm) => {
+                const myOrganization = organization
+                async function getOwner() {
+                    const accessors = (
+                        await listPrincipalsForFarm(
+                            fdm,
+                            myOrganization.id,
+                            farm.b_id_farm,
+                        )
+                    ).filter((accessor) => accessor.type === "user")
+
+                    return (
+                        accessors.find(
+                            (accessor) => accessor.role === "owner",
+                        ) ??
+                        accessors.find(
+                            (accessor) => accessor.role === "advisor",
+                        )
+                    )
+                }
+
+                async function reduceFields() {
+                    const fields = await getFields(
+                        fdm,
+                        myOrganization.id,
+                        farm.b_id_farm,
+                    )
+
+                    let b_area = 0
+                    const cultivations: Record<
+                        string,
+                        { b_lu_name: string; b_lu_croprotation: string }
+                    > = {}
+                    const fertilizers: Record<
+                        string,
+                        { p_name_nl: string; p_type: string }
+                    > = {}
+
+                    fields.forEach((field) => {
+                        b_area += field.b_area ?? 0
+                    })
+
+                    return {
+                        fields: fields.length,
+                        b_area: b_area,
+                        cultivations: Object.values(cultivations),
+                        fertilizers: Object.values(fertilizers),
+                    }
+                }
+
+                return {
+                    b_id_farm: farm.b_id_farm,
+                    b_name_farm: farm.b_name_farm,
+                    owner: await getOwner(),
+                    ...(await reduceFields()),
+                }
+            }),
+        )
+
+        return {
+            data: allFarms,
+            organization,
+        }
+    } catch (e) {
+        throw handleLoaderError(e)
+    }
+}
+export default function OrganizationFarmsPage() {
+    const { data, organization } = useLoaderData<typeof loader>()
+    return (
+        <main>
+            <div className="flex items-center justify-between">
+                <FarmTitle
+                    title={`Bedrijven met toegang door ${organization.name}`}
+                    description="Selecteer een perceel voor details of voeg een nieuw perceel toe."
+                />
+            </div>
+            <FarmContent>
+                <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
+                    <DataTable columns={columns} data={data} />
+                </div>
+            </FarmContent>
+        </main>
+    )
+}
