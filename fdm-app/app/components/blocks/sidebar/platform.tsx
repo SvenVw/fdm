@@ -18,8 +18,13 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "~/components/ui/sidebar"
+import { ComponentProps } from "react"
+import { SidebarOrganization } from "./organization"
 
-export function SidebarPlatform() {
+export function SidebarPlatform({
+    organization,
+    roles,
+}: ComponentProps<typeof SidebarOrganization>) {
     const location = useLocation()
     return (
         <>
@@ -77,44 +82,7 @@ export function SidebarPlatform() {
                     </SidebarMenu>
                 </SidebarGroupContent>
             </SidebarGroup>
-            <SidebarGroup>
-                <SidebarGroupLabel>Organisaties</SidebarGroupLabel>
-                <SidebarGroupContent>
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton
-                                asChild
-                                isActive={
-                                    location.pathname.includes(
-                                        "/organization",
-                                    ) &&
-                                    !location.pathname.includes(
-                                        "/organization/invitations",
-                                    )
-                                }
-                            >
-                                <NavLink to={"/organization"}>
-                                    <Users />
-                                    <span>Overzicht</span>
-                                </NavLink>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton
-                                asChild
-                                isActive={location.pathname.includes(
-                                    "/organization/invitations",
-                                )}
-                            >
-                                <NavLink to={"/organization/invitations"}>
-                                    <Mail />
-                                    <span>Uitnodigingen</span>
-                                </NavLink>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                </SidebarGroupContent>
-            </SidebarGroup>
+            <SidebarOrganization organization={organization} roles={roles} />
             <SidebarGroup>
                 <SidebarGroupLabel>Over {clientConfig.name}</SidebarGroupLabel>
                 <SidebarGroupContent>

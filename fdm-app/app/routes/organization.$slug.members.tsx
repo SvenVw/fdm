@@ -1,4 +1,3 @@
-import type { User } from "better-auth"
 import type { Invitation, Member, Organization } from "better-auth/plugins"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
@@ -104,7 +103,7 @@ export default function OrganizationIndex() {
                 {/* Changed this div to a flex container with justify-between */}
                 <div className="mb-8 flex items-center justify-between">
                     <FarmTitle
-                        title={organization.name}
+                        title={`Leden van ${organization.name}`}
                         description={organization.description || ""}
                     />
                 </div>

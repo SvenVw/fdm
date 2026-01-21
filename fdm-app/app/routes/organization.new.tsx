@@ -1,16 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
-import {
-    type ActionFunctionArgs,
-    Form,
-    type MetaFunction,
-} from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { useRemixForm } from "remix-hook-form"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
-import { z } from "zod"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Spinner } from "~/components/ui/spinner"
-import { Button } from "~/components/ui/button"
+import { OrganizationSettingsForm } from "~/components/blocks/organization/form"
+import { FormSchema } from "~/components/blocks/organization/schema"
 import {
     Card,
     CardContent,
@@ -18,22 +12,13 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "~/components/ui/form"
-import { Input } from "~/components/ui/input"
-import { Textarea } from "~/components/ui/textarea"
 import { auth, getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import type { Route } from "./+types/organization.new"
 
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
     return [
         { title: `Organisatie aanmaken | ${clientConfig.name}` },
         {
@@ -42,26 +27,6 @@ export const meta: MetaFunction = () => {
         },
     ]
 }
-
-const FormSchema = z.object({
-    name: z
-        .string({
-            required_error: "Naam van de organisatie is verplicht",
-        })
-        .min(3, {
-            message:
-                "Naam van de organisatie moet minimaal 3 karakters bevatten",
-        }),
-    slug: z
-        .string({
-            required_error: "ID de organisatie is verplicht",
-        })
-        .refine(isValidSlug, {
-            message:
-                "ID moet minimaal 3 karakters bevatten, enkel kleine letters, cijfers of '-'",
-        }),
-    description: z.string({}).optional(),
-})
 
 export async function loader() {
     try {
@@ -125,94 +90,7 @@ export default function AddOrganizationPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <RemixFormProvider {...form}>
-                            <Form method="post">
-                                <fieldset
-                                    disabled={form.formState.isSubmitting}
-                                >
-                                    <div className="space-y-4">
-                                        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-                                            <FormField
-                                                control={form.control}
-                                                name="name"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>
-                                                            Naam organisatie
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                type="text"
-                                                                required
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="slug"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>
-                                                            ID organisatie
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                type="text"
-                                                                readOnly
-                                                                required
-                                                                className="text-muted-foreground"
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        {/* <FormMessage /> */}
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-
-                                        <FormField
-                                            control={form.control}
-                                            name="description"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Beschrijving
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Textarea
-                                                            placeholder="Een korte toelichting op je organisatie zodat andere gebruikers er meer te weten over komen."
-                                                            className="resize-none"
-                                                            {...field}
-                                                        />
-                                                    </FormControl>
-                                                    <FormDescription />
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <Button
-                                            type="submit"
-                                            disabled={
-                                                form.formState.isSubmitting
-                                            }
-                                            className="m-auto"
-                                        >
-                                            {form.formState.isSubmitting && (
-                                                <Spinner />
-                                            )}
-                                            Aanmaken
-                                        </Button>
-                                    </div>
-                                </fieldset>
-                            </Form>
-                        </RemixFormProvider>
+                        <OrganizationSettingsForm />
                     </CardContent>
                 </Card>
             </div>
@@ -220,7 +98,7 @@ export default function AddOrganizationPage() {
     )
 }
 
-export async function action({ request }: ActionFunctionArgs) {
+export async function action({ request }: Route.ActionArgs) {
     try {
         // Get the session
         await getSession(request)
@@ -235,18 +113,22 @@ export async function action({ request }: ActionFunctionArgs) {
         const description = formValues.description || ""
 
         // Check if slug is available
-        const { status } = await auth.api.checkOrganizationSlug({
-            headers: request.headers,
-            body: {
-                slug: slug,
-            },
-        })
+        try {
+            await auth.api.checkOrganizationSlug({
+                headers: request.headers,
+                body: {
+                    slug: slug,
+                },
+            })
+        } catch (e) {
+            if ((e as any).body?.code === "SLUG_IS_TAKEN") {
+                return dataWithError(
+                    null,
+                    "Naam voor organisatie is niet meer beschikbaar. Kies een andere naam",
+                )
+            }
 
-        if (!status) {
-            return dataWithError(
-                null,
-                "Naam voor organisatie is niet meer beschikbaar. Kies een andere naam",
-            )
+            throw e
         }
 
         // Create the organization
@@ -267,19 +149,4 @@ export async function action({ request }: ActionFunctionArgs) {
     } catch (error) {
         throw handleActionError(error)
     }
-}
-
-function isValidSlug(slug: string): boolean {
-    // Slug must be lowercase
-    if (slug.toLowerCase() !== slug) {
-        return false
-    }
-
-    // Slug must be at least 3 characters long
-    if (slug.length < 3) {
-        return false
-    }
-
-    // Slug should only contain lowercase letters, numbers, and hyphens
-    return /^[a-z0-9-]+$/.test(slug)
 }
