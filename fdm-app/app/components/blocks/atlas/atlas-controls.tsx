@@ -1,4 +1,4 @@
-import { Earth, Layers, Mountain } from "lucide-react"
+import { Layers, Mountain, PanelsRightBottom } from "lucide-react"
 import type { ControlPosition, Map as MapLibreMap } from "maplibre-gl"
 import { useEffect } from "react"
 import { createRoot, type Root } from "react-dom/client"
@@ -160,7 +160,7 @@ function FieldsControl({
                 onToggle,
                 labelActive: "Verberg percelen",
                 labelInactive: "Toon percelen",
-                Icon: Layers,
+                Icon: PanelsRightBottom,
             }),
         CONTROL_OPTIONS,
     )
@@ -171,7 +171,7 @@ function FieldsControl({
             onToggle,
             labelActive: "Verberg percelen",
             labelInactive: "Toon percelen",
-            Icon: Layers,
+            Icon: PanelsRightBottom,
         })
     }, [control, showFields, onToggle])
 
@@ -224,7 +224,7 @@ function SoilControl({
                 onToggle,
                 labelActive: "Verberg bodemkaart",
                 labelInactive: "Toon bodemkaart",
-                Icon: Earth,
+                Icon: Layers,
             }),
         CONTROL_OPTIONS,
     )
@@ -235,7 +235,7 @@ function SoilControl({
             onToggle,
             labelActive: "Verberg bodemkaart",
             labelInactive: "Toon bodemkaart",
-            Icon: Earth,
+            Icon: Layers,
         })
     }, [control, showSoil, onToggle])
 
