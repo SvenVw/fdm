@@ -70,7 +70,7 @@ export const meta: MetaFunction = () => {
         { title: `Nieuw perceel | ${clientConfig.name}` },
         {
             name: "description",
-            content: "Voeg een nieuw perceel toe",
+            content: "Voeg nieuwe percelen toe",
         },
     ]
 }

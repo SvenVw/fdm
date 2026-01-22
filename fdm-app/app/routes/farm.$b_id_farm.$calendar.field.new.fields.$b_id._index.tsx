@@ -13,27 +13,17 @@ import {
     type ActionFunctionArgs,
     data,
     type LoaderFunctionArgs,
-    type MetaFunction,
     useLoaderData,
 } from "react-router"
 import { dataWithSuccess, redirectWithSuccess } from "remix-toast"
 import { getMapStyle } from "~/integrations/map"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
-import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { NewFieldsBlock } from "~/components/blocks/fields-new/block"
 import { FormSchema } from "../components/blocks/fields-new/schema"
-
-// Meta
-export const meta: MetaFunction = () => {
-    return [
-        { title: `${clientConfig.name} App` },
-        { name: "description", content: `Welcome to ${clientConfig.name}!` },
-    ]
-}
 
 /**
  * Retrieves and prepares data for rendering the field details page.

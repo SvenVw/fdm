@@ -21,13 +21,10 @@ import { NewFieldsSidebar } from "../components/blocks/fields-new/sidebar"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        {
-            title: `Percelen beheren - Bedrijf toevoegen | ${clientConfig.name}`,
-        },
+        { title: `Nieuw perceel | ${clientConfig.name}` },
         {
             name: "description",
-            content:
-                "Beheer de percelen van je bedrijf. Pas namen aan en bekijk perceelsinformatie.",
+            content: "Voeg nieuwe percelen toe",
         },
     ]
 }
