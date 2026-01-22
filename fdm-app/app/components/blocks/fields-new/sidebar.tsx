@@ -29,7 +29,7 @@ export function NewFieldsSidebar({
                     showProductiveOnly ? field.b_bufferstrip === false : true,
                 )
                 .slice()
-                .sort((a, b) => b.b_area - a.b_area) // Sort by area in descending order
+                .sort((a, b) => (b.b_area ?? 0) - (a.b_area ?? 0)) // Sort by area in descending order
                 .map((field) => ({
                     title: field.b_name,
                     to:
@@ -82,7 +82,7 @@ type NewFieldsSidebarProps = {
     fields: {
         b_id: string
         b_name: string
-        b_area: number
+        b_area: number | null
         b_bufferstrip: boolean
     }[]
     b_id_farm: string

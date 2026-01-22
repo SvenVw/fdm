@@ -22,7 +22,9 @@ export function loader({ params, request }: LoaderFunctionArgs) {
         let fieldIds: string[] = b_id ? [b_id] : []
         const fieldIdsParam = url.searchParams.get("fieldIds")
         if (fieldIdsParam && fieldIdsParam.length > 0)
-            fieldIds = fieldIdsParam.split(",")
+            fieldIds = fieldIdsParam
+                .split(",")
+                .filter((fieldId) => fieldId.length)
         if (!b_id) {
             if (fieldIds.length === 0) {
                 // Redirect to the fields table if no field can be shown at all.

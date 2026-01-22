@@ -63,7 +63,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const b_id = params.b_id
         let fieldIds: string[] = b_id ? [b_id] : []
         const fieldIdsParam = url.searchParams.get("fieldIds")
-        if (fieldIdsParam) fieldIds = fieldIdsParam.split(",")
+        if (fieldIdsParam)
+            fieldIds = fieldIdsParam
+                .split(",")
+                .filter((fieldId) => fieldId.length)
 
         // Get the session
         const session = await getSession(request)
