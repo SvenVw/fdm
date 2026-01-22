@@ -194,8 +194,8 @@ export default function FarmAtlasSoilBlock() {
                 bbox: bbox,
                 width: width.toString(),
                 height: height.toString(),
-                i: Math.round(point.x).toString(),
-                j: Math.round(point.y).toString(),
+                I: Math.round(point.x).toString(),
+                J: Math.round(point.y).toString(),
             })
 
             const url = `https://service.pdok.nl/bzk/bro-bodemkaart/wms/v1_0?${params.toString()}`
@@ -248,6 +248,26 @@ export default function FarmAtlasSoilBlock() {
         })
     }, [])
 
+    const onToggleFields = useCallback(() => {
+        setShowFields((prev) => !prev)
+    }, [])
+
+    const onControlsViewportChange = useCallback(
+        ({
+            longitude,
+            latitude,
+            zoom,
+        }: { longitude: number; latitude: number; zoom: number }) => {
+            setViewState((current) => ({
+                ...current,
+                longitude,
+                latitude,
+                zoom,
+            }))
+        },
+        [],
+    )
+
     return (
         <div className="relative h-full w-full">
             <MapGL
@@ -262,16 +282,9 @@ export default function FarmAtlasSoilBlock() {
                 cursor={showSoil ? "pointer" : undefined}
             >
                 <Controls
-                    onViewportChange={({ longitude, latitude, zoom }) =>
-                        setViewState((currentViewState) => ({
-                            ...currentViewState,
-                            longitude,
-                            latitude,
-                            zoom,
-                        }))
-                    }
+                    onViewportChange={onControlsViewportChange}
                     showFields={showFields}
-                    onToggleFields={() => setShowFields(!showFields)}
+                    onToggleFields={onToggleFields}
                     showSoil={showSoil}
                     onToggleSoil={onToggleSoil}
                 />
