@@ -127,18 +127,17 @@ export default function FarmAtlasFieldsBlock() {
     const fieldsAvailableId = "fieldsAvailable"
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
     const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
+    // ViewState logic
     const initialViewState = getViewState(fields)
-
-    // Create a sessionStorage to store the latest viewstate
     const [viewState, setViewState] = useState<ViewState>(() => {
         if (typeof window !== "undefined") {
-            const savedViewState = sessionStorage.getItem("mapViewState")
-            if (savedViewState) {
-                try {
+            try {
+                const savedViewState = sessionStorage.getItem("mapViewState")
+                if (savedViewState) {
                     return JSON.parse(savedViewState)
-                } catch {
-                    sessionStorage.removeItem("mapViewState")
                 }
+            } catch {
+                // ignore storage errors (e.g., private mode)
             }
         }
         return initialViewState as ViewState

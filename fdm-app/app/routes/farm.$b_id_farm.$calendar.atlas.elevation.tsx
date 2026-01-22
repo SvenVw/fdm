@@ -190,18 +190,18 @@ export default function FarmAtlasElevationBlock() {
     const initialViewState = getViewState(fields)
     const [viewState, setViewState] = useState<ViewState>(() => {
         if (typeof window !== "undefined") {
-            const savedViewState = sessionStorage.getItem("mapViewState")
-            if (savedViewState) {
-                try {
+            try {
+                const savedViewState = sessionStorage.getItem("mapViewState")
+                if (savedViewState) {
                     return JSON.parse(savedViewState)
-                } catch {
-                    sessionStorage.removeItem("mapViewState")
                 }
+            } catch {
+                // ignore storage errors (e.g., private mode)
             }
         }
         return initialViewState as ViewState
     })
-
+    
     const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
         setViewState(event.viewState)
     }, [])
@@ -231,8 +231,7 @@ export default function FarmAtlasElevationBlock() {
                         // Cache for 24 hours and ensure data is valid
                         if (
                             data?.features?.length > 0 &&
-                            Date.now() - timestamp <
-                            24 * 60 * 60 * 1000
+                            Date.now() - timestamp < 24 * 60 * 60 * 1000
                         ) {
                             setIndexData(data)
                             setNetworkStatus("idle")

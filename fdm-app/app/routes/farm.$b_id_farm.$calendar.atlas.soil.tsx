@@ -140,13 +140,13 @@ export default function FarmAtlasSoilBlock() {
     const initialViewState = getViewState(fields)
     const [viewState, setViewState] = useState<ViewState>(() => {
         if (typeof window !== "undefined") {
-            const savedViewState = sessionStorage.getItem("mapViewState")
-            if (savedViewState) {
-                try {
+            try {
+                const savedViewState = sessionStorage.getItem("mapViewState")
+                if (savedViewState) {
                     return JSON.parse(savedViewState)
-                } catch {
-                    sessionStorage.removeItem("mapViewState")
                 }
+            } catch {
+                // ignore storage errors (e.g., private mode)
             }
         }
         return initialViewState as ViewState
@@ -257,7 +257,11 @@ export default function FarmAtlasSoilBlock() {
             longitude,
             latitude,
             zoom,
-        }: { longitude: number; latitude: number; zoom: number }) => {
+        }: {
+            longitude: number
+            latitude: number
+            zoom: number
+        }) => {
             setViewState((current) => ({
                 ...current,
                 longitude,
