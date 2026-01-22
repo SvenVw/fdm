@@ -84,6 +84,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 statusText: "Field not found",
             })
         }
+
+        // Get the geojson
+        if (!field.b_geometry) {
+            throw data("Field geometry is required", {
+                status: 400,
+                statusText: "Field geometry is required",
+            })
+        }
+
         const feature: GeoJSON.Feature = {
             type: "Feature",
             properties: {
@@ -97,14 +106,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const featureCollection: FeatureCollection = {
             type: "FeatureCollection",
             features: [feature],
-        }
-
-        // Get the geojson
-        if (!field.b_geometry) {
-            throw data("Field geometry is required", {
-                status: 400,
-                statusText: "Field geometry is required",
-            })
         }
 
         // Get soil analysis data
