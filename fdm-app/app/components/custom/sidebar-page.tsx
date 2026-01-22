@@ -30,7 +30,9 @@ export function SidebarPage({
                 <NavLink
                     key={item.to}
                     to={item.to}
-                    aria-current={domainUrl === item.to ? "page" : undefined}
+                    aria-current={
+                        domainUrl.startsWith(item.to) ? "page" : undefined
+                    }
                     aria-label={item.title}
                     className={cn(
                         buttonVariants({ variant: "ghost", size: "sm" }),
