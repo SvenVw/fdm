@@ -153,6 +153,8 @@ export type OrganicMatterBalanceFieldResult = {
     b_id: string
     /** The area of the field in hectares. */
     b_area: number
+    /** Whether the field is a buffer strip */
+    b_bufferstrip: boolean
     /** The detailed organic matter balance for the field. Undefined if an error occurred. */
     balance?: OrganicMatterBalanceField
     /** An error message if the calculation for this field failed. */
@@ -193,7 +195,10 @@ export type SoilAnalysisPicked = Pick<
  */
 export type FieldInput = {
     /** The core details of the field. */
-    field: Pick<Field, "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end">
+    field: Pick<
+        Field,
+        "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end" | "b_bufferstrip"
+    >
     /** The list of cultivations that took place on the field. */
     cultivations: Pick<
         Cultivation,
@@ -328,9 +333,15 @@ export type OrganicMatterBalanceFieldNumeric = {
 
 /** Numeric version of `OrganicMatterBalanceFieldResult`. */
 export type OrganicMatterBalanceFieldResultNumeric = {
+    /** The unique identifier of the field. */
     b_id: string
+    /** The area of the field in hectares. */
     b_area: number
+    /** Whether the field is a buffer strip */
+    b_bufferstrip: boolean
+    /** The detailed organic matter balance for the field. Undefined if an error occurred. */
     balance?: OrganicMatterBalanceFieldNumeric
+    /** An error message if the calculation for this field failed. */
     errorMessage?: string
 }
 

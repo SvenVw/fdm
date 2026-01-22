@@ -22,6 +22,7 @@ import {
     getCurrentSoilData,
     type PrincipalId,
     type Timeframe,
+    getField,
 } from "@svenvw/fdm-core"
 import { getNmiApiKey } from "./nmi"
 
@@ -164,6 +165,8 @@ export async function getNutrientAdviceForField({
 
     const currentSoilData = await getCurrentSoilData(fdm, principal_id, b_id)
 
+    const field = await getField(fdm, principal_id, b_id)
+
     const cultivations = await getCultivations(
         fdm,
         principal_id,
@@ -185,6 +188,7 @@ export async function getNutrientAdviceForField({
         b_centroid: b_centroid,
         currentSoilData: currentSoilData,
         nmiApiKey: nmiApiKey,
+        b_bufferstrip: field.b_bufferstrip,
     })
 
     return nutrientAdvice
@@ -194,15 +198,17 @@ export async function getNorms({
     fdm,
     principal_id,
     b_id,
+    calendar,
 }: {
     fdm: FdmType
     principal_id: PrincipalId
     b_id: Field["b_id"]
+    calendar: "2025" | "2026"
 }) {
-    const functionsForNorms = createFunctionsForNorms("NL", "2025")
+    const functionsForNorms = createFunctionsForNorms("NL", calendar)
     const functionsForFilling = createFunctionsForFertilizerApplicationFilling(
         "NL",
-        "2025",
+        calendar,
     )
 
     const normsInput = await functionsForNorms.collectInputForNorms(

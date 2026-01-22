@@ -107,7 +107,7 @@ export default function Index() {
         () =>
             fields
                 .filter((field) =>
-                    showProductiveOnly ? field.b_isproductive : true,
+                    showProductiveOnly ? field.b_bufferstrip === false : true,
                 )
                 .slice()
                 .sort((a, b) => b.b_area - a.b_area) // Sort by area in descending order
@@ -138,7 +138,7 @@ export default function Index() {
 
                         <div className="ml-auto">
                             <NavLink
-                                to={`/farm/create/${b_id_farm}/${calendar}/cultivations`}
+                                to={`/farm/create/${b_id_farm}/${calendar}/rotation`}
                                 className={cn("ml-auto", {
                                     "pointer-events-none":
                                         sidebarPageItems.length === 0,
