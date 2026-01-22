@@ -149,15 +149,14 @@ export default function FarmAtlasFieldsBlock() {
         setViewState(event.viewState)
     }, [])
 
-    const isFirstRender = useRef(true)
-
-    // If latest viewstate is available use that one
     useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false
-            return
+        if (typeof window !== "undefined") {
+            try {
+                sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
+            } catch {
+                // ignore storage errors (e.g., private mode)
+            }
         }
-        sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
     }, [viewState])
 
     const layerLayout = { visibility: showFields ? "visible" : "none" } as const

@@ -206,14 +206,14 @@ export default function FarmAtlasElevationBlock() {
         setViewState(event.viewState)
     }, [])
 
-    // Save viewState
-    const isFirstRender = useRef(true)
     useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false
-            return
+        if (typeof window !== "undefined") {
+            try {
+                sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
+            } catch {
+                // ignore storage errors (e.g., private mode)
+            }
         }
-        sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
     }, [viewState])
 
     // Fetch COG Index once

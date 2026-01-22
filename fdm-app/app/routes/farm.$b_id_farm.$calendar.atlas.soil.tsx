@@ -3,7 +3,7 @@ import { simplify } from "@turf/turf"
 import type { Feature, FeatureCollection, Geometry } from "geojson"
 import maplibregl from "maplibre-gl"
 import proj4 from "proj4"
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
     Layer,
     Map as MapGL,
@@ -151,6 +151,16 @@ export default function FarmAtlasSoilBlock() {
         }
         return initialViewState as ViewState
     })
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            try {
+                sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
+            } catch {
+                // ignore storage errors (e.g., private mode)
+            }
+        }
+    }, [viewState])
 
     const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
         setViewState(event.viewState)
