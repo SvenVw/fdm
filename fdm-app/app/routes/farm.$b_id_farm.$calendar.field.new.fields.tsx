@@ -6,7 +6,10 @@ import {
     Outlet,
     useLoaderData,
 } from "react-router"
+import { NewFieldsSidebar } from "~/components/blocks/fields-new/sidebar"
 import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderField } from "~/components/blocks/header/field"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
@@ -14,9 +17,6 @@ import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { HeaderFarm } from "../components/blocks/header/farm"
-import { HeaderField } from "../components/blocks/header/field"
-import { NewFieldsSidebar } from "../components/blocks/fields-new/sidebar"
 
 // Meta
 export const meta: MetaFunction = () => {

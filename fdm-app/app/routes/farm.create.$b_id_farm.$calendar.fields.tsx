@@ -7,6 +7,7 @@ import {
     Outlet,
     useLoaderData,
 } from "react-router"
+import { NewFieldsSidebar } from "~/components/blocks/fields-new/sidebar"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { Button } from "~/components/ui/button"
@@ -18,7 +19,6 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { cn } from "~/lib/utils"
-import { NewFieldsSidebar } from "../components/blocks/fields-new/sidebar"
 
 // Meta
 export const meta: MetaFunction = () => {
