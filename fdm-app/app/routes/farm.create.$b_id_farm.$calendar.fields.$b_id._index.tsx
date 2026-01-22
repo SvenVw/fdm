@@ -1,4 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod"
 import {
     getCultivations,
     getCultivationsFromCatalogue,
@@ -9,51 +8,15 @@ import {
     updateCultivation,
     updateField,
 } from "@svenvw/fdm-core"
-import type { FeatureCollection } from "geojson"
-import { Plus } from "lucide-react"
-import maplibregl from "maplibre-gl"
-import { useEffect, useRef, useState } from "react"
-import { Layer, Map as MapGL, type MapRef } from "react-map-gl/maplibre"
+import type { FeatureCollection, Geometry } from "geojson"
 import {
     type ActionFunctionArgs,
     data,
-    Form,
     type LoaderFunctionArgs,
     type MetaFunction,
-    NavLink,
     useLoaderData,
 } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess, redirectWithSuccess } from "remix-toast"
-import { z } from "zod"
-import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
-import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
-import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
-import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
-import { SoilDataCards } from "~/components/blocks/soil/cards"
-import { Combobox } from "~/components/custom/combobox"
-import { Spinner } from "~/components/ui/spinner"
-import { Button } from "~/components/ui/button"
-import { Checkbox } from "~/components/ui/checkbox"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "~/components/ui/card"
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "~/components/ui/form"
-import { Input } from "~/components/ui/input"
-import { Separator } from "~/components/ui/separator"
-import { Skeleton } from "~/components/ui/skeleton"
 import { getMapStyle } from "~/integrations/map"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
@@ -61,7 +24,8 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { FieldDeleteDialog } from "../components/blocks/field/delete"
+import { NewFieldsBlock } from "../components/blocks/fields-new/block"
+import { FormSchema } from "../components/blocks/fields-new/schema"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -72,24 +36,6 @@ export const meta: MetaFunction = () => {
 }
 
 // Form Schema
-const FormSchema = z.object({
-    b_name: z
-        .string({
-            required_error: "Naam van perceel is verplicht",
-        })
-        .min(3, {
-            message: "Naam van perceel moet minimaal 3 karakters bevatten",
-        }),
-    b_area: z.coerce
-        .number({
-            required_error: "Oppervlakte van perceel is verplicht",
-        })
-        .optional(),
-    b_lu_catalogue: z.string({
-        required_error: "Hoofdgewas is verplicht",
-    }),
-    b_bufferstrip: z.boolean().optional(),
-})
 
 /**
  * Retrieves and prepares data for rendering the field details page.
@@ -143,11 +89,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             properties: {
                 b_id: field.b_id,
                 b_name: field.b_name,
-                b_area: Math.round(field.b_area * 10) / 10,
-                b_lu_name: field.b_lu_name,
+                b_area: Math.round((field.b_area ?? 0) * 10) / 10,
                 b_id_source: field.b_id_source,
             },
-            geometry: field.b_geometry,
+            geometry: field.b_geometry as Geometry,
         }
         const featureCollection: FeatureCollection = {
             type: "FeatureCollection",
@@ -208,7 +153,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_lu_start: cultivations[0]?.b_lu_start,
             currentSoilData: currentSoilData,
             soilParameterDescription: soilParameterDescription,
-            b_area: field.b_area,
+            b_area: field.b_area ?? 0,
             b_bufferstrip: field.b_bufferstrip,
             featureCollection: featureCollection,
             cultivationOptions: cultivationOptions,
@@ -226,258 +171,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
-    const viewState = getViewState(loaderData.featureCollection)
-    const id = "fieldsSaved"
-    const fields = loaderData.featureCollection
-    const fieldsSavedStyle = getFieldsStyle(id)
-    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
-
-    const form = useRemixForm({
-        mode: "onTouched",
-        resolver: zodResolver(FormSchema),
-        defaultValues: {
-            b_name: loaderData.b_name ?? "",
-            b_area: Math.round(loaderData.b_area * 10) / 10,
-            b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
-            b_bufferstrip: loaderData.b_bufferstrip ?? false,
-        },
-    })
-
-    useEffect(() => {
-        form.reset({
-            b_name: loaderData.b_name ?? "",
-            b_area: Math.round(loaderData.b_area * 10) / 10,
-            b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
-            b_bufferstrip: loaderData.b_bufferstrip ?? false,
-        })
-    }, [loaderData, form.reset])
-
-    //ref to refit the map when the selected field changes
-    const mapRef = useRef<MapRef>(null)
-
-    useEffect(() => {
-        mapRef.current?.fitBounds(viewState.bounds, viewState.fitBoundsOptions)
-    }, [viewState])
-
-    //ref to check if map is rendered
-    const mapContainerRef = useRef<HTMLDivElement>(null)
-    const [mapIsLoaded, setMapIsLoaded] = useState(false)
-
-    useEffect(() => {
-        if (mapContainerRef.current) {
-            setMapIsLoaded(true)
-        }
-    }, [])
 
     return (
-        <div className="space-y-6">
-            <div className="grid lg:grid-cols-4 gap-6">
-                <div className="col-span-2">
-                    <RemixFormProvider {...form}>
-                        <fieldset disabled={form.formState.isSubmitting}>
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Perceel</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <Form
-                                        id="formField"
-                                        method="POST"
-                                        onSubmit={form.handleSubmit}
-                                    >
-                                        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-                                            <FormField
-                                                control={form.control}
-                                                name="b_name"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>
-                                                            Naam
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                type="text"
-                                                                required
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="b_area"
-                                                disabled={true}
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>
-                                                            Oppervlak (ha)
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                type="text"
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="b_lu_catalogue"
-                                                render={({ field }) => (
-                                                    <FormItem className="col-span-2 items-center gap-4">
-                                                        <Combobox
-                                                            options={
-                                                                loaderData.cultivationOptions
-                                                            }
-                                                            form={form}
-                                                            name={
-                                                                "b_lu_catalogue"
-                                                            }
-                                                            label={"Hoofdgewas"}
-                                                            defaultValue={
-                                                                loaderData.b_lu_catalogue
-                                                            }
-                                                        />
-                                                        <Input
-                                                            type="hidden"
-                                                            {...field}
-                                                        />
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="b_bufferstrip"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-row col-span-2 items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
-                                                        <FormControl>
-                                                            <Checkbox
-                                                                checked={
-                                                                    field.value
-                                                                }
-                                                                onCheckedChange={
-                                                                    field.onChange
-                                                                }
-                                                            />
-                                                        </FormControl>
-                                                        <div className="space-y-1 leading-none">
-                                                            <FormLabel>
-                                                                Bufferstrook
-                                                            </FormLabel>
-                                                            <FormDescription>
-                                                                Is dit perceel
-                                                                een
-                                                                bufferstrook?
-                                                            </FormDescription>
-                                                        </div>
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                    </Form>
-                                </CardContent>
-                                <CardFooter>
-                                    <FieldDeleteDialog
-                                        key={loaderData.b_id}
-                                        fieldName={loaderData.b_name}
-                                        isSubmitting={
-                                            form.formState.isSubmitting
-                                        }
-                                        buttonText="Verwijderen"
-                                    />
-                                    <Button
-                                        type="submit"
-                                        form="formField"
-                                        disabled={
-                                            form.formState.isSubmitting
-                                        }
-                                        className="ml-auto"
-                                    >
-                                        {form.formState.isSubmitting && (
-                                            <Spinner />
-                                        )}
-                                        Bijwerken
-                                    </Button>
-                                </CardFooter>
-                            </Card>
-                        </fieldset>
-                    </RemixFormProvider>
-                </div>
-                <div className="col-span-2 space-y-5">
-                    <div ref={mapContainerRef} className="h-full w-full">
-                        {mapIsLoaded ? (
-                            <MapGL
-                                {...viewState}
-                                style={{
-                                    height: "100%",
-                                    width: "100%",
-                                    borderRadius: "0.75rem",
-                                }}
-                                interactive={false}
-                                mapStyle={loaderData.mapStyle}
-                                mapLib={maplibregl}
-                                interactiveLayerIds={[id]}
-                                ref={mapRef}
-                            >
-                                <MapTilerAttribution />
-                                <FieldsSourceNotClickable
-                                    id={id}
-                                    fieldsData={fields}
-                                >
-                                    <Layer {...fieldsSavedStyle} />
-                                    <Layer {...fieldsSavedOutlineStyle} />
-                                </FieldsSourceNotClickable>
-                            </MapGL>
-                        ) : (
-                            <Skeleton className="h-full w-full rounded-xl" />
-                        )}
-                    </div>
-                </div>
-            </div>
-            <div className="col-span-4">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Bodem</CardTitle>
-                        <CardDescription>
-                            Voeg een bodemanalyse toe voor dit perceel of bekijk
-                            de schatting door NMI.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <Button asChild>
-                                    <NavLink
-                                        to={`../${loaderData.b_id}/soil/analysis`}
-                                    >
-                                        <Plus />
-                                        Bodemanalyse toevoegen
-                                    </NavLink>
-                                </Button>
-                            </div>
-
-                            <Separator />
-                            <div className="">
-                                <SoilDataCards
-                                    currentSoilData={loaderData.currentSoilData}
-                                    soilParameterDescription={
-                                        loaderData.soilParameterDescription
-                                    }
-                                />
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
+        <NewFieldsBlock
+            b_id={loaderData.b_id}
+            b_name={loaderData.b_name}
+            b_lu_catalogue={loaderData.b_lu_catalogue}
+            b_area={loaderData.b_area}
+            b_bufferstrip={loaderData.b_bufferstrip}
+            cultivationOptions={loaderData.cultivationOptions}
+            featureCollection={loaderData.featureCollection}
+            mapStyle={loaderData.mapStyle}
+            currentSoilData={loaderData.currentSoilData}
+            soilParameterDescription={loaderData.soilParameterDescription}
+        />
     )
 }
 

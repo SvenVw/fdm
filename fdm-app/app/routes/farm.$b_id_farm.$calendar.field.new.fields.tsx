@@ -1,26 +1,12 @@
 import { getFarm, getFarms, getField } from "@svenvw/fdm-core"
-import { ArrowLeft } from "lucide-react"
-import { useMemo } from "react"
 import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    NavLink,
     Outlet,
     useLoaderData,
-    useLocation,
 } from "react-router"
 import { Header } from "~/components/blocks/header/base"
-import { FieldFilterToggle } from "~/components/custom/field-filter-toggle"
-import { SidebarPage } from "~/components/custom/sidebar-page"
-import { Button } from "~/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
@@ -28,9 +14,9 @@ import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { useFieldFilterStore } from "~/store/field-filter"
 import { HeaderFarm } from "../components/blocks/header/farm"
 import { HeaderField } from "../components/blocks/header/field"
+import { NewFieldsSidebar } from "../components/blocks/fields-new/sidebar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -117,24 +103,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
     const { fields, b_id_farm, calendar } = loaderData
-    const { showProductiveOnly } = useFieldFilterStore()
-    const location = useLocation()
-
-    // Create the sidenav
-    const sidebarPageItems = useMemo(
-        () =>
-            fields
-                .filter((field) =>
-                    showProductiveOnly ? field.b_isproductive : true,
-                )
-                .slice()
-                .sort((a, b) => b.b_area - a.b_area) // Sort by area in descending order
-                .map((field) => ({
-                    title: field.b_name,
-                    to: `/farm/${b_id_farm}/${calendar}/field/new/fields/${field.b_id}${location.search}`,
-                })),
-        [fields, showProductiveOnly, b_id_farm, calendar, location.search],
-    )
 
     return (
         <SidebarInset>
@@ -171,30 +139,12 @@ export default function Index() {
                     <Separator className="my-6" />
                     <div className="space-y-6 pb-0">
                         <div className="flex flex-col space-y-0 lg:flex-row lg:space-x-4 lg:space-y-0">
-                            <aside className="lg:w-1/5 gap-0">
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                            <p>Percelen</p>
-                                            <FieldFilterToggle />
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <SidebarPage items={sidebarPageItems} />
-                                    </CardContent>
-                                    <CardFooter className="flex flex-col items-center space-y-2 relative">
-                                        {/* <Separator /> */}
-                                        <Button variant={"link"} asChild>
-                                            <NavLink
-                                                to={`/farm/create/${b_id_farm}/${calendar}/atlas`}
-                                            >
-                                                <ArrowLeft />
-                                                Terug naar kaart
-                                            </NavLink>
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
-                            </aside>
+                            <NewFieldsSidebar
+                                fields={fields}
+                                b_id_farm={b_id_farm}
+                                calendar={calendar}
+                                isFarmCreateWizard={false}
+                            />
                             <div className="flex-1">
                                 <Outlet />
                             </div>
