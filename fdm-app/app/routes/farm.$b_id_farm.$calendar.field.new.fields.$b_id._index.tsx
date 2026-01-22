@@ -8,7 +8,7 @@ import {
     updateCultivation,
     updateField,
 } from "@svenvw/fdm-core"
-import type { FeatureCollection, Geometry } from "geojson"
+import type { FeatureCollection } from "geojson"
 import {
     type ActionFunctionArgs,
     data,
@@ -88,7 +88,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 b_area: Math.round((field.b_area ?? 0) * 10) / 10,
                 b_id_source: field.b_id_source,
             },
-            geometry: field.b_geometry as Geometry,
+            geometry: field.b_geometry,
         }
         const featureCollection: FeatureCollection = {
             type: "FeatureCollection",
