@@ -1,5 +1,12 @@
 import { getFarms } from "@svenvw/fdm-core"
-import { CheckIcon, House, MapIcon, PlusCircle, PlusIcon } from "lucide-react"
+import {
+    Building,
+    CheckIcon,
+    House,
+    MapIcon,
+    PlusCircle,
+    PlusIcon,
+} from "lucide-react"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -397,6 +404,37 @@ export default function AppIndex() {
                                         <CardFooter>
                                             <span className="text-sm font-semibold text-primary">
                                                 Naar Atlas →
+                                            </span>
+                                        </CardFooter>
+                                    </NavLink>
+                                </Card>
+                                <Card
+                                    key="atlas"
+                                    className="transition-all hover:shadow-md"
+                                >
+                                    <NavLink
+                                        to="/organization"
+                                        className="flex h-full flex-col"
+                                    >
+                                        <CardHeader>
+                                            <CardTitle className="flex items-center gap-2">
+                                                <div className="rounded-lg bg-muted p-2">
+                                                    <Building className="h-5 w-5 text-muted-foreground" />
+                                                </div>
+                                                <span>Organisaties</span>
+                                            </CardTitle>
+                                            <CardDescription />
+                                        </CardHeader>
+                                        <CardContent className="grow">
+                                            <p className="text-sm text-muted-foreground">
+                                                Werk samen met andere gebruikers
+                                                op bedrijven in een gemakkelijke
+                                                manier.
+                                            </p>
+                                        </CardContent>
+                                        <CardFooter>
+                                            <span className="text-sm font-semibold text-primary">
+                                                Naar Organisaties →
                                             </span>
                                         </CardFooter>
                                     </NavLink>

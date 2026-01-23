@@ -1,5 +1,6 @@
 import {
     ArrowLeft,
+    ArrowUpRightFromSquare,
     Cookie,
     Languages,
     Mail,
@@ -18,13 +19,8 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "~/components/ui/sidebar"
-import { ComponentProps } from "react"
-import { SidebarOrganization } from "./organization"
 
-export function SidebarPlatform({
-    organization,
-    roles,
-}: ComponentProps<typeof SidebarOrganization>) {
+export function SidebarPlatform() {
     const location = useLocation()
     return (
         <>
@@ -82,7 +78,52 @@ export function SidebarPlatform({
                     </SidebarMenu>
                 </SidebarGroupContent>
             </SidebarGroup>
-            <SidebarOrganization organization={organization} roles={roles} />
+            <SidebarGroup>
+                <SidebarGroupLabel>Organisaties</SidebarGroupLabel>
+                <SidebarGroupContent>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={
+                                    location.pathname.includes(
+                                        "/organization",
+                                    ) &&
+                                    !location.pathname.includes(
+                                        "/organization/invitations",
+                                    )
+                                }
+                            >
+                                <NavLink
+                                    to={"/organization"}
+                                    className="group/sidebar-button"
+                                >
+                                    <Users />
+                                    <span>Overzicht</span>
+                                    <ArrowUpRightFromSquare className="ml-2 h-4 w-4 text-gray-500 opacity-0 group-hover/sidebar-button:opacity-100 transition-opacity" />
+                                </NavLink>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                asChild
+                                isActive={location.pathname.includes(
+                                    "/organization/invitations",
+                                )}
+                            >
+                                <NavLink
+                                    to={"/organization/invitations"}
+                                    className="group/sidebar-button"
+                                >
+                                    <Mail />
+                                    <span>Uitnodigingen</span>
+                                    <ArrowUpRightFromSquare className="ml-2 h-4 w-4 text-gray-500 opacity-0 group-hover/sidebar-button:opacity-100 transition-opacity" />
+                                </NavLink>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarGroupContent>
+            </SidebarGroup>
             <SidebarGroup>
                 <SidebarGroupLabel>Over {clientConfig.name}</SidebarGroupLabel>
                 <SidebarGroupContent>

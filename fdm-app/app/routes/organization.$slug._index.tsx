@@ -67,9 +67,9 @@ export default function AppIndex() {
                     <div className="lg:col-span-2 space-y-8">
                         <div className="space-y-4">
                             <h2 className="text-2xl font-semibold tracking-tight">
-                                Bedrijven
+                                Overzicht
                             </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <NavLink to="farms">
                                     <Card className="transition-all hover:shadow-md">
                                         <CardHeader>
