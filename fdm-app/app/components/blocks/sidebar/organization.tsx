@@ -1,5 +1,5 @@
 import type { Organization } from "better-auth/plugins"
-import { Building, Cog, House, Mail, Square, Users } from "lucide-react"
+import { Building, Cog, House, Mail, Users } from "lucide-react"
 import { NavLink, useLocation } from "react-router"
 import { Badge } from "~/components/ui/badge"
 import {
