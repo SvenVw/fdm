@@ -65,7 +65,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
     )
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
     const lastSelectedRowIndex = useRef<number | null>(null)
-    const globalFilter = useFieldFilterStore()
+    const fieldFilter = useFieldFilterStore()
 
     useEffect(() => {
         setColumnVisibility(
@@ -141,14 +141,17 @@ export function DataTable<TData extends FieldExtended, TValue>({
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
-        onGlobalFilterChange: (state) => useFieldFilterStore.setState(state),
+        onGlobalFilterChange: (globalFilter) => {
+            if ((globalFilter?.searchTerms ?? "") !== fieldFilter.searchTerms)
+                fieldFilter.setSearchTerms(globalFilter?.searchTerms ?? "")
+        },
         onRowSelectionChange: setRowSelection,
         globalFilterFn: fuzzyFilter,
         state: {
             sorting,
             columnFilters,
             columnVisibility,
-            globalFilter,
+            globalFilter: fieldFilter,
             rowSelection,
         },
     })
@@ -172,9 +175,9 @@ export function DataTable<TData extends FieldExtended, TValue>({
             <div className="sticky top-0 z-10 bg-background py-4 flex flex-col sm:flex-row gap-2 items-center">
                 <Input
                     placeholder="Zoek op naam, gewas of meststof"
-                    value={globalFilter.searchTerms ?? ""}
+                    value={fieldFilter.searchTerms ?? ""}
                     onChange={(event) =>
-                        globalFilter.setSearchTerms(event.target.value)
+                        fieldFilter.setSearchTerms(event.target.value)
                     }
                     className="w-full sm:w-auto sm:flex-grow"
                 />
