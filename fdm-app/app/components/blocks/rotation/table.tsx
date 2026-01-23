@@ -64,7 +64,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-    const [searchTerms, setSearchTerms] = useState("")
+    const fieldFilter = useFieldFilterStore()
     const isMobile = useIsMobile()
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
         isMobile
@@ -230,11 +230,6 @@ export function DataTable<TData extends RotationExtended, TValue>({
         )
     }
 
-    const showProductiveOnly = useFieldFilterStore((s) => s.showProductiveOnly)
-    const globalFilter = useMemo(
-        () => ({ searchTerms, showProductiveOnly }),
-        [searchTerms, showProductiveOnly],
-    )
     const table = useReactTable({
         data: memoizedData,
         columns,
@@ -249,8 +244,8 @@ export function DataTable<TData extends RotationExtended, TValue>({
             row.type === "crop" ? (row.fields as TData[]) : undefined,
         onColumnVisibilityChange: setColumnVisibility,
         onGlobalFilterChange: (globalFilter) => {
-            if (globalFilter?.searchTerms ?? "" !== searchTerms)
-                setSearchTerms(globalFilter?.searchTerms ?? "")
+            if (globalFilter?.searchTerms ?? "" !== fieldFilter.searchTerms)
+                fieldFilter.setSearchTerms(globalFilter?.searchTerms ?? "")
         },
         onRowSelectionChange: setRowSelection,
         globalFilterFn: fuzzySearchAndProductivityFilter,
@@ -263,7 +258,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
             sorting,
             columnFilters,
             columnVisibility,
-            globalFilter,
+            globalFilter: fieldFilter,
             rowSelection,
         },
     })
@@ -331,8 +326,10 @@ export function DataTable<TData extends RotationExtended, TValue>({
             <div className="sticky top-0 z-10 bg-background py-4 flex flex-col sm:flex-row gap-2 items-center">
                 <Input
                     placeholder="Zoek op gewas, meststof of datum"
-                    value={globalFilter?.searchTerms ?? ""}
-                    onChange={(event) => setSearchTerms(event.target.value)}
+                    value={fieldFilter?.searchTerms ?? ""}
+                    onChange={(event) =>
+                        fieldFilter.setSearchTerms(event.target.value)
+                    }
                     className="w-full sm:w-auto sm:grow"
                 />
                 <div className="flex w-full items-center justify-start sm:justify-end gap-2 sm:w-auto flex-wrap">

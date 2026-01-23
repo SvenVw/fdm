@@ -16,6 +16,7 @@ import fuzzysort from "fuzzysort"
 import { ChevronDown, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { NavLink, useParams } from "react-router-dom"
+import { useFieldFilterStore } from "@/app/store/field-filter"
 import { Button } from "~/components/ui/button"
 import {
     DropdownMenu,
@@ -56,7 +57,6 @@ export function DataTable<TData extends FieldExtended, TValue>({
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-    const [globalFilter, setGlobalFilter] = useState("")
     const isMobile = useIsMobile()
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
         isMobile
@@ -65,6 +65,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
     )
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
     const lastSelectedRowIndex = useRef<number | null>(null)
+    const globalFilter = useFieldFilterStore()
 
     useEffect(() => {
         setColumnVisibility(
@@ -123,8 +124,9 @@ export function DataTable<TData extends FieldExtended, TValue>({
         }))
     }, [data])
 
-    const fuzzyFilter: FilterFn<TData> = (row, _columnId, filterValue) => {
-        const result = fuzzysort.go(filterValue, [
+    const fuzzyFilter: FilterFn<TData> = (row, _columnId, { searchTerms }) => {
+        if (searchTerms === "") return true
+        const result = fuzzysort.go(searchTerms, [
             (row.original as any).searchTarget,
         ])
         return result.length > 0
@@ -139,7 +141,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
-        onGlobalFilterChange: setGlobalFilter,
+        onGlobalFilterChange: (state) => useFieldFilterStore.setState(state),
         onRowSelectionChange: setRowSelection,
         globalFilterFn: fuzzyFilter,
         state: {
@@ -170,8 +172,10 @@ export function DataTable<TData extends FieldExtended, TValue>({
             <div className="sticky top-0 z-10 bg-background py-4 flex flex-col sm:flex-row gap-2 items-center">
                 <Input
                     placeholder="Zoek op naam, gewas of meststof"
-                    value={globalFilter ?? ""}
-                    onChange={(event) => setGlobalFilter(event.target.value)}
+                    value={globalFilter.searchTerms ?? ""}
+                    onChange={(event) =>
+                        globalFilter.setSearchTerms(event.target.value)
+                    }
                     className="w-full sm:w-auto sm:flex-grow"
                 />
                 <div className="flex w-full items-center justify-start sm:justify-end gap-2 sm:w-auto flex-wrap">
