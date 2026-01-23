@@ -15,7 +15,8 @@ export function SidebarPage({
     children,
     ...props
 }: SidebarPageProps) {
-    const { pathname } = useLocation()
+    const { pathname, search } = useLocation()
+    const domainUrl = `${pathname}${search}`
 
     return (
         <nav
@@ -29,11 +30,13 @@ export function SidebarPage({
                 <NavLink
                     key={item.to}
                     to={item.to}
-                    aria-current={pathname === item.to ? "page" : undefined}
+                    aria-current={
+                        domainUrl.startsWith(item.to) ? "page" : undefined
+                    }
                     aria-label={item.title}
                     className={cn(
                         buttonVariants({ variant: "ghost", size: "sm" }),
-                        pathname.startsWith(item.to)
+                        domainUrl.startsWith(item.to)
                             ? "bg-muted hover:bg-muted "
                             : "hover:bg-transparent hover:underline",
                         "justify-start",

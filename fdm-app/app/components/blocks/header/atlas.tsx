@@ -18,7 +18,12 @@ export function HeaderAtlas({ b_id_farm }: { b_id_farm: string | undefined }) {
     const location = useLocation()
 
     const isElevation = location.pathname.includes("/elevation")
-    const currentName = isElevation ? "Hoogtekaart" : "Gewaspercelen"
+    const isSoil = location.pathname.includes("/soil")
+    const currentName = isElevation
+        ? "Hoogtekaart"
+        : isSoil
+          ? "Bodemkaart"
+          : "Gewaspercelen"
 
     return (
         <>
@@ -48,6 +53,13 @@ export function HeaderAtlas({ b_id_farm }: { b_id_farm: string | undefined }) {
                                 to={`/farm/${b_id_farm}/${calendar}/atlas/elevation`}
                             >
                                 Hoogtekaart
+                            </NavLink>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <NavLink
+                                to={`/farm/${b_id_farm}/${calendar}/atlas/soil`}
+                            >
+                                Bodemkaart
                             </NavLink>
                         </DropdownMenuItem>
                     </DropdownMenuContent>

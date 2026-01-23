@@ -1,35 +1,30 @@
-import { getFarm, getFields } from "@svenvw/fdm-core"
+import { getFarm, getFarms, getField } from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    NavLink,
     Outlet,
     useLoaderData,
 } from "react-router"
 import { NewFieldsSidebar } from "~/components/blocks/fields-new/sidebar"
 import { Header } from "~/components/blocks/header/base"
-import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
-import { Button } from "~/components/ui/button"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderField } from "~/components/blocks/header/field"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
-import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { cn } from "~/lib/utils"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        {
-            title: `Percelen beheren - Bedrijf toevoegen | ${clientConfig.name}`,
-        },
+        { title: `Nieuw perceel | ${clientConfig.name}` },
         {
             name: "description",
-            content:
-                "Beheer de percelen van je bedrijf. Pas namen aan en bekijk perceelsinformatie.",
+            content: "Voeg nieuwe percelen toe",
         },
     ]
 }
@@ -57,27 +52,46 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
+        const calendar = getCalendar(params)
+        const url = new URL(request.url)
+
+        // Obtain the fieldIds
+        // Redirect to one of them if not viewing a field currently.
+        const b_id = params.b_id
+        let fieldIds: string[] = b_id ? [b_id] : []
+        const fieldIdsParam = url.searchParams.get("fieldIds")
+        if (fieldIdsParam)
+            fieldIds = fieldIdsParam
+                .split(",")
+                .filter((fieldId) => fieldId.length)
+
         // Get the session
         const session = await getSession(request)
 
-        // Get timeframe from calendar store
-        const calendar = getCalendar(params)
-        const timeframe = getTimeframe(params)
-
         const farm = await getFarm(fdm, session.principal_id, b_id_farm)
 
+        // Get a list of possible farms of the user
+        const farms = await getFarms(fdm, session.principal_id)
+        const farmOptions = farms.map((farm) => {
+            if (!farm?.b_id_farm || !farm?.b_name_farm) {
+                throw new Error("Invalid farm data structure")
+            }
+            return {
+                b_id_farm: farm.b_id_farm,
+                b_name_farm: farm.b_name_farm,
+            }
+        })
+
         // Get the fields
-        const fields = await getFields(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            timeframe,
+        const fields = await Promise.all(
+            fieldIds.map((b_id) => getField(fdm, session.principal_id, b_id)),
         )
 
         return {
             fields: fields,
             b_id_farm: b_id_farm,
             b_name_farm: farm.b_name_farm,
+            farmOptions: farmOptions,
             calendar: calendar,
         }
     } catch (error) {
@@ -88,12 +102,26 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
-    const { fields, b_id_farm, b_name_farm, calendar } = loaderData
+    const { fields, b_id_farm, calendar } = loaderData
 
     return (
         <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarmCreate b_name_farm={b_name_farm} />
+            <Header
+                action={{
+                    to: `/farm/${loaderData.b_id_farm}/${calendar}/field/`,
+                    label: "Terug naar percelen",
+                    disabled: false,
+                }}
+            >
+                <HeaderFarm
+                    b_id_farm={loaderData.b_id_farm}
+                    farmOptions={loaderData.farmOptions}
+                />
+                <HeaderField
+                    b_id_farm={loaderData.b_id_farm}
+                    fieldOptions={[]}
+                    b_id={undefined}
+                />
             </Header>
             <main>
                 <div className="space-y-6 p-10 pb-16">
@@ -107,22 +135,6 @@ export default function Index() {
                                 bodemgegevens
                             </p>
                         </div>
-
-                        <div className="ml-auto">
-                            <NavLink
-                                to={`/farm/create/${b_id_farm}/${calendar}/rotation`}
-                                className={cn("ml-auto", {
-                                    "pointer-events-none":
-                                        fields.length === 0,
-                                })}
-                            >
-                                <Button
-                                    disabled={fields.length === 0}
-                                >
-                                    Doorgaan
-                                </Button>
-                            </NavLink>
-                        </div>
                     </div>
                     <Separator className="my-6" />
                     <div className="space-y-6 pb-0">
@@ -131,7 +143,7 @@ export default function Index() {
                                 fields={fields}
                                 b_id_farm={b_id_farm}
                                 calendar={calendar}
-                                isFarmCreateWizard={true}
+                                isFarmCreateWizard={false}
                             />
                             <div className="flex-1">
                                 <Outlet />
