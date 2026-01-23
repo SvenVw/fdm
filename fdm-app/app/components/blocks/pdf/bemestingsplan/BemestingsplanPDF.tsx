@@ -154,7 +154,7 @@ const FrontPage = ({ data }: { data: BemestingsplanData }) => (
                         KvK: {data.farm.kvk || "-"}
                     </Text>
                     <Text style={pdfStyles.frontInfo}>
-                        Oppervlakte: {data.totalArea.toFixed(2)} ha
+                        Oppervlakte: {data.totalarea.toFixed(1)} ha
                     </Text>
                 </View>
                 <Text style={[pdfStyles.frontInfo, { marginTop: 20 }]}>
@@ -486,13 +486,13 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                 totaal oppervlakte
                             </Text>
                             <Text style={pdfStyles.value}>
-                                {data.totalArea.toFixed(2)} ha
+                                {data.totalarea.toFixed(1)} ha
                             </Text>
                             <Text style={[pdfStyles.label, { marginTop: 4 }]}>
                                 productieve opp.
                             </Text>
                             <Text style={pdfStyles.value}>
-                                {data.productiveArea.toFixed(2)} ha
+                                {data.productivearea.toFixed(1)} ha
                             </Text>
                         </View>
                     </View>
@@ -729,7 +729,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                                             { fontSize: 9 },
                                                         ]}
                                                     >
-                                                        {area.toFixed(2)} ha (
+                                                        {area.toFixed(1)} ha (
                                                         {(
                                                             (area / farmTotal) *
                                                             100
@@ -1141,7 +1141,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                         style={[pdfStyles.miniHeader, { opacity: 0.6 }]}
                         fixed
                     >
-                        {field.name} ({field.area.toFixed(2)} ha)
+                        {field.name} ({field.area.toFixed(1)} ha)
                     </Text>
 
                     <View style={pdfStyles.header}>
@@ -1150,7 +1150,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                 {field.name}
                             </Text>
                             <Text style={{ color: "#64748b", fontSize: 10 }}>
-                                {field.area.toFixed(2)} ha — {field.mainCrop}
+                                {field.area.toFixed(1)} ha — {field.mainCrop}
                             </Text>
                         </View>
                         {data.config.logo && (
