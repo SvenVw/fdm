@@ -838,19 +838,19 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                 <PdfTableCell weight={2}>
                                     <Text>Product</Text>
                                 </PdfTableCell>
-                                <PdfTableCell>
+                                <PdfTableCell style={{ textAlign: "right" }}>
                                     <Text>Totaal (kg)</Text>
                                 </PdfTableCell>
-                                <PdfTableCell>
+                                <PdfTableCell style={{ textAlign: "right" }}>
                                     <Text>N-totaal (kg)</Text>
                                 </PdfTableCell>
-                                <PdfTableCell>
+                                <PdfTableCell style={{ textAlign: "right" }}>
                                     <Text>N-werkzaam (kg)</Text>
                                 </PdfTableCell>
-                                <PdfTableCell>
+                                <PdfTableCell style={{ textAlign: "right" }}>
                                     <Text>P2O5 (kg)</Text>
                                 </PdfTableCell>
-                                <PdfTableCell>
+                                <PdfTableCell style={{ textAlign: "right" }}>
                                     <Text>K2O (kg)</Text>
                                 </PdfTableCell>
                             </View>
@@ -936,7 +936,9 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                                     {name}
                                                 </Text>
                                             </PdfTableCell>
-                                            <PdfTableCell>
+                                            <PdfTableCell
+                                                style={{ textAlign: "right" }}
+                                            >
                                                 <Text>
                                                     {Math.round(
                                                         stats.amount,
@@ -946,21 +948,27 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                                     kg
                                                 </Text>
                                             </PdfTableCell>
-                                            <PdfTableCell>
+                                            <PdfTableCell
+                                                style={{ textAlign: "right" }}
+                                            >
                                                 <Text>
                                                     {Math.round(
                                                         stats.n,
                                                     ).toLocaleString("nl-NL")}
                                                 </Text>
                                             </PdfTableCell>
-                                            <PdfTableCell>
+                                            <PdfTableCell
+                                                style={{ textAlign: "right" }}
+                                            >
                                                 <Text>
                                                     {Math.round(
                                                         stats.p,
                                                     ).toLocaleString("nl-NL")}
                                                 </Text>
                                             </PdfTableCell>
-                                            <PdfTableCell>
+                                            <PdfTableCell
+                                                style={{ textAlign: "right" }}
+                                            >
                                                 <Text>
                                                     {Math.round(
                                                         stats.k,
@@ -1037,29 +1045,29 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                         <PdfTableCell weight={1.5}>
                             <Text>Perceel</Text>
                         </PdfTableCell>
-                        <PdfTableCell weight={0.6}>
+                        <PdfTableCell weight={0.6} style={{ textAlign: "right" }}>
                             <Text>Opp (ha)</Text>
                         </PdfTableCell>
-                        <PdfTableCell>
+                        <PdfTableCell style={{ textAlign: "right" }}>
                             <Text>N-werkzaam</Text>
                         </PdfTableCell>
-                        <PdfTableCell>
+                        <PdfTableCell style={{ textAlign: "right" }}>
                             <Text>N-dierlijk</Text>
                         </PdfTableCell>
-                        <PdfTableCell>
+                        <PdfTableCell style={{ textAlign: "right" }}>
                             <Text>
                                 <Chemical symbol="P2O5" />
                             </Text>
                         </PdfTableCell>
-                        <PdfTableCell>
+                        <PdfTableCell style={{ textAlign: "right" }}>
                             <Text>N-werkzaam</Text>
                         </PdfTableCell>
-                        <PdfTableCell>
+                        <PdfTableCell style={{ textAlign: "right" }}>
                             <Text>
                                 <Chemical symbol="P2O5" />
                             </Text>
                         </PdfTableCell>
-                        <PdfTableCell>
+                        <PdfTableCell style={{ textAlign: "right" }}>
                             <Text>
                                 <Chemical symbol="K2O" />
                             </Text>
@@ -1082,40 +1090,40 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                     {field.mainCrop}
                                 </Text>
                             </PdfTableCell>
-                            <PdfTableCell weight={0.6}>
+                            <PdfTableCell weight={0.6} style={{ textAlign: "right" }}>
                                 <Text>{field.area.toFixed(2)}</Text>
                             </PdfTableCell>
-                            <PdfTableCell>
+                            <PdfTableCell style={{ textAlign: "right" }}>
                                 <Text>
                                     {Math.round(field.normsFilling.nitrogen)} /{" "}
                                     {Math.round(field.norms.nitrogen)}
                                 </Text>
                             </PdfTableCell>
-                            <PdfTableCell>
+                            <PdfTableCell style={{ textAlign: "right" }}>
                                 <Text>
                                     {Math.round(field.normsFilling.manure)} /{" "}
                                     {Math.round(field.norms.manure)}
                                 </Text>
                             </PdfTableCell>
-                            <PdfTableCell>
+                            <PdfTableCell style={{ textAlign: "right" }}>
                                 <Text>
                                     {Math.round(field.normsFilling.phosphate)} /{" "}
                                     {Math.round(field.norms.phosphate)}
                                 </Text>
                             </PdfTableCell>
-                            <PdfTableCell>
+                            <PdfTableCell style={{ textAlign: "right" }}>
                                 <Text>
                                     {Math.round(field.planned.p_dose_nw)} /{" "}
                                     {Math.round(field.advice.d_n_req)}
                                 </Text>
                             </PdfTableCell>
-                            <PdfTableCell>
+                            <PdfTableCell style={{ textAlign: "right" }}>
                                 <Text>
                                     {Math.round(field.planned.p_dose_p)} /{" "}
                                     {Math.round(field.advice.d_p_req)}
                                 </Text>
                             </PdfTableCell>
-                            <PdfTableCell>
+                            <PdfTableCell style={{ textAlign: "right" }}>
                                 <Text>
                                     {Math.round(field.planned.p_dose_k)} /{" "}
                                     {Math.round(field.advice.d_k_req)}
@@ -1506,18 +1514,24 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                             label: "Stikstof werkzaam (N-w)",
                                             unit: "kg/ha",
                                             factor: 1,
+                                            plannedKey: "p_dose_nw",
+                                            adviceKey: "d_n_req",
                                         },
                                         {
                                             key: "p2o5",
                                             label: "Fosfaat (P2O5)",
                                             unit: "kg/ha",
                                             factor: 1,
+                                            plannedKey: "p_dose_p",
+                                            adviceKey: "d_p_req",
                                         },
                                         {
                                             key: "k2o",
                                             label: "Kalium (K2O)",
                                             unit: "kg/ha",
                                             factor: 1,
+                                            plannedKey: "p_dose_k",
+                                            adviceKey: "d_k_req",
                                         },
                                     ].map((n, i) => (
                                         <View
@@ -1534,12 +1548,12 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                                 label={n.label}
                                                 planned={
                                                     (field.planned[
-                                                        n.key as keyof typeof field.planned
+                                                        n.plannedKey as keyof typeof field.planned
                                                     ] || 0) * n.factor
                                                 }
                                                 limit={
                                                     (field.advice[
-                                                        n.key as keyof typeof field.advice
+                                                        n.adviceKey as keyof typeof field.advice
                                                     ] || 0) * n.factor
                                                 }
                                                 unit={n.unit}
@@ -1578,30 +1592,40 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                             label: "Organische koolstof (EOC)",
                                             unit: "kg/ha",
                                             factor: 1,
+                                            plannedKey: "p_dose_eoc",
+                                            adviceKey: "d_c_req",
                                         },
                                         {
                                             key: "mg",
                                             label: "Magnesium (MgO)",
                                             unit: "kg/ha",
                                             factor: 1,
+                                            plannedKey: "p_dose_mg",
+                                            adviceKey: "d_mg_req",
                                         },
                                         {
                                             key: "s",
                                             label: "Zwavel (S)",
                                             unit: "kg/ha",
                                             factor: 1,
+                                            plannedKey: "p_dose_s",
+                                            adviceKey: "d_s_req",
                                         },
                                         {
                                             key: "ca",
                                             label: "Calcium (CaO)",
                                             unit: "kg/ha",
                                             factor: 1,
+                                            plannedKey: "p_dose_ca",
+                                            adviceKey: "d_ca_req",
                                         },
                                         {
                                             key: "na",
                                             label: "Natrium (Na2O)",
                                             unit: "kg/ha",
                                             factor: 1,
+                                            plannedKey: "p_dose_na",
+                                            adviceKey: "d_na_req",
                                         },
                                     ].map((n) => (
                                         <View
@@ -1617,12 +1641,12 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                                 label={n.label}
                                                 planned={
                                                     (field.planned[
-                                                        n.key as keyof typeof field.planned
+                                                        n.plannedKey as keyof typeof field.planned
                                                     ] || 0) * n.factor
                                                 }
                                                 limit={
                                                     (field.advice[
-                                                        n.key as keyof typeof field.advice
+                                                        n.adviceKey as keyof typeof field.advice
                                                     ] || 0) * n.factor
                                                 }
                                                 unit={n.unit}
@@ -1661,36 +1685,48 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                             label: "Koper (Cu)",
                                             unit: "g/ha",
                                             factor: 1000,
+                                            plannedKey: "p_dose_cu",
+                                            adviceKey: "d_cu_req",
                                         },
                                         {
                                             key: "zn",
                                             label: "Zink (Zn)",
                                             unit: "g/ha",
                                             factor: 1000,
+                                            plannedKey: "p_dose_zn",
+                                            adviceKey: "d_zn_req",
                                         },
                                         {
                                             key: "co",
                                             label: "Kobalt (Co)",
                                             unit: "g/ha",
                                             factor: 1000,
+                                            plannedKey: "p_dose_co",
+                                            adviceKey: "d_co_req",
                                         },
                                         {
                                             key: "mn",
                                             label: "Mangaan (Mn)",
                                             unit: "g/ha",
                                             factor: 1000,
+                                            plannedKey: "p_dose_mn",
+                                            adviceKey: "d_mn_req",
                                         },
                                         {
                                             key: "mo",
                                             label: "Molybdeen (Mo)",
                                             unit: "g/ha",
                                             factor: 1000,
+                                            plannedKey: "p_dose_mo",
+                                            adviceKey: "d_mo_req",
                                         },
                                         {
                                             key: "b",
                                             label: "Borium (B)",
                                             unit: "g/ha",
                                             factor: 1000,
+                                            plannedKey: "p_dose_b",
+                                            adviceKey: "d_b_req",
                                         },
                                     ].map((n) => (
                                         <View
@@ -1706,12 +1742,12 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                                 label={n.label}
                                                 planned={
                                                     (field.planned[
-                                                        n.key as keyof typeof field.planned
+                                                        n.plannedKey as keyof typeof field.planned
                                                     ] || 0) * n.factor
                                                 }
                                                 limit={
                                                     (field.advice[
-                                                        n.key as keyof typeof field.advice
+                                                        n.adviceKey as keyof typeof field.advice
                                                     ] || 0) * n.factor
                                                 }
                                                 unit={n.unit}
