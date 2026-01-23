@@ -48,14 +48,12 @@ export function DataTable<TData extends FarmExtended, TValue>({
     const [globalFilter, setGlobalFilter] = useState("")
     const isMobile = useIsMobile()
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-        isMobile
-            ? { a_som_loi: false, b_soiltype_agr: false, b_area: false }
-            : {},
+        isMobile ? { owner: false, b_area: false } : {},
     )
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
     useEffect(() => {
-        setColumnVisibility(isMobile ? { b_area: false } : {})
+        setColumnVisibility(isMobile ? { owner: false, b_area: false } : {})
     }, [isMobile])
 
     const memoizedData = useMemo(() => {

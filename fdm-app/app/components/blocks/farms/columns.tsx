@@ -40,6 +40,7 @@ export const columns: ColumnDef<FarmExtended>[] = [
         },
     },
     {
+        id: "owner",
         accessorKey: "owner.displayUserName",
         enableSorting: true,
         header: ({ column }) => {

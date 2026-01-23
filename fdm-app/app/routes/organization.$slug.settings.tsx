@@ -57,9 +57,9 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 }
 
 /**
- * Renders a form for updating farm properties.
+ * Renders a form for updating organization properties.
  *
- * This component initializes a form using data loaded from the route loader and sets default values for fields such as company name (required), business ID, address, and postal code. It leverages validation with a Zod schema and automatically resets form data when the loader data changes. Upon submission, the form sends a POST request to update the farm settings.
+ * This component initializes a form using data loaded from the route loader and sets default values for fields such as organization name (required), slug, and description. It leverages validation with a Zod schema and automatically resets form data when the loader data changes. Upon submission, the form sends a POST request to update the organization settings.
  */
 export default function FarmSettingsPropertiesBlock() {
     const loaderData = useLoaderData<typeof loader>()
