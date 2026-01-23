@@ -55,7 +55,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const members = membersListResponse.members
 
     // Determine permissions
-    const currentUserMember = members.find((m) => m.userId === session.user.id)
+    const currentUserMember = members.find(
+        (m) => m.userId === session.principal_id,
+    )
     const role = currentUserMember?.role || "viewer"
     const permissions = {
         canEdit: role === "owner" || role === "admin",

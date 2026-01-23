@@ -61,7 +61,7 @@ export function DataTable<TData extends FarmExtended, TValue>({
     const memoizedData = useMemo(() => {
         return data.map((item) => ({
             ...item,
-            searchTarget: `${item.b_name_farm} ${item.owner?.name ?? ""} ${item.cultivations.map((c) => c.b_lu_name).join(" ")} ${item.fertilizers.map((f) => f.p_name_nl).join(" ")}`,
+            searchTarget: `${item.b_name_farm} ${item.owner?.displayUserName ?? ""} ${item.cultivations.map((c) => c.b_lu_name).join(" ")} ${item.fertilizers.map((f) => f.p_name_nl).join(" ")}`,
         }))
     }, [data])
 

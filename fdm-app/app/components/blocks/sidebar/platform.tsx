@@ -100,7 +100,7 @@ export function SidebarPlatform() {
                                 >
                                     <Users />
                                     <span>Overzicht</span>
-                                    <ArrowUpRightFromSquare className="ml-2 h-4 w-4 text-gray-500 opacity-0 group-hover/sidebar-button:opacity-100 transition-opacity" />
+                                    <ArrowUpRightFromSquare className="ml-2 h-4 w-4 text-muted-foreground opacity-0 group-hover/sidebar-button:opacity-100 transition-opacity" />
                                 </NavLink>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -117,7 +117,7 @@ export function SidebarPlatform() {
                                 >
                                     <Mail />
                                     <span>Uitnodigingen</span>
-                                    <ArrowUpRightFromSquare className="ml-2 h-4 w-4 text-gray-500 opacity-0 group-hover/sidebar-button:opacity-100 transition-opacity" />
+                                    <ArrowUpRightFromSquare className="ml-2 h-4 w-4 text-muted-foreground opacity-0 group-hover/sidebar-button:opacity-100 transition-opacity" />
                                 </NavLink>
                             </SidebarMenuButton>
                         </SidebarMenuItem>

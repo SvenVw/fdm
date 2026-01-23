@@ -40,7 +40,7 @@ export const columns: ColumnDef<FarmExtended>[] = [
         },
     },
     {
-        accessorKey: "owner",
+        accessorKey: "owner.displayUserName",
         enableSorting: true,
         header: ({ column }) => {
             return <DataTableColumnHeader column={column} title="Eigenaar" />
@@ -64,7 +64,7 @@ export const columns: ColumnDef<FarmExtended>[] = [
                         </>
                     ) : (
                         <>
-                            <div className="h-8 w-8 invisible" />
+                            <div className="h-6 w-6 invisible" />
                             Onbekend
                         </>
                     )}

@@ -12,7 +12,8 @@ function isValidSlug(slug: string): boolean {
     }
 
     // Slug should only contain lowercase letters, numbers, and hyphens
-    return /^[a-z0-9-]+$/.test(slug)
+    // Must start and end with alphanumeric, no consecutive hyphens
+    return /^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)
 }
 
 export const FormSchema = z.object({
@@ -30,7 +31,7 @@ export const FormSchema = z.object({
         })
         .refine(isValidSlug, {
             message:
-                "ID moet minimaal 3 karakters bevatten, enkel kleine letters, cijfers of '-'",
+                "ID moet minimaal 3 karakters bevatten, enkel kleine letters, cijfers of enkel '-'",
         }),
     description: z.string({}).optional(),
 })

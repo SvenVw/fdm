@@ -15,10 +15,12 @@ export function OrganizationSettingsForm({
     organization,
     action,
     method = "POST",
+    canModify,
 }: {
     organization?: Organization
     action?: string
     method?: HTMLFormMethod
+    canModify: boolean
 }) {
     const form = useRemixForm({
         mode: "onTouched",
@@ -54,13 +56,11 @@ export function OrganizationSettingsForm({
         return () => subscription.unsubscribe()
     }, [organization?.slug, form.watch, form.setValue])
 
+    const disabled = !canModify || form.formState.isSubmitting
     return (
         <RemixFormProvider {...form}>
             <Form action={action} method={method}>
-                <fieldset
-                    disabled={form.formState.isSubmitting}
-                    className="space-y-4"
-                >
+                <fieldset disabled={disabled} className="space-y-4">
                     <Controller
                         name="name"
                         control={form.control}
@@ -106,7 +106,7 @@ export function OrganizationSettingsForm({
                     />
                     <Button
                         type="submit"
-                        disabled={form.formState.isSubmitting}
+                        disabled={disabled}
                         className="m-auto"
                     >
                         {form.formState.isSubmitting && <Spinner />}

@@ -409,7 +409,7 @@ export default function AppIndex() {
                                     </NavLink>
                                 </Card>
                                 <Card
-                                    key="atlas"
+                                    key="organization"
                                     className="transition-all hover:shadow-md"
                                 >
                                     <NavLink

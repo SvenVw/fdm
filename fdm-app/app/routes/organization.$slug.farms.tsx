@@ -76,11 +76,14 @@ export async function loader({ params, request }: Route.LoaderArgs) {
                     }
                 }
 
+                const ownerPromise = getOwner()
+                const reduceFieldsPromise = reduceFields()
+
                 return {
                     b_id_farm: farm.b_id_farm,
                     b_name_farm: farm.b_name_farm,
-                    owner: await getOwner(),
-                    ...(await reduceFields()),
+                    owner: await ownerPromise,
+                    ...(await reduceFieldsPromise),
                 }
             }),
         )
@@ -100,7 +103,7 @@ export default function OrganizationFarmsPage() {
             <div className="flex items-center justify-between">
                 <FarmTitle
                     title={`Bedrijven met toegang door ${organization.name}`}
-                    description="Selecteer een perceel voor details of voeg een nieuw perceel toe."
+                    description="Klik op een bedrijfsnaam voor meer informatie."
                 />
             </div>
             <FarmContent>

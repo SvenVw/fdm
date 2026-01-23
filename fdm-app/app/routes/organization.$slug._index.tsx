@@ -84,7 +84,7 @@ export default function AppIndex() {
                                                     <CardDescription>
                                                         Uitgebreide tabel met
                                                         bedrijven met toegang
-                                                        door deze organizatie, .
+                                                        tot deze organisatie, .
                                                     </CardDescription>
                                                 </div>
                                             </div>
@@ -104,7 +104,7 @@ export default function AppIndex() {
                                                         Bekijk en beheer de
                                                         gebruikers die toegang
                                                         hebben tot deze
-                                                        organizatie.
+                                                        organisatie.
                                                     </CardDescription>
                                                 </div>
                                             </div>

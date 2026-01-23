@@ -1,6 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect } from "react"
-import { useRemixForm } from "remix-hook-form"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { OrganizationSettingsForm } from "~/components/blocks/organization/form"
@@ -37,40 +34,6 @@ export async function loader() {
 }
 
 export default function AddOrganizationPage() {
-    const form = useRemixForm({
-        mode: "onTouched",
-        resolver: zodResolver(FormSchema),
-        defaultValues: {
-            name: undefined,
-            slug: undefined,
-            description: undefined,
-        },
-    })
-
-    // Function to convert text to a slug
-    const convertToSlug = (text: string) => {
-        return text
-            .toLowerCase()
-            .replace(/[^a-z0-9-]+/g, "-") // Replace non-alphanumeric with -
-            .replace(/--+/g, "-") // Replace multiple - with single -
-            .replace(/^-|-$/g, "") // Trim - from start and end
-    }
-
-    // Update slug when name changes
-    // biome-ignore lint/correctness/useExhaustiveDependencies: convertToSlug changes on every re-render and should not be used as a hook dependency
-    useEffect(() => {
-        const subscription = form.watch((value, { name }) => {
-            if (name === "name") {
-                const slug = convertToSlug(value.name ?? "")
-                form.setValue("slug", slug, {
-                    shouldDirty: true,
-                    shouldValidate: true,
-                })
-            }
-        })
-        return () => subscription.unsubscribe()
-    }, [form.watch, form.setValue])
-
     return (
         <main className="container">
             <div className="max-w-3xl mx-auto px-4">
@@ -90,7 +53,7 @@ export default function AddOrganizationPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <OrganizationSettingsForm />
+                        <OrganizationSettingsForm canModify={true} />
                     </CardContent>
                 </Card>
             </div>

@@ -38,7 +38,9 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     ).members
 
     // Determine permissions
-    const currentUserMember = members.find((m) => m.userId === session.user.id)
+    const currentUserMember = members.find(
+        (m) => m.userId === session.principal_id,
+    )
     const role = currentUserMember?.role || "viewer"
     const permissions = {
         canEdit: role === "owner" || role === "admin",
@@ -78,6 +80,7 @@ export default function FarmSettingsPropertiesBlock() {
                     <CardContent className="space-y-4">
                         <OrganizationSettingsForm
                             organization={loaderData.organization}
+                            canModify={loaderData.permissions.canEdit}
                         />
                     </CardContent>
                 </Card>
