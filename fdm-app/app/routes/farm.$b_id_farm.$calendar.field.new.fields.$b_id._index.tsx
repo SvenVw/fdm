@@ -13,7 +13,6 @@ import {
     type ActionFunctionArgs,
     data,
     type LoaderFunctionArgs,
-    type MetaFunction,
     useLoaderData,
 } from "react-router"
 import { dataWithSuccess, redirectWithSuccess } from "remix-toast"
@@ -22,20 +21,9 @@ import { FormSchema } from "~/components/blocks/fields-new/schema"
 import { getMapStyle } from "~/integrations/map"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
-import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-
-// Meta
-export const meta: MetaFunction = () => {
-    return [
-        { title: `${clientConfig.name} App` },
-        { name: "description", content: `Welcome to ${clientConfig.name}!` },
-    ]
-}
-
-// Form Schema
 
 /**
  * Retrieves and prepares data for rendering the field details page.
@@ -62,7 +50,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get the field id
         const b_id = params.b_id
         if (!b_id) {
             throw data("Field ID is required", {
@@ -74,7 +61,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
-        const timeframe = await getTimeframe(params)
+        const timeframe = getTimeframe(params)
 
         // Get the field data
         const field = await getField(fdm, session.principal_id, b_id)
@@ -96,7 +83,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const feature: GeoJSON.Feature = {
             type: "Feature",
             properties: {
-                b_id: field.b_id,
+                b_id: b_id,
                 b_name: field.b_name,
                 b_area: Math.round((field.b_area ?? 0) * 10) / 10,
                 b_id_source: field.b_id_source,
@@ -219,6 +206,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const timeframe = getTimeframe(params)
         const calendar = getCalendar(params)
 
+        const url = new URL(request.url)
+
         if (request.method === "POST") {
             const formValues = await extractFormValuesFromRequest(
                 request,
@@ -253,24 +242,30 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     undefined,
                     undefined,
                 )
-
-                return dataWithSuccess("fields have been updated", {
-                    message: `${formValues.b_name} is bijgewerkt! 🎉`,
-                })
             }
+
+            return dataWithSuccess("fields have been updated", {
+                message: `${formValues.b_name} is bijgewerkt! 🎉`,
+            })
+            // biome-ignore lint/style/noUselessElse: for low maintenance
         } else if (request.method === "DELETE") {
             // Delete field
             const field = await getField(fdm, session.principal_id, b_id)
             await removeField(fdm, session.principal_id, b_id)
+            const fieldIds = url.searchParams.get("fieldIds")?.split(",") ?? []
+            url.searchParams.set(
+                "fieldIds",
+                fieldIds.filter((id) => id !== b_id).join(","),
+            )
             return redirectWithSuccess(
-                `/farm/create/${b_id_farm}/${calendar}/fields`,
+                `/farm/${b_id_farm}/${calendar}/field/new/fields${url.search}`,
                 {
                     message: `${field.b_name} is verwijderd! 🎉`,
                 },
             )
-        } else {
-            throw new Error("invalid method")
         }
+
+        throw new Error("invalid method")
     } catch (error) {
         throw handleActionError(error)
     }
