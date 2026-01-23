@@ -276,7 +276,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         // Mineral: -0.60296
         // Manure (broadcasting on cropland): 2000 * 20 / 1000 * 0.69 * -1 = -27.6 kg N
         // Compost: -4.95
-        // Total = -0.60296 - 27.6 - 4.95 = -92.84600
+        // Total = -0.60296 - 27.6 - 4.95 = -33.15296
         expect(result.total.toFixed(5)).toBe("-33.15296")
         expect(result.mineral.total.toFixed(5)).toBe("-0.60296")
         expect(result.manure.total.toFixed(1)).toBe("-27.6")

@@ -2,4 +2,4 @@
 "@svenvw/fdm-calculator": patch
 ---
 
-Fixes that `determineMineralAmmoniaEmissionFactor` returns a factor instead of percentage
+Fixes that `determineMineralAmmoniaEmissionFactor` returned a percentage instead of a factor
