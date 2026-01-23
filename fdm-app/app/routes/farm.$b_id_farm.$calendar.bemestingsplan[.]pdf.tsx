@@ -165,6 +165,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                                     number,
                                 ],
                                 timeframe,
+                                calendar,
                             })
 
                             const yearAdvice =

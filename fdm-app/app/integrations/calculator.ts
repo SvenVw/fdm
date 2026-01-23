@@ -28,6 +28,7 @@ import {
     getField,
 } from "@svenvw/fdm-core"
 import { getNmiApiKey } from "./nmi"
+import { getDefaultCultivation } from "~/lib/cultivation-helpers"
 
 // Get nitrogen balance for a field
 export async function getNitrogenBalanceForField({
@@ -157,12 +158,14 @@ export async function getNutrientAdviceForField({
     b_id,
     b_centroid,
     timeframe,
+    calendar,
 }: {
     fdm: FdmType
     principal_id: PrincipalId
     b_id: Field["b_id"]
     b_centroid: Field["b_centroid"]
     timeframe: Timeframe
+    calendar: string
 }) {
     const nmiApiKey = getNmiApiKey()
 
@@ -181,9 +184,9 @@ export async function getNutrientAdviceForField({
     if (!cultivations.length) {
         b_lu_catalogue = null
     } else {
-        // For now take the first cultivation
-        // TODO: Replace this with hoofdteelt
-        b_lu_catalogue = cultivations[0].b_lu_catalogue
+        const mainCultivation =
+            getDefaultCultivation(cultivations, calendar) || cultivations[0]
+        b_lu_catalogue = mainCultivation.b_lu_catalogue
     }
 
     const nutrientAdvice = await getNutrientAdvice(fdm, {
