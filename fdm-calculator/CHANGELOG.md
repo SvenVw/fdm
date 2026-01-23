@@ -1,5 +1,11 @@
 # fdm-calculator
 
+## 0.10.2
+
+### Patch Changes
+
+- 3f16a89: Fixes that `determineMineralAmmoniaEmissionFactor` returned a percentage instead of a factor
+
 ## 0.10.1
 
 ### Patch Changes
