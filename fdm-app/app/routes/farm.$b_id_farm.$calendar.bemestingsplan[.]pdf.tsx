@@ -221,7 +221,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         catchCrop: catchCrop?.b_lu_name,
                         soil: {
                             b_sampling_date: formatDate(samplingDate),
-                            a_ph_ccc: soilParams.a_ph_cc,
+                            a_ph_cc: soilParams.a_ph_cc,
                             a_p_al: soilParams.a_p_al,
                             a_p_cc: soilParams.a_p_cc,
                             a_k_cc: soilParams.a_k_cc,
