@@ -9,7 +9,6 @@ import {
     getFilteredRowModel,
     getSortedRowModel,
     type Row,
-    type RowSelectionState,
     type SortingState,
     useReactTable,
     type VisibilityState,
@@ -24,6 +23,7 @@ import { toast as notify } from "sonner"
 import { modifySearchParams } from "@/app/lib/url-utils"
 import { useActiveTableFormStore } from "@/app/store/active-table-form"
 import { useFieldFilterStore } from "@/app/store/field-filter"
+import { useRotationSelectionStore } from "@/app/store/rotation-selection"
 import { Button } from "~/components/ui/button"
 import {
     DropdownMenu,
@@ -71,9 +71,20 @@ export function DataTable<TData extends RotationExtended, TValue>({
             ? { a_som_loi: false, b_soiltype_agr: false, b_area: false }
             : {},
     )
-    const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
     const lastSelectedRowIndex = useRef<string | null>(null)
     const location = useLocation()
+
+    const rotationSelectionStore = useRotationSelectionStore()
+    function handleRowSelection(selection: Record<string, boolean>) {
+        rotationSelectionStore.setSelectionFrom(
+            table.getRowModel().rows,
+            selection,
+        )
+    }
+
+    const [rowSelection, setRowSelection] = useState<Record<string, boolean>>(
+        {},
+    )
 
     useEffect(() => {
         setColumnVisibility(
@@ -151,7 +162,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
                         (subRow) => newRowSelection[subRow.id],
                     )
                 }
-                setRowSelection(newRowSelection)
+                handleRowSelection(newRowSelection)
             }
         } else {
             lastSelectedRowIndex.current = null
@@ -247,7 +258,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
             if ((globalFilter?.searchTerms ?? "") !== fieldFilter.searchTerms)
                 fieldFilter.setSearchTerms(globalFilter?.searchTerms ?? "")
         },
-        onRowSelectionChange: setRowSelection,
+        onRowSelectionChange: (fn) => handleRowSelection(fn(rowSelection)),
         globalFilterFn: fuzzySearchAndProductivityFilter,
         // There are nulls in the columns which can cause false assumptions if this is not provided
         // The global filter checks the searchTarget field anyways
@@ -262,6 +273,16 @@ export function DataTable<TData extends RotationExtended, TValue>({
             rowSelection,
         },
     })
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: custom behaviour
+    useEffect(() => {
+        rotationSelectionStore.clear()
+    }, [fieldFilter])
+    useEffect(() => {
+        setRowSelection(
+            rotationSelectionStore.getSelectionFor(table.getRowModel().rows),
+        )
+    }, [table.getRowModel, rotationSelectionStore])
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Oogst button activation
     const selectedCultivations = useMemo(() => {
