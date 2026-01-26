@@ -131,20 +131,6 @@ export const columns: ColumnDef<RotationExtended>[] = [
                     }
                     onCheckedChange={(value) => {
                         row.toggleSelected(!!value)
-                        const parentRow = row.getParentRow()
-                        if (parentRow) {
-                            const wantedValue = parentRow.subRows.every(
-                                (childRow) =>
-                                    childRow.id === row.id
-                                        ? value
-                                        : childRow.getIsSelected(),
-                            )
-                            if (parentRow.getIsSelected() !== wantedValue) {
-                                parentRow.toggleSelected(wantedValue, {
-                                    selectChildren: false,
-                                })
-                            }
-                        }
                     }}
                     aria-label="Selecteer deze rij"
                     className="text-muted-foreground"
