@@ -159,7 +159,7 @@ export const pdfStyles = StyleSheet.create({
     },
     footer: {
         position: "absolute",
-        bottom: 30,
+        top: 780,
         left: 40,
         right: 40,
         flexDirection: "row",

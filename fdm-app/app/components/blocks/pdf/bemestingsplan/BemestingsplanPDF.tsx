@@ -11,17 +11,23 @@ import {
 import { pdfStyles } from "./styles"
 import type { BemestingsplanData } from "./types"
 
-const Footer = ({ config }: { config: { name: string } }) => (
-    <View style={pdfStyles.footer} fixed>
+const Footer = ({
+    config,
+    style,
+    showPageNumbers = true,
+}: { config: { name: string }; style?: any; showPageNumbers?: boolean }) => (
+    <View style={[pdfStyles.footer, style]} fixed>
         <Text>
             {config.name} - Gegenereerd op{" "}
             {format(new Date(), "d MMMM yyyy", { locale: nl })}
         </Text>
-        <Text
-            render={({ pageNumber, totalPages }) =>
-                `Pagina ${pageNumber} / ${totalPages}`
-            }
-        />
+        {showPageNumbers && (
+            <Text
+                render={({ pageNumber, totalPages }) =>
+                    `Pagina ${pageNumber} / ${totalPages}`
+                }
+            />
+        )}
     </View>
 )
 
@@ -64,6 +70,11 @@ const soilTypeLabels: Record<string, string> = {
 
 const FrontPage = ({ data }: { data: BemestingsplanData }) => (
     <Page size="A4" style={pdfStyles.frontPage}>
+        <Footer
+            config={data.config}
+            style={{ color: "#FFFFFF", borderTopWidth: 0 }}
+            showPageNumbers={false}
+        />
         <View
             style={{
                 position: "absolute",
@@ -162,6 +173,11 @@ const FrontPage = ({ data }: { data: BemestingsplanData }) => (
                 </Text>
             </View>
         </View>
+        <Footer
+            config={data.config}
+            style={{ color: "#FFFFFF", borderTopWidth: 0 }}
+            showPageNumbers={false}
+        />
     </Page>
 )
 
@@ -998,6 +1014,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
 
         {/* Page 4: Fields Overview Table */}
         <Page size="A4" orientation="landscape" style={pdfStyles.page}>
+            <Footer config={data.config} />
             <View style={pdfStyles.header} id="fields-overview">
                 <Text style={pdfStyles.title}>
                     Overzicht percelen {data.year}
@@ -1161,6 +1178,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                     size="A4"
                     style={pdfStyles.page}
                 >
+                    <Footer config={data.config} />
                     <Text
                         style={[pdfStyles.miniHeader, { opacity: 0.6 }]}
                         fixed
