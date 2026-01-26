@@ -264,13 +264,14 @@ export function DataTable<TData extends RotationExtended, TValue>({
         },
     })
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection uses generic table row ids and not field-specific ids, so it needs to be refreshed when the memoized data changes.
     useEffect(() => {
         setRowSelection(
             rotationSelectionStore.getSelectionFor(
                 table.getCoreRowModel().rows,
             ),
         )
-    }, [table.getCoreRowModel, rotationSelectionStore])
+    }, [memoizedData, table.getCoreRowModel, rotationSelectionStore])
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Oogst button activation
     const selectedCultivations = useMemo(() => {

@@ -170,6 +170,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
         )
     }
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection uses generic table row ids and not field-specific ids, so it needs to be refreshed when the memoized data changes.
     useEffect(() => {
         setRowSelection(
             Object.fromEntries(
@@ -181,7 +182,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
                     ]),
             ),
         )
-    }, [table.getCoreRowModel, fieldSelection])
+    }, [memoizedData, table.getCoreRowModel, fieldSelection])
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Bemesting button activation
     const selectedFields = useMemo(() => {
