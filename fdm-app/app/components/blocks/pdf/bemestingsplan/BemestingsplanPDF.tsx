@@ -1160,7 +1160,6 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                     key={field.id}
                     size="A4"
                     style={pdfStyles.page}
-                    id={`field-${field.id}`}
                 >
                     <Text
                         style={[pdfStyles.miniHeader, { opacity: 0.6 }]}
@@ -1169,7 +1168,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                         {field.name} ({field.area.toFixed(1)} ha)
                     </Text>
 
-                    <View style={pdfStyles.header}>
+                    <View style={pdfStyles.header} id={`field-${field.id}`}>
                         <View>
                             <Text style={{ fontSize: 16, fontWeight: "bold" }}>
                                 {field.name}
