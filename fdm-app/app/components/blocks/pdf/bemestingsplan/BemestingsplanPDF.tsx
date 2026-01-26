@@ -874,6 +874,8 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                                     app.quantity * f.area
                                                 acc[app.product].n +=
                                                     app.p_dose_n * f.area
+                                                acc[app.product].nw +=
+                                                    app.p_dose_nw * f.area
                                                 acc[app.product].p +=
                                                     app.p_dose_p * f.area
                                                 acc[app.product].k +=
@@ -954,6 +956,15 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                                 <Text>
                                                     {Math.round(
                                                         stats.n,
+                                                    ).toLocaleString("nl-NL")}
+                                                </Text>
+                                            </PdfTableCell>
+                                            <PdfTableCell
+                                                style={{ textAlign: "right" }}
+                                            >
+                                                <Text>
+                                                    {Math.round(
+                                                        stats.nw,
                                                     ).toLocaleString("nl-NL")}
                                                 </Text>
                                             </PdfTableCell>
