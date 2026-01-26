@@ -433,11 +433,11 @@ const TableOfContents = ({ data }: { data: BemestingsplanData }) => (
                 De berekeningen van de gebruiksruimte en het bemestingsadvies in
                 dit document zijn gebaseerd op de door de gebruiker verstrekte
                 gegevens en de op het moment van genereren geldende wet- en
-                regelgeving. Deze getallen zijn uitsluitend bedoeld for
+                regelgeving. Deze getallen zijn uitsluitend bedoeld voor
                 informatieve doeleinden en dienen als indicatie. Hoewel{" "}
                 {data.config.name} streeft naar maximale nauwkeurigheid, kunnen
                 er geen rechten worden ontleend aan de gepresenteerde waarden.
-                De uiteindelijke verantwoordelijkheid for de naleving van de
+                De uiteindelijke verantwoordelijkheid voor de naleving van de
                 mestwetgeving ligt bij de landbouwer. Raadpleeg bij twijfel
                 altijd de officiële publicaties van de Rijksdienst voor
                 Ondernemend Nederland (RVO) en uw adviseur.
