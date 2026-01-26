@@ -154,7 +154,7 @@ const FrontPage = ({ data }: { data: BemestingsplanData }) => (
                         KvK: {data.farm.kvk || "-"}
                     </Text>
                     <Text style={pdfStyles.frontInfo}>
-                        Oppervlakte: {data.totalarea.toFixed(1)} ha
+                        Oppervlakte: {data.totalArea.toFixed(1)} ha
                     </Text>
                 </View>
                 <Text style={[pdfStyles.frontInfo, { marginTop: 20 }]}>
@@ -486,13 +486,13 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                 totaal oppervlakte
                             </Text>
                             <Text style={pdfStyles.value}>
-                                {data.totalarea.toFixed(1)} ha
+                                {data.totalArea.toFixed(1)} ha
                             </Text>
                             <Text style={[pdfStyles.label, { marginTop: 4 }]}>
                                 productieve opp.
                             </Text>
                             <Text style={pdfStyles.value}>
-                                {data.productivearea.toFixed(1)} ha
+                                {data.productiveArea.toFixed(1)} ha
                             </Text>
                         </View>
                     </View>
@@ -1045,7 +1045,10 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                         <PdfTableCell weight={1.5}>
                             <Text>Perceel</Text>
                         </PdfTableCell>
-                        <PdfTableCell weight={0.6} style={{ textAlign: "right" }}>
+                        <PdfTableCell
+                            weight={0.6}
+                            style={{ textAlign: "right" }}
+                        >
                             <Text>Opp (ha)</Text>
                         </PdfTableCell>
                         <PdfTableCell style={{ textAlign: "right" }}>
@@ -1090,7 +1093,10 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                     {field.mainCrop}
                                 </Text>
                             </PdfTableCell>
-                            <PdfTableCell weight={0.6} style={{ textAlign: "right" }}>
+                            <PdfTableCell
+                                weight={0.6}
+                                style={{ textAlign: "right" }}
+                            >
                                 <Text>{field.area.toFixed(2)}</Text>
                             </PdfTableCell>
                             <PdfTableCell style={{ textAlign: "right" }}>
