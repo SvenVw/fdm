@@ -144,7 +144,8 @@ export function DataTable<TData extends FieldExtended, TValue>({
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
-        onGlobalFilterChange: (globalFilter) => {
+        onGlobalFilterChange: (fn) => {
+            const globalFilter = typeof fn === "function" ? fn(fieldFilter) : fn
             if ((globalFilter?.searchTerms ?? "") !== fieldFilter.searchTerms)
                 fieldFilter.setSearchTerms(globalFilter?.searchTerms ?? "")
         },

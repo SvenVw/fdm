@@ -2,12 +2,12 @@ import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import { ssrSafeSessionJSONStorage } from "./storage"
 
-interface FieldFilterState {
+interface FieldSelectionState {
     fieldIds: string[]
     setFieldIds: (fieldIds: string[]) => void
 }
 
-export const useFieldSelectionStore = create<FieldFilterState>()(
+export const useFieldSelectionStore = create<FieldSelectionState>()(
     persist(
         (set) => ({
             fieldIds: [],

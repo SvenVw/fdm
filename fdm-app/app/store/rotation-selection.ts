@@ -8,7 +8,7 @@ import type {
 } from "~/components/blocks/rotation/columns"
 import { ssrSafeSessionJSONStorage } from "./storage"
 
-interface FieldFilterState {
+interface RotationSelectionState {
     selection: Record<string, Record<string, boolean>>
     clear(): void
     getSelectionFor(rows: Row<RotationExtended>[]): Record<string, boolean>
@@ -18,7 +18,7 @@ interface FieldFilterState {
     ): void
 }
 
-export const useRotationSelectionStore = create<FieldFilterState>()(
+export const useRotationSelectionStore = create<RotationSelectionState>()(
     persist(
         (set, get) => ({
             selection: {},
