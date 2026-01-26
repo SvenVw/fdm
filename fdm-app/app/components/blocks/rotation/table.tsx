@@ -168,19 +168,6 @@ export function DataTable<TData extends RotationExtended, TValue>({
             lastSelectedRowIndex.current = null
             const newIsSelected = !row.getIsSelected()
             row.toggleSelected(newIsSelected)
-            const parentRow = row.getParentRow()
-            if (parentRow) {
-                const wantedValue = parentRow?.subRows.every((otherRow) =>
-                    otherRow.id === row.id
-                        ? newIsSelected
-                        : otherRow.getIsSelected(),
-                )
-                if (parentRow.getIsSelected() !== wantedValue) {
-                    parentRow.toggleSelected(wantedValue, {
-                        selectChildren: false,
-                    })
-                }
-            }
         }
         lastSelectedRowIndex.current = row.id
     }
@@ -277,10 +264,6 @@ export function DataTable<TData extends RotationExtended, TValue>({
         },
     })
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: custom behaviour
-    useEffect(() => {
-        rotationSelectionStore.clear()
-    }, [fieldFilter])
     useEffect(() => {
         setRowSelection(
             rotationSelectionStore.getSelectionFor(

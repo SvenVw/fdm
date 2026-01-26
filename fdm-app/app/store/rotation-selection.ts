@@ -59,7 +59,7 @@ export const useRotationSelectionStore = create<FieldFilterState>()(
             },
         }),
         {
-            name: "field-filter-storage", // unique name
+            name: "rotation-selection-storage", // unique name
             storage: createJSONStorage(() => ssrSafeSessionJSONStorage), // Use SSR-safe storage
         },
     ),
