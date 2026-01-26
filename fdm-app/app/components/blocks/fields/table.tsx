@@ -9,6 +9,7 @@ import {
     type Row,
     type RowSelectionState,
     type SortingState,
+    type Updater,
     useReactTable,
     type VisibilityState,
 } from "@tanstack/react-table"
@@ -17,6 +18,7 @@ import { ChevronDown, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { NavLink, useParams } from "react-router-dom"
 import { useFieldFilterStore } from "@/app/store/field-filter"
+import { useFieldSelectionStore } from "@/app/store/field-selection"
 import { Button } from "~/components/ui/button"
 import {
     DropdownMenu,
@@ -63,6 +65,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
             ? { a_som_loi: false, b_soiltype_agr: false, b_area: false }
             : {},
     )
+    const fieldSelection = useFieldSelectionStore()
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
     const lastSelectedRowIndex = useRef<number | null>(null)
     const fieldFilter = useFieldFilterStore()
@@ -110,7 +113,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
             rowsToSelect.forEach((id) => {
                 newRowSelection[id] = true
             })
-            setRowSelection(newRowSelection)
+            handleRowSelection(newRowSelection)
         } else {
             row.toggleSelected()
         }
@@ -145,7 +148,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
             if ((globalFilter?.searchTerms ?? "") !== fieldFilter.searchTerms)
                 fieldFilter.setSearchTerms(globalFilter?.searchTerms ?? "")
         },
-        onRowSelectionChange: setRowSelection,
+        onRowSelectionChange: handleRowSelection,
         globalFilterFn: fuzzyFilter,
         state: {
             sorting,
@@ -155,6 +158,29 @@ export function DataTable<TData extends FieldExtended, TValue>({
             rowSelection,
         },
     })
+
+    function handleRowSelection(fn: Updater<Record<string, boolean>>) {
+        const selection = typeof fn === "function" ? fn(rowSelection) : fn
+        fieldSelection.setFieldIds(
+            table
+                .getCoreRowModel()
+                .rows.filter((row) => selection[row.id])
+                .map((row) => row.original.b_id),
+        )
+    }
+
+    useEffect(() => {
+        setRowSelection(
+            Object.fromEntries(
+                table
+                    .getCoreRowModel()
+                    .rows.map((row) => [
+                        row.id,
+                        fieldSelection.fieldIds.includes(row.original.b_id),
+                    ]),
+            ),
+        )
+    }, [table.getCoreRowModel, fieldSelection])
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Bemesting button activation
     const selectedFields = useMemo(() => {
