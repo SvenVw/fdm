@@ -1857,8 +1857,9 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
         {/* Bufferstrips Section */}
         {data.fields.some((f) => f.isBufferstrip) && (
             <Page size="A4" style={pdfStyles.page} id="bufferstrips">
-                <View style={pdfStyles.header}>
-                    <View>
+                <View style={pdfStyles.header}>                 
+                    <Text style={pdfStyles.title}>Bufferstroken</Text>
+                    <View style={{ alignItems: "flex-end" }}>
                         {data.config.logo ? (
                             <Image
                                 src={data.config.logo}
@@ -1875,9 +1876,6 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
                                 {data.config.name}
                             </Text>
                         )}
-                    </View>
-                    <View style={{ alignItems: "flex-end" }}>
-                        <Text style={pdfStyles.title}>Bufferstroken</Text>
                     </View>
                 </View>
 
