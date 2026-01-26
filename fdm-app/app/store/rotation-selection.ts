@@ -14,7 +14,7 @@ interface FieldFilterState {
     getSelectionFor(rows: Row<RotationExtended>[]): Record<string, boolean>
     setSelectionFrom(
         rows: Row<RotationExtended>[],
-        selection: Record<string, boolean>,
+        rowSelection: Record<string, boolean>,
     ): void
 }
 
@@ -25,34 +25,26 @@ export const useRotationSelectionStore = create<FieldFilterState>()(
             clear() {
                 set({ selection: {} })
             },
-            setSelectionFrom(rows, selection) {
-                console.log(rows, selection)
-                const finalSelection: Record<
-                    string,
-                    Record<string, boolean>
-                > = {}
-
+            setSelectionFrom(rows, rowSelection) {
+                const selection: Record<string, Record<string, boolean>> = {}
                 for (const row of rows) {
+                    const b_lu_catalogue = (row.original as CropRow)
+                        .b_lu_catalogue
                     const subSelection: Record<string, boolean> = {}
                     for (const fieldRow of row.subRows) {
-                        subSelection[(fieldRow.original as FieldRow).b_id] =
-                            selection[fieldRow.id]
+                        const b_id = (fieldRow.original as FieldRow).b_id
+                        subSelection[b_id] = rowSelection[fieldRow.id]
                     }
-                    finalSelection[(row.original as CropRow).b_lu_catalogue] =
-                        subSelection
+                    selection[b_lu_catalogue] = subSelection
                 }
-
-                console.log(finalSelection)
-                set({ selection: finalSelection })
+                set({ selection })
             },
-
             getSelectionFor(rows) {
                 const rowSelection: Record<string, boolean> = {}
                 const selection = get().selection
                 for (const row of rows) {
                     const b_lu_catalogue = (row.original as CropRow)
                         .b_lu_catalogue
-
                     const subSelection = selection[b_lu_catalogue] ?? {}
                     let allSelected = row.subRows.length > 0
                     for (const fieldRow of row.subRows) {
@@ -61,7 +53,7 @@ export const useRotationSelectionStore = create<FieldFilterState>()(
                         rowSelection[fieldRow.id] = val
                         allSelected &&= val
                     }
-                    if (allSelected) rowSelection[row.id] = allSelected
+                    rowSelection[row.id] = allSelected
                 }
                 return rowSelection
             },

@@ -77,7 +77,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
     const rotationSelectionStore = useRotationSelectionStore()
     function handleRowSelection(selection: Record<string, boolean>) {
         rotationSelectionStore.setSelectionFrom(
-            table.getRowModel().rows,
+            table.getCoreRowModel().rows,
             selection,
         )
     }
@@ -258,7 +258,10 @@ export function DataTable<TData extends RotationExtended, TValue>({
             if ((globalFilter?.searchTerms ?? "") !== fieldFilter.searchTerms)
                 fieldFilter.setSearchTerms(globalFilter?.searchTerms ?? "")
         },
-        onRowSelectionChange: (fn) => handleRowSelection(fn(rowSelection)),
+        onRowSelectionChange: (fn) =>
+            handleRowSelection(
+                typeof fn === "function" ? fn(rowSelection) : fn,
+            ),
         globalFilterFn: fuzzySearchAndProductivityFilter,
         // There are nulls in the columns which can cause false assumptions if this is not provided
         // The global filter checks the searchTarget field anyways
@@ -280,9 +283,11 @@ export function DataTable<TData extends RotationExtended, TValue>({
     }, [fieldFilter])
     useEffect(() => {
         setRowSelection(
-            rotationSelectionStore.getSelectionFor(table.getRowModel().rows),
+            rotationSelectionStore.getSelectionFor(
+                table.getCoreRowModel().rows,
+            ),
         )
-    }, [table.getRowModel, rotationSelectionStore])
+    }, [table.getCoreRowModel, rotationSelectionStore])
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Oogst button activation
     const selectedCultivations = useMemo(() => {
