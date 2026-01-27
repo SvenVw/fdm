@@ -121,7 +121,9 @@ export function SidebarOrganization({
                                 >
                                     <span className="flex items-center gap-2 cursor-default text-muted-foreground">
                                         <Building />
-                                        <span>Kies een organisatie</span>
+                                        <span>
+                                            Geen organisatie geselecteerd
+                                        </span>
                                     </span>
                                 </SidebarMenuButton>
                             )}
