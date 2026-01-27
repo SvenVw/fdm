@@ -497,12 +497,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             <BemestingsplanPDF data={bemestingsplanData} />,
         )
 
+        // Sanitize and encode filename for Content-Disposition header
+        const safeName = (farm.b_name_farm || b_id_farm).replace(
+            /[^\w\s-]/g,
+            "_",
+        )
+        const encodedName = encodeURIComponent(
+            `Bemestingsplan_${safeName}_${calendar}.pdf`,
+        )
+
         return new Response(
             Readable.toWeb(stream) as unknown as ReadableStream,
             {
                 headers: {
                     "Content-Type": "application/pdf",
-                    "Content-Disposition": `attachment; filename="Bemestingsplan_${farm.b_name_farm || b_id_farm}_${calendar}.pdf"`,
+                    "Content-Disposition": `attachment; filename="${safeName}.pdf"; filename*=UTF-8''${encodedName}`,
                 },
             },
         )
