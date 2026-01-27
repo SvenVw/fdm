@@ -160,8 +160,9 @@ export function DataTable<TData extends FieldExtended, TValue>({
         },
     })
 
-    function handleRowSelection(fn: Updater<Record<string, boolean>>) {
+    function handleRowSelection(fn: Updater<RowSelectionState>) {
         const selection = typeof fn === "function" ? fn(rowSelection) : fn
+        setRowSelection(selection)
         fieldSelection.setFieldIds(
             table
                 .getCoreRowModel()

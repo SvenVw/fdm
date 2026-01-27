@@ -9,7 +9,9 @@ import {
     getFilteredRowModel,
     getSortedRowModel,
     type Row,
+    type RowSelectionState,
     type SortingState,
+    type Updater,
     useReactTable,
     type VisibilityState,
 } from "@tanstack/react-table"
@@ -75,16 +77,16 @@ export function DataTable<TData extends RotationExtended, TValue>({
     const location = useLocation()
 
     const rotationSelectionStore = useRotationSelectionStore()
-    function handleRowSelection(selection: Record<string, boolean>) {
+    function handleRowSelection(fn: Updater<RowSelectionState>) {
+        const selection = typeof fn === "function" ? fn(rowSelection) : fn
+        setRowSelection(selection)
         rotationSelectionStore.setSelectionFrom(
             table.getCoreRowModel().rows,
             selection,
         )
     }
 
-    const [rowSelection, setRowSelection] = useState<Record<string, boolean>>(
-        {},
-    )
+    const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
     useEffect(() => {
         setColumnVisibility(
@@ -246,10 +248,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
             if ((globalFilter?.searchTerms ?? "") !== fieldFilter.searchTerms)
                 fieldFilter.setSearchTerms(globalFilter?.searchTerms ?? "")
         },
-        onRowSelectionChange: (fn) =>
-            handleRowSelection(
-                typeof fn === "function" ? fn(rowSelection) : fn,
-            ),
+        onRowSelectionChange: handleRowSelection,
         globalFilterFn: fuzzySearchAndProductivityFilter,
         // There are nulls in the columns which can cause false assumptions if this is not provided
         // The global filter checks the searchTarget field anyways
