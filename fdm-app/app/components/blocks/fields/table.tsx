@@ -65,10 +65,27 @@ export function DataTable<TData extends FieldExtended, TValue>({
             ? { a_som_loi: false, b_soiltype_agr: false, b_area: false }
             : {},
     )
-    const fieldSelection = useFieldSelectionStore()
-    const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+    const fieldIds = useFieldSelectionStore((state) => state.fieldIds)
+    const setFieldIds = useFieldSelectionStore((state) => state.setFieldIds)
+    const syncFarm = useFieldSelectionStore((state) => state.syncFarm)
     const lastSelectedRowIndex = useRef<number | null>(null)
     const fieldFilter = useFieldFilterStore()
+
+    const rowSelection = useMemo(
+        () => Object.fromEntries(fieldIds.map((id) => [id, true])),
+        [fieldIds],
+    )
+
+    const params = useParams()
+    const b_id_farm = params.b_id_farm
+    const calendar = params.calendar
+
+    useEffect(() => {
+        if (b_id_farm) {
+            syncFarm(b_id_farm)
+            fieldFilter.syncFarm(b_id_farm)
+        }
+    }, [b_id_farm, syncFarm, fieldFilter.syncFarm])
 
     useEffect(() => {
         setColumnVisibility(
@@ -77,10 +94,6 @@ export function DataTable<TData extends FieldExtended, TValue>({
                 : {},
         )
     }, [isMobile])
-
-    const params = useParams()
-    const b_id_farm = params.b_id_farm
-    const calendar = params.calendar
 
     const handleRowClick = (
         row: Row<TData>,
@@ -107,13 +120,11 @@ export function DataTable<TData extends FieldExtended, TValue>({
             const rowsToSelect = table
                 .getRowModel()
                 .rows.slice(start, end + 1)
-                .map((r) => r.id)
+                .map((r) => r.original.b_id) // Use b_id directly
 
-            const newRowSelection = { ...rowSelection }
-            rowsToSelect.forEach((id) => {
-                newRowSelection[id] = true
-            })
-            handleRowSelection(newRowSelection)
+            const newFieldIds = new Set(fieldIds)
+            rowsToSelect.forEach((id) => newFieldIds.add(id))
+            setFieldIds(Array.from(newFieldIds))
         } else {
             row.toggleSelected()
         }
@@ -138,6 +149,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
     const table = useReactTable({
         data: memoizedData,
         columns,
+        getRowId: (row) => row.b_id,
         getCoreRowModel: getCoreRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
@@ -145,11 +157,18 @@ export function DataTable<TData extends FieldExtended, TValue>({
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
         onGlobalFilterChange: (fn) => {
-            const globalFilter = typeof fn === "function" ? fn(fieldFilter) : fn
-            if ((globalFilter?.searchTerms ?? "") !== fieldFilter.searchTerms)
-                fieldFilter.setSearchTerms(globalFilter?.searchTerms ?? "")
+            const result = typeof fn === "function" ? fn(fieldFilter) : fn
+            // Ensure we are dealing with the store object structure before updating
+            const newSearchTerms =
+                typeof result === "string" ? result : result?.searchTerms
+            if ((newSearchTerms ?? "") !== fieldFilter.searchTerms) {
+                fieldFilter.setSearchTerms(newSearchTerms ?? "")
+            }
         },
-        onRowSelectionChange: handleRowSelection,
+        onRowSelectionChange: (fn) => {
+            const selection = typeof fn === "function" ? fn(rowSelection) : fn
+            setFieldIds(Object.keys(selection).filter((k) => selection[k]))
+        },
         globalFilterFn: fuzzyFilter,
         state: {
             sorting,
@@ -159,31 +178,6 @@ export function DataTable<TData extends FieldExtended, TValue>({
             rowSelection,
         },
     })
-
-    function handleRowSelection(fn: Updater<RowSelectionState>) {
-        const selection = typeof fn === "function" ? fn(rowSelection) : fn
-        setRowSelection(selection)
-        fieldSelection.setFieldIds(
-            table
-                .getCoreRowModel()
-                .rows.filter((row) => selection[row.id])
-                .map((row) => row.original.b_id),
-        )
-    }
-
-    // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection uses generic table row ids and not field-specific ids, so it needs to be refreshed when the memoized data changes.
-    useEffect(() => {
-        setRowSelection(
-            Object.fromEntries(
-                table
-                    .getCoreRowModel()
-                    .rows.map((row) => [
-                        row.id,
-                        fieldSelection.fieldIds.includes(row.original.b_id),
-                    ]),
-            ),
-        )
-    }, [memoizedData, table.getCoreRowModel, fieldSelection])
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Bemesting button activation
     const selectedFields = useMemo(() => {
