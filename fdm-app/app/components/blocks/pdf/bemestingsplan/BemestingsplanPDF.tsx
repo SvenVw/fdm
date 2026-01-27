@@ -15,21 +15,30 @@ const Footer = ({
     config,
     style,
     showPageNumbers = true,
-}: { config: { name: string }; style?: any; showPageNumbers?: boolean }) => (
-    <View style={[pdfStyles.footer, style]} fixed>
-        <Text>
-            {config.name} - Gegenereerd op{" "}
-            {format(new Date(), "d MMMM yyyy", { locale: nl })}
-        </Text>
-        {showPageNumbers && (
-            <Text
-                render={({ pageNumber, totalPages }) =>
-                    `Pagina ${pageNumber} / ${totalPages}`
-                }
-            />
-        )}
-    </View>
-)
+}: {
+    config: { name: string }
+    style?: any
+    showPageNumbers?: boolean
+}) => {
+    if (showPageNumbers) {
+        return (
+            <View style={[pdfStyles.footer, style]} fixed>
+                <Text>
+                    {config.name} - Gegenereerd op{" "}
+                    {format(new Date(), "d MMMM yyyy", { locale: nl })}
+                </Text>
+                {showPageNumbers && (
+                    <Text
+                        render={({ pageNumber, totalPages }) =>
+                            `Pagina ${pageNumber} / ${totalPages}`
+                        }
+                    />
+                )}
+            </View>
+        )
+    }
+    return null
+}
 
 const SectionHeader = ({ children }: { children: string }) => (
     <Text style={pdfStyles.sectionTitle}>{children}</Text>
@@ -1173,11 +1182,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
         {data.fields
             .filter((f) => !f.isBufferstrip)
             .map((field) => (
-                <Page
-                    key={field.id}
-                    size="A4"
-                    style={pdfStyles.page}
-                >
+                <Page key={field.id} size="A4" style={pdfStyles.page}>
                     <Footer config={data.config} />
                     <Text
                         style={[pdfStyles.miniHeader, { opacity: 0.6 }]}
@@ -1874,7 +1879,7 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
         {/* Bufferstrips Section */}
         {data.fields.some((f) => f.isBufferstrip) && (
             <Page size="A4" style={pdfStyles.page} id="bufferstrips">
-                <View style={pdfStyles.header}>                 
+                <View style={pdfStyles.header}>
                     <Text style={pdfStyles.title}>Bufferstroken</Text>
                     <View style={{ alignItems: "flex-end" }}>
                         {data.config.logo ? (
