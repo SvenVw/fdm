@@ -14,6 +14,7 @@ import {
 import { data, type LoaderFunctionArgs } from "react-router"
 import { Readable } from "node:stream"
 import path from "node:path"
+import fs from "node:fs"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import { getSession } from "~/lib/auth.server"
@@ -457,20 +458,44 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 totalArea > 0 ? totalOmBalance.degradation / totalArea : 0,
         }
 
-        // Get absolute path for logo
-        const publicDir = path.resolve(process.cwd(), "fdm-app", "public")
+        // Resolve public directory dynamically to handle both dev (monorepo root) and Docker/prod (app root)
+        let publicDir = path.resolve(process.cwd(), "public")
+        if (!fs.existsSync(publicDir)) {
+            // Fallback for monorepo dev environment where cwd is root but app is in fdm-app
+            const monorepoPublicDir = path.resolve(
+                process.cwd(),
+                "fdm-app",
+                "public",
+            )
+            if (fs.existsSync(monorepoPublicDir)) {
+                publicDir = monorepoPublicDir
+            }
+        }
 
         const relativeLogoPath = clientConfig.logo?.startsWith("/")
             ? clientConfig.logo.substring(1)
             : clientConfig.logo
-        const logoPath = relativeLogoPath
+
+        let logoPath = relativeLogoPath
             ? path.join(publicDir, relativeLogoPath)
             : undefined
 
-        const logoInverted = path.join(
+        // Validate logoPath existence
+        if (logoPath && !fs.existsSync(logoPath)) {
+            console.warn(`Logo not found at path: ${logoPath}`)
+            logoPath = undefined
+        }
+
+        let logoInverted: string | undefined = path.join(
             publicDir,
             "fdm-high-resolution-logo-grayscale-transparent.png",
         )
+
+        // Validate logoInverted existence
+        if (logoInverted && !fs.existsSync(logoInverted)) {
+            console.warn(`Inverted logo not found at path: ${logoInverted}`)
+            logoInverted = undefined
+        }
 
         const bemestingsplanData: BemestingsplanData = {
             config: {
