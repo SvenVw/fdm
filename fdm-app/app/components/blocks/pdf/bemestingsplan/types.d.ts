@@ -89,6 +89,7 @@ export interface BemestingsplanData {
             p_dose_nw: number
             p_dose_p: number
             p_dose_k: number
+            p_dose_eoc: number
             p_dose_mg: number
             p_dose_s: number
             p_dose_ca: number
