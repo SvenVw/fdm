@@ -21,9 +21,25 @@ export async function loader({ request }: LoaderFunctionArgs) {
             headers: request.headers,
         })
 
+        function parseMetadata(
+            slug: string,
+            rawMetadata: string | null | undefined,
+        ) {
+            try {
+                return rawMetadata ? JSON.parse(rawMetadata) : {}
+            } catch (e) {
+                throw new Error(
+                    `Failed to parse organization metadata for ${slug}`,
+                    {
+                        cause: e,
+                    },
+                )
+            }
+        }
+
         const organizations = organizationsRaw.map((org) => ({
             ...org,
-            metadata: org.metadata ? JSON.parse(org.metadata) : {},
+            metadata: parseMetadata(org.slug, org.metadata),
         }))
 
         return { organizations }

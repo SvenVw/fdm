@@ -52,13 +52,25 @@ export async function loader({ params, request }: Route.LoaderArgs) {
         canRemoveUser: role === "owner" || role === "admin",
     }
 
-    const metadata = organizationRaw.metadata
-        ? JSON.parse(organizationRaw.metadata)
-        : {}
+    function parseMetadata(
+        slug: string,
+        rawMetadata: string | null | undefined,
+    ) {
+        try {
+            return rawMetadata ? JSON.parse(rawMetadata) : {}
+        } catch (e) {
+            throw new Error(
+                `Failed to parse organization metadata for ${slug}`,
+                {
+                    cause: e,
+                },
+            )
+        }
+    }
 
     const organization = {
         ...organizationRaw,
-        metadata: metadata,
+        metadata: parseMetadata(organizationRaw.slug, organizationRaw.metadata),
     }
 
     return {
