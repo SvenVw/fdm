@@ -36,14 +36,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
         })
 
         const invitations = await Promise.all(
-            invitationsList.map(async (invitation) => {
-                return await auth.api.getInvitation({
-                    query: {
-                        id: invitation.id,
-                    },
-                    headers: request.headers,
-                })
-            }),
+            invitationsList
+                .filter((invitation) => invitation.status === "pending")
+                .map(async (invitation) => {
+                    return await auth.api.getInvitation({
+                        query: {
+                            id: invitation.id,
+                        },
+                        headers: request.headers,
+                    })
+                }),
         )
 
         return { invitations: invitations }
