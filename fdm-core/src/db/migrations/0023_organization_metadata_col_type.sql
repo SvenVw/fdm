@@ -1,0 +1,1 @@
+ALTER TABLE "fdm-authn"."organization" ALTER COLUMN "metadata" SET DATA TYPE jsonb;

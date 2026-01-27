@@ -1,13 +1,14 @@
 import { relations } from "drizzle-orm"
 import {
-    text,
     bigint,
-    timestamp,
     boolean,
-    integer,
     index,
-    uniqueIndex,
+    integer,
+    jsonb,
     pgSchema,
+    text,
+    timestamp,
+    uniqueIndex,
 } from "drizzle-orm/pg-core"
 
 export const fdmAuthNSchema = pgSchema("fdm-authn")
@@ -100,7 +101,7 @@ export const organization = fdmAuthNSchema.table(
         slug: text("slug").notNull().unique(),
         logo: text("logo"),
         createdAt: timestamp("created_at").notNull(),
-        metadata: text("metadata"),
+        metadata: jsonb("metadata"),
     },
     (table) => [uniqueIndex("organization_slug_uidx").on(table.slug)],
 )
