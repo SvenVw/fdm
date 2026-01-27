@@ -243,10 +243,14 @@ const MemberAction = ({
     }
 }) => {
     const fetcher = useFetcher()
-    const formRef = useRef<HTMLFormElement>()
+    const formRef = useRef<HTMLFormElement>(null)
     const disabled = fetcher.state !== "idle"
 
     function submitRoleChange() {
+        if (!formRef.current) {
+            console.error("HTML form is not referenced.")
+            return
+        }
         const formData = new FormData(formRef.current)
         formData.append("intent", "update_role")
         fetcher
