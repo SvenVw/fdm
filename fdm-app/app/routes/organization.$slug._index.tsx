@@ -61,6 +61,7 @@ export default function AppIndex() {
             <FarmTitle
                 title={`Dashboard van ${loaderData.organization.name}`}
                 description={"Bekijk alle informatie over deze organisatie"}
+                action={{ label: "Terug naar organisaties", to: "./.." }}
             />
             <FarmContent>
                 <div>

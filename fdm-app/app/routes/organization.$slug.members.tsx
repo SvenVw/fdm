@@ -1,9 +1,11 @@
 import type { Invitation, Member, Organization } from "better-auth/plugins"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
+import { useRef } from "react"
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
-import { useLoaderData } from "react-router"
+import { useFetcher, useLoaderData } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
+import { toast } from "sonner"
 import { z } from "zod"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
@@ -240,10 +242,30 @@ const MemberAction = ({
         canRemoveUser: boolean
     }
 }) => {
+    const fetcher = useFetcher()
+    const formRef = useRef<HTMLFormElement>()
+    const disabled = fetcher.state !== "idle"
+
+    function submitRoleChange() {
+        const formData = new FormData(formRef.current)
+        formData.append("intent", "update_role")
+        fetcher
+            .submit(formData, { method: "post" })
+            .catch((e) => toast.error(e.message))
+    }
     return (
-        <form method="post" className="flex items-center space-x-4">
+        <form
+            ref={formRef}
+            method="post"
+            className="flex items-center space-x-4"
+        >
             <input type="hidden" name="memberId" value={member.id} />
-            <Select defaultValue={member.role} name="role">
+            <Select
+                defaultValue={member.role}
+                name="role"
+                onValueChange={submitRoleChange}
+                disabled={disabled}
+            >
                 <SelectTrigger className="ml-auto w-27.5">
                     <SelectValue placeholder="Select" />
                 </SelectTrigger>
@@ -263,14 +285,6 @@ const MemberAction = ({
                     Verwijder
                 </Button>
             ) : null}
-            <Button
-                type="submit"
-                className="shrink-0"
-                name="intent"
-                value="update_role"
-            >
-                Bijwerken
-            </Button>
         </form>
     )
 }

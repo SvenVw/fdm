@@ -37,21 +37,20 @@ export default function OrganizationsIndex() {
 
     return (
         <main className="container">
-            <div className="max-w-3xl mx-auto px-4">
-                {/* Changed this div to a flex container with justify-between */}
-                <div className="mb-8 flex items-center justify-between">
-                    <FarmTitle
-                        title={"Mijn organisaties"}
-                        description={
-                            "Organisaties stellen je in staat om met anderen samen te werken. Je kunt organisaties aanmaken of lid worden om samen gegevens te beheren."
-                        }
-                        action={{
-                            to: "/organization/new",
-                            label: "Organisatie aanmaken",
-                        }}
-                    />
-                </div>
-
+            {/* Changed this div to a flex container with justify-between */}
+            <div className="mb-8 flex items-center justify-between">
+                <FarmTitle
+                    title={"Mijn organisaties"}
+                    description={
+                        "Organisaties stellen je in staat om met anderen samen te werken. Je kunt organisaties aanmaken of lid worden om samen gegevens te beheren."
+                    }
+                    action={{
+                        to: "/organization/new",
+                        label: "Organisatie aanmaken",
+                    }}
+                />
+            </div>
+            <div className="px-4">
                 {organizations.length === 0 ? (
                     <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-87.5">
                         <div className="flex flex-col space-y-2 text-center">
@@ -70,33 +69,38 @@ export default function OrganizationsIndex() {
                         </Button>
                     </div>
                 ) : (
-                    <div className="grid gap-4 grid-cols-1">
+                    <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
                         {organizations.map((org) => (
-                            <Card key={org.id}>
-                                <CardHeader>
-                                    <CardTitle>
-                                        <div className="flex items-center justify-between">
-                                            {org.name}
-                                        </div>
-                                    </CardTitle>
-                                    <CardDescription />
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-sm text-muted-foreground truncate">
-                                        {org.metadata?.description ??
-                                            "Geen beschrijving"}
-                                    </p>
-                                </CardContent>
-                                <CardFooter>
-                                    <Button asChild variant="outline" size="sm">
-                                        <NavLink
-                                            to={`/organization/${org.slug}`}
+                            <NavLink
+                                key={org.id}
+                                to={`/organization/${org.slug}`}
+                            >
+                                <Card className="flex flex-col h-full">
+                                    <CardHeader>
+                                        <CardTitle>
+                                            <div className="flex items-center justify-between">
+                                                {org.name}
+                                            </div>
+                                        </CardTitle>
+                                        <CardDescription />
+                                    </CardHeader>
+                                    <CardContent className="grow">
+                                        <p className="text-sm text-muted-foreground truncate">
+                                            {org.metadata?.description ??
+                                                "Geen beschrijving"}
+                                        </p>
+                                    </CardContent>
+                                    <CardFooter>
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
                                         >
-                                            Meer info
-                                        </NavLink>
-                                    </Button>
-                                </CardFooter>
-                            </Card>
+                                            <div>Meer info</div>
+                                        </Button>
+                                    </CardFooter>
+                                </Card>
+                            </NavLink>
                         ))}
                     </div>
                 )}
