@@ -161,10 +161,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                                 fdm,
                                 principal_id: session.principal_id,
                                 b_id: field.b_id,
-                                b_centroid: field.b_centroid as [
-                                    number,
-                                    number,
-                                ],
+                                b_centroid: field.b_centroid,
                                 timeframe,
                                 calendar,
                             })
