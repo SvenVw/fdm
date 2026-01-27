@@ -535,7 +535,7 @@ export default function FarmRotationIndex() {
                     Bouwplan
                 </BreadcrumbItem>
             </Header>
-            <main>
+            <main className="min-w-0">
                 {loaderData.fieldOptions.length === 0 ? (
                     <>
                         <FarmTitle
@@ -567,12 +567,10 @@ export default function FarmRotationIndex() {
                     </>
                 ) : (
                     <>
-                        <div className="flex items-center justify-between">
-                            <FarmTitle
-                                title={`Bouwplan van ${currentFarmName}`}
-                                description="Bekijk het bouwplan en voeg gegevens toe."
-                            />
-                        </div>
+                        <FarmTitle
+                            title={`Bouwplan van ${currentFarmName}`}
+                            description="Bekijk het bouwplan en voeg gegevens toe."
+                        />
                         <FarmContent>
                             <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
                                 <DataTable

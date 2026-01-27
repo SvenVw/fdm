@@ -332,8 +332,8 @@ export function DataTable<TData extends RotationExtended, TValue>({
         })
     }
     return (
-        <div className="w-full flex flex-col h-full">
-            <div className="sticky top-0 z-10 bg-background py-4 flex flex-col sm:flex-row gap-2 items-center">
+        <div className="w-full flex flex-col h-full min-w-0">
+            <div className="sticky top-0 z-5 bg-background py-4 flex flex-col sm:flex-row gap-2 items-center">
                 <Input
                     placeholder="Zoek op gewas, meststof of datum"
                     value={fieldFilter?.searchTerms ?? ""}
@@ -465,7 +465,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
             </div>
             <div className="rounded-md border grow relative overflow-x-auto">
                 <Table>
-                    <TableHeader className="sticky top-0 z-10 bg-background">
+                    <TableHeader className="sticky top-0 z-5 bg-background">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
