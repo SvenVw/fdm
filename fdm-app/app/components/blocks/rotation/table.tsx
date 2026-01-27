@@ -241,7 +241,8 @@ export function DataTable<TData extends RotationExtended, TValue>({
         getSubRows: (row) =>
             row.type === "crop" ? (row.fields as TData[]) : undefined,
         onColumnVisibilityChange: setColumnVisibility,
-        onGlobalFilterChange: (globalFilter) => {
+        onGlobalFilterChange: (fn) => {
+            const globalFilter = typeof fn === "function" ? fn(fieldFilter) : fn
             if ((globalFilter?.searchTerms ?? "") !== fieldFilter.searchTerms)
                 fieldFilter.setSearchTerms(globalFilter?.searchTerms ?? "")
         },
