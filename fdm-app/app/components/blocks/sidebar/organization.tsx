@@ -72,6 +72,19 @@ export function SidebarOrganization({
         organizationLinkDisplay = "Organisatie Dashboard"
     }
 
+    // Determine the active (highlighted) tab
+    let activeTab: string | undefined
+    if (organization) {
+        const prefix = `/organization/${organization.slug}/`
+        if (location.pathname.startsWith(prefix)) {
+            const subPath = location.pathname.substring(prefix.length)
+            if (subPath.includes("settings")) activeTab = "settings"
+            if (subPath.includes("members")) activeTab = "members"
+            if (subPath.includes("farms")) activeTab = "farms"
+        }
+    }
+    console.log(activeTab)
+
     function getLinkForYear(pathname: string, item: string) {
         // Construct the new URL with the selected calendar
         if (!organization) return pathname
@@ -255,9 +268,7 @@ export function SidebarOrganization({
                             {organization ? (
                                 <SidebarMenuButton
                                     asChild
-                                    isActive={location.pathname.includes(
-                                        "/settings",
-                                    )}
+                                    isActive={activeTab === "settings"}
                                 >
                                     <NavLink
                                         to={`/organization/${organization.slug}/settings`}
@@ -282,9 +293,7 @@ export function SidebarOrganization({
                             {organization ? (
                                 <SidebarMenuButton
                                     asChild
-                                    isActive={location.pathname.includes(
-                                        "/members",
-                                    )}
+                                    isActive={activeTab === "members"}
                                 >
                                     <NavLink
                                         to={`/organization/${organization.slug}/members`}
@@ -309,9 +318,7 @@ export function SidebarOrganization({
                             {organization ? (
                                 <SidebarMenuButton
                                     asChild
-                                    isActive={location.pathname.includes(
-                                        "/farms",
-                                    )}
+                                    isActive={activeTab === "farms"}
                                 >
                                     <NavLink
                                         to={`/organization/${organization.slug}/${selectedCalendar}/farms`}
