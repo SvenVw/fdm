@@ -153,33 +153,6 @@ export function SidebarOrganization({
                                 </SidebarMenuButton>
                             )}
                         </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            {organization ? (
-                                <SidebarMenuButton
-                                    asChild
-                                    isActive={location.pathname.includes(
-                                        "/settings",
-                                    )}
-                                >
-                                    <NavLink
-                                        to={`/organization/${organization.slug}/settings`}
-                                    >
-                                        <Cog />
-                                        <span>Instellingen</span>
-                                    </NavLink>
-                                </SidebarMenuButton>
-                            ) : (
-                                <SidebarMenuButton
-                                    asChild
-                                    className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
-                                >
-                                    <span className="flex items-center gap-2 cursor-default text-muted-foreground">
-                                        <Cog />
-                                        <span>Instellingen</span>
-                                    </span>
-                                </SidebarMenuButton>
-                            )}
-                        </SidebarMenuItem>
                         {organization ? (
                             <Collapsible
                                 asChild
@@ -268,6 +241,33 @@ export function SidebarOrganization({
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         )}
+                        <SidebarMenuItem>
+                            {organization ? (
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={location.pathname.includes(
+                                        "/settings",
+                                    )}
+                                >
+                                    <NavLink
+                                        to={`/organization/${organization.slug}/settings`}
+                                    >
+                                        <Cog />
+                                        <span>Instellingen</span>
+                                    </NavLink>
+                                </SidebarMenuButton>
+                            ) : (
+                                <SidebarMenuButton
+                                    asChild
+                                    className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                                >
+                                    <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                        <Cog />
+                                        <span>Instellingen</span>
+                                    </span>
+                                </SidebarMenuButton>
+                            )}
+                        </SidebarMenuItem>
                         <SidebarMenuItem>
                             {organization ? (
                                 <SidebarMenuButton
