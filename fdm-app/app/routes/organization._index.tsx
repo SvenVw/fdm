@@ -17,9 +17,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
     try {
         await getSession(request)
 
-        const organizations = await auth.api.listOrganizations({
+        const organizationsRaw = await auth.api.listOrganizations({
             headers: request.headers,
         })
+
+        const organizations = organizationsRaw.map((org) => ({
+            ...org,
+            metadata: org.metadata ? JSON.parse(org.metadata) : {},
+        }))
 
         return { organizations }
     } catch (error) {
@@ -71,7 +76,7 @@ export default function OrganizationsIndex() {
                                 <CardHeader>
                                     <CardTitle>
                                         <div className="flex items-center justify-between">
-                                            {org.name}                                          
+                                            {org.name}
                                         </div>
                                     </CardTitle>
                                     <CardDescription />

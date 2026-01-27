@@ -22,9 +22,11 @@ export async function loader({ params, request }: Route.LoaderArgs) {
         headers: request.headers,
     })
 
-    const organization = organizations.find((org) => org.slug === params.slug)
+    const organizationRaw = organizations.find(
+        (org) => org.slug === params.slug,
+    )
 
-    if (!organization) {
+    if (!organizationRaw) {
         throw data("Organisatie niet gevonden.", 404)
     }
 
@@ -32,7 +34,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
         await auth.api.listMembers({
             headers: request.headers,
             query: {
-                organizationId: organization.id,
+                organizationId: organizationRaw.id,
             },
         })
     ).members
@@ -48,6 +50,15 @@ export async function loader({ params, request }: Route.LoaderArgs) {
         canInvite: role === "owner" || role === "admin",
         canUpdateRoleUser: role === "owner" || role === "admin",
         canRemoveUser: role === "owner" || role === "admin",
+    }
+
+    const metadata = organizationRaw.metadata
+        ? JSON.parse(organizationRaw.metadata)
+        : {}
+
+    const organization = {
+        ...organizationRaw,
+        metadata: metadata,
     }
 
     return {
