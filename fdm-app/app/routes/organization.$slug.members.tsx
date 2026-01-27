@@ -102,13 +102,11 @@ export default function OrganizationIndex() {
     return (
         <main className="container">
             <div className="max-w-3xl mx-auto px-4">
-                {/* Changed this div to a flex container with justify-between */}
-                <div className="mb-8 flex items-center justify-between">
-                    <FarmTitle
-                        title={`Leden van ${organization.name}`}
-                        description={organization.description || ""}
-                    />
-                </div>
+                <FarmTitle
+                    title={`Leden van ${organization.name}`}
+                    description={organization.description || ""}
+                    action={{ label: "Terug naar overzicht", to: "./.." }}
+                />
                 <div className="grid lg:grid-cols-1 gap-4">
                     <Card>
                         <CardHeader>

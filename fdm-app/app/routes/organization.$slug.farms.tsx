@@ -100,12 +100,11 @@ export default function OrganizationFarmsPage() {
     const { data, organization } = useLoaderData<typeof loader>()
     return (
         <main>
-            <div className="flex items-center justify-between">
-                <FarmTitle
-                    title={`Bedrijven met toegang door ${organization.name}`}
-                    description="Klik op een bedrijfsnaam voor meer informatie."
-                />
-            </div>
+            <FarmTitle
+                title={`Bedrijven met toegang door ${organization.name}`}
+                description="Klik op een bedrijfsnaam voor meer informatie."
+                action={{ label: "Terug naar overzicht", to: "./.." }}
+            />
             <FarmContent>
                 <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
                     <DataTable columns={columns} data={data} />

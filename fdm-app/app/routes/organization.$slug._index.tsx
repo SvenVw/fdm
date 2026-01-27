@@ -1,5 +1,5 @@
 import { getFarms } from "@svenvw/fdm-core"
-import { FlaskConical, House, Users } from "lucide-react"
+import { House, Users } from "lucide-react"
 import { data, NavLink, useLoaderData } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import {
@@ -105,39 +105,6 @@ export default function AppIndex() {
                                                         gebruikers die toegang
                                                         hebben tot deze
                                                         organisatie.
-                                                    </CardDescription>
-                                                </div>
-                                            </div>
-                                        </CardHeader>
-                                    </Card>
-                                </NavLink>
-                            </div>
-                        </div>
-
-                        {/* Apps */}
-                        <div className="space-y-4">
-                            <h2 className="text-2xl font-semibold tracking-tight">
-                                Apps
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <NavLink to="farms">
-                                    <Card className="transition-all hover:shadow-md h-full">
-                                        <CardHeader>
-                                            <div className="flex items-center gap-4">
-                                                <div className="rounded-lg bg-muted p-3">
-                                                    <FlaskConical className="h-6 w-6 text-primary" />
-                                                </div>
-                                                <div>
-                                                    <CardTitle>
-                                                        Analyseren
-                                                    </CardTitle>
-                                                    <CardDescription>
-                                                        Stikstofbalans,
-                                                        OS-balans,
-                                                        gebruiksruimte, of
-                                                        bemestingsadvies voor
-                                                        één of meerdere
-                                                        bedrijven.
                                                     </CardDescription>
                                                 </div>
                                             </div>
