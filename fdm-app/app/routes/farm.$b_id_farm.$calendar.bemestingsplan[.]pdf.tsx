@@ -266,7 +266,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                             const fert = fertilizers.find(
                                 (f) => f.p_id === app.p_id,
                             )
-                            const appDose = dosesResult.applications[idx]
+                            const appDose = dosesResult.applications[idx] ?? {
+                                p_dose_n: 0,
+                                p_dose_nw: 0,
+                                p_dose_p: 0,
+                                p_dose_k: 0,
+                                p_dose_eoc: 0,
+                                p_dose_mg: 0,
+                                p_dose_s: 0,
+                                p_dose_ca: 0,
+                                p_dose_na: 0,
+                                p_dose_cu: 0,
+                                p_dose_zn: 0,
+                                p_dose_co: 0,
+                                p_dose_mn: 0,
+                                p_dose_mo: 0,
+                                p_dose_b: 0,
+                            }
 
                             return {
                                 date: formatDate(app.p_app_date),
