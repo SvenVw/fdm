@@ -4,8 +4,10 @@ import {
     type FilterFn,
     flexRender,
     getCoreRowModel,
+    getExpandedRowModel,
     getFilteredRowModel,
     getSortedRowModel,
+    type Row,
     type RowSelectionState,
     type SortingState,
     useReactTable,
@@ -39,6 +41,14 @@ interface DataTableProps<TData, TValue> {
     data: TData[]
 }
 
+function withSearchTarget<TData extends FarmExtended>(item: TData) {
+    return {
+        ...item,
+        fields: item.fields ? item.fields.map(withSearchTarget) : item.fields,
+        searchTarget: `${item.b_name_farm} ${item.owner?.displayUserName ?? ""} ${item.cultivations.map((c) => c.b_lu_name).join(" ")} ${item.fertilizers.map((f) => f.p_name_nl).join(" ")}`,
+    }
+}
+
 export function DataTable<TData extends FarmExtended, TValue>({
     columns,
     data,
@@ -57,10 +67,7 @@ export function DataTable<TData extends FarmExtended, TValue>({
     }, [isMobile])
 
     const memoizedData = useMemo(() => {
-        return data.map((item) => ({
-            ...item,
-            searchTarget: `${item.b_name_farm} ${item.owner?.displayUserName ?? ""} ${item.cultivations.map((c) => c.b_lu_name).join(" ")} ${item.fertilizers.map((f) => f.p_name_nl).join(" ")}`,
-        }))
+        return data.map((data) => withSearchTarget(data))
     }, [data])
 
     const fuzzyFilter: FilterFn<TData> = (row, _columnId, filterValue) => {
@@ -79,9 +86,12 @@ export function DataTable<TData extends FarmExtended, TValue>({
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
+        getExpandedRowModel: getExpandedRowModel(),
+        getSubRows: (row) => row.fields as TData[],
         onGlobalFilterChange: setGlobalFilter,
         onRowSelectionChange: setRowSelection,
         globalFilterFn: fuzzyFilter,
+        filterFromLeafRows: true,
         state: {
             sorting,
             columnFilters,
@@ -179,6 +189,22 @@ export function DataTable<TData extends FarmExtended, TValue>({
                                     data-state={
                                         row.getIsSelected() && "selected"
                                     }
+                                    className={cn(
+                                        row.original.type === "field" &&
+                                            "bg-muted/50 hover:bg-muted",
+                                        row.original.type === "field" &&
+                                            ((row.getParentRow() as Row<TData>)
+                                                ?.subRows.length === 1
+                                                ? "shadow-[inset_0_1em_2em_-2em_#00000088,inset_0_-1em_2em_-2em_#00000088]"
+                                                : row.index === 0
+                                                  ? "shadow-[inset_0_1em_2em_-2em_#00000088]"
+                                                  : row.index ===
+                                                        (
+                                                            row.getParentRow() as Row<TData>
+                                                        )?.subRows.length -
+                                                            1 &&
+                                                    "shadow-[inset_0_-1em_2em_-2em_#00000088]"),
+                                    )}
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell

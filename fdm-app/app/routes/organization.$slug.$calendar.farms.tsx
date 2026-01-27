@@ -72,7 +72,15 @@ export async function loader({ params, request }: Route.LoaderArgs) {
                     })
 
                     return {
-                        fields: fields.length,
+                        fields: fields.map((field) => ({
+                            type: "field",
+                            b_id_farm: field.b_id,
+                            b_name_farm: field.b_name,
+                            owner: null,
+                            b_area: field.b_area,
+                            cultivations: [],
+                            fertilizers: [],
+                        })),
                         b_area: b_area,
                         cultivations: Object.values(cultivations),
                         fertilizers: Object.values(fertilizers),
@@ -83,6 +91,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
                 const reduceFieldsPromise = reduceFields()
 
                 return {
+                    type: "farm",
                     b_id_farm: farm.b_id_farm,
                     b_name_farm: farm.b_name_farm,
                     owner: await ownerPromise,
