@@ -83,7 +83,6 @@ export function SidebarOrganization({
             if (subPath.includes("farms")) activeTab = "farms"
         }
     }
-    console.log(activeTab)
 
     function getLinkForYear(pathname: string, item: string) {
         // Construct the new URL with the selected calendar
