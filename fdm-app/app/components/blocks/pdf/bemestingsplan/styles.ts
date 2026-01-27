@@ -22,6 +22,7 @@ export const pdfStyles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: "space-between",
         backgroundColor: "#122023", // Landing page dark theme
+        overflow: "hidden",
     },
     frontHeader: {
         padding: 60,

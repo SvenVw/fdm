@@ -472,36 +472,57 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         }
 
-        const relativeLogoPath = clientConfig.logo?.startsWith("/")
-            ? clientConfig.logo.substring(1)
-            : clientConfig.logo
+        // Helper to get base64 data URI from file path
+        const getBase64Image = (
+            filePath: string | undefined,
+        ): string | undefined => {
+            if (!filePath || !fs.existsSync(filePath)) return undefined
+            try {
+                const ext = path.extname(filePath).toLowerCase().substring(1)
+                const mimeType =
+                    ext === "png"
+                        ? "image/png"
+                        : ext === "jpg" || ext === "jpeg"
+                          ? "image/jpeg"
+                          : "application/octet-stream"
+                const buffer = fs.readFileSync(filePath)
+                return `data:${mimeType};base64,${buffer.toString("base64")}`
+            } catch (e) {
+                console.warn(`Failed to read image file at ${filePath}`, e)
+                return undefined
+            }
+        }
 
-        let logoPath = relativeLogoPath
+        const relativeLogoPath = clientConfig.logomark?.startsWith("/")
+            ? clientConfig.logomark.substring(1)
+            : clientConfig.logomark
+
+        const logoPathRaw = relativeLogoPath
             ? path.join(publicDir, relativeLogoPath)
             : undefined
 
-        // Validate logoPath existence
-        if (logoPath && !fs.existsSync(logoPath)) {
-            console.warn(`Logo not found at path: ${logoPath}`)
-            logoPath = undefined
-        }
+        const logoDataUri = getBase64Image(logoPathRaw)
 
-        let logoInverted: string | undefined = path.join(
+        const logoInvertedPathRaw: string | undefined = path.join(
             publicDir,
-            "fdm-high-resolution-logo-grayscale-transparent.png",
+            "fdm-high-resolution-logo-transparent-no-text.png",
         )
 
-        // Validate logoInverted existence
-        if (logoInverted && !fs.existsSync(logoInverted)) {
-            console.warn(`Inverted logo not found at path: ${logoInverted}`)
-            logoInverted = undefined
-        }
+        const logoInvertedDataUri = getBase64Image(logoInvertedPathRaw)
+
+        const coverImagePathRaw: string | undefined = path.join(
+            publicDir,
+            "bemestingsplan_cover.jpg",
+        )
+
+        const coverImageDataUri = getBase64Image(coverImagePathRaw)
 
         const bemestingsplanData: BemestingsplanData = {
             config: {
                 name: clientConfig.name,
-                logo: logoPath,
-                logoInverted: logoInverted,
+                logo: logoDataUri,
+                logoInverted: logoInvertedDataUri,
+                coverImage: coverImageDataUri,
             },
             farm: {
                 name: farm.b_name_farm || "Onbekend",

@@ -3,6 +3,7 @@ export interface BemestingsplanData {
         name: string
         logo?: string
         logoInverted?: string
+        coverImage?: string
     }
     farm: {
         name: string

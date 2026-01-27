@@ -79,11 +79,6 @@ const soilTypeLabels: Record<string, string> = {
 
 const FrontPage = ({ data }: { data: BemestingsplanData }) => (
     <Page size="A4" style={pdfStyles.frontPage}>
-        <Footer
-            config={data.config}
-            style={{ color: "#FFFFFF", borderTopWidth: 0 }}
-            showPageNumbers={false}
-        />
         <View
             style={{
                 position: "absolute",
@@ -93,10 +88,25 @@ const FrontPage = ({ data }: { data: BemestingsplanData }) => (
                 height: "100%",
             }}
         >
-            <Image
-                src="https://images.unsplash.com/photo-1685708358097-02cc97289561?q=80&w=2070&auto=format&fit=crop"
-                style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
+            {/* Using local cover image passed from loader */}
+            {data.config.coverImage ? (
+                <Image
+                    src={data.config.coverImage}
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                    }}
+                />
+            ) : (
+                <View
+                    style={{
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "#0f172a",
+                    }}
+                />
+            )}
             <View
                 style={{
                     position: "absolute",
@@ -110,76 +120,87 @@ const FrontPage = ({ data }: { data: BemestingsplanData }) => (
         </View>
 
         <View
-            style={[
-                pdfStyles.frontHeader,
-                {
-                    alignItems: "center",
-                    flex: 1,
-                    justifyContent: "center",
-                },
-            ]}
+            style={{
+                flex: 1,
+                flexDirection: "column",
+                justifyContent: "space-between",
+            }}
         >
-            <View style={{ marginBottom: 40, alignItems: "center" }}>
-                {data.config.logo ? (
-                    <Image src={data.config.logo} style={pdfStyles.frontLogo} />
-                ) : data.config.logoInverted ? (
-                    <Image
-                        src={data.config.logoInverted}
-                        style={pdfStyles.frontLogo}
-                    />
-                ) : null}
-                <Text
-                    style={{
-                        fontSize: 24,
-                        fontWeight: "bold",
-                        color: "#FFFFFF",
-                        marginTop: 10,
-                        textAlign: "center",
-                    }}
-                >
-                    {data.config.name}
-                </Text>
-            </View>
-
             <View
                 style={[
-                    pdfStyles.frontTitleContainer,
-                    { alignItems: "center" },
+                    pdfStyles.frontHeader,
+                    {
+                        alignItems: "center",
+                        flex: 1,
+                        justifyContent: "center",
+                    },
                 ]}
             >
-                <Text style={[pdfStyles.frontTitle, { textAlign: "center" }]}>
-                    Bemestingsplan
-                </Text>
-                <Text
-                    style={[
-                        pdfStyles.frontSubtitle,
-                        { textAlign: "center", color: "#FFFFFF" },
-                    ]}
-                >
-                    {data.year}
-                </Text>
-            </View>
-        </View>
-
-        <View style={pdfStyles.frontFooter}>
-            <Text style={pdfStyles.frontFarmName}>{data.farm.name}</Text>
-            <View style={{ marginTop: 10, opacity: 0.8 }}>
-                <View
-                    style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                    }}
-                >
-                    <Text style={pdfStyles.frontInfo}>
-                        KvK: {data.farm.kvk || "-"}
-                    </Text>
-                    <Text style={pdfStyles.frontInfo}>
-                        Oppervlakte: {data.totalArea.toFixed(1)} ha
+                <View style={{ marginBottom: 40, alignItems: "center" }}>
+                    {/* {data.config.logo ? (
+                        <Image src={data.config.logo} style={pdfStyles.frontLogo} />
+                    ) : data.config.logoInverted ? (
+                        <Image
+                            src={data.config.logoInverted}
+                            style={pdfStyles.frontLogo}
+                        />
+                    ) : null} */}
+                    <Text
+                        style={{
+                            fontSize: 24,
+                            fontWeight: "bold",
+                            color: "#FFFFFF",
+                            marginTop: 10,
+                            textAlign: "center",
+                        }}
+                    >
+                        {data.config.name}
                     </Text>
                 </View>
-                <Text style={[pdfStyles.frontInfo, { marginTop: 20 }]}>
-                    Datum: {format(new Date(), "d MMMM yyyy", { locale: nl })}
-                </Text>
+
+                <View
+                    style={[
+                        pdfStyles.frontTitleContainer,
+                        { alignItems: "center" },
+                    ]}
+                >
+                    <Text
+                        style={[pdfStyles.frontTitle, { textAlign: "center" }]}
+                    >
+                        Bemestingsplan
+                    </Text>
+                    <Text
+                        style={[
+                            pdfStyles.frontSubtitle,
+                            { textAlign: "center", color: "#FFFFFF" },
+                        ]}
+                    >
+                        {data.year}
+                    </Text>
+                </View>
+            </View>
+
+            <View style={pdfStyles.frontFooter}>
+                <Text style={pdfStyles.frontFarmName}>{data.farm.name}</Text>
+                <View style={{ marginTop: 10, opacity: 0.8 }}>
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <Text style={pdfStyles.frontInfo}>
+                            KvK: {data.farm.kvk || "-"}
+                        </Text>
+                        <Text style={pdfStyles.frontInfo}>
+                            Oppervlakte: {data.totalArea.toFixed(1)} ha
+                        </Text>
+                    </View>
+                    <Text style={[pdfStyles.frontInfo, { marginTop: 20 }]}>
+                        Datum:{" "}
+                        {format(new Date(), "d MMMM yyyy", { locale: nl })}
+                    </Text>
+                </View>
             </View>
         </View>
         <Footer
@@ -469,19 +490,15 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
         <Page size="A4" style={pdfStyles.page} id="farm-summary">
             <View style={pdfStyles.header}>
                 <View>
-                    {data.config.logo ? (
-                        <Image src={data.config.logo} style={pdfStyles.logo} />
-                    ) : (
-                        <Text
-                            style={{
-                                fontSize: 18,
-                                fontWeight: "bold",
-                                color: "#0f172a",
-                            }}
-                        >
-                            {data.config.name}
-                        </Text>
-                    )}
+                    <Text
+                        style={{
+                            fontSize: 18,
+                            fontWeight: "bold",
+                            color: "#0f172a",
+                        }}
+                    >
+                        {data.config.name}
+                    </Text>
                 </View>
                 <View style={{ alignItems: "flex-end" }}>
                     <Text style={pdfStyles.title}>
