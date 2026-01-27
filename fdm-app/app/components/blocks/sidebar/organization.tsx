@@ -72,6 +72,24 @@ export function SidebarOrganization({
         organizationLinkDisplay = "Organisatie Dashboard"
     }
 
+    function getLinkForYear(pathname: string, item: string) {
+        // Construct the new URL with the selected calendar
+        if (!organization) return pathname
+        const prefix = `/organization/${organization.slug}/`
+        if (pathname.length <= prefix.length) {
+            return pathname
+        }
+        const suffixStart = pathname.indexOf("/", prefix.length)
+        if (suffixStart === -1) {
+            return pathname
+        }
+        const toReplace = pathname.substring(prefix.length, suffixStart)
+        if (!/(\d{4}|all)/.test(toReplace)) {
+            return pathname
+        }
+        return `${prefix}${item}${pathname.substring(suffixStart)}`
+    }
+
     return (
         <>
             <SidebarGroup>
@@ -180,50 +198,42 @@ export function SidebarOrganization({
                                     </CollapsibleTrigger>
                                     <CollapsibleContent>
                                         <SidebarMenuSub>
-                                            {calendarSelection?.map((item) => {
-                                                // Construct the new URL with the selected calendar
-                                                const newUrl =
-                                                    location.pathname.replace(
-                                                        /\/(\d{4}|all)/,
-                                                        `/${item}`,
-                                                    )
-                                                return (
-                                                    <SidebarMenuSubItem
-                                                        key={item}
-                                                        className={
-                                                            selectedCalendar ===
-                                                            item
-                                                                ? "bg-accent text-accent-foreground"
-                                                                : ""
+                                            {calendarSelection?.map((item) => (
+                                                <SidebarMenuSubItem
+                                                    key={item}
+                                                    className={
+                                                        selectedCalendar ===
+                                                        item
+                                                            ? "bg-accent text-accent-foreground"
+                                                            : ""
+                                                    }
+                                                >
+                                                    <SidebarMenuSubButton
+                                                        asChild
+                                                        onClick={() =>
+                                                            setCalendar(item)
                                                         }
                                                     >
-                                                        <SidebarMenuSubButton
-                                                            asChild
-                                                            onClick={() =>
-                                                                setCalendar(
-                                                                    item,
-                                                                )
-                                                            }
+                                                        <NavLink
+                                                            to={getLinkForYear(
+                                                                location.pathname,
+                                                                item,
+                                                            )}
+                                                            className="flex items-center"
                                                         >
-                                                            <NavLink
-                                                                to={newUrl}
-                                                                className="flex items-center"
-                                                            >
-                                                                <span>
-                                                                    {item ===
-                                                                    "all"
-                                                                        ? "Alle jaren"
-                                                                        : item}
-                                                                </span>
-                                                                {selectedCalendar ===
-                                                                    item && (
-                                                                    <Check className="ml-auto h-4 w-4" />
-                                                                )}
-                                                            </NavLink>
-                                                        </SidebarMenuSubButton>
-                                                    </SidebarMenuSubItem>
-                                                )
-                                            })}
+                                                            <span>
+                                                                {item === "all"
+                                                                    ? "Alle jaren"
+                                                                    : item}
+                                                            </span>
+                                                            {selectedCalendar ===
+                                                                item && (
+                                                                <Check className="ml-auto h-4 w-4" />
+                                                            )}
+                                                        </NavLink>
+                                                    </SidebarMenuSubButton>
+                                                </SidebarMenuSubItem>
+                                            ))}
                                         </SidebarMenuSub>
                                     </CollapsibleContent>
                                 </SidebarMenuItem>
