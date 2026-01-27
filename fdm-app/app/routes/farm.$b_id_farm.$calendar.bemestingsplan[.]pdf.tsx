@@ -169,26 +169,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                                 calendar,
                             })
 
-                            const yearAdvice =
-                                (result as any).data?.year ||
-                                (result as any).year ||
-                                result
-                            if (yearAdvice && typeof yearAdvice === "object") {
+                            if (result) {
                                 adviceKgHa = {
-                                    d_n_req: yearAdvice.d_n_req || 0,
-                                    d_p_req: yearAdvice.d_p_req || 0,
-                                    d_k_req: yearAdvice.d_k_req || 0,
-                                    d_mg_req: yearAdvice.d_mg_req || 0,
-                                    d_s_req: yearAdvice.d_s_req || 0,
-                                    d_c_req: yearAdvice.d_c_req || 0,
-                                    d_ca_req: yearAdvice.d_ca_req || 0,
-                                    d_na_req: yearAdvice.d_na_req || 0,
-                                    d_cu_req: yearAdvice.d_cu_req || 0,
-                                    d_zn_req: yearAdvice.d_zn_req || 0,
-                                    d_co_req: yearAdvice.d_co_req || 0,
-                                    d_mn_req: yearAdvice.d_mn_req || 0,
-                                    d_mo_req: yearAdvice.d_mo_req || 0,
-                                    d_b_req: yearAdvice.d_b_req || 0,
+                                    d_n_req: result.d_n_req || 0,
+                                    d_p_req: result.d_p_req || 0,
+                                    d_k_req: result.d_k_req || 0,
+                                    d_mg_req: result.d_mg_req || 0,
+                                    d_s_req: result.d_s_req || 0,
+                                    d_c_req: result.d_c_req || 0,
+                                    d_ca_req: result.d_ca_req || 0,
+                                    d_na_req: result.d_na_req || 0,
+                                    d_cu_req: result.d_cu_req || 0,
+                                    d_zn_req: result.d_zn_req || 0,
+                                    d_co_req: result.d_co_req || 0,
+                                    d_mn_req: result.d_mn_req || 0,
+                                    d_mo_req: result.d_mo_req || 0,
+                                    d_b_req: result.d_b_req || 0,
                                 }
                             }
                         }

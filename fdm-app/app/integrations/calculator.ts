@@ -14,6 +14,7 @@ import {
     type NitrogenBalanceNumeric,
     type OrganicMatterBalanceFieldResultNumeric,
     type OrganicMatterBalanceNumeric,
+    type NutrientAdvice,
 } from "@svenvw/fdm-calculator"
 import {
     type FdmType,
@@ -166,7 +167,7 @@ export async function getNutrientAdviceForField({
     b_centroid: Field["b_centroid"]
     timeframe: Timeframe
     calendar: string
-}) {
+}): Promise<NutrientAdvice> {
     const nmiApiKey = getNmiApiKey()
 
     const currentSoilData = await getCurrentSoilData(fdm, principal_id, b_id)
@@ -182,7 +183,7 @@ export async function getNutrientAdviceForField({
     let b_lu_catalogue: string | null
 
     if (!cultivations.length) {
-        b_lu_catalogue = null
+        b_lu_catalogue = "nl_6794" // Set to 'braak' when no cultivation is present
     } else {
         const mainCultivation =
             getDefaultCultivation(cultivations, calendar) || cultivations[0]
