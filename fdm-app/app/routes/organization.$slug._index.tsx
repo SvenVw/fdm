@@ -14,6 +14,7 @@ import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { FarmContent } from "../components/blocks/farm/farm-content"
 import type { Route } from "./+types/organization.$slug._index"
+import { useCalendarStore } from "../store/calendar"
 
 export async function loader({ params, request }: Route.LoaderArgs) {
     try {
@@ -55,6 +56,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
  */
 export default function AppIndex() {
     const loaderData = useLoaderData<typeof loader>()
+    const selectedCalendar = useCalendarStore((store) => store.calendar)
 
     return (
         <main>
@@ -71,27 +73,6 @@ export default function AppIndex() {
                                 Overzicht
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <NavLink to="farms">
-                                    <Card className="transition-all hover:shadow-md">
-                                        <CardHeader>
-                                            <div className="flex items-center gap-4">
-                                                <div className="rounded-lg bg-primary text-primary-foreground p-3">
-                                                    <House className="h-6 w-6" />
-                                                </div>
-                                                <div>
-                                                    <CardTitle>
-                                                        Bedrijven
-                                                    </CardTitle>
-                                                    <CardDescription>
-                                                        Uitgebreide tabel met
-                                                        bedrijven met toegang
-                                                        tot deze organisatie, .
-                                                    </CardDescription>
-                                                </div>
-                                            </div>
-                                        </CardHeader>
-                                    </Card>
-                                </NavLink>
                                 <NavLink to={"members"}>
                                     <Card className="transition-all hover:shadow-md">
                                         <CardHeader>
@@ -106,6 +87,27 @@ export default function AppIndex() {
                                                         gebruikers die toegang
                                                         hebben tot deze
                                                         organisatie.
+                                                    </CardDescription>
+                                                </div>
+                                            </div>
+                                        </CardHeader>
+                                    </Card>
+                                </NavLink>
+                                <NavLink to={`${selectedCalendar}/farms`}>
+                                    <Card className="transition-all hover:shadow-md">
+                                        <CardHeader>
+                                            <div className="flex items-center gap-4">
+                                                <div className="rounded-lg bg-primary text-primary-foreground p-3">
+                                                    <House className="h-6 w-6" />
+                                                </div>
+                                                <div>
+                                                    <CardTitle>
+                                                        Bedrijven
+                                                    </CardTitle>
+                                                    <CardDescription>
+                                                        Uitgebreide tabel met
+                                                        bedrijven met toegang
+                                                        tot deze organisatie, .
                                                     </CardDescription>
                                                 </div>
                                             </div>

@@ -1,7 +1,24 @@
 import type { Organization } from "better-auth/plugins"
-import { Building, Cog, House, Mail, Users } from "lucide-react"
+import {
+    Building,
+    Calendar,
+    Check,
+    ChevronRight,
+    Cog,
+    House,
+    Mail,
+    Users,
+} from "lucide-react"
+import { useState } from "react"
 import { NavLink, useLocation } from "react-router"
+import { getCalendarSelection } from "@/app/lib/calendar"
+import { useCalendarStore } from "@/app/store/calendar"
 import { Badge } from "~/components/ui/badge"
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "~/components/ui/collapsible"
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -9,6 +26,9 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
 } from "~/components/ui/sidebar"
 
 export function SidebarOrganization({
@@ -32,6 +52,11 @@ export function SidebarOrganization({
     }
 
     const location = useLocation()
+
+    const selectedCalendar = useCalendarStore((state) => state.calendar)
+    const setCalendar = useCalendarStore((state) => state.setCalendar)
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+    const calendarSelection = getCalendarSelection()
 
     const organizationRole = roles?.length ? getSuperiorRole(roles) : null
     // Set the farm link
@@ -155,6 +180,94 @@ export function SidebarOrganization({
                                 </SidebarMenuButton>
                             )}
                         </SidebarMenuItem>
+                        {organization ? (
+                            <Collapsible
+                                asChild
+                                defaultOpen={false}
+                                className="group/collapsible"
+                                onOpenChange={setIsCalendarOpen}
+                            >
+                                <SidebarMenuItem>
+                                    <CollapsibleTrigger asChild>
+                                        <SidebarMenuButton
+                                            tooltip={"Kalender"}
+                                            className="flex items-center"
+                                        >
+                                            <Calendar />
+                                            <span>Kalender </span>
+                                            {!isCalendarOpen && (
+                                                <Badge className="ml-1">
+                                                    {selectedCalendar === "all"
+                                                        ? "Alle jaren"
+                                                        : selectedCalendar}
+                                                </Badge>
+                                            )}
+                                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                        </SidebarMenuButton>
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent>
+                                        <SidebarMenuSub>
+                                            {calendarSelection?.map((item) => {
+                                                // Construct the new URL with the selected calendar
+                                                const newUrl =
+                                                    location.pathname.replace(
+                                                        /\/(\d{4}|all)/,
+                                                        `/${item}`,
+                                                    )
+                                                return (
+                                                    <SidebarMenuSubItem
+                                                        key={item}
+                                                        className={
+                                                            selectedCalendar ===
+                                                            item
+                                                                ? "bg-accent text-accent-foreground"
+                                                                : ""
+                                                        }
+                                                    >
+                                                        <SidebarMenuSubButton
+                                                            asChild
+                                                            onClick={() =>
+                                                                setCalendar(
+                                                                    item,
+                                                                )
+                                                            }
+                                                        >
+                                                            <NavLink
+                                                                to={newUrl}
+                                                                className="flex items-center"
+                                                            >
+                                                                <span>
+                                                                    {item ===
+                                                                    "all"
+                                                                        ? "Alle jaren"
+                                                                        : item}
+                                                                </span>
+                                                                {selectedCalendar ===
+                                                                    item && (
+                                                                    <Check className="ml-auto h-4 w-4" />
+                                                                )}
+                                                            </NavLink>
+                                                        </SidebarMenuSubButton>
+                                                    </SidebarMenuSubItem>
+                                                )
+                                            })}
+                                        </SidebarMenuSub>
+                                    </CollapsibleContent>
+                                </SidebarMenuItem>
+                            </Collapsible>
+                        ) : (
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    asChild
+                                    className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                                >
+                                    <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                        <Calendar />
+                                        <span>Kalender</span>
+                                    </span>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        )}
                         <SidebarMenuItem>
                             {organization ? (
                                 <SidebarMenuButton
@@ -191,7 +304,7 @@ export function SidebarOrganization({
                                     )}
                                 >
                                     <NavLink
-                                        to={`/organization/${organization.slug}/farms`}
+                                        to={`/organization/${organization.slug}/${selectedCalendar}/farms`}
                                     >
                                         <House />
                                         <span>Bedrijven</span>

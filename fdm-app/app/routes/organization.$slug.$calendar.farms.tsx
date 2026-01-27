@@ -5,13 +5,15 @@ import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { columns } from "~/components/blocks/farms/columns"
 import { DataTable } from "~/components/blocks/farms/table"
 import { auth } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
 import { handleLoaderError } from "~/lib/error"
-
 import { fdm } from "~/lib/fdm.server"
-import type { Route } from "./+types/organization.$slug.farms"
+import type { Route } from "./+types/organization.$slug.$calendar.farms"
 
 export async function loader({ params, request }: Route.LoaderArgs) {
     try {
+        const timeframe = getTimeframe(params)
+
         const organizations = await auth.api.listOrganizations({
             headers: request.headers,
         })
@@ -52,6 +54,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
                         fdm,
                         myOrganization.id,
                         farm.b_id_farm,
+                        timeframe,
                     )
 
                     let b_area = 0
@@ -103,7 +106,10 @@ export default function OrganizationFarmsPage() {
             <FarmTitle
                 title={`Bedrijven met toegang door ${organization.name}`}
                 description="Klik op een bedrijfsnaam voor meer informatie."
-                action={{ label: "Terug naar overzicht", to: "./.." }}
+                action={{
+                    label: "Terug naar overzicht",
+                    to: `/organization/${organization.slug}`,
+                }}
             />
             {data.length ? (
                 <FarmContent>
