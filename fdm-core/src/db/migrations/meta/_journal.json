@@ -162,13 +162,6 @@
             "when": 1768485087753,
             "tag": "0022_calculate_bufferstrips",
             "breakpoints": true
-        },
-        {
-            "idx": 23,
-            "version": "7",
-            "when": 1769510473267,
-            "tag": "0023_organization_metadata_col_type",
-            "breakpoints": true
         }
     ]
 }
