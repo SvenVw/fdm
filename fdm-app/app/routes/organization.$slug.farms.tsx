@@ -105,11 +105,25 @@ export default function OrganizationFarmsPage() {
                 description="Klik op een bedrijfsnaam voor meer informatie."
                 action={{ label: "Terug naar overzicht", to: "./.." }}
             />
-            <FarmContent>
-                <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
-                    <DataTable columns={columns} data={data} />
+            {data.length ? (
+                <FarmContent>
+                    <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
+                        <DataTable columns={columns} data={data} />
+                    </div>
+                </FarmContent>
+            ) : (
+                <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
+                    <div className="flex flex-col space-y-2 text-center">
+                        <h1 className="text-2xl font-semibold tracking-tight">
+                            Het lijkt erop dat je nog geen bouwplan hebt :(
+                        </h1>
+                        <p>
+                            Neem contact op met bedrijven om toegang tot hen te
+                            krijgen.
+                        </p>
+                    </div>
                 </div>
-            </FarmContent>
+            )}
         </main>
     )
 }
