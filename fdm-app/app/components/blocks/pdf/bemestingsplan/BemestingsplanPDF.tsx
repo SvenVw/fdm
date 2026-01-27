@@ -1040,7 +1040,6 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
 
         {/* Page 4: Fields Overview Table */}
         <Page size="A4" orientation="landscape" style={pdfStyles.page}>
-            <Footer config={data.config} />
             <View style={pdfStyles.header} id="fields-overview">
                 <Text style={pdfStyles.title}>
                     Overzicht percelen {data.year}
@@ -1200,7 +1199,6 @@ export const BemestingsplanPDF = ({ data }: { data: BemestingsplanData }) => (
             .filter((f) => !f.isBufferstrip)
             .map((field) => (
                 <Page key={field.id} size="A4" style={pdfStyles.page}>
-                    <Footer config={data.config} />
                     <Text
                         style={[pdfStyles.miniHeader, { opacity: 0.6 }]}
                         fixed
