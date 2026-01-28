@@ -9,6 +9,7 @@ import {
     getFilteredRowModel,
     getSortedRowModel,
     type Row,
+    type RowSelectionState,
     type SortingState,
     useReactTable,
     type VisibilityState,
@@ -22,8 +23,8 @@ import { NavLink, useLocation, useParams } from "react-router-dom"
 import { toast as notify } from "sonner"
 import { modifySearchParams } from "@/app/lib/url-utils"
 import { useActiveTableFormStore } from "@/app/store/active-table-form"
-import { useFieldFilterStore } from "@/app/store/field-filter"
-import { useFieldSelectionStore } from "@/app/store/field-selection"
+import { useRotationFilterStore } from "@/app/store/field-filter"
+import { useRotationSelectionStore } from "@/app/store/rotation-selection"
 import { Button } from "~/components/ui/button"
 import {
     DropdownMenu,
@@ -64,7 +65,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-    const fieldFilter = useFieldFilterStore()
+    const fieldFilter = useRotationFilterStore()
     const isMobile = useIsMobile()
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
         isMobile
@@ -74,9 +75,11 @@ export function DataTable<TData extends RotationExtended, TValue>({
     const lastSelectedRowIndex = useRef<string | null>(null)
     const location = useLocation()
 
-    const fieldIds = useFieldSelectionStore((state) => state.fieldIds)
-    const setFieldIds = useFieldSelectionStore((state) => state.setFieldIds)
-    const syncFarm = useFieldSelectionStore((state) => state.syncFarm)
+    const selection = useRotationSelectionStore((state) => state.selection)
+    const setSelection = useRotationSelectionStore(
+        (state) => state.setSelection,
+    )
+    const syncFarm = useRotationSelectionStore((state) => state.syncFarm)
 
     useEffect(() => {
         setColumnVisibility(
@@ -100,6 +103,24 @@ export function DataTable<TData extends RotationExtended, TValue>({
     const clearActiveForm = useActiveTableFormStore(
         (store) => store.clearActiveForm,
     )
+
+    function handleSelection(rowSelection: RowSelectionState) {
+        // Sync to store
+        const newSelection = Object.fromEntries(
+            table
+                .getFilteredRowModel()
+                .rows.map((row) => [
+                    (row.original as CropRow).b_lu_catalogue,
+                    Object.fromEntries(
+                        row.subRows.map((fieldRow) => [
+                            (fieldRow.original as FieldRow).b_id,
+                            rowSelection[fieldRow.id],
+                        ]),
+                    ),
+                ]),
+        )
+        setSelection(newSelection)
+    }
 
     const handleRowClick = (
         row: Row<TData>,
@@ -151,11 +172,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
                     }
                 }
 
-                // Sync to store
-                const newFieldIds = Object.keys(newRowSelection).filter(
-                    (k) => !k.startsWith("crop_") && newRowSelection[k],
-                )
-                setFieldIds(newFieldIds)
+                handleSelection(newRowSelection)
             }
         } else {
             lastSelectedRowIndex.current = null
@@ -222,33 +239,23 @@ export function DataTable<TData extends RotationExtended, TValue>({
     }
 
     const rowSelection = useMemo(() => {
-        const sel: Record<string, boolean> = {}
-        for (const id of fieldIds) {
-            sel[id] = true
-        }
-        for (const row of memoizedData) {
-            if (row.type === "crop") {
-                let all = true
-                let has = false
-                for (const field of row.fields) {
-                    has = true
-                    if (fieldIds.includes(field.b_id)) {
-                        sel[field.b_id] = true
-                    } else {
-                        all = false
-                    }
-                }
-                if (has && all) {
-                    sel[`crop_${row.b_lu_catalogue}`] = true
-                }
-            } else {
-                if (fieldIds.includes(row.b_id)) {
-                    sel[row.b_id] = true
-                }
-            }
-        }
-        return sel
-    }, [fieldIds, memoizedData])
+        return Object.fromEntries([
+            // Crop selection state is derived from whether all its fields are selected
+            ...memoizedData.map((crop) => [
+                `crop_${crop.b_lu_catalogue}`,
+                crop.fields.every(
+                    (field) => selection[crop.b_lu_catalogue]?.[field.b_id],
+                ),
+            ]),
+            // Include each field's selection state too
+            ...memoizedData.flatMap((crop) =>
+                crop.fields.map((field) => [
+                    field.b_id,
+                    selection[crop.b_lu_catalogue]?.[field.b_id],
+                ]),
+            ),
+        ])
+    }, [selection, memoizedData])
 
     const table = useReactTable({
         data: memoizedData,
@@ -274,10 +281,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
         },
         onRowSelectionChange: (fn) => {
             const selection = typeof fn === "function" ? fn(rowSelection) : fn
-            const newFieldIds = Object.keys(selection).filter(
-                (k) => !k.startsWith("crop_") && selection[k],
-            )
-            setFieldIds(newFieldIds)
+            handleSelection(selection)
         },
         globalFilterFn: fuzzySearchAndProductivityFilter,
         // There are nulls in the columns which can cause false assumptions if this is not provided
