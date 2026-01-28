@@ -2,14 +2,14 @@ import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import { ssrSafeSessionJSONStorage } from "./storage"
 
-interface FieldSelectionState {
+interface RotationSelectionState {
     farmId: string | null
     selection: Record<string, Record<string, boolean>>
     setSelection: (selection: Record<string, Record<string, boolean>>) => void
     syncFarm: (farmId: string) => void
 }
 
-export const useRotationSelectionStore = create<FieldSelectionState>()(
+export const useRotationSelectionStore = create<RotationSelectionState>()(
     persist(
         (set, get) => ({
             farmId: null,
