@@ -6,7 +6,6 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { z } from "zod"
 import { cn } from "@/app/lib/utils"
 import { Dropzone } from "~/components/custom/dropzone"
-import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -23,6 +22,7 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Progress } from "~/components/ui/progress"
+import { Spinner } from "~/components/ui/spinner"
 
 type UploadStatus = "idle" | "uploading" | "success" | "error"
 

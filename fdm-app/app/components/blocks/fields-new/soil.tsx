@@ -1,4 +1,10 @@
+import type {
+    CurrentSoilData,
+    SoilParameterDescription,
+} from "@svenvw/fdm-core"
+import { Plus } from "lucide-react"
 import { NavLink, useLocation } from "react-router"
+import { SoilDataCards } from "~/components/blocks/soil/cards"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -7,13 +13,7 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { Plus } from "lucide-react"
 import { Separator } from "~/components/ui/separator"
-import { SoilDataCards } from "~/components/blocks/soil/cards"
-import type {
-    CurrentSoilData,
-    SoilParameterDescription,
-} from "@svenvw/fdm-core"
 
 export function NewFieldSoilAnalysisBlock({
     b_id,

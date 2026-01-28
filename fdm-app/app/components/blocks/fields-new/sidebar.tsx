@@ -1,4 +1,7 @@
+import { ArrowLeft } from "lucide-react"
+import { useMemo } from "react"
 import { NavLink, useLocation } from "react-router"
+import { useFieldFilterStore } from "@/app/store/field-filter"
 import { FieldFilterToggle } from "../../custom/field-filter-toggle"
 import { SidebarPage } from "../../custom/sidebar-page"
 import { Button } from "../../ui/button"
@@ -9,9 +12,6 @@ import {
     CardHeader,
     CardTitle,
 } from "../../ui/card"
-import { ArrowLeft } from "lucide-react"
-import { useMemo } from "react"
-import { useFieldFilterStore } from "@/app/store/field-filter"
 
 export function NewFieldsSidebar({
     fields,

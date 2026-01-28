@@ -18,7 +18,6 @@ import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
-import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -46,6 +45,7 @@ import {
     SelectValue,
 } from "~/components/ui/select"
 import { SidebarInset } from "~/components/ui/sidebar"
+import { Spinner } from "~/components/ui/spinner"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"

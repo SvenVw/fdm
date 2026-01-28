@@ -6,6 +6,7 @@ import {
     getRegion,
     isFieldInNVGebied,
 } from "../../2025/value/stikstofgebruiksnorm"
+import { nonBouwlandCodes } from "../../constant"
 import type { GebruiksnormResult } from "../../types"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {
@@ -15,7 +16,6 @@ import type {
     NormsByRegion,
     RegionKey,
 } from "./types"
-import { nonBouwlandCodes } from "../../constant"
 
 /**
  * Retrieves the appropriate set of nitrogen norms (`NormsByRegion`) for a given cultivation.

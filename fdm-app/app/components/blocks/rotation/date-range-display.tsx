@@ -1,7 +1,7 @@
-import { cn } from "@/app/lib/utils"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
 import React from "react"
+import { cn } from "@/app/lib/utils"
 
 export function DateRangeDisplay({
     range,

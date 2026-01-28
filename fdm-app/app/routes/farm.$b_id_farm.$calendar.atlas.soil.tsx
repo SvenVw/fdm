@@ -1,6 +1,6 @@
 import { getFields } from "@svenvw/fdm-core"
 import { simplify } from "@turf/turf"
-import type { Feature, FeatureCollection, Geometry } from "geojson"
+import type { FeatureCollection, Geometry } from "geojson"
 import maplibregl from "maplibre-gl"
 import proj4 from "proj4"
 import { useCallback, useEffect, useRef, useState } from "react"
@@ -19,13 +19,13 @@ import {
     type MetaFunction,
     useLoaderData,
 } from "react-router"
-import { Badge } from "~/components/ui/badge"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
 import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
+import { Badge } from "~/components/ui/badge"
 import { getMapStyle } from "~/integrations/map"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
@@ -155,7 +155,10 @@ export default function FarmAtlasSoilBlock() {
     useEffect(() => {
         if (typeof window !== "undefined") {
             try {
-                sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
+                sessionStorage.setItem(
+                    "mapViewState",
+                    JSON.stringify(viewState),
+                )
             } catch {
                 // ignore storage errors (e.g., private mode)
             }

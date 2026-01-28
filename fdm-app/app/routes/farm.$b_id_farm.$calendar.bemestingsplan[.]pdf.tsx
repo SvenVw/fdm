@@ -1,35 +1,35 @@
+import fs from "node:fs"
+import path from "node:path"
+import { Readable } from "node:stream"
 import { renderToStream } from "@react-pdf/renderer"
 import {
-    getFarm,
-    getFields,
-    getCultivations,
-    getCurrentSoilData,
-} from "@svenvw/fdm-core"
-import {
-    collectInputForOrganicMatterBalance,
-    aggregateNormsToFarmLevel,
     aggregateNormFillingsToFarmLevel,
+    aggregateNormsToFarmLevel,
+    collectInputForOrganicMatterBalance,
     getOrganicMatterBalanceField,
 } from "@svenvw/fdm-calculator"
-import { data, type LoaderFunctionArgs } from "react-router"
-import { Readable } from "node:stream"
-import path from "node:path"
-import fs from "node:fs"
+import {
+    getCultivations,
+    getCurrentSoilData,
+    getFarm,
+    getFields,
+} from "@svenvw/fdm-core"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
-import { getSession } from "~/lib/auth.server"
-import { getTimeframe, getCalendar } from "~/lib/calendar"
-import { fdm } from "~/lib/fdm.server"
-import { getDefaultCultivation } from "~/lib/cultivation-helpers"
-import { handleLoaderError } from "~/lib/error"
-import { clientConfig } from "~/lib/config"
+import { data, type LoaderFunctionArgs } from "react-router"
+import { BemestingsplanPDF } from "~/components/blocks/pdf/bemestingsplan/BemestingsplanPDF"
+import type { BemestingsplanData } from "~/components/blocks/pdf/bemestingsplan/types"
 import {
     getNorms,
     getNutrientAdviceForField,
     getPlannedDosesForField,
 } from "~/integrations/calculator"
-import type { BemestingsplanData } from "~/components/blocks/pdf/bemestingsplan/types"
-import { BemestingsplanPDF } from "~/components/blocks/pdf/bemestingsplan/BemestingsplanPDF"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { getDefaultCultivation } from "~/lib/cultivation-helpers"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 
 const formatDate = (date: Date | null | undefined) => {
     if (!date) return "-"
@@ -99,7 +99,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     const fieldOmInput = omInput.fields.find(
                         (f) => f.field.b_id === field.b_id,
                     )
-                    let omBalanceResult = undefined
+                    let omBalanceResult
                     if (fieldOmInput) {
                         omBalanceResult = await getOrganicMatterBalanceField(
                             fdm,

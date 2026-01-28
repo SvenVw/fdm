@@ -112,13 +112,10 @@ export default function Index() {
                             <NavLink
                                 to={`/farm/create/${b_id_farm}/${calendar}/rotation`}
                                 className={cn("ml-auto", {
-                                    "pointer-events-none":
-                                        fields.length === 0,
+                                    "pointer-events-none": fields.length === 0,
                                 })}
                             >
-                                <Button
-                                    disabled={fields.length === 0}
-                                >
+                                <Button disabled={fields.length === 0}>
                                     Doorgaan
                                 </Button>
                             </NavLink>

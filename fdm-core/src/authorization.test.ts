@@ -172,7 +172,7 @@ describe("Authorization Functions", () => {
 
         it("should grant access through the organization", async () => {
             await grantRole(fdm, "farm", "owner", farm_id, organization_id)
-            
+
             await checkPermission(
                 fdm,
                 "farm",
@@ -200,7 +200,7 @@ describe("Authorization Functions", () => {
 
         it("should not grant permissions higher than the organization permissions", async () => {
             await grantRole(fdm, "farm", "researcher", farm_id, organization_id)
-            
+
             await expect(
                 checkPermission(
                     fdm,
@@ -602,7 +602,7 @@ describe("Authorization Functions", () => {
             const farm_id2 = createId()
             await grantRole(fdm, "farm", "owner", farm_id, organization_id)
             await grantRole(fdm, "farm", "advisor", farm_id2, organization_id)
-            
+
             const accessibleResources = await listResources(
                 fdm,
                 "farm",
@@ -623,7 +623,7 @@ describe("Authorization Functions", () => {
                 organization_member_id,
             )
             await grantRole(fdm, "farm", "advisor", farm_id, organization_id)
-            
+
             const accessibleResources = await listResources(
                 fdm,
                 "farm",
@@ -765,7 +765,7 @@ describe("Authorization Functions", () => {
 
         it("should get roles derived from an organization", async () => {
             await grantRole(fdm, "farm", "researcher", farm_id, organization_id)
-            
+
             const roles = await getRolesOfPrincipalForResource(
                 fdm,
                 "farm",
@@ -784,7 +784,7 @@ describe("Authorization Functions", () => {
                 organization_member_id,
             )
             await grantRole(fdm, "farm", "owner", farm_id, organization_id)
-            
+
             const roles = await getRolesOfPrincipalForResource(
                 fdm,
                 "farm",

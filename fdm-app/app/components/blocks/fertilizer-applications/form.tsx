@@ -9,7 +9,6 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { useFieldFertilizerFormStore } from "@/app/store/field-fertilizer-form"
 import { Combobox } from "~/components/custom/combobox"
 import { DatePicker } from "~/components/custom/date-picker"
-import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     FormControl,
@@ -27,6 +26,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import { Spinner } from "~/components/ui/spinner"
 import {
     Tooltip,
     TooltipContent,

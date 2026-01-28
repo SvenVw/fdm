@@ -7,7 +7,6 @@ import type { z } from "zod"
 import { FormSchema } from "@/app/components/blocks/soil/formschema"
 import type { SoilAnalysis } from "@/app/components/blocks/soil/types"
 import { DatePicker } from "~/components/custom/date-picker"
-import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     FormControl,
@@ -25,6 +24,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import { Spinner } from "~/components/ui/spinner"
 import { cn } from "~/lib/utils"
 
 export function SoilAnalysisForm(props: {

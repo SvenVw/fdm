@@ -21,10 +21,10 @@ import {
     useLoaderData,
     useLocation,
 } from "react-router"
+import { BufferStripWarning } from "~/components/blocks/balance/buffer-strip-warning"
 import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 import NitrogenBalanceDetails from "~/components/blocks/balance/nitrogen-details"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons"
-import { BufferStripWarning } from "~/components/blocks/balance/buffer-strip-warning"
 import { Button } from "~/components/ui/button"
 import {
     Card,

@@ -4,7 +4,6 @@ import { useFetcher } from "react-router"
 import { RemixFormProvider } from "remix-hook-form"
 import { cn } from "@/app/lib/utils"
 import { useActiveTableFormStore } from "@/app/store/active-table-form"
-import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Select,
@@ -13,6 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import { Spinner } from "~/components/ui/spinner"
 import type { CropRow, RotationExtended } from "./columns"
 import type { RotationTableFormSchemaType } from "./schema"
 

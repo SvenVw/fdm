@@ -1,12 +1,3 @@
-import {
-    getCultivations,
-    getCultivationsFromCatalogue,
-    getFertilizerApplications,
-    getFertilizers,
-    getFields,
-    getHarvests,
-    getSoilAnalyses,
-} from "@svenvw/fdm-core"
 import type {
     Cultivation,
     CultivationCatalogue,
@@ -19,11 +10,20 @@ import type {
     PrincipalId,
     SoilAnalysis,
 } from "@svenvw/fdm-core"
+import {
+    getCultivations,
+    getCultivationsFromCatalogue,
+    getFertilizerApplications,
+    getFertilizers,
+    getFields,
+    getHarvests,
+    getSoilAnalyses,
+} from "@svenvw/fdm-core"
+import Decimal from "decimal.js"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { collectInputForNitrogenBalance } from "./input"
-import type { FieldInput, NitrogenBalanceInput } from "./types"
 import { calculateAllFieldsNitrogenSupplyByDeposition } from "./supply/deposition"
-import Decimal from "decimal.js"
+import type { FieldInput, NitrogenBalanceInput } from "./types"
 
 // Mock the @svenvw/fdm-core module
 vi.mock("@svenvw/fdm-core", async () => {

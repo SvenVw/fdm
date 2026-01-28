@@ -1,6 +1,7 @@
 import { type FdmType, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import pkg from "../../package"
+import { convertDecimalToNumberRecursive } from "../shared/conversion"
 import { combineSoilAnalyses } from "../shared/soil"
 import { calculateNitrogenEmission } from "./emission"
 import { calculateNitrogenEmissionViaNitrate } from "./emission/nitrate"
@@ -16,7 +17,6 @@ import type {
     NitrogenBalanceNumeric,
     SoilAnalysisPicked,
 } from "./types"
-import { convertDecimalToNumberRecursive } from "../shared/conversion"
 
 /**
  * Calculates the nitrogen balance for an entire farm.

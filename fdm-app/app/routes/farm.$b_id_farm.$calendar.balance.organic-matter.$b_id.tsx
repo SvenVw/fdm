@@ -15,10 +15,10 @@ import {
     useLoaderData,
     useLocation,
 } from "react-router"
+import { BufferStripWarning } from "~/components/blocks/balance/buffer-strip-warning"
 import { OrganicMatterBalanceChart } from "~/components/blocks/balance/organic-matter-chart"
 import OrganicMatterBalanceDetails from "~/components/blocks/balance/organic-matter-details"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons"
-import { BufferStripWarning } from "~/components/blocks/balance/buffer-strip-warning"
 import { Button } from "~/components/ui/button"
 import {
     Card,

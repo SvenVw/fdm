@@ -32,7 +32,6 @@ import {
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
-import { Spinner } from "~/components/ui/spinner"
 import {
     Accordion,
     AccordionContent,
@@ -62,6 +61,7 @@ import {
 } from "~/components/ui/dialog"
 import { Label } from "~/components/ui/label"
 import { SidebarInset } from "~/components/ui/sidebar"
+import { Spinner } from "~/components/ui/spinner"
 import {
     Tooltip,
     TooltipContent,

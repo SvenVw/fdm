@@ -4,9 +4,11 @@ import {
     ArrowRightLeft,
     BookOpenText,
     ChevronUp,
+    DownloadIcon,
     Home,
     Icon,
     Landmark,
+    Loader2,
     MapIcon,
     ScrollText,
     Shapes,
@@ -14,9 +16,8 @@ import {
     Square,
     Trash2,
     UserRoundCheck,
-    Loader2,
-    DownloadIcon,
 } from "lucide-react"
+import { useState } from "react"
 import {
     data,
     type LoaderFunctionArgs,
@@ -24,6 +25,7 @@ import {
     NavLink,
     useLoaderData,
 } from "react-router"
+import { toast } from "sonner"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
@@ -50,8 +52,6 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
-import { toast } from "sonner"
-import { useState } from "react"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -376,9 +376,8 @@ export default function FarmDashboardIndex() {
                                                         Download bemestingsplan
                                                     </CardTitle>
                                                     <CardDescription>
-                                                        pdf met
-                                                        gebruiksruimte en
-                                                        bemestingsadvies op
+                                                        pdf met gebruiksruimte
+                                                        en bemestingsadvies op
                                                         bedrijfs- en
                                                         perceelsniveau.
                                                     </CardDescription>

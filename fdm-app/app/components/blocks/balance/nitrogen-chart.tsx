@@ -243,7 +243,9 @@ function buildChartDataAndLegend({
             if (!styles[styleId]) {
                 styles[styleId] = {
                     ...styles[""],
-                    color: getCultivationColor(cultivation.b_lu_croprotation ?? undefined),
+                    color: getCultivationColor(
+                        cultivation.b_lu_croprotation ?? undefined,
+                    ),
                 }
             }
             chartData[dataKey] = Math.abs(cultivationResult.value)

@@ -1,4 +1,4 @@
-import { type OrganicMatterBalanceFieldResultNumeric } from "@svenvw/fdm-calculator"
+import type { OrganicMatterBalanceFieldResultNumeric } from "@svenvw/fdm-calculator"
 import { getFarm, getFields } from "@svenvw/fdm-core"
 import {
     ArrowDownToLine,
@@ -16,9 +16,9 @@ import {
     NavLink,
     useLoaderData,
 } from "react-router"
+import { BufferStripInfo } from "~/components/blocks/balance/buffer-strip-info"
 import { OrganicMatterBalanceChart } from "~/components/blocks/balance/organic-matter-chart"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons" // Can be reused
-import { BufferStripInfo } from "~/components/blocks/balance/buffer-strip-info"
 import {
     Card,
     CardContent,

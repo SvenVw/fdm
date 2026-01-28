@@ -1,5 +1,4 @@
 import { Form } from "react-router"
-import { Spinner } from "~/components/ui/spinner"
 import {
     AlertDialog,
     AlertDialogCancel,
@@ -11,6 +10,7 @@ import {
     AlertDialogTrigger,
 } from "~/components/ui/alert-dialog"
 import { Button } from "~/components/ui/button"
+import { Spinner } from "~/components/ui/spinner"
 
 interface FarmDeleteDialogProps {
     farmName: string

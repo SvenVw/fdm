@@ -6,15 +6,15 @@ import {
     collectInputForOrganicMatterBalance,
     createFunctionsForFertilizerApplicationFilling,
     createFunctionsForNorms,
+    type FieldInput,
     getNitrogenBalanceField,
     getNutrientAdvice,
     getOrganicMatterBalanceField,
-    type FieldInput,
     type NitrogenBalanceFieldResultNumeric,
     type NitrogenBalanceNumeric,
+    type NutrientAdvice,
     type OrganicMatterBalanceFieldResultNumeric,
     type OrganicMatterBalanceNumeric,
-    type NutrientAdvice,
 } from "@svenvw/fdm-calculator"
 import {
     type FdmType,
@@ -24,12 +24,12 @@ import {
     getCurrentSoilData,
     getFertilizerApplications,
     getFertilizers,
+    getField,
     type PrincipalId,
     type Timeframe,
-    getField,
 } from "@svenvw/fdm-core"
-import { getNmiApiKey } from "./nmi"
 import { getDefaultCultivation } from "~/lib/cultivation-helpers"
+import { getNmiApiKey } from "./nmi"
 
 // Get nitrogen balance for a field
 export async function getNitrogenBalanceForField({
