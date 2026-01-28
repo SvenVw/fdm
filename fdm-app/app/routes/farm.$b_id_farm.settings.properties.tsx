@@ -327,7 +327,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 // Form Schema
 const FormSchema = z.object({
     b_name_farm: z.string().min(3, {
-        message: "Naam van bedrijf moet minimaal 3 karakters bevatten",
+        error: "Naam van bedrijf moet minimaal 3 karakters bevatten",
     }),
     b_businessid_farm: z.string().optional(),
     b_address_farm: z.string().optional(),
@@ -335,6 +335,6 @@ const FormSchema = z.object({
         .string()
         .optional()
         .refine((value) => !value || isPostalCode(value, "NL"), {
-            message: "Ongeldige postcode",
+            error: "Ongeldige postcode",
         }),
 })
