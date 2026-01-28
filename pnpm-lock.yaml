@@ -299,8 +299,8 @@ importers:
         specifier: ^13.15.26
         version: 13.15.26
       zod:
-        specifier: ^3.25.76
-        version: 3.25.76
+        specifier: ^4.3.6
+        version: 4.3.6
       zustand:
         specifier: ^5.0.10
         version: 5.0.10(@types/react@19.2.10)(react@19.2.4)(use-sync-external-store@1.6.0(react@19.2.4))
@@ -11184,8 +11184,8 @@ packages:
   yoga-layout@3.2.1:
     resolution: {integrity: sha512-0LPOt3AxKqMdFBZA3HBAt/t/8vIKq7VaQYbuA8WxCgung+p9TVyKRYdpvCb80HcdTN2NkbIKbhNwKUfm3tQywQ==}
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
   zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
@@ -24296,7 +24296,7 @@ snapshots:
 
   yoga-layout@3.2.1: {}
 
-  zod@3.25.76: {}
+  zod@4.3.6: {}
 
   zod@4.3.6: {}
 

@@ -1,4 +1,3 @@
-import type { User } from "better-auth"
 import type { Invitation, Member, Organization } from "better-auth/plugins"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
@@ -363,7 +362,7 @@ const InvitationForm = ({
 }
 
 const FormSchema = z.object({
-    email: z.string().email().optional(),
+    email: z.email().optional(),
     role: z.enum(["owner", "admin", "member"]).optional(),
     memberId: z.string().optional(),
     invitation_id: z.string().optional(),
