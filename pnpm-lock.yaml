@@ -542,6 +542,9 @@ importers:
       '@docusaurus/faster':
         specifier: 3.9.2
         version: 3.9.2(@docusaurus/types@3.9.2(@swc/core@1.15.11(@swc/helpers@0.5.18))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@swc/helpers@0.5.18)
+      '@docusaurus/plugin-content-docs':
+        specifier: 3.9.2
+        version: 3.9.2(@docusaurus/faster@3.9.2(@docusaurus/types@3.9.2(@swc/core@1.15.11(@swc/helpers@0.5.18))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@swc/helpers@0.5.18))(@mdx-js/react@3.1.1(@types/react@19.2.10)(react@19.2.4))(@rspack/core@1.7.4(@swc/helpers@0.5.18))(@swc/core@1.15.11(@swc/helpers@0.5.18))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       '@docusaurus/preset-classic':
         specifier: 3.9.2
         version: 3.9.2(@docusaurus/faster@3.9.2(@docusaurus/types@3.9.2(@swc/core@1.15.11(@swc/helpers@0.5.18))(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@swc/helpers@0.5.18))(@mdx-js/react@3.1.1(@types/react@19.2.10)(react@19.2.4))(@rspack/core@1.7.4(@swc/helpers@0.5.18))(@swc/core@1.15.11(@swc/helpers@0.5.18))(@types/react@19.2.10)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(search-insights@2.17.3)(typescript@5.9.3)
