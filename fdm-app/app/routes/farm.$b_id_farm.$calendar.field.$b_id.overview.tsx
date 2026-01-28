@@ -243,7 +243,9 @@ export default function FarmFieldsOverviewBlock() {
                                                 <Switch
                                                     id="b_bufferstrip"
                                                     checked={field.value}
-                                                    onCheckedChange={field.onChange}
+                                                    onCheckedChange={
+                                                        field.onChange
+                                                    }
                                                 />
                                             </div>
                                         </div>
@@ -345,14 +347,19 @@ export async function action({ request, params }: ActionFunctionArgs) {
 const FormSchema = z
     .object({
         b_name: z.string().min(2, {
-            message: "Naam van perceel moet minimaal 2 karakters bevatten",
+            error: "Naam van perceel moet minimaal 2 karakters bevatten",
         }),
         b_acquiring_method: z.string({
-            required_error:
-                "Selecteer of het perceel in eigendom is of gepacht",
+            error: (issue) =>
+                issue.input === undefined
+                    ? "Selecteer of het perceel in eigendom is of gepacht"
+                    : undefined,
         }),
         b_start: z.coerce.date({
-            required_error: "Kies een startdatum voor het perceel",
+            error: (issue) =>
+                issue.input === undefined
+                    ? "Kies een startdatum voor het perceel"
+                    : undefined,
         }),
         b_end: z.coerce.date().nullable().optional(),
         b_bufferstrip: z.boolean().optional(),
@@ -365,7 +372,7 @@ const FormSchema = z
             return true
         },
         {
-            message: "Einddatum moet na de startdatum zijn",
             path: ["b_end"],
+            error: "Einddatum moet na de startdatum zijn",
         },
     )

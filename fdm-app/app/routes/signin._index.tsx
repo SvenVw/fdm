@@ -126,14 +126,9 @@ export const links: LinksFunction = () => {
 
 const FormSchema = z.object({
     timeZone: z.string().optional(),
-    email: z.coerce
-        .string({
-            required_error:
-                "Voor aanmelden met e-mail hebben we je e-mailadres nodig",
-        })
-        .email({
-            message: "Dit is geen geldig e-mailadres",
-        }),
+    email: z.email({
+        error: "Dit is geen geldig e-mailadres",
+    }),
 })
 
 /**

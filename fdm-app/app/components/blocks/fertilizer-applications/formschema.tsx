@@ -3,32 +3,40 @@ import { z } from "zod"
 export const FormSchema = z.object({
     p_app_amount: z.coerce
         .number({
-            required_error: "Hoeveelheid is verplicht",
-            invalid_type_error: "Hoeveelheid moet een getal zijn",
+            error: (issue) =>
+                issue.input === undefined
+                    ? "Hoeveelheid is verplicht"
+                    : "Hoeveelheid moet een getal zijn",
         })
         .positive({
-            message: "Hoeveelheid moet positief zijn",
+            error: "Hoeveelheid moet positief zijn",
         })
         .finite({
-            message: "Hoeveelheid moet een geheel getal zijn",
+            error: "Hoeveelheid moet een geheel getal zijn",
         }),
     p_app_method: z.string().min(1, "Toepassingsmethode is verplicht"),
     p_app_date: z.coerce.date({
-        required_error: "Datum is verplicht",
-        invalid_type_error: "Datum is ongeldig",
+        error: (issue) =>
+            issue.input === undefined
+                ? "Datum is verplicht"
+                : "Datum is ongeldig",
     }),
     p_id: z.string({
         // TODO: Validate against the options that are available
-        required_error: "Keuze van meststof is verplicht",
-        invalid_type_error: "Meststof is ongeldig",
+        error: (issue) =>
+            issue.input === undefined
+                ? "Keuze van meststof is verplicht"
+                : "Meststof is ongeldig",
     }),
 })
 
 export const FormSchemaModify = FormSchema.extend({
     p_app_id: z.string({
         // TODO: Validate against the options that are available
-        required_error: "Bemesting id is verplicht",
-        invalid_type_error: "Bemesting id is ongeldig",
+        error: (issue) =>
+            issue.input === undefined
+                ? "Bemesting id is verplicht"
+                : "Bemesting id is ongeldig",
     }),
 })
 

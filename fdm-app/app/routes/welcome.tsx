@@ -49,17 +49,19 @@ export const meta: MetaFunction = () => {
 const FormSchema = z.object({
     firstname: z.coerce
         .string({
-            required_error: "Vul je voornaam in",
+            error: (issue) =>
+                issue.input === undefined ? "Vul je voornaam in" : undefined,
         })
         .min(1, {
-            message: "Vul je voornaam in",
+            error: "Vul je voornaam in",
         }),
     surname: z.coerce
         .string({
-            required_error: "Vul je achternaam in",
+            error: (issue) =>
+                issue.input === undefined ? "Vul je achternaam in" : undefined,
         })
         .min(1, {
-            message: "Vul je achternaam in",
+            error: "Vul je achternaam in",
         }),
 })
 

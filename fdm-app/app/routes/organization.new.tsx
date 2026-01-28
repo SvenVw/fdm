@@ -1,10 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
-import {
-    type ActionFunctionArgs,
-    Form,
-    type MetaFunction,
-} from "react-router"
+import { type ActionFunctionArgs, Form, type MetaFunction } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
@@ -46,19 +42,23 @@ export const meta: MetaFunction = () => {
 const FormSchema = z.object({
     name: z
         .string({
-            required_error: "Naam van de organisatie is verplicht",
+            error: (issue) =>
+                issue.input === undefined
+                    ? "Naam van de organisatie is verplicht"
+                    : undefined,
         })
         .min(3, {
-            message:
-                "Naam van de organisatie moet minimaal 3 karakters bevatten",
+            error: "Naam van de organisatie moet minimaal 3 karakters bevatten",
         }),
     slug: z
         .string({
-            required_error: "ID de organisatie is verplicht",
+            error: (issue) =>
+                issue.input === undefined
+                    ? "ID de organisatie is verplicht"
+                    : undefined,
         })
         .refine(isValidSlug, {
-            message:
-                "ID moet minimaal 3 karakters bevatten, enkel kleine letters, cijfers of '-'",
+            error: "ID moet minimaal 3 karakters bevatten, enkel kleine letters, cijfers of '-'",
         }),
     description: z.string({}).optional(),
 })
