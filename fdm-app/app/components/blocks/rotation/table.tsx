@@ -238,13 +238,19 @@ export function DataTable<TData extends RotationExtended, TValue>({
         )
     }
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: the filter function is pure
     const rowSelection = useMemo(() => {
         return Object.fromEntries([
             // Crop selection state is derived from whether all its fields are selected
             ...memoizedData.map((crop) => [
                 `crop_${crop.b_lu_catalogue}`,
                 crop.fields.every(
-                    (field) => selection[crop.b_lu_catalogue]?.[field.b_id],
+                    (field) =>
+                        !fuzzySearchAndProductivityFilter(
+                            { original: field } as unknown as Row<TData>,
+                            null,
+                            fieldFilter,
+                        ) || selection[crop.b_lu_catalogue]?.[field.b_id],
                 ),
             ]),
             // Include each field's selection state too
@@ -255,7 +261,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
                 ]),
             ),
         ])
-    }, [selection, memoizedData])
+    }, [selection, memoizedData, fieldFilter])
 
     const table = useReactTable({
         data: memoizedData,
