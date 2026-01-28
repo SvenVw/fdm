@@ -24,7 +24,8 @@ export const FormSchema = z
             }),
         b_lu_yield: z.preprocess(
             (val) => (val === "" ? undefined : val),
-            z
+            z.coerce
+                .number()
                 .int({
                     error: "De waarde is buiten het toegestane bereik",
                 })
@@ -41,7 +42,8 @@ export const FormSchema = z
         ),
         b_lu_yield_fresh: z.preprocess(
             (val) => (val === "" ? undefined : val),
-            z
+            z.coerce
+                .number()
                 .int({
                     error: "De waarde is buiten het toegestane bereik",
                 })
@@ -58,7 +60,8 @@ export const FormSchema = z
         ),
         b_lu_yield_bruto: z.preprocess(
             (val) => (val === "" ? undefined : val),
-            z
+            z.coerce
+                .number()
                 .int({
                     error: "De waarde is buiten het toegestane bereik",
                 })
@@ -75,7 +78,8 @@ export const FormSchema = z
         ),
         b_lu_dm: z.preprocess(
             (val) => (val === "" ? undefined : val),
-            z
+            z.coerce
+                .number()
                 .int({
                     error: "De waarde is buiten het toegestane bereik",
                 })
@@ -109,7 +113,8 @@ export const FormSchema = z
         ),
         b_lu_tarra: z.preprocess(
             (val) => (val === "" ? undefined : val),
-            z
+            z.coerce
+                .number()
                 .int({
                     error: "De waarde is buiten het toegestane bereik",
                 })
@@ -126,7 +131,8 @@ export const FormSchema = z
         ),
         b_lu_uww: z.preprocess(
             (val) => (val === "" ? undefined : val),
-            z
+            z.coerce
+                .number()
                 .int({
                     error: "De waarde is buiten het toegestane bereik",
                 })
@@ -146,7 +152,8 @@ export const FormSchema = z
         ),
         b_lu_moist: z.preprocess(
             (val) => (val === "" ? undefined : val),
-            z
+            z.coerce
+                .number()
                 .int({
                     error: "De waarde is buiten het toegestane bereik",
                 })
@@ -163,7 +170,8 @@ export const FormSchema = z
         ),
         b_lu_cp: z.preprocess(
             (val) => (val === "" ? undefined : val),
-            z
+            z.coerce
+                .number()
                 .int({
                     error: "De waarde is buiten het toegestane bereik",
                 })
