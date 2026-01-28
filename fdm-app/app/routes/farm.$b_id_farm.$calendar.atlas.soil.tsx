@@ -179,8 +179,8 @@ export default function FarmAtlasSoilBlock() {
 
             // Construct GetFeatureInfo request
             const bounds = map.getBounds()
-            const width = map.getCanvas().width
-            const height = map.getCanvas().height
+            const width = map.getCanvas().offsetWidth
+            const height = map.getCanvas().offsetHeight
 
             // Use proj4 to get bounds in EPSG:3857
             const sw = proj4("EPSG:3857").forward([
