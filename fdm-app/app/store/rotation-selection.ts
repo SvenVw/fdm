@@ -5,7 +5,9 @@ import { ssrSafeSessionJSONStorage } from "./storage"
 interface RotationSelectionState {
     farmId: string | null
     selection: Record<string, Record<string, boolean>>
-    setSelection: (selection: Record<string, Record<string, boolean>>) => void
+    updateSelection: (
+        selection: Record<string, Record<string, boolean>>,
+    ) => void
     syncFarm: (farmId: string) => void
 }
 
@@ -14,8 +16,18 @@ export const useRotationSelectionStore = create<RotationSelectionState>()(
         (set, get) => ({
             farmId: null,
             selection: {},
-            setSelection(selection: Record<string, Record<string, boolean>>) {
-                set({ selection })
+            updateSelection(
+                selection: Record<string, Record<string, boolean>>,
+            ) {
+                const currentSelection = get().selection
+                const result: Record<string, Record<string, boolean>> = {}
+                for (const currentKey of Object.keys(currentSelection)) {
+                    result[currentKey] = { ...currentSelection[currentKey] }
+                }
+                for (const key of Object.keys(selection)) {
+                    result[key] = { ...(result[key] ?? {}), ...selection[key] }
+                }
+                set({ selection: result })
             },
             syncFarm(farmId: string) {
                 if (get().farmId !== farmId) {

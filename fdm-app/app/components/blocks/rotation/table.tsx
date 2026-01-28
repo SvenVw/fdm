@@ -76,8 +76,8 @@ export function DataTable<TData extends RotationExtended, TValue>({
     const location = useLocation()
 
     const selection = useRotationSelectionStore((state) => state.selection)
-    const setSelection = useRotationSelectionStore(
-        (state) => state.setSelection,
+    const updateSelection = useRotationSelectionStore(
+        (state) => state.updateSelection,
     )
     const syncFarm = useRotationSelectionStore((state) => state.syncFarm)
 
@@ -119,7 +119,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
                     ),
                 ]),
         )
-        setSelection(newSelection)
+        updateSelection(newSelection)
     }
 
     const handleRowClick = (
