@@ -1,19 +1,17 @@
 import { z } from "zod"
 
 export const FormSchema = z.object({
-    p_app_amount: z.coerce
-        .number({
+    p_app_amount: z.preprocess(
+        (val) => (typeof val === "string" && val !== "" ? Number(val) : val),
+        z.number({
             error: (issue) =>
                 issue.input === undefined
                     ? "Hoeveelheid is verplicht"
                     : "Hoeveelheid moet een getal zijn",
-        })
-        .positive({
+        }).positive({
             error: "Hoeveelheid moet positief zijn",
-        })
-        .finite({
-            error: "Hoeveelheid moet een geheel getal zijn",
         }),
+    ),
     p_app_method: z.string().min(1, "Toepassingsmethode is verplicht"),
     p_app_date: z.preprocess(
         (val) => (typeof val === "string" ? new Date(val) : val),

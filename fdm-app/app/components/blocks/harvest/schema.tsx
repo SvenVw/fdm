@@ -23,171 +23,157 @@ export const FormSchema = z
                 return date
             }),
         b_lu_yield: z.preprocess(
-            (val) => (val === "" ? undefined : val),
-            z.coerce
-                .number()
+            (val) => (val === "" ? undefined : typeof val === "string" ? Number(val) : val),
+            z.number({
+                error: "De opbrengst (DS) moet een getal zijn",
+            })
                 .int({
-                    error: "De waarde is buiten het toegestane bereik",
+                    message: "De opbrengst (DS) moet een geheel getal zijn (zonder decimalen)",
                 })
                 .positive({
-                    error: "De waarde moet groter zijn dan 0",
-                })
-                .finite({
-                    error: "De waarde moet een geldig getal zijn",
+                    message: "De opbrengst (DS) moet groter zijn dan 0",
                 })
                 .max(250000, {
-                    error: "Opbrengst mag niet groter zijn dan 250.000 kg DS / ha",
+                    message: "De opbrengst (DS) mag niet groter zijn dan 250.000 kg DS/ha",
                 })
                 .optional(),
         ),
         b_lu_yield_fresh: z.preprocess(
-            (val) => (val === "" ? undefined : val),
-            z.coerce
-                .number()
+            (val) => (val === "" ? undefined : typeof val === "string" ? Number(val) : val),
+            z.number({
+                error: "De versproduct opbrengst moet een getal zijn",
+            })
                 .int({
-                    error: "De waarde is buiten het toegestane bereik",
+                    message: "De versproduct opbrengst moet een geheel getal zijn (zonder decimalen)",
                 })
                 .positive({
-                    error: "De waarde moet groter zijn dan 0",
-                })
-                .finite({
-                    error: "De waarde moet een geldig getal zijn",
+                    message: "De versproduct opbrengst moet groter zijn dan 0",
                 })
                 .max(250000, {
-                    error: "Opbrengst mag niet groter zijn dan 250.000 kg versproduct / ha",
+                    message: "De versproduct opbrengst mag niet groter zijn dan 250.000 kg versproduct/ha",
                 })
                 .optional(),
         ),
         b_lu_yield_bruto: z.preprocess(
-            (val) => (val === "" ? undefined : val),
-            z.coerce
-                .number()
+            (val) => (val === "" ? undefined : typeof val === "string" ? Number(val) : val),
+            z.number({
+                error: "De bruto opbrengst (incl. tarra) moet een getal zijn",
+            })
                 .int({
-                    error: "De waarde is buiten het toegestane bereik",
+                    message: "De bruto opbrengst (incl. tarra) moet een geheel getal zijn (zonder decimalen)",
                 })
                 .positive({
-                    error: "De waarde moet groter zijn dan 0",
-                })
-                .finite({
-                    error: "De waarde moet een geldig getal zijn",
+                    message: "De bruto opbrengst (incl. tarra) moet groter zijn dan 0",
                 })
                 .max(250000, {
-                    error: "Opbrengst mag niet groter zijn dan 250.000 kg versproduct (incl. tarra) / ha",
+                    message: "De bruto opbrengst mag niet groter zijn dan 250.000 kg versproduct (incl. tarra)/ha",
                 })
                 .optional(),
         ),
         b_lu_dm: z.preprocess(
-            (val) => (val === "" ? undefined : val),
-            z.coerce
-                .number()
+            (val) => (val === "" ? undefined : typeof val === "string" ? Number(val) : val),
+            z.number({
+                error: "Het droge stofgehalte moet een getal zijn",
+            })
                 .int({
-                    error: "De waarde is buiten het toegestane bereik",
+                    message: "Het droge stofgehalte moet een geheel getal zijn (zonder decimalen)",
                 })
                 .positive({
-                    error: "De waarde moet groter zijn dan 0",
-                })
-                .finite({
-                    error: "De waarde moet een geldig getal zijn",
+                    message: "Het droge stofgehalte moet groter zijn dan 0",
                 })
                 .max(1000, {
-                    error: "Het droge stof gehalte mag niet groter zijn dan 1.000 g / kg",
+                    message: "Het droge stofgehalte mag niet groter zijn dan 1.000 g/kg",
                 })
                 .optional(),
         ),
         b_lu_n_harvestable: z.preprocess(
-            (val) => (val === "" ? undefined : val),
-            z.coerce
-                .number({
-                    error: (issue) =>
-                        issue.input === undefined
-                            ? undefined
-                            : "De waarde moet een getal zijn",
-                })
+            (val) => (val === "" ? undefined : typeof val === "string" ? Number(val) : val),
+            z.number({
+                error: "De stikstofopbrengst moet een getal zijn",
+            })
                 .positive({
-                    error: "De waarde moet groter zijn dan 0",
+                    message: "De stikstofopbrengst moet groter zijn dan 0",
                 })
                 .max(1000, {
-                    error: "De stikstofopbrengst mag niet groter zijn dan 1.000 kg N / ha",
+                    message: "De stikstofopbrengst mag niet groter zijn dan 1.000 kg N/ha",
                 })
                 .optional(),
         ),
         b_lu_tarra: z.preprocess(
-            (val) => (val === "" ? undefined : val),
-            z.coerce
-                .number()
+            (val) => (val === "" ? undefined : typeof val === "string" ? Number(val) : val),
+            z.number({
+                error: "Het tarra-percentage moet een getal zijn",
+            })
                 .int({
-                    error: "De waarde is buiten het toegestane bereik",
+                    message: "Het tarra-percentage moet een geheel getal zijn (zonder decimalen)",
                 })
                 .positive({
-                    error: "De waarde moet groter zijn dan 0",
-                })
-                .finite({
-                    error: "De waarde moet een geldig getal zijn",
+                    message: "Het tarra-percentage moet groter zijn dan 0",
                 })
                 .max(25, {
-                    error: "Het tarra-percentage mag niet hoger zijn dan 25%",
+                    message: "Het tarra-percentage mag niet hoger zijn dan 25%",
                 })
                 .optional(),
         ),
         b_lu_uww: z.preprocess(
-            (val) => (val === "" ? undefined : val),
-            z.coerce
-                .number()
+            (val) => (val === "" ? undefined : typeof val === "string" ? Number(val) : val),
+            z.number({
+                error: "Het onderwatergewicht moet een getal zijn",
+            })
                 .int({
-                    error: "De waarde is buiten het toegestane bereik",
+                    message: "Het onderwatergewicht moet een geheel getal zijn (zonder decimalen)",
                 })
                 .positive({
-                    error: "De waarde moet groter zijn dan 0",
-                })
-                .finite({
-                    error: "De waarde moet een geldig getal zijn",
+                    message: "Het onderwatergewicht moet groter zijn dan 0",
                 })
                 .min(100, {
-                    error: "Het onderwatergewicht mag niet kleiner zijn dan 100 g / 5 kg",
+                    message: "Het onderwatergewicht mag niet kleiner zijn dan 100 g / 5 kg",
                 })
                 .max(1000, {
-                    error: "Het onderwatergewicht mag niet groter zijn dan 1.000 g / 5 kg",
+                    message: "Het onderwatergewicht mag niet groter zijn dan 1.000 g / 5 kg",
                 })
                 .optional(),
         ),
         b_lu_moist: z.preprocess(
-            (val) => (val === "" ? undefined : val),
-            z.coerce
-                .number()
+            (val) => (val === "" ? undefined : typeof val === "string" ? Number(val) : val),
+            z.number({
+                error: "Het vochtpercentage moet een getal zijn",
+            })
                 .int({
-                    error: "De waarde is buiten het toegestane bereik",
+                    message: "Het vochtpercentage moet een geheel getal zijn (zonder decimalen)",
                 })
                 .positive({
-                    error: "De waarde moet groter zijn dan 0",
-                })
-                .finite({
-                    error: "De waarde moet een geldig getal zijn",
+                    message: "Het vochtpercentage moet groter zijn dan 0",
                 })
                 .max(100, {
-                    error: "Het vochtpercentage mag niet hoger zijn dan 100%",
+                    message: "Het vochtpercentage mag niet hoger zijn dan 100%",
                 })
                 .optional(),
-        ),
+        ),      
         b_lu_cp: z.preprocess(
-            (val) => (val === "" ? undefined : val),
-            z.coerce
-                .number()
+            (val) => (val === "" ? undefined : typeof val === "string" ? Number(val) : val),
+            z.number({
+                error: "Het ruw eiwitgehalte moet een getal zijn",
+            })
                 .int({
-                    error: "De waarde is buiten het toegestane bereik",
+                    message: "Het ruw eiwitgehalte moet een geheel getal zijn (zonder decimalen)",
                 })
                 .positive({
-                    error: "De waarde moet groter zijn dan 0",
-                })
-                .finite({
-                    error: "De waarde moet een geldig getal zijn",
+                    message: "Het ruw eiwitgehalte moet groter zijn dan 0",
                 })
                 .max(500, {
-                    error: "Het ruw eiwit gehalte mag niet groter zijn dan 500 g / kg DS",
+                    message: "Het ruw eiwitgehalte mag niet groter zijn dan 500 g/kg DS",
                 })
                 .optional(),
         ),
-        b_lu_start: z.coerce.date().optional().nullable(),
-        b_lu_end: z.coerce.date().optional().nullable(),
+        b_lu_start: z.preprocess(
+            (val) => (typeof val === "string" ? new Date(val) : val),
+            z.date().optional().nullable(),
+        ),
+        b_lu_end: z.preprocess(
+            (val) => (typeof val === "string" ? new Date(val) : val),
+            z.date().optional().nullable(),
+        ),
         b_lu_harvestable: z.enum(["once", "multiple", "none"]),
     })
     .superRefine((data, ctx) => {
