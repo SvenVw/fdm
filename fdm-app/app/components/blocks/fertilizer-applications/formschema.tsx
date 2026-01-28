@@ -15,12 +15,15 @@ export const FormSchema = z.object({
             error: "Hoeveelheid moet een geheel getal zijn",
         }),
     p_app_method: z.string().min(1, "Toepassingsmethode is verplicht"),
-    p_app_date: z.coerce.date({
-        error: (issue) =>
-            issue.input === undefined
-                ? "Datum is verplicht"
-                : "Datum is ongeldig",
-    }),
+    p_app_date: z.preprocess(
+        (val) => (typeof val === "string" ? new Date(val) : val),
+        z.date({
+            error: (issue) =>
+                issue.input === undefined
+                    ? "Datum is verplicht"
+                    : "Datum is ongeldig",
+        }),
+    ),
     p_id: z.string({
         // TODO: Validate against the options that are available
         error: (issue) =>

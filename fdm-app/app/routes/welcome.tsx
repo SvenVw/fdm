@@ -47,7 +47,7 @@ export const meta: MetaFunction = () => {
 }
 
 const FormSchema = z.object({
-    firstname: z.coerce
+    firstname: z
         .string({
             error: (issue) =>
                 issue.input === undefined ? "Vul je voornaam in" : undefined,
@@ -55,7 +55,7 @@ const FormSchema = z.object({
         .min(1, {
             error: "Vul je voornaam in",
         }),
-    surname: z.coerce
+    surname: z
         .string({
             error: (issue) =>
                 issue.input === undefined ? "Vul je achternaam in" : undefined,

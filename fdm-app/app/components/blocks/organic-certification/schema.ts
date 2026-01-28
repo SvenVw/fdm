@@ -41,12 +41,15 @@ export const formSchema = z
             .refine((val) => !val || isValidSkalNumber(val), {
                 error: "Ongeldig SKAL-nummer",
             }),
-        b_organic_issued: z.coerce.date({
-            error: (issue) =>
-                issue.input === undefined
-                    ? "Startdatum is verplicht"
-                    : "Ongeldige datum",
-        }),
+        b_organic_issued: z.preprocess(
+            (val) => (typeof val === "string" ? new Date(val) : val),
+            z.date({
+                error: (issue) =>
+                    issue.input === undefined
+                        ? "Startdatum is verplicht"
+                        : "Ongeldige datum",
+            }),
+        ),
         b_organic_expires: z.coerce
             .date({
                 error: (issue) =>

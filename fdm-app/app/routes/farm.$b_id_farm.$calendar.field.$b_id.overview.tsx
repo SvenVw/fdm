@@ -355,12 +355,15 @@ const FormSchema = z
                     ? "Selecteer of het perceel in eigendom is of gepacht"
                     : undefined,
         }),
-        b_start: z.coerce.date({
-            error: (issue) =>
-                issue.input === undefined
-                    ? "Kies een startdatum voor het perceel"
-                    : undefined,
-        }),
+        b_start: z.preprocess(
+            (val) => (typeof val === "string" ? new Date(val) : val),
+            z.date({
+                error: (issue) =>
+                    issue.input === undefined
+                        ? "Kies een startdatum voor het perceel"
+                        : undefined,
+            }),
+        ),
         b_end: z.coerce.date().nullable().optional(),
         b_bufferstrip: z.boolean().optional(),
     })

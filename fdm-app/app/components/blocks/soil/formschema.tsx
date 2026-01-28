@@ -12,12 +12,15 @@ export const FormSchema = z
             .refine((value) => value.toLowerCase() !== "nl-other-nmi", {
                 error: "Bron mag niet 'NMI BodemSchat' zijn.",
             }),
-        b_sampling_date: z.coerce.date({
-            error: (issue) =>
-                issue.input === undefined
-                    ? "Vul een datum in"
-                    : "Datum is ongeldig",
-        }),
+        b_sampling_date: z.preprocess(
+            (val) => (typeof val === "string" ? new Date(val) : val),
+            z.date({
+                error: (issue) =>
+                    issue.input === undefined
+                        ? "Vul een datum in"
+                        : "Datum is ongeldig",
+            }),
+        ),
         a_depth_upper: z.preprocess(
             (val) => (val === "" ? undefined : val),
             z.coerce

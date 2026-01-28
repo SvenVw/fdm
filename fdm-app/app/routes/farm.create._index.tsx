@@ -75,12 +75,15 @@ const FormSchema = z.object({
         .min(3, {
             error: "Naam van bedrijf moet minimaal 3 karakters bevatten",
         }),
-    year: z.coerce.number({
-        error: (issue) =>
-            issue.input === undefined
-                ? "Jaar is verplicht"
-                : "Jaar moet een getal zijn",
-    }),
+    year: z.preprocess(
+        (val) => (typeof val === "string" && val !== "" ? Number(val) : val),
+        z.number({
+            error: (issue) =>
+                issue.input === undefined
+                    ? "Jaar is verplicht"
+                    : "Jaar moet een getal zijn",
+        }),
+    ),
     has_derogation: z.coerce.boolean().prefault(false),
     derogation_start_year: z.coerce
         .number()
