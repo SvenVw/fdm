@@ -5,7 +5,6 @@ import { Form } from "react-router-dom"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { AutoComplete } from "~/components/custom/autocomplete"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
     Select,
@@ -14,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import { Spinner } from "~/components/ui/spinner"
 import { AccessFormSchema } from "~/lib/schemas/access.schema"
 
 // Define the type for the principal object based on usage
@@ -101,7 +101,7 @@ export const InvitationForm = ({ principals }: InvitationFormProps) => {
                             type="submit"
                         >
                             {form.formState.isSubmitting ? (
-                                <LoadingSpinner />
+                                <Spinner />
                             ) : (
                                 "Uitnodigen"
                             )}

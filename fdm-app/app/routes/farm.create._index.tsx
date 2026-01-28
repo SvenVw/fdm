@@ -18,7 +18,6 @@ import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -46,6 +45,7 @@ import {
     SelectValue,
 } from "~/components/ui/select"
 import { SidebarInset } from "~/components/ui/sidebar"
+import { Spinner } from "~/components/ui/spinner"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
@@ -67,23 +67,31 @@ export const meta: MetaFunction = () => {
 const FormSchema = z.object({
     b_name_farm: z
         .string({
-            required_error: "Naam van bedrijf is verplicht",
+            error: (issue) =>
+                issue.input === undefined
+                    ? "Naam van bedrijf is verplicht"
+                    : undefined,
         })
         .min(3, {
-            message: "Naam van bedrijf moet minimaal 3 karakters bevatten",
+            error: "Naam van bedrijf moet minimaal 3 karakters bevatten",
         }),
-    year: z.coerce.number({
-        required_error: "Jaar is verplicht",
-        invalid_type_error: "Jaar moet een getal zijn",
-    }),
-    has_derogation: z.coerce.boolean().default(false),
+    year: z.preprocess(
+        (val) => (typeof val === "string" && val !== "" ? Number(val) : val),
+        z.number({
+            error: (issue) =>
+                issue.input === undefined
+                    ? "Jaar is verplicht"
+                    : "Jaar moet een getal zijn",
+        }),
+    ),
+    has_derogation: z.coerce.boolean().prefault(false),
     derogation_start_year: z.coerce
         .number()
         .min(2006, {
-            message: "Startjaar moet minimaal 2006 zijn",
+            error: "Startjaar moet minimaal 2006 zijn",
         })
         .max(2025, {
-            message: "Startjaar mag maximaal 2025 zijn",
+            error: "Startjaar mag maximaal 2025 zijn",
         })
         .optional(),
 })
@@ -326,7 +334,7 @@ export default function AddFarmPage() {
                                         <Button type="submit">
                                             {form.formState.isSubmitting ? (
                                                 <div className="flex items-center space-x-2">
-                                                    <LoadingSpinner />
+                                                    <Spinner />
                                                     <span>Opslaan...</span>
                                                 </div>
                                             ) : (

@@ -29,7 +29,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.26.0
+          version: 10.28.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -57,21 +57,57 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           pnpm changeset version
-          pnpm changeset tag
           git add .
           git commit -m "chore: bump version of packages for release"
-          git push --follow-tags
+          git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Runs for the 'main' branch on push
       - name: Publish Packages and Create Releases
         if: github.ref == 'refs/heads/main'
-        uses: changesets/action@v1
-        with:
-          publish: |
-            pnpm build --filter="!@svenvw/fdm-app"
-            pnpm changeset publish
+        shell: bash
+        run: |
+          # Build packages
+          pnpm build --filter="!@svenvw/fdm-app"
+          
+          # Publish to GitHub Packages
+          pnpm changeset publish
+          
+          # Create git tags locally
+          pnpm changeset tag
+          
+          # Push ONLY the new tags to bypass 'main' branch protection rules
+          # (git push --follow-tags can fail if it tries to push the branch ref)
+          git tag --points-at HEAD | xargs -r git push origin
+          
+          # Create GitHub Releases for each updated package
+          # This script finds tags created in this commit and creates a GH release for each
+          git tag --points-at HEAD | while read tag; do
+            # Extract package name and version from tag (format: name@version)
+            if [[ $tag == *"@"* ]]; then
+              package_name="${tag%@*}"
+              version="${tag##*@}"
+              
+              # Check if release already exists to avoid errors on re-runs
+              if gh release view "$tag" >/dev/null 2>&1; then
+                echo "Release $tag already exists, skipping."
+                continue
+              fi
+
+              # Find the directory of the package
+              pkg_dir=$(find . -name package.json -exec grep -l "\"name\": \"$package_name\"" {} + | xargs dirname)
+              
+              if [ -n "$pkg_dir" ] && [ -f "$pkg_dir/CHANGELOG.md" ]; then
+                # Extract notes for this version from CHANGELOG.md
+                # Matches "## <version>" followed by space or end-of-line
+                notes=$(awk "/^## $version($| )/{flag=1;next}/^## /{flag=0}flag" "$pkg_dir/CHANGELOG.md")
+                
+                echo "Creating release for $tag"
+                gh release create "$tag" --title "$tag" --notes "$notes"
+              fi
+            fi
+          done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.FDM_PACKAGES_TOKEN }}

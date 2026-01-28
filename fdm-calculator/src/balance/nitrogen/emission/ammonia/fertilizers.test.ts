@@ -86,6 +86,8 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             b_lu_start: new Date("2024-01-01"),
             b_lu_end: new Date("2024-02-29"), // Ends before cropland starts
             m_cropresidue: null,
+            b_lu_name: "Grasland",
+            b_lu_croprotation: "grass",
         },
         {
             b_lu: "cult-2",
@@ -93,6 +95,8 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             b_lu_start: new Date("2024-03-01"),
             b_lu_end: new Date("2024-10-31"),
             m_cropresidue: null,
+            b_lu_name: "Maïs",
+            b_lu_croprotation: "maize",
         },
     ]
 

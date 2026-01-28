@@ -409,7 +409,7 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
         const filteredFieldNorms = fieldNorms.filter((fieldNorm) => {
             if (!showProductiveOnly) return true
             const fieldData = fieldsMap.get(fieldNorm.b_id)
-            return fieldData ? fieldData.b_isproductive === true : false
+            return fieldData ? fieldData.b_bufferstrip === false : true
         })
 
         return (

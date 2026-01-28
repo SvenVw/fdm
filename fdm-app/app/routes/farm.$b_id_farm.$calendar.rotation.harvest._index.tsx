@@ -35,7 +35,6 @@ import { HarvestForm } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Badge } from "~/components/ui/badge"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
@@ -59,6 +58,7 @@ import {
 } from "~/components/ui/dialog"
 import { Label } from "~/components/ui/label"
 import { SidebarInset } from "~/components/ui/sidebar"
+import { Spinner } from "~/components/ui/spinner"
 import {
     Tooltip,
     TooltipContent,
@@ -149,24 +149,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const allFieldsWithCultivations = await Promise.all(
             (
                 await getFields(fdm, session.principal_id, b_id_farm, timeframe)
-            ).map(
-                async (field: {
-                    b_id: string
-                    b_name: string
-                    b_area: number
-                }) => {
-                    const cultivations = await getCultivations(
-                        fdm,
-                        session.principal_id,
-                        field.b_id,
-                        timeframe,
-                    )
-                    return {
-                        ...field,
-                        cultivations: cultivations,
-                    }
-                },
-            ),
+            ).map(async (field) => {
+                const cultivations = await getCultivations(
+                    fdm,
+                    session.principal_id,
+                    field.b_id,
+                    timeframe,
+                )
+                return {
+                    ...field,
+                    cultivations: cultivations,
+                }
+            }),
         )
 
         // Get fieldIds from search params (if any)
@@ -294,6 +288,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             )
         }
 
+        const b_lu_starts = selectedFields.map(
+            (field) =>
+                field.cultivations.find((cultivation) =>
+                    cultivationIds.includes(cultivation.b_lu_catalogue),
+                )?.b_lu_start,
+        )
+        const b_lu_ends = selectedFields.map(
+            (field) =>
+                field.cultivations.find((cultivation) =>
+                    cultivationIds.includes(cultivation.b_lu_catalogue),
+                )?.b_lu_end,
+        )
+        const b_lu_start = b_lu_starts.reduce(
+            (max, date) =>
+                max && date ? (max > date ? max : date) : max || date,
+            undefined,
+        )
+        const b_lu_end = b_lu_ends.reduce(
+            (min, date) =>
+                min && date ? (min < date ? min : date) : min || date,
+            undefined,
+        )
+
         const fieldOptions = allFieldsWithCultivations.map((field) => {
             if (!field?.b_id || !field?.b_name) {
                 throw new Error("Invalid field data structure")
@@ -333,6 +350,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             harvestApplication: harvestApplication,
             harvestableAnalysis: harvestableAnalysis,
             harvestParameters: harvestParameters,
+            b_lu_start: b_lu_start,
+            b_lu_end: b_lu_end,
+            create: url.searchParams.has("create"),
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -442,11 +462,14 @@ export default function FarmRotationHarvestAddIndex() {
         setShowOverwriteWarning(false)
     }
 
+    const backlink = loaderData.create
+        ? `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`
+        : `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`
     return (
         <SidebarInset>
             <Header
                 action={{
-                    to: `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`,
+                    to: backlink,
                     label: "Terug naar bouwplan",
                     disabled: false,
                 }}
@@ -481,7 +504,7 @@ export default function FarmRotationHarvestAddIndex() {
                     {isSubmitting && (
                         <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
                             <div className="flex items-center text-sm text-muted-foreground">
-                                <LoadingSpinner className="mr-2" />
+                                <Spinner className="mr-2" />
                                 <span>Oogst wordt toegevoegd...</span>
                             </div>
                         </div>
@@ -563,9 +586,7 @@ export default function FarmRotationHarvestAddIndex() {
                                                 variant="link"
                                                 className="mt-4"
                                             >
-                                                <NavLink
-                                                    to={`/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`}
-                                                >
+                                                <NavLink to={backlink}>
                                                     Terug naar bouwplan
                                                 </NavLink>
                                             </Button>
@@ -690,6 +711,7 @@ export default function FarmRotationHarvestAddIndex() {
                                         </div>
                                     ) : loaderData.fieldAmount > 0 ? (
                                         <HarvestForm
+                                            key={selectedFieldIds.join(",")}
                                             harvestParameters={
                                                 loaderData.harvestParameters
                                             }
@@ -737,13 +759,8 @@ export default function FarmRotationHarvestAddIndex() {
                                                 loaderData.cultivation
                                                     .b_lu_harvestable
                                             }
-                                            b_lu_start={
-                                                loaderData.cultivation
-                                                    .b_lu_start
-                                            }
-                                            b_lu_end={
-                                                loaderData.cultivation.b_lu_end
-                                            }
+                                            b_lu_start={loaderData.b_lu_start}
+                                            b_lu_end={loaderData.b_lu_end}
                                             action={modifySearchParams(
                                                 `${location.pathname}${location.search}`,
                                                 (searchParams) =>
@@ -861,6 +878,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
             return dataWithError(null, "Dit gewas is niet oogstbaar.")
         }
 
+        const redirectURL = url.searchParams.has("create")
+            ? `/farm/create/${b_id_farm}/${calendar}/rotation`
+            : `/farm/${b_id_farm}/${calendar}/rotation`
+
         if (request.method === "DELETE") {
             for (const fieldId of fieldIds) {
                 const cultivationsForField = await getCultivations(
@@ -898,12 +919,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 }
             }
 
-            return redirectWithSuccess(
-                `/farm/${b_id_farm}/${calendar}/rotation`,
-                {
-                    message: `Oogst succesvol verwijderd van ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
-                },
-            )
+            return redirectWithSuccess(redirectURL, {
+                message: `Oogst succesvol verwijderd van ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
+            })
         }
 
         const formValues = await extractFormValuesFromRequest(
@@ -1002,7 +1020,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
 
-        return redirectWithSuccess(`/farm/${b_id_farm}/${calendar}/rotation`, {
+        return redirectWithSuccess(redirectURL, {
             message: `Oogst succesvol toegevoegd aan ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
         })
     } catch (error) {

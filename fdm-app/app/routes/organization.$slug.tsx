@@ -1,12 +1,4 @@
-import {
-    cancelPendingInvitation,
-    getOrganization,
-    getPendingInvitationsForOrganization,
-    getUsersInOrganization,
-    inviteUserToOrganization,
-    removeUserFromOrganization,
-    updateRoleOfUserAtOrganization,
-} from "@svenvw/fdm-core"
+import type { Invitation, Member, Organization } from "better-auth/plugins"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
@@ -32,10 +24,9 @@ import {
     SelectValue,
 } from "~/components/ui/select"
 import { Separator } from "~/components/ui/separator"
-import { getSession } from "~/lib/auth.server"
+import { auth, getSession } from "~/lib/auth.server"
 import { renderInvitationEmail, sendEmail } from "~/lib/email.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -44,27 +35,58 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     const session = await getSession(request)
-    const organization = await getOrganization(
-        fdm,
-        params.slug,
-        session.user.id,
-    )
+    const organizations = await auth.api.listOrganizations({
+        headers: request.headers,
+    })
+
+    const organization = organizations.find((org) => org.slug === params.slug)
 
     if (!organization) {
         throw handleLoaderError("not found: organization")
     }
 
     // Get members of organization
-    const members = await getUsersInOrganization(fdm, params.slug)
+    const membersListResponse = await auth.api.listMembers({
+        headers: request.headers,
+        query: {
+            organizationId: organization.id,
+        },
+    })
+    const members = membersListResponse.members
+
+    // Determine permissions
+    const currentUserMember = members.find((m) => m.userId === session.user.id)
+    const role = currentUserMember?.role || "viewer"
+    const permissions = {
+        canEdit: role === "owner" || role === "admin",
+        canDelete: role === "owner",
+        canInvite: role === "owner" || role === "admin",
+        canUpdateRoleUser: role === "owner" || role === "admin",
+        canRemoveUser: role === "owner" || role === "admin",
+    }
 
     // Get pending invitations of organization
-    const invitations = await getPendingInvitationsForOrganization(
-        fdm,
-        organization.id,
-    )
+    let invitations: Invitation[] = []
+    if (permissions.canInvite) {
+        const invitationsListResponse = await auth.api.listInvitations({
+            headers: request.headers,
+            query: {
+                organizationId: organization.id,
+            },
+        })
+        invitations = (
+            Array.isArray(invitationsListResponse)
+                ? invitationsListResponse
+                : []
+        ).filter((inv) => inv.status === "pending")
+    }
 
     return {
-        organization: organization,
+        organization: {
+            ...organization,
+            permissions,
+            description: organization.metadata?.description || "",
+        },
         invitations: invitations,
         members: members,
     }
@@ -103,10 +125,9 @@ export default function OrganizationIndex() {
                                 <div className="grid gap-6">
                                     {members.map((member) => (
                                         <MemberRow
-                                            key={member.username}
+                                            key={member.id}
                                             member={member}
                                             permissions={permissions}
-                                            slug={organization.slug}
                                         />
                                     ))}
                                 </div>
@@ -142,11 +163,8 @@ export default function OrganizationIndex() {
                                         <div className="grid gap-6">
                                             {invitations.map((invitation) => (
                                                 <InvitationRow
-                                                    key={
-                                                        invitation.invitation_id
-                                                    }
+                                                    key={invitation.id}
                                                     invitation={invitation}
-                                                    permissions={permissions}
                                                 />
                                             ))}
                                         </div>
@@ -161,18 +179,20 @@ export default function OrganizationIndex() {
     )
 }
 
+type MemberWithUser = Member & {
+    user: {
+        id: string
+        name: string
+        email: string
+        image?: string | null
+    }
+}
+
 const MemberRow = ({
     member,
     permissions,
 }: {
-    member: {
-        id: string
-        firstname: string
-        surname: string
-        username: string
-        role: string
-        image: string
-    }
+    member: MemberWithUser
     permissions: {
         canEdit: boolean
         canDelete: boolean
@@ -181,20 +201,17 @@ const MemberRow = ({
         canRemoveUser: boolean
     }
 }) => {
-    const initials = member.firstname.charAt(0) + member.surname.charAt(0)
+    const initials = (member.user.name || "?").charAt(0).toUpperCase()
     return (
-        <div
-            key={member.username}
-            className="flex items-center justify-between space-x-4"
-        >
+        <div className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
                 <Avatar>
-                    <AvatarImage src={member.image} />
+                    <AvatarImage src={member.user.image ?? undefined} />
                     <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
                 <div>
                     <p className="text-sm font-medium leading-none">
-                        {member.firstname} {member.surname}
+                        {member.user.name}
                     </p>
                     {!permissions.canUpdateRoleUser ? (
                         <p className="text-sm text-muted-foreground">
@@ -214,13 +231,7 @@ const MemberAction = ({
     member,
     permissions,
 }: {
-    member: {
-        firstname: string
-        surname: string
-        username: string
-        role: string
-        image: string
-    }
+    member: MemberWithUser
     permissions: {
         canEdit: boolean
         canDelete: boolean
@@ -231,15 +242,15 @@ const MemberAction = ({
 }) => {
     return (
         <form method="post" className="flex items-center space-x-4">
-            <input type="hidden" name="username" value={member.username} />
+            <input type="hidden" name="memberId" value={member.id} />
             <Select defaultValue={member.role} name="role">
-                <SelectTrigger className="ml-auto w-[110px]">
+                <SelectTrigger className="ml-auto w-27.5">
                     <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="owner">Owner</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="member">Member</SelectItem>
+                    <SelectItem value="owner">Eigenaar</SelectItem>
+                    <SelectItem value="admin">Beheerder</SelectItem>
+                    <SelectItem value="member">Lid</SelectItem>
                 </SelectContent>
             </Select>
             {permissions.canRemoveUser ? (
@@ -264,27 +275,13 @@ const MemberAction = ({
     )
 }
 
-const InvitationRow = ({
-    invitation,
-}: {
-    invitation: {
-        email: string
-        role: string
-        expires_at: Date
-        inviter_firstname: string
-        inviter_surname: string
-        invitation_id: string
-    }
-}) => {
+const InvitationRow = ({ invitation }: { invitation: Invitation }) => {
     return (
-        <div
-            key={invitation.invitation_id}
-            className="flex items-center justify-between space-x-4"
-        >
+        <div className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
                 <Avatar>
                     <AvatarFallback>
-                        {invitation.email.charAt(0).toUpperCase()}
+                        {(invitation.email || "?").charAt(0).toUpperCase()}
                     </AvatarFallback>
                 </Avatar>
                 <div>
@@ -299,21 +296,19 @@ const InvitationRow = ({
             <div>
                 <p className="text-sm font-medium leading-none">
                     Verloopt{" "}
-                    {formatDistanceToNow(invitation.expires_at, {
+                    {formatDistanceToNow(new Date(invitation.expiresAt), {
                         addSuffix: true,
                         locale: nl,
                     })}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                    {`Uitgenodigd door: ${invitation.inviter_firstname} ${invitation.inviter_surname}`}
                 </p>
             </div>
             <form method="post">
                 <input
                     type="hidden"
                     name="invitation_id"
-                    value={invitation.invitation_id}
+                    value={invitation.id}
                 />
+                <input type="hidden" name="email" value={invitation.email} />
                 <Button
                     variant="destructive"
                     className="shrink-0"
@@ -327,7 +322,11 @@ const InvitationRow = ({
     )
 }
 
-const InvitationForm = ({ organizationId }: { organizationId: string }) => {
+const InvitationForm = ({
+    organizationId,
+}: {
+    organizationId: Organization["id"]
+}) => {
     return (
         <form method="post" className="flex space-x-2">
             <input
@@ -341,13 +340,13 @@ const InvitationForm = ({ organizationId }: { organizationId: string }) => {
                 name="email"
             />
             <Select defaultValue="member" name="role">
-                <SelectTrigger className="ml-auto w-[110px]">
+                <SelectTrigger className="ml-auto w-27.5">
                     <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="owner">Owner</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="member">Member</SelectItem>
+                    <SelectItem value="owner">Eigenaar</SelectItem>
+                    <SelectItem value="admin">Beheerder</SelectItem>
+                    <SelectItem value="member">Lid</SelectItem>
                 </SelectContent>
             </Select>
             <Button
@@ -363,10 +362,9 @@ const InvitationForm = ({ organizationId }: { organizationId: string }) => {
 }
 
 const FormSchema = z.object({
-    email: z.string().email().optional(),
-    username: z.string().optional(),
+    email: z.email().optional(),
     role: z.enum(["owner", "admin", "member"]).optional(),
-    user_id: z.string().optional(),
+    memberId: z.string().optional(),
     invitation_id: z.string().optional(),
     organization_id: z.string().optional(),
     intent: z.enum([
@@ -382,19 +380,24 @@ export async function action({ request, params }: ActionFunctionArgs) {
         if (!params.slug) {
             throw handleActionError("not found: organization")
         }
+
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
         )
         const session = await getSession(request)
-        const organization = await getOrganization(
-            fdm,
-            params.slug,
-            session.user.id,
+
+        const organizations = await auth.api.listOrganizations({
+            headers: request.headers,
+        })
+        const organization = organizations.find(
+            (org) => org.slug === params.slug,
         )
         if (!organization) {
             throw handleActionError("not found: organization")
         }
+        const organizationId = organization.id
+        const organizationName = organization.name
 
         if (formValues.intent === "invite_user") {
             if (!formValues.email) {
@@ -406,68 +409,76 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!formValues.role) {
                 return handleActionError("missing: role")
             }
-            const invitationId = await inviteUserToOrganization(
-                fdm,
-                session.user.id,
-                formValues.email,
-                formValues.role,
-                organization.id,
-            )
-            const invitationEmail = await renderInvitationEmail(
-                formValues.email,
-                {
-                    firstname: session.user.firstname,
-                    surname: session.user.surname,
+
+            const invitation = await auth.api.createInvitation({
+                headers: request.headers,
+                body: {
+                    email: formValues.email,
+                    role: formValues.role,
+                    organizationId: organizationId,
                 },
-                organization.name,
-                invitationId,
-            )
-            await sendEmail(invitationEmail)
+            })
+
+            // better-auth might not send email by default depending on config.
+            // We'll send it manually using our template.
+            if (invitation?.id) {
+                const invitationEmail = await renderInvitationEmail(
+                    formValues.email,
+                    session.user,
+                    organizationName,
+                    invitation.id,
+                )
+                await sendEmail(invitationEmail)
+            }
 
             return dataWithSuccess(null, {
                 message: `Gebruiker ${formValues.email} is uitgenodigd! 🎉`,
             })
         }
         if (formValues.intent === "update_role") {
-            if (!formValues.username) {
-                return handleActionError("missing: username")
+            if (!formValues.memberId) {
+                return handleActionError("missing: memberId")
             }
             if (!formValues.role) {
                 return handleActionError("missing: role")
             }
-            await updateRoleOfUserAtOrganization(
-                fdm,
-                session.user.id,
-                organization.id,
-                formValues.username,
-                formValues.role,
-            )
+
+            await auth.api.updateMemberRole({
+                headers: request.headers,
+                body: {
+                    memberId: formValues.memberId,
+                    role: formValues.role,
+                    organizationId: organizationId,
+                },
+            })
             return dataWithSuccess(null, {
                 message: "Rol is bijgewerkt! 🎉",
             })
         }
         if (formValues.intent === "remove_user") {
-            if (!formValues.username) {
-                return handleActionError("missing: username")
+            if (!formValues.memberId) {
+                return handleActionError("missing: memberId")
             }
-            await removeUserFromOrganization(
-                fdm,
-                session.user.id,
-                organization.id,
-                formValues.username,
-            )
+            await auth.api.removeMember({
+                headers: request.headers,
+                body: {
+                    memberIdOrEmail: formValues.memberId,
+                    organizationId: organizationId,
+                },
+            })
             return dataWithSuccess(null, {
-                message: `Gebruiker ${formValues.username} is verwijderd`,
+                message: "Gebruiker is verwijderd",
             })
         }
         if (formValues.intent === "cancel_invite") {
             if (!formValues.invitation_id)
                 throw new Error("invalid invitation_id")
-            await cancelPendingInvitation(
-                fdm,
-                formValues.invitation_id,
-                session.user.id,
-            )
+            await auth.api.cancelInvitation({
+                headers: request.headers,
+                body: {
+                    invitationId: formValues.invitation_id,
+                },
+            })
             return dataWithSuccess(null, {
                 message: `Uitnodiging voor ${formValues.email} is ingetrokken`,
             })

@@ -25,11 +25,11 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "~/components/ui/popover"
-import { endMonth, startMonth } from "~/lib/calendar"
+import { endMonth } from "~/lib/calendar"
 import { cn } from "~/lib/utils"
 
 type DatePickerProps = {
-    label: string
+    label: string | undefined
     description?: string
     defaultValue?: Date
     field: ControllerRenderProps<FieldValues, string>

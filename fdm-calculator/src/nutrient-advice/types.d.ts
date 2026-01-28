@@ -84,4 +84,6 @@ export type NutrientAdviceInputs = {
     currentSoilData: CurrentSoilData
     /** NMI API key for authentication */
     nmiApiKey: string | undefined
+    /** Indicates if the field is a buffer strip */
+    b_bufferstrip?: boolean
 }

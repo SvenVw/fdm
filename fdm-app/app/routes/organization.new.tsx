@@ -1,20 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-    checkOrganizationSlugForAvailability,
-    createOrganization,
-} from "@svenvw/fdm-core"
 import { useEffect } from "react"
-import {
-    type ActionFunctionArgs,
-    Form,
-    type LoaderFunctionArgs,
-    type MetaFunction,
-} from "react-router"
+import { type ActionFunctionArgs, Form, type MetaFunction } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -32,11 +22,11 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
+import { Spinner } from "~/components/ui/spinner"
 import { Textarea } from "~/components/ui/textarea"
-import { getSession } from "~/lib/auth.server"
+import { auth, getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 
 export const meta: MetaFunction = () => {
@@ -52,24 +42,28 @@ export const meta: MetaFunction = () => {
 const FormSchema = z.object({
     name: z
         .string({
-            required_error: "Naam van de organisatie is verplicht",
+            error: (issue) =>
+                issue.input === undefined
+                    ? "Naam van de organisatie is verplicht"
+                    : undefined,
         })
         .min(3, {
-            message:
-                "Naam van de organisatie moet minimaal 3 karakters bevatten",
+            error: "Naam van de organisatie moet minimaal 3 karakters bevatten",
         }),
     slug: z
         .string({
-            required_error: "ID de organisatie is verplicht",
+            error: (issue) =>
+                issue.input === undefined
+                    ? "ID de organisatie is verplicht"
+                    : undefined,
         })
         .refine(isValidSlug, {
-            message:
-                "ID moet minimaal 3 karakters bevatten, enkel kleine letters, cijfers of '-'",
+            error: "ID moet minimaal 3 karakters bevatten, enkel kleine letters, cijfers of '-'",
         }),
     description: z.string({}).optional(),
 })
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader() {
     try {
         return {}
     } catch (error) {
@@ -102,7 +96,7 @@ export default function AddOrganizationPage() {
     useEffect(() => {
         const subscription = form.watch((value, { name }) => {
             if (name === "name") {
-                const slug = convertToSlug(value.name)
+                const slug = convertToSlug(value.name ?? "")
                 form.setValue("slug", slug, {
                     shouldDirty: true,
                     shouldValidate: true,
@@ -211,7 +205,7 @@ export default function AddOrganizationPage() {
                                             className="m-auto"
                                         >
                                             {form.formState.isSubmitting && (
-                                                <LoadingSpinner />
+                                                <Spinner />
                                             )}
                                             Aanmaken
                                         </Button>
@@ -229,8 +223,7 @@ export default function AddOrganizationPage() {
 export async function action({ request }: ActionFunctionArgs) {
     try {
         // Get the session
-        const session = await getSession(request)
-        const user_id = session.user.id
+        await getSession(request)
 
         // Get the form values
         const formValues = await extractFormValuesFromRequest(
@@ -242,11 +235,14 @@ export async function action({ request }: ActionFunctionArgs) {
         const description = formValues.description || ""
 
         // Check if slug is available
-        const slugIsAvailable = await checkOrganizationSlugForAvailability(
-            fdm,
-            slug,
-        )
-        if (!slugIsAvailable) {
+        const { status } = await auth.api.checkOrganizationSlug({
+            headers: request.headers,
+            body: {
+                slug: slug,
+            },
+        })
+
+        if (!status) {
             return dataWithError(
                 null,
                 "Naam voor organisatie is niet meer beschikbaar. Kies een andere naam",
@@ -254,7 +250,16 @@ export async function action({ request }: ActionFunctionArgs) {
         }
 
         // Create the organization
-        await createOrganization(fdm, user_id, name, slug, description)
+        await auth.api.createOrganization({
+            headers: request.headers,
+            body: {
+                name,
+                slug,
+                metadata: {
+                    description,
+                },
+            },
+        })
 
         return redirectWithSuccess(`/organization/${formValues.slug}`, {
             message: `Organisatie ${formValues.name} is aangemaakt! 🎉`,

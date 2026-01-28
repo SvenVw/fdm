@@ -1,4 +1,3 @@
-import { getOrganizationsForUser } from "@svenvw/fdm-core"
 import posthog from "posthog-js"
 import { useEffect } from "react"
 import type { LoaderFunctionArgs } from "react-router"
@@ -16,10 +15,9 @@ import {
     SidebarInset,
     SidebarProvider,
 } from "~/components/ui/sidebar"
-import { checkSession, getSession } from "~/lib/auth.server"
+import { auth, checkSession, getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
 
 /**
  * Retrieves the session from the HTTP request and returns user information if available.
@@ -43,10 +41,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
         const selectedOrganizationSlug = params.slug
 
-        const organizations = await getOrganizationsForUser(
-            fdm,
-            session.user.id,
-        )
+        const organizations = await auth.api.listOrganizations({
+            headers: request.headers,
+        })
 
         // Return user information from loader
         return {

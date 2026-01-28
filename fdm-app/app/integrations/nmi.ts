@@ -99,7 +99,7 @@ export async function getSoilParameterEstimates(
     if (!parsedResponse.success) {
         console.error(
             "NMI API response validation failed:",
-            JSON.stringify(parsedResponse.error.format(), null, 2),
+            JSON.stringify(z.treeifyError(parsedResponse.error), null, 2),
         )
         throw new Error(
             `Invalid response from NMI API: ${parsedResponse.error.message}`,

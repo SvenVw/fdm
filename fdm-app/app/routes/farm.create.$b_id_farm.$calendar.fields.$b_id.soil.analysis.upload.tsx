@@ -192,7 +192,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
             Number(soilAnalysis.a_depth_upper),
         )
 
-        return redirectWithSuccess("../", {
+        const url = new URL(request.url)
+
+        // Search needed for the /farm/$b_id_farm/$calendar/field/new/fields route
+        return redirectWithSuccess(`../${url.search}`, {
             message: "Bodemanalyse is toegevoegd! 🎉",
         })
     } catch (error) {

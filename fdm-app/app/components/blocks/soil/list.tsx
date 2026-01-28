@@ -2,8 +2,8 @@ import type { SoilParameterDescription } from "@svenvw/fdm-core"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
 import { NavLink } from "react-router"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
+import { Spinner } from "~/components/ui/spinner"
 import { cn } from "~/lib/utils"
 import type { SoilAnalysis } from "./types"
 
@@ -110,7 +110,7 @@ export function SoilAnalysesList({
                                     >
                                         {fetcher.state === "submitting" ? (
                                             <div className="flex items-center space-x-2">
-                                                <LoadingSpinner />
+                                                <Spinner />
                                                 <span>Verwijderen...</span>
                                             </div>
                                         ) : (

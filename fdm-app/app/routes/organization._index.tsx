@@ -1,8 +1,6 @@
-import { getOrganizationsForUser } from "@svenvw/fdm-core"
 import type { LoaderFunctionArgs } from "react-router"
 import { NavLink, useLoaderData } from "react-router-dom"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -12,27 +10,17 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { getSession } from "~/lib/auth.server"
+import { auth, getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
-
-// Define the type for a single organization based on getOrganizationsForUser return type
-type OrganizationType = {
-    organization_id: string
-    name: string
-    slug: string
-    role: string
-    is_verified: boolean
-    description: string
-}
 
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
-        const session = await getSession(request)
-        const organizations = await getOrganizationsForUser(
-            fdm,
-            session.user.id,
-        )
+        await getSession(request)
+
+        const organizations = await auth.api.listOrganizations({
+            headers: request.headers,
+        })
+
         return { organizations }
     } catch (error) {
         throw handleLoaderError(error)
@@ -40,9 +28,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function OrganizationsIndex() {
-    const { organizations } = useLoaderData<{
-        organizations: OrganizationType[]
-    }>()
+    const { organizations } = useLoaderData<typeof loader>()
 
     return (
         <main className="container">
@@ -62,7 +48,7 @@ export default function OrganizationsIndex() {
                 </div>
 
                 {organizations.length === 0 ? (
-                    <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
+                    <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-87.5">
                         <div className="flex flex-col space-y-2 text-center">
                             <h1 className="text-2xl font-semibold tracking-tight">
                                 Je bent nog geen lid van een organisatie
@@ -80,25 +66,20 @@ export default function OrganizationsIndex() {
                     </div>
                 ) : (
                     <div className="grid gap-4 grid-cols-1">
-                        {organizations.map((org: OrganizationType) => (
-                            <Card key={org.organization_id}>
+                        {organizations.map((org) => (
+                            <Card key={org.id}>
                                 <CardHeader>
                                     <CardTitle>
                                         <div className="flex items-center justify-between">
                                             {org.name}
-                                            <Badge
-                                                className="ml-auto"
-                                                variant="secondary"
-                                            >
-                                                {org.role}
-                                            </Badge>
                                         </div>
                                     </CardTitle>
                                     <CardDescription />
                                 </CardHeader>
                                 <CardContent>
                                     <p className="text-sm text-muted-foreground truncate">
-                                        {org.description}
+                                        {org.metadata?.description ??
+                                            "Geen beschrijving"}
                                     </p>
                                 </CardContent>
                                 <CardFooter>

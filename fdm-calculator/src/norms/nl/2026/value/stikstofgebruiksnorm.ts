@@ -6,6 +6,7 @@ import {
     getRegion,
     isFieldInNVGebied,
 } from "../../2025/value/stikstofgebruiksnorm"
+import { nonBouwlandCodes } from "../../constant"
 import type { GebruiksnormResult } from "../../types"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {
@@ -15,7 +16,6 @@ import type {
     NormsByRegion,
     RegionKey,
 } from "./types"
-import { nonBouwlandCodes } from "../../constant"
 
 /**
  * Retrieves the appropriate set of nitrogen norms (`NormsByRegion`) for a given cultivation.
@@ -229,6 +229,12 @@ function determineSubTypeOmschrijving(
             ?.omschrijving
     }
 
+    // Maize logic based on derogation status
+    if (standard.cultivation_rvo_table2 === "Akkerbouwgewassen, mais") {
+        // In 2026 derogation is no longer possible, so we always return "non-derogatie"
+        return "non-derogatie"
+    }
+
     // Luzerne logic based on cultivation history
     if (standard.cultivation_rvo_table2 === "Akkerbouwgewassen, Luzerne") {
         const lucerneCultivationCodes = standard.b_lu_catalogue_match
@@ -350,11 +356,100 @@ function calculateKorting(
 
     const sandyOrLoessRegions: RegionKey[] = ["zand_nwc", "zand_zuid", "loess"]
 
-    // Check if field is outside regions with korting
+    // Check if field is outside regions with korting (2026: ONLY Sand/Loess)
     if (!sandyOrLoessRegions.includes(region)) {
         return {
             amount: new Decimal(0),
             description: ".",
+        }
+    }
+
+    // Sort cultivations by start date
+    const sortedCultivations = [...cultivations].sort((a, b) => {
+        if (!a.b_lu_start || !b.b_lu_start) return 0
+        return a.b_lu_start.getTime() - b.b_lu_start.getTime()
+    })
+
+    // Find the transition from Grassland to Next Crop in 2026
+    for (let i = 0; i < sortedCultivations.length - 1; i++) {
+        const prevCult = sortedCultivations[i]
+        const currCult = sortedCultivations[i + 1]
+
+        if (!prevCult.b_lu_end || !currCult.b_lu_start) continue
+
+        // Check if transition happens in 2026
+        if (prevCult.b_lu_end.getFullYear() !== currentYear) continue
+
+        const prevStandard = nitrogenStandardsData.find((ns) =>
+            ns.b_lu_catalogue_match.includes(prevCult.b_lu_catalogue),
+        )
+        const currStandard = nitrogenStandardsData.find((ns) =>
+            ns.b_lu_catalogue_match.includes(currCult.b_lu_catalogue),
+        )
+
+        const isPrevGrass = nonBouwlandCodes.includes(prevCult.b_lu_catalogue)
+        const isCurrGrass = nonBouwlandCodes.includes(currCult.b_lu_catalogue)
+
+        // 1. Grassland Renewal (Gras-na-Gras) -> 50 kg N/ha korting
+        // Only applies on Sand/Loess (already checked above)
+        if (isPrevGrass && isCurrGrass) {
+            const renewalDate = prevCult.b_lu_end
+            // Sand/Loess: June 1 - August 31
+            if (
+                renewalDate >= new Date(currentYear, 5, 1) && // June 1
+                renewalDate <= new Date(currentYear, 7, 31) // Aug 31
+            ) {
+                return {
+                    amount: new Decimal(50),
+                    description: ". Korting: 50kg N/ha: graslandvernieuwing",
+                }
+            }
+            // Error if date is invalid for renewal
+            throw new Error(
+                "Graslandvernieuwing op zand- en lössgrond is alleen toegestaan tussen 1 juni en 31 augustus.",
+            )
+        }
+
+        // 2. Grassland Destruction (Gras-naar-Bouwland) -> 65 kg N/ha korting
+        const isMaize = currStandard?.cultivation_rvo_table2.includes("mais")
+        const isPotato = currStandard?.type === "aardappel"
+        const isSeedPotato =
+            currStandard?.cultivation_rvo_table2.includes("pootaardappelen") ||
+            currCult.b_lu_catalogue === "nl_2015" ||
+            currCult.b_lu_catalogue === "nl_2016" ||
+            currStandard?.cultivation_rvo_table2.includes("uitgroeiteelt")
+
+        if (isPrevGrass && (isMaize || (isPotato && !isSeedPotato))) {
+            // Check Exclusion: Was previous grass a Catch Crop?
+            // "Infer from sowing date (late previous year)"
+            // If sown in autumn of previous year (e.g. >= Aug 1), it's a catch crop.
+            // Also check is_vanggewas property if true.
+            const isCatchCrop =
+                prevStandard?.is_vanggewas ||
+                (prevCult.b_lu_start &&
+                    prevCult.b_lu_start.getFullYear() === previousYear &&
+                    prevCult.b_lu_start.getMonth() >= 7) // August or later
+
+            if (isCatchCrop) {
+                // No korting allowed if it was a catch crop
+                continue
+            }
+
+            const destructionDate = prevCult.b_lu_end
+            // Sand/Loess: Feb 1 - May 10
+            if (
+                destructionDate >= new Date(currentYear, 1, 1) && // Feb 1
+                destructionDate <= new Date(currentYear, 4, 10) // May 10
+            ) {
+                return {
+                    amount: new Decimal(65),
+                    description: ". Korting: 65kg N/ha: graslandvernietiging",
+                }
+            }
+            // Error if date is invalid for destruction
+            throw new Error(
+                "Graslandvernietiging op zand- en lössgrond is alleen toegestaan tussen 1 februari en 10 mei.",
+            )
         }
     }
 
@@ -554,6 +649,14 @@ export async function calculateNL2026StikstofGebruiksNorm(
     const has_grazing_intention = input.farm.has_grazing_intention
     const field = input.field
     const cultivations = input.cultivations
+
+    // Check for buffer strip
+    if (field.b_bufferstrip) {
+        return {
+            normValue: 0,
+            normSource: "Bufferstrook: geen plaatsingsruimte",
+        }
+    }
 
     // Determine hoofdteelt
     const b_lu_catalogue = determineNLHoofdteelt(cultivations, 2026)

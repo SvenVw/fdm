@@ -40,7 +40,6 @@ import { Form, redirect, useSearchParams } from "react-router"
 import { useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
     Accordion,
     AccordionContent,
@@ -64,6 +63,7 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
+import { Spinner } from "~/components/ui/spinner"
 import { auth } from "~/lib/auth.server"
 import { signIn } from "~/lib/auth-client"
 import { clientConfig } from "~/lib/config"
@@ -126,14 +126,9 @@ export const links: LinksFunction = () => {
 
 const FormSchema = z.object({
     timeZone: z.string().optional(),
-    email: z.coerce
-        .string({
-            required_error:
-                "Voor aanmelden met e-mail hebben we je e-mailadres nodig",
-        })
-        .email({
-            message: "Dit is geen geldig e-mailadres",
-        }),
+    email: z.email({
+        error: "Dit is geen geldig e-mailadres",
+    }),
 })
 
 /**
@@ -396,7 +391,7 @@ export default function SignIn() {
                                                 {loadingProvider ===
                                                 "microsoft" ? (
                                                     <div className="flex items-center space-x-2">
-                                                        <LoadingSpinner />
+                                                        <Spinner />
                                                         <span>
                                                             Aanmelden...
                                                         </span>
@@ -465,7 +460,7 @@ export default function SignIn() {
                                                 {loadingProvider ===
                                                 "google" ? (
                                                     <div className="flex items-center space-x-2">
-                                                        <LoadingSpinner />
+                                                        <Spinner />
                                                         <span>
                                                             Aanmelden...
                                                         </span>
@@ -584,7 +579,7 @@ export default function SignIn() {
                                                         {form.formState
                                                             .isSubmitting ? (
                                                             <div className="flex items-center space-x-2">
-                                                                <LoadingSpinner />
+                                                                <Spinner />
                                                                 <span>
                                                                     Aanmelden...
                                                                 </span>
