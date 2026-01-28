@@ -203,6 +203,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
 
                 return {
                     ...field,
+                    b_lu_catalogue: (item as CropRow).b_lu_catalogue,
                     searchTarget: `${field.b_name} ${commonTerms} ${dateTermsArr(field.b_lu_start)} ${dateTermsArr(field.b_lu_end)} ${dateTermsArr(field.b_lu_harvest_date)}`,
                 }
             })
@@ -256,7 +257,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
             // Include each field's selection state too
             ...memoizedData.flatMap((crop) =>
                 crop.fields.map((field) => [
-                    field.b_id,
+                    `${crop.b_lu_catalogue}_${field.b_id}`,
                     selection[crop.b_lu_catalogue]?.[field.b_id],
                 ]),
             ),
@@ -267,7 +268,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
         data: memoizedData,
         columns,
         getRowId: (row) =>
-            row.type === "crop" ? `crop_${row.b_lu_catalogue}` : row.b_id,
+            row.type === "crop"
+                ? `crop_${row.b_lu_catalogue}`
+                : `${row.b_lu_catalogue}_${row.b_id}`,
         getCoreRowModel: getCoreRowModel(),
         onSortingChange: setSorting,
         getSortedRowModel: getSortedRowModel(),
