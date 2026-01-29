@@ -25,7 +25,7 @@ export const meta: MetaFunction = () => {
 export const changelogEntries: ChangelogEntry[] = [
     {
         version: "v0.27.0",
-        date: "28 januari 2026",
+        date: "29 januari 2026",
         title: "Bemestingsplan als pdf, Bodemkaart in Atlas en uitklapbaar bouwplan",
         description:
             "De eerste release van 2026 maakt het mogelijk om het bemestingsplan als pdf te downloaden, voegt de bodemkaart toe aan de Atlas en maakt de bouwplantabel uitklapbaar voor meer detail. Daarnaast is er verbeterde ondersteuning voor bufferstroken.",
