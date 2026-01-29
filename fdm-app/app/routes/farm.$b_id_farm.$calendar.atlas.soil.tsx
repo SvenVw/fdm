@@ -192,22 +192,27 @@ export default function FarmAtlasSoilBlock() {
                 return placeholderData
             }
             try {
-                const cachedIndex = cachedBodemData.findIndex(
+                const found = cachedBodemData.find(
                     (item) => item.key === soilcode,
                 )
-                if (cachedIndex > -1) {
+                if (found) {
                     // If found in the cache, move the cached item to the end of the list
-                    const found = cachedBodemData[cachedIndex]
                     setCachedBodemData((cachedBodemData) => {
-                        const update = [...cachedBodemData]
-                        const cached = update.splice(cachedIndex, 1)
-                        update.push(cached[0])
-                        return update
+                        const cachedIndex = cachedBodemData.findIndex(
+                            (item) => item.key === soilcode,
+                        )
+                        if (cachedIndex > -1) {
+                            const update = [...cachedBodemData]
+                            const cached = update.splice(cachedIndex, 1)
+                            update.push(cached[0])
+                            return update
+                        }
+                        return cachedBodemData
                     })
                     return found.value
                 }
                 const response: BodemResponse = await fetch(
-                    `/farm/undefined/all/atlas/soil/bodemdata/${soilcode}`,
+                    `/farm/undefined/all/atlas/soil/bodemdata/${encodeURIComponent(soilcode)}`,
                 ).then((r) => r.json())
                 if (response.success && response.data) {
                     // If Bodemdata has data, cache it by adding to the end of the cache list
