@@ -1,5 +1,6 @@
 import { getFields } from "@svenvw/fdm-core"
 import { simplify } from "@turf/turf"
+import DOMPurify from "dompurify"
 import type { FeatureCollection, Geometry } from "geojson"
 import maplibregl from "maplibre-gl"
 import proj4 from "proj4"
@@ -213,10 +214,13 @@ export default function FarmAtlasSoilBlock() {
                     const data = Object.keys(response.data).length
                         ? (response.data as BodemData)
                         : placeholderData
-                    data.omschrijving = data.omschrijving?.replace(
-                        /<[^>]*>/g,
-                        "",
-                    )
+                    if (data.omschrijving)
+                        data.omschrijving = DOMPurify(window).sanitize(
+                            data.omschrijving,
+                            {
+                                ALLOWED_TAGS: [],
+                            },
+                        )
                     setCachedBodemData((cachedBodemData) => {
                         const update = [
                             ...cachedBodemData,
