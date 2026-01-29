@@ -213,9 +213,10 @@ export default function FarmAtlasSoilBlock() {
                     const data = Object.keys(response.data).length
                         ? (response.data as BodemData)
                         : placeholderData
-                    data.omschrijving = data.omschrijving
-                        ?.replaceAll("<p>", "")
-                        .replaceAll("</p>", "")
+                    data.omschrijving = data.omschrijving?.replace(
+                        /<[^>]*>/g,
+                        "",
+                    )
                     setCachedBodemData((cachedBodemData) => {
                         const update = [
                             ...cachedBodemData,
