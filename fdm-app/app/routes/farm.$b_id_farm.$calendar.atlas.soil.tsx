@@ -1,5 +1,6 @@
 import { getFields } from "@svenvw/fdm-core"
 import { simplify } from "@turf/turf"
+import DOMPurify from "dompurify"
 import type { FeatureCollection, Geometry } from "geojson"
 import maplibregl from "maplibre-gl"
 import proj4 from "proj4"
@@ -26,6 +27,7 @@ import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import { Badge } from "~/components/ui/badge"
+import { Spinner } from "~/components/ui/spinner"
 import { getMapStyle } from "~/integrations/map"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
@@ -136,6 +138,18 @@ export default function FarmAtlasSoilBlock() {
     const fieldsSelectedStyle = getFieldsStyle("fieldsSelected")
     const layerLayout = { visibility: showFields ? "visible" : "none" } as const
 
+    interface BodemData {
+        omschrijving?: string
+    }
+    interface BodemResponse {
+        success: boolean
+        data?: Partial<BodemData>
+    }
+    // Ordered from the least recently used to the most
+    const [cachedBodemData, setCachedBodemData] = useState<
+        { key: string; value: BodemData }[]
+    >([])
+
     // ViewState logic
     const initialViewState = getViewState(fields)
     const [viewState, setViewState] = useState<ViewState>(() => {
@@ -168,6 +182,79 @@ export default function FarmAtlasSoilBlock() {
     const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
         setViewState(event.viewState)
     }, [])
+
+    const fetchBodemData = useCallback(
+        async (first_soilcode: string | undefined) => {
+            const placeholderData = {
+                omschrijving: "geen informatie beschikbaar",
+            }
+            if (!first_soilcode) {
+                return placeholderData
+            }
+            try {
+                const found = cachedBodemData.find(
+                    (item) => item.key === first_soilcode,
+                )
+                if (found) {
+                    // If found in the cache, move the cached item to the end of the list
+                    setCachedBodemData((cachedBodemData) => {
+                        const cachedIndex = cachedBodemData.findIndex(
+                            (item) => item.key === first_soilcode,
+                        )
+                        if (cachedIndex > -1) {
+                            const update = [...cachedBodemData]
+                            const cached = update.splice(cachedIndex, 1)
+                            update.push(cached[0])
+                            return update
+                        }
+                        return cachedBodemData
+                    })
+                    return found.value
+                }
+                const response: BodemResponse = await fetch(
+                    `/farm/undefined/all/atlas/soil/bodemdata/${encodeURIComponent(first_soilcode)}`,
+                ).then((r) => r.json())
+                if (response.success && response.data) {
+                    // If Bodemdata has data, cache it by adding to the end of the cache list
+                    const data = Object.keys(response.data).length
+                        ? (response.data as BodemData)
+                        : placeholderData
+                    if (data.omschrijving)
+                        data.omschrijving = DOMPurify(window).sanitize(
+                            data.omschrijving,
+                            {
+                                ALLOWED_TAGS: [],
+                            },
+                        )
+                    setCachedBodemData((cachedBodemData) => {
+                        const update = [
+                            ...cachedBodemData,
+                            {
+                                key: first_soilcode,
+                                value: data,
+                            },
+                        ]
+                        if (update.length > 20) {
+                            // If the list gets too long, drop the least recently used items
+                            update.splice(0, update.length - 20)
+                        }
+                        return update
+                    })
+
+                    return data
+                }
+                return {
+                    omschrijving: `Error: ${(response as any).error ?? "onbekende error"}`,
+                }
+            } catch (e) {
+                console.error(e)
+                return {
+                    omschrijving: `Error: ${(e as any)?.message ?? "onbekende error"}`,
+                }
+            }
+        },
+        [cachedBodemData],
+    )
 
     const onMapClick = useCallback(
         async (event: MapLayerMouseEvent) => {
@@ -217,6 +304,7 @@ export default function FarmAtlasSoilBlock() {
                 const response = await fetch(url)
                 if (response.ok) {
                     const data = (await response.json()) as FeatureCollection
+                    console.log(data)
                     if (data.features && data.features.length > 0) {
                         const feature = data.features[0]
                         const props = feature.properties || {}
@@ -241,13 +329,33 @@ export default function FarmAtlasSoilBlock() {
                             latitude: lngLat.lat,
                             properties: props,
                         })
+
+                        // Get additional data from BodemData
+                        const bodemData = await fetchBodemData(
+                            props.first_soilcode,
+                        )
+                        setPopupInfo((popupInfo) => {
+                            if (
+                                popupInfo &&
+                                popupInfo.properties.first_soilcode ===
+                                    props.first_soilcode
+                            )
+                                return {
+                                    ...popupInfo,
+                                    properties: {
+                                        ...popupInfo.properties,
+                                        bodemData: bodemData,
+                                    },
+                                }
+                            return popupInfo
+                        })
                     }
                 }
             } catch (e) {
                 console.error("Failed to fetch soil info", e)
             }
         },
-        [showSoil],
+        [fetchBodemData, showSoil],
     )
 
     const onToggleSoil = useCallback(() => {
@@ -363,7 +471,10 @@ export default function FarmAtlasSoilBlock() {
                         latitude={popupInfo.latitude}
                         closeButton={true}
                         closeOnClick={false}
-                        onClose={() => setPopupInfo(null)}
+                        onClose={() => {
+                            setSelectedSoilFeature(null)
+                            setPopupInfo(null)
+                        }}
                         anchor="bottom"
                         maxWidth="350px"
                     >
@@ -375,15 +486,27 @@ export default function FarmAtlasSoilBlock() {
                                             .normal_soilprofile_name ||
                                         "Onbekende bodem"}
                                 </h3>
-                                {popupInfo.properties.soilcode && (
+                                {popupInfo.properties.first_soilcode && (
                                     <Badge
                                         variant="secondary"
                                         className="shrink-0 font-mono"
                                     >
-                                        {popupInfo.properties.soilcode}
+                                        {popupInfo.properties.first_soilcode}
                                     </Badge>
                                 )}
                             </div>
+                            {popupInfo.properties.bodemData ? (
+                                popupInfo.properties.bodemData.omschrijving && (
+                                    <p className="text-muted-foreground">
+                                        {
+                                            popupInfo.properties.bodemData
+                                                .omschrijving
+                                        }
+                                    </p>
+                                )
+                            ) : (
+                                <Spinner />
+                            )}
                         </div>
                     </Popup>
                 )}
