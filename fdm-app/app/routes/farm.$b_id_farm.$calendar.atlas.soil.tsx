@@ -137,8 +137,13 @@ export default function FarmAtlasSoilBlock() {
     const fieldsSelectedStyle = getFieldsStyle("fieldsSelected")
     const layerLayout = { visibility: showFields ? "visible" : "none" } as const
 
-    interface BodemData { omschrijving: }
-    interface BodemResponse { success: boolean, data?: Partial<BodemData> }
+    interface BodemData {
+        omschrijving?: string
+    }
+    interface BodemResponse {
+        success: boolean
+        data?: Partial<BodemData>
+    }
     // Ordered from the least recently used to the most
     const [cachedBodemData, setCachedBodemData] = useState<
         { key: string; value: BodemData }[]
@@ -176,6 +181,67 @@ export default function FarmAtlasSoilBlock() {
     const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
         setViewState(event.viewState)
     }, [])
+
+    const fetchBodemData = useCallback(
+        async (soilcode: string | undefined) => {
+            const placeholderData = {
+                omschrijving: "geen informatie beschikbaar",
+            }
+            if (!soilcode) {
+                return placeholderData
+            }
+            try {
+                const cachedIndex = cachedBodemData.findIndex(
+                    (item) => item.key === soilcode,
+                )
+                if (cachedIndex > -1) {
+                    // If found in the cache, move the cached item to the end of the list
+                    const found = cachedBodemData[cachedIndex]
+                    setCachedBodemData((cachedBodemData) => {
+                        const update = [...cachedBodemData]
+                        const cached = update.splice(cachedIndex, 1)
+                        update.push(cached[0])
+                        return update
+                    })
+                    return found.value
+                }
+                const response: BodemResponse = await fetch(
+                    `/farm/undefined/all/atlas/soil/bodemdata/${soilcode}`,
+                ).then((r) => r.json())
+                if (response.success && response.data) {
+                    // If Bodemdata has data, cache it by adding to the end of the cache list
+                    const data = Object.keys(response.data).length
+                        ? (response.data as BodemData)
+                        : placeholderData
+                    data.omschrijving = data.omschrijving
+                        ?.replaceAll("<p>", "")
+                        .replaceAll("</p>", "")
+                    setCachedBodemData((cachedBodemData) => {
+                        const update = [
+                            ...cachedBodemData,
+                            {
+                                key: soilcode,
+                                value: data,
+                            },
+                        ]
+                        if (update.length > 20) {
+                            // If the list gets too long, drop the least recently used items
+                            update.splice(0, update.length - 20)
+                        }
+                        return update
+                    })
+
+                    return data
+                }
+            } catch (e) {
+                console.error(e)
+                return {
+                    omschrijving: `Error: ${(e as any)?.message ?? "onbekende error"}`,
+                }
+            }
+        },
+        [cachedBodemData],
+    )
 
     const onMapClick = useCallback(
         async (event: MapLayerMouseEvent) => {
@@ -251,100 +317,28 @@ export default function FarmAtlasSoilBlock() {
                         })
 
                         // Get additional data from BodemData
-                        const placeholderData = {
-                            omschrijving: "geen informatie beschikbaar",
-                        }
-                        if (!props.soilcode) {
-                            return placeholderData
-                        }
-                        try {
-                            const cachedIndex = cachedBodemData.findIndex(
-                                (item) => item.key === props.soilcode,
+                        const bodemData = await fetchBodemData(props.soilcode)
+                        setPopupInfo((popupInfo) => {
+                            if (
+                                popupInfo &&
+                                popupInfo.properties.soilcode === props.soilcode
                             )
-                            if (cachedIndex > -1) {
-                                // If found in the cache, move the cached item to the end of the list
-                                const found = cachedBodemData[cachedIndex]
-                                setCachedBodemData((cachedBodemData) => {
-                                    const update = [...cachedBodemData]
-                                    const cached = update.splice(cachedIndex, 1)
-                                    update.push(cached[0])
-                                    return update
-                                })
-                                setPopupInfo((popupInfo) => {
-                                    if (
-                                        popupInfo?.properties.soilcode ===
-                                        props.soilcode
-                                    ) {
-                                        const newProps = {
-                                            ...popupInfo?.properties,
-                                        }
-                                        newProps.bodemData = found.value
-                                        return {
-                                            ...(popupInfo ?? {
-                                                latitude: 0,
-                                                longitude: 0,
-                                            }),
-                                            properties: newProps,
-                                        }
-                                    }
-                                    return popupInfo
-                                })
-                                return found
-                            }
-                            const response: BodemResponse = await fetch(
-                                `/farm/undefined/all/atlas/soil/bodemdata/${props.soilcode}`,
-                            ).then((r) => r.json())
-                            if (response.success && response.data) {
-                                // If Bodemdata has data, cache it by adding to the end of the cache list
-                                const data = Object.keys(response.data).length
-                                    ? response.data as BodemData
-                                    : placeholderData
-                                setCachedBodemData((cachedBodemData) => {
-                                    const update = [
-                                        ...cachedBodemData,
-                                        {
-                                            key: props.soilcode,
-                                            value: data,
-                                        },
-                                    ]
-                                    if (update.length > 20) {
-                                        // If the list gets too long, drop the least recently used items
-                                        update.splice(0, update.length - 20)
-                                    }
-                                    return update
-                                })
-                                setPopupInfo((popupInfo) => {
-                                    if (
-                                        popupInfo?.properties.soilcode ===
-                                        props.soilcode
-                                    ) {
-                                        const newProps = {
-                                            ...popupInfo?.properties,
-                                        }
-                                        newProps.bodemData = data
-                                        return {
-                                            ...(popupInfo ?? {
-                                                latitude: 0,
-                                                longitude: 0,
-                                            }),
-                                            properties: newProps,
-                                        }
-                                    }
-                                    return popupInfo
-                                })
-                                return data
-                            }
-                        } catch (e) {
-                            console.error(e)
-                            return { error: (e as any)?.message ?? "" }
-                        }
+                                return {
+                                    ...popupInfo,
+                                    properties: {
+                                        ...popupInfo.properties,
+                                        bodemData: bodemData,
+                                    },
+                                }
+                            return popupInfo
+                        })
                     }
                 }
             } catch (e) {
                 console.error("Failed to fetch soil info", e)
             }
         },
-        [cachedBodemData, showSoil],
+        [fetchBodemData, showSoil],
     )
 
     const onToggleSoil = useCallback(() => {
