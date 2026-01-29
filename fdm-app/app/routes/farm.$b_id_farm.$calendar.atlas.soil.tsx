@@ -471,7 +471,10 @@ export default function FarmAtlasSoilBlock() {
                         latitude={popupInfo.latitude}
                         closeButton={true}
                         closeOnClick={false}
-                        onClose={() => setPopupInfo(null)}
+                        onClose={() => {
+                            setSelectedSoilFeature(null)
+                            setPopupInfo(null)
+                        }}
                         anchor="bottom"
                         maxWidth="350px"
                     >
