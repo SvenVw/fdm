@@ -330,7 +330,9 @@ export default function FarmAtlasSoilBlock() {
                         })
 
                         // Get additional data from BodemData
-                        const bodemData = await fetchBodemData(props.soilcode)
+                        const bodemData = await fetchBodemData(
+                            props.soilcode.split("/")[0],
+                        )
                         setPopupInfo((popupInfo) => {
                             if (
                                 popupInfo &&
