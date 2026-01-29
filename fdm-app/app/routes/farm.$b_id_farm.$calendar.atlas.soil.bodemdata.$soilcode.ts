@@ -9,7 +9,7 @@ export async function loader({ params }: Route.LoaderArgs) {
         const timeoutId = setTimeout(() => controller.abort(), 5000)
 
         const response = await fetch(
-            `https://legenda-bodemkaart.bodemdata.nl/soilmaplegendserver/item/bodemklasse/${params.soilcode}`,
+            `https://legenda-bodemkaart.bodemdata.nl/soilmaplegendserver/item/bodemklasse/${encodeURIComponent(params.soilcode)}`,
             { signal: controller.signal },
         )
         clearTimeout(timeoutId)
