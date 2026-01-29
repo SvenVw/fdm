@@ -184,22 +184,22 @@ export default function FarmAtlasSoilBlock() {
     }, [])
 
     const fetchBodemData = useCallback(
-        async (soilcode: string | undefined) => {
+        async (first_soilcode: string | undefined) => {
             const placeholderData = {
                 omschrijving: "geen informatie beschikbaar",
             }
-            if (!soilcode) {
+            if (!first_soilcode) {
                 return placeholderData
             }
             try {
                 const found = cachedBodemData.find(
-                    (item) => item.key === soilcode,
+                    (item) => item.key === first_soilcode,
                 )
                 if (found) {
                     // If found in the cache, move the cached item to the end of the list
                     setCachedBodemData((cachedBodemData) => {
                         const cachedIndex = cachedBodemData.findIndex(
-                            (item) => item.key === soilcode,
+                            (item) => item.key === first_soilcode,
                         )
                         if (cachedIndex > -1) {
                             const update = [...cachedBodemData]
@@ -212,7 +212,7 @@ export default function FarmAtlasSoilBlock() {
                     return found.value
                 }
                 const response: BodemResponse = await fetch(
-                    `/farm/undefined/all/atlas/soil/bodemdata/${encodeURIComponent(soilcode)}`,
+                    `/farm/undefined/all/atlas/soil/bodemdata/${encodeURIComponent(first_soilcode)}`,
                 ).then((r) => r.json())
                 if (response.success && response.data) {
                     // If Bodemdata has data, cache it by adding to the end of the cache list
@@ -230,7 +230,7 @@ export default function FarmAtlasSoilBlock() {
                         const update = [
                             ...cachedBodemData,
                             {
-                                key: soilcode,
+                                key: first_soilcode,
                                 value: data,
                             },
                         ]
@@ -304,6 +304,7 @@ export default function FarmAtlasSoilBlock() {
                 const response = await fetch(url)
                 if (response.ok) {
                     const data = (await response.json()) as FeatureCollection
+                    console.log(data)
                     if (data.features && data.features.length > 0) {
                         const feature = data.features[0]
                         const props = feature.properties || {}
@@ -331,12 +332,13 @@ export default function FarmAtlasSoilBlock() {
 
                         // Get additional data from BodemData
                         const bodemData = await fetchBodemData(
-                            props.soilcode.split("/")[0],
+                            props.first_soilcode,
                         )
                         setPopupInfo((popupInfo) => {
                             if (
                                 popupInfo &&
-                                popupInfo.properties.soilcode === props.soilcode
+                                popupInfo.properties.first_soilcode ===
+                                    props.first_soilcode
                             )
                                 return {
                                     ...popupInfo,
@@ -481,12 +483,12 @@ export default function FarmAtlasSoilBlock() {
                                             .normal_soilprofile_name ||
                                         "Onbekende bodem"}
                                 </h3>
-                                {popupInfo.properties.soilcode && (
+                                {popupInfo.properties.first_soilcode && (
                                     <Badge
                                         variant="secondary"
                                         className="shrink-0 font-mono"
                                     >
-                                        {popupInfo.properties.soilcode}
+                                        {popupInfo.properties.first_soilcode}
                                     </Badge>
                                 )}
                             </div>
