@@ -1,6 +1,6 @@
 import type {
     FieldInput,
-    NitrogenBalanceNumeric,
+    NitrogenBalanceFieldNumeric,
     NitrogenEmissionNumeric,
     NitrogenRemovalHarvestsNumeric,
     NitrogenRemovalNumeric,
@@ -23,7 +23,7 @@ import {
 } from "~/components/ui/accordion"
 
 interface NitrogenBalanceDetailsProps {
-    balanceData: NitrogenBalanceNumeric
+    balanceData: NitrogenBalanceFieldNumeric
     fieldInput: FieldInput
 }
 

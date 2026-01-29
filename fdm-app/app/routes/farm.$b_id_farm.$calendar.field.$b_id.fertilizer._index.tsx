@@ -35,7 +35,7 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import {
-    getNitrogenBalanceforField,
+    getNitrogenBalanceForField,
     getNorms,
 } from "../integrations/calculator"
 
@@ -177,6 +177,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 b_centroid: b_centroid,
                 currentSoilData: currentSoilData,
                 nmiApiKey: nmiApiKey,
+                b_bufferstrip: field.b_bufferstrip,
             })
         }
 
@@ -190,7 +191,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                           calendar,
                       })
                     : Promise.resolve(null),
-            nitrogenBalance: getNitrogenBalanceforField({
+            nitrogenBalance: getNitrogenBalanceForField({
                 fdm,
                 principal_id,
                 b_id_farm,
@@ -201,6 +202,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             dose: dose.dose,
             b_id: b_id,
             b_id_farm: b_id_farm,
+            b_bufferstrip: field.b_bufferstrip,
             calendar: calendar,
             cultivations,
             activeCultivation,
@@ -273,35 +275,31 @@ export default function FarmFieldsOverviewBlock() {
     const isSubmitting = navigation.state === "submitting"
 
     return (
-        <div className="container mx-auto py-8 px-4">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                <div className="md:col-span-1 lg:col-span-1">
-                    <FertilizerApplicationCard
-                        fertilizerApplications={
-                            loaderData.fertilizerApplications
-                        }
-                        applicationMethodOptions={
-                            loaderData.applicationMethodOptions
-                        }
-                        fertilizers={loaderData.fertilizers}
-                        fertilizerOptions={loaderData.fertilizerOptions}
-                        dose={loaderData.dose}
-                        canCreateFertilizerApplication={
-                            loaderData.fieldWritePermission
-                        }
-                        canModifyFertilizerApplication={
-                            loaderData.fertilizerApplicationWritePermissions
-                        }
-                    />
-                </div>
-                <div className="md:col-span-1 lg:col-span-2">
-                    <FertilizerApplicationMetricsCard
-                        fertilizerApplicationMetricsData={
-                            loaderData.fertilizerApplicationMetricsData
-                        }
-                        isSubmitting={isSubmitting}
-                    />
-                </div>
+        <div className="grid grid-cols-1 gap-6 2xl:grid-cols-3">
+            <div className="2xl:col-span-1">
+                <FertilizerApplicationCard
+                    fertilizerApplications={loaderData.fertilizerApplications}
+                    applicationMethodOptions={
+                        loaderData.applicationMethodOptions
+                    }
+                    fertilizers={loaderData.fertilizers}
+                    fertilizerOptions={loaderData.fertilizerOptions}
+                    dose={loaderData.dose}
+                    canCreateFertilizerApplication={
+                        loaderData.fieldWritePermission
+                    }
+                    canModifyFertilizerApplication={
+                        loaderData.fertilizerApplicationWritePermissions
+                    }
+                />
+            </div>
+            <div className="2xl:col-span-2 min-w-0">
+                <FertilizerApplicationMetricsCard
+                    fertilizerApplicationMetricsData={
+                        loaderData.fertilizerApplicationMetricsData
+                    }
+                    isSubmitting={isSubmitting}
+                />
             </div>
         </div>
     )

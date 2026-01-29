@@ -4,7 +4,6 @@ import { magicLink, organization, username } from "better-auth/plugins"
 import { eq } from "drizzle-orm"
 import { customAlphabet } from "nanoid"
 import { generateFromEmail } from "unique-username-generator"
-import type { FdmAuth } from "./authentication.d"
 import * as authNSchema from "./db/schema-authn"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
@@ -38,7 +37,7 @@ export function createFdmAuth(
         code: string,
     ) => Promise<void>,
     emailAndPassword?: boolean,
-): FdmAuth {
+) {
     // Setup social auth providers
     let googleAuth
     if (google) {
@@ -93,7 +92,7 @@ export function createFdmAuth(
         }
     }
 
-    const auth: FdmAuth = betterAuth({
+    const auth = betterAuth({
         database: drizzleAdapter(fdm, {
             provider: "pg",
             schema: authNSchema,
@@ -157,6 +156,7 @@ export function createFdmAuth(
                                 metadata: {
                                     isVerified: false,
                                     description: "",
+                                    ...(organization.metadata || {}),
                                 },
                             },
                         }
@@ -232,6 +232,8 @@ export function createFdmAuth(
 
     return auth
 }
+
+export type FdmAuth = ReturnType<typeof createFdmAuth>
 
 /**
  * Updates the profile information of a user.

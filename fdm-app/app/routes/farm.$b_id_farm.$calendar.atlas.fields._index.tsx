@@ -2,7 +2,7 @@ import { getFields } from "@svenvw/fdm-core"
 import { simplify } from "@turf/turf"
 import type { FeatureCollection, Geometry } from "geojson"
 import maplibregl from "maplibre-gl"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import {
     Layer,
     Map as MapGL,
@@ -127,18 +127,17 @@ export default function FarmAtlasFieldsBlock() {
     const fieldsAvailableId = "fieldsAvailable"
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
     const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
+    // ViewState logic
     const initialViewState = getViewState(fields)
-
-    // Create a sessionStorage to store the latest viewstate
     const [viewState, setViewState] = useState<ViewState>(() => {
         if (typeof window !== "undefined") {
-            const savedViewState = sessionStorage.getItem("mapViewState")
-            if (savedViewState) {
-                try {
+            try {
+                const savedViewState = sessionStorage.getItem("mapViewState")
+                if (savedViewState) {
                     return JSON.parse(savedViewState)
-                } catch {
-                    sessionStorage.removeItem("mapViewState")
                 }
+            } catch {
+                // ignore storage errors (e.g., private mode)
             }
         }
         return initialViewState as ViewState
@@ -150,15 +149,17 @@ export default function FarmAtlasFieldsBlock() {
         setViewState(event.viewState)
     }, [])
 
-    const isFirstRender = useRef(true)
-
-    // If latest viewstate is available use that one
     useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false
-            return
+        if (typeof window !== "undefined") {
+            try {
+                sessionStorage.setItem(
+                    "mapViewState",
+                    JSON.stringify(viewState),
+                )
+            } catch {
+                // ignore storage errors (e.g., private mode)
+            }
         }
-        sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
     }, [viewState])
 
     const layerLayout = { visibility: showFields ? "visible" : "none" } as const

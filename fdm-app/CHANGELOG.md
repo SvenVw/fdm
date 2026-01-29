@@ -1,5 +1,44 @@
 # Changelog fdm-app
 
+## 0.27.0
+
+### Minor Changes
+
+- [#427](https://github.com/SvenVw/fdm/pull/427) [`5566687`](https://github.com/SvenVw/fdm/commit/556668727b17377ad77ddc090c50fdccdfe67c65) Thanks [@SvenVw](https://github.com/SvenVw)! - Integrated the BRO "Bodemkaart" (Soil Map) into the Atlas
+
+- [#410](https://github.com/SvenVw/fdm/pull/410) [`44ec6d8`](https://github.com/SvenVw/fdm/commit/44ec6d8bd3afc5b7874c5111fab16033e756a9a1) Thanks [@BoraIneviNMI](https://github.com/BoraIneviNMI)! - Users can now add multiple fields at once on the atlas also through the fields table.
+
+- [#425](https://github.com/SvenVw/fdm/pull/425) [`94fc2c5`](https://github.com/SvenVw/fdm/commit/94fc2c562fa456b803e475c304b62ed5c9fd92cf) Thanks [@SvenVw](https://github.com/SvenVw)! - Adds that the user can download a pdf, "Bemestingsplan", for a farm that gives on farm-level an overview of norms, advices, used fertilizers and on field-level,the norms, advices, soil status and planned fertilizer applications.
+
+- [#377](https://github.com/SvenVw/fdm/pull/377) [`6bee78e`](https://github.com/SvenVw/fdm/commit/6bee78e79d936d796c35d4d70a499bcdc6965af3) Thanks [@BoraIneviNMI](https://github.com/BoraIneviNMI)! - Added expandable rows to the crop rotation table. When a cultivation row is expanded, fields with the cultivation appear on their own rows below, only showing data that is relevant to the cultivation type. Users can select fields and cultivation types in a mixed manner. The field selection will be passed to the harvest or fertilizer addition wizard, so the user no longer needs to deselect fields that they don't want if they have selected the correct fields on the table already.
+
+- [#422](https://github.com/SvenVw/fdm/pull/422) [`6839005`](https://github.com/SvenVw/fdm/commit/683900597cebf1b7fb330caf0188bef597032486) Thanks [@SvenVw](https://github.com/SvenVw)! - Users can now indicate if a field is a buffer strip. Fields marked as buffer strips are excluded from nitrogen and organic matter balances at the farm level, and their nutrient advice and norms are automatically adjusted to zero. The UI now displays informative messages when calculations are skipped for these fields.
+
+- [#430](https://github.com/SvenVw/fdm/pull/430) [`661f3e2`](https://github.com/SvenVw/fdm/commit/661f3e2d4a6bf242cc3574538de816912bca9b2f) Thanks [@BoraIneviNMI](https://github.com/BoraIneviNMI)! - Improve the user experience when they come back to the field and rotation tables, by storing their filters in the session storage.
+
+### Patch Changes
+
+- [#418](https://github.com/SvenVw/fdm/pull/418) [`5f3eec2`](https://github.com/SvenVw/fdm/commit/5f3eec2ce1efc080717ee7dc69136938cadf9fff) Thanks [@SvenVw](https://github.com/SvenVw)! - Add "Copy to Clipboard" button to Cultivation History card to allow users to export data to Excel as TSV.
+
+- [#405](https://github.com/SvenVw/fdm/pull/405) [`cd223e2`](https://github.com/SvenVw/fdm/commit/cd223e22d18996578bb4813da0e3695630d6d9c7) Thanks [@SvenVw](https://github.com/SvenVw)! - Added accessibility improvements to Cookie Banner and error pages. Replaced all instances of LoadingSpinner with the standardized shadcn Spinner component.
+
+- [#414](https://github.com/SvenVw/fdm/pull/414) [`316d3c7`](https://github.com/SvenVw/fdm/commit/316d3c7c497fbe5fe31099b796b4e6efebe78e6b) Thanks [@BoraIneviNMI](https://github.com/BoraIneviNMI)! - While adding a harvest on the crop rotation table, the harvest date is now validated against the latest sowing date and the earliest cultivation ending date before submitting the form.
+
+- [#433](https://github.com/SvenVw/fdm/pull/433) [`e775778`](https://github.com/SvenVw/fdm/commit/e775778c065b12658600492c86e070c40f94b6a4) Thanks [@SvenVw](https://github.com/SvenVw)! - Migrate to zod v4
+
+- [#431](https://github.com/SvenVw/fdm/pull/431) [`aa13654`](https://github.com/SvenVw/fdm/commit/aa13654cb3919581fb9a6b4001310a323d4f4f6d) Thanks [@SvenVw](https://github.com/SvenVw)! - Significant UI/UX and mobile responsiveness improvements across the application:
+  - Field Overview: Refactored to use a responsive Card layout and simplified labels for better mobile fit.
+  - Header: Optimized for small screens with flexible height, truncated labels, and streamlined breadcrumbs.
+  - Sidebar: Reduced width and internal spacing on medium screens to reclaim horizontal space for content.
+  - Fertilizer Dashboard: Redesigned with a stacked layout for better readability on laptops and added robust text truncation.
+  - Layout: Improved global padding and adjusted breakpoints (xl/2xl) to ensure a polished look across mobile, tablet, and desktop.
+
+- [#403](https://github.com/SvenVw/fdm/pull/403) [`36643d3`](https://github.com/SvenVw/fdm/commit/36643d321c303d2b71b20aa51535167a49a9269e) Thanks [@SvenVw](https://github.com/SvenVw)! - Use Better-Auth functions for organizations instead of fdm-core functions
+
+- Updated dependencies [[`4687738`](https://github.com/SvenVw/fdm/commit/4687738e3b8ef35d071ae16b218d567a3cfbf3be), [`ae0468c`](https://github.com/SvenVw/fdm/commit/ae0468c9b37f1326634bff24bd667ec5003d4bed), [`c316515`](https://github.com/SvenVw/fdm/commit/c3165156c249931f56a97fa4a0b82493a5e25c9b), [`da3e50a`](https://github.com/SvenVw/fdm/commit/da3e50a571483c576dd88abecd3e70ca0b9f22ba), [`bcd3a32`](https://github.com/SvenVw/fdm/commit/bcd3a3289c9a13ffc36ea108e502661496164bf7), [`01d7174`](https://github.com/SvenVw/fdm/commit/01d7174bef42f2fc8e71b4bb25eee045687e8c56), [`6f7f271`](https://github.com/SvenVw/fdm/commit/6f7f27183f66bcc329720af5dcc17f250d74cbcf), [`4687738`](https://github.com/SvenVw/fdm/commit/4687738e3b8ef35d071ae16b218d567a3cfbf3be), [`75553c4`](https://github.com/SvenVw/fdm/commit/75553c41830c8519788a68560d9403192790d051), [`4687738`](https://github.com/SvenVw/fdm/commit/4687738e3b8ef35d071ae16b218d567a3cfbf3be), [`6f7f271`](https://github.com/SvenVw/fdm/commit/6f7f27183f66bcc329720af5dcc17f250d74cbcf)]:
+  - @svenvw/fdm-calculator@0.11.0
+  - @svenvw/fdm-core@0.29.0
+
 ## 0.26.7
 
 ### Patch Changes

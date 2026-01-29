@@ -3,6 +3,7 @@ import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { getGeoTiffValue } from "../../../../shared/geotiff"
 import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
+import { nonBouwlandCodes } from "../../constant"
 import type { GebruiksnormResult } from "../../types"
 import { determineNLHoofdteelt } from "./hoofdteelt"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
@@ -13,7 +14,6 @@ import type {
     NormsByRegion,
     RegionKey,
 } from "./types"
-import { nonBouwlandCodes } from "../../constant"
 
 /**
  * Determines if a field is located within a met nutriënten verontreinigde gebied (NV-gebied) in the Netherlands.
@@ -443,11 +443,170 @@ function determineSubTypeOmschrijving(
 function calculateKorting(
     cultivations: NL2025NormsInputForCultivation[],
     region: RegionKey,
+    is_derogatie_bedrijf: boolean | undefined,
+    is_nv_area: boolean,
 ): { amount: Decimal; description: string } {
     const currentYear = 2025
     const previousYear = currentYear - 1
 
     const sandyOrLoessRegions: RegionKey[] = ["zand_nwc", "zand_zuid", "loess"]
+    const clayOrPeatRegions: RegionKey[] = ["klei", "veen"]
+
+    // Sort cultivations by start date
+    const sortedCultivations = [...cultivations].sort((a, b) => {
+        if (!a.b_lu_start || !b.b_lu_start) return 0
+        return a.b_lu_start.getTime() - b.b_lu_start.getTime()
+    })
+
+    // Find the transition from Grassland to Next Crop in 2025
+    for (let i = 0; i < sortedCultivations.length - 1; i++) {
+        const prevCult = sortedCultivations[i]
+        const currCult = sortedCultivations[i + 1]
+
+        if (!prevCult.b_lu_end || !currCult.b_lu_start) continue
+
+        // Check if transition happens in 2025
+        if (prevCult.b_lu_end.getFullYear() !== currentYear) continue
+
+        const currStandard = nitrogenStandardsData.find((ns) =>
+            ns.b_lu_catalogue_match.includes(currCult.b_lu_catalogue),
+        )
+
+        // 1. Grassland Renewal (Gras-na-Gras) -> 50 kg N/ha korting
+        if (
+            nonBouwlandCodes.includes(prevCult.b_lu_catalogue) &&
+            nonBouwlandCodes.includes(currCult.b_lu_catalogue)
+        ) {
+            const renewalDate = prevCult.b_lu_end
+            let isValidRenewal = false
+
+            if (sandyOrLoessRegions.includes(region)) {
+                // Sand/Loess: June 1 - August 31
+                if (
+                    renewalDate >= new Date(currentYear, 5, 1) && // June 1
+                    renewalDate <= new Date(currentYear, 7, 31) // Aug 31
+                ) {
+                    isValidRenewal = true
+                } else {
+                    throw new Error(
+                        "Graslandvernieuwing op zand- en lössgrond is alleen toegestaan tussen 1 juni en 31 augustus.",
+                    )
+                }
+            } else if (clayOrPeatRegions.includes(region)) {
+                if (is_derogatie_bedrijf) {
+                    if (is_nv_area) {
+                        // Derogation + NV: June 1 - August 31
+                        if (
+                            renewalDate >= new Date(currentYear, 5, 1) &&
+                            renewalDate <= new Date(currentYear, 7, 31)
+                        ) {
+                            isValidRenewal = true
+                        } else {
+                            throw new Error(
+                                "Graslandvernieuwing op klei- en veengrond (derogatie + NV-gebied) is alleen toegestaan tussen 1 juni en 31 augustus.",
+                            )
+                        }
+                    } else {
+                        // Derogation + Non-NV: June 1 - September 15
+                        if (
+                            renewalDate >= new Date(currentYear, 5, 1) &&
+                            renewalDate <= new Date(currentYear, 8, 15)
+                        ) {
+                            isValidRenewal = true
+                        } else {
+                            throw new Error(
+                                "Graslandvernieuwing op klei- en veengrond (derogatie + niet NV-gebied) is alleen toegestaan tussen 1 juni en 15 september.",
+                            )
+                        }
+                    }
+                } else {
+                    // Non-Derogation: February 1 - September 15
+                    if (
+                        renewalDate >= new Date(currentYear, 1, 1) &&
+                        renewalDate <= new Date(currentYear, 8, 15)
+                    ) {
+                        isValidRenewal = true
+                    } else {
+                        throw new Error(
+                            "Graslandvernieuwing op klei- en veengrond (geen derogatie) is alleen toegestaan tussen 1 februari en 15 september.",
+                        )
+                    }
+                }
+            }
+
+            if (isValidRenewal) {
+                return {
+                    amount: new Decimal(50),
+                    description: ". Korting: 50kg N/ha: graslandvernieuwing",
+                }
+            }
+        }
+
+        // 2. Grassland Destruction (Gras-naar-Bouwland) -> 65 kg N/ha korting
+        // Applies if New Crop is Maize OR Consumption/Factory/Starch Potatoes (NOT Seed Potatoes)
+        const isMaize = currStandard?.cultivation_rvo_table2.includes("mais")
+        const isPotato = currStandard?.type === "aardappel"
+        const isSeedPotato =
+            currStandard?.cultivation_rvo_table2.includes("pootaardappelen") ||
+            currCult.b_lu_catalogue === "nl_2015" ||
+            currCult.b_lu_catalogue === "nl_2016" ||
+            currStandard?.cultivation_rvo_table2.includes("uitgroeiteelt")
+
+        if (
+            nonBouwlandCodes.includes(prevCult.b_lu_catalogue) &&
+            (isMaize || (isPotato && !isSeedPotato))
+        ) {
+            const destructionDate = prevCult.b_lu_end
+            let isValidDestruction = false
+
+            if (sandyOrLoessRegions.includes(region)) {
+                // Sand/Loess: Feb 1 - May 10
+                if (
+                    destructionDate >= new Date(currentYear, 1, 1) && // Feb 1
+                    destructionDate <= new Date(currentYear, 4, 10) // May 10
+                ) {
+                    isValidDestruction = true
+                } else {
+                    throw new Error(
+                        "Graslandvernietiging op zand- en lössgrond is alleen toegestaan tussen 1 februari en 10 mei.",
+                    )
+                }
+            } else if (clayOrPeatRegions.includes(region)) {
+                if (is_nv_area) {
+                    // Clay/Peat NV: Feb 1 - Mar 15
+                    if (
+                        destructionDate >= new Date(currentYear, 1, 1) &&
+                        destructionDate <= new Date(currentYear, 2, 15)
+                    ) {
+                        isValidDestruction = true
+                    } else {
+                        throw new Error(
+                            "Graslandvernietiging op klei- en veengrond (NV-gebied) is alleen toegestaan tussen 1 februari en 15 maart.",
+                        )
+                    }
+                } else {
+                    // Clay/Peat Non-NV: Feb 1 - May 31
+                    if (
+                        destructionDate >= new Date(currentYear, 1, 1) &&
+                        destructionDate <= new Date(currentYear, 4, 31)
+                    ) {
+                        isValidDestruction = true
+                    } else {
+                        throw new Error(
+                            "Graslandvernietiging op klei- en veengrond (niet NV-gebied) is alleen toegestaan tussen 1 februari en 31 mei.",
+                        )
+                    }
+                }
+            }
+
+            if (isValidDestruction) {
+                return {
+                    amount: new Decimal(65),
+                    description: ". Korting: 65kg N/ha: graslandvernietiging",
+                }
+            }
+        }
+    }
 
     // Check if field is outside regions with korting
     if (!sandyOrLoessRegions.includes(region)) {
@@ -655,6 +814,14 @@ export async function calculateNL2025StikstofGebruiksNorm(
     const field = input.field
     const cultivations = input.cultivations
 
+    // Check for buffer strip
+    if (field.b_bufferstrip) {
+        return {
+            normValue: 0,
+            normSource: "Bufferstrook: geen plaatsingsruimte",
+        }
+    }
+
     // Determine hoofdteelt
     const b_lu_catalogue = determineNLHoofdteelt(cultivations, 2025)
     let cultivation = cultivations.find(
@@ -752,7 +919,7 @@ export async function calculateNL2025StikstofGebruiksNorm(
 
     // Apply korting
     const { amount: kortingAmount, description: kortingDescription } =
-        calculateKorting(cultivations, region)
+        calculateKorting(cultivations, region, is_derogatie_bedrijf, is_nv_area)
     normValue = new Decimal(normValue).minus(kortingAmount)
 
     // If normvalue is negative, e.g. Geen plaatsingsruimte plus korting, set it to 0

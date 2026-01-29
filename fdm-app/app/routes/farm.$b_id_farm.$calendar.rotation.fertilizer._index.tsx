@@ -32,7 +32,6 @@ import {
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
     Accordion,
     AccordionContent,
@@ -62,6 +61,7 @@ import {
 } from "~/components/ui/dialog"
 import { Label } from "~/components/ui/label"
 import { SidebarInset } from "~/components/ui/sidebar"
+import { Spinner } from "~/components/ui/spinner"
 import {
     Tooltip,
     TooltipContent,
@@ -282,6 +282,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             ), // All fields for selection
             cultivationName: cultivationName,
             cultivationIds: cultivationIds,
+            create: url.searchParams.has("create"),
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -342,7 +343,9 @@ export default function FarmRotationFertilizerAddIndex() {
         <SidebarInset>
             <Header
                 action={{
-                    to: `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`,
+                    to: loaderData.create
+                        ? `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`
+                        : `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`,
                     label: "Terug naar bouwplan",
                     disabled: false,
                 }}
@@ -369,7 +372,7 @@ export default function FarmRotationFertilizerAddIndex() {
                     {isSubmitting && (
                         <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
                             <div className="flex items-center text-sm text-muted-foreground">
-                                <LoadingSpinner className="mr-2" />
+                                <Spinner className="mr-2" />
                                 <span>Bemesting wordt toegevoegd...</span>
                             </div>
                         </div>
@@ -718,9 +721,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
             ),
         )
 
-        return redirectWithSuccess(`/farm/${b_id_farm}/${calendar}/rotation`, {
-            message: `Bemesting succesvol toegevoegd aan ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
-        })
+        return redirectWithSuccess(
+            url.searchParams.has("create")
+                ? `/farm/create/${b_id_farm}/${calendar}/rotation`
+                : `/farm/${b_id_farm}/${calendar}/rotation`,
+            {
+                message: `Bemesting succesvol toegevoegd aan ${fieldIds.length} ${fieldIds.length === 1 ? "perceel" : "percelen"}.`,
+            },
+        )
     } catch (error) {
         if (error instanceof z.ZodError) {
             return dataWithError(

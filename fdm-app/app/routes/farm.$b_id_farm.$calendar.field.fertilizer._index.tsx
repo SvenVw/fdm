@@ -27,7 +27,6 @@ import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applic
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Badge } from "~/components/ui/badge"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
@@ -51,6 +50,7 @@ import {
 } from "~/components/ui/dialog"
 import { Label } from "~/components/ui/label"
 import { SidebarInset } from "~/components/ui/sidebar"
+import { Spinner } from "~/components/ui/spinner"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -225,11 +225,11 @@ export default function FarmFieldFertilizerAddIndex() {
                     b_id_farm={loaderData.b_id_farm}
                     farmOptions={loaderData.farmOptions}
                 />
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem className="hidden md:block">
                     Percelen
                 </BreadcrumbItem>
-                <BreadcrumbSeparator />
+                <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem className="hidden md:block">
                     Bemesting toevoegen
                 </BreadcrumbItem>
@@ -243,14 +243,14 @@ export default function FarmFieldFertilizerAddIndex() {
                     {isSubmitting && (
                         <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
                             <div className="flex items-center text-sm text-muted-foreground">
-                                <LoadingSpinner className="mr-2" />
+                                <Spinner className="mr-2" />
                                 <span>Bemesting wordt toegevoegd...</span>
                             </div>
                         </div>
                     )}
                     <FarmContent>
-                        <div className="flex flex-col space-y-8 pb-10 md:flex-row md:space-x-12 md:space-y-0">
-                            <Card className="md:w-1/3">
+                        <div className="flex flex-col xl:flex-row gap-6 pb-10">
+                            <Card className="w-full xl:w-64 h-fit shrink-0">
                                 <CardHeader>
                                     <CardTitle>
                                         Geselecteerde percelen
@@ -262,17 +262,20 @@ export default function FarmFieldFertilizerAddIndex() {
                                 </CardHeader>
                                 <CardContent>
                                     {loaderData.selectedFields.length > 0 ? (
-                                        <div className="max-h-[60vh] space-y-2 overflow-y-auto">
+                                        <div className="max-h-[60vh] space-y-2 overflow-y-auto pr-1">
                                             {loaderData.selectedFields.map(
                                                 (field) => (
                                                     <div
                                                         key={field.b_id}
-                                                        className="flex items-center justify-between rounded-md border p-3"
+                                                        className="flex items-center justify-between rounded-md border p-3 gap-2"
                                                     >
-                                                        <p className="text-sm font-medium">
+                                                        <p className="text-sm font-medium truncate min-w-0">
                                                             {field.b_name}
                                                         </p>
-                                                        <Badge variant="secondary">
+                                                        <Badge
+                                                            variant="secondary"
+                                                            className="shrink-0"
+                                                        >
                                                             {field.b_area} ha
                                                         </Badge>
                                                     </div>

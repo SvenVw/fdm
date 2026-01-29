@@ -11,8 +11,8 @@ import {
 } from "~/components/ui/command"
 import { Input } from "~/components/ui/input"
 import { Popover, PopoverAnchor, PopoverContent } from "~/components/ui/popover"
+import { Spinner } from "~/components/ui/spinner"
 import { cn } from "~/lib/utils"
-import { LoadingSpinner } from "./loadingspinner"
 
 // Expected shape of items returned by the lookup API
 type LookupItem<T extends string> = {
@@ -214,7 +214,7 @@ export function AutoComplete<T extends string>({
                             {isLoading && (
                                 <CommandPrimitive.Loading>
                                     <div className="p-1">
-                                        <LoadingSpinner className="h-6 w-full" />
+                                        <Spinner className="h-6 w-full" />
                                     </div>
                                 </CommandPrimitive.Loading>
                             )}

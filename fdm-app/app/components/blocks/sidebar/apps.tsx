@@ -43,18 +43,22 @@ export function SidebarApps() {
     let atlasLink: string | undefined
     let atlasFieldsLink: string | undefined
     let atlasElevationLink: string | undefined
+    let atlasSoilLink: string | undefined
     if (isCreateFarmWizard) {
         atlasLink = undefined
         atlasFieldsLink = undefined
         atlasElevationLink = undefined
+        atlasSoilLink = undefined
     } else if (farmId) {
         atlasLink = `/farm/${farmId}/${selectedCalendar}/atlas`
         atlasFieldsLink = `/farm/${farmId}/${selectedCalendar}/atlas/fields`
         atlasElevationLink = `/farm/${farmId}/${selectedCalendar}/atlas/elevation`
+        atlasSoilLink = `/farm/${farmId}/${selectedCalendar}/atlas/soil`
     } else {
         atlasLink = `/farm/undefined/${selectedCalendar}/atlas`
         atlasFieldsLink = `/farm/undefined/${selectedCalendar}/atlas/fields`
         atlasElevationLink = `/farm/undefined/${selectedCalendar}/atlas/elevation`
+        atlasSoilLink = `/farm/undefined/${selectedCalendar}/atlas/soil`
     }
 
     let nitrogenBalanceLink: string | undefined
@@ -154,6 +158,20 @@ export function SidebarApps() {
                                                     to={atlasElevationLink}
                                                 >
                                                     <span>Hoogtekaart</span>
+                                                </NavLink>
+                                            </SidebarMenuSubButton>
+                                        ) : null}
+                                    </SidebarMenuSubItem>
+                                    <SidebarMenuSubItem>
+                                        {atlasSoilLink ? (
+                                            <SidebarMenuSubButton
+                                                asChild
+                                                isActive={location.pathname.includes(
+                                                    atlasSoilLink,
+                                                )}
+                                            >
+                                                <NavLink to={atlasSoilLink}>
+                                                    <span>Bodemkaart</span>
                                                 </NavLink>
                                             </SidebarMenuSubButton>
                                         ) : null}

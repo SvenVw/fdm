@@ -22,7 +22,6 @@ import { dataWithSuccess } from "remix-toast"
 import type { z } from "zod"
 import { formSchema } from "~/components/blocks/organic-certification/schema"
 import { DatePicker } from "~/components/custom/date-picker"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -59,6 +58,7 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
+import { Spinner } from "~/components/ui/spinner"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
@@ -298,7 +298,7 @@ export default function OrganicCertificationSettings() {
                                         >
                                             {isDeleting ? (
                                                 <div className="flex items-center space-x-2">
-                                                    <LoadingSpinner />
+                                                    <Spinner />
                                                     <span>Verwijderen...</span>
                                                 </div>
                                             ) : (
@@ -420,7 +420,7 @@ export default function OrganicCertificationSettings() {
                                         <Button type="submit" variant="default">
                                             {form.formState.isSubmitting ? (
                                                 <div className="flex items-center space-x-2">
-                                                    <LoadingSpinner />
+                                                    <Spinner />
                                                     <span>Toevoegen</span>
                                                 </div>
                                             ) : (

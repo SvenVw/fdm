@@ -2,11 +2,13 @@ import pkg from "./package"
 export const fdmCalculator = pkg
 export {
     calculateNitrogenBalance,
-    getNitrogenBalance,
+    calculateNitrogenBalanceField,
+    getNitrogenBalanceField,
 } from "./balance/nitrogen/index"
 export { collectInputForNitrogenBalance } from "./balance/nitrogen/input"
 export type {
     FieldInput,
+    NitrogenBalanceFieldInput,
     NitrogenBalanceFieldNumeric,
     NitrogenBalanceFieldResultNumeric,
     NitrogenBalanceInput,
@@ -14,6 +16,7 @@ export type {
     NitrogenEmissionAmmoniaFertilizersNumeric,
     NitrogenEmissionAmmoniaNumeric,
     NitrogenEmissionAmmoniaResiduesNumeric,
+    NitrogenEmissionNumeric,
     NitrogenRemovalHarvestsNumeric,
     NitrogenRemovalNumeric,
     NitrogenRemovalResiduesNumeric,
@@ -24,7 +27,8 @@ export type {
 } from "./balance/nitrogen/types"
 export {
     calculateOrganicMatterBalance,
-    getOrganicMatterBalance,
+    calculateOrganicMatterBalanceField,
+    getOrganicMatterBalanceField,
 } from "./balance/organic-matter/index"
 export { collectInputForOrganicMatterBalance } from "./balance/organic-matter/input"
 export type {
@@ -50,6 +54,10 @@ export type {
     AggregatedNormsToFarmLevel,
     InputAggregateNormFillingsToFarmLevel,
     InputAggregateNormsToFarmLevel,
+} from "./norms/farm"
+export {
+    aggregateNormFillingsToFarmLevel,
+    aggregateNormsToFarmLevel,
 } from "./norms/farm"
 export {
     isFieldInGWGBGebied,

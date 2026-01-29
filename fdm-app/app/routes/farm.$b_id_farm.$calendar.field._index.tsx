@@ -174,7 +174,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     a_som_loi: a_som_loi,
                     b_soiltype_agr: b_soiltype_agr,
                     b_area: Math.round(field.b_area * 10) / 10,
-                    b_isproductive: field.b_isproductive ?? true,
+                    b_bufferstrip: field.b_bufferstrip,
                     has_write_permission: has_write_permission,
                 }
             }),
@@ -223,7 +223,7 @@ export default function FarmFieldIndex() {
         if (!showProductiveOnly) {
             return true
         }
-        return field.b_isproductive === true
+        return field.b_bufferstrip === false
     })
 
     const currentFarmName =

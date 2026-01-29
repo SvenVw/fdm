@@ -1,5 +1,21 @@
 # Changelog fdm-core
 
+## 0.29.0
+
+### Minor Changes
+
+- [#403](https://github.com/SvenVw/fdm/pull/403) [`ae0468c`](https://github.com/SvenVw/fdm/commit/ae0468c9b37f1326634bff24bd667ec5003d4bed) Thanks [@SvenVw](https://github.com/SvenVw)! - Remove organization functions as better-auth can handle them now server-side as well
+
+- [#407](https://github.com/SvenVw/fdm/pull/407) [`c316515`](https://github.com/SvenVw/fdm/commit/c3165156c249931f56a97fa4a0b82493a5e25c9b) Thanks [@SvenVw](https://github.com/SvenVw)! - For withCalculationCache add the option to provide which sensitive keys should be redacted in the cache
+
+- [#422](https://github.com/SvenVw/fdm/pull/422) [`da3e50a`](https://github.com/SvenVw/fdm/commit/da3e50a571483c576dd88abecd3e70ca0b9f22ba) Thanks [@SvenVw](https://github.com/SvenVw)! - Replace the derived field parameter `b_isproductive` with the stored parameter `b_bufferstrip` so users can set it explicitly.
+
+- [#422](https://github.com/SvenVw/fdm/pull/422) [`bcd3a32`](https://github.com/SvenVw/fdm/commit/bcd3a3289c9a13ffc36ea108e502661496164bf7) Thanks [@SvenVw](https://github.com/SvenVw)! - Set for existing fields the b_bufferstrip based on the same logic as in determineIfFieldIsBuffer
+
+### Patch Changes
+
+- [#403](https://github.com/SvenVw/fdm/pull/403) [`75553c4`](https://github.com/SvenVw/fdm/commit/75553c41830c8519788a68560d9403192790d051) Thanks [@SvenVw](https://github.com/SvenVw)! - Fix type of FdmAuth by including plugins and other settings
+
 ## 0.28.0
 
 ### Minor Changes

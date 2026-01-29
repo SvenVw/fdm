@@ -98,6 +98,7 @@ export const fields = fdmSchema.table(
             type: "Polygon",
         }), // PGLite does not support PostGIS yet; I expect to be supported in Q4 2024: https://github.com/electric-sql/pglite/issues/11
         b_id_source: text(),
+        b_bufferstrip: boolean().notNull().default(false),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },

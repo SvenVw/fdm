@@ -9,7 +9,6 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { useFieldFertilizerFormStore } from "@/app/store/field-fertilizer-form"
 import { Combobox } from "~/components/custom/combobox"
 import { DatePicker } from "~/components/custom/date-picker"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
     FormControl,
@@ -27,6 +26,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import { Spinner } from "~/components/ui/spinner"
 import {
     Tooltip,
     TooltipContent,
@@ -166,21 +166,24 @@ export function FertilizerApplicationForm({
                 method="post"
             >
                 <fieldset disabled={isSubmitting}>
-                    <div className="grid md:grid-cols-2 items-end gap-x-8 gap-y-4 justify-between">
-                        {/* <Label htmlFor="b_name_farm">Meststof</Label> */}
-                        <div className="flex flex-row items-baseline [&>*]:grow">
-                            <Combobox
-                                options={options}
-                                form={form}
-                                name="p_id"
-                                label={
-                                    <span>
-                                        Meststof
-                                        <span className="text-red-500">*</span>
-                                    </span>
-                                }
-                            />
-                            <div className="py-2 [&.py-2]:grow-0">
+                    <div className="grid grid-cols-1 md:grid-cols-2 items-end gap-x-8 gap-y-4">
+                        <div className="flex flex-row items-baseline min-w-0">
+                            <div className="min-w-0 flex-1">
+                                <Combobox
+                                    options={options}
+                                    form={form}
+                                    name="p_id"
+                                    label={
+                                        <span>
+                                            Meststof
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </span>
+                                    }
+                                />
+                            </div>
+                            <div className="py-2 shrink-0 grow-0">
                                 <p className="invisible">&nbsp;</p>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
@@ -190,12 +193,11 @@ export function FertilizerApplicationForm({
                                             className="ml-2"
                                             onClick={handleManageFertilizers}
                                         >
-                                            <Plus />
+                                            <Plus className="size-4" />
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        Voeg een nieuwe meststof toe aan de
-                                        keuzelijst
+                                        Voeg een nieuwe meststof toe
                                     </TooltipContent>
                                 </Tooltip>
                             </div>
@@ -293,7 +295,7 @@ export function FertilizerApplicationForm({
                             <Button type="submit">
                                 {isSubmitting ? (
                                     <div className="flex items-center space-x-2">
-                                        <LoadingSpinner />
+                                        <Spinner />
                                         <span>Opslaan...</span>
                                     </div>
                                 ) : fertilizerApplication ? (

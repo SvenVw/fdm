@@ -31,14 +31,14 @@ export function HeaderOrganization({
 
     return (
         <>
-            <BreadcrumbItem className="hidden md:block">
+            <BreadcrumbItem className="hidden xl:block">
                 <BreadcrumbLink href="/organization">
                     Organisaties
                 </BreadcrumbLink>
             </BreadcrumbItem>
             {page === "new" ? (
                 <>
-                    <BreadcrumbSeparator />
+                    <BreadcrumbSeparator className="hidden xl:block" />
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/organization/new">
                             Nieuwe organisatie
@@ -47,7 +47,7 @@ export function HeaderOrganization({
                 </>
             ) : page === "invitation" ? (
                 <>
-                    <BreadcrumbSeparator />
+                    <BreadcrumbSeparator className="hidden xl:block" />
                     <BreadcrumbItem>
                         <BreadcrumbLink href="/invitations">
                             Uitnodigingen
@@ -56,18 +56,21 @@ export function HeaderOrganization({
                 </>
             ) : (
                 <>
-                    <BreadcrumbSeparator />
+                    <BreadcrumbSeparator className="hidden xl:block" />
                     <BreadcrumbItem>
                         <DropdownMenu>
-                            <DropdownMenuTrigger className="flex items-center gap-1">
-                                {selectedOrganizationSlug && organizationOptions
-                                    ? (organizationOptions.find(
-                                          (option) =>
-                                              option.slug ===
-                                              selectedOrganizationSlug,
-                                      )?.name ?? "Unknown organization")
-                                    : "Kies een organisatie"}
-                                <ChevronDown className="text-muted-foreground h-4 w-4" />
+                            <DropdownMenuTrigger className="flex items-center gap-1 max-w-[120px] sm:max-w-[200px] md:max-w-none outline-none">
+                                <span className="truncate">
+                                    {selectedOrganizationSlug &&
+                                    organizationOptions
+                                        ? (organizationOptions.find(
+                                              (option) =>
+                                                  option.slug ===
+                                                  selectedOrganizationSlug,
+                                          )?.name ?? "Unknown organization")
+                                        : "Kies een organisatie"}
+                                </span>
+                                <ChevronDown className="text-muted-foreground h-4 w-4 shrink-0" />
                             </DropdownMenuTrigger>
                             {organizationOptions &&
                             organizationOptions.length > 0 ? (
