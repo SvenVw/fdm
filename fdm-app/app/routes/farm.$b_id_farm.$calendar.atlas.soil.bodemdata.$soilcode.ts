@@ -23,7 +23,10 @@ export async function loader({ params }: Route.LoaderArgs) {
     } catch (error) {
         console.error(error)
         return data(
-            { success: false, error: "Failed to fetch soil data" },
+            {
+                success: false,
+                error: error ? (error as any).message : undefined,
+            },
             { status: 502 },
         )
     }

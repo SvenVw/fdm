@@ -238,6 +238,9 @@ export default function FarmAtlasSoilBlock() {
 
                     return data
                 }
+                return {
+                    omschrijving: `Error: ${(response as any).error ?? "onbekende error"}`,
+                }
             } catch (e) {
                 console.error(e)
                 return {
