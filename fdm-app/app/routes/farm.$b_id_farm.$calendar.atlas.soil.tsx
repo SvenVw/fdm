@@ -309,7 +309,7 @@ export default function FarmAtlasSoilBlock() {
                                     ]
                                     if (update.length > 20) {
                                         // If the list gets too long, drop the least recently used items
-                                        update.slice(update.length - 20)
+                                        update.splice(0, update.length - 20)
                                     }
                                     return update
                                 })
