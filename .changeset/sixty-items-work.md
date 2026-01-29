@@ -1,5 +1,5 @@
 ---
-"fdm-app": patch
+"@svenvw/fdm-app": patch
 ---
 
 Significant UI/UX and mobile responsiveness improvements across the application:

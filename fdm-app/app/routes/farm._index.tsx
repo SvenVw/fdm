@@ -235,6 +235,10 @@ export default function AppIndex() {
                             description={
                                 "Kies een bedrijf uit de lijst om verder te gaan of maak een nieuw bedrijf aan"
                             }
+                            action={{
+                                to: "/farm/create",
+                                label: "Nieuw bedrijf",
+                            }}
                         />
                         <div className="space-y-6 p-10 pb-0">
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
