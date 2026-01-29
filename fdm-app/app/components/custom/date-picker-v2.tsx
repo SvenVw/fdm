@@ -25,7 +25,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "~/components/ui/popover"
-import { endMonth, startMonth } from "~/lib/calendar"
+import { endMonth } from "~/lib/calendar"
 import { cn } from "~/lib/utils"
 
 type DatePickerProps = {

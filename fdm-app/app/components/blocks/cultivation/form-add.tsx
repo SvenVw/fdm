@@ -5,7 +5,6 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { Combobox } from "~/components/custom/combobox"
 import { DatePicker } from "~/components/custom/date-picker"
-import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Dialog,
@@ -14,6 +13,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "~/components/ui/dialog"
+import { Spinner } from "~/components/ui/spinner"
 import { CultivationAddFormSchema } from "./schema"
 import type { CultivationsFormProps } from "./types"
 

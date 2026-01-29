@@ -1,4 +1,4 @@
-import { type NitrogenBalanceFieldResultNumeric } from "@svenvw/fdm-calculator"
+import type { NitrogenBalanceFieldResultNumeric } from "@svenvw/fdm-calculator"
 import { getFarm, getFields } from "@svenvw/fdm-core"
 import {
     ArrowDown,
@@ -18,9 +18,9 @@ import {
     NavLink,
     useLoaderData,
 } from "react-router"
+import { BufferStripInfo } from "~/components/blocks/balance/buffer-strip-info"
 import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons"
-import { BufferStripInfo } from "~/components/blocks/balance/buffer-strip-info"
 import {
     Card,
     CardContent,

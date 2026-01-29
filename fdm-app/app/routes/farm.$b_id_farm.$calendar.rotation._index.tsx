@@ -23,8 +23,8 @@ import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import {
-    columns,
     type CropRow,
+    columns,
     type RotationExtended,
 } from "~/components/blocks/rotation/columns"
 import { RotationTableFormSchema } from "~/components/blocks/rotation/schema"
@@ -368,7 +368,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     b_bufferstrip: fieldsWithThisCultivation.some(
                         (field) => field.b_bufferstrip,
                     ),
-                    fields: fieldsWithThisCultivation.map((field, i) => ({
+                    fields: fieldsWithThisCultivation.map((field, _i) => ({
                         // TODO: Define a proper type for field
                         type: "field",
                         canModify: farmWritePermission,

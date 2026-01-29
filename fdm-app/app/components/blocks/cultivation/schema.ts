@@ -43,7 +43,7 @@ export const CultivationDetailsFormSchema = z
         },
         {
             path: ["b_lu_end"],
-            error: "Einddatum moet na de zaaidatum liggen."
+            error: "Einddatum moet na de zaaidatum liggen.",
         },
     )
 

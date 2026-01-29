@@ -14,7 +14,6 @@ import { toast as notify } from "sonner"
 import { z } from "zod"
 import { cn } from "@/app/lib/utils"
 import { Dropzone } from "~/components/custom/dropzone"
-import { Spinner } from "~/components/ui/spinner"
 import {
     Accordion,
     AccordionContent,
@@ -36,6 +35,7 @@ import {
     FormItem,
     FormMessage,
 } from "~/components/ui/form"
+import { Spinner } from "~/components/ui/spinner"
 
 import { MijnPercelenUploadAnimation } from "./upload-animation"
 

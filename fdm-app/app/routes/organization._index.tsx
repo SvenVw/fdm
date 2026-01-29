@@ -71,7 +71,7 @@ export default function OrganizationsIndex() {
                                 <CardHeader>
                                     <CardTitle>
                                         <div className="flex items-center justify-between">
-                                            {org.name}                                          
+                                            {org.name}
                                         </div>
                                     </CardTitle>
                                     <CardDescription />

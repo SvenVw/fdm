@@ -5,7 +5,6 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -23,6 +22,7 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
+import { Spinner } from "~/components/ui/spinner"
 import { Textarea } from "~/components/ui/textarea"
 import { auth, getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"

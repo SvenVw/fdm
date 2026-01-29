@@ -22,7 +22,9 @@ export function BufferStripInfo() {
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>Bufferstroken zijn uitgesloten van de balansberekening</p>
+                    <p>
+                        Bufferstroken zijn uitgesloten van de balansberekening
+                    </p>
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>

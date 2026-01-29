@@ -14,9 +14,9 @@ import {
     getHarvests,
     getSoilAnalyses,
 } from "@svenvw/fdm-core"
-import type { NitrogenBalanceInput } from "./types"
-import { calculateAllFieldsNitrogenSupplyByDeposition } from "./supply/deposition"
 import { getFdmPublicDataUrl } from "../../shared/public-data-url"
+import { calculateAllFieldsNitrogenSupplyByDeposition } from "./supply/deposition"
+import type { NitrogenBalanceInput } from "./types"
 
 /**
  * Collects necessary input data from a FDM instance for calculating the nitrogen balance.

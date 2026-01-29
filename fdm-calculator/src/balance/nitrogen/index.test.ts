@@ -1,14 +1,14 @@
+import type { FdmType } from "@svenvw/fdm-core"
+import Decimal from "decimal.js"
 import { describe, expect, it } from "vitest"
 import {
     calculateNitrogenBalance,
     calculateNitrogenBalancesFieldToFarm,
 } from "."
 import type {
-    NitrogenBalanceInput,
     NitrogenBalanceFieldResultNumeric,
+    NitrogenBalanceInput,
 } from "./types"
-import type { FdmType } from "@svenvw/fdm-core"
-import Decimal from "decimal.js"
 
 // Mock FdmType
 const mockFdm = {

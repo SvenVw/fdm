@@ -13,7 +13,7 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                 b_lu_start: null,
                 b_lu_end: null,
                 b_lu_name: "test",
-                b_lu_croprotation: null
+                b_lu_croprotation: null,
             },
         ]
         const harvests: FieldInput["harvests"] = [

@@ -278,9 +278,7 @@ export default function FarmFieldsOverviewBlock() {
         <div className="grid grid-cols-1 gap-6 2xl:grid-cols-3">
             <div className="2xl:col-span-1">
                 <FertilizerApplicationCard
-                    fertilizerApplications={
-                        loaderData.fertilizerApplications
-                    }
+                    fertilizerApplications={loaderData.fertilizerApplications}
                     applicationMethodOptions={
                         loaderData.applicationMethodOptions
                     }

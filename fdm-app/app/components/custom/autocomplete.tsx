@@ -11,8 +11,8 @@ import {
 } from "~/components/ui/command"
 import { Input } from "~/components/ui/input"
 import { Popover, PopoverAnchor, PopoverContent } from "~/components/ui/popover"
-import { cn } from "~/lib/utils"
 import { Spinner } from "~/components/ui/spinner"
+import { cn } from "~/lib/utils"
 
 // Expected shape of items returned by the lookup API
 type LookupItem<T extends string> = {

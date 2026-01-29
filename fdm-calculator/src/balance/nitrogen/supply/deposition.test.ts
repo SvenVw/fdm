@@ -1,9 +1,9 @@
+import type { Field } from "@svenvw/fdm-core"
+import Decimal from "decimal.js"
 import { describe, expect, it } from "vitest"
 import { getFdmPublicDataUrl } from "../../../shared/public-data-url"
 import type { FieldInput, NitrogenBalanceInput } from "../types"
 import { calculateAllFieldsNitrogenSupplyByDeposition } from "./deposition"
-import Decimal from "decimal.js"
-import type { Field } from "@svenvw/fdm-core"
 
 describe("calculateAllFieldsNitrogenSupplyByDeposition", () => {
     const fdmPublicDataUrl = getFdmPublicDataUrl()
@@ -127,7 +127,7 @@ describe("calculateAllFieldsNitrogenSupplyByDeposition", () => {
                     b_id: "field_1",
                     b_start: new Date("2025-01-01"),
                     b_end: new Date("2025-12-31"),
-                b_bufferstrip: false,
+                    b_bufferstrip: false,
                 },
                 cultivations: [],
                 harvests: [],
@@ -142,7 +142,7 @@ describe("calculateAllFieldsNitrogenSupplyByDeposition", () => {
                     b_id: "field_2",
                     b_start: new Date("2025-01-01"),
                     b_end: new Date("2025-12-31"),
-                b_bufferstrip: false,
+                    b_bufferstrip: false,
                 },
                 cultivations: [],
                 harvests: [],
@@ -157,7 +157,7 @@ describe("calculateAllFieldsNitrogenSupplyByDeposition", () => {
         }
 
         const resultMap = await calculateAllFieldsNitrogenSupplyByDeposition(
-            fields.map(f => f.field as unknown as Field),
+            fields.map((f) => f.field as unknown as Field),
             timeFrame,
             fdmPublicDataUrl,
         )

@@ -1,5 +1,4 @@
 import { NavLink } from "react-router"
-import { useCalendarStore } from "~/store/calendar"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -8,6 +7,7 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
+import { useCalendarStore } from "~/store/calendar"
 
 export function BufferStripWarning({ b_id }: { b_id: string }) {
     const calendar = useCalendarStore((state) => state.calendar)

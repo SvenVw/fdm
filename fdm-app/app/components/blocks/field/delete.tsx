@@ -1,6 +1,5 @@
-import { Form, useNavigation } from "react-router"
 import { useEffect, useRef, useState } from "react"
-import { Spinner } from "~/components/ui/spinner"
+import { Form, useNavigation } from "react-router"
 import {
     AlertDialog,
     AlertDialogCancel,
@@ -12,6 +11,7 @@ import {
     AlertDialogTrigger,
 } from "~/components/ui/alert-dialog"
 import { Button } from "~/components/ui/button"
+import { Spinner } from "~/components/ui/spinner"
 
 interface FieldDeleteDialogProps {
     fieldName: string

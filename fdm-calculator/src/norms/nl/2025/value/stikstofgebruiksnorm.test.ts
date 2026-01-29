@@ -1,5 +1,5 @@
 import type { Field } from "@svenvw/fdm-core"
-import { describe, expect, it, vi, afterEach } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import * as GeoTiff from "../../../../shared/geotiff"
 import {
     calculateNL2025StikstofGebruiksNorm,

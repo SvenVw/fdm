@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
 import { beforeAll, describe, expect, inject, it } from "vitest"
-import { createFdmAuth } from "./authentication"
 import type { FdmAuth } from "./authentication"
+import { createFdmAuth } from "./authentication"
 import { listPrincipalsForResource } from "./authorization"
 import * as schema from "./db/schema"
 import {

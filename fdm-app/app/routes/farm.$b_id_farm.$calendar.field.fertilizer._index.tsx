@@ -27,7 +27,6 @@ import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applic
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
-import { Spinner } from "~/components/ui/spinner"
 import { Badge } from "~/components/ui/badge"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
@@ -51,6 +50,7 @@ import {
 } from "~/components/ui/dialog"
 import { Label } from "~/components/ui/label"
 import { SidebarInset } from "~/components/ui/sidebar"
+import { Spinner } from "~/components/ui/spinner"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -272,7 +272,10 @@ export default function FarmFieldFertilizerAddIndex() {
                                                         <p className="text-sm font-medium truncate min-w-0">
                                                             {field.b_name}
                                                         </p>
-                                                        <Badge variant="secondary" className="shrink-0">
+                                                        <Badge
+                                                            variant="secondary"
+                                                            className="shrink-0"
+                                                        >
                                                             {field.b_area} ha
                                                         </Badge>
                                                     </div>

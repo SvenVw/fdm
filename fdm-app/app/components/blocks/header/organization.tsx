@@ -61,7 +61,8 @@ export function HeaderOrganization({
                         <DropdownMenu>
                             <DropdownMenuTrigger className="flex items-center gap-1 max-w-[120px] sm:max-w-[200px] md:max-w-none outline-none">
                                 <span className="truncate">
-                                    {selectedOrganizationSlug && organizationOptions
+                                    {selectedOrganizationSlug &&
+                                    organizationOptions
                                         ? (organizationOptions.find(
                                               (option) =>
                                                   option.slug ===

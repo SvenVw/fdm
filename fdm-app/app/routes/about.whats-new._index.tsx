@@ -24,6 +24,23 @@ export const meta: MetaFunction = () => {
 
 export const changelogEntries: ChangelogEntry[] = [
     {
+        version: "v0.27.0",
+        date: "29 januari 2026",
+        title: "Bemestingsplan als pdf, Bodemkaart in Atlas en uitklapbaar bouwplan",
+        description:
+            "De eerste release van 2026 maakt het mogelijk om het bemestingsplan als pdf te downloaden, voegt de bodemkaart toe aan de Atlas en maakt de bouwplantabel uitklapbaar voor meer detail. Daarnaast is er verbeterde ondersteuning voor bufferstroken.",
+        items: [
+            "Bemestingsplan als PDF: Met één druk op de knop genereert u nu een 'Bemestingsplan'. Dit PDF-bestand geeft een compleet overzicht van de bedrijfssituatie, inclusief gebruiksruimte, bemestingsadviezen en geplande bemestingen op zowel bedrijfs- als perceelsniveau.",
+            "Bodemkaart in Atlas: De Bodemkaart van Nederland (BRO) is nu beschikbaar als kaartlaag in de Atlas. Hiermee ziet u direct de bodemtype bij de percelen.",
+            "Uitklapbaar bouwplan: In de tabel voor bouwplan kunt u nu rijen uitklappen om direct te zien welke percelen bij een teelt horen. Op deze manier kunt u bijvoorbeeld perceel uitluiten van bemesting toevoegen als u het gewas heeft geselecteerd.",
+            "Bufferstroken: U kunt nu aangeven of een perceel een bufferstrook is. Deze percelen worden automatisch uitgesloten van de stikstof- en organische stofbalans op bedrijfsniveau. De gebruiksruimte en het bemestingsadvies worden voor deze stroken op nul gezet.",
+            "Meerdere percelen toevoegen: Het is nu mogelijk om meerdere percelen aan een bestaand bedrijf toe te voegen.",
+            "Gewashistorie kopiëren: Bij de gewashistorie van een perceel in Atlas is nu een knop toegevoegd om de historie direct naar het klembord te kopiëren, zodat u ze eenvoudig kunt plakken in bijvoorbeeld Excel.",
+            "Graslandvernieuwing 2025/2026: De specifieke regels voor stikstofkorting bij het scheuren of vernieuwen van grasland zijn toegevoegd voor de jaren 2025 en 2026.",
+            "Verbeteringen voor kleine schermen: De app werkt nu nog prettiger op mobiele apparaten. Tabellen, headers en de zijbalk zijn geoptimaliseerd voor kleinere schermen.",
+        ],
+    },
+    {
         version: "v0.26.0",
         date: "22 december 2025",
         title: "Hoogtekaart in Atlas, meer details in stikstofbalans, 2026 is beschikbaar",

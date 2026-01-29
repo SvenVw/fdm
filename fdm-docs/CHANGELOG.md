@@ -1,5 +1,11 @@
 # fdm-docs
 
+## 0.9.1
+
+### Patch Changes
+
+- [#415](https://github.com/SvenVw/fdm/pull/415) [`3675792`](https://github.com/SvenVw/fdm/commit/36757922dd4e71d4767defd906d2a986757d09f5) Thanks [@SvenVw](https://github.com/SvenVw)! - Updated 2025 nitrogen usage norm documentation to include grassland renewal and destruction reduction rules.
+
 ## 0.9.0
 
 ### Minor Changes

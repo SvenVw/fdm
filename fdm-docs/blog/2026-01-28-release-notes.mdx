@@ -1,0 +1,60 @@
+---
+slug: release-january-2026
+title: January 2026 Release
+authors: [svenverweij]
+tags: [release, fdm-app, fdm-calculator, fdm-core, fdm-data]
+date: 2026-01-29
+---
+
+The January 2026 release of the Farm Data Model (FDM) introduces comprehensive support for buffer strips and updated grassland regulations, alongside new reporting tools and a significant mobile UI overhaul. We have integrated official Dutch soil maps into the Atlas, launched the Bemestingsplan PDF for formal reporting, and refactored our calculation engine to support field-level caching. These updates ensure that FDM remains aligned with 2026 regulatory requirements while improving the daily experience for both mobile and desktop users.
+
+{/* truncate */}
+
+### Compliance and Buffer Strips
+
+To better align with Dutch regulations, we have implemented explicit support for buffer strips across the calculator and application.
+
+*   **Buffer Strip Designation:** Users can now explicitly mark fields as buffer strips.
+    *   **Data Model:** We have replaced the derived `b_isproductive` parameter with a stored `b_bufferstrip` parameter. 
+    *   **Migration:** For existing fields, `b_bufferstrip` has been initialized based on previous logic to ensure data consistency.
+*   **Calculation Logic:**
+    *   **Farm Balances:** Fields designated as buffer strips are now excluded from farm-level Nitrogen and Organic Matter balance calculations.
+    *   **Norms and Advice:** The calculator automatically sets nitrogen usage norms and nutrient advice to zero for buffer strips, reflecting their lack of *plaatsingsruimte*.
+    *   **UI Updates:** The application now displays informative messages when calculations are omitted for these fields.
+*   **Grassland Regulations:** We have implemented the nitrogen reduction (*korting*) logic for grassland renewal and destruction for the 2025 and 2026 seasons.
+
+### Reporting and Data Management
+
+*   **Bemestingsplan PDF:** A new "Bemestingsplan" PDF export is available. This report provides an overview of norms, advice, and fertilizer usage at both the farm and field levels.
+*   **Crop Rotation Table:**
+    *   **Expandable Rows:** The crop rotation table now supports expandable rows, allowing users to see the specific fields associated with each cultivation.
+    *   **Workflow Integration:** Field selections made in the rotation table are now carried over to the harvest and fertilizer addition wizards.
+*   **Data Export:** A "Copy to Clipboard" button has been added to the Cultivation History view, enabling data export in TSV format for use in spreadsheet software.
+*   **Session Persistence:** Filters applied to the field and rotation tables are now stored in session storage, maintaining the user's view when navigating within the application.
+
+### Atlas and Spatial Data
+
+*   **Soil Map Integration:** The BRO "Bodemkaart" (Soil Map) is now integrated into the Atlas, providing official soil classification data for field analysis.
+*   **Bulk Addition:** The Atlas now supports adding multiple fields simultaneously through the fields table interface.
+
+### UI/UX and Mobile Improvements
+
+We have refactored several core components to improve responsiveness and accessibility.
+
+*   **Responsive Layouts:** The Field Overview, Header, Sidebar, and Fertilizer Dashboard have been updated to improve usability on smaller screens and mobile devices.
+*   **Component Standardization:** All instances of `LoadingSpinner` have been replaced with the standardized shadcn `Spinner` component.
+*   **Accessibility:** Improvements have been made to the Cookie Banner and error pages to better support assistive technologies.
+*   **Input Validation:** Harvest dates are now validated against sowing and cultivation dates before submission to prevent data entry errors.
+
+### Technical Improvements
+
+*   **Calculation Performance:** We have refactored Nitrogen and Organic Matter balance calculations to use a bottom-up approach (Field -> Farm). This change enables per-field caching, improving performance for farms with many fields.
+*   **Security and Authentication:**
+    *   **Organization Management:** Organization-related functions have been migrated to use `better-auth` server-side capabilities.
+    *   **Cache Privacy:** The `withCalculationCache` function now supports redacting sensitive keys in the cache.
+*   **Type Safety:** Fixed the `FdmAuth` type definition to correctly include plugin configurations and settings.
+*   **Documentation:** Updated the documentation for 2025 nitrogen usage norms to include rules for grassland renewal and destruction.
+
+---
+
+The January release introduces expanded compliance features and reporting tools to support farm management. We continue to refine the platform's tools and data integrations to improve the overall user experience.

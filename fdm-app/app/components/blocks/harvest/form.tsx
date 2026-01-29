@@ -8,7 +8,6 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { cn } from "@/app/lib/utils"
 import { DatePicker } from "~/components/custom/date-picker-v2"
-import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     Collapsible,
@@ -32,6 +31,7 @@ import {
     FieldSet,
 } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
+import { Spinner } from "~/components/ui/spinner"
 import { getHarvestParameterLabel } from "./parameters"
 import { FormSchema } from "./schema"
 
