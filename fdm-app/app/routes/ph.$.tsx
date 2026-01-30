@@ -30,11 +30,12 @@ const posthogProxy = async (request: Request) => {
 
     const headers = new Headers(request.headers)
     headers.set("host", hostname)
+    const xForwardedFor = request.headers.get("x-forwarded-for")
+    if (xForwardedFor) {
+        const clientIp = xForwardedFor.split(",")[0].trim()
+        headers.set("x-real-ip", clientIp)
+    }
     headers.delete("accept-encoding")
-    headers.delete("x-forwarded-for")
-    headers.delete("x-forwarded-host")
-    headers.delete("x-forwarded-proto")
-    headers.delete("forwarded")
     headers.delete("proxy-authorization")
     headers.delete("authorization")
     headers.delete("cookie")
