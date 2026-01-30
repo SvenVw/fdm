@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.27.1
+
+### Patch Changes
+
+- [#442](https://github.com/SvenVw/fdm/pull/442) [`cc2f9c6`](https://github.com/SvenVw/fdm/commit/cc2f9c6af3b08980c064ad70b0b03abbb545afa0) Thanks [@SvenVw](https://github.com/SvenVw)! - Fix forwarding headers to reverse proxy for posthog
+
 ## 0.27.0
 
 ### Minor Changes
