@@ -23,9 +23,9 @@ const replaceCalculatorVersion = {
             id.endsWith("fdm-calculator/src/package.ts") ||
             id.endsWith("fdm-calculator\\src\\package.ts")
         ) {
-            const placeholder = "fdm-calculator:{FDM_CALCULATOR_VERSION}"
+            const placeholder = `"fdm-calculator:{FDM_CALCULATOR_VERSION}"`
             if (code.includes(placeholder)) {
-                const replacement = `fdm-calculator:${calculatorPackage.version}`
+                const replacement = `"fdm-calculator:${calculatorPackage.version}"`
                 return {
                     code: code.replace(
                         placeholder,
