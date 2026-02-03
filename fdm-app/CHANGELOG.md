@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.27.2
+
+### Patch Changes
+
+- [#448](https://github.com/SvenVw/fdm/pull/448) [`5e5ebf4`](https://github.com/SvenVw/fdm/commit/5e5ebf4bf169516d1c2fce9ef14c9a4a77bc3e12) Thanks [@SvenVw](https://github.com/SvenVw)! - Fix FormDataParseError when uploading files by converting LazyFile to File in uploadHandlers.
+
 ## 0.27.1
 
 ### Patch Changes
