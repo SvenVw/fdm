@@ -22,7 +22,7 @@ export type ProcessedAnalysis = {
     a_som_loi?: number
     a_p_al?: number
     a_p_cc?: number
-    a_nmin?: number
+    a_nmin_cc?: number
     a_source: string
     matchedFieldId?: string
     data: any // Raw parsed data
@@ -91,13 +91,16 @@ export function BulkSoilAnalysisReview({
             cell: ({ row }) => (
                 <div className="flex flex-wrap gap-1">
                     {row.original.a_som_loi !== undefined && (
-                        <Badge variant="secondary">OM: {row.original.a_som_loi}%</Badge>
+                        <Badge variant="secondary">OS: {row.original.a_som_loi}%</Badge>
                     )}
                     {row.original.a_p_al !== undefined && (
                         <Badge variant="secondary">P-AL: {row.original.a_p_al}</Badge>
+                    )}           
+                    {row.original.a_p_al !== undefined && (
+                        <Badge variant="secondary">P-CaCl2: {row.original.a_p_cc}</Badge>
                     )}
-                    {row.original.a_nmin !== undefined && (
-                        <Badge variant="secondary">Nmin: {row.original.a_nmin}</Badge>
+                    {row.original.a_nmin_cc !== undefined && (
+                        <Badge variant="secondary">Nmin: {row.original.a_nmin_cc}</Badge>
                     )}
                 </div>
             ),
