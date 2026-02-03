@@ -233,3 +233,82 @@ export async function extractSoilAnalysis(formData: FormData) {
     }
     return soilAnalysis
 }
+
+export async function extractBulkSoilAnalyses(formData: FormData) {
+    const nmiApiKey = getNmiApiKey()
+
+    if (!nmiApiKey) {
+        throw new Error("NMI API key not configured")
+    }
+    
+    const responseApi = await fetch("https://api.nmi-agro.nl/soilreader", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${nmiApiKey}`,
+        },
+        body: formData,
+    })
+
+    if (!responseApi.ok) {
+        const text = await responseApi.text()
+        console.error(`NMI API Error: ${responseApi.status} ${responseApi.statusText}`, text)
+        throw new Error(`Request to NMI API failed: ${responseApi.status} ${responseApi.statusText}`)
+    }
+
+    const text = await responseApi.text()
+    try {
+        const result = JSON.parse(text)
+        const response = result.data
+
+        if (!response.fields || !Array.isArray(response.fields)) {
+            console.error("Invalid NMI API response structure:", JSON.stringify(result, null, 2))
+            throw new Error("Invalid API response: no fields found")
+        }
+
+        return response.fields.map((field: any, index: number) => {
+            const soilAnalysis: { [key: string]: any } = {
+                id: crypto.randomUUID(),
+                filename: field.filename || `Analyse ${index + 1}`,
+            }
+    
+            for (const key of Object.keys(field).filter((key) => key.startsWith("a_"))) {
+                soilAnalysis[key] = field[key]
+            }
+    
+            if (field.b_date) {
+                const dateParts = field.b_date.split("-")
+                if (dateParts.length === 3) {
+                    const day = Number.parseInt(dateParts[0], 10)
+                    const month = Number.parseInt(dateParts[1], 10) - 1
+                    const year = Number.parseInt(dateParts[2], 10)
+                    soilAnalysis.b_sampling_date = new Date(year, month, day)
+                }
+            }
+    
+            if (field.b_soiltype_agr) {
+                soilAnalysis.b_soil_type = field.b_soiltype_agr
+            }
+    
+            if (field.b_depth) {
+                const depthParts = field.b_depth.split("-")
+                if (depthParts.length === 2) {
+                    soilAnalysis.a_depth_upper = Number(depthParts[0])
+                    soilAnalysis.a_depth_lower = Number(depthParts[1])
+                }
+            }
+    
+            // Add coordinates if present in the response for geometry matching
+            if (field.a_lat && field.a_lon) {
+                soilAnalysis.location = {
+                    type: "Point",
+                    coordinates: [Number(field.a_lon), Number(field.a_lat)]
+                }
+            }
+    
+            return soilAnalysis
+        })
+    } catch (e) {
+        console.error("Failed to parse NMI API response:", text)
+        throw e
+    }
+}

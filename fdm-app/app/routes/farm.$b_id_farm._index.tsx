@@ -15,6 +15,7 @@ import {
     Sprout,
     Square,
     Trash2,
+    FileStack,
     UserRoundCheck,
 } from "lucide-react"
 import { useState } from "react"
@@ -493,6 +494,16 @@ export default function FarmDashboardIndex() {
                                                 <NavLink to="fertilizers">
                                                     <Shapes className="mr-2 h-4 w-4" />
                                                     Meststoffen
+                                                </NavLink>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-start"
+                                                asChild
+                                            >
+                                                <NavLink to="soil-analysis/bulk">
+                                                    <FileStack className="mr-2 h-4 w-4" />
+                                                    Upload bodemanalyses
                                                 </NavLink>
                                             </Button>
                                             <Button
