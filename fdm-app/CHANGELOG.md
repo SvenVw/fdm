@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.27.3
+
+### Patch Changes
+
+- [#445](https://github.com/SvenVw/fdm/pull/445) [`f30565a`](https://github.com/SvenVw/fdm/commit/f30565ada2349775c159fa23ba58545159e9c15a) Thanks [@SvenVw](https://github.com/SvenVw)! - Fix calculator version placeholder in `fdm-app` build. This ensures the calculation cache key correctly reflects the calculator version in production, where `fdm-app` consumes source files directly.
+
 ## 0.27.2
 
 ### Patch Changes
