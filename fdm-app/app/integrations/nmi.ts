@@ -258,19 +258,20 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
     const text = await responseApi.text()
     try {
         const result = JSON.parse(text)
-        const response = result.data
+        const response = result?.data
 
-        if (!response.fields || !Array.isArray(response.fields)) {
+        if (!response?.fields || !Array.isArray(response.fields)) {
             console.error("Invalid NMI API response structure:", JSON.stringify(result, null, 2))
             throw new Error("Invalid API response: no fields found")
         }
 
         return response.fields.map((field: any, index: number) => {
             const soilAnalysis: { [key: string]: any } = {
-                id: crypto.randomUUID(),
+                id: crypto.randomUUID(), // Used for UI matching
                 filename: field.filename || `Analyse ${index + 1}`,
             }
     
+            // Safely map known soil parameters (starting with a_)
             for (const key of Object.keys(field).filter((key) => key.startsWith("a_"))) {
                 soilAnalysis[key] = field[key]
             }
@@ -297,7 +298,7 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
                 }
             }
     
-            // Add coordinates if present in the response for geometry matching
+            // Add coordinates for geometry matching, but keep them separate from the main analysis data
             if (field.a_lat && field.a_lon) {
                 soilAnalysis.location = {
                     type: "Point",

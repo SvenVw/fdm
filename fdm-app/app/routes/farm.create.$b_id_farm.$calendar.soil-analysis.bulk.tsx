@@ -1,4 +1,4 @@
-import { getFarm, getFields, addSoilAnalysis, getSoilParametersDescription } from "@svenvw/fdm-core"
+import { getFarm, getFields, getSoilParametersDescription, addSoilAnalysis } from "@svenvw/fdm-core"
 import { fdm } from "~/lib/fdm.server"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError, handleActionError } from "~/lib/error"
@@ -60,22 +60,28 @@ export async function action({ request, params }: ActionFunctionArgs) {
             const matches = JSON.parse(formData.get("matches") as string)
             const analysesData = JSON.parse(formData.get("analysesData") as string)
 
-            for (const match of matches) {
-                const analysis = analysesData.find((a: any) => a.id === match.analysisId)
-                if (analysis) {
-                    await addSoilAnalysis(
-                        fdm,
-                        session.principal_id,
-                        null,
-                        analysis.a_source || "other",
-                        match.fieldId,
-                        Number(analysis.a_depth_lower),
-                        new Date(analysis.b_sampling_date),
-                        analysis,
-                        Number(analysis.a_depth_upper),
-                    )
-                }
-            }
+            await Promise.all(
+                matches.map(async (match: { analysisId: string; fieldId: string }) => {
+                    const analysis = analysesData.find((a: any) => a.id === match.analysisId)
+                    if (analysis) {
+                        // Strip UI-only properties before saving to DB
+                        const { id, location, ...dbAnalysis } = analysis
+
+                        return addSoilAnalysis(
+                            fdm,
+                            session.principal_id,
+                            null,
+                            analysis.a_source || "other",
+                            match.fieldId,
+                            Number(analysis.a_depth_lower),
+                            new Date(analysis.b_sampling_date),
+                            dbAnalysis,
+                            Number(analysis.a_depth_upper),
+                        )
+                    }
+                }),
+            )
+
             return redirectWithSuccess(`/farm/create/${b_id_farm}/${calendar}/fields`, {
                 message: "Bodemanalyses succesvol opgeslagen",
             })
