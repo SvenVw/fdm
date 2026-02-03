@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { useFetcher } from "react-router"
 import { FileText, Upload, Trash2, X, FileUp } from "lucide-react"
-import { toast } from "sonner"
 import { Dropzone } from "~/components/custom/dropzone"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
@@ -39,16 +38,8 @@ export function BulkSoilAnalysisUploadForm({
     useEffect(() => {
         if (isUploading) return
 
-        if (fetcher.data) {
-            // Check for success
-            if (fetcher.data.analyses) {
-                toast.success(`${files.length} analyses succesvol verwerkt`)
-                onSuccess(fetcher.data.analyses)
-            } 
-            // Check for error (standard error format or custom)
-            else if (fetcher.data.warning || fetcher.data.error) {
-                 toast.error(fetcher.data.warning || fetcher.data.error || "Er is iets fout gegaan")
-            }
+        if (fetcher.data && fetcher.data.analyses) {
+            onSuccess(fetcher.data.analyses)
         }
     }, [fetcher.data, fetcher.state, onSuccess])
 
@@ -57,6 +48,7 @@ export function BulkSoilAnalysisUploadForm({
         newFiles.splice(index, 1)
         setFiles(newFiles)
     }
+
 
     const formatFileSize = (bytes: number) => {
         if (bytes === 0) return "0 B"

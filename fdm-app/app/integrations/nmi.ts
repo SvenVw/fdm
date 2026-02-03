@@ -2,6 +2,7 @@ import centroid from "@turf/centroid"
 import type { Feature, Geometry, Polygon } from "geojson"
 import { z } from "zod"
 import { serverConfig } from "~/lib/config.server"
+import { fileTypeFromBuffer } from "file-type"
 
 export function getNmiApiKey() {
     if (!serverConfig.integrations.nmi) {
@@ -10,6 +11,14 @@ export function getNmiApiKey() {
 
     const nmiApiKey = serverConfig.integrations.nmi.api_key
     return nmiApiKey
+}
+
+async function validatePdfMagicBytes(file: File) {
+    const buffer = await file.arrayBuffer()
+    const type = await fileTypeFromBuffer(Buffer.from(buffer))
+    if (!type || type.ext !== "pdf" || type.mime !== "application/pdf") {
+        throw new Error(`invalid: Bestand "${file.name}" is geen geldig PDF-bestand.`)
+    }
 }
 
 export async function getSoilParameterEstimates(
@@ -161,6 +170,8 @@ export async function extractSoilAnalysis(formData: FormData) {
         throw new Error("No file provided in FormData")
     }
 
+    await validatePdfMagicBytes(file)
+
     const responseApi = await fetch("https://api.nmi-agro.nl/soilreader", {
         method: "POST",
         headers: {
@@ -239,6 +250,15 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
 
     if (!nmiApiKey) {
         throw new Error("NMI API key not configured")
+    }
+
+    const files = formData.getAll("soilAnalysisFile") as File[]
+    if (files.length === 0) {
+        throw new Error("Geen bestanden gevonden in FormData")
+    }
+
+    for (const file of files) {
+        await validatePdfMagicBytes(file)
     }
     
     const responseApi = await fetch("https://api.nmi-agro.nl/soilreader", {

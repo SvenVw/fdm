@@ -13,7 +13,7 @@ import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { Spinner } from "~/components/ui/spinner"
-import { redirectWithSuccess } from "remix-toast"
+import { redirectWithSuccess, dataWithSuccess } from "remix-toast"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -53,7 +53,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         if (formData.has("soilAnalysisFile")) {
             const analyses = await extractBulkSoilAnalyses(formData)
-            return data({ analyses })
+            return dataWithSuccess({ analyses }, {
+                message: `${analyses.length} analyses succesvol verwerkt`,
+            })
         }
 
         if (formData.has("matches")) {

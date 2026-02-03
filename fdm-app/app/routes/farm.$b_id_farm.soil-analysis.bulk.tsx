@@ -14,7 +14,7 @@ import { BulkSoilAnalysisReview, type ProcessedAnalysis } from "~/components/blo
 import { extractBulkSoilAnalyses } from "~/integrations/nmi"
 import { booleanPointInPolygon } from "@turf/turf"
 import { Spinner } from "~/components/ui/spinner"
-import { redirectWithSuccess } from "remix-toast"
+import { redirectWithSuccess, dataWithSuccess } from "remix-toast"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -59,7 +59,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Handle initial upload to NMI
         if (formData.has("soilAnalysisFile")) {
             const analyses = await extractBulkSoilAnalyses(formData)
-            return data({ analyses })
+            return dataWithSuccess({ analyses }, {
+                message: `${analyses.length} analyses succesvol verwerkt`,
+            })
         }
 
         // Handle final save
