@@ -19,10 +19,9 @@ const calculatorPackage = JSON.parse(
 const replaceCalculatorVersion = {
     name: "replace-calculator-version",
     transform(code: string, id: string) {
-        if (
-            id.endsWith("fdm-calculator/src/package.ts") ||
-            id.endsWith("fdm-calculator\\src\\package.ts")
-        ) {
+        const cleanId = id.split("?", 1)[0]
+        const target = path.join("fdm-calculator", "src", "package.ts")
+        if (path.normalize(cleanId).endsWith(target)) {
             const placeholder = `"fdm-calculator:{FDM_CALCULATOR_VERSION}"`
             if (code.includes(placeholder)) {
                 const replacement = `"fdm-calculator:${calculatorPackage.version}"`
