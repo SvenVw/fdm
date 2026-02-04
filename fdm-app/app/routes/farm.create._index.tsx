@@ -1,4 +1,3 @@
-import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addDerogation,
@@ -10,6 +9,7 @@ import {
     getFertilizersFromCatalogue,
     setGrazingIntention,
 } from "@svenvw/fdm-core"
+import { useEffect } from "react"
 import { Controller } from "react-hook-form"
 import type {
     ActionFunctionArgs,
@@ -67,65 +67,63 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-const FormSchema = z
-    .object({
-        b_name_farm: z
-            .string({
-                error: (issue) =>
-                    issue.input === undefined
-                        ? "Naam van bedrijf is verplicht"
-                        : undefined,
-            })
-            .min(3, {
-                error: "Naam van bedrijf moet minimaal 3 karakters bevatten",
-            }),
-        year: z.coerce.number({
+const FormSchema = z.object({
+    b_name_farm: z
+        .string({
             error: (issue) =>
                 issue.input === undefined
-                    ? "Jaar is verplicht"
-                    : "Jaar moet een getal zijn",
+                    ? "Naam van bedrijf is verplicht"
+                    : undefined,
+        })
+        .min(3, {
+            error: "Naam van bedrijf moet minimaal 3 karakters bevatten",
         }),
-        b_businessid_farm: z
-            .string()
-            .regex(/^\d{8}$/, "KvK-nummer moet uit 8 cijfers bestaan")
-            .optional()
-            .or(z.literal("")),
-        has_derogation: z.coerce.boolean().default(false),
-        derogation_start_year: z.coerce
-            .number()
-            .min(2006, {
-                error: "Startjaar moet minimaal 2006 zijn",
-            })
-            .max(2025, {
-                error: "Startjaar mag maximaal 2025 zijn",
-            })
-            .optional(),
-        grazing_intention: z.coerce.boolean().default(false),
-        organic_certification: z.coerce.boolean().default(false),
-        organic_skal: z
-            .string()
-            .trim()
-            .optional()
-            .refine((val) => !val || /^\d{6}$/.test(val), {
-                message: "Ongeldig SKAL-nummer",
-            }),
-        organic_traces: z
-            .string()
-            .trim()
-            .optional()
-            .refine(
-                (val) =>
-                    !val ||
-                    /^NL-BIO-\d{2}\.\d{3}-\d{7}\.\d{4}\.\d{3}$/.test(val),
-                {
-                    message: "Ongeldig TRACES-nummer",
-                },
-            ),
-        organic_issued: z.coerce.date().optional(),
-    })
+    year: z.coerce.number({
+        error: (issue) =>
+            issue.input === undefined
+                ? "Jaar is verplicht"
+                : "Jaar moet een getal zijn",
+    }),
+    b_businessid_farm: z
+        .string()
+        .regex(/^\d{8}$/, "KvK-nummer moet uit 8 cijfers bestaan")
+        .optional()
+        .or(z.literal("")),
+    has_derogation: z.coerce.boolean().default(false),
+    derogation_start_year: z.coerce
+        .number()
+        .min(2006, {
+            error: "Startjaar moet minimaal 2006 zijn",
+        })
+        .max(2025, {
+            error: "Startjaar mag maximaal 2025 zijn",
+        })
+        .optional(),
+    grazing_intention: z.coerce.boolean().default(false),
+    organic_certification: z.coerce.boolean().default(false),
+    organic_skal: z
+        .string()
+        .trim()
+        .optional()
+        .refine((val) => !val || /^\d{6}$/.test(val), {
+            message: "Ongeldig SKAL-nummer",
+        }),
+    organic_traces: z
+        .string()
+        .trim()
+        .optional()
+        .refine(
+            (val) =>
+                !val || /^NL-BIO-\d{2}\.\d{3}-\d{7}\.\d{4}\.\d{3}$/.test(val),
+            {
+                message: "Ongeldig TRACES-nummer",
+            },
+        ),
+    organic_issued: z.coerce.date().optional(),
+})
 
 // Loader
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({}: LoaderFunctionArgs) {
     const yearSelection = getCalendarSelection()
 
     return {
@@ -144,6 +142,7 @@ export default function AddFarmPage() {
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
+        // biome-ignore lint/suspicious/noExplicitAny: zodResolver type mismatch
         resolver: zodResolver(FormSchema) as any,
         defaultValues: {
             b_name_farm: "",
@@ -178,474 +177,591 @@ export default function AddFarmPage() {
             <Header action={undefined}>
                 <HeaderFarmCreate b_name_farm={undefined} />
             </Header>
-            <main>
-                <div className="flex h-screen items-center justify-center overflow-y-auto py-8">
-                    <Card className="w-[500px] my-auto">
-                        <RemixFormProvider {...form}>
-                            <Form
-                                id="formFarm"
-                                onSubmit={form.handleSubmit}
-                                method="POST"
-                            >
-                                <fieldset
-                                    disabled={form.formState.isSubmitting}
+            <main className="flex-1 overflow-y-auto bg-muted/20">
+                <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 p-4 lg:grid-cols-3 lg:p-8">
+                    {/* Left Column: Form */}
+                    <div className="lg:col-span-2">
+                        <Card className="w-full">
+                            <RemixFormProvider {...form}>
+                                <Form
+                                    id="formFarm"
+                                    onSubmit={form.handleSubmit}
+                                    method="POST"
                                 >
-                                    <CardHeader>
-                                        <CardTitle>Bedrijf toevoegen</CardTitle>
-                                        <CardDescription>
-                                            Voer de basisgegevens van je bedrijf
-                                            in.
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="space-y-6">
-                                        {/* General Information */}
-                                        <div className="space-y-4">
-                                            <Controller
-                                                control={form.control}
-                                                name="b_name_farm"
-                                                render={({
-                                                    field,
-                                                    fieldState,
-                                                }) => (
-                                                    <Field
-                                                        data-invalid={
-                                                            fieldState.invalid
-                                                        }
-                                                    >
-                                                        <FieldLabel>
-                                                            Bedrijfsnaam
-                                                        </FieldLabel>
-                                                        <Input
-                                                            placeholder="Bv. Jansen V.O.F."
-                                                            aria-required="true"
-                                                            {...field}
-                                                        />
-                                                        {fieldState.invalid && (
-                                                            <FieldError
-                                                                errors={[
-                                                                    fieldState.error,
-                                                                ]}
-                                                            />
-                                                        )}
-                                                    </Field>
-                                                )}
-                                            />
-
-                                            <Controller
-                                                control={form.control}
-                                                name="year"
-                                                render={({
-                                                    field,
-                                                    fieldState,
-                                                }) => (
-                                                    <Field
-                                                        data-invalid={
-                                                            fieldState.invalid
-                                                        }
-                                                    >
-                                                        <FieldLabel>
-                                                            Kalenderjaar
-                                                        </FieldLabel>
-                                                        <Select
-                                                            onValueChange={
-                                                                field.onChange
-                                                            }
-                                                            defaultValue={field.value.toString()}
-                                                        >
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Selecteer een jaar" />
-                                                            </SelectTrigger>
-                                                            <SelectContent>
-                                                                {yearSelection.map(
-                                                                    (
-                                                                        yearOption: string,
-                                                                    ) => (
-                                                                        <SelectItem
-                                                                            key={
-                                                                                yearOption
-                                                                            }
-                                                                            value={
-                                                                                yearOption
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                yearOption
-                                                                            }
-                                                                        </SelectItem>
-                                                                    ),
-                                                                )}
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FieldDescription>
-                                                            Het jaar waarvoor je
-                                                            data wilt invoeren.
-                                                        </FieldDescription>
-                                                        {fieldState.invalid && (
-                                                            <FieldError
-                                                                errors={[
-                                                                    fieldState.error,
-                                                                ]}
-                                                            />
-                                                        )}
-                                                    </Field>
-                                                )}
-                                            />
-
-                                            <Controller
-                                                control={form.control}
-                                                name="b_businessid_farm"
-                                                render={({
-                                                    field,
-                                                    fieldState,
-                                                }) => (
-                                                    <Field
-                                                        data-invalid={
-                                                            fieldState.invalid
-                                                        }
-                                                    >
-                                                        <FieldLabel>
-                                                            KvK-nummer
-                                                        </FieldLabel>
-                                                        <Input
-                                                            placeholder="12345678"
-                                                            {...field}
-                                                        />
-                                                        {fieldState.invalid && (
-                                                            <FieldError
-                                                                errors={[
-                                                                    fieldState.error,
-                                                                ]}
-                                                            />
-                                                        )}
-                                                    </Field>
-                                                )}
-                                            />
-                                        </div>
-
-                                        {/* Derogation Section */}
-                                        {isDerogationPossible && (
-                                            <div className="rounded-lg border p-4">
-                                                <h3 className="font-medium mb-3">
-                                                    Derogatie
-                                                </h3>
-                                                <div className="space-y-4">
+                                    <fieldset
+                                        disabled={form.formState.isSubmitting}
+                                    >
+                                        <CardHeader>
+                                            <CardTitle>
+                                                Bedrijf toevoegen
+                                            </CardTitle>
+                                            <CardDescription>
+                                                Voer de basisgegevens van je
+                                                bedrijf in.
+                                            </CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="space-y-6">
+                                            {/* General Information */}
+                                            <div className="grid gap-4 sm:grid-cols-2">
+                                                <div className="sm:col-span-2">
                                                     <Controller
                                                         control={form.control}
-                                                        name="has_derogation"
+                                                        name="b_name_farm"
                                                         render={({
                                                             field,
                                                             fieldState,
                                                         }) => (
                                                             <Field
-                                                                orientation="horizontal"
-                                                                className="justify-between items-center"
                                                                 data-invalid={
                                                                     fieldState.invalid
                                                                 }
                                                             >
-                                                                <FieldLabel className="text-base font-normal">
-                                                                    Heeft dit
-                                                                    bedrijf
-                                                                    derogatie?
+                                                                <FieldLabel>
+                                                                    Bedrijfsnaam
                                                                 </FieldLabel>
-                                                                <Checkbox
-                                                                    checked={
-                                                                        field.value
-                                                                    }
-                                                                    onCheckedChange={
-                                                                        field.onChange
-                                                                    }
+                                                                <Input
+                                                                    placeholder="Bv. Jansen V.O.F."
+                                                                    aria-required="true"
+                                                                    {...field}
                                                                 />
+                                                                {fieldState.invalid && (
+                                                                    <FieldError
+                                                                        errors={[
+                                                                            fieldState.error,
+                                                                        ]}
+                                                                    />
+                                                                )}
                                                             </Field>
                                                         )}
                                                     />
-                                                    {form.watch(
-                                                        "has_derogation",
-                                                    ) && (
-                                                        <Controller
-                                                            control={
-                                                                form.control
-                                                            }
-                                                            name="derogation_start_year"
-                                                            render={({
-                                                                field,
-                                                                fieldState,
-                                                            }) => (
-                                                                <Field
-                                                                    data-invalid={
-                                                                        fieldState.invalid
-                                                                    }
-                                                                >
-                                                                    <FieldLabel>
-                                                                        Startjaar
-                                                                    </FieldLabel>
-                                                                    <Select
-                                                                        onValueChange={
-                                                                            field.onChange
-                                                                        }
-                                                                        defaultValue={String(
-                                                                            field.value,
-                                                                        )}
-                                                                    >
-                                                                        <SelectTrigger>
-                                                                            <SelectValue placeholder="Selecteer een jaar" />
-                                                                        </SelectTrigger>
-                                                                        <SelectContent>
-                                                                            {Array.from(
-                                                                                {
-                                                                                    length:
-                                                                                        2025 -
-                                                                                        2006 +
-                                                                                        1,
-                                                                                },
-                                                                                (
-                                                                                    _,
-                                                                                    i,
-                                                                                ) =>
-                                                                                    2006 +
-                                                                                    i,
-                                                                            ).map(
-                                                                                (
-                                                                                    year,
-                                                                                ) => (
-                                                                                    <SelectItem
-                                                                                        key={
-                                                                                            year
-                                                                                        }
-                                                                                        value={String(
-                                                                                            year,
-                                                                                        )}
-                                                                                    >
-                                                                                        {
-                                                                                            year
-                                                                                        }
-                                                                                    </SelectItem>
-                                                                                ),
-                                                                            )}
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                    {fieldState.invalid && (
-                                                                        <FieldError
-                                                                            errors={[
-                                                                                fieldState.error,
-                                                                            ]}
-                                                                        />
-                                                                    )}
-                                                                </Field>
-                                                            )}
-                                                        />
-                                                    )}
                                                 </div>
-                                            </div>
-                                        )}
 
-                                        {/* Grazing Section */}
-                                        <div className="rounded-lg border p-4">
-                                            <h3 className="font-medium mb-3">
-                                                Weidegang
-                                            </h3>
-                                            <Controller
-                                                control={form.control}
-                                                name="grazing_intention"
-                                                render={({
-                                                    field,
-                                                    fieldState,
-                                                }) => (
-                                                    <Field
-                                                        orientation="horizontal"
-                                                        className="justify-between items-center"
-                                                        data-invalid={
-                                                            fieldState.invalid
-                                                        }
-                                                    >
-                                                        <FieldLabel className="text-base font-normal">
-                                                            Is er een voornemen
-                                                            tot weiden?
-                                                        </FieldLabel>
-                                                        <Checkbox
-                                                            checked={
-                                                                field.value
-                                                            }
-                                                            onCheckedChange={
-                                                                field.onChange
-                                                            }
-                                                        />
-                                                    </Field>
-                                                )}
-                                            />
-                                        </div>
-
-                                        {/* Organic Section */}
-                                        <div className="rounded-lg border p-4">
-                                            <h3 className="font-medium mb-3">
-                                                Biologisch
-                                            </h3>
-                                            <div className="space-y-4">
                                                 <Controller
                                                     control={form.control}
-                                                    name="organic_certification"
+                                                    name="year"
                                                     render={({
                                                         field,
                                                         fieldState,
                                                     }) => (
                                                         <Field
-                                                            orientation="horizontal"
-                                                            className="justify-between items-center"
                                                             data-invalid={
                                                                 fieldState.invalid
                                                             }
                                                         >
-                                                            <FieldLabel className="text-base font-normal">
-                                                                Is het bedrijf
-                                                                biologisch
-                                                                gecertificeerd?
+                                                            <FieldLabel>
+                                                                Kalenderjaar
                                                             </FieldLabel>
-                                                            <Checkbox
-                                                                checked={
-                                                                    field.value
-                                                                }
-                                                                onCheckedChange={
+                                                            <Select
+                                                                onValueChange={
                                                                     field.onChange
                                                                 }
-                                                            />
+                                                                defaultValue={field.value.toString()}
+                                                            >
+                                                                <SelectTrigger>
+                                                                    <SelectValue placeholder="Selecteer een jaar" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    {yearSelection.map(
+                                                                        (
+                                                                            yearOption: string,
+                                                                        ) => (
+                                                                            <SelectItem
+                                                                                key={
+                                                                                    yearOption
+                                                                                }
+                                                                                value={
+                                                                                    yearOption
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    yearOption
+                                                                                }
+                                                                            </SelectItem>
+                                                                        ),
+                                                                    )}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FieldDescription>
+                                                                Startjaar voor
+                                                                invoer.
+                                                            </FieldDescription>
+                                                            {fieldState.invalid && (
+                                                                <FieldError
+                                                                    errors={[
+                                                                        fieldState.error,
+                                                                    ]}
+                                                                />
+                                                            )}
                                                         </Field>
                                                     )}
                                                 />
 
-                                                {form.watch(
-                                                    "organic_certification",
-                                                ) && (
-                                                    <div className="space-y-4 pt-2">
-                                                        <div className="grid grid-cols-2 gap-4">
-                                                            <Controller
-                                                                control={
-                                                                    form.control
-                                                                }
-                                                                name="organic_skal"
-                                                                render={({
-                                                                    field,
-                                                                    fieldState,
-                                                                }) => (
-                                                                    <Field
-                                                                        data-invalid={
-                                                                            fieldState.invalid
-                                                                        }
-                                                                    >
-                                                                        <FieldLabel>
-                                                                            SKAL-nummer
-                                                                        </FieldLabel>
-                                                                        <Input
-                                                                            placeholder="012345"
-                                                                            {...field}
-                                                                        />
-                                                                        <FieldDescription>
-                                                                            Optioneel
-                                                                        </FieldDescription>
-                                                                        {fieldState.invalid && (
-                                                                            <FieldError
-                                                                                errors={[
-                                                                                    fieldState.error,
-                                                                                ]}
-                                                                            />
-                                                                        )}
-                                                                    </Field>
-                                                                )}
+                                                <Controller
+                                                    control={form.control}
+                                                    name="b_businessid_farm"
+                                                    render={({
+                                                        field,
+                                                        fieldState,
+                                                    }) => (
+                                                        <Field
+                                                            data-invalid={
+                                                                fieldState.invalid
+                                                            }
+                                                        >
+                                                            <FieldLabel>
+                                                                KvK-nummer
+                                                            </FieldLabel>
+                                                            <Input
+                                                                placeholder="12345678"
+                                                                {...field}
                                                             />
+                                                            {fieldState.invalid && (
+                                                                <FieldError
+                                                                    errors={[
+                                                                        fieldState.error,
+                                                                    ]}
+                                                                />
+                                                            )}
+                                                        </Field>
+                                                    )}
+                                                />
+                                            </div>
+
+                                            <div className="space-y-6">
+                                                <div className="border-t pt-4">
+                                                    <h3 className="font-medium mb-4 text-base">
+                                                        Instellingen
+                                                    </h3>
+                                                    <div className="grid gap-4 sm:grid-cols-2">
+                                                        {/* Derogation Section */}
+                                                        {isDerogationPossible && (
+                                                            <div className="rounded-lg border p-4 sm:col-span-2">
+                                                                <div className="space-y-4">
+                                                                    <Controller
+                                                                        control={
+                                                                            form.control
+                                                                        }
+                                                                        name="has_derogation"
+                                                                        render={({
+                                                                            field,
+                                                                            fieldState,
+                                                                        }) => (
+                                                                            <Field
+                                                                                orientation="horizontal"
+                                                                                className="justify-between items-center"
+                                                                                data-invalid={
+                                                                                    fieldState.invalid
+                                                                                }
+                                                                            >
+                                                                                <FieldLabel className="text-base font-normal">
+                                                                                    Heeft
+                                                                                    dit
+                                                                                    bedrijf
+                                                                                    derogatie?
+                                                                                </FieldLabel>
+                                                                                <Checkbox
+                                                                                    checked={
+                                                                                        field.value
+                                                                                    }
+                                                                                    onCheckedChange={
+                                                                                        field.onChange
+                                                                                    }
+                                                                                />
+                                                                            </Field>
+                                                                        )}
+                                                                    />
+                                                                    {form.watch(
+                                                                        "has_derogation",
+                                                                    ) && (
+                                                                        <Controller
+                                                                            control={
+                                                                                form.control
+                                                                            }
+                                                                            name="derogation_start_year"
+                                                                            render={({
+                                                                                field,
+                                                                                fieldState,
+                                                                            }) => (
+                                                                                <Field
+                                                                                    data-invalid={
+                                                                                        fieldState.invalid
+                                                                                    }
+                                                                                >
+                                                                                    <FieldLabel>
+                                                                                        Startjaar
+                                                                                    </FieldLabel>
+                                                                                    <Select
+                                                                                        onValueChange={
+                                                                                            field.onChange
+                                                                                        }
+                                                                                        defaultValue={String(
+                                                                                            field.value,
+                                                                                        )}
+                                                                                    >
+                                                                                        <SelectTrigger>
+                                                                                            <SelectValue placeholder="Selecteer een jaar" />
+                                                                                        </SelectTrigger>
+                                                                                        <SelectContent>
+                                                                                            {Array.from(
+                                                                                                {
+                                                                                                    length:
+                                                                                                        2025 -
+                                                                                                        2006 +
+                                                                                                        1,
+                                                                                                },
+                                                                                                (
+                                                                                                    _,
+                                                                                                    i,
+                                                                                                ) =>
+                                                                                                    2006 +
+                                                                                                    i,
+                                                                                            ).map(
+                                                                                                (
+                                                                                                    year,
+                                                                                                ) => (
+                                                                                                    <SelectItem
+                                                                                                        key={
+                                                                                                            year
+                                                                                                        }
+                                                                                                        value={String(
+                                                                                                            year,
+                                                                                                        )}
+                                                                                                    >
+                                                                                                        {
+                                                                                                            year
+                                                                                                        }
+                                                                                                    </SelectItem>
+                                                                                                ),
+                                                                                            )}
+                                                                                        </SelectContent>
+                                                                                    </Select>
+                                                                                    {fieldState.invalid && (
+                                                                                        <FieldError
+                                                                                            errors={[
+                                                                                                fieldState.error,
+                                                                                            ]}
+                                                                                        />
+                                                                                    )}
+                                                                                </Field>
+                                                                            )}
+                                                                        />
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Grazing Section */}
+                                                        <div className="rounded-lg border p-4 sm:col-span-2">
                                                             <Controller
                                                                 control={
                                                                     form.control
                                                                 }
-                                                                name="organic_traces"
+                                                                name="grazing_intention"
                                                                 render={({
                                                                     field,
                                                                     fieldState,
                                                                 }) => (
                                                                     <Field
+                                                                        orientation="horizontal"
+                                                                        className="justify-between items-center"
                                                                         data-invalid={
                                                                             fieldState.invalid
                                                                         }
                                                                     >
-                                                                        <FieldLabel>
-                                                                            TRACES-nummer
+                                                                        <FieldLabel className="text-base font-normal">
+                                                                            Is
+                                                                            er
+                                                                            een
+                                                                            voornemen
+                                                                            tot
+                                                                            weiden?
                                                                         </FieldLabel>
-                                                                        <Input
-                                                                            placeholder="NL-BIO-01..."
-                                                                            {...field}
+                                                                        <Checkbox
+                                                                            checked={
+                                                                                field.value
+                                                                            }
+                                                                            onCheckedChange={
+                                                                                field.onChange
+                                                                            }
                                                                         />
-                                                                        <FieldDescription>
-                                                                            Optioneel
-                                                                        </FieldDescription>
-                                                                        {fieldState.invalid && (
-                                                                            <FieldError
-                                                                                errors={[
-                                                                                    fieldState.error,
-                                                                                ]}
-                                                                            />
-                                                                        )}
                                                                     </Field>
                                                                 )}
                                                             />
                                                         </div>
-                                                        <Controller
-                                                            control={
-                                                                form.control
-                                                            }
-                                                            name="organic_issued"
-                                                            render={({
-                                                                field,
-                                                                fieldState,
-                                                            }) => (
-                                                                <DatePicker
-                                                                    label="Certificaat geldig vanaf"
-                                                                    defaultValue={
-                                                                        new Date(
-                                                                            Number(
-                                                                                selectedYear,
-                                                                            ),
-                                                                            0,
-                                                                            1,
-                                                                        )
-                                                                    }
-                                                                    field={
-                                                                        field as any
-                                                                    }
-                                                                    fieldState={
-                                                                        fieldState
-                                                                    }
-                                                                />
-                                                            )}
-                                                        />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
 
-                                    </CardContent>
-                                    <CardFooter className="flex justify-between">
-                                        <Button
-                                            variant="outline"
-                                            type="button"
-                                            onClick={() =>
-                                                window.history.back()
-                                            }
-                                        >
-                                            Terug
-                                        </Button>
-                                        <Button type="submit">
-                                            {form.formState.isSubmitting ? (
-                                                <div className="flex items-center space-x-2">
-                                                    <Spinner />
-                                                    <span>Opslaan...</span>
+                                                        {/* Organic Section */}
+                                                        <div className="rounded-lg border p-4 sm:col-span-2">
+                                                            <div className="space-y-4">
+                                                                <Controller
+                                                                    control={
+                                                                        form.control
+                                                                    }
+                                                                    name="organic_certification"
+                                                                    render={({
+                                                                        field,
+                                                                        fieldState,
+                                                                    }) => (
+                                                                        <Field
+                                                                            orientation="horizontal"
+                                                                            className="justify-between items-center"
+                                                                            data-invalid={
+                                                                                fieldState.invalid
+                                                                            }
+                                                                        >
+                                                                            <FieldLabel className="text-base font-normal">
+                                                                                Is
+                                                                                het
+                                                                                bedrijf
+                                                                                biologisch
+                                                                                gecertificeerd?
+                                                                            </FieldLabel>
+                                                                            <Checkbox
+                                                                                checked={
+                                                                                    field.value
+                                                                                }
+                                                                                onCheckedChange={
+                                                                                    field.onChange
+                                                                                }
+                                                                            />
+                                                                        </Field>
+                                                                    )}
+                                                                />
+
+                                                                {form.watch(
+                                                                    "organic_certification",
+                                                                ) && (
+                                                                    <div className="space-y-4 pt-2">
+                                                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                                                            <Controller
+                                                                                control={
+                                                                                    form.control
+                                                                                }
+                                                                                name="organic_skal"
+                                                                                render={({
+                                                                                    field,
+                                                                                    fieldState,
+                                                                                }) => (
+                                                                                    <Field
+                                                                                        data-invalid={
+                                                                                            fieldState.invalid
+                                                                                        }
+                                                                                    >
+                                                                                        <FieldLabel>
+                                                                                            SKAL-nummer
+                                                                                        </FieldLabel>
+                                                                                        <Input
+                                                                                            placeholder="012345"
+                                                                                            {...field}
+                                                                                        />
+                                                                                        <FieldDescription>
+                                                                                            Optioneel
+                                                                                        </FieldDescription>
+                                                                                        {fieldState.invalid && (
+                                                                                            <FieldError
+                                                                                                errors={[
+                                                                                                    fieldState.error,
+                                                                                                ]}
+                                                                                            />
+                                                                                        )}
+                                                                                    </Field>
+                                                                                )}
+                                                                            />
+                                                                            <Controller
+                                                                                control={
+                                                                                    form.control
+                                                                                }
+                                                                                name="organic_traces"
+                                                                                render={({
+                                                                                    field,
+                                                                                    fieldState,
+                                                                                }) => (
+                                                                                    <Field
+                                                                                        data-invalid={
+                                                                                            fieldState.invalid
+                                                                                        }
+                                                                                    >
+                                                                                        <FieldLabel>
+                                                                                            TRACES-nummer
+                                                                                        </FieldLabel>
+                                                                                        <Input
+                                                                                            placeholder="NL-BIO-01..."
+                                                                                            {...field}
+                                                                                        />
+                                                                                        <FieldDescription>
+                                                                                            Optioneel
+                                                                                        </FieldDescription>
+                                                                                        {fieldState.invalid && (
+                                                                                            <FieldError
+                                                                                                errors={[
+                                                                                                    fieldState.error,
+                                                                                                ]}
+                                                                                            />
+                                                                                        )}
+                                                                                    </Field>
+                                                                                )}
+                                                                            />
+                                                                        </div>
+                                                                        <Controller
+                                                                            control={
+                                                                                form.control
+                                                                            }
+                                                                            name="organic_issued"
+                                                                            render={({
+                                                                                field,
+                                                                                fieldState,
+                                                                            }) => (
+                                                                                <DatePicker
+                                                                                    label="Certificaat geldig vanaf"
+                                                                                    defaultValue={
+                                                                                        new Date(
+                                                                                            Number(
+                                                                                                selectedYear,
+                                                                                            ),
+                                                                                            0,
+                                                                                            1,
+                                                                                        )
+                                                                                    }
+                                                                                    // biome-ignore lint/suspicious/noExplicitAny: library type mismatch
+                                                                                    field={
+                                                                                        field as any
+                                                                                    }
+                                                                                    fieldState={
+                                                                                        fieldState
+                                                                                    }
+                                                                                />
+                                                                            )}
+                                                                        />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            ) : (
-                                                "Volgende"
-                                            )}
-                                        </Button>
-                                    </CardFooter>
-                                </fieldset>
-                            </Form>
-                        </RemixFormProvider>
-                    </Card>
+                                            </div>
+                                        </CardContent>
+                                        <CardFooter className="flex justify-between">
+                                            <Button
+                                                variant="outline"
+                                                type="button"
+                                                onClick={() =>
+                                                    window.history.back()
+                                                }
+                                            >
+                                                Terug
+                                            </Button>
+                                            <Button type="submit">
+                                                {form.formState.isSubmitting ? (
+                                                    <div className="flex items-center space-x-2">
+                                                        <Spinner />
+                                                        <span>Opslaan...</span>
+                                                    </div>
+                                                ) : (
+                                                    "Volgende"
+                                                )}
+                                            </Button>
+                                        </CardFooter>
+                                    </fieldset>
+                                </Form>
+                            </RemixFormProvider>
+                        </Card>
+                    </div>
+
+                    {/* Right Column: Help & Info */}
+                    <div className="space-y-6">
+                        <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                            <div className="flex flex-col space-y-1.5 p-6">
+                                <h3 className="font-semibold leading-none tracking-tight">
+                                    Maak een nieuw bedrijf aan.
+                                </h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Welkom! Je kan nu een nieuw bedrijf
+                                    aanmaken. In dit stappenplan leggen we uit
+                                    welke data je kan invullen, zodat we je
+                                    bedrijf goed hebben ingesteld voor de
+                                    rekenregels.
+                                </p>
+                            </div>
+                            <div className="p-6 pt-0 text-sm space-y-4">
+                                <ol className="list-decimal pl-4 space-y-3 text-muted-foreground">
+                                    <li>
+                                        <strong className="text-foreground">
+                                            Bedrijfsgegevens (Nu):
+                                        </strong>{" "}
+                                        Vul hier je bedrijfsgegevens in. Dit
+                                        helpt bijvoorbeeld bij het bepalen van
+                                        de gebruiksruimte.
+                                        <p className="text-xs text-muted-foreground italic pt-1">
+                                            Tip: Vul alvast het KvK-nummer zdoat
+                                            we binnenkort eenvoudig gegevens
+                                            kunnen importeren.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <strong className="text-foreground">
+                                            Percelen:
+                                        </strong>{" "}
+                                        In de volgende stap kun je
+                                        RVO-shapefiles importeren of percelen
+                                        selecteren op een kaart.
+                                    </li>
+                                    <li>
+                                        <strong className="text-foreground">
+                                            Percelen:
+                                        </strong>{" "}
+                                        Check het hoofdgewas van de percelen,
+                                        markeer buffestroken en bekijk de
+                                        geschatte bodemeigenschappen.
+                                        <p className="text-xs text-muted-foreground italic pt-1">
+                                            Tip: Je kunt de pdf's van je
+                                            bodemanalyses uploaden om direct je
+                                            gemeten bodemeigenschappen te
+                                            gebruiken.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <strong className="text-foreground">
+                                            Bouwplan:
+                                        </strong>{" "}
+                                        Hier vul je op gewasniveau de
+                                        bemestingen, oogsten en andere gegevens
+                                        van je gewassen invullen.
+                                        <p className="text-xs text-muted-foreground italic pt-1">
+                                            Tip: Je kunt ook de gewassen
+                                            uitklappen in de tabel als je op
+                                            perceelsniveau gegevens wilt
+                                            invullen.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <strong className="text-foreground">
+                                            Toegang:
+                                        </strong>{" "}
+                                        Hier heb je de keuze om eventueel
+                                        toegang tot je bedrijf te delen met je
+                                        adviseur.
+                                    </li>
+                                </ol>
+
+                                <div className="space-y-2 pt-2 border-t">
+                                    <h4 className="font-medium text-foreground">
+                                        Kan ik ook later gegevens invullen?
+                                    </h4>
+                                    <p className="text-muted-foreground">
+                                        Ja, je kunt ook je gegevens na het
+                                        doorlopen van het stappenplan invullen
+                                        of aanpassen. Met het stappenplan staat
+                                        het alleen makkelijk op een rijtje om
+                                        een nieuw bedrijf aan te maken.
+                                    </p>
+                                    {/* <p className="text-xs text-muted-foreground italic">
+                                        Tip: KVK- en SKAL-nummers zijn optioneel
+                                        maar handig voor het automatisch
+                                        invullen van rapportages.
+                                    </p> */}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
         </SidebarInset>
