@@ -3,14 +3,31 @@ import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
-import { getFarm, getFarms, getFields, getSoilParametersDescription, addSoilAnalysis } from "@svenvw/fdm-core"
+import {
+    getFarm,
+    getFarms,
+    getFields,
+    getSoilParametersDescription,
+    addSoilAnalysis,
+} from "@svenvw/fdm-core"
 import { fdm } from "~/lib/fdm.server"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError, handleActionError } from "~/lib/error"
-import { data, type LoaderFunctionArgs, type ActionFunctionArgs, useLoaderData, useNavigate, useNavigation, useSubmit } from "react-router"
+import {
+    data,
+    type LoaderFunctionArgs,
+    type ActionFunctionArgs,
+    useLoaderData,
+    useNavigate,
+    useNavigation,
+    useSubmit,
+} from "react-router"
 import { useState } from "react"
 import { BulkSoilAnalysisUploadForm } from "~/components/blocks/soil/bulk-upload-form"
-import { BulkSoilAnalysisReview, type ProcessedAnalysis } from "~/components/blocks/soil/bulk-upload-review"
+import {
+    BulkSoilAnalysisReview,
+    type ProcessedAnalysis,
+} from "~/components/blocks/soil/bulk-upload-review"
 import { extractBulkSoilAnalyses } from "~/integrations/nmi"
 import { booleanPointInPolygon } from "@turf/turf"
 import { Spinner } from "~/components/ui/spinner"
@@ -40,7 +57,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm,
             b_name_farm: farm.b_name_farm,
             farmOptions,
-            fields: fields.map(f => ({ b_id: f.b_id, b_name: f.b_name, geometry: f.b_geometry })),
+            fields: fields.map((f) => ({
+                b_id: f.b_id,
+                b_name: f.b_name,
+                geometry: f.b_geometry,
+            })),
             soilParameterDescription,
         }
     } catch (error) {
@@ -55,45 +76,63 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         const session = await getSession(request)
         const formData = await request.formData()
-        
+
         // Handle initial upload to NMI
         if (formData.has("soilAnalysisFile")) {
             const analyses = await extractBulkSoilAnalyses(formData)
-            return dataWithSuccess({ analyses }, {
-                message: `${analyses.length} analyses succesvol verwerkt`,
-            })
+            return dataWithSuccess(
+                { analyses },
+                {
+                    message: `${analyses.length} analyses succesvol verwerkt`,
+                },
+            )
         }
 
         // Handle final save
         if (formData.has("matches")) {
             const matchesRaw = formData.get("matches") as string
             const analysesDataRaw = formData.get("analysesData") as string
-            
+
             const matches = JSON.parse(matchesRaw)
             const analysesData = JSON.parse(analysesDataRaw)
 
             await Promise.all(
-                matches.map(async (match: { analysisId: string; fieldId: string }) => {
-                    const analysis = analysesData.find((a: any) => a.id === match.analysisId)
-                    if (analysis) {
-                        // Strip UI-only properties before saving to DB
-                        const { id, location, ...dbAnalysis } = analysis
-
-                        return addSoilAnalysis(
-                            fdm,
-                            session.principal_id,
-                            null,
-                            analysis.a_source || "other",
-                            match.fieldId,
-                            Number(analysis.a_depth_lower),
-                            new Date(analysis.b_sampling_date),
-                            dbAnalysis,
-                            Number(analysis.a_depth_upper),
+                matches.map(
+                    async (match: { analysisId: string; fieldId: string }) => {
+                        const analysis = analysesData.find(
+                            (a: any) => a.id === match.analysisId,
                         )
-                    }
-                }),
+                        if (analysis) {
+                            // Validate depth fields before processing
+                            const depthLower = Number(analysis.a_depth_lower)
+                            const depthUpper = Number(
+                                analysis.a_depth_upper ?? 0,
+                            )
+                            if (Number.isNaN(depthLower)) {
+                                console.warn(
+                                    `Analysis ${match.analysisId}: invalid a_depth_lower`,
+                                )
+                                return
+                            }
+                            // Strip UI-only properties before saving to DB
+                            const { id, location, ...dbAnalysis } = analysis
+
+                            return addSoilAnalysis(
+                                fdm,
+                                session.principal_id,
+                                null,
+                                analysis.a_source || "other",
+                                match.fieldId,
+                                depthLower,
+                                new Date(analysis.b_sampling_date),
+                                dbAnalysis,
+                                depthUpper,
+                            )
+                        }
+                    },
+                ),
             )
-            
+
             return redirectWithSuccess(`/farm/${b_id_farm}`, {
                 message: "Bodemanalyses succesvol opgeslagen",
             })
@@ -106,25 +145,37 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function BulkSoilAnalysisUploadPage() {
-    const { b_id_farm, b_name_farm, farmOptions, fields, soilParameterDescription } = useLoaderData<typeof loader>()
-    const [processedAnalyses, setProcessedAnalyses] = useState<ProcessedAnalysis[]>([])
+    const {
+        b_id_farm,
+        b_name_farm,
+        farmOptions,
+        fields,
+        soilParameterDescription,
+    } = useLoaderData<typeof loader>()
+    const [processedAnalyses, setProcessedAnalyses] = useState<
+        ProcessedAnalysis[]
+    >([])
     const [step, setStep] = useState<"upload" | "review">("upload")
     const navigate = useNavigate()
     const navigation = useNavigation()
     const submit = useSubmit()
 
-    const isSaving = navigation.state === "submitting" && navigation.formData?.has("matches")
+    const isSaving =
+        navigation.state === "submitting" && navigation.formData?.has("matches")
 
     const handleUploadSuccess = (analyses: any[]) => {
         // Perform geometry matching
-        const matchedAnalyses = analyses.map(analysis => {
+        const matchedAnalyses = analyses.map((analysis) => {
             let matchedFieldId = ""
-            
+
             if (analysis.location) {
-                const fieldMatch = fields.find(field => {
+                const fieldMatch = fields.find((field) => {
                     if (!field.geometry) return false
                     try {
-                        return booleanPointInPolygon(analysis.location, field.geometry)
+                        return booleanPointInPolygon(
+                            analysis.location,
+                            field.geometry,
+                        )
                     } catch (e) {
                         return false
                     }
@@ -134,15 +185,17 @@ export default function BulkSoilAnalysisUploadPage() {
 
             // If no geometry match, try name match
             if (!matchedFieldId) {
-                const fieldMatch = fields.find(field => 
-                    field.b_name.toLowerCase() === analysis.filename.replace(/\.pdf$/i, '').toLowerCase()
+                const fieldMatch = fields.find(
+                    (field) =>
+                        field.b_name.toLowerCase() ===
+                        analysis.filename.replace(/\.pdf$/i, "").toLowerCase(),
                 )
                 if (fieldMatch) matchedFieldId = fieldMatch.b_id
             }
 
             return {
                 ...analysis,
-                matchedFieldId
+                matchedFieldId,
             }
         })
 
@@ -150,10 +203,12 @@ export default function BulkSoilAnalysisUploadPage() {
         setStep("review")
     }
 
-    const handleSave = (matches: { analysisId: string, fieldId: string }[]) => {
+    const handleSave = (matches: { analysisId: string; fieldId: string }[]) => {
         const formData = new FormData()
         // Filter out "none" selections
-        const validMatches = matches.filter(m => m.fieldId !== "none" && m.fieldId !== "")
+        const validMatches = matches.filter(
+            (m) => m.fieldId !== "none" && m.fieldId !== "",
+        )
         formData.append("matches", JSON.stringify(validMatches))
         formData.append("analysesData", JSON.stringify(processedAnalyses))
 
@@ -169,18 +224,15 @@ export default function BulkSoilAnalysisUploadPage() {
                     disabled: false,
                 }}
             >
-                <HeaderFarm
-                    b_id_farm={b_id_farm}
-                    farmOptions={farmOptions}
-                />
+                <HeaderFarm b_id_farm={b_id_farm} farmOptions={farmOptions} />
             </Header>
             <main>
                 <FarmTitle
                     title="Upload bodemanalyses"
                     description={
-                        step === "upload" 
-                        ? "Upload meerdere bodemanalyses tegelijkertijd en koppel ze aan je percelen."
-                        : "Controleer de resultaten en bevestig de koppelingen."
+                        step === "upload"
+                            ? "Upload meerdere bodemanalyses tegelijkertijd en koppel ze aan je percelen."
+                            : "Controleer de resultaten en bevestig de koppelingen."
                     }
                 />
                 <FarmContent>
@@ -188,15 +240,21 @@ export default function BulkSoilAnalysisUploadPage() {
                         {isSaving ? (
                             <div className="flex flex-col items-center justify-center py-12 space-y-4">
                                 <Spinner className="h-8 w-8 text-primary" />
-                                <p className="text-muted-foreground">Opslaan en koppelen...</p>
+                                <p className="text-muted-foreground">
+                                    Opslaan en koppelen...
+                                </p>
                             </div>
                         ) : step === "upload" ? (
-                            <BulkSoilAnalysisUploadForm onSuccess={handleUploadSuccess} />
+                            <BulkSoilAnalysisUploadForm
+                                onSuccess={handleUploadSuccess}
+                            />
                         ) : (
-                            <BulkSoilAnalysisReview 
-                                analyses={processedAnalyses} 
-                                fields={fields} 
-                                soilParameterDescription={soilParameterDescription}
+                            <BulkSoilAnalysisReview
+                                analyses={processedAnalyses}
+                                fields={fields}
+                                soilParameterDescription={
+                                    soilParameterDescription
+                                }
                                 onSave={handleSave}
                                 onCancel={() => setStep("upload")}
                             />
