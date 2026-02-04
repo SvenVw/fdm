@@ -5,10 +5,30 @@ import {
     getCoreRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "~/components/ui/table"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "~/components/ui/select"
 import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
 import { Badge } from "~/components/ui/badge"
 import { Check, AlertTriangle, Save, X, Microscope } from "lucide-react"
 import type { SoilParameterDescription } from "@svenvw/fdm-core"
@@ -38,20 +58,20 @@ export function BulkSoilAnalysisReview({
     fields,
     soilParameterDescription,
     onSave,
-    onCancel
+    onCancel,
 }: {
     analyses: ProcessedAnalysis[]
     fields: Field[]
     soilParameterDescription: SoilParameterDescription
-    onSave: (matches: { analysisId: string, fieldId: string }[]) => void
+    onSave: (matches: { analysisId: string; fieldId: string }[]) => void
     onCancel: () => void
 }) {
     const [matches, setMatches] = useState<Record<string, string>>(
-        Object.fromEntries(analyses.map(a => [a.id, a.matchedFieldId || ""]))
+        Object.fromEntries(analyses.map((a) => [a.id, a.matchedFieldId || ""])),
     )
 
     const handleFieldChange = (analysisId: string, fieldId: string) => {
-        setMatches(prev => ({ ...prev, [analysisId]: fieldId }))
+        setMatches((prev) => ({ ...prev, [analysisId]: fieldId }))
     }
 
     const columns: ColumnDef<ProcessedAnalysis>[] = [
@@ -60,8 +80,7 @@ export function BulkSoilAnalysisReview({
             header: "Bestand / Lab",
             cell: ({ row }) => {
                 const sourceParam = soilParameterDescription.find(
-                    (x: { parameter: string }) =>
-                        x.parameter === "a_source",
+                    (x: { parameter: string }) => x.parameter === "a_source",
                 )
                 const sourceOption = sourceParam?.options?.find(
                     (x: { value: string }) => x.value === row.original.a_source,
@@ -71,7 +90,9 @@ export function BulkSoilAnalysisReview({
 
                 return (
                     <div className="flex flex-col">
-                        <span className="font-medium">{row.original.filename}</span>
+                        <span className="font-medium">
+                            {row.original.filename}
+                        </span>
                         <div className="flex items-center text-xs text-muted-foreground mt-1">
                             <Microscope className="h-3 w-3 mr-1" />
                             <span>{sourceLabel}</span>
@@ -83,7 +104,12 @@ export function BulkSoilAnalysisReview({
         {
             accessorKey: "b_sampling_date",
             header: "Datum",
-            cell: ({ row }) => row.original.b_sampling_date ? format(new Date(row.original.b_sampling_date), "P", { locale: nl }) : "-",
+            cell: ({ row }) =>
+                row.original.b_sampling_date
+                    ? format(new Date(row.original.b_sampling_date), "P", {
+                          locale: nl,
+                      })
+                    : "-",
         },
         {
             id: "parameters",
@@ -91,16 +117,24 @@ export function BulkSoilAnalysisReview({
             cell: ({ row }) => (
                 <div className="flex flex-wrap gap-1">
                     {row.original.a_som_loi !== undefined && (
-                        <Badge variant="secondary">OS: {row.original.a_som_loi}%</Badge>
+                        <Badge variant="secondary">
+                            OS: {row.original.a_som_loi}%
+                        </Badge>
                     )}
                     {row.original.a_p_al !== undefined && (
-                        <Badge variant="secondary">P-AL: {row.original.a_p_al}</Badge>
-                    )}           
-                    {row.original.a_p_al !== undefined && (
-                        <Badge variant="secondary">P-CaCl2: {row.original.a_p_cc}</Badge>
+                        <Badge variant="secondary">
+                            P-AL: {row.original.a_p_al}
+                        </Badge>
+                    )}
+                    {row.original.a_p_cc !== undefined && (
+                        <Badge variant="secondary">
+                            P-CaCl₂: {row.original.a_p_cc}
+                        </Badge>
                     )}
                     {row.original.a_nmin_cc !== undefined && (
-                        <Badge variant="secondary">Nmin: {row.original.a_nmin_cc}</Badge>
+                        <Badge variant="secondary">
+                            Nmin: {row.original.a_nmin_cc}
+                        </Badge>
                     )}
                 </div>
             ),
@@ -109,16 +143,18 @@ export function BulkSoilAnalysisReview({
             id: "match",
             header: "Perceel",
             cell: ({ row }) => (
-                <Select 
-                    value={matches[row.original.id]} 
-                    onValueChange={(value) => handleFieldChange(row.original.id, value)}
+                <Select
+                    value={matches[row.original.id]}
+                    onValueChange={(value) =>
+                        handleFieldChange(row.original.id, value)
+                    }
                 >
                     <SelectTrigger className="w-[300px]">
                         <SelectValue placeholder="Selecteer perceel..." />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="none">-- Geen perceel --</SelectItem>
-                        {fields.map(field => (
+                        {fields.map((field) => (
                             <SelectItem key={field.b_id} value={field.b_id}>
                                 {field.b_name}
                             </SelectItem>
@@ -144,8 +180,8 @@ export function BulkSoilAnalysisReview({
                         <span className="text-xs">Niet gekoppeld</span>
                     </div>
                 )
-            }
-        }
+            },
+        },
     ]
 
     const table = useReactTable({
@@ -166,7 +202,9 @@ export function BulkSoilAnalysisReview({
             <CardHeader>
                 <CardTitle>Controleer en koppel</CardTitle>
                 <CardDescription>
-                    Controleer de gegevens uit de pdf's en koppel ze aan het juiste perceel. Analyses zonder gekoppeld perceel worden overgeslagen.
+                    Controleer de gegevens uit de pdf's en koppel ze aan het
+                    juiste perceel. Analyses zonder gekoppeld perceel worden
+                    overgeslagen.
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -180,7 +218,8 @@ export function BulkSoilAnalysisReview({
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                      header.column.columnDef.header,
+                                                      header.column.columnDef
+                                                          .header,
                                                       header.getContext(),
                                                   )}
                                         </TableHead>
@@ -193,7 +232,9 @@ export function BulkSoilAnalysisReview({
                                 table.getRowModel().rows.map((row) => (
                                     <TableRow
                                         key={row.id}
-                                        data-state={row.getIsSelected() && "selected"}
+                                        data-state={
+                                            row.getIsSelected() && "selected"
+                                        }
                                     >
                                         {row.getVisibleCells().map((cell) => (
                                             <TableCell key={cell.id}>
