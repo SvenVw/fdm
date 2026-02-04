@@ -17,7 +17,9 @@ async function validatePdfMagicBytes(file: File) {
     const buffer = await file.arrayBuffer()
     const type = await fileTypeFromBuffer(Buffer.from(buffer))
     if (!type || type.ext !== "pdf" || type.mime !== "application/pdf") {
-        throw new Error(`invalid: Bestand "${file.name}" is geen geldig PDF-bestand.`)
+        throw new Error(
+            `invalid: Bestand "${file.name}" is geen geldig PDF-bestand.`,
+        )
     }
 }
 
@@ -260,7 +262,7 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
     for (const file of files) {
         await validatePdfMagicBytes(file)
     }
-    
+
     const responseApi = await fetch("https://api.nmi-agro.nl/soilreader", {
         method: "POST",
         headers: {
@@ -271,8 +273,13 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
 
     if (!responseApi.ok) {
         const text = await responseApi.text()
-        console.error(`NMI API Error: ${responseApi.status} ${responseApi.statusText}`, text)
-        throw new Error(`Request to NMI API failed: ${responseApi.status} ${responseApi.statusText}`)
+        console.error(
+            `NMI API Error: ${responseApi.status} ${responseApi.statusText}`,
+            text,
+        )
+        throw new Error(
+            `Request to NMI API failed: ${responseApi.status} ${responseApi.statusText}`,
+        )
     }
 
     const text = await responseApi.text()
@@ -281,7 +288,10 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
         const response = result?.data
 
         if (!response?.fields || !Array.isArray(response.fields)) {
-            console.error("Invalid NMI API response structure:", JSON.stringify(result, null, 2))
+            console.error(
+                "Invalid NMI API response structure:",
+                JSON.stringify(result, null, 2),
+            )
             throw new Error("Invalid API response: no fields found")
         }
 
@@ -290,12 +300,14 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
                 id: crypto.randomUUID(), // Used for UI matching
                 filename: field.filename || `Analyse ${index + 1}`,
             }
-    
+
             // Safely map known soil parameters (starting with a_)
-            for (const key of Object.keys(field).filter((key) => key.startsWith("a_"))) {
+            for (const key of Object.keys(field).filter((key) =>
+                key.startsWith("a_"),
+            )) {
                 soilAnalysis[key] = field[key]
             }
-    
+
             if (field.b_date) {
                 const dateParts = field.b_date.split("-")
                 if (dateParts.length === 3) {
@@ -305,27 +317,35 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
                     soilAnalysis.b_sampling_date = new Date(year, month, day)
                 }
             }
-    
+
             if (field.b_soiltype_agr) {
                 soilAnalysis.b_soil_type = field.b_soiltype_agr
             }
-    
+
             if (field.b_depth) {
                 const depthParts = field.b_depth.split("-")
-                if (depthParts.length === 2) {
-                    soilAnalysis.a_depth_upper = Number(depthParts[0])
-                    soilAnalysis.a_depth_lower = Number(depthParts[1])
+                if (depthParts.length !== 2) {
+                    throw new Error(`Invalid depth format: ${field.b_depth}`)
                 }
+                const upper = Number(depthParts[0])
+                const lower = Number(depthParts[1])
+                if (Number.isNaN(upper) || Number.isNaN(lower)) {
+                    throw new Error(
+                        `Invalid numeric depth values: ${field.b_depth}`,
+                    )
+                }
+                soilAnalysis.a_depth_upper = upper
+                soilAnalysis.a_depth_lower = lower
             }
-    
+
             // Add coordinates for geometry matching, but keep them separate from the main analysis data
             if (field.a_lat && field.a_lon) {
                 soilAnalysis.location = {
                     type: "Point",
-                    coordinates: [Number(field.a_lon), Number(field.a_lat)]
+                    coordinates: [Number(field.a_lon), Number(field.a_lat)],
                 }
             }
-    
+
             return soilAnalysis
         })
     } catch (e) {
