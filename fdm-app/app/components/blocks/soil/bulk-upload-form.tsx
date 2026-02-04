@@ -200,7 +200,7 @@ export function BulkSoilAnalysisUploadForm({
                             <div className="pt-4 mt-auto flex justify-end">
                                 <Button
                                     onClick={handleUpload}
-                                    disabled={isUploading}
+                                    disabled={isUploading || files.length === 0}
                                     className="w-full lg:w-auto min-w-[140px]"
                                 >
                                     {isUploading ? (
@@ -211,7 +211,7 @@ export function BulkSoilAnalysisUploadForm({
                                     ) : (
                                         <>
                                             <FileUp className="mr-2 h-4 w-4" />
-                                            Start Analyse
+                                            Upload analyses
                                         </>
                                     )}
                                 </Button>
