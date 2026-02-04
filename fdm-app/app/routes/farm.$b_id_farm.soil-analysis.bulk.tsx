@@ -227,6 +227,18 @@ export async function action({ request, params }: ActionFunctionArgs) {
                                 )
                                 return
                             }
+                            const samplingDate = analysis.b_sampling_date
+                                ? new Date(analysis.b_sampling_date)
+                                : undefined
+                            if (
+                                !samplingDate ||
+                                Number.isNaN(samplingDate.getTime())
+                            ) {
+                                console.warn(
+                                    `Analysis ${match.analysisId}: invalid b_sampling_date`,
+                                )
+                                return
+                            }
                             // Strip UI-only properties before saving to DB
                             const { id, location, ...dbAnalysis } = analysis
 
@@ -237,7 +249,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                                 analysis.a_source || "other",
                                 match.fieldId,
                                 depthLower,
-                                new Date(analysis.b_sampling_date),
+                                samplingDate,
                                 dbAnalysis,
                                 depthUpper,
                             )

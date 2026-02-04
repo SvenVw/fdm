@@ -66,79 +66,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
-    try {
-        const b_id_farm = params.b_id_farm
-        if (!b_id_farm) throw data("Farm ID is required", { status: 400 })
-
-        const session = await getSession(request)
-        const calendar = getCalendar(params)
-        const formData = await request.formData()
-
-        if (formData.has("soilAnalysisFile")) {
-            const analyses = await extractBulkSoilAnalyses(formData)
-            return dataWithSuccess(
-                { analyses },
-                {
-                    message: `${analyses.length} analyses succesvol verwerkt`,
-                },
-            )
-        }
-
-        if (formData.has("matches")) {
-            const matches = JSON.parse(formData.get("matches") as string)
-            const analysesData = JSON.parse(
-                formData.get("analysesData") as string,
-            )
-
-            await Promise.all(
-                matches.map(
-                    async (match: { analysisId: string; fieldId: string }) => {
-                        const analysis = analysesData.find(
-                            (a: any) => a.id === match.analysisId,
-                        )
-                        if (analysis) {
-                            // Strip UI-only properties before saving to DB
-                            const { id, location, ...dbAnalysis } = analysis
-
-                            return addSoilAnalysis(
-                                fdm,
-                                session.principal_id,
-                                null,
-                                analysis.a_source || "other",
-                                match.fieldId,
-                                Number(analysis.a_depth_lower),
-                                new Date(analysis.b_sampling_date),
-                                dbAnalysis,
-                                Number(analysis.a_depth_upper),
-                            )
-                        }
-                    },
-                ),
-            )
-
-            return redirectWithSuccess(
-                `/farm/create/${b_id_farm}/${calendar}/fields`,
-                {
-                    message: "Bodemanalyses succesvol opgeslagen",
-                },
-            )
-        }
-
-        return data({ message: "Invalid request" }, { status: 400 })
-    } catch (error) {
-        throw handleActionError(error)
-    }
-}
-
 export default function BulkSoilAnalysisUploadWizardPage() {
-    const {
-        b_id_farm,
-        b_name_farm,
-        calendar,
-        fields,
-        soilParameterDescription,
-    } = useLoaderData<typeof loader>()
+    const { b_name_farm, fields, soilParameterDescription } =
+        useLoaderData<typeof loader>()
     const [processedAnalyses, setProcessedAnalyses] = useState<
         ProcessedAnalysis[]
     >([])
@@ -244,4 +174,92 @@ export default function BulkSoilAnalysisUploadWizardPage() {
             </main>
         </SidebarInset>
     )
+}
+
+export async function action({ request, params }: ActionFunctionArgs) {
+    try {
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) throw data("Farm ID is required", { status: 400 })
+
+        const session = await getSession(request)
+        const calendar = getCalendar(params)
+        const formData = await request.formData()
+
+        if (formData.has("soilAnalysisFile")) {
+            const analyses = await extractBulkSoilAnalyses(formData)
+            return dataWithSuccess(
+                { analyses },
+                {
+                    message: `${analyses.length} analyses succesvol verwerkt`,
+                },
+            )
+        }
+
+        if (formData.has("matches")) {
+            const matches = JSON.parse(formData.get("matches") as string)
+            const analysesData = JSON.parse(
+                formData.get("analysesData") as string,
+            )
+
+            await Promise.all(
+                matches.map(
+                    async (match: { analysisId: string; fieldId: string }) => {
+                        const analysis = analysesData.find(
+                            (a: any) => a.id === match.analysisId,
+                        )
+                        if (analysis) {
+                            // Validate depth fields before processing
+                            const depthLower = Number(analysis.a_depth_lower)
+                            const depthUpper = Number(
+                                analysis.a_depth_upper ?? 0,
+                            )
+                            if (Number.isNaN(depthLower)) {
+                                console.warn(
+                                    `Analysis ${match.analysisId}: invalid a_depth_lower`,
+                                )
+                                return
+                            }
+                            const samplingDate = analysis.b_sampling_date
+                                ? new Date(analysis.b_sampling_date)
+                                : undefined
+                            if (
+                                !samplingDate ||
+                                Number.isNaN(samplingDate.getTime())
+                            ) {
+                                console.warn(
+                                    `Analysis ${match.analysisId}: invalid b_sampling_date`,
+                                )
+                                return
+                            }
+                            // Strip UI-only properties before saving to DB
+                            const { id, location, ...dbAnalysis } = analysis
+
+                            return addSoilAnalysis(
+                                fdm,
+                                session.principal_id,
+                                null,
+                                analysis.a_source || "other",
+                                match.fieldId,
+                                depthLower,
+                                samplingDate,
+                                dbAnalysis,
+                                depthUpper,
+                            )
+                        }
+                    },
+                ),
+            )
+
+            return redirectWithSuccess(
+                `/farm/create/${b_id_farm}/${calendar}/fields`,
+                {
+                    message: "Bodemanalyses succesvol opgeslagen",
+                },
+            )
+        }
+
+        return data({ message: "Invalid request" }, { status: 400 })
+    } catch (error) {
+        throw handleActionError(error)
+    }
 }
