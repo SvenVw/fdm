@@ -10,7 +10,7 @@ import {
     setGrazingIntention,
 } from "@svenvw/fdm-core"
 import { useEffect } from "react"
-import { Controller } from "react-hook-form"
+import { Controller, type Resolver } from "react-hook-form"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
@@ -122,6 +122,8 @@ const FormSchema = z.object({
     organic_issued: z.coerce.date().optional(),
 })
 
+type FormValues = z.infer<typeof FormSchema>
+
 // Loader
 export async function loader() {
     const yearSelection = getCalendarSelection()
@@ -140,10 +142,9 @@ export async function loader() {
 export default function AddFarmPage() {
     const { year, yearSelection } = useLoaderData<typeof loader>()
 
-    const form = useRemixForm<z.infer<typeof FormSchema>>({
+    const form = useRemixForm<FormValues>({
         mode: "onTouched",
-        // biome-ignore lint/suspicious/noExplicitAny: zodResolver type mismatch
-        resolver: zodResolver(FormSchema) as any,
+        resolver: zodResolver(FormSchema) as Resolver<FormValues>,
         defaultValues: {
             b_name_farm: "",
             year: year,
@@ -621,9 +622,8 @@ export default function AddFarmPage() {
                                                                                             1,
                                                                                         )
                                                                                     }
-                                                                                    // biome-ignore lint/suspicious/noExplicitAny: library type mismatch
                                                                                     field={
-                                                                                        field as any
+                                                                                        field
                                                                                     }
                                                                                     fieldState={
                                                                                         fieldState
