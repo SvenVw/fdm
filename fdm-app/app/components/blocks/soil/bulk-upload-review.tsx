@@ -192,7 +192,7 @@ export function BulkSoilAnalysisReview({
 
     const handleSave = () => {
         const result = Object.entries(matches)
-            .filter(([_, fieldId]) => fieldId !== "")
+            .filter(([_, fieldId]) => fieldId !== "" && fieldId !== "none")
             .map(([analysisId, fieldId]) => ({ analysisId, fieldId }))
         onSave(result)
     }
