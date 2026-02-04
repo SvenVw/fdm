@@ -316,7 +316,7 @@ export default function AppIndex() {
                                                     </div>
                                                     <div className="flex items-center text-sm text-muted-foreground">
                                                         <p>KvK-nummer:</p>
-                                                        {farm.b_postalcode_farm ? (
+                                                        {farm.b_businessid_farm ? (
                                                             <p className="ml-auto">
                                                                 {
                                                                     farm.b_businessid_farm
