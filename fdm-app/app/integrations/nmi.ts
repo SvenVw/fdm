@@ -3,6 +3,7 @@ import type { Feature, Geometry, Polygon } from "geojson"
 import { z } from "zod"
 import { serverConfig } from "~/lib/config.server"
 import { fileTypeFromBuffer } from "file-type"
+const MAX_PDF_SIZE = 5 * 1024 * 1024
 
 export function getNmiApiKey() {
     if (!serverConfig.integrations.nmi) {
@@ -14,6 +15,9 @@ export function getNmiApiKey() {
 }
 
 async function validatePdfMagicBytes(file: File) {
+    if (file.size > MAX_PDF_SIZE) {
+        throw new Error(`invalid: Bestand "${file.name}" is groter dan 5MB.`)
+    }
     const buffer = await file.arrayBuffer()
     const type = await fileTypeFromBuffer(Buffer.from(buffer))
     if (!type || type.ext !== "pdf" || type.mime !== "application/pdf") {
