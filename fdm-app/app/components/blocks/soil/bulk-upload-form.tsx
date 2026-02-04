@@ -3,15 +3,21 @@ import { useFetcher } from "react-router"
 import { FileText, Upload, Trash2, X, FileUp } from "lucide-react"
 import { Dropzone } from "~/components/custom/dropzone"
 import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
 import { Spinner } from "~/components/ui/spinner"
 import { ScrollArea } from "~/components/ui/scroll-area"
 import { cn } from "~/lib/utils"
 
-export function BulkSoilAnalysisUploadForm({ 
-    onSuccess 
-}: { 
-    onSuccess: (data: any[]) => void 
+export function BulkSoilAnalysisUploadForm({
+    onSuccess,
+}: {
+    onSuccess: (data: any[]) => void
 }) {
     const [files, setFiles] = useState<File[]>([])
     const fetcher = useFetcher()
@@ -38,7 +44,7 @@ export function BulkSoilAnalysisUploadForm({
     useEffect(() => {
         if (isUploading) return
 
-        if (fetcher.data && fetcher.data.analyses) {
+        if (fetcher.data?.analyses) {
             onSuccess(fetcher.data.analyses)
         }
     }, [fetcher.data, isUploading, onSuccess])
@@ -49,13 +55,12 @@ export function BulkSoilAnalysisUploadForm({
         setFiles(newFiles)
     }
 
-
     const formatFileSize = (bytes: number) => {
         if (bytes === 0) return "0 B"
         const k = 1024
         const sizes = ["B", "KB", "MB", "GB"]
         const i = Math.floor(Math.log(bytes) / Math.log(k))
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+        return `${Number.parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`
     }
 
     return (
@@ -63,12 +68,17 @@ export function BulkSoilAnalysisUploadForm({
             <CardHeader>
                 <CardTitle>Bodemanalyses uploaden</CardTitle>
                 <CardDescription>
-                    Sleep PDF-bestanden hierheen om ze te analyseren en te koppelen aan percelen.
+                    Sleep PDF-bestanden hierheen om ze te analyseren en te
+                    koppelen aan percelen.
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className={cn("grid gap-6", files.length > 0 ? "lg:grid-cols-2" : "")}>
-                    
+                <div
+                    className={cn(
+                        "grid gap-6",
+                        files.length > 0 ? "lg:grid-cols-2" : "",
+                    )}
+                >
                     {/* Dropzone Column */}
                     <div className="flex flex-col h-full">
                         <Dropzone
@@ -80,22 +90,34 @@ export function BulkSoilAnalysisUploadForm({
                             allowReset={false}
                             className={cn(
                                 "w-full transition-all duration-200 border-2",
-                                files.length > 0 ? "h-64 lg:h-full min-h-[300px]" : "h-64"
+                                files.length > 0
+                                    ? "h-64 lg:h-full min-h-[300px]"
+                                    : "h-64",
                             )}
                         >
                             <div className="flex flex-col items-center justify-center space-y-4 text-center px-4">
-                                <div className={cn(
-                                    "flex items-center justify-center rounded-full bg-muted transition-colors",
-                                    files.length > 0 ? "h-12 w-12" : "h-16 w-16"
-                                )}>
-                                    <Upload className={cn(
-                                        "text-muted-foreground",
-                                        files.length > 0 ? "h-6 w-6" : "h-8 w-8"
-                                    )} />
+                                <div
+                                    className={cn(
+                                        "flex items-center justify-center rounded-full bg-muted transition-colors",
+                                        files.length > 0
+                                            ? "h-12 w-12"
+                                            : "h-16 w-16",
+                                    )}
+                                >
+                                    <Upload
+                                        className={cn(
+                                            "text-muted-foreground",
+                                            files.length > 0
+                                                ? "h-6 w-6"
+                                                : "h-8 w-8",
+                                        )}
+                                    />
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-sm font-medium text-foreground">
-                                        {files.length > 0 ? "Voeg meer bestanden toe" : "Sleep bestanden hierheen"}
+                                        {files.length > 0
+                                            ? "Voeg meer bestanden toe"
+                                            : "Sleep bestanden hierheen"}
                                     </p>
                                     <p className="text-xs text-muted-foreground">
                                         PDF, max 5MB per bestand
@@ -110,11 +132,14 @@ export function BulkSoilAnalysisUploadForm({
                         <div className="flex flex-col h-full min-h-[300px]">
                             <div className="flex items-center justify-between mb-3">
                                 <h4 className="text-sm font-medium leading-none flex items-center gap-2">
-                                    Geselecteerde bestanden <span className="text-muted-foreground text-xs font-normal">({files.length})</span>
+                                    Geselecteerde bestanden{" "}
+                                    <span className="text-muted-foreground text-xs font-normal">
+                                        ({files.length})
+                                    </span>
                                 </h4>
-                                <Button 
-                                    variant="ghost" 
-                                    size="sm" 
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
                                     onClick={() => setFiles([])}
                                     disabled={isUploading}
                                     className="h-8 px-2 text-xs text-muted-foreground hover:text-destructive"
@@ -123,7 +148,7 @@ export function BulkSoilAnalysisUploadForm({
                                     Alles wissen
                                 </Button>
                             </div>
-                            
+
                             <div className="flex-1 rounded-md border relative flex flex-col overflow-hidden">
                                 <ScrollArea className="flex-1 h-[300px] lg:h-auto">
                                     <div className="p-3 space-y-2">
@@ -137,11 +162,16 @@ export function BulkSoilAnalysisUploadForm({
                                                         <FileText className="h-4 w-4" />
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <p className="truncate text-sm font-medium leading-none" title={file.name}>
+                                                        <p
+                                                            className="truncate text-sm font-medium leading-none"
+                                                            title={file.name}
+                                                        >
                                                             {file.name}
                                                         </p>
                                                         <p className="text-xs text-muted-foreground mt-1">
-                                                            {formatFileSize(file.size)}
+                                                            {formatFileSize(
+                                                                file.size,
+                                                            )}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -149,20 +179,24 @@ export function BulkSoilAnalysisUploadForm({
                                                     variant="ghost"
                                                     size="icon"
                                                     className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                                    onClick={() => removeFile(index)}
+                                                    onClick={() =>
+                                                        removeFile(index)
+                                                    }
                                                     disabled={isUploading}
                                                 >
                                                     <X className="h-4 w-4" />
-                                                    <span className="sr-only">Verwijder bestand</span>
+                                                    <span className="sr-only">
+                                                        Verwijder bestand
+                                                    </span>
                                                 </Button>
                                             </div>
                                         ))}
                                     </div>
                                 </ScrollArea>
                             </div>
-                            
+
                             <div className="pt-4 mt-auto flex justify-end">
-                                <Button 
+                                <Button
                                     onClick={handleUpload}
                                     disabled={isUploading}
                                     className="w-full lg:w-auto min-w-[140px]"
