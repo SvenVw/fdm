@@ -1,11 +1,26 @@
-import { getFarm, getFields, getSoilParametersDescription, addSoilAnalysis } from "@svenvw/fdm-core"
+import {
+    getFarm,
+    getFields,
+    getSoilParametersDescription,
+    addSoilAnalysis,
+} from "@svenvw/fdm-core"
 import { fdm } from "~/lib/fdm.server"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError, handleActionError } from "~/lib/error"
-import { data, type LoaderFunctionArgs, type ActionFunctionArgs, useLoaderData, useNavigate, useNavigation, useSubmit } from "react-router"
+import {
+    data,
+    type LoaderFunctionArgs,
+    type ActionFunctionArgs,
+    useLoaderData,
+    useNavigation,
+    useSubmit,
+} from "react-router"
 import { useState } from "react"
 import { BulkSoilAnalysisUploadForm } from "~/components/blocks/soil/bulk-upload-form"
-import { BulkSoilAnalysisReview, type ProcessedAnalysis } from "~/components/blocks/soil/bulk-upload-review"
+import {
+    BulkSoilAnalysisReview,
+    type ProcessedAnalysis,
+} from "~/components/blocks/soil/bulk-upload-review"
 import { extractBulkSoilAnalyses } from "~/integrations/nmi"
 import { booleanPointInPolygon } from "@turf/turf"
 import { Header } from "~/components/blocks/header/base"
@@ -22,10 +37,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         const session = await getSession(request)
         const farm = await getFarm(fdm, session.principal_id, b_id_farm)
-        
+
         const calendar = getCalendar(params)
         const timeframe = getTimeframe(params)
-        const fields = await getFields(fdm, session.principal_id, b_id_farm, timeframe)
+        const fields = await getFields(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
 
         // Get soil parameter descriptions
         const soilParameterDescription = getSoilParametersDescription()
@@ -34,7 +54,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm,
             b_name_farm: farm.b_name_farm,
             calendar,
-            fields: fields.map(f => ({ b_id: f.b_id, b_name: f.b_name, geometry: f.b_geometry })),
+            fields: fields.map((f) => ({
+                b_id: f.b_id,
+                b_name: f.b_name,
+                geometry: f.b_geometry,
+            })),
             soilParameterDescription,
         }
     } catch (error) {
@@ -53,40 +77,52 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         if (formData.has("soilAnalysisFile")) {
             const analyses = await extractBulkSoilAnalyses(formData)
-            return dataWithSuccess({ analyses }, {
-                message: `${analyses.length} analyses succesvol verwerkt`,
-            })
+            return dataWithSuccess(
+                { analyses },
+                {
+                    message: `${analyses.length} analyses succesvol verwerkt`,
+                },
+            )
         }
 
         if (formData.has("matches")) {
             const matches = JSON.parse(formData.get("matches") as string)
-            const analysesData = JSON.parse(formData.get("analysesData") as string)
-
-            await Promise.all(
-                matches.map(async (match: { analysisId: string; fieldId: string }) => {
-                    const analysis = analysesData.find((a: any) => a.id === match.analysisId)
-                    if (analysis) {
-                        // Strip UI-only properties before saving to DB
-                        const { id, location, ...dbAnalysis } = analysis
-
-                        return addSoilAnalysis(
-                            fdm,
-                            session.principal_id,
-                            null,
-                            analysis.a_source || "other",
-                            match.fieldId,
-                            Number(analysis.a_depth_lower),
-                            new Date(analysis.b_sampling_date),
-                            dbAnalysis,
-                            Number(analysis.a_depth_upper),
-                        )
-                    }
-                }),
+            const analysesData = JSON.parse(
+                formData.get("analysesData") as string,
             )
 
-            return redirectWithSuccess(`/farm/create/${b_id_farm}/${calendar}/fields`, {
-                message: "Bodemanalyses succesvol opgeslagen",
-            })
+            await Promise.all(
+                matches.map(
+                    async (match: { analysisId: string; fieldId: string }) => {
+                        const analysis = analysesData.find(
+                            (a: any) => a.id === match.analysisId,
+                        )
+                        if (analysis) {
+                            // Strip UI-only properties before saving to DB
+                            const { id, location, ...dbAnalysis } = analysis
+
+                            return addSoilAnalysis(
+                                fdm,
+                                session.principal_id,
+                                null,
+                                analysis.a_source || "other",
+                                match.fieldId,
+                                Number(analysis.a_depth_lower),
+                                new Date(analysis.b_sampling_date),
+                                dbAnalysis,
+                                Number(analysis.a_depth_upper),
+                            )
+                        }
+                    },
+                ),
+            )
+
+            return redirectWithSuccess(
+                `/farm/create/${b_id_farm}/${calendar}/fields`,
+                {
+                    message: "Bodemanalyses succesvol opgeslagen",
+                },
+            )
         }
 
         return data({ message: "Invalid request" }, { status: 400 })
@@ -96,24 +132,35 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function BulkSoilAnalysisUploadWizardPage() {
-    const { b_id_farm, b_name_farm, calendar, fields, soilParameterDescription } = useLoaderData<typeof loader>()
-    const [processedAnalyses, setProcessedAnalyses] = useState<ProcessedAnalysis[]>([])
+    const {
+        b_id_farm,
+        b_name_farm,
+        calendar,
+        fields,
+        soilParameterDescription,
+    } = useLoaderData<typeof loader>()
+    const [processedAnalyses, setProcessedAnalyses] = useState<
+        ProcessedAnalysis[]
+    >([])
     const [step, setStep] = useState<"upload" | "review">("upload")
-    const navigate = useNavigate()
     const navigation = useNavigation()
     const submit = useSubmit()
 
-    const isSaving = navigation.state === "submitting" && navigation.formData?.has("matches")
+    const isSaving =
+        navigation.state === "submitting" && navigation.formData?.has("matches")
 
     const handleUploadSuccess = (analyses: any[]) => {
-        const matchedAnalyses = analyses.map(analysis => {
+        const matchedAnalyses = analyses.map((analysis) => {
             let matchedFieldId = ""
-            
+
             if (analysis.location) {
-                const fieldMatch = fields.find(field => {
+                const fieldMatch = fields.find((field) => {
                     if (!field.geometry) return false
                     try {
-                        return booleanPointInPolygon(analysis.location, field.geometry)
+                        return booleanPointInPolygon(
+                            analysis.location,
+                            field.geometry,
+                        )
                     } catch (e) {
                         return false
                     }
@@ -122,15 +169,17 @@ export default function BulkSoilAnalysisUploadWizardPage() {
             }
 
             if (!matchedFieldId) {
-                const fieldMatch = fields.find(field => 
-                    field.b_name.toLowerCase() === analysis.filename.replace(/\.pdf$/i, '').toLowerCase()
+                const fieldMatch = fields.find(
+                    (field) =>
+                        field.b_name.toLowerCase() ===
+                        analysis.filename.replace(/\.pdf$/i, "").toLowerCase(),
                 )
                 if (fieldMatch) matchedFieldId = fieldMatch.b_id
             }
 
             return {
                 ...analysis,
-                matchedFieldId
+                matchedFieldId,
             }
         })
 
@@ -138,10 +187,12 @@ export default function BulkSoilAnalysisUploadWizardPage() {
         setStep("review")
     }
 
-    const handleSave = (matches: { analysisId: string, fieldId: string }[]) => {
+    const handleSave = (matches: { analysisId: string; fieldId: string }[]) => {
         const formData = new FormData()
         // Filter out "none" selections
-        const validMatches = matches.filter(m => m.fieldId !== "none" && m.fieldId !== "")
+        const validMatches = matches.filter(
+            (m) => m.fieldId !== "none" && m.fieldId !== "",
+        )
         formData.append("matches", JSON.stringify(validMatches))
         formData.append("analysesData", JSON.stringify(processedAnalyses))
 
@@ -160,7 +211,7 @@ export default function BulkSoilAnalysisUploadWizardPage() {
                             Upload bodemanalyses
                         </h2>
                         <p className="text-muted-foreground">
-                            {step === "upload" 
+                            {step === "upload"
                                 ? "Upload meerdere bodemanalyses tegelijkertijd en koppel ze aan je percelen."
                                 : "Controleer de resultaten en bevestig de koppelingen."}
                         </p>
@@ -169,15 +220,21 @@ export default function BulkSoilAnalysisUploadWizardPage() {
                         {isSaving ? (
                             <div className="flex flex-col items-center justify-center py-12 space-y-4">
                                 <Spinner className="h-8 w-8 text-primary" />
-                                <p className="text-muted-foreground">Opslaan en koppelen...</p>
+                                <p className="text-muted-foreground">
+                                    Opslaan en koppelen...
+                                </p>
                             </div>
                         ) : step === "upload" ? (
-                            <BulkSoilAnalysisUploadForm onSuccess={handleUploadSuccess} />
+                            <BulkSoilAnalysisUploadForm
+                                onSuccess={handleUploadSuccess}
+                            />
                         ) : (
-                            <BulkSoilAnalysisReview 
-                                analyses={processedAnalyses} 
-                                fields={fields} 
-                                soilParameterDescription={soilParameterDescription}
+                            <BulkSoilAnalysisReview
+                                analyses={processedAnalyses}
+                                fields={fields}
+                                soilParameterDescription={
+                                    soilParameterDescription
+                                }
                                 onSave={handleSave}
                                 onCancel={() => setStep("upload")}
                             />

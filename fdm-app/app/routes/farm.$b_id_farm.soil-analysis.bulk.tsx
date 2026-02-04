@@ -18,7 +18,6 @@ import {
     type LoaderFunctionArgs,
     type ActionFunctionArgs,
     useLoaderData,
-    useNavigate,
     useNavigation,
     useSubmit,
 } from "react-router"
@@ -41,7 +40,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         const session = await getSession(request)
-        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
         const farms = await getFarms(fdm, session.principal_id)
         const fields = await getFields(fdm, session.principal_id, b_id_farm)
 
@@ -55,7 +53,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         return {
             b_id_farm,
-            b_name_farm: farm.b_name_farm,
             farmOptions,
             fields: fields.map((f) => ({
                 b_id: f.b_id,
@@ -69,94 +66,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
-    try {
-        const b_id_farm = params.b_id_farm
-        if (!b_id_farm) throw data("Farm ID is required", { status: 400 })
-
-        const session = await getSession(request)
-        const formData = await request.formData()
-
-        // Handle initial upload to NMI
-        if (formData.has("soilAnalysisFile")) {
-            const analyses = await extractBulkSoilAnalyses(formData)
-            return dataWithSuccess(
-                { analyses },
-                {
-                    message: `${analyses.length} analyses succesvol verwerkt`,
-                },
-            )
-        }
-
-        // Handle final save
-        if (formData.has("matches")) {
-            const matchesRaw = formData.get("matches") as string
-            const analysesDataRaw = formData.get("analysesData") as string
-
-            const matches = JSON.parse(matchesRaw)
-            const analysesData = JSON.parse(analysesDataRaw)
-
-            await Promise.all(
-                matches.map(
-                    async (match: { analysisId: string; fieldId: string }) => {
-                        const analysis = analysesData.find(
-                            (a: any) => a.id === match.analysisId,
-                        )
-                        if (analysis) {
-                            // Validate depth fields before processing
-                            const depthLower = Number(analysis.a_depth_lower)
-                            const depthUpper = Number(
-                                analysis.a_depth_upper ?? 0,
-                            )
-                            if (Number.isNaN(depthLower)) {
-                                console.warn(
-                                    `Analysis ${match.analysisId}: invalid a_depth_lower`,
-                                )
-                                return
-                            }
-                            // Strip UI-only properties before saving to DB
-                            const { id, location, ...dbAnalysis } = analysis
-
-                            return addSoilAnalysis(
-                                fdm,
-                                session.principal_id,
-                                null,
-                                analysis.a_source || "other",
-                                match.fieldId,
-                                depthLower,
-                                new Date(analysis.b_sampling_date),
-                                dbAnalysis,
-                                depthUpper,
-                            )
-                        }
-                    },
-                ),
-            )
-
-            return redirectWithSuccess(`/farm/${b_id_farm}`, {
-                message: "Bodemanalyses succesvol opgeslagen",
-            })
-        }
-
-        return data({ message: "Invalid request" }, { status: 400 })
-    } catch (error) {
-        throw handleActionError(error)
-    }
-}
-
 export default function BulkSoilAnalysisUploadPage() {
-    const {
-        b_id_farm,
-        b_name_farm,
-        farmOptions,
-        fields,
-        soilParameterDescription,
-    } = useLoaderData<typeof loader>()
+    const { b_id_farm, farmOptions, fields, soilParameterDescription } =
+        useLoaderData<typeof loader>()
     const [processedAnalyses, setProcessedAnalyses] = useState<
         ProcessedAnalysis[]
     >([])
     const [step, setStep] = useState<"upload" | "review">("upload")
-    const navigate = useNavigate()
     const navigation = useNavigation()
     const submit = useSubmit()
 
@@ -264,4 +180,79 @@ export default function BulkSoilAnalysisUploadPage() {
             </main>
         </SidebarInset>
     )
+}
+
+export async function action({ request, params }: ActionFunctionArgs) {
+    try {
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) throw data("Farm ID is required", { status: 400 })
+
+        const session = await getSession(request)
+        const formData = await request.formData()
+
+        // Handle initial upload to NMI
+        if (formData.has("soilAnalysisFile")) {
+            const analyses = await extractBulkSoilAnalyses(formData)
+            return dataWithSuccess(
+                { analyses },
+                {
+                    message: `${analyses.length} analyses succesvol verwerkt`,
+                },
+            )
+        }
+
+        // Handle final save
+        if (formData.has("matches")) {
+            const matchesRaw = formData.get("matches") as string
+            const analysesDataRaw = formData.get("analysesData") as string
+
+            const matches = JSON.parse(matchesRaw)
+            const analysesData = JSON.parse(analysesDataRaw)
+
+            await Promise.all(
+                matches.map(
+                    async (match: { analysisId: string; fieldId: string }) => {
+                        const analysis = analysesData.find(
+                            (a: any) => a.id === match.analysisId,
+                        )
+                        if (analysis) {
+                            // Validate depth fields before processing
+                            const depthLower = Number(analysis.a_depth_lower)
+                            const depthUpper = Number(
+                                analysis.a_depth_upper ?? 0,
+                            )
+                            if (Number.isNaN(depthLower)) {
+                                console.warn(
+                                    `Analysis ${match.analysisId}: invalid a_depth_lower`,
+                                )
+                                return
+                            }
+                            // Strip UI-only properties before saving to DB
+                            const { id, location, ...dbAnalysis } = analysis
+
+                            return addSoilAnalysis(
+                                fdm,
+                                session.principal_id,
+                                null,
+                                analysis.a_source || "other",
+                                match.fieldId,
+                                depthLower,
+                                new Date(analysis.b_sampling_date),
+                                dbAnalysis,
+                                depthUpper,
+                            )
+                        }
+                    },
+                ),
+            )
+
+            return redirectWithSuccess(`/farm/${b_id_farm}`, {
+                message: "Bodemanalyses succesvol opgeslagen",
+            })
+        }
+
+        return data({ message: "Invalid request" }, { status: 400 })
+    } catch (error) {
+        throw handleActionError(error)
+    }
 }
