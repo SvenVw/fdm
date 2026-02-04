@@ -41,7 +41,7 @@ export function BulkSoilAnalysisUploadForm({
         if (fetcher.data && fetcher.data.analyses) {
             onSuccess(fetcher.data.analyses)
         }
-    }, [fetcher.data, fetcher.state, onSuccess])
+    }, [fetcher.data, isUploading, onSuccess])
 
     const removeFile = (index: number) => {
         const newFiles = [...files]
