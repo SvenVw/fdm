@@ -48,7 +48,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         if (!b_id_farm) throw data("Farm ID is required", { status: 400 })
 
         const session = await getSession(request)
-        const calendar = await getCalendar(params)
+        const calendar = getCalendar(params)
         const formData = await request.formData()
 
         if (formData.has("soilAnalysisFile")) {
