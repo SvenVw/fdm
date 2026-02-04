@@ -123,7 +123,7 @@ const FormSchema = z.object({
 })
 
 // Loader
-export async function loader({}: LoaderFunctionArgs) {
+export async function loader() {
     const yearSelection = getCalendarSelection()
 
     return {
@@ -691,14 +691,14 @@ export default function AddFarmPage() {
                                         helpt bijvoorbeeld bij het bepalen van
                                         de gebruiksruimte.
                                         <p className="text-xs text-muted-foreground italic pt-1">
-                                            Tip: Vul alvast het KvK-nummer zdoat
+                                            Tip: Vul alvast het KvK-nummer zodat
                                             we binnenkort eenvoudig gegevens
                                             kunnen importeren.
                                         </p>
                                     </li>
                                     <li>
                                         <strong className="text-foreground">
-                                            Percelen:
+                                            Percelen toevoegen:
                                         </strong>{" "}
                                         In de volgende stap kun je
                                         RVO-shapefiles importeren of percelen
@@ -706,7 +706,7 @@ export default function AddFarmPage() {
                                     </li>
                                     <li>
                                         <strong className="text-foreground">
-                                            Percelen:
+                                            Perceelseigenschappen:
                                         </strong>{" "}
                                         Check het hoofdgewas van de percelen,
                                         markeer buffestroken en bekijk de
@@ -753,11 +753,6 @@ export default function AddFarmPage() {
                                         het alleen makkelijk op een rijtje om
                                         een nieuw bedrijf aan te maken.
                                     </p>
-                                    {/* <p className="text-xs text-muted-foreground italic">
-                                        Tip: KVK- en SKAL-nummers zijn optioneel
-                                        maar handig voor het automatisch
-                                        invullen van rapportages.
-                                    </p> */}
                                 </div>
                             </div>
                         </div>
