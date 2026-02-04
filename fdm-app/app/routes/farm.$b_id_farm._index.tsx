@@ -98,7 +98,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fields = await getFields(fdm, session.principal_id, b_id_farm)
 
         // Calculate total area for this farm
-        const farmArea = fields.reduce((acc, field) => acc + field.b_area, 0)
+        const farmArea = fields.reduce(
+            (acc, field) => acc + (field.b_area ?? 0),
+            0,
+        )
 
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
@@ -396,7 +399,7 @@ export default function FarmDashboardIndex() {
                                     Acties
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <NavLink to={`soil-analysis/bulk`}>
+                                    <NavLink to={"soil-analysis/bulk"}>
                                         <Card className="transition-all hover:shadow-md h-full">
                                             <CardHeader>
                                                 <div className="flex items-center gap-4">
@@ -408,16 +411,18 @@ export default function FarmDashboardIndex() {
                                                             Upload bodemanalyses
                                                         </CardTitle>
                                                         <CardDescription>
-                                                            Upload meerdere pdf's met bodemanalyses en koppel ze aan percelen.
+                                                            Upload meerdere
+                                                            pdf's met
+                                                            bodemanalyses en
+                                                            koppel ze aan
+                                                            percelen.
                                                         </CardDescription>
                                                     </div>
                                                 </div>
                                             </CardHeader>
                                         </Card>
                                     </NavLink>
-                                    <NavLink
-                                        to={`${calendar}/field/new`}
-                                    >
+                                    <NavLink to={`${calendar}/field/new`}>
                                         <Card className="transition-all hover:shadow-md h-full">
                                             <CardHeader>
                                                 <div className="flex items-center gap-4">
@@ -429,13 +434,14 @@ export default function FarmDashboardIndex() {
                                                             Nieuwe percelen
                                                         </CardTitle>
                                                         <CardDescription>
-                                                            Voeg nieuwe percelen toe aan dit bedrijf.
+                                                            Voeg nieuwe percelen
+                                                            toe aan dit bedrijf.
                                                         </CardDescription>
                                                     </div>
                                                 </div>
                                             </CardHeader>
                                         </Card>
-                                    </NavLink>                                   
+                                    </NavLink>
                                 </div>
                             </div>
                         </div>
@@ -545,7 +551,7 @@ export default function FarmDashboardIndex() {
                                                     <Shapes className="mr-2 h-4 w-4" />
                                                     Meststoffen
                                                 </NavLink>
-                                            </Button>                                            
+                                            </Button>
                                             <Button
                                                 variant="ghost"
                                                 className="w-full justify-start"
