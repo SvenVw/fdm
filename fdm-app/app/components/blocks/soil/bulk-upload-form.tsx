@@ -22,6 +22,7 @@ export function BulkSoilAnalysisUploadForm({
     const [files, setFiles] = useState<File[]>([])
     const fetcher = useFetcher()
     const isUploading = fetcher.state !== "idle"
+    const MAX_FILE_SIZE = 5 * 1024 * 1024
 
     const handleFilesChange = (newFiles: File[]) => {
         setFiles(newFiles)
@@ -88,6 +89,7 @@ export function BulkSoilAnalysisUploadForm({
                             value={files}
                             onFilesChange={handleFilesChange}
                             allowReset={false}
+                            maxSize={MAX_FILE_SIZE}
                             className={cn(
                                 "w-full transition-all duration-200 border-2",
                                 files.length > 0
