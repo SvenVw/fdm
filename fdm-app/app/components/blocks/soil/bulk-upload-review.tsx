@@ -169,6 +169,19 @@ export function BulkSoilAnalysisReview({
             cell: ({ row }) => {
                 const match = matches[row.original.id]
                 const isMatched = match && match !== "none"
+                const isValid =
+                    row.original.b_sampling_date &&
+                    !Number.isNaN(new Date(row.original.b_sampling_date).getTime())
+
+                if (!isValid) {
+                    return (
+                        <div className="flex items-center text-destructive">
+                            <AlertTriangle className="h-4 w-4 mr-1" />
+                            <span className="text-xs">Ongeldige pdf</span>
+                        </div>
+                    )
+                }
+
                 return isMatched ? (
                     <div className="flex items-center text-green-600">
                         <Check className="h-4 w-4 mr-1" />
@@ -192,7 +205,14 @@ export function BulkSoilAnalysisReview({
 
     const handleSave = () => {
         const result = Object.entries(matches)
-            .filter(([_, fieldId]) => fieldId !== "" && fieldId !== "none")
+            .filter(([analysisId, fieldId]) => {
+                if (fieldId === "" || fieldId === "none") return false
+                const analysis = analyses.find((a) => a.id === analysisId)
+                const isValid =
+                    analysis?.b_sampling_date &&
+                    !Number.isNaN(new Date(analysis.b_sampling_date).getTime())
+                return isValid
+            })
             .map(([analysisId, fieldId]) => ({ analysisId, fieldId }))
         onSave(result)
     }
@@ -203,8 +223,8 @@ export function BulkSoilAnalysisReview({
                 <CardTitle>Controleer en koppel</CardTitle>
                 <CardDescription>
                     Controleer de gegevens uit de pdf's en koppel ze aan het
-                    juiste perceel. Analyses zonder gekoppeld perceel worden
-                    overgeslagen.
+                    juiste perceel. Analyses met ontbrekende datum of zonder
+                    gekoppeld perceel worden overgeslagen.
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -229,23 +249,51 @@ export function BulkSoilAnalysisReview({
                         </TableHeader>
                         <TableBody>
                             {table.getRowModel().rows?.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={
-                                            row.getIsSelected() && "selected"
-                                        }
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext(),
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
+                                table.getRowModel().rows.map((row) => {
+                                    const isValid =
+                                        row.original.b_sampling_date &&
+                                        !Number.isNaN(
+                                            new Date(
+                                                row.original.b_sampling_date,
+                                            ).getTime(),
+                                        )
+
+                                    return (
+                                        <TableRow
+                                            key={row.id}
+                                            data-state={
+                                                row.getIsSelected() &&
+                                                "selected"
+                                            }
+                                            className={
+                                                !isValid
+                                                    ? "bg-destructive/5"
+                                                    : ""
+                                            }
+                                        >
+                                            {row.getVisibleCells().map(
+                                                (cell) => (
+                                                    <TableCell key={cell.id}>
+                                                        {cell.column.id ===
+                                                            "match" &&
+                                                        !isValid ? (
+                                                            <div className="text-xs text-muted-foreground italic px-3">
+                                                                Niet koppelbaar
+                                                            </div>
+                                                        ) : (
+                                                            flexRender(
+                                                                cell.column
+                                                                    .columnDef
+                                                                    .cell,
+                                                                cell.getContext(),
+                                                            )
+                                                        )}
+                                                    </TableCell>
+                                                ),
+                                            )}
+                                        </TableRow>
+                                    )
+                                })
                             ) : (
                                 <TableRow>
                                     <TableCell
@@ -265,7 +313,19 @@ export function BulkSoilAnalysisReview({
                     <X className="mr-2 h-4 w-4" />
                     Annuleren
                 </Button>
-                <Button onClick={handleSave}>
+                <Button
+                    onClick={handleSave}
+                    disabled={
+                        !Object.entries(matches).some(([analysisId, fieldId]) => {
+                            if (fieldId === "" || fieldId === "none") return false
+                            const analysis = analyses.find((a) => a.id === analysisId)
+                            return (
+                                analysis?.b_sampling_date &&
+                                !Number.isNaN(new Date(analysis.b_sampling_date).getTime())
+                            )
+                        })
+                    }
+                >
                     <Save className="mr-2 h-4 w-4" />
                     Opslaan & Koppelen
                 </Button>

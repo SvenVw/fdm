@@ -221,12 +221,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
                             const depthUpper = Number(
                                 analysis.a_depth_upper ?? 0,
                             )
-                            if (Number.isNaN(depthLower)) {
-                                console.warn(
-                                    `Analysis ${match.analysisId}: invalid a_depth_lower`,
+                            if (
+                                Number.isNaN(depthLower) ||
+                                Number.isNaN(depthUpper)
+                            ) {
+                                throw new Error(
+                                    `Analysis ${match.analysisId}: invalid depth values (lower: ${analysis.a_depth_lower}, upper: ${analysis.a_depth_upper})`,
                                 )
-                                return
                             }
+
                             const samplingDate = analysis.b_sampling_date
                                 ? new Date(analysis.b_sampling_date)
                                 : undefined
@@ -234,10 +237,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
                                 !samplingDate ||
                                 Number.isNaN(samplingDate.getTime())
                             ) {
-                                console.warn(
-                                    `Analysis ${match.analysisId}: invalid b_sampling_date`,
+                                throw new Error(
+                                    `Analysis ${match.analysisId}: invalid b_sampling_date (${analysis.b_sampling_date})`,
                                 )
-                                return
                             }
                             // Strip UI-only properties before saving to DB
                             const { id, location, ...dbAnalysis } = analysis
