@@ -104,12 +104,13 @@ export function BulkSoilAnalysisReview({
         {
             accessorKey: "b_sampling_date",
             header: "Datum",
-            cell: ({ row }) =>
-                row.original.b_sampling_date
-                    ? format(new Date(row.original.b_sampling_date), "P", {
-                          locale: nl,
-                      })
-                    : "-",
+            cell: ({ row }) => {
+                const date = row.original.b_sampling_date
+                    ? new Date(row.original.b_sampling_date)
+                    : undefined
+                if (!date || Number.isNaN(date.getTime())) return "-"
+                return format(date, "P", { locale: nl })
+            },
         },
         {
             id: "parameters",
