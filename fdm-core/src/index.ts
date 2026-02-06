@@ -77,6 +77,7 @@ export {
     updateRoleOfPrincipalAtFarm,
 } from "./farm"
 export type { FdmType } from "./fdm.d"
+export { closeFdm } from "./fdm"
 export { createFdmServer } from "./fdm-server"
 export type { FdmServerType } from "./fdm-server.d"
 export { exportFarm } from "./exchange/export"

@@ -10,7 +10,7 @@ export function createFdmServer(
     user: string | undefined,
     password: string | (() => string | Promise<string>) | undefined,
     database: string | undefined,
-    max = 40,
+    max = process.env.NODE_ENV === "test" ? 1 : 40,
 ): FdmServerType {
     try {
         const client = postgres({
@@ -26,6 +26,10 @@ export function createFdmServer(
             logger: false,
             schema: schema,
         })
+
+        // Attach the client to the drizzle instance for closing
+        // @ts-ignore
+        db.$client = client
 
         return db
     } catch (err) {
