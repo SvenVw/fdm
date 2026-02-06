@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, FileStack } from "lucide-react"
 import { useMemo } from "react"
 import { NavLink, useLocation } from "react-router"
 import { useFieldFilterStore } from "@/app/store/field-filter"
@@ -55,8 +55,20 @@ export function NewFieldsSidebar({
                         <FieldFilterToggle />
                     </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                     <SidebarPage items={sidebarPageItems} />
+                    <Button variant="outline" className="w-full justify-start" asChild>
+                                <NavLink 
+                            to={
+                                isFarmCreateWizard
+                                    ? `/farm/create/${b_id_farm}/${calendar}/soil-analysis/bulk`
+                                    : `/farm/${b_id_farm}/soil-analysis/bulk`
+                            }
+                        >
+                            <FileStack className="mr-2 h-4 w-4" />
+                            Upload bodemanalyses
+                        </NavLink>
+                    </Button>
                 </CardContent>
                 <CardFooter className="flex flex-col items-center space-y-2 relative">
                     {/* <Separator /> */}
@@ -68,7 +80,7 @@ export function NewFieldsSidebar({
                                     : `/farm/${b_id_farm}/${calendar}/field/new`
                             }
                         >
-                            <ArrowLeft />
+                            <ArrowLeft className="mr-2 h-4 w-4" />
                             Terug naar kaart
                         </NavLink>
                     </Button>
