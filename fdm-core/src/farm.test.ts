@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm"
-import { beforeAll, describe, expect, inject, it } from "vitest"
+import { afterAll, beforeAll, describe, expect, inject, it } from "vitest"
 import type { FdmAuth } from "./authentication"
 import { createFdmAuth } from "./authentication"
 import { listPrincipalsForResource } from "./authorization"
@@ -17,6 +17,7 @@ import {
     updateFarm,
     updateRoleOfPrincipalAtFarm,
 } from "./farm"
+import { closeFdm } from "./fdm"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
@@ -95,6 +96,11 @@ describe("Farm Functions", () => {
             farmPostalCode,
         )
     })
+
+    afterAll(async () => {
+        await closeFdm(fdm)
+    })
+
     describe("getFarm", () => {
         it("should retrieve a farm's details if the principal has read access", async () => {
             const farm = await getFarm(fdm, principal_id, b_id_farm)

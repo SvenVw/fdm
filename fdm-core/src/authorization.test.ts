@@ -1,5 +1,5 @@
 import { and, desc, eq, isNotNull, isNull } from "drizzle-orm"
-import { beforeAll, beforeEach, describe, expect, inject, it } from "vitest"
+import { afterAll, beforeAll, beforeEach, describe, expect, inject, it } from "vitest"
 import { type BetterAuth, createFdmAuth } from "./authentication"
 import {
     actions,
@@ -16,6 +16,7 @@ import {
 import * as authNSchema from "./db/schema-authn"
 import * as authZSchema from "./db/schema-authz"
 import { addFarm } from "./farm"
+import { closeFdm } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { createId } from "./id"
@@ -51,9 +52,13 @@ describe("Authorization Functions", () => {
             clientSecret: "mock_ms_client_secret",
         }
 
-        fdm = createFdmServer(host, port, user, password, database, 10) // allow some connections
+        fdm = createFdmServer(host, port, user, password, database)
         fdmAuth = createFdmAuth(fdm, googleAuth, microsoftAuth, undefined, true)
         principal_id = createId()
+    })
+
+    afterAll(async () => {
+        await closeFdm(fdm)
     })
 
     beforeEach(async () => {

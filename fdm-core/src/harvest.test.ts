@@ -1,10 +1,11 @@
 import { eq } from "drizzle-orm"
-import { afterAll, beforeEach, describe, expect, inject, it } from "vitest"
+import { afterAll, afterEach, beforeEach, describe, expect, inject, it } from "vitest"
 import { enableCultivationCatalogue } from "./catalogues"
 import { addCultivation, addCultivationToCatalogue } from "./cultivation"
 import type { cultivationsCatalogueTypeSelect } from "./db/schema"
 import * as schema from "./db/schema"
 import { addFarm } from "./farm"
+import { closeFdm } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField } from "./field"
@@ -140,6 +141,10 @@ describe("Harvest Data Model", () => {
             b_id,
             b_lu_start,
         )
+    })
+
+    afterEach(async () => {
+        await closeFdm(fdm)
     })
 
     afterAll(async () => {

@@ -1,5 +1,6 @@
 import {
     afterAll,
+    afterEach,
     beforeAll,
     beforeEach,
     describe,
@@ -12,6 +13,7 @@ import {
     enableFertilizerCatalogue,
 } from "./catalogues"
 import { addFarm } from "./farm"
+import { closeFdm } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import {
@@ -60,6 +62,10 @@ describe("Fertilizer Data Model", () => {
         )
 
         await enableFertilizerCatalogue(fdm, principal_id, b_id_farm, b_id_farm)
+    })
+
+    afterEach(async () => {
+        await closeFdm(fdm)
     })
 
     afterAll(async () => {})
@@ -807,7 +813,7 @@ describe("Fertilizer Data Model", () => {
         let b_id: string
         let p_id: string
 
-        beforeAll(async () => {
+        beforeEach(async () => {
             const farmName = "Test Farm"
             const farmBusinessId = "123456"
             const farmAddress = "123 Farm Lane"

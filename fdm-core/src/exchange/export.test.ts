@@ -1,9 +1,10 @@
-import { beforeAll, describe, expect, inject, it } from "vitest"
+import { afterAll, beforeAll, describe, expect, inject, it } from "vitest"
 import { eq } from "drizzle-orm"
 import type { FdmAuth } from "../authentication"
 import { createFdmAuth } from "../authentication"
 import * as schema from "../db/schema"
 import { addFarm } from "../farm"
+import { closeFdm } from "../fdm"
 import { createFdmServer } from "../fdm-server"
 import type { FdmServerType } from "../fdm-server.d"
 import {
@@ -205,6 +206,10 @@ describe("Export Logic", () => {
 
         // Add grazing intention
         await setGrazingIntention(fdm, principal_id, b_id_farm, 2024, true)
+    })
+
+    afterAll(async () => {
+        await closeFdm(fdm)
     })
 
     it("should export all farm data correctly", async () => {

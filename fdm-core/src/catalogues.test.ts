@@ -3,7 +3,7 @@ import {
     getFertilizersCatalogue,
 } from "@svenvw/fdm-data"
 import { eq, isNotNull } from "drizzle-orm"
-import { beforeEach, describe, expect, inject, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, inject, it } from "vitest"
 import {
     disableCultivationCatalogue,
     disableFertilizerCatalogue,
@@ -17,7 +17,8 @@ import {
 } from "./catalogues"
 import * as schema from "./db/schema"
 import { addFarm } from "./farm"
-import type { FdmType } from "./fdm"
+import { closeFdm } from "./fdm"
+import type { FdmType } from "./fdm.d"
 import { createFdmServer } from "./fdm-server"
 
 describe("Catalogues", () => {
@@ -31,7 +32,7 @@ describe("Catalogues", () => {
         const user = inject("user")
         const password = inject("password")
         const database = inject("database")
-        fdm = createFdmServer(host, port, user, password, database)
+        fdm = createFdmServer(host, port, user, password, database, 1)
         principal_id = "test_principal"
 
         // Create a test farm
@@ -47,6 +48,10 @@ describe("Catalogues", () => {
             farmAddress,
             farmPostalCode,
         )
+    })
+
+    afterEach(async () => {
+        await closeFdm(fdm)
     })
 
     describe("Fertilizer Catalogues", () => {
@@ -585,7 +590,11 @@ describe("Catalogues syncing", () => {
         const user = inject("user")
         const password = inject("password")
         const database = inject("database")
-        fdm = createFdmServer(host, port, user, password, database)
+        fdm = createFdmServer(host, port, user, password, database, 1)
+    })
+
+    afterEach(async () => {
+        await closeFdm(fdm)
     })
 
     it("should sync catalogues", async () => {
