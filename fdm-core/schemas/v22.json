@@ -1160,6 +1160,9 @@
                         "properties": {
                             "b_id_derogation": {
                                 "type": "string"
+                            },
+                            "b_derogation_year": {
+                                "type": ["number", "null"]
                             }
                         },
                         "required": ["b_id_derogation"],
@@ -1249,6 +1252,9 @@
                             },
                             "b_grazing_intention": {
                                 "type": ["boolean", "null"]
+                            },
+                            "b_grazing_intention_year": {
+                                "type": ["number", "null"]
                             }
                         },
                         "required": ["b_id_farm"],

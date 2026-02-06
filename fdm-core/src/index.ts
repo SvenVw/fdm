@@ -79,6 +79,7 @@ export {
 export type { FdmType } from "./fdm.d"
 export { createFdmServer } from "./fdm-server"
 export type { FdmServerType } from "./fdm-server.d"
+export { exportFarm } from "./exchange/export"
 export {
     addFertilizer,
     addFertilizerApplication,

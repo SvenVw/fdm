@@ -42,30 +42,81 @@ function toStandardZod(value: any): z.ZodTypeAny {
     const constructorName = value?.constructor?.name
     const def = value?._def
 
+    if (!def) return value
+
+    let result: z.ZodTypeAny
+
     switch (constructorName) {
         case "ZodString":
-            return z.string()
+            result = z.string()
+            break
         case "ZodNumber":
-            return z.number()
+            result = z.number()
+            break
         case "ZodBoolean":
-            return z.boolean()
+            result = z.boolean()
+            break
         case "ZodDate":
-            return z.date()
+            result = z.date()
+            break
         case "ZodEnum": {
-            const values = Array.isArray(def.values)
-                ? def.values
-                : Object.values(def.entries || {})
-            return z.enum(values as [string, ...string[]])
+            const values =
+                def.values ||
+                def.options ||
+                (Array.isArray(def.entries)
+                    ? def.entries
+                    : Object.values(def.entries || {}))
+            result = z.enum(values as [string, ...string[]])
+            break
         }
-        case "ZodArray":
-            return z.array(toStandardZod(def.type || def.innerType))
+        case "ZodObject": {
+            const shape: z.ZodRawShape = {}
+            const inputShape =
+                typeof def.shape === "function" ? def.shape() : def.shape
+            for (const [key, val] of Object.entries(inputShape)) {
+                shape[key] = toStandardZod(val)
+            }
+            let obj = z.object(shape)
+            if (def.unknownKeys === "passthrough") {
+                obj = obj.passthrough()
+            } else if (def.unknownKeys === "strict") {
+                obj = obj.strict()
+            }
+            result = obj
+            break
+        }
+        case "ZodArray": {
+            result = z.array(toStandardZod(def.type || def.innerType))
+            break
+        }
         case "ZodNullable":
             return toStandardZod(def.innerType).nullable().optional()
         case "ZodOptional":
             return toStandardZod(def.innerType).optional()
+        case "ZodDefault":
+            return toStandardZod(def.innerType).default(def.defaultValue())
+        case "ZodNumberFormat":
+        case "ZodEffects":
+            return toStandardZod(def.innerType || def.schema)
         default:
             return value
     }
+
+    // Preserve constraints (min, max, length) for Array, String, Number
+    if (def.minLength && (result as any)._def) {
+        ;(result as any)._def.minLength = def.minLength
+    }
+    if (def.maxLength && (result as any)._def) {
+        ;(result as any)._def.maxLength = def.maxLength
+    }
+    if (def.exactLength && (result as any)._def) {
+        ;(result as any)._def.exactLength = def.exactLength
+    }
+    if (def.checks && (result as any)._def) {
+        ;(result as any)._def.checks = [...def.checks]
+    }
+
+    return result
 }
 
 /**
@@ -97,13 +148,48 @@ function createExchangeSchema<T extends Table>(
     const baseSchema = (createSelectSchema as any)(table, overrides).omit(
         commonOmit,
     )
+
     const standardShape: z.ZodRawShape = {}
 
     for (const [key, value] of Object.entries(baseSchema.shape)) {
         standardShape[key] = toStandardZod(value)
     }
 
-    return z.object(standardShape)
+    // Explicit fallback for known important fields that sometimes get skipped by drizzle-zod
+    const colMap = getTableColumns(table)
+    if (colMap.b_derogation_year && !standardShape.b_derogation_year) {
+        standardShape.b_derogation_year = z.number().nullish()
+    }
+    if (
+        colMap.b_grazing_intention_year &&
+        !standardShape.b_grazing_intention_year
+    ) {
+        standardShape.b_grazing_intention_year = z.number().nullish()
+    }
+
+    return z.object(standardShape).strict()
+}
+
+/**
+ * Recursively removes 'created' and 'updated' fields from an object or array.
+ * This is used to clean up raw database results for the exchange format.
+ */
+export function stripAuditFields(data: any): any {
+    if (data instanceof Date) {
+        return data
+    }
+    if (Array.isArray(data)) {
+        return data.map(stripAuditFields)
+    }
+    if (data !== null && typeof data === "object") {
+        const result: any = {}
+        for (const [key, value] of Object.entries(data)) {
+            if (key === "created" || key === "updated") continue
+            result[key] = stripAuditFields(value)
+        }
+        return result
+    }
+    return data
 }
 
 // --- Tables ---
@@ -236,42 +322,50 @@ export const cultivationCatalogueSelectingSchema = createExchangeSchema(
 
 // --- Root Schema ---
 
-export const metaSchema = z.object({
-    version: z.string(),
-    exportedAt: z.string().datetime(), // Strict ISO string
-    source: z.string(),
-})
+export const metaSchema = z
+    .object({
+        version: z.string(),
+        exportedAt: z.string().datetime(), // Strict ISO string
+        source: z.string(),
+    })
+    .strict()
 
-export const exchangeSchema = z.object({
-    meta: metaSchema,
-    farm: farmSchema,
-    fields: z.array(fieldSchema),
-    field_acquiring: z.array(fieldAcquiringSchema),
-    field_discarding: z.array(fieldDiscardingSchema),
-    fertilizers: z.array(fertilizerSchema),
-    fertilizer_acquiring: z.array(fertilizerAcquiringSchema),
-    fertilizer_applying: z.array(fertilizerApplicationSchema),
-    fertilizers_catalogue: z.array(fertilizersCatalogueSchema),
-    fertilizer_picking: z.array(fertilizerPickingSchema),
-    cultivations: z.array(cultivationSchema),
-    cultivation_starting: z.array(cultivationStartingSchema),
-    cultivations_catalogue: z.array(cultivationsCatalogueSchema),
-    harvestables: z.array(harvestableSchema),
-    harvestable_sampling: z.array(harvestableSamplingSchema),
-    harvestable_analyses: z.array(harvestableAnalysesSchema),
-    cultivation_harvesting: z.array(cultivationHarvestingSchema),
-    cultivation_ending: z.array(cultivationEndingSchema),
-    soil_analysis: z.array(soilAnalysisSchema),
-    soil_sampling: z.array(soilSamplingSchema),
-    derogations: z.array(derogationSchema),
-    derogation_applying: z.array(derogationApplyingSchema),
-    organic_certifications: z.array(organicCertificationSchema),
-    organic_certifications_holding: z.array(organicCertificationsHoldingSchema),
-    intending_grazing: z.array(intendingGrazingSchema),
-    fertilizer_catalogue_enabling: z.array(fertilizerCatalogueEnablingSchema),
-    cultivation_catalogue_selecting: z.array(
-        cultivationCatalogueSelectingSchema,
-    ),
-})
+export const exchangeSchema = z
+    .object({
+        meta: metaSchema,
+        farm: farmSchema,
+        fields: z.array(fieldSchema),
+        field_acquiring: z.array(fieldAcquiringSchema),
+        field_discarding: z.array(fieldDiscardingSchema),
+        fertilizers: z.array(fertilizerSchema),
+        fertilizer_acquiring: z.array(fertilizerAcquiringSchema),
+        fertilizer_applying: z.array(fertilizerApplicationSchema),
+        fertilizers_catalogue: z.array(fertilizersCatalogueSchema),
+        fertilizer_picking: z.array(fertilizerPickingSchema),
+        cultivations: z.array(cultivationSchema),
+        cultivation_starting: z.array(cultivationStartingSchema),
+        cultivations_catalogue: z.array(cultivationsCatalogueSchema),
+        harvestables: z.array(harvestableSchema),
+        harvestable_sampling: z.array(harvestableSamplingSchema),
+        harvestable_analyses: z.array(harvestableAnalysesSchema),
+        cultivation_harvesting: z.array(cultivationHarvestingSchema),
+        cultivation_ending: z.array(cultivationEndingSchema),
+        soil_analysis: z.array(soilAnalysisSchema),
+        soil_sampling: z.array(soilSamplingSchema),
+        derogations: z.array(derogationSchema),
+        derogation_applying: z.array(derogationApplyingSchema),
+        organic_certifications: z.array(organicCertificationSchema),
+        organic_certifications_holding: z.array(
+            organicCertificationsHoldingSchema,
+        ),
+        intending_grazing: z.array(intendingGrazingSchema),
+        fertilizer_catalogue_enabling: z.array(
+            fertilizerCatalogueEnablingSchema,
+        ),
+        cultivation_catalogue_selecting: z.array(
+            cultivationCatalogueSelectingSchema,
+        ),
+    })
+    .strict()
 
 export type ExchangeData = z.infer<typeof exchangeSchema>
