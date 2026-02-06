@@ -1,26 +1,26 @@
-import { afterAll, beforeAll, describe, expect, inject, it } from "vitest"
 import { eq } from "drizzle-orm"
+import { afterAll, beforeAll, describe, expect, inject, it } from "vitest"
 import type { FdmAuth } from "../authentication"
 import { createFdmAuth } from "../authentication"
+import { addCultivation } from "../cultivation"
 import * as schema from "../db/schema"
+import { addDerogation } from "../derogation"
 import { addFarm } from "../farm"
 import { closeFdm } from "../fdm"
 import { createFdmServer } from "../fdm-server"
 import type { FdmServerType } from "../fdm-server.d"
 import {
     addFertilizer,
-    addFertilizerToCatalogue,
     addFertilizerApplication,
+    addFertilizerToCatalogue,
 } from "../fertilizer"
 import { addField } from "../field"
-import { exportFarm } from "./export"
-import { createId } from "../id"
-import { addSoilAnalysis } from "../soil"
-import { addCultivation } from "../cultivation"
-import { addHarvest } from "../harvest"
-import { addDerogation } from "../derogation"
-import { addOrganicCertification } from "../organic"
 import { setGrazingIntention } from "../grazing_intention"
+import { addHarvest } from "../harvest"
+import { createId } from "../id"
+import { addOrganicCertification } from "../organic"
+import { addSoilAnalysis } from "../soil"
+import { exportFarm } from "./export"
 
 describe("Export Logic", () => {
     let fdm: FdmServerType
@@ -48,12 +48,13 @@ describe("Export Logic", () => {
         fdmAuth = createFdmAuth(fdm, googleAuth, microsoftAuth, undefined, true)
 
         // Create principal_id
+        const uniqueId = createId(8).toLowerCase()
         const user1 = await fdmAuth.api.signUpEmail({
             headers: undefined,
             body: {
-                email: "export_user@example.com",
+                email: `export_user_${uniqueId}@example.com`,
                 name: "export_user",
-                username: "export_user",
+                username: `export_user_${uniqueId}`,
                 password: "password",
             },
         })

@@ -39,25 +39,51 @@ const commonOmit = {
  */
 // biome-ignore lint/suspicious/noExplicitAny: drizzle-zod types are not standard Zod types
 function toStandardZod(value: any): z.ZodTypeAny {
+    // Handle native constructors if passed as types
+    if (value === String) return z.string()
+    if (value === Number) return z.number()
+    if (value === Boolean) return z.boolean()
+    if (value === Date) return z.coerce.date()
+
     const constructorName = value?.constructor?.name
     const def = value?._def
 
     if (!def) return value
 
+    // Fallback: if type is number, treat as ZodNumber
+    if (
+        def.typeName === "ZodNumber" ||
+        (def.type === "number" && !constructorName?.includes("Literal"))
+    ) {
+        const result = z.number()
+        // Copy checks if possible
+        if (def.checks && (result as any)._def) {
+            ;(result as any)._def.checks = [...def.checks]
+        }
+        return result
+    }
+
     let result: z.ZodTypeAny
 
     switch (constructorName) {
         case "ZodString":
+        case "String":
             result = z.string()
             break
         case "ZodNumber":
+        case "ZodNumberFormat":
+        case "Number":
             result = z.number()
             break
         case "ZodBoolean":
+        case "Boolean":
             result = z.boolean()
             break
         case "ZodDate":
-            result = z.date()
+            result = z.coerce.date()
+            break
+        case "ZodLiteral":
+            result = z.literal(def.value)
             break
         case "ZodEnum": {
             const values =
@@ -86,7 +112,11 @@ function toStandardZod(value: any): z.ZodTypeAny {
             break
         }
         case "ZodArray": {
-            result = z.array(toStandardZod(def.type || def.innerType))
+            const inner =
+                typeof def.type === "string"
+                    ? def.element || def.innerType
+                    : def.type || def.element || def.innerType
+            result = z.array(toStandardZod(inner))
             break
         }
         case "ZodNullable":
@@ -95,7 +125,6 @@ function toStandardZod(value: any): z.ZodTypeAny {
             return toStandardZod(def.innerType).optional()
         case "ZodDefault":
             return toStandardZod(def.innerType).default(def.defaultValue())
-        case "ZodNumberFormat":
         case "ZodEffects":
             return toStandardZod(def.innerType || def.schema)
         default:

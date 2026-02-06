@@ -63,6 +63,8 @@ export {
     listDerogations,
     removeDerogation,
 } from "./derogation"
+export { exportFarm } from "./exchange/export"
+export { importFarm } from "./exchange/import"
 export {
     addFarm,
     getFarm,
@@ -76,11 +78,10 @@ export {
     updateFarm,
     updateRoleOfPrincipalAtFarm,
 } from "./farm"
-export type { FdmType } from "./fdm.d"
 export { closeFdm } from "./fdm"
+export type { FdmType } from "./fdm.d"
 export { createFdmServer } from "./fdm-server"
 export type { FdmServerType } from "./fdm-server.d"
-export { exportFarm } from "./exchange/export"
 export {
     addFertilizer,
     addFertilizerApplication,

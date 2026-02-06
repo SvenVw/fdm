@@ -1,10 +1,10 @@
 import { eq, inArray } from "drizzle-orm"
+import { checkPermission } from "../authorization"
 import * as schema from "../db/schema"
 import { handleError } from "../error"
 import type { FdmType } from "../fdm"
-import { checkPermission } from "../authorization"
-import { stripAuditFields } from "./schemas"
 import type { ExchangeData } from "./schemas"
+import { stripAuditFields } from "./schemas"
 import { getLatestMigrationVersion } from "./utils"
 
 /**
