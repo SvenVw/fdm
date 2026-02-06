@@ -1,0 +1,1323 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema#",
+    "$ref": "#/definitions/FdmExchangeSchemaV22",
+    "definitions": {
+        "FdmExchangeSchemaV22": {
+            "type": "object",
+            "properties": {
+                "meta": {
+                    "type": "object",
+                    "properties": {
+                        "version": {
+                            "type": "string"
+                        },
+                        "exportedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                        },
+                        "source": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["version", "exportedAt", "source"],
+                    "additionalProperties": false
+                },
+                "farm": {
+                    "type": "object",
+                    "properties": {
+                        "b_id_farm": {
+                            "type": "string"
+                        },
+                        "b_name_farm": {
+                            "type": ["string", "null"]
+                        },
+                        "b_businessid_farm": {
+                            "type": ["string", "null"]
+                        },
+                        "b_address_farm": {
+                            "type": ["string", "null"]
+                        },
+                        "b_postalcode_farm": {
+                            "type": ["string", "null"]
+                        }
+                    },
+                    "required": ["b_id_farm"],
+                    "additionalProperties": false
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id": {
+                                "type": "string"
+                            },
+                            "b_name": {
+                                "type": "string"
+                            },
+                            "b_geometry": {
+                                "anyOf": [
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "const": "Polygon"
+                                            },
+                                            "coordinates": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "number"
+                                                        },
+                                                        "minItems": 2
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "required": ["type", "coordinates"],
+                                        "additionalProperties": false
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "b_id_source": {
+                                "type": ["string", "null"]
+                            },
+                            "b_bufferstrip": {
+                                "type": "boolean"
+                            }
+                        },
+                        "required": ["b_id", "b_name", "b_bufferstrip"],
+                        "additionalProperties": false
+                    }
+                },
+                "field_acquiring": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id": {
+                                "type": "string"
+                            },
+                            "b_id_farm": {
+                                "type": "string"
+                            },
+                            "b_start": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "b_acquiring_method": {
+                                "type": "string",
+                                "enum": [
+                                    "nl_01",
+                                    "nl_02",
+                                    "nl_03",
+                                    "nl_04",
+                                    "nl_07",
+                                    "nl_09",
+                                    "nl_10",
+                                    "nl_11",
+                                    "nl_12",
+                                    "nl_13",
+                                    "nl_61",
+                                    "nl_63",
+                                    "unknown"
+                                ]
+                            }
+                        },
+                        "required": ["b_id", "b_id_farm", "b_acquiring_method"],
+                        "additionalProperties": false
+                    }
+                },
+                "field_discarding": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id": {
+                                "type": "string"
+                            },
+                            "b_end": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": ["b_id"],
+                        "additionalProperties": false
+                    }
+                },
+                "fertilizers": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "p_id": {
+                                "type": "string"
+                            }
+                        },
+                        "required": ["p_id"],
+                        "additionalProperties": false
+                    }
+                },
+                "fertilizer_acquiring": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id_farm": {
+                                "type": "string"
+                            },
+                            "p_id": {
+                                "type": "string"
+                            },
+                            "p_acquiring_amount": {
+                                "type": ["number", "null"]
+                            },
+                            "p_acquiring_date": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": ["b_id_farm", "p_id"],
+                        "additionalProperties": false
+                    }
+                },
+                "fertilizer_applying": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "p_app_id": {
+                                "type": "string"
+                            },
+                            "b_id": {
+                                "type": "string"
+                            },
+                            "p_id": {
+                                "type": "string"
+                            },
+                            "p_app_amount": {
+                                "type": ["number", "null"]
+                            },
+                            "p_app_method": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "enum": [
+                                            "slotted coulter",
+                                            "incorporation",
+                                            "incorporation 2 tracks",
+                                            "injection",
+                                            "shallow injection",
+                                            "spraying",
+                                            "broadcasting",
+                                            "spoke wheel",
+                                            "pocket placement",
+                                            "narrowband"
+                                        ]
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "p_app_date": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": ["p_app_id", "b_id", "p_id"],
+                        "additionalProperties": false
+                    }
+                },
+                "fertilizers_catalogue": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "p_id_catalogue": {
+                                "type": "string"
+                            },
+                            "p_source": {
+                                "type": "string"
+                            },
+                            "p_name_nl": {
+                                "type": "string"
+                            },
+                            "p_name_en": {
+                                "type": ["string", "null"]
+                            },
+                            "p_description": {
+                                "type": ["string", "null"]
+                            },
+                            "p_app_method_options": {
+                                "anyOf": [
+                                    {
+                                        "type": "array"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "p_dm": {
+                                "type": ["number", "null"]
+                            },
+                            "p_density": {
+                                "type": ["number", "null"]
+                            },
+                            "p_om": {
+                                "type": ["number", "null"]
+                            },
+                            "p_a": {
+                                "type": ["number", "null"]
+                            },
+                            "p_hc": {
+                                "type": ["number", "null"]
+                            },
+                            "p_eom": {
+                                "type": ["number", "null"]
+                            },
+                            "p_eoc": {
+                                "type": ["number", "null"]
+                            },
+                            "p_c_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_c_of": {
+                                "type": ["number", "null"]
+                            },
+                            "p_c_if": {
+                                "type": ["number", "null"]
+                            },
+                            "p_c_fr": {
+                                "type": ["number", "null"]
+                            },
+                            "p_cn_of": {
+                                "type": ["number", "null"]
+                            },
+                            "p_n_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_n_if": {
+                                "type": ["number", "null"]
+                            },
+                            "p_n_of": {
+                                "type": ["number", "null"]
+                            },
+                            "p_n_wc": {
+                                "type": ["number", "null"]
+                            },
+                            "p_no3_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_nh4_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_p_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_k_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_mg_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_ca_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_ne": {
+                                "type": ["number", "null"]
+                            },
+                            "p_s_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_s_wc": {
+                                "type": ["number", "null"]
+                            },
+                            "p_cu_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_zn_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_na_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_si_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_b_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_mn_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_ni_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_fe_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_mo_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_co_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_as_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_cd_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_cr_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_cr_vi": {
+                                "type": ["number", "null"]
+                            },
+                            "p_pb_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_hg_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_cl_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "p_ef_nh3": {
+                                "type": ["number", "null"]
+                            },
+                            "p_type_manure": {
+                                "type": ["boolean", "null"]
+                            },
+                            "p_type_mineral": {
+                                "type": ["boolean", "null"]
+                            },
+                            "p_type_compost": {
+                                "type": ["boolean", "null"]
+                            },
+                            "p_type_rvo": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "enum": [
+                                            "10",
+                                            "11",
+                                            "12",
+                                            "13",
+                                            "14",
+                                            "17",
+                                            "18",
+                                            "19",
+                                            "23",
+                                            "25",
+                                            "26",
+                                            "27",
+                                            "30",
+                                            "31",
+                                            "32",
+                                            "33",
+                                            "35",
+                                            "39",
+                                            "40",
+                                            "41",
+                                            "42",
+                                            "43",
+                                            "46",
+                                            "50",
+                                            "56",
+                                            "60",
+                                            "61",
+                                            "75",
+                                            "76",
+                                            "80",
+                                            "81",
+                                            "90",
+                                            "91",
+                                            "92",
+                                            "95",
+                                            "96",
+                                            "97",
+                                            "98",
+                                            "99",
+                                            "100",
+                                            "101",
+                                            "102",
+                                            "103",
+                                            "104",
+                                            "105",
+                                            "106",
+                                            "107",
+                                            "108",
+                                            "109",
+                                            "110",
+                                            "111",
+                                            "112",
+                                            "113",
+                                            "114",
+                                            "115",
+                                            "116",
+                                            "117",
+                                            "120"
+                                        ]
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "hash": {
+                                "type": ["string", "null"]
+                            }
+                        },
+                        "required": ["p_id_catalogue", "p_source", "p_name_nl"],
+                        "additionalProperties": false
+                    }
+                },
+                "fertilizer_picking": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "p_id": {
+                                "type": "string"
+                            },
+                            "p_id_catalogue": {
+                                "type": "string"
+                            },
+                            "p_picking_date": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": ["p_id", "p_id_catalogue"],
+                        "additionalProperties": false
+                    }
+                },
+                "cultivations": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_lu": {
+                                "type": "string"
+                            },
+                            "b_lu_catalogue": {
+                                "type": "string"
+                            },
+                            "b_lu_variety": {
+                                "type": ["string", "null"]
+                            }
+                        },
+                        "required": ["b_lu", "b_lu_catalogue"],
+                        "additionalProperties": false
+                    }
+                },
+                "cultivation_starting": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id": {
+                                "type": "string"
+                            },
+                            "b_lu": {
+                                "type": "string"
+                            },
+                            "b_lu_start": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "b_sowing_amount": {
+                                "type": ["number", "null"]
+                            },
+                            "b_sowing_method": {
+                                "type": ["string", "null"]
+                            }
+                        },
+                        "required": ["b_id", "b_lu"],
+                        "additionalProperties": false
+                    }
+                },
+                "cultivations_catalogue": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_lu_catalogue": {
+                                "type": "string"
+                            },
+                            "b_lu_source": {
+                                "type": "string"
+                            },
+                            "b_lu_name": {
+                                "type": "string"
+                            },
+                            "b_lu_name_en": {
+                                "type": ["string", "null"]
+                            },
+                            "b_lu_harvestable": {
+                                "type": "string",
+                                "enum": ["none", "once", "multiple"]
+                            },
+                            "b_lu_harvestcat": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "enum": [
+                                            "HC010",
+                                            "HC020",
+                                            "HC031",
+                                            "HC040",
+                                            "HC041",
+                                            "HC042",
+                                            "HC050"
+                                        ]
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "b_lu_hcat3": {
+                                "type": ["string", "null"]
+                            },
+                            "b_lu_hcat3_name": {
+                                "type": ["string", "null"]
+                            },
+                            "b_lu_croprotation": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "enum": [
+                                            "other",
+                                            "clover",
+                                            "nature",
+                                            "potato",
+                                            "grass",
+                                            "rapeseed",
+                                            "starch",
+                                            "maize",
+                                            "cereal",
+                                            "sugarbeet",
+                                            "alfalfa",
+                                            "catchcrop"
+                                        ]
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "b_lu_yield": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_dm": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_hi": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_n_harvestable": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_n_residue": {
+                                "type": ["number", "null"]
+                            },
+                            "b_n_fixation": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_eom": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_eom_residues": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_rest_oravib": {
+                                "type": ["boolean", "null"]
+                            },
+                            "b_lu_variety_options": {
+                                "anyOf": [
+                                    {
+                                        "type": "array"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "b_lu_start_default": {
+                                "type": ["string", "null"]
+                            },
+                            "b_date_harvest_default": {
+                                "type": ["string", "null"]
+                            },
+                            "hash": {
+                                "type": ["string", "null"]
+                            }
+                        },
+                        "required": [
+                            "b_lu_catalogue",
+                            "b_lu_source",
+                            "b_lu_name",
+                            "b_lu_harvestable"
+                        ],
+                        "additionalProperties": false
+                    }
+                },
+                "harvestables": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id_harvestable": {
+                                "type": "string"
+                            }
+                        },
+                        "required": ["b_id_harvestable"],
+                        "additionalProperties": false
+                    }
+                },
+                "harvestable_sampling": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id_harvestable": {
+                                "type": "string"
+                            },
+                            "b_id_harvestable_analysis": {
+                                "type": "string"
+                            },
+                            "b_sampling_date": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "b_id_harvestable",
+                            "b_id_harvestable_analysis"
+                        ],
+                        "additionalProperties": false
+                    }
+                },
+                "harvestable_analyses": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id_harvestable_analysis": {
+                                "type": "string"
+                            },
+                            "b_lu_yield": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_yield_fresh": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_yield_bruto": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_tarra": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_dm": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_moist": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_uww": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_cp": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_n_harvestable": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_n_residue": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_p_harvestable": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_p_residue": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_k_harvestable": {
+                                "type": ["number", "null"]
+                            },
+                            "b_lu_k_residue": {
+                                "type": ["number", "null"]
+                            }
+                        },
+                        "required": ["b_id_harvestable_analysis"],
+                        "additionalProperties": false
+                    }
+                },
+                "cultivation_harvesting": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id_harvesting": {
+                                "type": "string"
+                            },
+                            "b_id_harvestable": {
+                                "type": "string"
+                            },
+                            "b_lu": {
+                                "type": "string"
+                            },
+                            "b_lu_harvest_date": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": [
+                            "b_id_harvesting",
+                            "b_id_harvestable",
+                            "b_lu"
+                        ],
+                        "additionalProperties": false
+                    }
+                },
+                "cultivation_ending": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_lu": {
+                                "type": "string"
+                            },
+                            "b_lu_end": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "m_cropresidue": {
+                                "type": ["boolean", "null"]
+                            }
+                        },
+                        "required": ["b_lu"],
+                        "additionalProperties": false
+                    }
+                },
+                "soil_analysis": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "a_id": {
+                                "type": "string"
+                            },
+                            "a_date": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "a_source": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "enum": [
+                                            "nl-rva-l122",
+                                            "nl-rva-l136",
+                                            "nl-rva-l264",
+                                            "nl-rva-l320",
+                                            "nl-rva-l335",
+                                            "nl-rva-l610",
+                                            "nl-rva-l648",
+                                            "nl-rva-l697",
+                                            "nl-other-nmi",
+                                            "other"
+                                        ]
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "a_al_ox": {
+                                "type": ["number", "null"]
+                            },
+                            "a_c_of": {
+                                "type": ["number", "null"]
+                            },
+                            "a_ca_co": {
+                                "type": ["number", "null"]
+                            },
+                            "a_ca_co_po": {
+                                "type": ["number", "null"]
+                            },
+                            "a_caco3_if": {
+                                "type": ["number", "null"]
+                            },
+                            "a_cec_co": {
+                                "type": ["number", "null"]
+                            },
+                            "a_clay_mi": {
+                                "type": ["number", "null"]
+                            },
+                            "a_cn_fr": {
+                                "type": ["number", "null"]
+                            },
+                            "a_com_fr": {
+                                "type": ["number", "null"]
+                            },
+                            "a_cu_cc": {
+                                "type": ["number", "null"]
+                            },
+                            "a_density_sa": {
+                                "type": ["number", "null"]
+                            },
+                            "a_fe_ox": {
+                                "type": ["number", "null"]
+                            },
+                            "a_k_cc": {
+                                "type": ["number", "null"]
+                            },
+                            "a_k_co": {
+                                "type": ["number", "null"]
+                            },
+                            "a_k_co_po": {
+                                "type": ["number", "null"]
+                            },
+                            "a_mg_cc": {
+                                "type": ["number", "null"]
+                            },
+                            "a_mg_co": {
+                                "type": ["number", "null"]
+                            },
+                            "a_mg_co_po": {
+                                "type": ["number", "null"]
+                            },
+                            "a_n_pmn": {
+                                "type": ["number", "null"]
+                            },
+                            "a_n_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "a_nh4_cc": {
+                                "type": ["number", "null"]
+                            },
+                            "a_nmin_cc": {
+                                "type": ["number", "null"]
+                            },
+                            "a_no3_cc": {
+                                "type": ["number", "null"]
+                            },
+                            "a_p_al": {
+                                "type": ["number", "null"]
+                            },
+                            "a_p_cc": {
+                                "type": ["number", "null"]
+                            },
+                            "a_p_ox": {
+                                "type": ["number", "null"]
+                            },
+                            "a_p_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "a_p_sg": {
+                                "type": ["number", "null"]
+                            },
+                            "a_p_wa": {
+                                "type": ["number", "null"]
+                            },
+                            "a_ph_cc": {
+                                "type": ["number", "null"]
+                            },
+                            "a_s_rt": {
+                                "type": ["number", "null"]
+                            },
+                            "a_sand_mi": {
+                                "type": ["number", "null"]
+                            },
+                            "a_silt_mi": {
+                                "type": ["number", "null"]
+                            },
+                            "a_som_loi": {
+                                "type": ["number", "null"]
+                            },
+                            "a_zn_cc": {
+                                "type": ["number", "null"]
+                            },
+                            "b_gwl_class": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "enum": [
+                                            "I",
+                                            "Ia",
+                                            "Ic",
+                                            "II",
+                                            "IIa",
+                                            "IIb",
+                                            "IIc",
+                                            "III",
+                                            "IIIa",
+                                            "IIIb",
+                                            "IV",
+                                            "IVu",
+                                            "IVc",
+                                            "V",
+                                            "Va",
+                                            "Vao",
+                                            "Vad",
+                                            "Vb",
+                                            "Vbo",
+                                            "Vbd",
+                                            "sV",
+                                            "sVb",
+                                            "VI",
+                                            "VIo",
+                                            "VId",
+                                            "VII",
+                                            "VIIo",
+                                            "VIId",
+                                            "VIII",
+                                            "VIIIo",
+                                            "VIIId"
+                                        ]
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "b_soiltype_agr": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "enum": [
+                                            "moerige_klei",
+                                            "rivierklei",
+                                            "dekzand",
+                                            "zeeklei",
+                                            "dalgrond",
+                                            "veen",
+                                            "loess",
+                                            "duinzand",
+                                            "maasklei"
+                                        ]
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": ["a_id"],
+                        "additionalProperties": false
+                    }
+                },
+                "soil_sampling": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id_sampling": {
+                                "type": "string"
+                            },
+                            "b_id": {
+                                "type": "string"
+                            },
+                            "a_id": {
+                                "type": "string"
+                            },
+                            "a_depth_upper": {
+                                "type": ["number", "null"]
+                            },
+                            "a_depth_lower": {
+                                "type": ["number", "null"]
+                            },
+                            "b_sampling_date": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "b_sampling_geometry": {
+                                "anyOf": [
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {
+                                                "type": "string",
+                                                "const": "MultiPoint"
+                                            },
+                                            "coordinates": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "number"
+                                                    },
+                                                    "minItems": 2
+                                                }
+                                            }
+                                        },
+                                        "required": ["type", "coordinates"],
+                                        "additionalProperties": false
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": ["b_id_sampling", "b_id", "a_id"],
+                        "additionalProperties": false
+                    }
+                },
+                "derogations": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id_derogation": {
+                                "type": "string"
+                            }
+                        },
+                        "required": ["b_id_derogation"],
+                        "additionalProperties": false
+                    }
+                },
+                "derogation_applying": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id_farm": {
+                                "type": "string"
+                            },
+                            "b_id_derogation": {
+                                "type": "string"
+                            }
+                        },
+                        "required": ["b_id_farm", "b_id_derogation"],
+                        "additionalProperties": false
+                    }
+                },
+                "organic_certifications": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id_organic": {
+                                "type": "string"
+                            },
+                            "b_organic_traces": {
+                                "type": ["string", "null"]
+                            },
+                            "b_organic_skal": {
+                                "type": ["string", "null"]
+                            },
+                            "b_organic_issued": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "b_organic_expires": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "required": ["b_id_organic"],
+                        "additionalProperties": false
+                    }
+                },
+                "organic_certifications_holding": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id_farm": {
+                                "type": "string"
+                            },
+                            "b_id_organic": {
+                                "type": "string"
+                            }
+                        },
+                        "required": ["b_id_farm", "b_id_organic"],
+                        "additionalProperties": false
+                    }
+                },
+                "intending_grazing": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id_farm": {
+                                "type": "string"
+                            },
+                            "b_grazing_intention": {
+                                "type": ["boolean", "null"]
+                            }
+                        },
+                        "required": ["b_id_farm"],
+                        "additionalProperties": false
+                    }
+                },
+                "fertilizer_catalogue_enabling": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id_farm": {
+                                "type": "string"
+                            },
+                            "p_source": {
+                                "type": "string"
+                            }
+                        },
+                        "required": ["b_id_farm", "p_source"],
+                        "additionalProperties": false
+                    }
+                },
+                "cultivation_catalogue_selecting": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "b_id_farm": {
+                                "type": "string"
+                            },
+                            "b_lu_source": {
+                                "type": "string"
+                            }
+                        },
+                        "required": ["b_id_farm", "b_lu_source"],
+                        "additionalProperties": false
+                    }
+                }
+            },
+            "required": [
+                "meta",
+                "farm",
+                "fields",
+                "field_acquiring",
+                "field_discarding",
+                "fertilizers",
+                "fertilizer_acquiring",
+                "fertilizer_applying",
+                "fertilizers_catalogue",
+                "fertilizer_picking",
+                "cultivations",
+                "cultivation_starting",
+                "cultivations_catalogue",
+                "harvestables",
+                "harvestable_sampling",
+                "harvestable_analyses",
+                "cultivation_harvesting",
+                "cultivation_ending",
+                "soil_analysis",
+                "soil_sampling",
+                "derogations",
+                "derogation_applying",
+                "organic_certifications",
+                "organic_certifications_holding",
+                "intending_grazing",
+                "fertilizer_catalogue_enabling",
+                "cultivation_catalogue_selecting"
+            ],
+            "additionalProperties": false
+        }
+    }
+}

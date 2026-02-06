@@ -34,6 +34,8 @@
         "coverage": "dotenvx run -- vitest run --coverage",
         "db:generate-authn": "pnpm dlx @better-auth/cli generate --config /src/db/generator/authn.ts --output ./src/db/schema-authn.ts --y",
         "db:generate": "npx drizzle-kit generate",
+        "generate:schemas": "tsx src/exchange/generate-schema.ts",
+        "check:schemas": "tsx src/exchange/schema-sync.ts",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
         "dotenvx": "dotenvx",
         "build": "dotenvx run -- rollup -c && tsc -p tsconfig.build.json",
@@ -57,6 +59,7 @@
         "rollup": "catalog:",
         "rollup-plugin-esbuild": "catalog:",
         "rollup-plugin-polyfill-node": "catalog:",
+        "tsx": "^4.21.0",
         "typedoc": "catalog:",
         "typedoc-plugin-missing-exports": "catalog:",
         "typescript": "catalog:",
@@ -69,10 +72,13 @@
         "better-auth": "catalog:",
         "decimal.js": "^10.6.0",
         "drizzle-orm": "catalog:",
+        "drizzle-zod": "^0.8.3",
         "nanoid": "^5.1.6",
         "postgres": "^3.4.8",
         "safe-stable-stringify": "^2.5.0",
-        "unique-username-generator": "^1.5.1"
+        "unique-username-generator": "^1.5.1",
+        "zod": "3.25.1",
+        "zod-to-json-schema": "^3.25.1"
     },
     "packageManager": "pnpm@10.28.1",
     "publishConfig": {

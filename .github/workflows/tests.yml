@@ -73,6 +73,10 @@ jobs:
         run: pnpm build
         working-directory: ./fdm-core
 
+      - name: Check exchange schema sync
+        run: pnpm check:schemas
+        working-directory: ./fdm-core
+
       - name: Run tests with coverage
         run: pnpm test-coverage
         working-directory: ./fdm-core
