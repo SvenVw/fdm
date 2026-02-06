@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm"
-import { beforeEach, describe, expect, inject, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, inject, it } from "vitest"
 import * as schema from "./db/schema"
 import { addFarm } from "./farm"
+import { closeFdm } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { createId } from "./id"
@@ -40,6 +41,10 @@ describe("Organic Certifications", () => {
             farmAddress,
             farmPostalCode,
         )
+    })
+
+    afterEach(async () => {
+        await closeFdm(fdm)
     })
 
     it("should add a new organic certification", async () => {

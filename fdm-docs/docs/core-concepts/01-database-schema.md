@@ -6,6 +6,8 @@ This document provides a comprehensive overview of the Farm Data Model (FDM) dat
 
 FDM uses a relational database to store its data. The schema is defined using TypeScript and then translated into a physical database schema using a tool called an **Object-Relational Mapper (ORM)**.
 
+For information on how this relational data is exported and imported as a portable file, see the [JSON Exchange Format](../data-exchange/json-schema).
+
 > **What is an ORM?**
 >
 > An ORM is a library that provides a way to interact with a database using an object-oriented programming language. It maps the tables in a database to classes in the code, and the rows in those tables to instances of those classes. This allows developers to work with the database in a more intuitive and natural way, without having to write raw SQL queries.

@@ -1,5 +1,5 @@
 import { eq, sql } from "drizzle-orm"
-import { afterAll, beforeEach, describe, expect, inject, it } from "vitest"
+import { afterAll, afterEach, beforeEach, describe, expect, inject, it } from "vitest"
 import {
     enableCultivationCatalogue,
     enableFertilizerCatalogue,
@@ -17,7 +17,8 @@ import {
 } from "./cultivation"
 import * as schema from "./db/schema"
 import { addFarm } from "./farm"
-import type { FdmType } from "./fdm"
+import { closeFdm } from "./fdm"
+import type { FdmType } from "./fdm.d"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import {
@@ -92,6 +93,10 @@ describe("Cultivation Data Model", () => {
             b_id_farm,
             b_lu_source,
         )
+    })
+
+    afterEach(async () => {
+        await closeFdm(fdm)
     })
 
     afterAll(async () => {
@@ -1449,6 +1454,10 @@ describe("Cultivation Data Model", () => {
             )
         })
 
+        afterEach(async () => {
+            await closeFdm(fdm)
+        })
+
         it("should get cultivation plan for a farm", async () => {
             const p_app_id1 = await addFertilizerApplication(
                 fdm,
@@ -2074,6 +2083,10 @@ describe("buildCultivationTimeframeCondition", () => {
             b_lu_eom_residues: null,
             b_date_harvest_default: "09-15",
         })
+    })
+
+    afterEach(async () => {
+        await closeFdm(fdm)
     })
 
     // Test cases for buildCultivationTimeframeCondition (via getCultivations)

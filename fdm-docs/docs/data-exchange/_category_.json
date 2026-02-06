@@ -1,0 +1,8 @@
+{
+    "label": "Data Exchange",
+    "position": 6,
+    "link": {
+        "type": "generated-index",
+        "description": "Overview of data import and export capabilities in the Farm Data Model."
+    }
+}

@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, inject, it } from "vitest"
+import { afterAll, beforeAll, describe, expect, inject, it } from "vitest"
 import {
     addDerogation,
     isDerogationGrantedForYear,
@@ -6,6 +6,7 @@ import {
     removeDerogation,
 } from "./derogation"
 import { addFarm } from "./farm"
+import { closeFdm } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { createId } from "./id"
@@ -32,6 +33,10 @@ describe("Derogation Functions", () => {
             "123 Farm Lane",
             "12345",
         )
+    })
+
+    afterAll(async () => {
+        await closeFdm(fdm)
     })
 
     describe("addDerogation", () => {

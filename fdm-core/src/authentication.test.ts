@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm"
-import { beforeAll, beforeEach, describe, expect, inject, it } from "vitest"
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, inject, it } from "vitest"
 import type { FdmAuth } from "./authentication"
 import {
     createDisplayUsername,
@@ -8,6 +8,7 @@ import {
     updateUserProfile,
 } from "./authentication"
 import * as authNSchema from "./db/schema-authn"
+import { closeFdm } from "./fdm"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import { createId } from "./id"
@@ -36,6 +37,10 @@ describe("createFdmAuth", () => {
         const password = inject("password")
         const database = inject("database")
         fdm = createFdmServer(host, port, user, password, database)
+    })
+
+    afterEach(async () => {
+        await closeFdm(fdm)
     })
 
     it("should create an auth instance with the correct database adapter", () => {
@@ -81,6 +86,10 @@ describe("updateUserProfile", () => {
             .returning({ id: authNSchema.user.id })
 
         userId = insertResult[0].id
+    })
+
+    afterAll(async () => {
+        await closeFdm(fdm)
     })
 
     it("should update user profile information", async () => {

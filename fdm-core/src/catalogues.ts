@@ -10,7 +10,6 @@ import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import type { FdmServerType } from "./fdm-server.d"
 
 /**
  * Gets all enabled fertilizer catalogues for a farm.
@@ -380,7 +379,7 @@ async function syncFertilizerCatalogue(fdm: FdmType) {
     const baatCatalogue = await getFertilizersCatalogue("baat")
     const fertilizersCatalogue = [...srmCatalogue, ...baatCatalogue]
 
-    await fdm.transaction(async (tx: FdmServerType) => {
+    await fdm.transaction(async (tx: FdmType) => {
         try {
             for (const item of fertilizersCatalogue) {
                 const hash = await hashFertilizer(item)
@@ -428,7 +427,7 @@ async function syncFertilizerCatalogue(fdm: FdmType) {
 async function syncCultivationCatalogue(fdm: FdmType) {
     const brpCatalogue = await getCultivationCatalogue("brp")
 
-    await fdm.transaction(async (tx: FdmServerType) => {
+    await fdm.transaction(async (tx: FdmType) => {
         try {
             for (const item of brpCatalogue) {
                 const hash = await hashCultivation(item)

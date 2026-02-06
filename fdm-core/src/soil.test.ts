@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm"
-import { beforeEach, describe, expect, inject, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, inject, it } from "vitest"
 import * as schema from "./db/schema"
 import { addFarm } from "./farm"
+import { closeFdm } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField } from "./field"
@@ -76,6 +77,10 @@ describe("Soil Analysis Functions", () => {
             acquiringMethod,
             DiscardingDate,
         )
+    })
+
+    afterEach(async () => {
+        await closeFdm(fdm)
     })
 
     it("should add a new soil analysis", async () => {

@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm"
-import { beforeAll, describe, expect, inject, it } from "vitest"
+import { afterAll, beforeAll, describe, expect, inject, it } from "vitest"
 import { type BetterAuth, createFdmAuth } from "./authentication"
 import * as authNSchema from "./db/schema-authn"
+import { closeFdm } from "./fdm"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import { createId } from "./id"
@@ -73,6 +74,10 @@ describe("Principals", () => {
             role: "owner",
             createdAt: new Date(),
         })
+    })
+
+    afterAll(async () => {
+        await closeFdm(fdm)
     })
 
     describe("getPrincipal", () => {

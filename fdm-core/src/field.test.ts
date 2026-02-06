@@ -1,10 +1,11 @@
 import { eq } from "drizzle-orm"
-import { beforeEach, describe, expect, inject, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, inject, it } from "vitest"
 import { enableCultivationCatalogue } from "./catalogues"
 import { addCultivation, addCultivationToCatalogue } from "./cultivation"
 import * as schema from "./db/schema"
 import { addFarm } from "./farm"
-import type { FdmType } from "./fdm"
+import { closeFdm } from "./fdm"
+import type { FdmType } from "./fdm.d"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import {
@@ -36,6 +37,10 @@ describe("Farm Data Model", () => {
         principal_id = createId()
     })
 
+    afterEach(async () => {
+        await closeFdm(fdm)
+    })
+
     describe("Field CRUD", () => {
         let fdm: FdmType
         let principal_id: string
@@ -63,6 +68,10 @@ describe("Farm Data Model", () => {
                 farmAddress,
                 farmPostalCode,
             )
+        })
+
+        afterEach(async () => {
+            await closeFdm(fdm)
         })
 
         it("should add a new field", async () => {

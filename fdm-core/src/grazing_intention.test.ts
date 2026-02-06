@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, inject, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, inject, it } from "vitest"
 import { addFarm } from "./farm"
+import { closeFdm } from "./fdm"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import {
@@ -32,6 +33,10 @@ describe("Grazing Intention", () => {
             "321 Farm Road",
             "54321",
         )
+    })
+
+    afterEach(async () => {
+        await closeFdm(fdm)
     })
 
     describe("setGrazingIntention", () => {

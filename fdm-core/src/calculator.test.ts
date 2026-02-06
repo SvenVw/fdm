@@ -1,11 +1,12 @@
 import { and, eq } from "drizzle-orm"
-import { beforeEach, describe, expect, inject, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, inject, it, vi } from "vitest"
 import {
     generateCalculationHash,
     setCachedCalculation,
     withCalculationCache,
 } from "./calculator"
 import { calculationCache, calculationErrors } from "./db/schema-calculator"
+import { closeFdm } from "./fdm"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 
@@ -89,6 +90,10 @@ describe("withCalculationCache", () => {
         // Clear tables before each test
         await fdm.delete(calculationCache)
         await fdm.delete(calculationErrors)
+    })
+
+    afterEach(async () => {
+        await closeFdm(fdm)
     })
 
     it("should calculate if no cached result is present and cache the result", async () => {

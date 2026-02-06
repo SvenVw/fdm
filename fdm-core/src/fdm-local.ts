@@ -17,6 +17,10 @@ export function createFdmLocal(
             schema: schema,
         })
 
+        // Attach the client to the drizzle instance for closing
+        // @ts-ignore
+        db.$client = db._.session.client
+
         return db
     } catch (err) {
         throw handleError(err, "Exception for createFdmLocal", { backend })
