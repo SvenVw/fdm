@@ -76,7 +76,7 @@ function toStandardZod(value: any): z.ZodTypeAny {
             for (const [key, val] of Object.entries(inputShape)) {
                 shape[key] = toStandardZod(val)
             }
-            let obj = z.object(shape)
+            let obj: z.ZodObject<any, any, any> = z.object(shape)
             if (def.unknownKeys === "passthrough") {
                 obj = obj.passthrough()
             } else if (def.unknownKeys === "strict") {
@@ -214,7 +214,7 @@ export const fieldDiscardingSchema = createExchangeSchema(
     },
 )
 
-export const fertilizerSchema = createExchangeSchema(schema.fertilizers)
+// export const fertilizerSchema = createExchangeSchema(schema.fertilizers)
 
 export const fertilizerAcquiringSchema = createExchangeSchema(
     schema.fertilizerAcquiring,
@@ -337,7 +337,7 @@ export const exchangeSchema = z
         fields: z.array(fieldSchema),
         field_acquiring: z.array(fieldAcquiringSchema),
         field_discarding: z.array(fieldDiscardingSchema),
-        fertilizers: z.array(fertilizerSchema),
+        // fertilizers: z.array(fertilizerSchema),
         fertilizer_acquiring: z.array(fertilizerAcquiringSchema),
         fertilizer_applying: z.array(fertilizerApplicationSchema),
         fertilizers_catalogue: z.array(fertilizersCatalogueSchema),

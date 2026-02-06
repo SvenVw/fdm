@@ -166,19 +166,6 @@
                         "additionalProperties": false
                     }
                 },
-                "fertilizers": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "p_id": {
-                                "type": "string"
-                            }
-                        },
-                        "required": ["p_id"],
-                        "additionalProperties": false
-                    }
-                },
                 "fertilizer_acquiring": {
                     "type": "array",
                     "items": {
@@ -1300,7 +1287,6 @@
                 "fields",
                 "field_acquiring",
                 "field_discarding",
-                "fertilizers",
                 "fertilizer_acquiring",
                 "fertilizer_applying",
                 "fertilizers_catalogue",

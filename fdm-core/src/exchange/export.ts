@@ -1,5 +1,3 @@
-import { readFile } from "node:fs/promises"
-import { resolve } from "node:path"
 import { eq, inArray } from "drizzle-orm"
 import * as schema from "../db/schema"
 import { handleError } from "../error"
@@ -23,6 +21,8 @@ export async function exportFarm(
     fdm: FdmType,
     principal_id: string,
     b_id_farm: string,
+    applicationName: string,
+    applicationVersion: string,
 ): Promise<ExchangeData> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
@@ -189,50 +189,76 @@ export async function exportFarm(
                 }
             }
 
-            // Fertilizers
+            // --- Fertilizers Collection ---
+
+            // 1. Get all fertilizers explicitly picked by the farm
+            const fertilizerPicking = await tx
+                .select()
+                .from(schema.fertilizerPicking)
+                .where(
+                    inArray(
+                        schema.fertilizerPicking.p_id_catalogue,
+                        tx
+                            .select({
+                                id: schema.fertilizersCatalogue.p_id_catalogue,
+                            })
+                            .from(schema.fertilizersCatalogue)
+                            .where(
+                                eq(
+                                    schema.fertilizersCatalogue.p_source,
+                                    b_id_farm,
+                                ),
+                            )
+                            .union(
+                                tx
+                                    .select({
+                                        id: schema.fertilizerPicking
+                                            .p_id_catalogue,
+                                    })
+                                    .from(schema.fertilizerPicking),
+                            ) as any,
+                    ),
+                )
+
             const fertilizerAcquiring = await tx
                 .select()
                 .from(schema.fertilizerAcquiring)
                 .where(eq(schema.fertilizerAcquiring.b_id_farm, b_id_farm))
-
-            const acquiringPIds = fertilizerAcquiring.map(
-                (fa: schema.fertilizerAcquiringTypeSelect) => fa.p_id,
-            )
-            const appPIds = fertilizerApplication.map(
-                (fa: schema.fertilizerApplicationTypeSelect) => fa.p_id,
-            )
-            const allPIds = Array.from(new Set([...acquiringPIds, ...appPIds]))
-
-            let fertilizers: schema.fertilizersTypeSelect[] = []
-            let fertilizerPicking: schema.fertilizerPickingTypeSelect[] = []
-            const usedFertilizerCatalogueIds = new Set<string>()
-
-            if (allPIds.length > 0) {
-                fertilizers = await tx
-                    .select()
-                    .from(schema.fertilizers)
-                    .where(inArray(schema.fertilizers.p_id, allPIds))
-
-                fertilizerPicking = await tx
-                    .select()
-                    .from(schema.fertilizerPicking)
-                    .where(inArray(schema.fertilizerPicking.p_id, allPIds))
-
-                fertilizerPicking.forEach(
-                    (fp: schema.fertilizerPickingTypeSelect) => {
-                        usedFertilizerCatalogueIds.add(fp.p_id_catalogue)
-                    },
-                )
-            }
 
             const customFertilizersCatalogue = await tx
                 .select()
                 .from(schema.fertilizersCatalogue)
                 .where(eq(schema.fertilizersCatalogue.p_source, b_id_farm))
 
-            const customFertilizerCatalogueIds = customFertilizersCatalogue.map(
-                (c: schema.fertilizersCatalogueTypeSelect) => c.p_id_catalogue,
+            // IDs of fertilizers used in acquiring or application
+            const acquiringPIds = fertilizerAcquiring.map(
+                (f: { p_id: string }) => f.p_id,
             )
+            const appPIds = fertilizerApplication.map((f) => f.p_id)
+            const knownUsedPIds = Array.from(
+                new Set([...acquiringPIds, ...appPIds]),
+            )
+
+            let farmFertilizerPicking: schema.fertilizerPickingTypeSelect[] = []
+            if (knownUsedPIds.length > 0) {
+                farmFertilizerPicking = await tx
+                    .select()
+                    .from(schema.fertilizerPicking)
+                    .where(
+                        inArray(schema.fertilizerPicking.p_id, knownUsedPIds),
+                    )
+            }
+
+            // Collected Catalogue IDs
+            const usedFertilizerCatalogueIds = new Set<string>(
+                farmFertilizerPicking.map(
+                    (fp: { p_id_catalogue: string }) => fp.p_id_catalogue,
+                ),
+            )
+            const customFertilizerCatalogueIds = customFertilizersCatalogue.map(
+                (c: { p_id_catalogue: string }) => c.p_id_catalogue,
+            )
+
             const allFertilizerCatalogueIds = Array.from(
                 new Set([
                     ...usedFertilizerCatalogueIds,
@@ -254,22 +280,35 @@ export async function exportFarm(
                     )
             }
 
-            // Cultivations Catalogue
-            const usedCultivationCatalogueIds = new Set<string>()
-            cultivations.forEach((c: schema.cultivationsTypeSelect) => {
-                usedCultivationCatalogueIds.add(c.b_lu_catalogue)
-            })
+            // Now get all relevant 'fertilizers' table entries
+            // const allRelatedPIds = Array.from(new Set([
+            //     ...knownUsedPIds,
+            //     ...farmFertilizerPicking.map(fp => fp.p_id)
+            // ]))
+
+            // let fertilizers: schema.fertilizersTypeSelect[] = []
+            // if (allRelatedPIds.length > 0) {
+            //     fertilizers = await tx
+            //         .select()
+            //         .from(schema.fertilizers)
+            //         .where(inArray(schema.fertilizers.p_id, allRelatedPIds))
+            // }
+
+            // --- Cultivations Collection ---
 
             const customCultivationsCatalogue = await tx
                 .select()
                 .from(schema.cultivationsCatalogue)
                 .where(eq(schema.cultivationsCatalogue.b_lu_source, b_id_farm))
 
+            const usedCultivationCatalogueIds = new Set<string>(
+                cultivations.map((c) => c.b_lu_catalogue),
+            )
             const customCultivationCatalogueIds =
                 customCultivationsCatalogue.map(
-                    (c: schema.cultivationsCatalogueTypeSelect) =>
-                        c.b_lu_catalogue,
+                    (c: { b_lu_catalogue: string }) => c.b_lu_catalogue,
                 )
+
             const allCultivationCatalogueIds = Array.from(
                 new Set([
                     ...usedCultivationCatalogueIds,
@@ -348,13 +387,6 @@ export async function exportFarm(
                 .from(schema.intendingGrazing)
                 .where(eq(schema.intendingGrazing.b_id_farm, b_id_farm))
 
-            const fertilizerCatalogueEnabling = await tx
-                .select()
-                .from(schema.fertilizerCatalogueEnabling)
-                .where(
-                    eq(schema.fertilizerCatalogueEnabling.b_id_farm, b_id_farm),
-                )
-
             const cultivationCatalogueSelecting = await tx
                 .select()
                 .from(schema.cultivationCatalogueSelecting)
@@ -365,25 +397,26 @@ export async function exportFarm(
                     ),
                 )
 
+            const fertilizerCatalogueEnabling = await tx
+                .select()
+                .from(schema.fertilizerCatalogueEnabling)
+                .where(
+                    eq(schema.fertilizerCatalogueEnabling.b_id_farm, b_id_farm),
+                )
+
             // Meta info
             const schemaVersion = await getLatestMigrationVersion()
-            const packageJsonRaw = await readFile(
-                resolve(process.cwd(), "package.json"),
-                "utf-8",
-            )
-            const packageJson = JSON.parse(packageJsonRaw)
-
             const exportData = {
                 meta: {
                     version: schemaVersion,
                     exportedAt: new Date().toISOString(),
-                    source: `${packageJson.name} v${packageJson.version}`,
+                    source: `${applicationName} ${applicationVersion}`,
                 },
                 farm,
                 fields,
                 field_acquiring: fieldAcquiring,
                 field_discarding: fieldDiscarding,
-                fertilizers,
+                // fertilizers,
                 fertilizer_acquiring: fertilizerAcquiring,
                 fertilizer_applying: fertilizerApplication,
                 fertilizers_catalogue: fertilizersCatalogue,

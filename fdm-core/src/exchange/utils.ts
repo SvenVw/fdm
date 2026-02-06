@@ -1,10 +1,19 @@
 import { readdir } from "node:fs/promises"
-import { resolve } from "node:path"
+import { dirname, resolve } from "node:path"
+import { fileURLToPath } from "node:url"
 import { zodToJsonSchema } from "zod-to-json-schema"
 import { exchangeSchema } from "./schemas"
 
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
 export const SCHEMAS_DIR = resolve(process.cwd(), "schemas")
-export const MIGRATIONS_DIR = resolve(process.cwd(), "src", "db", "migrations")
+
+// Robust migration directory resolution
+// 1. If in 'src/exchange/utils.ts' -> '../../src/db/migrations'
+// 2. If in 'dist/exchange/utils.js' -> '../db/migrations'
+export const MIGRATIONS_DIR = __dirname.includes("dist")
+    ? resolve(__dirname, "..", "db", "migrations")
+    : resolve(__dirname, "..", "..", "src", "db", "migrations")
 
 export async function getLatestMigrationVersion() {
     const files = await readdir(MIGRATIONS_DIR)
@@ -23,7 +32,8 @@ export async function getLatestMigrationVersion() {
 
 export function generateExchangeJsonSchema(versionNum: string) {
     const capitalizedVersion = `V${versionNum}`
-    const jsonSchema = zodToJsonSchema(exchangeSchema, {
+    // biome-ignore lint/suspicious/noExplicitAny: zod-to-json-schema types are not compatible with Zod 4 yet
+    const jsonSchema = zodToJsonSchema(exchangeSchema as any, {
         name: `FdmExchangeSchema${capitalizedVersion}`,
         target: "jsonSchema2019-09",
         definitionPath: "definitions",
