@@ -15,7 +15,9 @@ import {
     Sprout,
     Square,
     Trash2,
+    FileStack,
     UserRoundCheck,
+    PlusIcon,
 } from "lucide-react"
 import { useState } from "react"
 import {
@@ -96,7 +98,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fields = await getFields(fdm, session.principal_id, b_id_farm)
 
         // Calculate total area for this farm
-        const farmArea = fields.reduce((acc, field) => acc + field.b_area, 0)
+        const farmArea = fields.reduce(
+            (acc, field) => acc + (field.b_area ?? 0),
+            0,
+        )
 
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
@@ -385,6 +390,58 @@ export default function FarmDashboardIndex() {
                                             </div>
                                         </CardHeader>
                                     </Card>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="space-y-4">
+                                <h2 className="text-2xl font-semibold tracking-tight">
+                                    Acties
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <NavLink to={"soil-analysis/bulk"}>
+                                        <Card className="transition-all hover:shadow-md h-full">
+                                            <CardHeader>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="rounded-lg bg-muted p-3">
+                                                        <FileStack className="h-6 w-6 text-primary" />
+                                                    </div>
+                                                    <div>
+                                                        <CardTitle>
+                                                            Upload bodemanalyses
+                                                        </CardTitle>
+                                                        <CardDescription>
+                                                            Upload meerdere
+                                                            pdf's met
+                                                            bodemanalyses en
+                                                            koppel ze aan
+                                                            percelen.
+                                                        </CardDescription>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                        </Card>
+                                    </NavLink>
+                                    <NavLink to={`${calendar}/field/new`}>
+                                        <Card className="transition-all hover:shadow-md h-full">
+                                            <CardHeader>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="rounded-lg bg-muted p-3">
+                                                        <PlusIcon className="h-6 w-6 text-primary" />
+                                                    </div>
+                                                    <div>
+                                                        <CardTitle>
+                                                            Nieuwe percelen
+                                                        </CardTitle>
+                                                        <CardDescription>
+                                                            Voeg nieuwe percelen
+                                                            toe aan dit bedrijf.
+                                                        </CardDescription>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                        </Card>
+                                    </NavLink>
                                 </div>
                             </div>
                         </div>
