@@ -807,10 +807,17 @@ export async function action({ request }: ActionFunctionArgs) {
             null,
             null,
         )
-        if (year < 2026 && has_derogation && derogation_start_year) {
+
+        const isDerogationAllowed = year < 2026
+        const effectiveHasDerogation = isDerogationAllowed && has_derogation
+        const effectiveDerogationStartYear = isDerogationAllowed
+            ? derogation_start_year
+            : undefined
+
+        if (effectiveHasDerogation && effectiveDerogationStartYear) {
             const years = Array.from(
-                { length: 2025 - derogation_start_year + 1 },
-                (_, i) => derogation_start_year + i,
+                { length: 2025 - effectiveDerogationStartYear + 1 },
+                (_, i) => effectiveDerogationStartYear + i,
             )
             await Promise.all(
                 years.map((year) =>
