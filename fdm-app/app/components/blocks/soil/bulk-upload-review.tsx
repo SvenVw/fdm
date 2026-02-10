@@ -45,7 +45,7 @@ export type ProcessedAnalysis = {
     a_nmin_cc?: number
     a_source: string
     matchedFieldId?: string
-    data: any // Raw parsed data
+    data: Record<string, unknown> // Raw parsed data
 }
 
 type Field = {
