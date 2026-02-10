@@ -117,22 +117,22 @@ export function BulkSoilAnalysisReview({
             header: "Parameters",
             cell: ({ row }) => (
                 <div className="flex flex-wrap gap-1">
-                    {row.original.a_som_loi !== undefined && (
+                    {row.original.a_som_loi != null && (
                         <Badge variant="secondary">
                             OS: {row.original.a_som_loi}%
                         </Badge>
                     )}
-                    {row.original.a_p_al !== undefined && (
+                    {row.original.a_p_al != null && (
                         <Badge variant="secondary">
                             P-AL: {row.original.a_p_al}
                         </Badge>
                     )}
-                    {row.original.a_p_cc !== undefined && (
+                    {row.original.a_p_cc != null && (
                         <Badge variant="secondary">
                             P-CaCl₂: {row.original.a_p_cc}
                         </Badge>
                     )}
-                    {row.original.a_nmin_cc !== undefined && (
+                    {row.original.a_nmin_cc != null && (
                         <Badge variant="secondary">
                             Nmin: {row.original.a_nmin_cc}
                         </Badge>
