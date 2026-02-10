@@ -546,10 +546,7 @@ export default function AddFarmPage() {
                                                                         </Field>
                                                                     )}
                                                                 />
-
-                                                                {form.watch(
-                                                                    "organic_certification",
-                                                                ) && (
+                                                                {organicCertified && (
                                                                     <div className="space-y-4 pt-2">
                                                                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                                                             <Controller
