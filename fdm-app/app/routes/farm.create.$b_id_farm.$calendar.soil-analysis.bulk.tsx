@@ -234,7 +234,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                                 )
                             }
                             // Strip UI-only properties before saving to DB
-                            const { id, location, ...dbAnalysis } = analysis
+                            const { id, location, a_source, ...dbAnalysis } = analysis
 
                             return addSoilAnalysis(
                                 fdm,
