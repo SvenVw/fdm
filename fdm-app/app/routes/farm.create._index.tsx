@@ -67,63 +67,71 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-const FormSchema = z.object({
-    b_name_farm: z
-        .string({
+const FormSchema = z
+    .object({
+        b_name_farm: z
+            .string({
+                error: (issue) =>
+                    issue.input === undefined
+                        ? "Naam van bedrijf is verplicht"
+                        : undefined,
+            })
+            .min(3, {
+                error: "Naam van bedrijf moet minimaal 3 karakters bevatten",
+            }),
+        year: z.coerce.number({
             error: (issue) =>
                 issue.input === undefined
-                    ? "Naam van bedrijf is verplicht"
-                    : undefined,
-        })
-        .min(3, {
-            error: "Naam van bedrijf moet minimaal 3 karakters bevatten",
+                    ? "Jaar is verplicht"
+                    : "Jaar moet een getal zijn",
         }),
-    year: z.coerce.number({
-        error: (issue) =>
-            issue.input === undefined
-                ? "Jaar is verplicht"
-                : "Jaar moet een getal zijn",
-    }),
-    b_businessid_farm: z
-        .string()
-        .regex(/^\d{8}$/, "KvK-nummer moet uit 8 cijfers bestaan")
-        .optional()
-        .or(z.literal("")),
-    has_derogation: z.coerce.boolean().default(false),
-    derogation_start_year: z.preprocess(
-        (val) => (val === "" ? undefined : val),
-        z.coerce
-            .number()
-            .min(2006, {
-                error: "Startjaar moet minimaal 2006 zijn",
-            })
-            .max(2025, {
-                error: "Startjaar mag maximaal 2025 zijn",
-            })
-            .optional(),
-    ),
-    grazing_intention: z.coerce.boolean().default(false),
-    organic_certification: z.coerce.boolean().default(false),
-    organic_skal: z
-        .string()
-        .trim()
-        .optional()
-        .refine((val) => !val || /^\d{6}$/.test(val), {
-            message: "Ongeldig SKAL-nummer",
-        }),
-    organic_traces: z
-        .string()
-        .trim()
-        .optional()
-        .refine(
-            (val) =>
-                !val || /^NL-BIO-\d{2}\.\d{3}-\d{7}\.\d{4}\.\d{3}$/.test(val),
-            {
-                message: "Ongeldig TRACES-nummer",
-            },
+        b_businessid_farm: z
+            .string()
+            .regex(/^\d{8}$/, "KvK-nummer moet uit 8 cijfers bestaan")
+            .optional()
+            .or(z.literal("")),
+        has_derogation: z.coerce.boolean().default(false),
+        derogation_start_year: z.preprocess(
+            (val) => (val === "" ? undefined : val),
+            z.coerce
+                .number()
+                .min(2006, {
+                    error: "Startjaar moet minimaal 2006 zijn",
+                })
+                .max(2025, {
+                    error: "Startjaar mag maximaal 2025 zijn",
+                })
+                .optional(),
         ),
-    organic_issued: z.coerce.date().optional(),
-})
+        grazing_intention: z.coerce.boolean().default(false),
+        organic_certification: z.coerce.boolean().default(false),
+        organic_skal: z.string().trim().optional(),
+        organic_traces: z.string().trim().optional(),
+        organic_issued: z.coerce.date().optional(),
+    })
+    .superRefine((data, ctx) => {
+        if (data.organic_certification) {
+            if (data.organic_skal && !/^\d{6}$/.test(data.organic_skal)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "Ongeldig SKAL-nummer",
+                    path: ["organic_skal"],
+                })
+            }
+            if (
+                data.organic_traces &&
+                !/^NL-BIO-\d{2}\.\d{3}-\d{7}\.\d{4}\.\d{3}$/.test(
+                    data.organic_traces,
+                )
+            ) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "Ongeldig TRACES-nummer",
+                    path: ["organic_traces"],
+                })
+            }
+        }
+    })
 
 type FormValues = z.infer<typeof FormSchema>
 
@@ -175,6 +183,14 @@ export default function AddFarmPage() {
             )
         }
     }, [organicCertified, selectedYear])
+
+    // Reset derogation when year >= 2026
+    // biome-ignore lint/correctness/useExhaustiveDependencies: form.setValue is stable
+    useEffect(() => {
+        if (Number(selectedYear) >= 2026) {
+            form.setValue("has_derogation", false)
+        }
+    }, [selectedYear])
 
     return (
         <SidebarInset>
@@ -814,58 +830,69 @@ export async function action({ request }: ActionFunctionArgs) {
             ? derogation_start_year
             : undefined
 
+        const setupPromises: Promise<unknown>[] = []
+
         if (effectiveHasDerogation && effectiveDerogationStartYear) {
             const years = Array.from(
                 { length: 2025 - effectiveDerogationStartYear + 1 },
                 (_, i) => effectiveDerogationStartYear + i,
             )
-            await Promise.all(
-                years.map((year) =>
-                    addDerogation(fdm, session.principal_id, b_id_farm, year),
+            setupPromises.push(
+                ...years.map((y) =>
+                    addDerogation(fdm, session.principal_id, b_id_farm, y),
                 ),
             )
         }
 
         if (grazing_intention) {
-            await setGrazingIntention(
-                fdm,
-                session.principal_id,
-                b_id_farm,
-                year,
-                true,
+            setupPromises.push(
+                setGrazingIntention(
+                    fdm,
+                    session.principal_id,
+                    b_id_farm,
+                    year,
+                    true,
+                ),
             )
         }
 
         if (organic_certification) {
-            await addOrganicCertification(
+            setupPromises.push(
+                addOrganicCertification(
+                    fdm,
+                    session.principal_id,
+                    b_id_farm,
+                    organic_traces || null,
+                    organic_skal || null,
+                    organic_issued ?? null,
+                    null,
+                ),
+            )
+        }
+
+        setupPromises.push(
+            enableFertilizerCatalogue(
                 fdm,
                 session.principal_id,
                 b_id_farm,
-                organic_traces || null,
-                organic_skal || null,
-                organic_issued ?? null,
-                null,
-            )
-        }
-        await enableFertilizerCatalogue(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            "baat",
+                "baat",
+            ),
+            enableFertilizerCatalogue(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+                b_id_farm,
+            ),
+            enableCultivationCatalogue(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+                "brp",
+            ),
         )
-        // Enable catalogue with custom user fertilizers
-        await enableFertilizerCatalogue(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            b_id_farm,
-        )
-        await enableCultivationCatalogue(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            "brp",
-        )
+
+        await Promise.all(setupPromises)
+
         const fertilizers = await getFertilizersFromCatalogue(
             fdm,
             session.principal_id,
