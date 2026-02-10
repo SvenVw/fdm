@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import {
     type ColumnDef,
     flexRender,
@@ -79,6 +79,18 @@ export function BulkSoilAnalysisReview({
     const handleFieldChange = (analysisId: string, fieldId: string) => {
         setMatches((prev) => ({ ...prev, [analysisId]: fieldId }))
     }
+
+    const validMatches = useMemo(
+        () =>
+            Object.entries(matches)
+                .filter(([analysisId, fieldId]) => {
+                    if (fieldId === "" || fieldId === "none") return false
+                    const analysis = analyses.find((a) => a.id === analysisId)
+                    return isValidDate(analysis?.b_sampling_date)
+                })
+                .map(([analysisId, fieldId]) => ({ analysisId, fieldId })),
+        [matches, analyses],
+    )
 
     const columns: ColumnDef<ProcessedAnalysis>[] = [
         {
@@ -208,14 +220,7 @@ export function BulkSoilAnalysisReview({
     })
 
     const handleSave = () => {
-        const result = Object.entries(matches)
-            .filter(([analysisId, fieldId]) => {
-                if (fieldId === "" || fieldId === "none") return false
-                const analysis = analyses.find((a) => a.id === analysisId)
-                return isValidDate(analysis?.b_sampling_date)
-            })
-            .map(([analysisId, fieldId]) => ({ analysisId, fieldId }))
-        onSave(result)
+        onSave(validMatches)
     }
 
     return (
@@ -312,18 +317,7 @@ export function BulkSoilAnalysisReview({
                 </Button>
                 <Button
                     onClick={handleSave}
-                    disabled={
-                        !Object.entries(matches).some(
-                            ([analysisId, fieldId]) => {
-                                if (fieldId === "" || fieldId === "none")
-                                    return false
-                                const analysis = analyses.find(
-                                    (a) => a.id === analysisId,
-                                )
-                                return isValidDate(analysis?.b_sampling_date)
-                            },
-                        )
-                    }
+                    disabled={validMatches.length === 0}
                 >
                     <Save className="mr-2 h-4 w-4" />
                     Opslaan & Koppelen
