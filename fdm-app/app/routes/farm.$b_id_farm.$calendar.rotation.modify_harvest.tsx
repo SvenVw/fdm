@@ -11,7 +11,6 @@ import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    redirect,
     useLoaderData,
 } from "react-router"
 import { dataWithWarning, redirectWithSuccess } from "remix-toast"
@@ -93,15 +92,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
         const calendar = getCalendar(params)
 
-        const harvestingIds = await getModifiableHarvestingIds(
+        const modifiableHarvestingIds = await getModifiableHarvestingIds(
             url,
             session.principal_id,
             b_id_harvesting,
         )
-        if (harvestingIds.length === 0) {
-            return redirect(`/farm/${b_id_farm}/${calendar}/rotation/`)
-        }
-
+        const harvestingIds = modifiableHarvestingIds.length
+            ? modifiableHarvestingIds
+            : b_id_harvesting.split(",")
         // Get selected harvest
         const harvest = await getHarvest(
             fdm,
@@ -137,7 +135,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm: b_id_farm,
             calendar: calendar,
             harvestParameters: harvestParameters,
-            harvestingWritePermission: true,
+            harvestingWritePermission:
+                harvestingIds === modifiableHarvestingIds,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -293,25 +292,29 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 ),
             )
 
-            return redirectWithSuccess(
-                `/farm/${b_id_farm}/${calendar}/rotation/`,
-                {
-                    message: "Oogst is gewijzigd! 🎉",
-                },
-            )
+            return redirectWithSuccess("..", {
+                message: "Oogst is gewijzigd! 🎉",
+            })
         }
         if (request.method === "DELETE") {
             const b_id_harvesting = params.b_id_harvesting
             if (!b_id_harvesting) {
                 throw new Error("missing: b_id_harvesting")
             }
-            await removeHarvest(fdm, session.principal_id, b_id_harvesting)
-            return redirectWithSuccess(
-                `/farm/${b_id_farm}/${calendar}/rotation/`,
-                {
-                    message: "Oogst is verwijderd! 🎉",
-                },
+            await fdm.transaction((tx) =>
+                Promise.all(
+                    harvestingIds.map((b_id_harvesting) =>
+                        removeHarvest(
+                            tx,
+                            session.principal_id,
+                            b_id_harvesting,
+                        ),
+                    ),
+                ),
             )
+            return redirectWithSuccess("..", {
+                message: "Oogst is verwijderd! 🎉",
+            })
         }
     } catch (error) {
         throw handleActionError(error)

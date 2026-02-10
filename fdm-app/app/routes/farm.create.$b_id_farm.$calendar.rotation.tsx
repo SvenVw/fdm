@@ -1,4 +1,4 @@
-import { type MetaFunction, NavLink, useLoaderData } from "react-router"
+import { type MetaFunction, NavLink, Outlet, useLoaderData } from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
@@ -105,6 +105,7 @@ export default function FarmCreateRotationIndex() {
                         </FarmContent>
                     </>
                 )}
+                <Outlet />
             </main>
         </>
     )
