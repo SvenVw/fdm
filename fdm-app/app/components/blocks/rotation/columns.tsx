@@ -57,7 +57,11 @@ export type FieldRow = {
     m_cropresidue_ending: [Date, boolean][]
     b_lu_variety: Record<string, number>
     b_lu_croprotation: string
-    b_lu_harvest_date: Date[]
+    harvests: {
+        b_lu: string
+        b_id_harvesting: string
+        b_lu_harvest_date: Date | null
+    }[]
     b_lu_harvestable: "once" | "multiple" | "none"
     calendar: string
     b_lu_start: Date[]
@@ -217,7 +221,7 @@ export const columns: ColumnDef<RotationExtended>[] = [
         enableHiding: true, // Enable hiding for mobile
         cell: ({ row }) => {
             const cultivation = row.original
-            return <HarvestDatesDisplay cultivation={cultivation} />
+            return <HarvestDatesDisplay row={cultivation} />
         },
     },
     {

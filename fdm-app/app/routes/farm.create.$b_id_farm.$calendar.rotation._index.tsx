@@ -7,11 +7,11 @@ import { columns } from "~/components/blocks/rotation/columns"
 import { DataTable } from "~/components/blocks/rotation/table"
 import { Button } from "~/components/ui/button"
 import { clientConfig } from "~/lib/config"
-import type { Route as UpstreamRoute } from "./+types/farm.$b_id_farm.$calendar.rotation._index"
+import type { Route as UpstreamRoute } from "./+types/farm.$b_id_farm.$calendar.rotation"
 import {
     action as originalAction,
     loader as originalLoader,
-} from "./farm.$b_id_farm.$calendar.rotation._index"
+} from "./farm.$b_id_farm.$calendar.rotation"
 
 // Meta
 export const meta: MetaFunction = () => {
