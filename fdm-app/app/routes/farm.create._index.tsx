@@ -181,6 +181,8 @@ export default function AddFarmPage() {
                 "organic_issued",
                 new Date(Number(selectedYear), 0, 1),
             )
+        } else if (!organicCertified) {
+            form.setValue("organic_issued", undefined)
         }
     }, [organicCertified, selectedYear])
 
