@@ -113,7 +113,7 @@ const FormSchema = z
         if (data.organic_certification) {
             if (data.organic_skal && !/^\d{6}$/.test(data.organic_skal)) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: "custom",
                     message: "Ongeldig SKAL-nummer",
                     path: ["organic_skal"],
                 })
@@ -125,7 +125,7 @@ const FormSchema = z
                 )
             ) {
                 ctx.addIssue({
-                    code: z.ZodIssueCode.custom,
+                    code: "custom",
                     message: "Ongeldig TRACES-nummer",
                     path: ["organic_traces"],
                 })
