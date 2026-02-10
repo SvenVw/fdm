@@ -50,7 +50,7 @@ export const meta: MetaFunction = () => {
  *
  * @throws {Error} If retrieving the session or fetching the farm data fails.
  */
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session
         const session = await getSession(request)
@@ -314,18 +314,20 @@ export default function AppIndex() {
                                                             </p>
                                                         )}
                                                     </div>
-                                                    {farm.b_businessid_farm && (
-                                                        <div className="flex items-center">
-                                                            <p className="text-muted-foreground">
-                                                                KvK-nummer:
-                                                            </p>
-                                                            <p className="font-medium ml-auto">
+                                                    <div className="flex items-center text-sm text-muted-foreground">
+                                                        <p>KvK-nummer:</p>
+                                                        {farm.b_businessid_farm ? (
+                                                            <p className="ml-auto">
                                                                 {
                                                                     farm.b_businessid_farm
                                                                 }
                                                             </p>
-                                                        </div>
-                                                    )}
+                                                        ) : (
+                                                            <p className="ml-auto">
+                                                                {"Onbekend"}
+                                                            </p>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </CardContent>
                                             <CardFooter>
