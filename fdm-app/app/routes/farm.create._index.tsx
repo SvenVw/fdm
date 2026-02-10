@@ -90,15 +90,18 @@ const FormSchema = z.object({
         .optional()
         .or(z.literal("")),
     has_derogation: z.coerce.boolean().default(false),
-    derogation_start_year: z.coerce
-        .number()
-        .min(2006, {
-            error: "Startjaar moet minimaal 2006 zijn",
-        })
-        .max(2025, {
-            error: "Startjaar mag maximaal 2025 zijn",
-        })
-        .optional(),
+    derogation_start_year: z.preprocess(
+        (val) => (val === "" ? undefined : val),
+        z.coerce
+            .number()
+            .min(2006, {
+                error: "Startjaar moet minimaal 2006 zijn",
+            })
+            .max(2025, {
+                error: "Startjaar mag maximaal 2025 zijn",
+            })
+            .optional(),
+    ),
     grazing_intention: z.coerce.boolean().default(false),
     organic_certification: z.coerce.boolean().default(false),
     organic_skal: z
