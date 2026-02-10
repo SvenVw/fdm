@@ -35,6 +35,12 @@ import type { SoilParameterDescription } from "@svenvw/fdm-core"
 import { format } from "date-fns/format"
 import { nl } from "date-fns/locale/nl"
 
+const isValidDate = (dateStr: string | undefined | null): boolean => {
+    if (!dateStr) return false
+    const d = new Date(dateStr)
+    return !Number.isNaN(d.getTime())
+}
+
 export type ProcessedAnalysis = {
     id: string
     filename: string
@@ -105,11 +111,10 @@ export function BulkSoilAnalysisReview({
             accessorKey: "b_sampling_date",
             header: "Datum",
             cell: ({ row }) => {
-                const date = row.original.b_sampling_date
-                    ? new Date(row.original.b_sampling_date)
-                    : undefined
-                if (!date || Number.isNaN(date.getTime())) return "-"
-                return format(date, "P", { locale: nl })
+                if (!isValidDate(row.original.b_sampling_date)) return "-"
+                return format(new Date(row.original.b_sampling_date), "P", {
+                    locale: nl,
+                })
             },
         },
         {
@@ -170,9 +175,7 @@ export function BulkSoilAnalysisReview({
             cell: ({ row }) => {
                 const match = matches[row.original.id]
                 const isMatched = match && match !== "none"
-                const isValid =
-                    row.original.b_sampling_date &&
-                    !Number.isNaN(new Date(row.original.b_sampling_date).getTime())
+                const isValid = isValidDate(row.original.b_sampling_date)
 
                 if (!isValid) {
                     return (
@@ -209,10 +212,7 @@ export function BulkSoilAnalysisReview({
             .filter(([analysisId, fieldId]) => {
                 if (fieldId === "" || fieldId === "none") return false
                 const analysis = analyses.find((a) => a.id === analysisId)
-                const isValid =
-                    analysis?.b_sampling_date &&
-                    !Number.isNaN(new Date(analysis.b_sampling_date).getTime())
-                return isValid
+                return isValidDate(analysis?.b_sampling_date)
             })
             .map(([analysisId, fieldId]) => ({ analysisId, fieldId }))
         onSave(result)
@@ -251,13 +251,9 @@ export function BulkSoilAnalysisReview({
                         <TableBody>
                             {table.getRowModel().rows?.length ? (
                                 table.getRowModel().rows.map((row) => {
-                                    const isValid =
-                                        row.original.b_sampling_date &&
-                                        !Number.isNaN(
-                                            new Date(
-                                                row.original.b_sampling_date,
-                                            ).getTime(),
-                                        )
+                                    const isValid = isValidDate(
+                                        row.original.b_sampling_date,
+                                    )
 
                                     return (
                                         <TableRow
@@ -272,8 +268,9 @@ export function BulkSoilAnalysisReview({
                                                     : ""
                                             }
                                         >
-                                            {row.getVisibleCells().map(
-                                                (cell) => (
+                                            {row
+                                                .getVisibleCells()
+                                                .map((cell) => (
                                                     <TableCell key={cell.id}>
                                                         {cell.column.id ===
                                                             "match" &&
@@ -290,8 +287,7 @@ export function BulkSoilAnalysisReview({
                                                             )
                                                         )}
                                                     </TableCell>
-                                                ),
-                                            )}
+                                                ))}
                                         </TableRow>
                                     )
                                 })
@@ -317,14 +313,16 @@ export function BulkSoilAnalysisReview({
                 <Button
                     onClick={handleSave}
                     disabled={
-                        !Object.entries(matches).some(([analysisId, fieldId]) => {
-                            if (fieldId === "" || fieldId === "none") return false
-                            const analysis = analyses.find((a) => a.id === analysisId)
-                            return (
-                                analysis?.b_sampling_date &&
-                                !Number.isNaN(new Date(analysis.b_sampling_date).getTime())
-                            )
-                        })
+                        !Object.entries(matches).some(
+                            ([analysisId, fieldId]) => {
+                                if (fieldId === "" || fieldId === "none")
+                                    return false
+                                const analysis = analyses.find(
+                                    (a) => a.id === analysisId,
+                                )
+                                return isValidDate(analysis?.b_sampling_date)
+                            },
+                        )
                     }
                 >
                     <Save className="mr-2 h-4 w-4" />
