@@ -712,7 +712,7 @@ export default function AddFarmPage() {
                                             Perceelseigenschappen:
                                         </strong>{" "}
                                         Check het hoofdgewas van de percelen,
-                                        markeer buffestroken en bekijk de
+                                        markeer bufferstroken en bekijk de
                                         geschatte bodemeigenschappen.
                                         <p className="text-xs text-muted-foreground italic pt-1">
                                             Tip: Je kunt de pdf's van je
@@ -725,7 +725,7 @@ export default function AddFarmPage() {
                                         <strong className="text-foreground">
                                             Bouwplan:
                                         </strong>{" "}
-                                        Hier vul je op gewasniveau de
+                                        Hier kun je op gewasniveau de
                                         bemestingen, oogsten en andere gegevens
                                         van je gewassen invullen.
                                         <p className="text-xs text-muted-foreground italic pt-1">
