@@ -60,8 +60,23 @@ function groupAndOrderHarvests(row: RotationExtended) {
     return entries.map((ent) => ent[1])
 }
 
+function combineRecords(records: HarvestRecordItem[]): HarvestRecordItem {
+    const timestamps = [
+        ...new Set(
+            records.flatMap((record) =>
+                record.dates.map((date) => date.getTime()),
+            ),
+        ),
+    ]
+    timestamps.sort()
+    return {
+        id: records[0].id,
+        dates: timestamps.map((timestamp) => new Date(timestamp)),
+        harvests: records.flatMap((record) => record.harvests),
+    }
+}
+
 function formatDateRange(dates: Date[]) {
-    console.log(dates)
     const firstDate = dates[0]
     const lastDate = dates[dates.length - 1]
     return firstDate.getTime() === lastDate.getTime()
@@ -108,15 +123,10 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
 
         if (harvestsByOrder.length > 1) {
             if (row.b_lu_harvestable === "once") {
-                const dates = harvestsByOrder.flatMap((reduced) =>
-                    reduced.dates.map((date) => date.getTime()),
-                )
-                dates.sort((a, b) => a - b)
+                const combined = combineRecords(harvestsByOrder)
                 return (
-                    <HarvestDatesDisplayButton record={harvestsByOrder[0]}>
-                        {formatDateRange(
-                            dates.map((timestamp) => new Date(timestamp)),
-                        )}
+                    <HarvestDatesDisplayButton record={combined}>
+                        {formatDateRange(combined.dates)}
                     </HarvestDatesDisplayButton>
                 )
             }
