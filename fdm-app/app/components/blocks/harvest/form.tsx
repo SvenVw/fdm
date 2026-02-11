@@ -34,6 +34,8 @@ import { Input } from "~/components/ui/input"
 import { Spinner } from "~/components/ui/spinner"
 import { getHarvestParameterLabel } from "./parameters"
 import { FormSchema } from "./schema"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale"
 
 type HarvestFormDialogProps = {
     harvestParameters: HarvestParameters
@@ -53,6 +55,7 @@ type HarvestFormDialogProps = {
     action?: string
     handleConfirmation?: (data: z.infer<typeof FormSchema>) => Promise<boolean>
     editable?: boolean
+    partial?: boolean
 }
 
 function useHarvestRemixForm({
@@ -70,6 +73,7 @@ function useHarvestRemixForm({
     b_lu_harvestable,
     b_lu_start,
     b_lu_end,
+    partial,
     handleConfirmation,
 }: HarvestFormDialogProps) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
@@ -88,6 +92,16 @@ function useHarvestRemixForm({
             ) {
                 return validation
             }
+            // If this was not a partial update and there were mandatory fields missing
+            if (!partial) {
+                if (!values.b_lu_harvest_date) {
+                    return {
+                        errors: {
+                            b_lu_harvest_date: "Selecteer een oogstdatum",
+                        },
+                    }
+                }
+            }
             // If submitting, handle the confirmation procedure
             // (it might just return true without a dialog)
             if (
@@ -99,41 +113,53 @@ function useHarvestRemixForm({
             }
             return validation
         },
-        defaultValues: {
-            b_lu_harvest_date: b_lu_harvest_date
-                ? new Date(b_lu_harvest_date)
-                : undefined,
-            b_lu_yield: harvestParameters.includes("b_lu_yield")
-                ? b_lu_yield
-                : undefined,
-            b_lu_yield_fresh: harvestParameters.includes("b_lu_yield_fresh")
-                ? b_lu_yield_fresh
-                : undefined,
-            b_lu_yield_bruto: harvestParameters.includes("b_lu_yield_bruto")
-                ? b_lu_yield_bruto
-                : undefined,
-            b_lu_tarra: harvestParameters.includes("b_lu_tarra")
-                ? b_lu_tarra
-                : undefined,
-            b_lu_dm: harvestParameters.includes("b_lu_dm")
-                ? b_lu_dm
-                : undefined,
-            b_lu_uww: harvestParameters.includes("b_lu_uww")
-                ? b_lu_uww
-                : undefined,
-            b_lu_moist: harvestParameters.includes("b_lu_moist")
-                ? b_lu_moist
-                : undefined,
-            b_lu_cp: harvestParameters.includes("b_lu_cp")
-                ? b_lu_cp
-                : undefined,
-            b_lu_n_harvestable: harvestParameters.includes("b_lu_n_harvestable")
-                ? b_lu_n_harvestable
-                : undefined,
-            b_lu_start: b_lu_start,
-            b_lu_end: b_lu_end,
-            b_lu_harvestable: b_lu_harvestable,
-        },
+        defaultValues: partial
+            ? {
+                  b_lu_start: b_lu_start,
+                  b_lu_end: b_lu_end,
+                  b_lu_harvestable: b_lu_harvestable,
+              }
+            : {
+                  b_lu_harvest_date: b_lu_harvest_date
+                      ? new Date(b_lu_harvest_date)
+                      : undefined,
+                  b_lu_yield: harvestParameters.includes("b_lu_yield")
+                      ? b_lu_yield
+                      : undefined,
+                  b_lu_yield_fresh: harvestParameters.includes(
+                      "b_lu_yield_fresh",
+                  )
+                      ? b_lu_yield_fresh
+                      : undefined,
+                  b_lu_yield_bruto: harvestParameters.includes(
+                      "b_lu_yield_bruto",
+                  )
+                      ? b_lu_yield_bruto
+                      : undefined,
+                  b_lu_tarra: harvestParameters.includes("b_lu_tarra")
+                      ? b_lu_tarra
+                      : undefined,
+                  b_lu_dm: harvestParameters.includes("b_lu_dm")
+                      ? b_lu_dm
+                      : undefined,
+                  b_lu_uww: harvestParameters.includes("b_lu_uww")
+                      ? b_lu_uww
+                      : undefined,
+                  b_lu_moist: harvestParameters.includes("b_lu_moist")
+                      ? b_lu_moist
+                      : undefined,
+                  b_lu_cp: harvestParameters.includes("b_lu_cp")
+                      ? b_lu_cp
+                      : undefined,
+                  b_lu_n_harvestable: harvestParameters.includes(
+                      "b_lu_n_harvestable",
+                  )
+                      ? b_lu_n_harvestable
+                      : undefined,
+                  b_lu_start: b_lu_start,
+                  b_lu_end: b_lu_end,
+                  b_lu_harvestable: b_lu_harvestable,
+              },
     })
 
     return form
@@ -144,10 +170,23 @@ function HarvestFields({
     harvestParameters,
     form,
     className,
+    partial,
+    b_lu_yield,
+    b_lu_yield_fresh,
+    b_lu_yield_bruto,
+    b_lu_tarra,
+    b_lu_uww,
+    b_lu_moist,
+    b_lu_dm,
+    b_lu_cp,
+    b_lu_n_harvestable,
 }: HarvestFormDialogProps & {
     form: ReturnType<typeof useHarvestRemixForm>
     className: React.ComponentProps<typeof FieldGroup>["className"]
 }) {
+    const formatted_b_lu_harvest_date = b_lu_harvest_date
+        ? format(new Date(b_lu_harvest_date), "PP", { locale: nl })
+        : undefined
     return (
         <FieldGroup className={cn("gap-5", className)}>
             <Controller
@@ -156,6 +195,13 @@ function HarvestFields({
                 render={({ field, fieldState }) => (
                     <DatePicker
                         label="Oogstdatum"
+                        placeholder={
+                            partial &&
+                            typeof b_lu_harvest_date !== "undefined" &&
+                            b_lu_harvest_date !== null
+                                ? `Voorbeeld uit de huidige: ${formatted_b_lu_harvest_date}`
+                                : undefined
+                        }
                         defaultValue={
                             b_lu_harvest_date instanceof Date
                                 ? b_lu_harvest_date
@@ -190,7 +236,11 @@ function HarvestFields({
                         </FieldLabel>
                         <Input
                             {...field}
-                            placeholder="Bv. 37500 kg / ha"
+                            placeholder={
+                                partial && Number.isFinite(b_lu_yield)
+                                    ? `Voorbeeld uit de huidige: ${b_lu_yield}`
+                                    : "Bv. 37500 kg / ha"
+                            }
                             aria-required="true"
                             aria-invalid={fieldState.invalid}
                             type="number"
@@ -221,7 +271,11 @@ function HarvestFields({
                         </FieldLabel>
                         <Input
                             {...field}
-                            placeholder="Bv. 37500 kg / ha"
+                            placeholder={
+                                partial && Number.isFinite(b_lu_yield_fresh)
+                                    ? `Voorbeeld uit de huidige: ${b_lu_yield_fresh} kg / ha`
+                                    : "Bv. 37500 kg / ha"
+                            }
                             aria-required="true"
                             aria-invalid={fieldState.invalid}
                             type="number"
@@ -251,7 +305,11 @@ function HarvestFields({
                         </FieldLabel>
                         <Input
                             {...field}
-                            placeholder="Bv. 37500 kg / ha"
+                            placeholder={
+                                partial && Number.isFinite(b_lu_yield_bruto)
+                                    ? `Voorbeeld uit de huidige: ${b_lu_yield_bruto} kg / ha`
+                                    : "Bv. 37500 kg / ha"
+                            }
                             aria-required="true"
                             aria-invalid={fieldState.invalid}
                             type="number"
@@ -282,7 +340,11 @@ function HarvestFields({
                         </FieldLabel>
                         <Input
                             {...field}
-                            placeholder="Bv. 5 %"
+                            placeholder={
+                                partial && Number.isFinite(b_lu_tarra)
+                                    ? `Voorbeeld uit de huidige: ${b_lu_tarra} %`
+                                    : "Bv. 5 %"
+                            }
                             aria-required="true"
                             aria-invalid={fieldState.invalid}
                             type="number"
@@ -312,7 +374,11 @@ function HarvestFields({
                         </FieldLabel>
                         <Input
                             {...field}
-                            placeholder="Bv. 850 g / kg"
+                            placeholder={
+                                partial && Number.isFinite(b_lu_dm)
+                                    ? `Voorbeeld uit de huidige: ${b_lu_dm} g / kg`
+                                    : "Bv. 850 g / kg"
+                            }
                             aria-required="true"
                             aria-invalid={fieldState.invalid}
                             type="number"
@@ -342,7 +408,11 @@ function HarvestFields({
                         </FieldLabel>
                         <Input
                             {...field}
-                            placeholder="Bv. 350 g / 5 kg"
+                            placeholder={
+                                partial && Number.isFinite(b_lu_uww)
+                                    ? `Voorbeeld uit de huidige: ${b_lu_uww} g / 5 kg`
+                                    : "Bv. 350 g / 5 kg"
+                            }
                             aria-required="true"
                             aria-invalid={fieldState.invalid}
                             type="number"
@@ -372,7 +442,11 @@ function HarvestFields({
                         </FieldLabel>
                         <Input
                             {...field}
-                            placeholder="Bv. 15 %"
+                            placeholder={
+                                partial && Number.isFinite(b_lu_moist)
+                                    ? `Voorbeeld uit de huidige: ${b_lu_moist} %`
+                                    : "Bv. 15 %"
+                            }
                             aria-required="true"
                             aria-invalid={fieldState.invalid}
                             type="number"
@@ -402,7 +476,11 @@ function HarvestFields({
                         </FieldLabel>
                         <Input
                             {...field}
-                            placeholder="Bv. 850 g / kg"
+                            placeholder={
+                                partial && Number.isFinite(b_lu_n_harvestable)
+                                    ? `Voorbeeld uit de huidige: ${b_lu_n_harvestable} g / kg`
+                                    : "Bv. 850 g / kg"
+                            }
                             aria-required="true"
                             aria-invalid={fieldState.invalid}
                             type="number"
@@ -432,7 +510,11 @@ function HarvestFields({
                         </FieldLabel>
                         <Input
                             {...field}
-                            placeholder="Bv. 170 g RE / kg DS"
+                            placeholder={
+                                partial && Number.isFinite(b_lu_cp)
+                                    ? `Voorbeeld uit de huidige: ${b_lu_cp} g RE / kg DS`
+                                    : "Bv. 170 g RE / kg DS"
+                            }
                             aria-required="true"
                             aria-invalid={fieldState.invalid}
                             type="number"

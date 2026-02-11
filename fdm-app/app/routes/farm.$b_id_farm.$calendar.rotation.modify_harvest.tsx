@@ -10,7 +10,7 @@ import {
     updateHarvest,
 } from "@svenvw/fdm-core"
 import { data, useLoaderData } from "react-router"
-import { dataWithWarning, redirectWithSuccess } from "remix-toast"
+import { redirectWithSuccess } from "remix-toast"
 import { HarvestFormDialog } from "~/components/blocks/harvest/form"
 import { getHarvestParameterLabel } from "~/components/blocks/harvest/parameters"
 import { FormSchema } from "~/components/blocks/harvest/schema"
@@ -146,6 +146,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
             harvestableAnalysis: harvestableAnalysis,
             harvestParameters: harvestParameters,
             harvestingWritePermission: modifiableHarvestingIds.length > 0,
+            partial: modifiableHarvestingIds.length > 1,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -184,6 +185,7 @@ export default function ModifyHarvestingDialog() {
             b_lu_start={loaderData.cultivation.b_lu_start}
             b_lu_end={loaderData.cultivation.b_lu_end}
             editable={loaderData.harvestingWritePermission}
+            partial={loaderData.partial}
         />
     )
 }
@@ -247,7 +249,7 @@ export async function action({ request, params }: Route.ActionArgs) {
             }
 
             // First, validate against the full FormSchema
-            const formValues = await extractFormValuesFromRequest(
+            const partialFormValues = await extractFormValuesFromRequest(
                 request,
                 FormSchema,
             )
@@ -257,59 +259,75 @@ export async function action({ request, params }: Route.ActionArgs) {
                 cultivation.b_lu_harvestcat,
             )
 
-            // Check if all required parameters are present
-            const missingParameters: string[] = []
-            for (const param of requiredHarvestParameters) {
-                if (
-                    (formValues as Record<string, any>)[param] === undefined ||
-                    (formValues as Record<string, any>)[param] === null
-                ) {
-                    missingParameters.push(param)
-                }
-            }
-            const missingParameterLabels = missingParameters.map((param) => {
-                return getHarvestParameterLabel(param)
-            })
-
-            if (missingParameters.length > 0) {
-                return dataWithWarning(
-                    {
-                        warning: `Missing required harvest parameters: ${missingParameters.join(
-                            ", ",
-                        )}`,
-                    },
-                    `Voor de volgende parameters ontbreekt een waarde: ${missingParameterLabels.join(
-                        ", ",
-                    )}`,
-                )
-            }
-
             // Filter form values to include only required parameters for updateHarvest
-            const harvestProperties: Record<string, any> = {}
+            const updatedHarvestProperties: Record<string, any> = {}
             for (const param of requiredHarvestParameters) {
-                if ((formValues as Record<string, any>)[param] !== undefined) {
-                    harvestProperties[param] = (
-                        formValues as Record<string, any>
-                    )[param]
+                if (partialFormValues[param] !== undefined) {
+                    updatedHarvestProperties[param] = partialFormValues[param]
                 }
             }
 
             await fdm.transaction((tx) =>
                 Promise.all(
-                    harvestingIds.map((b_id_harvesting) =>
-                        updateHarvest(
+                    harvestingIds.map(async (b_id_harvesting) => {
+                        const harvest = await getHarvest(
                             tx,
                             session.principal_id,
                             b_id_harvesting,
-                            formValues.b_lu_harvest_date,
-                            harvestProperties,
-                        ),
-                    ),
+                        )
+                        const b_lu_harvest_date =
+                            partialFormValues.b_lu_harvest_date ??
+                            harvest.b_lu_harvest_date
+                        const currentHarvestProperties: Partial<HarvestableAnalysis> =
+                            harvest.harvestable.harvestable_analyses.length
+                                ? harvest.harvestable.harvestable_analyses[0]
+                                : {}
+                        const finalHarvestProperties = {
+                            ...currentHarvestProperties,
+                            ...updatedHarvestProperties,
+                        }
+
+                        // Check if all required parameters are present
+                        const missingParameters: string[] = []
+                        for (const param of requiredHarvestParameters) {
+                            if (
+                                finalHarvestProperties[param] === undefined ||
+                                finalHarvestProperties[param] === null
+                            ) {
+                                missingParameters.push(param)
+                            }
+                        }
+
+                        if (missingParameters.length > 0) {
+                            const missingParameterLabels =
+                                missingParameters.map((param) => {
+                                    return getHarvestParameterLabel(param)
+                                })
+                            const statusText = `Voor de volgende parameters ontbreekt een waarde: ${missingParameterLabels.join(
+                                ", ",
+                            )}`
+                            throw data(statusText, {
+                                status: 422,
+                                statusText: statusText,
+                            })
+                        }
+
+                        return updateHarvest(
+                            tx,
+                            session.principal_id,
+                            b_id_harvesting,
+                            b_lu_harvest_date,
+                            finalHarvestProperties,
+                        )
+                    }),
                 ),
             )
 
             return redirectWithSuccess("..", {
-                message: "Oogst is gewijzigd! 🎉",
+                message:
+                    harvestingIds.length > 1
+                        ? "Oogsten zijn gewijzigd! 🎉"
+                        : "Oogst is gewijzigd! 🎉",
             })
         }
         if (request.method === "DELETE") {
@@ -325,7 +343,10 @@ export async function action({ request, params }: Route.ActionArgs) {
                 ),
             )
             return redirectWithSuccess("..", {
-                message: "Oogst is verwijderd! 🎉",
+                message:
+                    harvestingIds.length > 1
+                        ? "Oogsten zijn verwijderd! 🎉"
+                        : "Oogst is verwijderd! 🎉",
             })
         }
         throw data("Method not allowed", {
