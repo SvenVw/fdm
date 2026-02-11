@@ -183,9 +183,9 @@ export default function FarmFieldsOverviewBlock() {
 }
 
 /**
- * Handles form submissions to add a new harvest entry.
+ * Handles form submissions to modify multiple specified harvest entries.
  *
- * This function validates the presence of required route parameters (farm ID, field ID, and cultivation ID), retrieves the user session, and extracts harvest details from the submitted form based on a predefined schema. If all validations pass, it adds the new harvest and redirects to the cultivation overview with a success message.
+ * This function validates the presence of required route parameters (farm ID, field ID, and cultivation ID), retrieves the user session, and extracts harvest details from the submitted form based on a predefined schema. If all validations pass, it modifies the harvests whose ids are passed in the harvestIds search parameter, and redirects to the cultivation overview with a success message.
  *
  * @throws {Error} When any required parameter is missing or if an error occurs during form processing.
  */
