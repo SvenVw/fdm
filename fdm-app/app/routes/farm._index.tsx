@@ -151,7 +151,7 @@ export default function AppIndex() {
                                             <PlusCircle className="h-7 w-7" />
                                         </div>
                                         <CardTitle className="text-2xl text-left">
-                                            Bedrijf aamaken
+                                            Bedrijf aanmaken
                                         </CardTitle>
                                         <CardDescription className="text-base text-left">
                                             Beheer uw percelen en bereken
@@ -184,7 +184,7 @@ export default function AppIndex() {
                                             <li className="flex items-start gap-3">
                                                 <Check className="mt-1 h-4 w-4 shrink-0 text-primary" />
                                                 <span>
-                                                    <b>Gebruikruimte:</b> Houd
+                                                    <b>Gebruiksruimte:</b> Houd
                                                     uw gebruiksruimte voor
                                                     stikstof, dierlijke mest en
                                                     fosfaat in de gaten.
