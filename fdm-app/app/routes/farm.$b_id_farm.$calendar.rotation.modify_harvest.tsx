@@ -13,7 +13,11 @@ import {
     type MetaFunction,
     useLoaderData,
 } from "react-router"
-import { dataWithWarning, redirectWithSuccess } from "remix-toast"
+import {
+    dataWithWarning,
+    redirectWithError,
+    redirectWithSuccess,
+} from "remix-toast"
 import { HarvestFormDialog } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import { getSession } from "~/lib/auth.server"
@@ -211,7 +215,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
             b_id_harvesting,
         )
         if (harvestingIds.length === 0) {
-            return
+            throw data("Het is u niet toegestaan de oogsten te beheren.", {
+                status: 403,
+                statusText: "Het is u niet toegestaan de oogsten te beheren.",
+            })
         }
         const firstHarvest = await getHarvest(
             fdm,
@@ -297,10 +304,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             })
         }
         if (request.method === "DELETE") {
-            const b_id_harvesting = params.b_id_harvesting
-            if (!b_id_harvesting) {
-                throw new Error("missing: b_id_harvesting")
-            }
             await fdm.transaction((tx) =>
                 Promise.all(
                     harvestingIds.map((b_id_harvesting) =>
