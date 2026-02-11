@@ -9,26 +9,20 @@ import {
     removeHarvest,
     updateHarvest,
 } from "@svenvw/fdm-core"
-import {
-    type ActionFunctionArgs,
-    data,
-    type LoaderFunctionArgs,
-    type MetaFunction,
-    useLoaderData,
-} from "react-router"
+import { data, useLoaderData } from "react-router"
 import { dataWithWarning, redirectWithSuccess } from "remix-toast"
 import { HarvestFormDialog } from "~/components/blocks/harvest/form"
 import { getHarvestParameterLabel } from "~/components/blocks/harvest/parameters"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import { getSession } from "~/lib/auth.server"
-import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import type { Route } from "./+types/farm.$b_id_farm.$calendar.rotation.modify_harvest"
 
 // Meta
-export const meta: MetaFunction = () => {
+export const meta: Route.MetaFunction = () => {
     return [
         { title: `Oogst - Gewas - Perceel | ${clientConfig.name}` },
         {
@@ -71,7 +65,7 @@ async function getModifiableHarvestingIds(
  *
  * @throws {Response} If any required URL parameter is missing or if the specified cultivation is not found.
  */
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params }: Route.LoaderArgs) {
     try {
         const url = new URL(request.url)
         // Get the farm id
@@ -93,7 +87,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get the session
         const session = await getSession(request)
-        const calendar = getCalendar(params)
 
         const modifiableHarvestingIds = await getModifiableHarvestingIds(
             url,
@@ -149,8 +142,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             cultivation: cultivation,
             harvest: harvests[0],
             harvestableAnalysis: harvestableAnalysis,
-            b_id_farm: b_id_farm,
-            calendar: calendar,
             harvestParameters: harvestParameters,
             harvestingWritePermission: modifiableHarvestingIds.length > 0,
         }
@@ -202,7 +193,7 @@ export default function ModifyHarvestingDialog() {
  *
  * @throws {Error} When any required parameter is missing or if an error occurs during form processing.
  */
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params }: Route.ActionArgs) {
     try {
         const url = new URL(request.url)
         // Get the farm ID
@@ -213,7 +204,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         // Get the session
         const session = await getSession(request)
-        const calendar = await getCalendar(params)
 
         const b_id_harvesting = url.searchParams.get("harvestingIds")
         if (!b_id_harvesting || b_id_harvesting.length === 0) {
