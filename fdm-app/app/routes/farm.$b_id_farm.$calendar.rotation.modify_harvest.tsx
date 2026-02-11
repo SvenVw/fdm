@@ -160,15 +160,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders a block displaying cultivation details and a harvest input form.
+ * Renders a dialog that lets the user edit one or multiple harvestings.
  *
- * This component uses data loaded by the router to show the name of the cultivation and an instruction
- * for entering harvest information. It also provides a navigation link back to the cultivation details page
- * and renders a HarvestForm component prefilled with available harvest analytics data when present.
+ * This component uses data from the loader to pre-fill the form with the existing harvest information
+ * and a harvestable analysis, the latter being either one that already exists or just the defaults for
+ * the cultivation catalogue type. If the user can edit one of the harvestings whose ID is provided,
+ * the user can submit the form to modify all of the harvestings whose ID is provided, at the same time.
  *
- * @returns The JSX element representing the harvest overview block.
+ * @returns The JSX element representing the harvesting editing dialog.
  */
-export default function FarmFieldsOverviewBlock() {
+export default function ModifyHarvestingDialog() {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
