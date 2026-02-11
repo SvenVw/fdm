@@ -317,7 +317,10 @@ export default function AppIndex() {
                                                                             : role ===
                                                                                 "advisor"
                                                                               ? "Adviseur"
-                                                                              : "Lid"}
+                                                                              : role ===
+                                                                                  "researcher"
+                                                                                ? "Onderzoeker"
+                                                                                : "Lid"}
                                                                     </Badge>
                                                                 ),
                                                             )}
