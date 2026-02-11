@@ -167,33 +167,36 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
 
         // Submit to NMI API
-        const soilAnalysis = await extractSoilAnalysis(formData)
+        const soilAnalysisResult = await extractSoilAnalysis(formData)
 
         // Validate required fields exist
-        if (!soilAnalysis.a_depth_lower) {
+        if (!soilAnalysisResult.a_depth_lower) {
             throw new Error("Missing required a_depth_lower value")
         }
-        if (!soilAnalysis.b_sampling_date) {
+        if (!soilAnalysisResult.b_sampling_date) {
             throw new Error("Missing required b_sampling_date")
         }
         if (
-            soilAnalysis.a_depth_upper === undefined ||
-            soilAnalysis.a_depth_upper === null
+            soilAnalysisResult.a_depth_upper === undefined ||
+            soilAnalysisResult.a_depth_upper === null
         ) {
             throw new Error("Missing required a_depth_upper value")
         }
+
+        // Exclude a_source from the spread
+        const { a_source, ...soilAnalysisData } = soilAnalysisResult as any
 
         // Add soil analysis
         await addSoilAnalysis(
             fdm,
             session.principal_id,
             null,
-            "other",
+            (soilAnalysisResult as any).a_source || "other",
             b_id,
-            Number(soilAnalysis.a_depth_lower),
-            new Date(soilAnalysis.b_sampling_date),
-            soilAnalysis,
-            Number(soilAnalysis.a_depth_upper),
+            Number(soilAnalysisResult.a_depth_lower),
+            new Date(soilAnalysisResult.b_sampling_date),
+            soilAnalysisData,
+            Number(soilAnalysisResult.a_depth_upper),
         )
 
         const url = new URL(request.url)
