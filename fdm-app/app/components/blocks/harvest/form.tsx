@@ -238,7 +238,7 @@ function HarvestFields({
                             {...field}
                             placeholder={
                                 partial && Number.isFinite(b_lu_yield)
-                                    ? `Voorbeeld uit de huidige: ${b_lu_yield}`
+                                    ? `Voorbeeld uit de huidige: ${b_lu_yield} kg / ha`
                                     : "Bv. 37500 kg / ha"
                             }
                             aria-required="true"
