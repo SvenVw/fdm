@@ -35,9 +35,8 @@ export const meta: Route.MetaFunction = () => {
 async function getModifiableHarvestingIds(
     url: URL,
     principal_id: string,
-    b_id_harvesting: string,
+    allHarvestingIds: string[],
 ) {
-    const allHarvestingIds = b_id_harvesting.split(",")
     const harvestingWritePermissions = await Promise.all(
         allHarvestingIds.map((id) =>
             checkPermission(
@@ -78,7 +77,10 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         }
 
         const b_id_harvesting = url.searchParams.get("harvestingIds")
-        if (!b_id_harvesting || b_id_harvesting.length === 0) {
+        const allHarvestingIds = b_id_harvesting
+            ?.split(",")
+            .filter((id) => id.length)
+        if (!allHarvestingIds || allHarvestingIds.length === 0) {
             throw data("Harvesting IDs are required", {
                 status: 400,
                 statusText: "Harvesting IDs are required",
@@ -91,11 +93,11 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         const modifiableHarvestingIds = await getModifiableHarvestingIds(
             url,
             session.principal_id,
-            b_id_harvesting,
+            allHarvestingIds,
         )
         const harvestingIds = modifiableHarvestingIds.length
             ? modifiableHarvestingIds
-            : b_id_harvesting.split(",")
+            : allHarvestingIds
         // Get selected harvest
         const harvests = await Promise.all(
             harvestingIds.map((b_id_harvesting) =>
@@ -206,16 +208,20 @@ export async function action({ request, params }: Route.ActionArgs) {
         const session = await getSession(request)
 
         const b_id_harvesting = url.searchParams.get("harvestingIds")
-        if (!b_id_harvesting || b_id_harvesting.length === 0) {
+        const allHarvestingIds = b_id_harvesting
+            ?.split(",")
+            .filter((id) => id.length)
+        if (!allHarvestingIds || allHarvestingIds.length === 0) {
             throw data("Harvesting IDs are required", {
                 status: 400,
                 statusText: "Harvesting IDs are required",
             })
         }
+
         const harvestingIds = await getModifiableHarvestingIds(
             url,
             session.principal_id,
-            b_id_harvesting,
+            allHarvestingIds,
         )
         if (harvestingIds.length === 0) {
             throw data("Het is u niet toegestaan de oogsten te beheren.", {
@@ -223,13 +229,13 @@ export async function action({ request, params }: Route.ActionArgs) {
                 statusText: "Het is u niet toegestaan de oogsten te beheren.",
             })
         }
-        const firstHarvest = await getHarvest(
-            fdm,
-            session.principal_id,
-            harvestingIds[0],
-        )
         // Get the action from the form
         if (request.method === "POST") {
+            const firstHarvest = await getHarvest(
+                fdm,
+                session.principal_id,
+                harvestingIds[0],
+            )
             // Fetch cultivation details to get b_lu_harvestcat
             const cultivation = await getCultivation(
                 fdm,
