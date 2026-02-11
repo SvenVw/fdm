@@ -322,6 +322,10 @@ export async function action({ request, params }: Route.ActionArgs) {
                 message: "Oogst is verwijderd! 🎉",
             })
         }
+        throw data("Method not allowed", {
+            status: 405,
+            statusText: "Method Not Allowed",
+        })
     } catch (error) {
         throw handleActionError(error)
     }
