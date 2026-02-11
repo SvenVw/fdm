@@ -397,7 +397,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                             .filter((harvest: { b_lu: string }) =>
                                 b_lu.includes(harvest.b_lu),
                             )
-                            .flatMap((harvest) => {
+                            .map((harvest) => {
                                 return {
                                     b_lu: harvest.b_lu,
                                     b_id_harvesting: harvest.b_id_harvesting,
