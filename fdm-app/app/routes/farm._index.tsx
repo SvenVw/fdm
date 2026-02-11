@@ -5,7 +5,7 @@ import {
     House,
     Layers,
     LifeBuoy,
-    Map,
+    MapIcon,
     Mountain,
     Plus,
     PlusCircle,
@@ -399,7 +399,7 @@ export default function AppIndex() {
                                     <CardHeader>
                                         <div className="flex items-center gap-3">
                                             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
-                                                <Map className="h-5 w-5" />
+                                                <MapIcon className="h-5 w-5" />
                                             </div>
                                             <CardTitle className="text-xl">
                                                 Percelen
