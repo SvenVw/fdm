@@ -391,7 +391,7 @@ export default function AppIndex() {
 
                         <FarmTitle
                             title="Atlas"
-                            description="Raadpleeg openbare kaarten en ruimtelijke gegevens."
+                            description="Toegang tot landelijke kaarten met informatie over percelen, bodem en hoogte."
                         />
                         <div className="grid gap-6 p-6 md:p-10 md:pt-0 lg:grid-cols-2 xl:grid-cols-3">
                             <Card className="group relative flex flex-col transition-all hover:border-primary/50 hover:shadow-md">

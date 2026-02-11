@@ -127,15 +127,23 @@ export function SidebarApps() {
                                         </SidebarMenuButton>
                                     </CollapsibleTrigger>
                                 ) : (
-                                    <SidebarMenuButton
-                                        isActive={false}
-                                        className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground opacity-50 cursor-not-allowed"
-                                    >
-                                        <MapIcon className="text-muted-foreground" />
-                                        <span className="text-muted-foreground">
-                                            Atlas
-                                        </span>
-                                    </SidebarMenuButton>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <SidebarMenuButton
+                                                isActive={false}
+                                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground opacity-50 cursor-not-allowed"
+                                            >
+                                                <MapIcon className="text-muted-foreground" />
+                                                <span className="text-muted-foreground">
+                                                    Atlas
+                                                </span>
+                                            </SidebarMenuButton>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right">
+                                            Atlas is niet beschikbaar tijdens
+                                            het aanmaken van een bedrijf
+                                        </TooltipContent>
+                                    </Tooltip>
                                 )}
                                 <CollapsibleContent>
                                     <SidebarMenuSub>
