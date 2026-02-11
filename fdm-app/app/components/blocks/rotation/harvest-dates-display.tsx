@@ -77,6 +77,7 @@ function combineRecords(records: HarvestRecordItem[]): HarvestRecordItem {
 }
 
 function formatDateRange(dates: Date[]) {
+    if (dates.length === 0) return ""
     const firstDate = dates[0]
     const lastDate = dates[dates.length - 1]
     return firstDate.getTime() === lastDate.getTime()
@@ -136,7 +137,7 @@ export const HarvestDatesDisplay: React.FC<HarvestDatesDisplayProps> = ({
                     {harvestsByOrder.map((record, idx) => {
                         return (
                             <HarvestDatesDisplayButton
-                                key={idx}
+                                key={record.id}
                                 record={record}
                             >
                                 {`${idx + 1}e ${row.b_lu_croprotation === "grass" ? "snede" : "oogst"}:`}
