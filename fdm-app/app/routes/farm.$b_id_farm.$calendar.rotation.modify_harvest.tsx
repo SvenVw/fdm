@@ -1,8 +1,11 @@
 import {
     checkPermission,
     getCultivation,
+    getCultivationsFromCatalogue,
+    getDefaultsForHarvestParameters,
     getHarvest,
     getParametersForHarvestCat,
+    type HarvestableAnalysis,
     removeHarvest,
     updateHarvest,
 } from "@svenvw/fdm-core"
@@ -13,12 +16,9 @@ import {
     type MetaFunction,
     useLoaderData,
 } from "react-router"
-import {
-    dataWithWarning,
-    redirectWithError,
-    redirectWithSuccess,
-} from "remix-toast"
+import { dataWithWarning, redirectWithSuccess } from "remix-toast"
 import { HarvestFormDialog } from "~/components/blocks/harvest/form"
+import { getHarvestParameterLabel } from "~/components/blocks/harvest/parameters"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar } from "~/lib/calendar"
@@ -26,7 +26,6 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { getHarvestParameterLabel } from "../components/blocks/harvest/parameters"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -105,10 +104,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             ? modifiableHarvestingIds
             : b_id_harvesting.split(",")
         // Get selected harvest
-        const harvest = await getHarvest(
-            fdm,
-            session.principal_id,
-            harvestingIds[0],
+        const harvests = await Promise.all(
+            harvestingIds.map((b_id_harvesting) =>
+                getHarvest(fdm, session.principal_id, b_id_harvesting),
+            ),
         )
 
         // Get details of cultivation
@@ -116,7 +115,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const cultivation = await getCultivation(
             fdm,
             session.principal_id,
-            harvest.b_lu,
+            harvests[0].b_lu,
         )
         if (!cultivation) {
             throw data("Cultivation is not found", {
@@ -125,7 +124,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        const harvestableAnalysis = harvest.harvestable.harvestable_analyses[0]
+        let harvestableAnalysis: Partial<HarvestableAnalysis> | undefined =
+            harvests.find(
+                (harvest) => harvest.harvestable.harvestable_analyses.length,
+            )?.harvestable.harvestable_analyses[0]
+
+        if (!harvestableAnalysis) {
+            harvestableAnalysis = getDefaultsForHarvestParameters(
+                cultivation.b_lu_catalogue,
+                await getCultivationsFromCatalogue(
+                    fdm,
+                    session.principal_id,
+                    b_id_farm,
+                ),
+            )
+        }
 
         const harvestParameters = getParametersForHarvestCat(
             cultivation.b_lu_harvestcat,
@@ -134,13 +147,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Return user information from loader
         return {
             cultivation: cultivation,
-            harvest: harvest,
+            harvest: harvests[0],
             harvestableAnalysis: harvestableAnalysis,
             b_id_farm: b_id_farm,
             calendar: calendar,
             harvestParameters: harvestParameters,
-            harvestingWritePermission:
-                harvestingIds === modifiableHarvestingIds,
+            harvestingWritePermission: modifiableHarvestingIds.length > 0,
         }
     } catch (error) {
         throw handleLoaderError(error)
