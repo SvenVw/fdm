@@ -20,16 +20,17 @@ type HarvestRecordDisplayProps = {
     record: HarvestRecordItem
 }
 
-function mapBySameDate(record: HarvestRecord, fieldRow: FieldRow) {
-    fieldRow.harvests.forEach((harvest) => {
+function mapByOrder(record: HarvestRecord, fieldRow: FieldRow) {
+    fieldRow.harvests.forEach((harvest, i) => {
         if (!harvest.b_lu_harvest_date) return
-        const key = harvest.b_lu_harvest_date.getTime().toString()
+        const key = i
         record[key] ??= {
             id: `${harvest.b_lu}_${key}`,
             dates: [harvest.b_lu_harvest_date],
             harvests: [],
         }
         record[key].harvests.push(harvest)
+        record[key].dates.push(harvest.b_lu_harvest_date)
     })
 }
 
@@ -38,10 +39,10 @@ function groupAndOrderHarvests(row: RotationExtended) {
 
     if (row.type === "crop") {
         row.fields.forEach((fieldRow) => {
-            mapBySameDate(record, fieldRow)
+            mapByOrder(record, fieldRow)
         })
     } else {
-        mapBySameDate(record, row)
+        mapByOrder(record, row)
     }
 
     const entries = Object.entries(record).map(
@@ -56,6 +57,7 @@ function groupAndOrderHarvests(row: RotationExtended) {
                 (a.b_lu_harvest_date as Date).getTime() -
                 (b.b_lu_harvest_date as Date).getTime(),
         )
+        ent[1].dates.sort((a, b) => a.getTime() - b.getTime())
     })
     return entries.map((ent) => ent[1])
 }
