@@ -119,13 +119,14 @@ export async function loader({ request, params }: Route.LoaderArgs) {
             })
         }
 
-        let harvestableAnalysis: Partial<HarvestableAnalysis> | undefined =
-            harvests.find(
-                (harvest) => harvest.harvestable.harvestable_analyses.length,
-            )?.harvestable.harvestable_analyses[0]
+        let exampleHarvestableAnalysis:
+            | Partial<HarvestableAnalysis>
+            | undefined = harvests.find(
+            (harvest) => harvest.harvestable.harvestable_analyses.length,
+        )?.harvestable.harvestable_analyses[0]
 
-        if (!harvestableAnalysis) {
-            harvestableAnalysis = getDefaultsForHarvestParameters(
+        if (!exampleHarvestableAnalysis) {
+            exampleHarvestableAnalysis = getDefaultsForHarvestParameters(
                 cultivation.b_lu_catalogue,
                 await getCultivationsFromCatalogue(
                     fdm,
@@ -139,11 +140,49 @@ export async function loader({ request, params }: Route.LoaderArgs) {
             cultivation.b_lu_harvestcat,
         )
 
+        // Figure out the harvest date that is the same between all harvests
+        // Also figure out harvest parameters that are the same between all these harvestings
+        let b_lu_harvest_date = harvests.find(
+            (harvest) => harvest.b_lu_harvest_date,
+        )?.b_lu_harvest_date
+        const initialHarvestableAnalysis: Partial<HarvestableAnalysis> = {
+            ...exampleHarvestableAnalysis,
+        }
+        if (Object.keys(initialHarvestableAnalysis).length > 0) {
+            for (const harvesting of harvests) {
+                if (
+                    b_lu_harvest_date &&
+                    harvesting.b_lu_harvest_date &&
+                    b_lu_harvest_date.getTime() !==
+                        harvesting.b_lu_harvest_date.getTime()
+                ) {
+                    b_lu_harvest_date = undefined
+                }
+
+                if (harvesting.harvestable.harvestable_analyses.length === 0)
+                    continue
+                const analysis = harvesting.harvestable.harvestable_analyses[0]
+                for (const key of Object.keys(
+                    initialHarvestableAnalysis,
+                ) as (keyof HarvestableAnalysis)[]) {
+                    if (
+                        analysis[key] !== null &&
+                        analysis[key] !== undefined &&
+                        analysis[key] !== initialHarvestableAnalysis[key]
+                    ) {
+                        delete initialHarvestableAnalysis[key]
+                    }
+                }
+            }
+        }
+
         // Return user information from loader
         return {
             cultivation: cultivation,
-            harvest: harvests[0],
-            harvestableAnalysis: harvestableAnalysis,
+            b_lu_harvest_date: b_lu_harvest_date,
+            example_b_lu_harvest_date: harvests[0].b_lu_harvest_date,
+            exampleHarvestableAnalysis: exampleHarvestableAnalysis,
+            initialHarvestableAnalysis: initialHarvestableAnalysis,
             harvestParameters: harvestParameters,
             harvestingWritePermission: modifiableHarvestingIds.length > 0,
             partial: modifiableHarvestingIds.length > 1,
@@ -169,23 +208,28 @@ export default function ModifyHarvestingDialog() {
     return (
         <HarvestFormDialog
             harvestParameters={loaderData.harvestParameters}
-            b_lu_harvest_date={loaderData.harvest.b_lu_harvest_date}
-            b_lu_yield={loaderData.harvestableAnalysis.b_lu_yield}
-            b_lu_yield_fresh={loaderData.harvestableAnalysis.b_lu_yield_fresh}
-            b_lu_yield_bruto={loaderData.harvestableAnalysis.b_lu_yield_bruto}
-            b_lu_tarra={loaderData.harvestableAnalysis.b_lu_tarra}
-            b_lu_uww={loaderData.harvestableAnalysis.b_lu_uww}
-            b_lu_moist={loaderData.harvestableAnalysis.b_lu_moist}
-            b_lu_dm={loaderData.harvestableAnalysis.b_lu_dm}
-            b_lu_cp={loaderData.harvestableAnalysis.b_lu_cp}
+            exampleHarvestableAnalysis={loaderData.exampleHarvestableAnalysis}
+            example_b_lu_harvest_date={loaderData.example_b_lu_harvest_date}
+            b_lu_harvest_date={loaderData.b_lu_harvest_date}
+            b_lu_yield={loaderData.initialHarvestableAnalysis.b_lu_yield}
+            b_lu_yield_fresh={
+                loaderData.initialHarvestableAnalysis.b_lu_yield_fresh
+            }
+            b_lu_yield_bruto={
+                loaderData.initialHarvestableAnalysis.b_lu_yield_bruto
+            }
+            b_lu_tarra={loaderData.initialHarvestableAnalysis.b_lu_tarra}
+            b_lu_uww={loaderData.initialHarvestableAnalysis.b_lu_uww}
+            b_lu_moist={loaderData.initialHarvestableAnalysis.b_lu_moist}
+            b_lu_dm={loaderData.initialHarvestableAnalysis.b_lu_dm}
+            b_lu_cp={loaderData.initialHarvestableAnalysis.b_lu_cp}
             b_lu_n_harvestable={
-                loaderData.harvestableAnalysis.b_lu_n_harvestable
+                loaderData.initialHarvestableAnalysis.b_lu_n_harvestable
             }
             b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
             b_lu_start={loaderData.cultivation.b_lu_start}
             b_lu_end={loaderData.cultivation.b_lu_end}
             editable={loaderData.harvestingWritePermission}
-            partial={loaderData.partial}
         />
     )
 }
