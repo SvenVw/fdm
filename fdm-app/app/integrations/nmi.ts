@@ -465,10 +465,10 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
 
         // Fallback for WGS84 if provided directly under other keys
         if (!soilAnalysis.location) {
-            const lat = field.a_lat || field.latitude || field.lat
-            const lon = field.a_lon || field.longitude || field.lon
+            const lat = field.a_lat ?? field.latitude ?? field.lat
+            const lon = field.a_lon ?? field.longitude ?? field.lon
 
-            if (lat && lon) {
+            if (lat != null && lon != null) {
                 const numericLat = Number(lat)
                 const numericLon = Number(lon)
 
