@@ -140,14 +140,17 @@ export default function BulkSoilAnalysisUploadPage() {
         setStep("review")
     }
 
-    const handleSave = (matches: { analysisId: string; fieldId: string }[]) => {
+    const handleSave = (
+        matches: { analysisId: string; fieldId: string }[],
+        updatedAnalyses: ProcessedAnalysis[],
+    ) => {
         const formData = new FormData()
         // Filter out "none" selections
         const validMatches = matches.filter(
             (m) => m.fieldId !== "none" && m.fieldId !== "",
         )
         formData.append("matches", JSON.stringify(validMatches))
-        formData.append("analysesData", JSON.stringify(processedAnalyses))
+        formData.append("analysesData", JSON.stringify(updatedAnalyses))
 
         submit(formData, { method: "post" })
     }

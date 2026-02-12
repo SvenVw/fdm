@@ -225,9 +225,8 @@ export async function extractSoilAnalysis(formData: FormData) {
     }
 
     // Check if soil parameters are returned
-    if (Object.keys(soilAnalysis).length <= 1) {
-        // a_source is returned with invalid soil analysis
-        throw new Error("Invalid soil analysis")
+    if (!soilAnalysis.a_source) {
+        throw new Error("Invalid soil analysis: laboratory source missing")
     }
 
     // Process the other parameters
