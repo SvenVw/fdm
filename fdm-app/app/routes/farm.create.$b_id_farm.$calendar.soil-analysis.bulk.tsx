@@ -234,7 +234,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                                 )
                             }
                             // Strip UI-only properties before saving to DB
-                            const { id, location, a_source, ...dbAnalysis } = analysis
+                            const { id, location, a_source, ...dbAnalysis } =
+                                analysis
 
                             return addSoilAnalysis(
                                 fdm,
@@ -262,6 +263,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         return data({ message: "Invalid request" }, { status: 400 })
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }

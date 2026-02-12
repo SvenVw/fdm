@@ -4,7 +4,6 @@ import { HeaderFarm } from "~/components/blocks/header/farm"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import {
-    getFarm,
     getFarms,
     getFields,
     getSoilParametersDescription,
@@ -267,6 +266,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         return data({ message: "Invalid request" }, { status: 400 })
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }
