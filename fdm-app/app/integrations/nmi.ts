@@ -240,7 +240,10 @@ export async function extractSoilAnalysis(formData: FormData) {
             const day = Number.parseInt(dateParts[0], 10)
             const month = Number.parseInt(dateParts[1], 10) - 1 // Month is 0-indexed
             const year = Number.parseInt(dateParts[2], 10)
-            soilAnalysis.b_sampling_date = new Date(year, month, day)
+
+            if (!Number.isNaN(day) && !Number.isNaN(month) && !Number.isNaN(year)) {
+                soilAnalysis.b_sampling_date = new Date(year, month, day)
+            }
         }
     }
     if (field.b_soiltype_agr) {
@@ -407,7 +410,10 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
                 const day = Number.parseInt(dateParts[0], 10)
                 const month = Number.parseInt(dateParts[1], 10) - 1
                 const year = Number.parseInt(dateParts[2], 10)
-                soilAnalysis.b_sampling_date = new Date(year, month, day)
+
+                if (!Number.isNaN(day) && !Number.isNaN(month) && !Number.isNaN(year)) {
+                    soilAnalysis.b_sampling_date = new Date(year, month, day)
+                }
             }
         }
 
