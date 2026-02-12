@@ -207,6 +207,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                                 b_sampling_date,
                                 a_depth_upper,
                                 a_depth_lower,
+                                data: _data, // Strip raw data
                                 ...dbAnalysis
                             } = analysis
 
