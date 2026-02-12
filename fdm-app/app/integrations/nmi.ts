@@ -216,7 +216,10 @@ export async function extractSoilAnalysis(formData: FormData) {
     const field = response.fields[0]
 
     // Select the a_* parameters
-    const soilAnalysis: { [key: string]: string | number | Date } = {}
+    const soilAnalysis: {
+        [key: string]: string | number | Date | any
+        location?: { type: "Point"; coordinates: [number, number] }
+    } = {}
     soilAnalysis.b_name = field.b_fieldname // Map b_fieldname for name matching
     for (const key of Object.keys(field).filter((key) =>
         key.startsWith("a_"),
