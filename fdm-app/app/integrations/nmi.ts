@@ -241,7 +241,11 @@ export async function extractSoilAnalysis(formData: FormData) {
             const month = Number.parseInt(dateParts[1], 10) - 1 // Month is 0-indexed
             const year = Number.parseInt(dateParts[2], 10)
 
-            if (!Number.isNaN(day) && !Number.isNaN(month) && !Number.isNaN(year)) {
+            if (
+                !Number.isNaN(day) &&
+                !Number.isNaN(month) &&
+                !Number.isNaN(year)
+            ) {
                 soilAnalysis.b_sampling_date = new Date(year, month, day)
             }
         }
@@ -301,7 +305,7 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
 
     // Filter out potential non-File objects or empty slots
     const files = formData.getAll("soilAnalysisFile") as File[]
-    const validFiles = files.filter(file => file instanceof File && file.name)
+    const validFiles = files.filter((file) => file instanceof File && file.name)
     if (validFiles.length === 0) {
         throw new Error("Geen geldige bestanden gevonden in FormData")
     }
@@ -312,7 +316,6 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
 
     const BATCH_SIZE = 10
     const MAX_BATCH_BYTES = 20 * 1024 * 1024 // 20MB
-    const allFields: any[] = []
 
     // Group files into batches based on count and total size
     let currentBatchFiles: File[] = []
@@ -336,8 +339,10 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
         batches.push(currentBatchFiles)
     }
 
-    // Process each batch in parallel
-    const batchPromises = batches.map(async (batchFiles, i) => {
+    // Process each batch sequentially to avoid overwhelming the API
+    const allBatchFields: any[] = []
+    for (let i = 0; i < batches.length; i++) {
+        const batchFiles = batches[i]
         const batchFormData = new FormData()
         for (const file of batchFiles) {
             batchFormData.append("soilAnalysisFile", file)
@@ -382,15 +387,10 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
             )
         }
 
-        return responseData.fields
-    })
-
-    const allBatchFields = await Promise.all(batchPromises)
-    for (const fields of allBatchFields) {
-        allFields.push(...fields)
+        allBatchFields.push(...responseData.fields)
     }
 
-    return allFields.map((field: any, index: number) => {
+    return allBatchFields.map((field: any, index: number) => {
         const soilAnalysis: { [key: string]: any } = {
             id: crypto.randomUUID(), // Used for UI matching
             filename: field.filename || `Analyse ${index + 1}`,
@@ -411,7 +411,11 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
                 const month = Number.parseInt(dateParts[1], 10) - 1
                 const year = Number.parseInt(dateParts[2], 10)
 
-                if (!Number.isNaN(day) && !Number.isNaN(month) && !Number.isNaN(year)) {
+                if (
+                    !Number.isNaN(day) &&
+                    !Number.isNaN(month) &&
+                    !Number.isNaN(year)
+                ) {
                     soilAnalysis.b_sampling_date = new Date(year, month, day)
                 }
             }
