@@ -94,6 +94,27 @@ export function BulkSoilAnalysisUploadForm({
                     }
                 }
             }
+
+            // Process final partial line if exists
+            if (buffer.trim()) {
+                try {
+                    const result = JSON.parse(buffer)
+                    completedFiles++
+
+                    if (result.success && result.analyses) {
+                        allResults.push(...result.analyses)
+                    } else if (result.error) {
+                        toast.error(`Fout bij ${result.filename}: ${result.error}`)
+                    }
+
+                    setCurrentFile(result.filename)
+                    setUploadProgress(
+                        Math.round((completedFiles / totalFiles) * 100),
+                    )
+                } catch (e) {
+                    console.error("Error parsing final NDJSON line:", e)
+                }
+            }
         } catch (error) {
             console.error("Bulk upload error:", error)
             toast.error(error instanceof Error ? error.message : "Upload mislukt")
