@@ -122,12 +122,14 @@ export function BulkSoilAnalysisReview({
     )
     const [dates, setDates] = useState<Record<string, string>>(
         Object.fromEntries(
-            analyses.map((a) => [
-                a.id,
-                a.b_sampling_date
-                    ? format(new Date(a.b_sampling_date), "yyyy-MM-dd")
-                    : "",
-            ]),
+            analyses.map((a) => {
+                const date = a.b_sampling_date
+                    ? new Date(a.b_sampling_date)
+                    : null
+                const validDateStr =
+                    date && isValid(date) ? format(date, "yyyy-MM-dd") : ""
+                return [a.id, validDateStr]
+            }),
         ),
     )
 
