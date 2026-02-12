@@ -78,6 +78,92 @@ function parseDateText(date: string | Date | undefined): Date | undefined {
     return parsedDate || undefined
 }
 
+function DateCell({
+    analysisId,
+    initialDateStr,
+    onDateChange,
+}: {
+    analysisId: string
+    initialDateStr: string
+    onDateChange: (id: string, date: string) => void
+}) {
+    const date = initialDateStr ? new Date(initialDateStr) : undefined
+    const [open, setOpen] = useState(false)
+    const [inputValue, setInputValue] = useState(
+        date && isValid(date) ? format(date, "PPP", { locale: nl }) : "",
+    )
+
+    const onDateSelect = (d: Date | undefined) => {
+        if (d) {
+            const iso = format(d, "yyyy-MM-dd")
+            onDateChange(analysisId, iso)
+            setInputValue(format(d, "PPP", { locale: nl }))
+        } else {
+            onDateChange(analysisId, "")
+            setInputValue("")
+        }
+        setOpen(false)
+    }
+
+    const onInputBlur = () => {
+        const parsed = parseDateText(inputValue)
+        if (parsed && isValid(parsed)) {
+            const iso = format(parsed, "yyyy-MM-dd")
+            onDateChange(analysisId, iso)
+            setInputValue(format(parsed, "PPP", { locale: nl }))
+        } else if (inputValue === "") {
+            onDateChange(analysisId, "")
+        }
+    }
+
+    return (
+        <div className="relative flex gap-2 w-[200px]">
+            <Input
+                value={inputValue}
+                placeholder="Kies een datum"
+                className="bg-background pr-10 text-xs h-8"
+                onChange={(e) => setInputValue(e.target.value)}
+                onBlur={onInputBlur}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault()
+                        e.currentTarget.blur()
+                    }
+                    if (e.key === "ArrowDown") {
+                        e.preventDefault()
+                        setOpen(true)
+                    }
+                }}
+            />
+            <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                    <Button
+                        variant="ghost"
+                        className="absolute top-1/2 right-1 size-6 -translate-y-1/2 p-0 h-6 w-6"
+                    >
+                        <CalendarIcon className="size-3" />
+                        <span className="sr-only">Kies een datum</span>
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                    className="w-auto overflow-hidden p-0"
+                    align="end"
+                >
+                    <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={onDateSelect}
+                        startMonth={new Date(1970, 0)}
+                        endMonth={endMonth}
+                        locale={nl}
+                        className="rounded-md border shadow-sm"
+                    />
+                </PopoverContent>
+            </Popover>
+        </div>
+    )
+}
+
 export type ProcessedAnalysis = {
     id: string
     filename: string
@@ -204,88 +290,13 @@ export function BulkSoilAnalysisReview({
         {
             accessorKey: "b_sampling_date",
             header: "Datum",
-            cell: ({ row }) => {
-                const dateStr = dates[row.original.id]
-                const date = dateStr ? new Date(dateStr) : undefined
-                const [open, setOpen] = useState(false)
-                const [inputValue, setInputValue] = useState(
-                    date && isValid(date)
-                        ? format(date, "PPP", { locale: nl })
-                        : "",
-                )
-
-                const onDateSelect = (d: Date | undefined) => {
-                    if (d) {
-                        const iso = format(d, "yyyy-MM-dd")
-                        handleDateChange(row.original.id, iso)
-                        setInputValue(format(d, "PPP", { locale: nl }))
-                    } else {
-                        handleDateChange(row.original.id, "")
-                        setInputValue("")
-                    }
-                    setOpen(false)
-                }
-
-                const onInputBlur = () => {
-                    const parsed = parseDateText(inputValue)
-                    if (parsed && isValid(parsed)) {
-                        const iso = format(parsed, "yyyy-MM-dd")
-                        handleDateChange(row.original.id, iso)
-                        setInputValue(format(parsed, "PPP", { locale: nl }))
-                    } else if (inputValue === "") {
-                        handleDateChange(row.original.id, "")
-                    }
-                }
-
-                return (
-                    <div className="relative flex gap-2 w-[200px]">
-                        <Input
-                            value={inputValue}
-                            placeholder="Kies een datum"
-                            className="bg-background pr-10 text-xs h-8"
-                            onChange={(e) => setInputValue(e.target.value)}
-                            onBlur={onInputBlur}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                    e.preventDefault()
-                                    e.currentTarget.blur()
-                                }
-                                if (e.key === "ArrowDown") {
-                                    e.preventDefault()
-                                    setOpen(true)
-                                }
-                            }}
-                        />
-                        <Popover open={open} onOpenChange={setOpen}>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    className="absolute top-1/2 right-1 size-6 -translate-y-1/2 p-0 h-6 w-6"
-                                >
-                                    <CalendarIcon className="size-3" />
-                                    <span className="sr-only">
-                                        Kies een datum
-                                    </span>
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent
-                                className="w-auto overflow-hidden p-0"
-                                align="end"
-                            >
-                                <Calendar
-                                    mode="single"
-                                    selected={date}
-                                    onSelect={onDateSelect}
-                                    startMonth={new Date(1970, 0)}
-                                    endMonth={endMonth}
-                                    locale={nl}
-                                    className="rounded-md border shadow-sm"
-                                />
-                            </PopoverContent>
-                        </Popover>
-                    </div>
-                )
-            },
+            cell: ({ row }) => (
+                <DateCell
+                    analysisId={row.original.id}
+                    initialDateStr={dates[row.original.id]}
+                    onDateChange={handleDateChange}
+                />
+            ),
         },
         {
             id: "parameters",
