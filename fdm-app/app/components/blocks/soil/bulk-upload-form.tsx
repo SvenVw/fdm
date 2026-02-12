@@ -54,7 +54,19 @@ export function BulkSoilAnalysisUploadForm({
             })
 
             if (!response.ok) {
-                throw new Error("Fout bij starten van analyse")
+                let errorMessage = "Fout bij starten van analyse"
+                try {
+                    const errorData = await response.json()
+                    errorMessage = errorData.message || errorData.error || errorMessage
+                } catch {
+                    try {
+                        const textError = await response.text()
+                        if (textError) errorMessage = textError
+                    } catch {
+                        // Ignore text parsing errors
+                    }
+                }
+                throw new Error(`${errorMessage} (Status: ${response.status})`)
             }
 
             if (!response.body) {
