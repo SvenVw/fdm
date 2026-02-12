@@ -140,7 +140,9 @@ export function DatePicker({
                             disabled={field.disabled}
                         >
                             <CalendarIcon className="size-3.5" />
-                            <span className="sr-only">Kies een datum</span>
+                            <span className="sr-only">
+                                {placeholder ?? "Kies een datum"}
+                            </span>
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent

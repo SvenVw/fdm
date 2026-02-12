@@ -26,7 +26,7 @@ function mapByOrder(record: HarvestRecord, fieldRow: FieldRow) {
         const key = i
         record[key] ??= {
             id: `${harvest.b_lu}_${key}`,
-            dates: [harvest.b_lu_harvest_date],
+            dates: [],
             harvests: [],
         }
         record[key].harvests.push(harvest)
