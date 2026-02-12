@@ -41,15 +41,15 @@ export async function action({ request }: ActionFunctionArgs) {
     const encoder = new TextEncoder()
     const stream = new ReadableStream({
         async start(controller) {
-            const queue = [...files]
+            let nextIndex = 0
             const concurrency = 10
 
             const workers = Array.from(
                 { length: Math.min(concurrency, files.length) },
                 async () => {
-                    while (queue.length > 0) {
-                        const file = queue.shift()
-                        if (!file) break
+                    while (nextIndex < files.length) {
+                        const file = files[nextIndex++]
+                        if (!file) continue
 
                         try {
                             // Create a minimal FormData for a single file extraction

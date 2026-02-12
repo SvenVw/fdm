@@ -257,9 +257,20 @@ export async function action({ request, params }: ActionFunctionArgs) {
                                     `Analysis ${match.analysisId}: invalid b_sampling_date (${analysis.b_sampling_date})`,
                                 )
                             }
-                            // Strip UI-only properties before saving to DB
-                            const { id, location, a_source, ...dbAnalysis } =
-                                analysis
+                            // Strip UI-only and redundant properties before saving to DB
+                            const {
+                                id,
+                                location,
+                                a_source,
+                                matchedFieldId,
+                                matchReason,
+                                filename,
+                                b_name,
+                                b_sampling_date,
+                                a_depth_upper,
+                                a_depth_lower,
+                                ...dbAnalysis
+                            } = analysis
 
                             return addSoilAnalysis(
                                 fdm,

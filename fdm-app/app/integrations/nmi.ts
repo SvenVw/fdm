@@ -293,12 +293,8 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
         throw new Error("NMI API key not configured")
     }
 
-    const files = formData.getAll("soilAnalysisFile") as File[]
-    if (files.length === 0) {
-        throw new Error("Geen bestanden gevonden in FormData")
-    }
-
     // Filter out potential non-File objects or empty slots
+    const files = formData.getAll("soilAnalysisFile") as File[]
     const validFiles = files.filter(file => file instanceof File && file.name)
     if (validFiles.length === 0) {
         throw new Error("Geen geldige bestanden gevonden in FormData")

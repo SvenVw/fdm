@@ -125,7 +125,7 @@ export function BulkSoilAnalysisReview({
             analyses.map((a) => [
                 a.id,
                 a.b_sampling_date
-                    ? new Date(a.b_sampling_date).toISOString().split("T")[0]
+                    ? format(new Date(a.b_sampling_date), "yyyy-MM-dd")
                     : "",
             ]),
         ),
@@ -214,7 +214,7 @@ export function BulkSoilAnalysisReview({
 
                 const onDateSelect = (d: Date | undefined) => {
                     if (d) {
-                        const iso = d.toISOString().split("T")[0]
+                        const iso = format(d, "yyyy-MM-dd")
                         handleDateChange(row.original.id, iso)
                         setInputValue(format(d, "PPP", { locale: nl }))
                     } else {
@@ -227,7 +227,7 @@ export function BulkSoilAnalysisReview({
                 const onInputBlur = () => {
                     const parsed = parseDateText(inputValue)
                     if (parsed && isValid(parsed)) {
-                        const iso = parsed.toISOString().split("T")[0]
+                        const iso = format(parsed, "yyyy-MM-dd")
                         handleDateChange(row.original.id, iso)
                         setInputValue(format(parsed, "PPP", { locale: nl }))
                     } else if (inputValue === "") {
