@@ -14,11 +14,12 @@ import { ScrollArea } from "~/components/ui/scroll-area"
 import { cn } from "~/lib/utils"
 import { Progress } from "~/components/ui/progress"
 import { toast } from "sonner"
+import type { ProcessedAnalysis } from "./bulk-upload-review"
 
 export function BulkSoilAnalysisUploadForm({
     onSuccess,
 }: {
-    onSuccess: (data: any[]) => void
+    onSuccess: (data: ProcessedAnalysis[]) => void
 }) {
     const [files, setFiles] = useState<File[]>([])
     const [isUploading, setIsUploading] = useState(false)
@@ -57,7 +58,8 @@ export function BulkSoilAnalysisUploadForm({
                 let errorMessage = "Fout bij starten van analyse"
                 try {
                     const errorData = await response.json()
-                    errorMessage = errorData.message || errorData.error || errorMessage
+                    errorMessage =
+                        errorData.message || errorData.error || errorMessage
                 } catch {
                     try {
                         const textError = await response.text()
@@ -95,7 +97,9 @@ export function BulkSoilAnalysisUploadForm({
                         if (result.success && result.analyses) {
                             allResults.push(...result.analyses)
                         } else if (result.error) {
-                            toast.error(`Fout bij ${result.filename}: ${result.error}`)
+                            toast.error(
+                                `Fout bij ${result.filename}: ${result.error}`,
+                            )
                         }
 
                         setCurrentFile(result.filename)
@@ -117,7 +121,9 @@ export function BulkSoilAnalysisUploadForm({
                     if (result.success && result.analyses) {
                         allResults.push(...result.analyses)
                     } else if (result.error) {
-                        toast.error(`Fout bij ${result.filename}: ${result.error}`)
+                        toast.error(
+                            `Fout bij ${result.filename}: ${result.error}`,
+                        )
                     }
 
                     setCurrentFile(result.filename)
@@ -130,14 +136,18 @@ export function BulkSoilAnalysisUploadForm({
             }
         } catch (error) {
             console.error("Bulk upload error:", error)
-            toast.error(error instanceof Error ? error.message : "Upload mislukt")
+            toast.error(
+                error instanceof Error ? error.message : "Upload mislukt",
+            )
             errorOccurred = true
         } finally {
             setIsUploading(false)
             setCurrentFile(null)
 
             if (allResults.length > 0) {
-                toast.success(`${allResults.length} analyses succesvol verwerkt`)
+                toast.success(
+                    `${allResults.length} analyses succesvol verwerkt`,
+                )
                 onSuccess(allResults)
             } else if (!errorOccurred && totalFiles > 0) {
                 toast.error("Geen analyses kunnen verwerken")
