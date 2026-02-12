@@ -351,7 +351,7 @@ export async function action({ request, params }: Route.ActionArgs) {
                                 ", ",
                             )}`
                             throw data(statusText, {
-                                status: 422,
+                                status: 400,
                                 statusText: statusText,
                             })
                         }
