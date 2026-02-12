@@ -22,13 +22,13 @@ import {
     type ProcessedAnalysis,
 } from "~/components/blocks/soil/bulk-upload-review"
 import { extractBulkSoilAnalyses } from "~/integrations/nmi"
-import { booleanPointInPolygon } from "@turf/turf"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { Spinner } from "~/components/ui/spinner"
 import { redirectWithSuccess, dataWithSuccess } from "remix-toast"
+import { matchAnalysesToFields } from "~/components/blocks/soil/bulk-upload-match"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -81,65 +81,7 @@ export default function BulkSoilAnalysisUploadWizardPage() {
         navigation.formMethod?.toLowerCase() === "post"
 
     const handleUploadSuccess = (analyses: any[]) => {
-        const matchedAnalyses = analyses.map((analysis) => {
-            let matchedFieldId = ""
-            let matchReason: "geometry" | "name" | "both" | undefined
-
-            // Geometry matching
-            if (analysis.location && analysis.location.coordinates) {
-                const [lon, lat] = analysis.location.coordinates
-                if (typeof lon === "number" && typeof lat === "number") {
-                    const fieldMatch = fields.find((field) => {
-                        if (!field.geometry) return false
-                        try {
-                            // booleanPointInPolygon handles both Polygon and MultiPolygon
-                            return booleanPointInPolygon(
-                                analysis.location,
-                                field.geometry as any,
-                            )
-                        } catch (e) {
-                            console.warn(`Matching failed for field ${field.b_name}:`, e)
-                            return false
-                        }
-                    })
-                    if (fieldMatch) {
-                        matchedFieldId = fieldMatch.b_id
-                        matchReason = "geometry"
-                    }
-                }
-            }
-
-            // Fallback: Name matching (b_fieldname vs field name)
-            const analysisName = (analysis.b_name || "")
-                .toLowerCase()
-                .trim()
-
-            if (analysisName) {
-                const fieldMatch = fields.find(
-                    (field) =>
-                        field.b_name.toLowerCase().trim() === analysisName,
-                )
-                
-                if (fieldMatch) {
-                    if (matchedFieldId) {
-                        // Check if it's the same field
-                        if (matchedFieldId === fieldMatch.b_id) {
-                            matchReason = "both"
-                        }
-                    } else {
-                        matchedFieldId = fieldMatch.b_id
-                        matchReason = "name"
-                    }
-                }
-            }
-
-            return {
-                ...analysis,
-                matchedFieldId,
-                matchReason,
-            }
-        })
-
+        const matchedAnalyses = matchAnalysesToFields(analyses, fields)
         setProcessedAnalyses(matchedAnalyses)
         setStep("review")
     }

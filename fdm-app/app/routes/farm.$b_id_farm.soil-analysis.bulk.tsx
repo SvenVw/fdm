@@ -27,9 +27,9 @@ import {
     type ProcessedAnalysis,
 } from "~/components/blocks/soil/bulk-upload-review"
 import { extractBulkSoilAnalyses } from "~/integrations/nmi"
-import { booleanPointInPolygon } from "@turf/turf"
 import { Spinner } from "~/components/ui/spinner"
 import { redirectWithSuccess, dataWithSuccess } from "remix-toast"
+import { matchAnalysesToFields } from "~/components/blocks/soil/bulk-upload-match"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -80,63 +80,7 @@ export default function BulkSoilAnalysisUploadPage() {
         navigation.formMethod?.toLowerCase() === "post"
 
     const handleUploadSuccess = (analyses: any[]) => {
-        // Perform geometry matching
-        const matchedAnalyses = analyses.map((analysis) => {
-            let matchedFieldId = ""
-            let matchReason: "geometry" | "name" | "both" | undefined
-
-            if (analysis.location && analysis.location.coordinates) {
-                const [lon, lat] = analysis.location.coordinates
-                if (typeof lon === "number" && typeof lat === "number") {
-                    const fieldMatch = fields.find((field) => {
-                        if (!field.geometry) return false
-                        try {
-                            return booleanPointInPolygon(
-                                analysis.location,
-                                field.geometry as any,
-                            )
-                        } catch (e) {
-                            console.warn(`Matching failed for field ${field.b_name}:`, e)
-                            return false
-                        }
-                    })
-                    if (fieldMatch) {
-                        matchedFieldId = fieldMatch.b_id
-                        matchReason = "geometry"
-                    }
-                }
-            }
-
-            // If no geometry match, try name match (b_fieldname vs field name)
-            const analysisName = (analysis.b_name || "")
-                .toLowerCase()
-                .trim()
-
-            if (analysisName) {
-                const fieldMatch = fields.find(
-                    (field) =>
-                        field.b_name.toLowerCase().trim() === analysisName,
-                )
-                
-                if (fieldMatch) {
-                    if (matchedFieldId) {
-                        if (matchedFieldId === fieldMatch.b_id) {
-                            matchReason = "both"
-                        }
-                    } else {
-                        matchedFieldId = fieldMatch.b_id
-                        matchReason = "name"
-                    }
-                }
-            }
-
-            return {
-                ...analysis,
-                matchedFieldId,
-                matchReason,
-            }
-        })
-
+        const matchedAnalyses = matchAnalysesToFields(analyses, fields)
         setProcessedAnalyses(matchedAnalyses)
         setStep("review")
     }
