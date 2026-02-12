@@ -39,6 +39,7 @@ export function BulkSoilAnalysisUploadForm({
         const allResults: any[] = []
         const totalFiles = files.length
         let completedFiles = 0
+        let errorOccurred = false
 
         const formData = new FormData()
         for (const file of files) {
@@ -118,6 +119,7 @@ export function BulkSoilAnalysisUploadForm({
         } catch (error) {
             console.error("Bulk upload error:", error)
             toast.error(error instanceof Error ? error.message : "Upload mislukt")
+            errorOccurred = true
         } finally {
             setIsUploading(false)
             setCurrentFile(null)
@@ -125,7 +127,7 @@ export function BulkSoilAnalysisUploadForm({
             if (allResults.length > 0) {
                 toast.success(`${allResults.length} analyses succesvol verwerkt`)
                 onSuccess(allResults)
-            } else if (totalFiles > 0) {
+            } else if (!errorOccurred && totalFiles > 0) {
                 toast.error("Geen analyses kunnen verwerken")
             }
         }
