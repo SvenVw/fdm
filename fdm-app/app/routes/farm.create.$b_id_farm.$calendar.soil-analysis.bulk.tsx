@@ -215,11 +215,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const calendar = getCalendar(params)
         const formData = await request.formData()
 
-        if (formData.has("soilAnalysisFile")) {
-            const analyses = await extractBulkSoilAnalyses(formData)
-            return data({ analyses })
-        }
-
         if (formData.has("matches")) {
             const matches = JSON.parse(formData.get("matches") as string)
             const analysesData = JSON.parse(

@@ -215,12 +215,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const session = await getSession(request)
         const formData = await request.formData()
 
-        // Handle initial upload to NMI
-        if (formData.has("soilAnalysisFile")) {
-            const analyses = await extractBulkSoilAnalyses(formData)
-            return data({ analyses })
-        }
-
         // Handle final save
         if (formData.has("matches")) {
             const matchesRaw = formData.get("matches") as string
