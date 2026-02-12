@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from "react"
-import { useFetcher } from "react-router"
+import { useState } from "react"
 import { FileText, Upload, Trash2, X, FileUp } from "lucide-react"
 import { Dropzone } from "~/components/custom/dropzone"
 import { Button } from "~/components/ui/button"
@@ -27,77 +26,89 @@ export function BulkSoilAnalysisUploadForm({
     const [currentFile, setCurrentFile] = useState<string | null>(null)
     const MAX_FILE_SIZE = 5 * 1024 * 1024
 
-    const fetcher = useFetcher()
-    const uploadQueueRef = useRef<File[]>([])
-    const allResultsRef = useRef<any[]>([])
-    const totalFilesRef = useRef(0)
-
     const handleFilesChange = (newFiles: File[]) => {
         setFiles(newFiles)
     }
 
-    const handleUpload = () => {
+    const handleUpload = async () => {
         if (files.length === 0) return
 
         setIsUploading(true)
         setUploadProgress(0)
-        allResultsRef.current = []
-        uploadQueueRef.current = [...files]
-        totalFilesRef.current = files.length
 
-        processNextFile()
-    }
+        const allResults: any[] = []
+        const totalFiles = files.length
+        let completedFiles = 0
 
-    const processNextFile = () => {
-        const nextFile = uploadQueueRef.current.shift()
-        if (!nextFile) {
-            // Done!
+        const formData = new FormData()
+        for (const file of files) {
+            formData.append("soilAnalysisFile", file)
+        }
+
+        try {
+            const response = await fetch("/api/soil-analysis/extract", {
+                method: "POST",
+                body: formData,
+                credentials: "same-origin",
+            })
+
+            if (!response.ok) {
+                throw new Error("Fout bij starten van analyse")
+            }
+
+            if (!response.body) {
+                throw new Error("Geen stream response ontvangen")
+            }
+
+            const reader = response.body.getReader()
+            const decoder = new TextDecoder()
+            let buffer = ""
+
+            while (true) {
+                const { done, value } = await reader.read()
+                if (done) break
+
+                buffer += decoder.decode(value, { stream: true })
+                const lines = buffer.split("\n")
+                // Keep the last partial line in the buffer
+                buffer = lines.pop() || ""
+
+                for (const line of lines) {
+                    if (!line.trim()) continue
+                    try {
+                        const result = JSON.parse(line)
+                        completedFiles++
+
+                        if (result.success && result.analyses) {
+                            allResults.push(...result.analyses)
+                        } else if (result.error) {
+                            toast.error(`Fout bij ${result.filename}: ${result.error}`)
+                        }
+
+                        setCurrentFile(result.filename)
+                        setUploadProgress(
+                            Math.round((completedFiles / totalFiles) * 100),
+                        )
+                    } catch (e) {
+                        console.error("Error parsing NDJSON line:", e)
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("Bulk upload error:", error)
+            toast.error(error instanceof Error ? error.message : "Upload mislukt")
+        } finally {
             setIsUploading(false)
             setCurrentFile(null)
-            if (allResultsRef.current.length > 0) {
-                toast.success(`${allResultsRef.current.length} analyses succesvol verwerkt`)
-                onSuccess(allResultsRef.current)
-            } else if (totalFilesRef.current > 0) {
+
+            if (allResults.length > 0) {
+                toast.success(`${allResults.length} analyses succesvol verwerkt`)
+                onSuccess(allResults)
+            } else if (totalFiles > 0) {
                 toast.error("Geen analyses kunnen verwerken")
             }
-            return
         }
-
-        setCurrentFile(nextFile.name)
-        const formData = new FormData()
-        formData.append("soilAnalysisFile", nextFile)
-
-        fetcher.submit(formData, {
-            method: "POST",
-            encType: "multipart/form-data",
-        })
     }
-
-    // Monitor fetcher state to process the queue
-    useEffect(() => {
-        if (!isUploading || fetcher.state !== "idle") return
-
-        if (fetcher.data) {
-            const analyses = (fetcher.data as any).analyses
-            if (analyses) {
-                if (Array.isArray(analyses)) {
-                    allResultsRef.current.push(...analyses)
-                } else {
-                    allResultsRef.current.push(analyses)
-                }
-            } else if ((fetcher.data as any).warning) {
-                toast.error(`Fout bij ${currentFile}: ${(fetcher.data as any).warning}`)
-            }
-        }
-
-        // Update progress
-        const completedCount = totalFilesRef.current - uploadQueueRef.current.length
-        setUploadProgress(Math.round((completedCount / totalFilesRef.current) * 100))
-
-        // Small delay for UI smoothness before next file
-        const timeout = setTimeout(processNextFile, 50)
-        return () => clearTimeout(timeout)
-    }, [fetcher.state, fetcher.data, isUploading])
 
     const removeFile = (index: number) => {
         const newFiles = [...files]
