@@ -177,13 +177,24 @@ export const Dropzone = ({
             const finalFiles = await handleFilesSet(files, validNewFiles)
 
             if (inputRef.current) {
-                const container = new DataTransfer()
-                finalFiles.forEach((f) => {
-                    container.items.add(f)
-                })
-                inputRef.current.files = container.files
+                try {
+                    const container = new DataTransfer()
+                    for (const f of finalFiles) {
+                        if (f instanceof File) {
+                            container.items.add(f)
+                        }
+                    }
+                    inputRef.current.files = container.files
+                } catch (err) {
+                    // Fallback or silent ignore if DataTransfer is restricted
+                    console.warn("Could not sync files to hidden input:", err)
+                }
             }
-            e.dataTransfer.clearData()
+            try {
+                e.dataTransfer.clearData()
+            } catch (err) {
+                // Ignore clearData errors
+            }
         }
     }
 

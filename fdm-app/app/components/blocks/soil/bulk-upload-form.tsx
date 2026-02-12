@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useFetcher } from "react-router"
 import { FileText, Upload, Trash2, X, FileUp } from "lucide-react"
 import { Dropzone } from "~/components/custom/dropzone"
@@ -13,6 +13,8 @@ import {
 import { Spinner } from "~/components/ui/spinner"
 import { ScrollArea } from "~/components/ui/scroll-area"
 import { cn } from "~/lib/utils"
+import { Progress } from "~/components/ui/progress"
+import { toast } from "sonner"
 
 export function BulkSoilAnalysisUploadForm({
     onSuccess,
@@ -20,9 +22,15 @@ export function BulkSoilAnalysisUploadForm({
     onSuccess: (data: any[]) => void
 }) {
     const [files, setFiles] = useState<File[]>([])
-    const fetcher = useFetcher()
-    const isUploading = fetcher.state !== "idle"
+    const [isUploading, setIsUploading] = useState(false)
+    const [uploadProgress, setUploadProgress] = useState(0)
+    const [currentFile, setCurrentFile] = useState<string | null>(null)
     const MAX_FILE_SIZE = 5 * 1024 * 1024
+
+    const fetcher = useFetcher()
+    const uploadQueueRef = useRef<File[]>([])
+    const allResultsRef = useRef<any[]>([])
+    const totalFilesRef = useRef(0)
 
     const handleFilesChange = (newFiles: File[]) => {
         setFiles(newFiles)
@@ -31,10 +39,33 @@ export function BulkSoilAnalysisUploadForm({
     const handleUpload = () => {
         if (files.length === 0) return
 
-        const formData = new FormData()
-        for (const file of files) {
-            formData.append("soilAnalysisFile", file)
+        setIsUploading(true)
+        setUploadProgress(0)
+        allResultsRef.current = []
+        uploadQueueRef.current = [...files]
+        totalFilesRef.current = files.length
+
+        processNextFile()
+    }
+
+    const processNextFile = () => {
+        const nextFile = uploadQueueRef.current.shift()
+        if (!nextFile) {
+            // Done!
+            setIsUploading(false)
+            setCurrentFile(null)
+            if (allResultsRef.current.length > 0) {
+                toast.success(`${allResultsRef.current.length} analyses succesvol verwerkt`)
+                onSuccess(allResultsRef.current)
+            } else if (totalFilesRef.current > 0) {
+                toast.error("Geen analyses kunnen verwerken")
+            }
+            return
         }
+
+        setCurrentFile(nextFile.name)
+        const formData = new FormData()
+        formData.append("soilAnalysisFile", nextFile)
 
         fetcher.submit(formData, {
             method: "POST",
@@ -42,13 +73,31 @@ export function BulkSoilAnalysisUploadForm({
         })
     }
 
+    // Monitor fetcher state to process the queue
     useEffect(() => {
-        if (isUploading) return
+        if (!isUploading || fetcher.state !== "idle") return
 
-        if (fetcher.data?.analyses) {
-            onSuccess(fetcher.data.analyses)
+        if (fetcher.data) {
+            const analyses = (fetcher.data as any).analyses
+            if (analyses) {
+                if (Array.isArray(analyses)) {
+                    allResultsRef.current.push(...analyses)
+                } else {
+                    allResultsRef.current.push(analyses)
+                }
+            } else if ((fetcher.data as any).warning) {
+                toast.error(`Fout bij ${currentFile}: ${(fetcher.data as any).warning}`)
+            }
         }
-    }, [fetcher.data, isUploading, onSuccess])
+
+        // Update progress
+        const completedCount = totalFilesRef.current - uploadQueueRef.current.length
+        setUploadProgress(Math.round((completedCount / totalFilesRef.current) * 100))
+
+        // Small delay for UI smoothness before next file
+        const timeout = setTimeout(processNextFile, 50)
+        return () => clearTimeout(timeout)
+    }, [fetcher.state, fetcher.data, isUploading])
 
     const removeFile = (index: number) => {
         const newFiles = [...files]
@@ -90,6 +139,7 @@ export function BulkSoilAnalysisUploadForm({
                             onFilesChange={handleFilesChange}
                             allowReset={false}
                             maxSize={MAX_FILE_SIZE}
+                            disabled={isUploading}
                             className={cn(
                                 "w-full transition-all duration-200 border-2",
                                 files.length > 0
@@ -196,6 +246,25 @@ export function BulkSoilAnalysisUploadForm({
                                     </div>
                                 </ScrollArea>
                             </div>
+
+                            {isUploading && (
+                                <div className="mt-4 space-y-2">
+                                    <div className="flex justify-between text-xs">
+                                        <span className="text-muted-foreground truncate max-w-[200px]">
+                                            {currentFile
+                                                ? `Analyseert: ${currentFile}`
+                                                : "Bestanden verwerken..."}
+                                        </span>
+                                        <span className="font-medium">
+                                            {uploadProgress}%
+                                        </span>
+                                    </div>
+                                    <Progress
+                                        value={uploadProgress}
+                                        className="h-1"
+                                    />
+                                </div>
+                            )}
 
                             <div className="pt-4 mt-auto flex justify-end">
                                 <Button

@@ -192,12 +192,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Handle initial upload to NMI
         if (formData.has("soilAnalysisFile")) {
             const analyses = await extractBulkSoilAnalyses(formData)
-            return dataWithSuccess(
-                { analyses },
-                {
-                    message: `${analyses.length} analyses succesvol verwerkt`,
-                },
-            )
+            return data({ analyses })
         }
 
         // Handle final save

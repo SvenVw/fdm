@@ -263,7 +263,13 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
         throw new Error("Geen bestanden gevonden in FormData")
     }
 
-    for (const file of files) {
+    // Filter out potential non-File objects or empty slots
+    const validFiles = files.filter(file => file instanceof File && file.name)
+    if (validFiles.length === 0) {
+        throw new Error("Geen geldige bestanden gevonden in FormData")
+    }
+
+    for (const file of validFiles) {
         await validatePdfMagicBytes(file)
     }
 
@@ -276,7 +282,7 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
     let currentBatchSize = 0
     const batches: File[][] = []
 
-    for (const file of files) {
+    for (const file of validFiles) {
         if (
             currentBatchFiles.length >= BATCH_SIZE ||
             (currentBatchFiles.length > 0 &&
@@ -293,9 +299,8 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
         batches.push(currentBatchFiles)
     }
 
-    // Process each batch
-    for (let i = 0; i < batches.length; i++) {
-        const batchFiles = batches[i]
+    // Process each batch in parallel
+    const batchPromises = batches.map(async (batchFiles, i) => {
         const batchFormData = new FormData()
         for (const file of batchFiles) {
             batchFormData.append("soilAnalysisFile", file)
@@ -340,7 +345,12 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
             )
         }
 
-        allFields.push(...responseData.fields)
+        return responseData.fields
+    })
+
+    const allBatchFields = await Promise.all(batchPromises)
+    for (const fields of allBatchFields) {
+        allFields.push(...fields)
     }
 
     return allFields.map((field: any, index: number) => {
