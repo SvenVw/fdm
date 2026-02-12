@@ -77,7 +77,7 @@ export default function BulkSoilAnalysisUploadWizardPage() {
     const submit = useSubmit()
 
     const isSaving =
-        navigation.state === "submitting" && navigation.formData?.has("matches")
+        navigation.state !== "idle" && navigation.formMethod === "POST"
 
     const handleUploadSuccess = (analyses: any[]) => {
         const matchedAnalyses = analyses.map((analysis) => {
