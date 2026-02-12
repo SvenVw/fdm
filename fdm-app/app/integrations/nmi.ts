@@ -3,7 +3,17 @@ import type { Feature, Geometry, Polygon } from "geojson"
 import { z } from "zod"
 import { serverConfig } from "~/lib/config.server"
 import { fileTypeFromBuffer } from "file-type"
+import proj4 from "proj4"
+
 const MAX_PDF_SIZE = 5 * 1024 * 1024
+
+// Register the projection for RD New (EPSG:28992)
+if (!proj4.defs("EPSG:28992")) {
+    proj4.defs(
+        "EPSG:28992",
+        "+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +towgs84=565.2369,50.0087,465.658,-0.406857330322398,0.350732676542563,-1.8703473836068,4.0812 +units=m +no_defs",
+    )
+}
 
 export function getNmiApiKey() {
     if (!serverConfig.integrations.nmi) {
@@ -207,6 +217,7 @@ export async function extractSoilAnalysis(formData: FormData) {
 
     // Select the a_* parameters
     const soilAnalysis: { [key: string]: string | number | Date } = {}
+    soilAnalysis.b_name = field.b_fieldname // Map b_fieldname for name matching
     for (const key of Object.keys(field).filter((key) =>
         key.startsWith("a_"),
     )) {
@@ -248,6 +259,31 @@ export async function extractSoilAnalysis(formData: FormData) {
             throw new Error(`Invalid numeric depth values: ${field.b_depth}`)
         }
     }
+
+    // Add coordinates for geometry matching
+    const x_rd = field.b_loc_x
+    const y_rd = field.b_loc_y
+
+    if (x_rd && y_rd) {
+        const numericX = Number(x_rd)
+        const numericY = Number(y_rd)
+
+        if (!Number.isNaN(numericX) && !Number.isNaN(numericY)) {
+            try {
+                const [lon, lat] = proj4("EPSG:28992", "EPSG:4326", [
+                    numericX,
+                    numericY,
+                ])
+                soilAnalysis.location = {
+                    type: "Point",
+                    coordinates: [lon, lat],
+                }
+            } catch (e) {
+                console.error("Coordinate transformation failed:", e)
+            }
+        }
+    }
+
     return soilAnalysis
 }
 
@@ -357,6 +393,7 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
         const soilAnalysis: { [key: string]: any } = {
             id: crypto.randomUUID(), // Used for UI matching
             filename: field.filename || `Analyse ${index + 1}`,
+            b_name: field.b_fieldname, // Map b_fieldname for name matching
         }
 
         // Safely map known soil parameters (starting with a_)
@@ -397,10 +434,46 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
         }
 
         // Add coordinates for geometry matching, but keep them separate from the main analysis data
-        if (field.a_lat && field.a_lon) {
-            soilAnalysis.location = {
-                type: "Point",
-                coordinates: [Number(field.a_lon), Number(field.a_lat)],
+        // NMI API uses RD New (EPSG:28992) with keys b_loc_x and b_loc_y
+        const x_rd = field.b_loc_x
+        const y_rd = field.b_loc_y
+
+        if (x_rd && y_rd) {
+            const numericX = Number(x_rd)
+            const numericY = Number(y_rd)
+
+            if (!Number.isNaN(numericX) && !Number.isNaN(numericY)) {
+                try {
+                    // Transform from RD New to WGS84
+                    const [lon, lat] = proj4("EPSG:28992", "EPSG:4326", [
+                        numericX,
+                        numericY,
+                    ])
+                    soilAnalysis.location = {
+                        type: "Point",
+                        coordinates: [lon, lat],
+                    }
+                } catch (e) {
+                    console.error("Coordinate transformation failed:", e)
+                }
+            }
+        }
+
+        // Fallback for WGS84 if provided directly under other keys
+        if (!soilAnalysis.location) {
+            const lat = field.a_lat || field.latitude || field.lat
+            const lon = field.a_lon || field.longitude || field.lon
+
+            if (lat && lon) {
+                const numericLat = Number(lat)
+                const numericLon = Number(lon)
+
+                if (!Number.isNaN(numericLat) && !Number.isNaN(numericLon)) {
+                    soilAnalysis.location = {
+                        type: "Point",
+                        coordinates: [numericLon, numericLat],
+                    }
+                }
             }
         }
 

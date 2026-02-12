@@ -34,6 +34,12 @@ import { Check, AlertTriangle, Save, X, Microscope } from "lucide-react"
 import type { SoilParameterDescription } from "@svenvw/fdm-core"
 import { format } from "date-fns/format"
 import { nl } from "date-fns/locale/nl"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "~/components/ui/tooltip"
 
 const isValidDate = (dateStr: string | undefined | null): boolean => {
     if (!dateStr) return false
@@ -51,6 +57,7 @@ export type ProcessedAnalysis = {
     a_nmin_cc?: number
     a_source: string
     matchedFieldId?: string
+    matchReason?: "geometry" | "name" | "both"
     data: Record<string, unknown> // Raw parsed data
 }
 
@@ -185,9 +192,11 @@ export function BulkSoilAnalysisReview({
             id: "status",
             header: "Status",
             cell: ({ row }) => {
-                const match = matches[row.original.id]
-                const isMatched = match && match !== "none"
+                const matchId = matches[row.original.id]
+                const isMatched = matchId && matchId !== "none"
                 const isValid = isValidDate(row.original.b_sampling_date)
+                const reason = row.original.matchReason
+                const initialMatchId = row.original.matchedFieldId
 
                 if (!isValid) {
                     return (
@@ -198,12 +207,38 @@ export function BulkSoilAnalysisReview({
                     )
                 }
 
-                return isMatched ? (
-                    <div className="flex items-center text-green-600">
-                        <Check className="h-4 w-4 mr-1" />
-                        <span className="text-xs">Gekoppeld</span>
-                    </div>
-                ) : (
+                if (isMatched) {
+                    // It's only an automatic match if the current selection is the same as the initial one
+                    const isAutomatic = matchId === initialMatchId
+                    let tooltipText = "Handmatig gekoppeld"
+
+                    if (isAutomatic && reason) {
+                        if (reason === "geometry")
+                            tooltipText =
+                                "Automatisch gekoppeld op basis van geometrie"
+                        else if (reason === "name")
+                            tooltipText = "Automatisch gekoppeld op basis van naam"
+                        else if (reason === "both")
+                            tooltipText =
+                                "Automatisch gekoppeld op basis van geometrie en naam"
+                    }
+
+                    return (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div className="flex items-center text-green-600 cursor-help">
+                                    <Check className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Gekoppeld</span>
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{tooltipText}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    )
+                }
+
+                return (
                     <div className="flex items-center text-amber-600">
                         <AlertTriangle className="h-4 w-4 mr-1" />
                         <span className="text-xs">Niet gekoppeld</span>
@@ -224,105 +259,107 @@ export function BulkSoilAnalysisReview({
     }
 
     return (
-        <Card className="w-full">
-            <CardHeader>
-                <CardTitle>Controleer en koppel</CardTitle>
-                <CardDescription>
-                    Controleer de gegevens uit de pdf's en koppel ze aan het
-                    juiste perceel. Analyses met ontbrekende datum of zonder
-                    gekoppeld perceel worden overgeslagen.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <TableRow key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
-                                                      header.getContext(),
-                                                  )}
-                                        </TableHead>
-                                    ))}
-                                </TableRow>
-                            ))}
-                        </TableHeader>
-                        <TableBody>
-                            {table.getRowModel().rows?.length ? (
-                                table.getRowModel().rows.map((row) => {
-                                    const isValid = isValidDate(
-                                        row.original.b_sampling_date,
-                                    )
+        <TooltipProvider>
+            <Card className="w-full">
+                <CardHeader>
+                    <CardTitle>Controleer en koppel</CardTitle>
+                    <CardDescription>
+                        Controleer de gegevens uit de pdf's en koppel ze aan het
+                        juiste perceel. Analyses met ontbrekende datum of zonder
+                        gekoppeld perceel worden overgeslagen.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="rounded-md border">
+                        <Table>
+                            <TableHeader>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <TableRow key={headerGroup.id}>
+                                        {headerGroup.headers.map((header) => (
+                                            <TableHead key={header.id}>
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                          header.column
+                                                              .columnDef.header,
+                                                          header.getContext(),
+                                                      )}
+                                            </TableHead>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableHeader>
+                            <TableBody>
+                                {table.getRowModel().rows?.length ? (
+                                    table.getRowModel().rows.map((row) => {
+                                        const isValid = isValidDate(
+                                            row.original.b_sampling_date,
+                                        )
 
-                                    return (
-                                        <TableRow
-                                            key={row.id}
-                                            data-state={
-                                                row.getIsSelected() &&
-                                                "selected"
-                                            }
-                                            className={
-                                                !isValid
-                                                    ? "bg-destructive/5"
-                                                    : ""
-                                            }
+                                        return (
+                                            <TableRow
+                                                key={row.id}
+                                                data-state={
+                                                    row.getIsSelected() &&
+                                                    "selected"
+                                                }
+                                                className={
+                                                    !isValid
+                                                        ? "bg-destructive/5"
+                                                        : ""
+                                                }
+                                            >
+                                                {row
+                                                    .getVisibleCells()
+                                                    .map((cell) => (
+                                                        <TableCell key={cell.id}>
+                                                            {cell.column.id ===
+                                                                "match" &&
+                                                            !isValid ? (
+                                                                <div className="text-xs text-muted-foreground italic px-3">
+                                                                    Niet koppelbaar
+                                                                </div>
+                                                            ) : (
+                                                                flexRender(
+                                                                    cell.column
+                                                                        .columnDef
+                                                                        .cell,
+                                                                    cell.getContext(),
+                                                                )
+                                                            )}
+                                                        </TableCell>
+                                                    ))}
+                                            </TableRow>
+                                        )
+                                    })
+                                ) : (
+                                    <TableRow>
+                                        <TableCell
+                                            colSpan={columns.length}
+                                            className="h-24 text-center"
                                         >
-                                            {row
-                                                .getVisibleCells()
-                                                .map((cell) => (
-                                                    <TableCell key={cell.id}>
-                                                        {cell.column.id ===
-                                                            "match" &&
-                                                        !isValid ? (
-                                                            <div className="text-xs text-muted-foreground italic px-3">
-                                                                Niet koppelbaar
-                                                            </div>
-                                                        ) : (
-                                                            flexRender(
-                                                                cell.column
-                                                                    .columnDef
-                                                                    .cell,
-                                                                cell.getContext(),
-                                                            )
-                                                        )}
-                                                    </TableCell>
-                                                ))}
-                                        </TableRow>
-                                    )
-                                })
-                            ) : (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={columns.length}
-                                        className="h-24 text-center"
-                                    >
-                                        Geen resultaten.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
-            </CardContent>
-            <CardFooter className="flex justify-between border-t p-6">
-                <Button variant="outline" onClick={onCancel}>
-                    <X className="mr-2 h-4 w-4" />
-                    Annuleren
-                </Button>
-                <Button
-                    onClick={handleSave}
-                    disabled={validMatches.length === 0}
-                >
-                    <Save className="mr-2 h-4 w-4" />
-                    Opslaan & Koppelen
-                </Button>
-            </CardFooter>
-        </Card>
+                                            Geen resultaten.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </CardContent>
+                <CardFooter className="flex justify-between border-t p-6">
+                    <Button variant="outline" onClick={onCancel}>
+                        <X className="mr-2 h-4 w-4" />
+                        Annuleren
+                    </Button>
+                    <Button
+                        onClick={handleSave}
+                        disabled={validMatches.length === 0}
+                    >
+                        <Save className="mr-2 h-4 w-4" />
+                        Opslaan & Koppelen
+                    </Button>
+                </CardFooter>
+            </Card>
+        </TooltipProvider>
     )
 }

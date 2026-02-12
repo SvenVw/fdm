@@ -82,34 +82,60 @@ export default function BulkSoilAnalysisUploadWizardPage() {
     const handleUploadSuccess = (analyses: any[]) => {
         const matchedAnalyses = analyses.map((analysis) => {
             let matchedFieldId = ""
+            let matchReason: "geometry" | "name" | "both" | undefined
 
-            if (analysis.location) {
-                const fieldMatch = fields.find((field) => {
-                    if (!field.geometry) return false
-                    try {
-                        return booleanPointInPolygon(
-                            analysis.location,
-                            field.geometry,
-                        )
-                    } catch (e) {
-                        return false
+            // Geometry matching
+            if (analysis.location && analysis.location.coordinates) {
+                const [lon, lat] = analysis.location.coordinates
+                if (typeof lon === "number" && typeof lat === "number") {
+                    const fieldMatch = fields.find((field) => {
+                        if (!field.geometry) return false
+                        try {
+                            // booleanPointInPolygon handles both Polygon and MultiPolygon
+                            return booleanPointInPolygon(
+                                analysis.location,
+                                field.geometry as any,
+                            )
+                        } catch (e) {
+                            console.warn(`Matching failed for field ${field.b_name}:`, e)
+                            return false
+                        }
+                    })
+                    if (fieldMatch) {
+                        matchedFieldId = fieldMatch.b_id
+                        matchReason = "geometry"
                     }
-                })
-                if (fieldMatch) matchedFieldId = fieldMatch.b_id
+                }
             }
 
-            if (!matchedFieldId) {
+            // Fallback: Name matching (b_fieldname vs field name)
+            const analysisName = (analysis.b_name || "")
+                .toLowerCase()
+                .trim()
+
+            if (analysisName) {
                 const fieldMatch = fields.find(
                     (field) =>
-                        field.b_name.toLowerCase() ===
-                        analysis.filename.replace(/\.pdf$/i, "").toLowerCase(),
+                        field.b_name.toLowerCase().trim() === analysisName,
                 )
-                if (fieldMatch) matchedFieldId = fieldMatch.b_id
+                
+                if (fieldMatch) {
+                    if (matchedFieldId) {
+                        // Check if it's the same field
+                        if (matchedFieldId === fieldMatch.b_id) {
+                            matchReason = "both"
+                        }
+                    } else {
+                        matchedFieldId = fieldMatch.b_id
+                        matchReason = "name"
+                    }
+                }
             }
 
             return {
                 ...analysis,
                 matchedFieldId,
+                matchReason,
             }
         })
 
