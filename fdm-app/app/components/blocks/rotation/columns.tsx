@@ -203,7 +203,12 @@ export const columns: ColumnDef<RotationExtended>[] = [
                             />
                         </TooltipTrigger>
                         <TooltipContent>
-                            U zou in plaats daarvan een oogst moeten toevoegen.
+                            {(row.original.type === "crop"
+                                ? row.original.fields
+                                : [row.original]
+                            ).some((fieldRow) => fieldRow.harvests.length > 0)
+                                ? "U zou in plaats daarvan de huidige oogsten bij te werken."
+                                : "U zou in plaats daarvan een oogst moeten toevoegen."}
                         </TooltipContent>
                     </Tooltip>
                 </span>
