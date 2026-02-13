@@ -1,9 +1,11 @@
 import type { Invitation, Member, Organization } from "better-auth/plugins"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
+import { useRef } from "react"
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
-import { useLoaderData } from "react-router"
+import { useFetcher, useLoaderData } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
+import { toast } from "sonner"
 import { z } from "zod"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
@@ -55,7 +57,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const members = membersListResponse.members
 
     // Determine permissions
-    const currentUserMember = members.find((m) => m.userId === session.user.id)
+    const currentUserMember = members.find(
+        (m) => m.userId === session.principal_id,
+    )
     const role = currentUserMember?.role || "viewer"
     const permissions = {
         canEdit: role === "owner" || role === "admin",
@@ -100,13 +104,11 @@ export default function OrganizationIndex() {
     return (
         <main className="container">
             <div className="max-w-3xl mx-auto px-4">
-                {/* Changed this div to a flex container with justify-between */}
-                <div className="mb-8 flex items-center justify-between">
-                    <FarmTitle
-                        title={organization.name}
-                        description={organization.description || ""}
-                    />
-                </div>
+                <FarmTitle
+                    title={`Leden van ${organization.name}`}
+                    description={organization.description || ""}
+                    action={{ label: "Terug naar overzicht", to: "./.." }}
+                />
                 <div className="grid lg:grid-cols-1 gap-4">
                     <Card>
                         <CardHeader>
@@ -240,10 +242,34 @@ const MemberAction = ({
         canRemoveUser: boolean
     }
 }) => {
+    const fetcher = useFetcher()
+    const formRef = useRef<HTMLFormElement>(null)
+    const disabled = fetcher.state !== "idle"
+
+    function submitRoleChange() {
+        if (!formRef.current) {
+            console.error("HTML form is not referenced.")
+            return
+        }
+        const formData = new FormData(formRef.current)
+        formData.append("intent", "update_role")
+        fetcher
+            .submit(formData, { method: "post" })
+            .catch((e) => toast.error(e.message))
+    }
     return (
-        <form method="post" className="flex items-center space-x-4">
+        <form
+            ref={formRef}
+            method="post"
+            className="flex items-center space-x-4"
+        >
             <input type="hidden" name="memberId" value={member.id} />
-            <Select defaultValue={member.role} name="role">
+            <Select
+                defaultValue={member.role}
+                name="role"
+                onValueChange={submitRoleChange}
+                disabled={disabled}
+            >
                 <SelectTrigger className="ml-auto w-27.5">
                     <SelectValue placeholder="Select" />
                 </SelectTrigger>
@@ -263,14 +289,6 @@ const MemberAction = ({
                     Verwijder
                 </Button>
             ) : null}
-            <Button
-                type="submit"
-                className="shrink-0"
-                name="intent"
-                value="update_role"
-            >
-                Bijwerken
-            </Button>
         </form>
     )
 }

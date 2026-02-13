@@ -1,6 +1,7 @@
 import { getFarms } from "@svenvw/fdm-core"
 import {
     ArrowRight,
+    Building,
     Check,
     House,
     Layers,
@@ -451,7 +452,6 @@ export default function AppIndex() {
                                     </CardFooter>
                                 </NavLink>
                             </Card>
-
                             <Card className="group relative flex flex-col transition-all hover:border-primary/50 hover:shadow-md">
                                 <NavLink
                                     to={`/farm/undefined/${loaderData.calendar}/atlas/soil`}
@@ -475,6 +475,39 @@ export default function AppIndex() {
                                     <CardFooter className="border-t bg-muted/50 py-3 group-hover:bg-primary/5">
                                         <span className="flex items-center text-sm font-semibold text-primary transition-transform group-hover:translate-x-1">
                                             Naar bodemkaart{" "}
+                                            <ArrowRight className="ml-2 h-4 w-4" />
+                                        </span>
+                                    </CardFooter>
+                                </NavLink>
+                            </Card>
+                        </div>
+                        <FarmTitle
+                            title="Andere Diensten"
+                            description={`${clientConfig.name} maakt het voor u gemakkelijker om meerdere bedrijven te beheren en samen te werken met andere gebruikers.`}
+                        />
+                        <div className="grid gap-6 p-6 md:p-10 md:pt-0 lg:grid-cols-2 xl:grid-cols-3">
+                            <Card className="group relative flex flex-col transition-all hover:border-primary/50 hover:shadow-md">
+                                <NavLink
+                                    to="/organization"
+                                    className="flex h-full flex-col"
+                                >
+                                    <CardHeader>
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors group-hover:bg-primary/10 group-hover:text-primary">
+                                                <Building className="h-5 w-5" />
+                                            </div>
+                                            <CardTitle className="text-xl">
+                                                Organisaties
+                                            </CardTitle>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="grow text-sm text-muted-foreground">
+                                        Werk samen met andere gebruikers op
+                                        bedrijven in een gemakkelijke manier.
+                                    </CardContent>
+                                    <CardFooter className="border-t bg-muted/50 py-3 group-hover:bg-primary/5">
+                                        <span className="flex items-center text-sm font-semibold text-primary transition-transform group-hover:translate-x-1">
+                                            Naar uw organisaties{" "}
                                             <ArrowRight className="ml-2 h-4 w-4" />
                                         </span>
                                     </CardFooter>
