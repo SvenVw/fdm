@@ -3,7 +3,17 @@ import type { Feature, Geometry, Polygon } from "geojson"
 import { z } from "zod"
 import { serverConfig } from "~/lib/config.server"
 import { fileTypeFromBuffer } from "file-type"
+import proj4 from "proj4"
+
 const MAX_PDF_SIZE = 5 * 1024 * 1024
+
+// Register the projection for RD New (EPSG:28992)
+if (!proj4.defs("EPSG:28992")) {
+    proj4.defs(
+        "EPSG:28992",
+        "+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +towgs84=565.2369,50.0087,465.658,-0.406857330322398,0.350732676542563,-1.8703473836068,4.0812 +units=m +no_defs",
+    )
+}
 
 export function getNmiApiKey() {
     if (!serverConfig.integrations.nmi) {
@@ -206,7 +216,11 @@ export async function extractSoilAnalysis(formData: FormData) {
     const field = response.fields[0]
 
     // Select the a_* parameters
-    const soilAnalysis: { [key: string]: string | number | Date } = {}
+    const soilAnalysis: {
+        [key: string]: string | number | Date | any
+        location?: { type: "Point"; coordinates: [number, number] }
+    } = {}
+    soilAnalysis.b_name = field.b_fieldname // Map b_fieldname for name matching
     for (const key of Object.keys(field).filter((key) =>
         key.startsWith("a_"),
     )) {
@@ -214,9 +228,8 @@ export async function extractSoilAnalysis(formData: FormData) {
     }
 
     // Check if soil parameters are returned
-    if (Object.keys(soilAnalysis).length <= 1) {
-        // a_source is returned with invalid soil analysis
-        throw new Error("Invalid soil analysis")
+    if (!soilAnalysis.a_source) {
+        throw new Error("Invalid soil analysis: laboratory source missing")
     }
 
     // Process the other parameters
@@ -227,7 +240,14 @@ export async function extractSoilAnalysis(formData: FormData) {
             const day = Number.parseInt(dateParts[0], 10)
             const month = Number.parseInt(dateParts[1], 10) - 1 // Month is 0-indexed
             const year = Number.parseInt(dateParts[2], 10)
-            soilAnalysis.b_sampling_date = new Date(year, month, day)
+
+            if (
+                !Number.isNaN(day) &&
+                !Number.isNaN(month) &&
+                !Number.isNaN(year)
+            ) {
+                soilAnalysis.b_sampling_date = new Date(year, month, day)
+            }
         }
     }
     if (field.b_soiltype_agr) {
@@ -248,6 +268,31 @@ export async function extractSoilAnalysis(formData: FormData) {
             throw new Error(`Invalid numeric depth values: ${field.b_depth}`)
         }
     }
+
+    // Add coordinates for geometry matching
+    const x_rd = field.b_loc_x
+    const y_rd = field.b_loc_y
+
+    if (x_rd && y_rd) {
+        const numericX = Number(x_rd)
+        const numericY = Number(y_rd)
+
+        if (!Number.isNaN(numericX) && !Number.isNaN(numericY)) {
+            try {
+                const [lon, lat] = proj4("EPSG:28992", "EPSG:4326", [
+                    numericX,
+                    numericY,
+                ])
+                soilAnalysis.location = {
+                    type: "Point",
+                    coordinates: [lon, lat],
+                }
+            } catch (e) {
+                console.error("Coordinate transformation failed:", e)
+            }
+        }
+    }
+
     return soilAnalysis
 }
 
@@ -258,102 +303,188 @@ export async function extractBulkSoilAnalyses(formData: FormData) {
         throw new Error("NMI API key not configured")
     }
 
+    // Filter out potential non-File objects or empty slots
     const files = formData.getAll("soilAnalysisFile") as File[]
-    if (files.length === 0) {
-        throw new Error("Geen bestanden gevonden in FormData")
+    const validFiles = files.filter((file) => file instanceof File && file.name)
+    if (validFiles.length === 0) {
+        throw new Error("Geen geldige bestanden gevonden in FormData")
     }
 
-    for (const file of files) {
+    for (const file of validFiles) {
         await validatePdfMagicBytes(file)
     }
 
-    const responseApi = await fetch("https://api.nmi-agro.nl/soilreader", {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${nmiApiKey}`,
-        },
-        body: formData,
-    })
+    const BATCH_SIZE = 10
+    const MAX_BATCH_BYTES = 20 * 1024 * 1024 // 20MB
 
-    if (!responseApi.ok) {
-        const text = await responseApi.text()
-        console.error(
-            `NMI API Error: ${responseApi.status} ${responseApi.statusText}`,
-            text,
-        )
-        throw new Error(
-            `Request to NMI API failed: ${responseApi.status} ${responseApi.statusText}`,
-        )
+    // Group files into batches based on count and total size
+    let currentBatchFiles: File[] = []
+    let currentBatchSize = 0
+    const batches: File[][] = []
+
+    for (const file of validFiles) {
+        if (
+            currentBatchFiles.length >= BATCH_SIZE ||
+            (currentBatchFiles.length > 0 &&
+                currentBatchSize + file.size > MAX_BATCH_BYTES)
+        ) {
+            batches.push(currentBatchFiles)
+            currentBatchFiles = []
+            currentBatchSize = 0
+        }
+        currentBatchFiles.push(file)
+        currentBatchSize += file.size
+    }
+    if (currentBatchFiles.length > 0) {
+        batches.push(currentBatchFiles)
     }
 
-    const text = await responseApi.text()
-    try {
-        const result = JSON.parse(text)
-        const response = result?.data
-
-        if (!response?.fields || !Array.isArray(response.fields)) {
-            console.error(
-                "Invalid NMI API response structure:",
-                JSON.stringify(result, null, 2),
-            )
-            throw new Error("Invalid API response: no fields found")
+    // Process each batch sequentially to avoid overwhelming the API
+    const allBatchFields: any[] = []
+    for (let i = 0; i < batches.length; i++) {
+        const batchFiles = batches[i]
+        const batchFormData = new FormData()
+        for (const file of batchFiles) {
+            batchFormData.append("soilAnalysisFile", file)
         }
 
-        return response.fields.map((field: any, index: number) => {
-            const soilAnalysis: { [key: string]: any } = {
-                id: crypto.randomUUID(), // Used for UI matching
-                filename: field.filename || `Analyse ${index + 1}`,
+        const responseApi = await fetch("https://api.nmi-agro.nl/soilreader", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${nmiApiKey}`,
+            },
+            body: batchFormData,
+        })
+
+        if (!responseApi.ok) {
+            const text = await responseApi.text()
+            console.error(
+                `NMI API Error (Batch ${i + 1}/${batches.length}): ${responseApi.status} ${responseApi.statusText}`,
+                text,
+            )
+
+            if (responseApi.status === 413) {
+                throw new Error(
+                    `invalid: Groep ${i + 1} van de bestanden is te groot voor de NMI API. Verklein de PDF's of upload ze in nog kleinere groepen.`,
+                )
             }
 
-            // Safely map known soil parameters (starting with a_)
-            for (const key of Object.keys(field).filter((key) =>
-                key.startsWith("a_"),
-            )) {
-                soilAnalysis[key] = field[key]
-            }
+            throw new Error(
+                `Request to NMI API failed: ${responseApi.status} ${responseApi.statusText}`,
+            )
+        }
 
-            if (field.b_date) {
-                const dateParts = field.b_date.split("-")
-                if (dateParts.length === 3) {
-                    const day = Number.parseInt(dateParts[0], 10)
-                    const month = Number.parseInt(dateParts[1], 10) - 1
-                    const year = Number.parseInt(dateParts[2], 10)
+        const result = await responseApi.json()
+        const responseData = result?.data
+
+        if (!responseData?.fields || !Array.isArray(responseData.fields)) {
+            console.error(
+                `Invalid NMI API response structure in batch ${i + 1}:`,
+                JSON.stringify(result, null, 2),
+            )
+            throw new Error(
+                `Invalid API response in batch ${i + 1}: no fields found`,
+            )
+        }
+
+        allBatchFields.push(...responseData.fields)
+    }
+
+    return allBatchFields.map((field: any, index: number) => {
+        const soilAnalysis: { [key: string]: any } = {
+            id: crypto.randomUUID(), // Used for UI matching
+            filename: field.filename || `Analyse ${index + 1}`,
+            b_name: field.b_fieldname, // Map b_fieldname for name matching
+        }
+
+        // Safely map known soil parameters (starting with a_)
+        for (const key of Object.keys(field).filter((key) =>
+            key.startsWith("a_"),
+        )) {
+            soilAnalysis[key] = field[key]
+        }
+
+        if (field.b_date) {
+            const dateParts = field.b_date.split("-")
+            if (dateParts.length === 3) {
+                const day = Number.parseInt(dateParts[0], 10)
+                const month = Number.parseInt(dateParts[1], 10) - 1
+                const year = Number.parseInt(dateParts[2], 10)
+
+                if (
+                    !Number.isNaN(day) &&
+                    !Number.isNaN(month) &&
+                    !Number.isNaN(year)
+                ) {
                     soilAnalysis.b_sampling_date = new Date(year, month, day)
                 }
             }
+        }
 
-            if (field.b_soiltype_agr) {
-                soilAnalysis.b_soil_type = field.b_soiltype_agr
+        if (field.b_soiltype_agr) {
+            soilAnalysis.b_soil_type = field.b_soiltype_agr
+        }
+
+        if (field.b_depth) {
+            const depthParts = field.b_depth.split("-")
+            if (depthParts.length !== 2) {
+                throw new Error(`Invalid depth format: ${field.b_depth}`)
             }
-
-            if (field.b_depth) {
-                const depthParts = field.b_depth.split("-")
-                if (depthParts.length !== 2) {
-                    throw new Error(`Invalid depth format: ${field.b_depth}`)
-                }
-                const upper = Number(depthParts[0])
-                const lower = Number(depthParts[1])
-                if (Number.isNaN(upper) || Number.isNaN(lower)) {
-                    throw new Error(
-                        `Invalid numeric depth values: ${field.b_depth}`,
-                    )
-                }
-                soilAnalysis.a_depth_upper = upper
-                soilAnalysis.a_depth_lower = lower
+            const upper = Number(depthParts[0])
+            const lower = Number(depthParts[1])
+            if (Number.isNaN(upper) || Number.isNaN(lower)) {
+                throw new Error(
+                    `Invalid numeric depth values: ${field.b_depth}`,
+                )
             }
+            soilAnalysis.a_depth_upper = upper
+            soilAnalysis.a_depth_lower = lower
+        }
 
-            // Add coordinates for geometry matching, but keep them separate from the main analysis data
-            if (field.a_lat && field.a_lon) {
-                soilAnalysis.location = {
-                    type: "Point",
-                    coordinates: [Number(field.a_lon), Number(field.a_lat)],
+        // Add coordinates for geometry matching, but keep them separate from the main analysis data
+        // NMI API uses RD New (EPSG:28992) with keys b_loc_x and b_loc_y
+        const x_rd = field.b_loc_x
+        const y_rd = field.b_loc_y
+
+        if (x_rd && y_rd) {
+            const numericX = Number(x_rd)
+            const numericY = Number(y_rd)
+
+            if (!Number.isNaN(numericX) && !Number.isNaN(numericY)) {
+                try {
+                    // Transform from RD New to WGS84
+                    const [lon, lat] = proj4("EPSG:28992", "EPSG:4326", [
+                        numericX,
+                        numericY,
+                    ])
+                    soilAnalysis.location = {
+                        type: "Point",
+                        coordinates: [lon, lat],
+                    }
+                } catch (e) {
+                    console.error("Coordinate transformation failed:", e)
                 }
             }
+        }
 
-            return soilAnalysis
-        })
-    } catch (e) {
-        console.error("Failed to parse NMI API response:", text)
-        throw e
-    }
+        // Fallback for WGS84 if provided directly under other keys
+        if (!soilAnalysis.location) {
+            const lat = field.a_lat ?? field.latitude ?? field.lat
+            const lon = field.a_lon ?? field.longitude ?? field.lon
+
+            if (lat != null && lon != null) {
+                const numericLat = Number(lat)
+                const numericLon = Number(lon)
+
+                if (!Number.isNaN(numericLat) && !Number.isNaN(numericLon)) {
+                    soilAnalysis.location = {
+                        type: "Point",
+                        coordinates: [numericLon, numericLat],
+                    }
+                }
+            }
+        }
+
+        return soilAnalysis
+    })
 }

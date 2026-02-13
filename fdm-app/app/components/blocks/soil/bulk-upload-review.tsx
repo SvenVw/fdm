@@ -30,15 +30,138 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { Badge } from "~/components/ui/badge"
-import { Check, AlertTriangle, Save, X, Microscope } from "lucide-react"
+import {
+    Check,
+    AlertTriangle,
+    Save,
+    X,
+    Microscope,
+    CalendarIcon,
+    Shovel,
+} from "lucide-react"
 import type { SoilParameterDescription } from "@svenvw/fdm-core"
-import { format } from "date-fns/format"
+import { format, isValid, parseISO } from "date-fns"
 import { nl } from "date-fns/locale/nl"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "~/components/ui/tooltip"
+import { Input } from "~/components/ui/input"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "~/components/ui/popover"
+import { Calendar } from "~/components/ui/calendar"
+import * as chrono from "chrono-node"
+import { endMonth } from "~/lib/calendar"
 
 const isValidDate = (dateStr: string | undefined | null): boolean => {
     if (!dateStr) return false
     const d = new Date(dateStr)
-    return !Number.isNaN(d.getTime())
+    return isValid(d)
+}
+
+function parseDateText(date: string | Date | undefined): Date | undefined {
+    if (date instanceof Date) return date
+    if (!date) return undefined
+
+    // Attempt to parse as ISO string first
+    const isoDate = parseISO(date)
+    if (isValid(isoDate)) return isoDate
+
+    // Fallback to chrono-node for localized strings
+    const referenceDate = new Date()
+    const parsedDate = chrono.nl.parseDate(date, referenceDate)
+    return parsedDate || undefined
+}
+
+function DateCell({
+    analysisId,
+    initialDateStr,
+    onDateChange,
+}: {
+    analysisId: string
+    initialDateStr: string
+    onDateChange: (id: string, date: string) => void
+}) {
+    const date = initialDateStr ? new Date(initialDateStr) : undefined
+    const [open, setOpen] = useState(false)
+    const [inputValue, setInputValue] = useState(
+        date && isValid(date) ? format(date, "PPP", { locale: nl }) : "",
+    )
+
+    const onDateSelect = (d: Date | undefined) => {
+        if (d) {
+            const iso = format(d, "yyyy-MM-dd")
+            onDateChange(analysisId, iso)
+            setInputValue(format(d, "PPP", { locale: nl }))
+        } else {
+            onDateChange(analysisId, "")
+            setInputValue("")
+        }
+        setOpen(false)
+    }
+
+    const onInputBlur = () => {
+        const parsed = parseDateText(inputValue)
+        if (parsed && isValid(parsed)) {
+            const iso = format(parsed, "yyyy-MM-dd")
+            onDateChange(analysisId, iso)
+            setInputValue(format(parsed, "PPP", { locale: nl }))
+        } else if (inputValue === "") {
+            onDateChange(analysisId, "")
+        }
+    }
+
+    return (
+        <div className="relative flex gap-2 w-[200px]">
+            <Input
+                value={inputValue}
+                placeholder="Kies een datum"
+                className="bg-background pr-10 text-xs h-8"
+                onChange={(e) => setInputValue(e.target.value)}
+                onBlur={onInputBlur}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault()
+                        e.currentTarget.blur()
+                    }
+                    if (e.key === "ArrowDown") {
+                        e.preventDefault()
+                        setOpen(true)
+                    }
+                }}
+            />
+            <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                    <Button
+                        variant="ghost"
+                        className="absolute top-1/2 right-1 size-6 -translate-y-1/2 p-0 h-6 w-6"
+                    >
+                        <CalendarIcon className="size-3" />
+                        <span className="sr-only">Kies een datum</span>
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                    className="w-auto overflow-hidden p-0"
+                    align="end"
+                >
+                    <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={onDateSelect}
+                        startMonth={new Date(1970, 0)}
+                        endMonth={endMonth}
+                        locale={nl}
+                        className="rounded-md border shadow-sm"
+                    />
+                </PopoverContent>
+            </Popover>
+        </div>
+    )
 }
 
 export type ProcessedAnalysis = {
@@ -49,8 +172,13 @@ export type ProcessedAnalysis = {
     a_p_al?: number
     a_p_cc?: number
     a_nmin_cc?: number
+    a_nh4_cc?: number
+    a_no3_cc?: number
+    a_depth_upper?: number
+    a_depth_lower?: number
     a_source: string
     matchedFieldId?: string
+    matchReason?: "geometry" | "name" | "both"
     data: Record<string, unknown> // Raw parsed data
 }
 
@@ -69,15 +197,34 @@ export function BulkSoilAnalysisReview({
     analyses: ProcessedAnalysis[]
     fields: Field[]
     soilParameterDescription: SoilParameterDescription
-    onSave: (matches: { analysisId: string; fieldId: string }[]) => void
+    onSave: (
+        matches: { analysisId: string; fieldId: string }[],
+        updatedAnalyses: ProcessedAnalysis[],
+    ) => void
     onCancel: () => void
 }) {
     const [matches, setMatches] = useState<Record<string, string>>(
         Object.fromEntries(analyses.map((a) => [a.id, a.matchedFieldId || ""])),
     )
+    const [dates, setDates] = useState<Record<string, string>>(
+        Object.fromEntries(
+            analyses.map((a) => {
+                const date = a.b_sampling_date
+                    ? new Date(a.b_sampling_date)
+                    : null
+                const validDateStr =
+                    date && isValid(date) ? format(date, "yyyy-MM-dd") : ""
+                return [a.id, validDateStr]
+            }),
+        ),
+    )
 
     const handleFieldChange = (analysisId: string, fieldId: string) => {
         setMatches((prev) => ({ ...prev, [analysisId]: fieldId }))
+    }
+
+    const handleDateChange = (analysisId: string, date: string) => {
+        setDates((prev) => ({ ...prev, [analysisId]: date }))
     }
 
     const validMatches = useMemo(
@@ -85,12 +232,20 @@ export function BulkSoilAnalysisReview({
             Object.entries(matches)
                 .filter(([analysisId, fieldId]) => {
                     if (fieldId === "" || fieldId === "none") return false
-                    const analysis = analyses.find((a) => a.id === analysisId)
-                    return isValidDate(analysis?.b_sampling_date)
+                    const date = dates[analysisId]
+                    return isValidDate(date)
                 })
                 .map(([analysisId, fieldId]) => ({ analysisId, fieldId })),
-        [matches, analyses],
+        [matches, dates],
     )
+
+    const handleSave = () => {
+        const updatedAnalyses = analyses.map((a) => ({
+            ...a,
+            b_sampling_date: dates[a.id],
+        }))
+        onSave(validMatches, updatedAnalyses)
+    }
 
     const columns: ColumnDef<ProcessedAnalysis>[] = [
         {
@@ -111,9 +266,22 @@ export function BulkSoilAnalysisReview({
                         <span className="font-medium">
                             {row.original.filename}
                         </span>
-                        <div className="flex items-center text-xs text-muted-foreground mt-1">
-                            <Microscope className="h-3 w-3 mr-1" />
-                            <span>{sourceLabel}</span>
+                        <div className="flex flex-col gap-0.5 mt-1 text-xs text-muted-foreground">
+                            <div className="flex items-center">
+                                <Microscope className="h-3 w-3 mr-1" />
+                                <span>{sourceLabel}</span>
+                            </div>
+                            {(row.original.a_depth_upper !== undefined ||
+                                row.original.a_depth_lower !== undefined) && (
+                                <div className="flex items-center ">
+                                    <Shovel className="h-3 w-3 mr-1" />
+                                    <span>
+                                        Diepte:{" "}
+                                        {row.original.a_depth_upper ?? 0} -{" "}
+                                        {row.original.a_depth_lower ?? "?"} cm
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )
@@ -122,12 +290,13 @@ export function BulkSoilAnalysisReview({
         {
             accessorKey: "b_sampling_date",
             header: "Datum",
-            cell: ({ row }) => {
-                if (!isValidDate(row.original.b_sampling_date)) return "-"
-                return format(new Date(row.original.b_sampling_date), "P", {
-                    locale: nl,
-                })
-            },
+            cell: ({ row }) => (
+                <DateCell
+                    analysisId={row.original.id}
+                    initialDateStr={dates[row.original.id]}
+                    onDateChange={handleDateChange}
+                />
+            ),
         },
         {
             id: "parameters",
@@ -141,7 +310,7 @@ export function BulkSoilAnalysisReview({
                     )}
                     {row.original.a_p_al != null && (
                         <Badge variant="secondary">
-                            P-AL: {row.original.a_p_al}
+                            P-Al: {row.original.a_p_al}
                         </Badge>
                     )}
                     {row.original.a_p_cc != null && (
@@ -154,56 +323,103 @@ export function BulkSoilAnalysisReview({
                             Nmin: {row.original.a_nmin_cc}
                         </Badge>
                     )}
+                    {row.original.a_nh4_cc != null && (
+                        <Badge variant="secondary">
+                            NH₄: {row.original.a_nh4_cc}
+                        </Badge>
+                    )}
+                    {row.original.a_no3_cc != null && (
+                        <Badge variant="secondary">
+                            NO₃: {row.original.a_no3_cc}
+                        </Badge>
+                    )}
                 </div>
             ),
         },
         {
             id: "match",
             header: "Perceel",
-            cell: ({ row }) => (
-                <Select
-                    value={matches[row.original.id]}
-                    onValueChange={(value) =>
-                        handleFieldChange(row.original.id, value)
-                    }
-                >
-                    <SelectTrigger className="w-[300px]">
-                        <SelectValue placeholder="Selecteer perceel..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="none">-- Geen perceel --</SelectItem>
-                        {fields.map((field) => (
-                            <SelectItem key={field.b_id} value={field.b_id}>
-                                {field.b_name}
+            cell: ({ row }) => {
+                const date = dates[row.original.id]
+                const isDateValid = isValidDate(date)
+
+                return (
+                    <Select
+                        value={matches[row.original.id]}
+                        disabled={!isDateValid}
+                        onValueChange={(value) =>
+                            handleFieldChange(row.original.id, value)
+                        }
+                    >
+                        <SelectTrigger className="w-[250px] text-xs h-8">
+                            <SelectValue placeholder="Selecteer perceel..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="none">
+                                -- Geen perceel --
                             </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            ),
+                            {fields.map((field) => (
+                                <SelectItem key={field.b_id} value={field.b_id}>
+                                    {field.b_name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                )
+            },
         },
         {
             id: "status",
             header: "Status",
             cell: ({ row }) => {
-                const match = matches[row.original.id]
-                const isMatched = match && match !== "none"
-                const isValid = isValidDate(row.original.b_sampling_date)
+                const matchId = matches[row.original.id]
+                const isMatched = matchId && matchId !== "none"
+                const date = dates[row.original.id]
+                const isDateValid = isValidDate(date)
+                const reason = row.original.matchReason
+                const initialMatchId = row.original.matchedFieldId
 
-                if (!isValid) {
+                if (!isDateValid) {
                     return (
                         <div className="flex items-center text-destructive">
                             <AlertTriangle className="h-4 w-4 mr-1" />
-                            <span className="text-xs">Ongeldige pdf</span>
+                            <span className="text-xs">Datum ontbreekt</span>
                         </div>
                     )
                 }
 
-                return isMatched ? (
-                    <div className="flex items-center text-green-600">
-                        <Check className="h-4 w-4 mr-1" />
-                        <span className="text-xs">Gekoppeld</span>
-                    </div>
-                ) : (
+                if (isMatched) {
+                    const isAutomatic = matchId === initialMatchId
+                    let tooltipText = "Handmatig gekoppeld"
+
+                    if (isAutomatic && reason) {
+                        if (reason === "geometry")
+                            tooltipText =
+                                "Automatisch gekoppeld op basis van geometrie"
+                        else if (reason === "name")
+                            tooltipText =
+                                "Automatisch gekoppeld op basis van naam"
+                        else if (reason === "both")
+                            tooltipText =
+                                "Automatisch gekoppeld op basis van geometrie en naam"
+                    }
+
+                    return (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div className="flex items-center text-green-600 cursor-help">
+                                    <Check className="h-4 w-4 mr-1" />
+                                    <span className="text-xs">Gekoppeld</span>
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{tooltipText}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    )
+                }
+
+                return (
                     <div className="flex items-center text-amber-600">
                         <AlertTriangle className="h-4 w-4 mr-1" />
                         <span className="text-xs">Niet gekoppeld</span>
@@ -219,110 +435,88 @@ export function BulkSoilAnalysisReview({
         getCoreRowModel: getCoreRowModel(),
     })
 
-    const handleSave = () => {
-        onSave(validMatches)
-    }
-
     return (
-        <Card className="w-full">
-            <CardHeader>
-                <CardTitle>Controleer en koppel</CardTitle>
-                <CardDescription>
-                    Controleer de gegevens uit de pdf's en koppel ze aan het
-                    juiste perceel. Analyses met ontbrekende datum of zonder
-                    gekoppeld perceel worden overgeslagen.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="rounded-md border">
-                    <Table>
-                        <TableHeader>
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <TableRow key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                      header.column.columnDef
-                                                          .header,
-                                                      header.getContext(),
-                                                  )}
-                                        </TableHead>
-                                    ))}
-                                </TableRow>
-                            ))}
-                        </TableHeader>
-                        <TableBody>
-                            {table.getRowModel().rows?.length ? (
-                                table.getRowModel().rows.map((row) => {
-                                    const isValid = isValidDate(
-                                        row.original.b_sampling_date,
-                                    )
-
-                                    return (
+        <TooltipProvider>
+            <Card className="w-full">
+                <CardHeader>
+                    <CardTitle>Controleer en koppel</CardTitle>
+                    <CardDescription>
+                        Controleer de gegevens uit de pdf's en koppel ze aan het
+                        juiste perceel. Analyses met ontbrekende datum of zonder
+                        gekoppeld perceel worden overgeslagen.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="rounded-md border overflow-hidden">
+                        <Table>
+                            <TableHeader>
+                                {table.getHeaderGroups().map((headerGroup) => (
+                                    <TableRow key={headerGroup.id}>
+                                        {headerGroup.headers.map((header) => (
+                                            <TableHead key={header.id}>
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                          header.column
+                                                              .columnDef.header,
+                                                          header.getContext(),
+                                                      )}
+                                            </TableHead>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                            </TableHeader>
+                            <TableBody>
+                                {table.getRowModel().rows?.length ? (
+                                    table.getRowModel().rows.map((row) => (
                                         <TableRow
                                             key={row.id}
                                             data-state={
                                                 row.getIsSelected() &&
                                                 "selected"
                                             }
-                                            className={
-                                                !isValid
-                                                    ? "bg-destructive/5"
-                                                    : ""
-                                            }
                                         >
                                             {row
                                                 .getVisibleCells()
                                                 .map((cell) => (
                                                     <TableCell key={cell.id}>
-                                                        {cell.column.id ===
-                                                            "match" &&
-                                                        !isValid ? (
-                                                            <div className="text-xs text-muted-foreground italic px-3">
-                                                                Niet koppelbaar
-                                                            </div>
-                                                        ) : (
-                                                            flexRender(
-                                                                cell.column
-                                                                    .columnDef
-                                                                    .cell,
-                                                                cell.getContext(),
-                                                            )
+                                                        {flexRender(
+                                                            cell.column
+                                                                .columnDef.cell,
+                                                            cell.getContext(),
                                                         )}
                                                     </TableCell>
                                                 ))}
                                         </TableRow>
-                                    )
-                                })
-                            ) : (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={columns.length}
-                                        className="h-24 text-center"
-                                    >
-                                        Geen resultaten.
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
-            </CardContent>
-            <CardFooter className="flex justify-between border-t p-6">
-                <Button variant="outline" onClick={onCancel}>
-                    <X className="mr-2 h-4 w-4" />
-                    Annuleren
-                </Button>
-                <Button
-                    onClick={handleSave}
-                    disabled={validMatches.length === 0}
-                >
-                    <Save className="mr-2 h-4 w-4" />
-                    Opslaan & Koppelen
-                </Button>
-            </CardFooter>
-        </Card>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell
+                                            colSpan={columns.length}
+                                            className="h-24 text-center"
+                                        >
+                                            Geen resultaten.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </CardContent>
+                <CardFooter className="flex justify-between border-t p-6">
+                    <Button variant="outline" onClick={onCancel}>
+                        <X className="mr-2 h-4 w-4" />
+                        Annuleren
+                    </Button>
+                    <Button
+                        onClick={handleSave}
+                        disabled={validMatches.length === 0}
+                    >
+                        <Save className="mr-2 h-4 w-4" />
+                        Opslaan & Koppelen
+                    </Button>
+                </CardFooter>
+            </Card>
+        </TooltipProvider>
     )
 }
