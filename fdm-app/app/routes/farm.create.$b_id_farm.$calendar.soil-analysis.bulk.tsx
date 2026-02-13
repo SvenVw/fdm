@@ -22,13 +22,13 @@ import {
     type ProcessedAnalysis,
 } from "~/components/blocks/soil/bulk-upload-review"
 import { extractBulkSoilAnalyses } from "~/integrations/nmi"
-import { booleanPointInPolygon } from "@turf/turf"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { Spinner } from "~/components/ui/spinner"
 import { redirectWithSuccess, dataWithSuccess } from "remix-toast"
+import { matchAnalysesToFields } from "~/components/blocks/soil/bulk-upload-match"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -77,54 +77,26 @@ export default function BulkSoilAnalysisUploadWizardPage() {
     const submit = useSubmit()
 
     const isSaving =
-        navigation.state === "submitting" && navigation.formData?.has("matches")
+        navigation.state !== "idle" &&
+        navigation.formMethod?.toLowerCase() === "post"
 
     const handleUploadSuccess = (analyses: any[]) => {
-        const matchedAnalyses = analyses.map((analysis) => {
-            let matchedFieldId = ""
-
-            if (analysis.location) {
-                const fieldMatch = fields.find((field) => {
-                    if (!field.geometry) return false
-                    try {
-                        return booleanPointInPolygon(
-                            analysis.location,
-                            field.geometry,
-                        )
-                    } catch (e) {
-                        return false
-                    }
-                })
-                if (fieldMatch) matchedFieldId = fieldMatch.b_id
-            }
-
-            if (!matchedFieldId) {
-                const fieldMatch = fields.find(
-                    (field) =>
-                        field.b_name.toLowerCase() ===
-                        analysis.filename.replace(/\.pdf$/i, "").toLowerCase(),
-                )
-                if (fieldMatch) matchedFieldId = fieldMatch.b_id
-            }
-
-            return {
-                ...analysis,
-                matchedFieldId,
-            }
-        })
-
+        const matchedAnalyses = matchAnalysesToFields(analyses, fields)
         setProcessedAnalyses(matchedAnalyses)
         setStep("review")
     }
 
-    const handleSave = (matches: { analysisId: string; fieldId: string }[]) => {
+    const handleSave = (
+        matches: { analysisId: string; fieldId: string }[],
+        updatedAnalyses: ProcessedAnalysis[],
+    ) => {
         const formData = new FormData()
         // Filter out "none" selections
         const validMatches = matches.filter(
             (m) => m.fieldId !== "none" && m.fieldId !== "",
         )
         formData.append("matches", JSON.stringify(validMatches))
-        formData.append("analysesData", JSON.stringify(processedAnalyses))
+        formData.append("analysesData", JSON.stringify(updatedAnalyses))
 
         submit(formData, { method: "post" })
     }
@@ -185,16 +157,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const calendar = getCalendar(params)
         const formData = await request.formData()
 
-        if (formData.has("soilAnalysisFile")) {
-            const analyses = await extractBulkSoilAnalyses(formData)
-            return dataWithSuccess(
-                { analyses },
-                {
-                    message: `${analyses.length} analyses succesvol verwerkt`,
-                },
-            )
-        }
-
         if (formData.has("matches")) {
             const matches = JSON.parse(formData.get("matches") as string)
             const analysesData = JSON.parse(
@@ -233,8 +195,21 @@ export async function action({ request, params }: ActionFunctionArgs) {
                                     `Analysis ${match.analysisId}: invalid b_sampling_date (${analysis.b_sampling_date})`,
                                 )
                             }
-                            // Strip UI-only properties before saving to DB
-                            const { id, location, a_source, ...dbAnalysis } = analysis
+                            // Strip UI-only and redundant properties before saving to DB
+                            const {
+                                id,
+                                location,
+                                a_source,
+                                matchedFieldId,
+                                matchReason,
+                                filename,
+                                b_name,
+                                b_sampling_date,
+                                a_depth_upper,
+                                a_depth_lower,
+                                data: _data, // Strip raw data
+                                ...dbAnalysis
+                            } = analysis
 
                             return addSoilAnalysis(
                                 fdm,
@@ -262,6 +237,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         return data({ message: "Invalid request" }, { status: 400 })
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }
