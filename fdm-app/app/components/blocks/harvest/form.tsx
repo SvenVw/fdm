@@ -179,7 +179,7 @@ function HarvestFields({
                         placeholder={
                             example_b_lu_harvest_date !== undefined &&
                             example_b_lu_harvest_date !== null
-                                ? `Voorbeeld uit de huidige: ${formatted_b_lu_harvest_date}`
+                                ? `Er zijn verschillende waarden ingevuld, bv: ${formatted_b_lu_harvest_date}`
                                 : undefined
                         }
                         defaultValue={
@@ -220,7 +220,7 @@ function HarvestFields({
                                 Number.isFinite(
                                     exampleHarvestableAnalysis?.b_lu_yield,
                                 )
-                                    ? `Voorbeeld uit de huidige: ${exampleHarvestableAnalysis?.b_lu_yield} kg / ha`
+                                    ? `Er zijn verschillende waarden ingevuld, bv: ${exampleHarvestableAnalysis?.b_lu_yield} kg / ha`
                                     : "Bv. 37500 kg / ha"
                             }
                             aria-required="true"
@@ -257,7 +257,7 @@ function HarvestFields({
                                 Number.isFinite(
                                     exampleHarvestableAnalysis?.b_lu_yield_fresh,
                                 )
-                                    ? `Voorbeeld uit de huidige: ${exampleHarvestableAnalysis?.b_lu_yield_fresh} kg / ha`
+                                    ? `Er zijn verschillende waarden ingevuld, bv: ${exampleHarvestableAnalysis?.b_lu_yield_fresh} kg / ha`
                                     : "Bv. 37500 kg / ha"
                             }
                             aria-required="true"
@@ -293,7 +293,7 @@ function HarvestFields({
                                 Number.isFinite(
                                     exampleHarvestableAnalysis?.b_lu_yield_bruto,
                                 )
-                                    ? `Voorbeeld uit de huidige: ${exampleHarvestableAnalysis?.b_lu_yield_bruto} kg / ha`
+                                    ? `Er zijn verschillende waarden ingevuld, bv: ${exampleHarvestableAnalysis?.b_lu_yield_bruto} kg / ha`
                                     : "Bv. 37500 kg / ha"
                             }
                             aria-required="true"
@@ -330,7 +330,7 @@ function HarvestFields({
                                 Number.isFinite(
                                     exampleHarvestableAnalysis?.b_lu_tarra,
                                 )
-                                    ? `Voorbeeld uit de huidige: ${exampleHarvestableAnalysis?.b_lu_tarra} %`
+                                    ? `Er zijn verschillende waarden ingevuld, bv: ${exampleHarvestableAnalysis?.b_lu_tarra} %`
                                     : "Bv. 5 %"
                             }
                             aria-required="true"
@@ -366,7 +366,7 @@ function HarvestFields({
                                 Number.isFinite(
                                     exampleHarvestableAnalysis?.b_lu_dm,
                                 )
-                                    ? `Voorbeeld uit de huidige: ${exampleHarvestableAnalysis?.b_lu_dm} g / kg`
+                                    ? `Er zijn verschillende waarden ingevuld, bv: ${exampleHarvestableAnalysis?.b_lu_dm} g / kg`
                                     : "Bv. 850 g / kg"
                             }
                             aria-required="true"
@@ -402,7 +402,7 @@ function HarvestFields({
                                 Number.isFinite(
                                     exampleHarvestableAnalysis?.b_lu_uww,
                                 )
-                                    ? `Voorbeeld uit de huidige: ${exampleHarvestableAnalysis?.b_lu_uww} g / 5 kg`
+                                    ? `Er zijn verschillende waarden ingevuld, bv: ${exampleHarvestableAnalysis?.b_lu_uww} g / 5 kg`
                                     : "Bv. 350 g / 5 kg"
                             }
                             aria-required="true"
@@ -438,7 +438,7 @@ function HarvestFields({
                                 Number.isFinite(
                                     exampleHarvestableAnalysis?.b_lu_moist,
                                 )
-                                    ? `Voorbeeld uit de huidige: ${exampleHarvestableAnalysis?.b_lu_moist} %`
+                                    ? `Er zijn verschillende waarden ingevuld, bv: ${exampleHarvestableAnalysis?.b_lu_moist} %`
                                     : "Bv. 15 %"
                             }
                             aria-required="true"
@@ -474,7 +474,7 @@ function HarvestFields({
                                 Number.isFinite(
                                     exampleHarvestableAnalysis?.b_lu_n_harvestable,
                                 )
-                                    ? `Voorbeeld uit de huidige: ${exampleHarvestableAnalysis?.b_lu_n_harvestable} g / kg`
+                                    ? `Er zijn verschillende waarden ingevuld, bv: ${exampleHarvestableAnalysis?.b_lu_n_harvestable} g / kg`
                                     : "Bv. 850 g / kg"
                             }
                             aria-required="true"
@@ -510,7 +510,7 @@ function HarvestFields({
                                 Number.isFinite(
                                     exampleHarvestableAnalysis?.b_lu_cp,
                                 )
-                                    ? `Voorbeeld uit de huidige: ${exampleHarvestableAnalysis?.b_lu_cp} g RE / kg DS`
+                                    ? `Er zijn verschillende waarden ingevuld, bv: ${exampleHarvestableAnalysis?.b_lu_cp} g RE / kg DS`
                                     : "Bv. 170 g RE / kg DS"
                             }
                             aria-required="true"
