@@ -142,9 +142,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
         // Figure out the harvest date that is the same between all harvests
         // Also figure out harvest parameters that are the same between all these harvestings
-        let b_lu_harvest_date = harvests.find(
-            (harvest) => harvest.b_lu_harvest_date,
-        )?.b_lu_harvest_date
+        let b_lu_harvest_date = harvests[0].b_lu_harvest_date
         const initialHarvestableAnalysis: Partial<HarvestableAnalysis> = {
             ...exampleHarvestableAnalysis,
         }
@@ -156,7 +154,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     b_lu_harvest_date.getTime() !==
                         harvesting.b_lu_harvest_date.getTime()
                 ) {
-                    b_lu_harvest_date = undefined
+                    b_lu_harvest_date = null
                 }
 
                 if (harvesting.harvestable.harvestable_analyses.length === 0)
@@ -165,11 +163,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                 for (const key of Object.keys(
                     initialHarvestableAnalysis,
                 ) as (keyof HarvestableAnalysis)[]) {
-                    if (
-                        analysis[key] !== null &&
-                        analysis[key] !== undefined &&
-                        analysis[key] !== initialHarvestableAnalysis[key]
-                    ) {
+                    if (analysis[key] !== initialHarvestableAnalysis[key]) {
                         delete initialHarvestableAnalysis[key]
                     }
                 }
