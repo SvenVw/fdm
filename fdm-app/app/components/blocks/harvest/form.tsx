@@ -40,8 +40,8 @@ import { FormSchema } from "./schema"
 type HarvestFormDialogProps = {
     harvestParameters: HarvestParameters
     exampleHarvestableAnalysis?: Partial<HarvestableAnalysis>
-    example_b_lu_harvest_date?: Date | string | undefined
-    b_lu_harvest_date: Date | string | undefined // Changed to allow Date or string
+    example_b_lu_harvest_date?: Date | null
+    b_lu_harvest_date: Date | string | null | undefined // Changed to allow Date or string
     b_lu_yield: number | undefined
     b_lu_yield_fresh: number | undefined
     b_lu_yield_bruto: number | undefined
