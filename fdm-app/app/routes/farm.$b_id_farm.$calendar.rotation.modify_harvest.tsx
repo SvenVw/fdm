@@ -152,7 +152,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         }
 
         // Figure out harvest parameters that are the same between all these harvestings
-        console.log(harvests)
         let initialHarvestableAnalysis: Partial<HarvestableAnalysis> = {}
 
         if (
