@@ -20,7 +20,6 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import type { Route } from "./+types/farm.$b_id_farm.$calendar.rotation.modify_harvest"
-
 // Meta
 export const meta: Route.MetaFunction = () => {
     return [
@@ -141,24 +140,33 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         )
 
         // Figure out the harvest date that is the same between all harvests
-        // Also figure out harvest parameters that are the same between all these harvestings
         let b_lu_harvest_date = harvests[0].b_lu_harvest_date
-        const initialHarvestableAnalysis: Partial<HarvestableAnalysis> = {
-            ...exampleHarvestableAnalysis,
+        if (
+            harvests.find(
+                (harvest) =>
+                    harvest?.b_lu_harvest_date?.getTime() !==
+                    b_lu_harvest_date?.getTime(),
+            )
+        ) {
+            b_lu_harvest_date = null
         }
-        if (Object.keys(initialHarvestableAnalysis).length > 0) {
-            for (const harvesting of harvests) {
-                if (
-                    b_lu_harvest_date &&
-                    harvesting.b_lu_harvest_date &&
-                    b_lu_harvest_date.getTime() !==
-                        harvesting.b_lu_harvest_date.getTime()
-                ) {
-                    b_lu_harvest_date = null
-                }
 
-                if (harvesting.harvestable.harvestable_analyses.length === 0)
-                    continue
+        // Figure out harvest parameters that are the same between all these harvestings
+        console.log(harvests)
+        let initialHarvestableAnalysis: Partial<HarvestableAnalysis> = {}
+
+        if (
+            !harvests.find(
+                (harvest) =>
+                    harvest.harvestable.harvestable_analyses.length === 0,
+            ) &&
+            Object.keys(exampleHarvestableAnalysis).length > 0
+        ) {
+            initialHarvestableAnalysis = {
+                ...exampleHarvestableAnalysis,
+            }
+
+            for (const harvesting of harvests) {
                 const analysis = harvesting.harvestable.harvestable_analyses[0]
                 for (const key of Object.keys(
                     initialHarvestableAnalysis,
