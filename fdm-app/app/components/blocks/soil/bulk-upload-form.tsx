@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react"
-import { useFetcher } from "react-router"
+import { useState } from "react"
 import { FileText, Upload, Trash2, X, FileUp } from "lucide-react"
 import { Dropzone } from "~/components/custom/dropzone"
 import { Button } from "~/components/ui/button"
@@ -13,42 +12,148 @@ import {
 import { Spinner } from "~/components/ui/spinner"
 import { ScrollArea } from "~/components/ui/scroll-area"
 import { cn } from "~/lib/utils"
+import { Progress } from "~/components/ui/progress"
+import { toast } from "sonner"
+import type { ProcessedAnalysis } from "./bulk-upload-review"
 
 export function BulkSoilAnalysisUploadForm({
     onSuccess,
 }: {
-    onSuccess: (data: any[]) => void
+    onSuccess: (data: ProcessedAnalysis[]) => void
 }) {
     const [files, setFiles] = useState<File[]>([])
-    const fetcher = useFetcher()
-    const isUploading = fetcher.state !== "idle"
+    const [isUploading, setIsUploading] = useState(false)
+    const [uploadProgress, setUploadProgress] = useState(0)
+    const [currentFile, setCurrentFile] = useState<string | null>(null)
     const MAX_FILE_SIZE = 5 * 1024 * 1024
 
     const handleFilesChange = (newFiles: File[]) => {
         setFiles(newFiles)
     }
 
-    const handleUpload = () => {
+    const handleUpload = async () => {
         if (files.length === 0) return
+
+        setIsUploading(true)
+        setUploadProgress(0)
+
+        const allResults: any[] = []
+        const totalFiles = files.length
+        let completedFiles = 0
+        let errorOccurred = false
 
         const formData = new FormData()
         for (const file of files) {
             formData.append("soilAnalysisFile", file)
         }
 
-        fetcher.submit(formData, {
-            method: "POST",
-            encType: "multipart/form-data",
-        })
-    }
+        try {
+            const response = await fetch("/api/soil-analysis/extract", {
+                method: "POST",
+                body: formData,
+                credentials: "same-origin",
+            })
 
-    useEffect(() => {
-        if (isUploading) return
+            if (!response.ok) {
+                let errorMessage = "Fout bij starten van analyse"
+                try {
+                    const errorData = await response.json()
+                    errorMessage =
+                        errorData.message || errorData.error || errorMessage
+                } catch {
+                    try {
+                        const textError = await response.text()
+                        if (textError) errorMessage = textError
+                    } catch {
+                        // Ignore text parsing errors
+                    }
+                }
+                throw new Error(`${errorMessage} (Status: ${response.status})`)
+            }
 
-        if (fetcher.data?.analyses) {
-            onSuccess(fetcher.data.analyses)
+            if (!response.body) {
+                throw new Error("Geen stream response ontvangen")
+            }
+
+            const reader = response.body.getReader()
+            const decoder = new TextDecoder()
+            let buffer = ""
+
+            while (true) {
+                const { done, value } = await reader.read()
+                if (done) break
+
+                buffer += decoder.decode(value, { stream: true })
+                const lines = buffer.split("\n")
+                // Keep the last partial line in the buffer
+                buffer = lines.pop() || ""
+
+                for (const line of lines) {
+                    if (!line.trim()) continue
+                    try {
+                        const result = JSON.parse(line)
+                        completedFiles++
+
+                        if (result.success && result.analyses) {
+                            allResults.push(...result.analyses)
+                        } else if (result.error) {
+                            toast.error(
+                                `Fout bij ${result.filename}: ${result.error}`,
+                            )
+                        }
+
+                        setCurrentFile(result.filename)
+                        setUploadProgress(
+                            Math.round((completedFiles / totalFiles) * 100),
+                        )
+                    } catch (e) {
+                        console.error("Error parsing NDJSON line:", e)
+                    }
+                }
+            }
+
+            // Process final partial line if exists
+            if (buffer.trim()) {
+                try {
+                    const result = JSON.parse(buffer)
+                    completedFiles++
+
+                    if (result.success && result.analyses) {
+                        allResults.push(...result.analyses)
+                    } else if (result.error) {
+                        toast.error(
+                            `Fout bij ${result.filename}: ${result.error}`,
+                        )
+                    }
+
+                    setCurrentFile(result.filename)
+                    setUploadProgress(
+                        Math.round((completedFiles / totalFiles) * 100),
+                    )
+                } catch (e) {
+                    console.error("Error parsing final NDJSON line:", e)
+                }
+            }
+        } catch (error) {
+            console.error("Bulk upload error:", error)
+            toast.error(
+                error instanceof Error ? error.message : "Upload mislukt",
+            )
+            errorOccurred = true
+        } finally {
+            setIsUploading(false)
+            setCurrentFile(null)
+
+            if (allResults.length > 0) {
+                toast.success(
+                    `${allResults.length} analyses succesvol verwerkt`,
+                )
+                onSuccess(allResults)
+            } else if (!errorOccurred && totalFiles > 0) {
+                toast.error("Geen analyses kunnen verwerken")
+            }
         }
-    }, [fetcher.data, isUploading, onSuccess])
+    }
 
     const removeFile = (index: number) => {
         const newFiles = [...files]
@@ -90,6 +195,7 @@ export function BulkSoilAnalysisUploadForm({
                             onFilesChange={handleFilesChange}
                             allowReset={false}
                             maxSize={MAX_FILE_SIZE}
+                            disabled={isUploading}
                             className={cn(
                                 "w-full transition-all duration-200 border-2",
                                 files.length > 0
@@ -196,6 +302,25 @@ export function BulkSoilAnalysisUploadForm({
                                     </div>
                                 </ScrollArea>
                             </div>
+
+                            {isUploading && (
+                                <div className="mt-4 space-y-2">
+                                    <div className="flex justify-between text-xs">
+                                        <span className="text-muted-foreground truncate max-w-[200px]">
+                                            {currentFile
+                                                ? `Analyseert: ${currentFile}`
+                                                : "Bestanden verwerken..."}
+                                        </span>
+                                        <span className="font-medium">
+                                            {uploadProgress}%
+                                        </span>
+                                    </div>
+                                    <Progress
+                                        value={uploadProgress}
+                                        className="h-1"
+                                    />
+                                </div>
+                            )}
 
                             <div className="pt-4 mt-auto flex justify-end">
                                 <Button
