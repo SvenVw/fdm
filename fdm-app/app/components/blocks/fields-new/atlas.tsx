@@ -1,11 +1,11 @@
+import maplibregl from "maplibre-gl"
+import { useEffect, useRef, useState } from "react"
 import { Layer, Map as MapGL, type MapRef } from "react-map-gl/maplibre"
+import { Skeleton } from "../../ui/skeleton"
 import { MapTilerAttribution } from "../atlas/atlas-attribution"
 import { FieldsSourceNotClickable } from "../atlas/atlas-sources"
-import { Skeleton } from "../../ui/skeleton"
-import { useEffect, useRef, useState } from "react"
-import maplibregl from "maplibre-gl"
-import { getViewState } from "../atlas/atlas-viewstate"
 import { getFieldsStyle } from "../atlas/atlas-styles"
+import { getViewState } from "../atlas/atlas-viewstate"
 
 export function NewFieldsAtlas({
     featureCollection,

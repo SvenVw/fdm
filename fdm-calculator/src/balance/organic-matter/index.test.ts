@@ -132,7 +132,12 @@ describe("Organic Matter Balance Calculation", () => {
                         degradation: { total: -200 },
                     } as OrganicMatterBalanceFieldNumeric,
                 },
-                { b_id: "field2", b_area: 5, errorMessage: "Failed", b_bufferstrip: false },
+                {
+                    b_id: "field2",
+                    b_area: 5,
+                    errorMessage: "Failed",
+                    b_bufferstrip: false,
+                },
             ]
             const farmBalance = calculateOrganicMatterBalancesFieldToFarm(
                 results,

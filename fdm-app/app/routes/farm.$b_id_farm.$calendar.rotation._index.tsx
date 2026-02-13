@@ -23,8 +23,8 @@ import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import {
-    columns,
     type CropRow,
+    columns,
     type RotationExtended,
 } from "~/components/blocks/rotation/columns"
 import { RotationTableFormSchema } from "~/components/blocks/rotation/schema"
@@ -368,7 +368,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
                     b_bufferstrip: fieldsWithThisCultivation.some(
                         (field) => field.b_bufferstrip,
                     ),
-                    fields: fieldsWithThisCultivation.map((field, i) => ({
+                    fields: fieldsWithThisCultivation.map((field, _i) => ({
                         // TODO: Define a proper type for field
                         type: "field",
                         canModify: farmWritePermission,
@@ -535,7 +535,7 @@ export default function FarmRotationIndex() {
                     Bouwplan
                 </BreadcrumbItem>
             </Header>
-            <main>
+            <main className="min-w-0">
                 {loaderData.fieldOptions.length === 0 ? (
                     <>
                         <FarmTitle
@@ -567,12 +567,10 @@ export default function FarmRotationIndex() {
                     </>
                 ) : (
                     <>
-                        <div className="flex items-center justify-between">
-                            <FarmTitle
-                                title={`Bouwplan van ${currentFarmName}`}
-                                description="Bekijk het bouwplan en voeg gegevens toe."
-                            />
-                        </div>
+                        <FarmTitle
+                            title={`Bouwplan van ${currentFarmName}`}
+                            description="Bekijk het bouwplan en voeg gegevens toe."
+                        />
                         <FarmContent>
                             <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
                                 <DataTable

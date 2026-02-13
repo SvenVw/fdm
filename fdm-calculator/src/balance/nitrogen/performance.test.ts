@@ -1,3 +1,5 @@
+import type { FdmType } from "@svenvw/fdm-core"
+import Decimal from "decimal.js"
 import { describe, expect, it, vi } from "vitest"
 import { calculateNitrogenBalance } from "./index"
 import type {
@@ -6,8 +8,6 @@ import type {
     FieldInput,
     NitrogenBalanceInput,
 } from "./types"
-import type { FdmType } from "@svenvw/fdm-core"
-import Decimal from "decimal.js"
 
 // Mock FdmType
 const mockFdm = {
@@ -16,7 +16,9 @@ const mockFdm = {
     where: vi.fn().mockReturnThis(),
     limit: vi.fn().mockReturnThis(),
     // biome-ignore lint/suspicious/noThenProperty: Simulate cache miss
-    then: vi.fn((resolve) => resolve ? Promise.resolve(resolve([])) : Promise.resolve([])),
+    then: vi.fn((resolve) =>
+        resolve ? Promise.resolve(resolve([])) : Promise.resolve([]),
+    ),
     insert: vi.fn().mockReturnThis(),
     values: vi.fn().mockResolvedValue(undefined),
 } as unknown as FdmType

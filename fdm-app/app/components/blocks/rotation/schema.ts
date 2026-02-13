@@ -37,8 +37,8 @@ export const RotationTableFormSchema = z
             return true
         },
         {
-            message: "Einddatum moet na de zaaidatum liggen.",
             path: ["b_lu_end"],
+            error: "Einddatum moet na de zaaidatum liggen.",
         },
     )
 

@@ -380,7 +380,7 @@ const InvitationForm = ({
 }
 
 const FormSchema = z.object({
-    email: z.string().email().optional(),
+    email: z.email().optional(),
     role: z.enum(["owner", "admin", "member"]).optional(),
     memberId: z.string().optional(),
     invitation_id: z.string().optional(),

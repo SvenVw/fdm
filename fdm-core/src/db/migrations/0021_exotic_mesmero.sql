@@ -1,1 +1,0 @@
-ALTER TABLE "fdm"."fields" ADD COLUMN "b_bufferstrip" boolean DEFAULT false NOT NULL;

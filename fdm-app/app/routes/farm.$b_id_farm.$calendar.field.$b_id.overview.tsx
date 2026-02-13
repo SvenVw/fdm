@@ -19,9 +19,14 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { DatePicker } from "~/components/custom/date-picker-v2"
-import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
-import { Switch } from "~/components/ui/switch"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
 import { Field, FieldError, FieldLabel } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
 import {
@@ -31,13 +36,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "~/components/ui/card"
+import { Spinner } from "~/components/ui/spinner"
+import { Switch } from "~/components/ui/switch"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
@@ -243,7 +243,9 @@ export default function FarmFieldsOverviewBlock() {
                                                 <Switch
                                                     id="b_bufferstrip"
                                                     checked={field.value}
-                                                    onCheckedChange={field.onChange}
+                                                    onCheckedChange={
+                                                        field.onChange
+                                                    }
                                                 />
                                             </div>
                                         </div>
@@ -345,15 +347,23 @@ export async function action({ request, params }: ActionFunctionArgs) {
 const FormSchema = z
     .object({
         b_name: z.string().min(2, {
-            message: "Naam van perceel moet minimaal 2 karakters bevatten",
+            error: "Naam van perceel moet minimaal 2 karakters bevatten",
         }),
         b_acquiring_method: z.string({
-            required_error:
-                "Selecteer of het perceel in eigendom is of gepacht",
+            error: (issue) =>
+                issue.input === undefined
+                    ? "Selecteer of het perceel in eigendom is of gepacht"
+                    : undefined,
         }),
-        b_start: z.coerce.date({
-            required_error: "Kies een startdatum voor het perceel",
-        }),
+        b_start: z.preprocess(
+            (val) => (typeof val === "string" ? new Date(val) : val),
+            z.date({
+                error: (issue) =>
+                    issue.input === undefined
+                        ? "Kies een startdatum voor het perceel"
+                        : undefined,
+            }),
+        ),
         b_end: z.coerce.date().nullable().optional(),
         b_bufferstrip: z.boolean().optional(),
     })
@@ -365,7 +375,7 @@ const FormSchema = z
             return true
         },
         {
-            message: "Einddatum moet na de startdatum zijn",
             path: ["b_end"],
+            error: "Einddatum moet na de startdatum zijn",
         },
     )

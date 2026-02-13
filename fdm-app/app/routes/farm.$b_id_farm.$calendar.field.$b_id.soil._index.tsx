@@ -83,7 +83,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
-            timeframe,
+            {
+                start: null,
+                end: timeframe.end
+            },
         )
 
         // Get current soil data

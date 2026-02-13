@@ -1,5 +1,26 @@
 # fdm-calculator
 
+## 0.11.0
+
+### Minor Changes
+
+- [#422](https://github.com/SvenVw/fdm/pull/422) [`4687738`](https://github.com/SvenVw/fdm/commit/4687738e3b8ef35d071ae16b218d567a3cfbf3be) Thanks [@SvenVw](https://github.com/SvenVw)! - Exclude buffer strips from calculating farm balances and set field values to 0
+
+- [#415](https://github.com/SvenVw/fdm/pull/415) [`01d7174`](https://github.com/SvenVw/fdm/commit/01d7174bef42f2fc8e71b4bb25eee045687e8c56) Thanks [@SvenVw](https://github.com/SvenVw)! - Implement Dutch nitrogen reduction (korting) logic for grassland renewal and destruction for 2025 and 2026. Includes localized Dutch error messages for invalid operation dates.
+
+- [#407](https://github.com/SvenVw/fdm/pull/407) [`6f7f271`](https://github.com/SvenVw/fdm/commit/6f7f27183f66bcc329720af5dcc17f250d74cbcf) Thanks [@SvenVw](https://github.com/SvenVw)! - For balance calculation cache per field instead of per farm and thus replace getNitrogenBalance with getNitrogenBalanceField and getOrganicMatterBalance with getOrganicMatterBalanceField
+
+- [#422](https://github.com/SvenVw/fdm/pull/422) [`4687738`](https://github.com/SvenVw/fdm/commit/4687738e3b8ef35d071ae16b218d567a3cfbf3be) Thanks [@SvenVw](https://github.com/SvenVw)! - Do not provide nutrient advice for buffer strips by setting the output to 0
+
+- [#422](https://github.com/SvenVw/fdm/pull/422) [`4687738`](https://github.com/SvenVw/fdm/commit/4687738e3b8ef35d071ae16b218d567a3cfbf3be) Thanks [@SvenVw](https://github.com/SvenVw)! - For buffer strips set the norm values to 0 as they have no 'plaatsingsruimte'
+
+### Patch Changes
+
+- [#407](https://github.com/SvenVw/fdm/pull/407) [`6f7f271`](https://github.com/SvenVw/fdm/commit/6f7f27183f66bcc329720af5dcc17f250d74cbcf) Thanks [@SvenVw](https://github.com/SvenVw)! - Refactor Nitrogen and Organic Matter balance calculations to use a bottom-up (Field -> Farm) approach
+
+- Updated dependencies [[`ae0468c`](https://github.com/SvenVw/fdm/commit/ae0468c9b37f1326634bff24bd667ec5003d4bed), [`c316515`](https://github.com/SvenVw/fdm/commit/c3165156c249931f56a97fa4a0b82493a5e25c9b), [`da3e50a`](https://github.com/SvenVw/fdm/commit/da3e50a571483c576dd88abecd3e70ca0b9f22ba), [`bcd3a32`](https://github.com/SvenVw/fdm/commit/bcd3a3289c9a13ffc36ea108e502661496164bf7), [`75553c4`](https://github.com/SvenVw/fdm/commit/75553c41830c8519788a68560d9403192790d051)]:
+  - @svenvw/fdm-core@0.29.0
+
 ## 0.10.2
 
 ### Patch Changes

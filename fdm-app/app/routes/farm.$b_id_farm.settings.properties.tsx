@@ -13,7 +13,6 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import validator from "validator"
 import { z } from "zod"
-import { Spinner } from "~/components/ui/spinner"
 import { Button } from "~/components/ui/button"
 import {
     FormControl,
@@ -25,6 +24,7 @@ import {
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
 import { Separator } from "~/components/ui/separator"
+import { Spinner } from "~/components/ui/spinner"
 import { Textarea } from "~/components/ui/textarea"
 import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
@@ -327,7 +327,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 // Form Schema
 const FormSchema = z.object({
     b_name_farm: z.string().min(3, {
-        message: "Naam van bedrijf moet minimaal 3 karakters bevatten",
+        error: "Naam van bedrijf moet minimaal 3 karakters bevatten",
     }),
     b_businessid_farm: z.string().optional(),
     b_address_farm: z.string().optional(),
@@ -335,6 +335,6 @@ const FormSchema = z.object({
         .string()
         .optional()
         .refine((value) => !value || isPostalCode(value, "NL"), {
-            message: "Ongeldige postcode",
+            error: "Ongeldige postcode",
         }),
 })

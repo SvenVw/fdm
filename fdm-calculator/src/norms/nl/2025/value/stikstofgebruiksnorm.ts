@@ -3,6 +3,7 @@ import Decimal from "decimal.js"
 import pkg from "../../../../package"
 import { getGeoTiffValue } from "../../../../shared/geotiff"
 import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
+import { nonBouwlandCodes } from "../../constant"
 import type { GebruiksnormResult } from "../../types"
 import { determineNLHoofdteelt } from "./hoofdteelt"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
@@ -13,7 +14,6 @@ import type {
     NormsByRegion,
     RegionKey,
 } from "./types"
-import { nonBouwlandCodes } from "../../constant"
 
 /**
  * Determines if a field is located within a met nutriënten verontreinigde gebied (NV-gebied) in the Netherlands.

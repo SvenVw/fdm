@@ -201,7 +201,7 @@ export default function FarmAtlasElevationBlock() {
         }
         return initialViewState as ViewState
     })
-    
+
     const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
         setViewState(event.viewState)
     }, [])
@@ -209,7 +209,10 @@ export default function FarmAtlasElevationBlock() {
     useEffect(() => {
         if (typeof window !== "undefined") {
             try {
-                sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
+                sessionStorage.setItem(
+                    "mapViewState",
+                    JSON.stringify(viewState),
+                )
             } catch {
                 // ignore storage errors (e.g., private mode)
             }

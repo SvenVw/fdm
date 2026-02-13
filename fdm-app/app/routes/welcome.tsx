@@ -10,7 +10,6 @@ import { Form, useLoaderData } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { Spinner } from "~/components/ui/spinner"
 import { Avatar, AvatarImage } from "~/components/ui/avatar"
 import { Button } from "~/components/ui/button"
 import {
@@ -30,6 +29,7 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
+import { Spinner } from "~/components/ui/spinner"
 import { auth, getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
@@ -47,19 +47,21 @@ export const meta: MetaFunction = () => {
 }
 
 const FormSchema = z.object({
-    firstname: z.coerce
+    firstname: z
         .string({
-            required_error: "Vul je voornaam in",
+            error: (issue) =>
+                issue.input === undefined ? "Vul je voornaam in" : undefined,
         })
         .min(1, {
-            message: "Vul je voornaam in",
+            error: "Vul je voornaam in",
         }),
-    surname: z.coerce
+    surname: z
         .string({
-            required_error: "Vul je achternaam in",
+            error: (issue) =>
+                issue.input === undefined ? "Vul je achternaam in" : undefined,
         })
         .min(1, {
-            message: "Vul je achternaam in",
+            error: "Vul je achternaam in",
         }),
 })
 

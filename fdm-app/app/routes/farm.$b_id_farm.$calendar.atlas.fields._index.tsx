@@ -2,7 +2,7 @@ import { getFields } from "@svenvw/fdm-core"
 import { simplify } from "@turf/turf"
 import type { FeatureCollection, Geometry } from "geojson"
 import maplibregl from "maplibre-gl"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import {
     Layer,
     Map as MapGL,
@@ -152,7 +152,10 @@ export default function FarmAtlasFieldsBlock() {
     useEffect(() => {
         if (typeof window !== "undefined") {
             try {
-                sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
+                sessionStorage.setItem(
+                    "mapViewState",
+                    JSON.stringify(viewState),
+                )
             } catch {
                 // ignore storage errors (e.g., private mode)
             }

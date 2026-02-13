@@ -3,7 +3,6 @@ import type React from "react"
 import { useFetcher } from "react-router-dom"
 import { useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
-import { Spinner } from "~/components/ui/spinner"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
@@ -14,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import { Spinner } from "~/components/ui/spinner"
 import { AccessFormSchema } from "~/lib/schemas/access.schema"
 
 // Define the props type based on usage in the original file

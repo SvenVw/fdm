@@ -4,17 +4,22 @@ import {
     ArrowRightLeft,
     BookOpenText,
     ChevronUp,
+    DownloadIcon,
     Home,
     Icon,
     Landmark,
+    Loader2,
     MapIcon,
     ScrollText,
     Shapes,
     Sprout,
     Square,
     Trash2,
+    FileStack,
     UserRoundCheck,
+    PlusIcon,
 } from "lucide-react"
+import { useState } from "react"
 import {
     data,
     type LoaderFunctionArgs,
@@ -22,6 +27,7 @@ import {
     NavLink,
     useLoaderData,
 } from "react-router"
+import { toast } from "sonner"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
@@ -92,7 +98,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fields = await getFields(fdm, session.principal_id, b_id_farm)
 
         // Calculate total area for this farm
-        const farmArea = fields.reduce((acc, field) => acc + field.b_area, 0)
+        const farmArea = fields.reduce(
+            (acc, field) => acc + (field.b_area ?? 0),
+            0,
+        )
 
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
@@ -123,6 +132,41 @@ export default function FarmDashboardIndex() {
     const calendar = useCalendarStore((state) => state.calendar)
     const setCalendar = useCalendarStore((state) => state.setCalendar)
     const years = getCalendarSelection()
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
+
+    const handleDownloadPdf = async (e: React.MouseEvent) => {
+        e.preventDefault()
+        if (isGeneratingPdf) return
+
+        setIsGeneratingPdf(true)
+        toast.info("Bemestingsplan wordt gegenereerd", {
+            description: "Dit kan enkele seconden duren...",
+        })
+
+        try {
+            const response = await fetch(
+                `/farm/${loaderData.b_id_farm}/${calendar}/bemestingsplan.pdf`,
+            )
+            if (!response.ok) throw new Error("Download failed")
+
+            const blob = await response.blob()
+            const url = window.URL.createObjectURL(blob)
+            const a = document.createElement("a")
+            a.href = url
+            a.download = `Bemestingsplan_${loaderData.b_name_farm}_${calendar}.pdf`
+            document.body.appendChild(a)
+            a.click()
+            window.URL.revokeObjectURL(url)
+            document.body.removeChild(a)
+
+            toast.success("Download voltooid")
+        } catch (error) {
+            console.error(error)
+            toast.error("Er ging iets mis bij het genereren van de PDF")
+        } finally {
+            setIsGeneratingPdf(false)
+        }
+    }
 
     return (
         <SidebarInset>
@@ -313,6 +357,85 @@ export default function FarmDashboardIndex() {
                                                         <CardDescription>
                                                             Normen op bedrijfs-
                                                             en perceelsniveau.
+                                                        </CardDescription>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                        </Card>
+                                    </NavLink>
+                                    <Card
+                                        className="transition-all hover:shadow-md h-full cursor-pointer"
+                                        onClick={handleDownloadPdf}
+                                    >
+                                        <CardHeader>
+                                            <div className="flex items-center gap-4">
+                                                <div className="rounded-lg bg-muted p-3">
+                                                    {isGeneratingPdf ? (
+                                                        <Loader2 className="h-6 w-6 text-primary animate-spin" />
+                                                    ) : (
+                                                        <DownloadIcon className="h-6 w-6 text-primary" />
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <CardTitle>
+                                                        Download bemestingsplan
+                                                    </CardTitle>
+                                                    <CardDescription>
+                                                        pdf met gebruiksruimte
+                                                        en bemestingsadvies op
+                                                        bedrijfs- en
+                                                        perceelsniveau.
+                                                    </CardDescription>
+                                                </div>
+                                            </div>
+                                        </CardHeader>
+                                    </Card>
+                                </div>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="space-y-4">
+                                <h2 className="text-2xl font-semibold tracking-tight">
+                                    Acties
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <NavLink to={"soil-analysis/bulk"}>
+                                        <Card className="transition-all hover:shadow-md h-full">
+                                            <CardHeader>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="rounded-lg bg-muted p-3">
+                                                        <FileStack className="h-6 w-6 text-primary" />
+                                                    </div>
+                                                    <div>
+                                                        <CardTitle>
+                                                            Upload bodemanalyses
+                                                        </CardTitle>
+                                                        <CardDescription>
+                                                            Upload meerdere
+                                                            pdf's met
+                                                            bodemanalyses en
+                                                            koppel ze aan
+                                                            percelen.
+                                                        </CardDescription>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                        </Card>
+                                    </NavLink>
+                                    <NavLink to={`${calendar}/field/new`}>
+                                        <Card className="transition-all hover:shadow-md h-full">
+                                            <CardHeader>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="rounded-lg bg-muted p-3">
+                                                        <PlusIcon className="h-6 w-6 text-primary" />
+                                                    </div>
+                                                    <div>
+                                                        <CardTitle>
+                                                            Nieuwe percelen
+                                                        </CardTitle>
+                                                        <CardDescription>
+                                                            Voeg nieuwe percelen
+                                                            toe aan dit bedrijf.
                                                         </CardDescription>
                                                     </div>
                                                 </div>

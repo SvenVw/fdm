@@ -32,10 +32,7 @@ if (serverConfig.mail) {
             ...auth.options.databaseHooks?.user,
             create: {
                 ...auth.options.databaseHooks?.user?.create,
-                after: async (
-                    user: any,
-                    context?: GenericEndpointContext,
-                ) => {
+                after: async (user: any, _context?: GenericEndpointContext) => {
                     if (originalUserCreateAfter) {
                         await originalUserCreateAfter(user)
                     }

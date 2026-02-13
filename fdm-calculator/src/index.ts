@@ -56,6 +56,10 @@ export type {
     InputAggregateNormsToFarmLevel,
 } from "./norms/farm"
 export {
+    aggregateNormFillingsToFarmLevel,
+    aggregateNormsToFarmLevel,
+} from "./norms/farm"
+export {
     isFieldInGWGBGebied,
     isFieldInNatura2000Gebied,
 } from "./norms/nl/2025/value/dierlijke-mest-gebruiksnorm"

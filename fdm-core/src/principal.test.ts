@@ -54,13 +54,16 @@ describe("Principals", () => {
         organizationSlug = "test-org"
         organizationName = "Test Organization"
         organization_id = createId()
-        
+
         await fdm.insert(authNSchema.organization).values({
             id: organization_id,
             name: organizationName,
             slug: organizationSlug,
             createdAt: new Date(),
-            metadata: JSON.stringify({ description: "Test organization", isVerified: false }),
+            metadata: JSON.stringify({
+                description: "Test organization",
+                isVerified: false,
+            }),
         })
 
         await fdm.insert(authNSchema.member).values({
@@ -216,13 +219,16 @@ describe("Principals", () => {
             //in real world scenario, however, this unit test should demonstrate expected behaviour
             const conflictingSlug = userName
             const conflictingOrganization_id = createId()
-            
+
             await fdm.insert(authNSchema.organization).values({
                 id: conflictingOrganization_id,
                 name: "Conflicting Organization",
                 slug: conflictingSlug,
                 createdAt: new Date(),
-                metadata: JSON.stringify({ description: "Test description", isVerified: false }),
+                metadata: JSON.stringify({
+                    description: "Test description",
+                    isVerified: false,
+                }),
             })
 
             const principalDetails = await identifyPrincipal(
@@ -360,13 +366,16 @@ describe("Principals", () => {
         it("should prioritize email match of user over slug match of organization", async () => {
             // Create an organization with slug same as one of the user email
             const conflicting_organization_id = createId()
-            
+
             await fdm.insert(authNSchema.organization).values({
                 id: conflicting_organization_id,
                 name: "Conflicting Organization",
                 slug: userEmail,
                 createdAt: new Date(),
-                metadata: JSON.stringify({ description: "Test description", isVerified: false }),
+                metadata: JSON.stringify({
+                    description: "Test description",
+                    isVerified: false,
+                }),
             })
 
             const identifier = userEmail

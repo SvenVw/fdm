@@ -1,4 +1,17 @@
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useEffect } from "react"
+import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { Combobox } from "~/components/custom/combobox"
+import { Button } from "~/components/ui/button"
+import {
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
+import { Checkbox } from "~/components/ui/checkbox"
 import {
     FormControl,
     FormDescription,
@@ -7,23 +20,10 @@ import {
     FormLabel,
     FormMessage,
 } from "~/components/ui/form"
-import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "~/components/ui/card"
-import { Form } from "react-router"
 import { Input } from "~/components/ui/input"
-import { Combobox } from "~/components/custom/combobox"
-import { FieldDeleteDialog } from "../field/delete"
-import { Button } from "~/components/ui/button"
 import { Spinner } from "~/components/ui/spinner"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect } from "react"
+import { FieldDeleteDialog } from "../field/delete"
 import { FormSchema } from "./schema"
-import { Checkbox } from "~/components/ui/checkbox"
 
 export function NewFieldsForm({
     b_id,

@@ -1,16 +1,18 @@
 import {
+    calculateDose,
     calculateNitrogenBalance,
     calculateOrganicMatterBalance,
     collectInputForNitrogenBalance,
     collectInputForOrganicMatterBalance,
     createFunctionsForFertilizerApplicationFilling,
     createFunctionsForNorms,
+    type FieldInput,
     getNitrogenBalanceField,
     getNutrientAdvice,
     getOrganicMatterBalanceField,
-    type FieldInput,
     type NitrogenBalanceFieldResultNumeric,
     type NitrogenBalanceNumeric,
+    type NutrientAdvice,
     type OrganicMatterBalanceFieldResultNumeric,
     type OrganicMatterBalanceNumeric,
 } from "@svenvw/fdm-calculator"
@@ -20,10 +22,13 @@ import {
     type fdmSchema,
     getCultivations,
     getCurrentSoilData,
+    getFertilizerApplications,
+    getFertilizers,
+    getField,
     type PrincipalId,
     type Timeframe,
-    getField,
 } from "@svenvw/fdm-core"
+import { getDefaultCultivation } from "~/lib/cultivation-helpers"
 import { getNmiApiKey } from "./nmi"
 
 // Get nitrogen balance for a field
@@ -154,13 +159,15 @@ export async function getNutrientAdviceForField({
     b_id,
     b_centroid,
     timeframe,
+    calendar,
 }: {
     fdm: FdmType
     principal_id: PrincipalId
     b_id: Field["b_id"]
     b_centroid: Field["b_centroid"]
     timeframe: Timeframe
-}) {
+    calendar: string
+}): Promise<NutrientAdvice> {
     const nmiApiKey = getNmiApiKey()
 
     const currentSoilData = await getCurrentSoilData(fdm, principal_id, b_id)
@@ -176,11 +183,11 @@ export async function getNutrientAdviceForField({
     let b_lu_catalogue: string | null
 
     if (!cultivations.length) {
-        b_lu_catalogue = null
+        b_lu_catalogue = "nl_6794" // Set to 'braak' when no cultivation is present
     } else {
-        // For now take the first cultivation
-        // TODO: Replace this with hoofdteelt
-        b_lu_catalogue = cultivations[0].b_lu_catalogue
+        const mainCultivation =
+            getDefaultCultivation(cultivations, calendar) || cultivations[0]
+        b_lu_catalogue = mainCultivation.b_lu_catalogue
     }
 
     const nutrientAdvice = await getNutrientAdvice(fdm, {
@@ -261,4 +268,34 @@ export async function getNorms({
     }
 
     return norms
+}
+
+export async function getPlannedDosesForField({
+    fdm,
+    principal_id,
+    b_id,
+    b_id_farm,
+    timeframe,
+}: {
+    fdm: FdmType
+    principal_id: PrincipalId
+    b_id: Field["b_id"]
+    b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"]
+    timeframe: Timeframe
+}) {
+    const [applications, fertilizers] = await Promise.all([
+        getFertilizerApplications(fdm, principal_id, b_id, timeframe),
+        getFertilizers(fdm, principal_id, b_id_farm),
+    ])
+
+    const dosesResult = calculateDose({
+        applications: applications,
+        fertilizers: fertilizers,
+    })
+
+    return {
+        doses: dosesResult,
+        applications,
+        fertilizers,
+    }
 }

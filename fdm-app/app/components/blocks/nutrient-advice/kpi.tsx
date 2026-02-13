@@ -2,9 +2,9 @@ import type { Dose } from "@svenvw/fdm-calculator"
 import type { FertilizerApplication } from "@svenvw/fdm-core"
 import { ArrowDownToLine, Gauge, Leaf, Sprout } from "lucide-react"
 import { useNavigation } from "react-router"
-import { Spinner } from "~/components/ui/spinner"
 import { Badge } from "~/components/ui/badge"
 import { Card, CardContent, CardFooter } from "~/components/ui/card"
+import { Spinner } from "~/components/ui/spinner"
 import type { NutrientDescription } from "./types"
 
 /**
