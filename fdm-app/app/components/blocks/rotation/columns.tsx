@@ -193,6 +193,16 @@ export const columns: ColumnDef<RotationExtended>[] = [
                 )
             }
             const cultivation = (row.getParentRow() ?? row).original as CropRow
+            const tooltipMessageNumHarvests =
+                cultivation.b_lu_harvestable === "multiple"
+                    ? 0
+                    : (row.original.type === "crop"
+                          ? row.original.fields
+                          : [row.original]
+                      ).reduce(
+                          (sum, fieldRow) => sum + fieldRow.harvests.length,
+                          0,
+                      )
             return cultivation.b_lu_harvestable !== "multiple" ? (
                 <span className="whitespace-nowrap">
                     <Tooltip>
@@ -203,12 +213,11 @@ export const columns: ColumnDef<RotationExtended>[] = [
                             />
                         </TooltipTrigger>
                         <TooltipContent>
-                            {(row.original.type === "crop"
-                                ? row.original.fields
-                                : [row.original]
-                            ).some((fieldRow) => fieldRow.harvests.length > 0)
-                                ? "U zou in plaats daarvan de huidige oogsten bij te werken."
-                                : "U zou in plaats daarvan een oogst moeten toevoegen."}
+                            {tooltipMessageNumHarvests > 1
+                                ? "U zou in plaats daarvan de huidige oogsten bijwerken."
+                                : tooltipMessageNumHarvests === 1
+                                  ? "U zou in plaats daarvan de huidige oogst bijwerken."
+                                  : "U zou in plaats daarvan een oogst moeten toevoegen."}
                         </TooltipContent>
                     </Tooltip>
                 </span>
