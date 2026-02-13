@@ -5,6 +5,7 @@ import {
     BookOpenText,
     ChevronUp,
     DownloadIcon,
+    FileJson,
     Home,
     Icon,
     Landmark,
@@ -593,6 +594,16 @@ export default function FarmDashboardIndex() {
                                                 <NavLink to="settings/access">
                                                     <UserRoundCheck className="mr-2 h-4 w-4" />
                                                     Toegang
+                                                </NavLink>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-start"
+                                                asChild
+                                            >
+                                                <NavLink to="settings/export">
+                                                    <FileJson className="mr-2 h-4 w-4" />
+                                                    Exporteren
                                                 </NavLink>
                                             </Button>
                                             <Button

@@ -58,8 +58,8 @@ describe("runMigration", () => {
             .spyOn(console, "error")
             .mockImplementation(() => {})
 
-        //Run migration
-        await runMigration(client, invalidMigrationsFolderPath)
+        //Run migration and expect it to throw
+        await expect(runMigration(client, invalidMigrationsFolderPath)).rejects.toThrow()
 
         // Verify error was logged
         expect(consoleErrorSpy).toHaveBeenCalled()
