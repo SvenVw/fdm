@@ -1,18 +1,12 @@
 /* eslint-disable typescript/unbound-method -- TanStack React Table row models are designed to use destructured methods directly in columns. */
 import {
-  type ColumnDef,
   type ColumnFiltersState,
+  ColumnVisibilityState,
   flexRender,
-  getCoreRowModel,
-  getExpandedRowModel,
-  getFacetedRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
   type Row,
   type RowSelectionState,
   type SortingState,
-  useReactTable,
-  type VisibilityState,
+  useTable,
 } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
@@ -45,25 +39,32 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip"
 import { useIsMobile } from "~/hooks/use-mobile"
 import { cn } from "~/lib/utils"
-import type { CropRow, RotationExtended } from "./columns"
+import type {
+  columns as ColumnsT,
+  CropRow,
+  MemoizedFieldRow,
+  MemoizedRotationExtended,
+  RotationExtended,
+} from "./columns"
 import { FieldFilterToggle } from "../../custom/field-filter-toggle"
+import { rotationTableFeatures } from "./table-features"
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
+interface DataTableProps<TData> {
+  columns: typeof ColumnsT
   data: TData[]
   canAddItem: boolean
 }
 
-export function DataTable<TData extends RotationExtended, TValue>({
+export function DataTable<TData extends RotationExtended>({
   columns,
   data,
   canAddItem,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const fieldFilter = useFieldFilterStore()
   const isMobile = useIsMobile()
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>(
     isMobile ? { a_som_loi: false, b_soiltype_agr: false, b_area: false } : {},
   )
   const lastSelectedRowIndex = useRef<string | null>(null)
@@ -110,7 +111,7 @@ export function DataTable<TData extends RotationExtended, TValue>({
   }
 
   const handleRowClick = (
-    row: Row<MemoizedTData>,
+    row: Row<typeof rotationTableFeatures, MemoizedRotationExtended>,
     event: React.MouseEvent<HTMLTableRowElement>,
   ) => {
     // Ignore clicks on interactive elements inside the row
@@ -132,7 +133,9 @@ export function DataTable<TData extends RotationExtended, TValue>({
       const lastSelectedRow =
         lastSelectedRowIndex.current && table.getRow(lastSelectedRowIndex.current)
       if (lastSelectedRow) {
-        const newRowSelection = { ...table.getState().rowSelection }
+        const newRowSelection = Object.fromEntries(
+          table.getSelectedRowIds().map((k) => [k, true]),
+        ) as RowSelectionState
         const visibleRows = table.getRowModel().rows
 
         // Select or deselect everything in between
@@ -150,14 +153,21 @@ export function DataTable<TData extends RotationExtended, TValue>({
           if ((newRowSelection[r.id] ?? false) !== mode) {
             somethingSelected = true
           }
-          newRowSelection[r.id] = mode
+          if (mode) newRowSelection[r.id] = true
+          else {
+            delete newRowSelection[r.id]
+          }
           if (r.original.type === "crop" && r.getCanExpand()) {
             // Also select subrows
             for (const sub of r.subRows) {
               if ((newRowSelection[sub.id] ?? false) !== mode) {
                 somethingSelected = true
               }
-              newRowSelection[sub.id] = mode
+              if (mode) {
+                newRowSelection[sub.id] = true
+              } else {
+                delete newRowSelection[sub.id]
+              }
               if (sub.id === visibleRows[end].id) break
             }
           }
@@ -165,7 +175,11 @@ export function DataTable<TData extends RotationExtended, TValue>({
 
         if (!somethingSelected) {
           // Fall back to toggling last clicked row's selection if no visible selection change happens
-          newRowSelection[row.id] = !row.getIsSelected()
+          if (!row.getIsSelected()) {
+            newRowSelection[row.id] = true
+          } else {
+            delete newRowSelection[row.id]
+          }
         }
 
         handleSelection(newRowSelection)
@@ -213,13 +227,11 @@ export function DataTable<TData extends RotationExtended, TValue>({
       }
     })
   }, [data])
-  type MemoizedCropRow = (typeof memoizedData)[number]
-  type MemoizedFieldRow = MemoizedCropRow["fields"][number]
-  type MemoizedTData = MemoizedCropRow | MemoizedFieldRow
-  const isMemoizedFieldRow = (row: MemoizedTData): row is MemoizedFieldRow => row.type === "field"
+  const isMemoizedFieldRow = (row: MemoizedRotationExtended): row is MemoizedFieldRow =>
+    row.type === "field"
 
   const fuzzySearchAndProductivityFilter = (
-    data: MemoizedTData,
+    data: MemoizedRotationExtended,
     searchTerms: string,
     showProductiveOnly: boolean,
   ) => {
@@ -259,19 +271,16 @@ export function DataTable<TData extends RotationExtended, TValue>({
     ])
   }, [selection, memoizedData, fieldFilter])
 
-  const table = useReactTable<MemoizedTData>({
+  const table = useTable({
     data: memoizedData,
-    columns: columns as ColumnDef<MemoizedTData>[],
+    features: rotationTableFeatures,
+    columns: columns,
     getRowId: (row) =>
       row.type === "crop" ? `crop_${row.b_lu_catalogue}` : `${row.b_lu_catalogue}_${row.b_id}`,
-    getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
     getSubRows: (row) => (row.type === "crop" ? row.fields : undefined),
+    enableMultiRowSelection: false,
     onColumnVisibilityChange: setColumnVisibility,
     onGlobalFilterChange: (fn) => {
       const result = typeof fn === "function" ? fn(fieldFilter) : fn
@@ -352,12 +361,18 @@ export function DataTable<TData extends RotationExtended, TValue>({
     })
   }
 
-  function isFirstFieldRowForACrop(flatRows: Row<MemoizedTData>[], i: number) {
+  function isFirstFieldRowForACrop(
+    flatRows: Row<typeof rotationTableFeatures, MemoizedRotationExtended>[],
+    i: number,
+  ) {
     if (flatRows[i].original.type !== "field") return false
     return i === 0 || flatRows[i - 1].original.type === "crop"
   }
 
-  function isLastFieldRowForACrop(flatRows: Row<MemoizedTData>[], i: number) {
+  function isLastFieldRowForACrop(
+    flatRows: Row<typeof rotationTableFeatures, MemoizedRotationExtended>[],
+    i: number,
+  ) {
     if (flatRows[i].original.type !== "field") return false
     return i + 1 === flatRows.length || flatRows[i + 1].original.type === "crop"
   }

@@ -7,14 +7,10 @@
  *  - Sortable columns (field name, cultivation, area, measure count)
  */
 import {
-  type ColumnDef,
   flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
   type RowSelectionState,
   type SortingState,
-  useReactTable,
+  useTable,
 } from "@tanstack/react-table"
 import fuzzysort from "fuzzysort"
 import { Plus } from "lucide-react"
@@ -33,10 +29,11 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip"
 import { cn } from "~/lib/utils"
 import { useFieldFilterStore } from "~/store/field-filter"
-import type { FieldSummaryRow } from "./field-summary-columns"
+import type { getFieldSummaryColumns, FieldSummaryRow } from "./field-summary-columns"
+import { fieldSummaryTableFeatures } from "./field-summary-table-features"
 
 interface FieldSummaryTableProps {
-  columns: ColumnDef<FieldSummaryRow>[]
+  columns: ReturnType<typeof getFieldSummaryColumns>
   data: FieldSummaryRow[]
   onAddMeasure?: (selectedFieldIds: string[]) => void
   canModify?: boolean
@@ -81,8 +78,9 @@ export function FieldSummaryTable({
     return rows
   }, [data, searchTerms])
 
-  const table = useReactTable({
+  const table = useTable({
     data: filteredData,
+    features: fieldSummaryTableFeatures,
     columns,
     getRowId: (row) => row.b_id,
     state: {
@@ -93,9 +91,6 @@ export function FieldSummaryTable({
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
     enableRowSelection: canModify,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
   })
 
   const selectedIds = Object.keys(rowSelection).filter((k) => rowSelection[k])

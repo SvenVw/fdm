@@ -1,11 +1,4 @@
-import {
-  type ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  type SortingState,
-  useReactTable,
-} from "@tanstack/react-table"
+import { type ColumnDef, flexRender, type SortingState, useTable } from "@tanstack/react-table"
 import { ChevronDown, TriangleAlert } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router"
@@ -36,6 +29,7 @@ import { useNutrientAdviceOverviewStore } from "~/store/nutrient-advice-overview
 import type { FieldNutrientRow, UnitMode } from "./overview-types"
 import type { NutrientDescription } from "./types"
 import { buildOverviewColumns, GROUP_LABELS } from "./overview-columns"
+import { overviewTableFeatures } from "./overview-table-features"
 
 // Above this many affected fields, the summary switches to "eerste N + en X andere" instead of
 // listing every name, so a farm with many missing-advice fields doesn't produce an unreadable wall of text.
@@ -82,7 +76,7 @@ export function NutrientAdviceOverviewTable({
     )
   }, [isMobile, nutrients, hasCustomColumnVisibility, applyDefaultColumnVisibility])
 
-  const columns = useMemo<ColumnDef<FieldNutrientRow>[]>(
+  const columns = useMemo<ColumnDef<typeof overviewTableFeatures, FieldNutrientRow>[]>(
     () => buildOverviewColumns(nutrients, unitMode, b_id_farm, calendar),
     [nutrients, unitMode, b_id_farm, calendar],
   )
@@ -97,13 +91,12 @@ export function NutrientAdviceOverviewTable({
     )
   }, [data, search])
 
-  const table = useReactTable({
+  const table = useTable({
     data: filteredData,
+    features: overviewTableFeatures,
     columns,
     getRowId: (row) => row.b_id,
-    getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,

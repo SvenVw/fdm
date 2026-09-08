@@ -4,6 +4,7 @@ import { ArrowUpRightFromSquare, MoreHorizontal } from "lucide-react"
 import { NavLink } from "react-router"
 import type { BcsColor } from "~/components/blocks/soil-visual/bcs-color-utils"
 import type { CultivationSuggestion } from "~/lib/cultivation-suggestion.server"
+import { DataTableColumnHeader } from "~/components/blocks/data-table/column-header"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
 import { FertilizerIcon } from "~/components/custom/fertilizer-icon"
 import { Badge } from "~/components/ui/badge"
@@ -19,7 +20,7 @@ import {
 import { CultivationSuggestionBadge } from "../cultivation/suggestion"
 import { getFertilizerCategoryFromRvoCode } from "../fertilizer/utils"
 import { BufferStripCheckbox } from "./buffer-strip-checkbox"
-import { DataTableColumnHeader } from "./column-header"
+import { fieldsTableFeatures } from "./table-features"
 
 const BCS_BADGE_CLASS: Record<BcsColor, string> = {
   red: "bg-red-100 text-red-700 hover:bg-red-200",
@@ -49,7 +50,10 @@ export type FieldExtended = {
   } | null
 }
 
-export function buildColumns(b_id_farm: string, calendar: string): ColumnDef<FieldExtended>[] {
+export function buildColumns(
+  b_id_farm: string,
+  calendar: string,
+): ColumnDef<typeof fieldsTableFeatures, FieldExtended>[] {
   return [
     {
       id: "select",
@@ -93,7 +97,7 @@ export function buildColumns(b_id_farm: string, calendar: string): ColumnDef<Fie
     {
       accessorKey: "cultivations",
       enableSorting: true,
-      sortingFn: (rowA, rowB, _columnId) => {
+      sortFn: (rowA, rowB, _columnId) => {
         const cultivationA = rowA.original.cultivations[0]?.b_lu_name || ""
         const cultivationB = rowB.original.cultivations[0]?.b_lu_name || ""
         return cultivationA.localeCompare(cultivationB)
@@ -138,7 +142,7 @@ export function buildColumns(b_id_farm: string, calendar: string): ColumnDef<Fie
     {
       accessorKey: "fertilizerApplications",
       enableSorting: true,
-      sortingFn: (rowA, rowB, _columnId) => {
+      sortFn: (rowA, rowB, _columnId) => {
         const fertilizerA = rowA.original.fertilizers[0]?.p_name_nl || ""
         const fertilizerB = rowB.original.fertilizers[0]?.p_name_nl || ""
         return fertilizerA.localeCompare(fertilizerB)
@@ -182,7 +186,7 @@ export function buildColumns(b_id_farm: string, calendar: string): ColumnDef<Fie
     {
       accessorKey: "d_n_supply_base",
       enableSorting: true,
-      sortingFn: "alphanumeric",
+      sortFn: "alphanumeric",
       header: ({ column }) => {
         return <DataTableColumnHeader column={column} title="NLV" />
       },
@@ -199,7 +203,7 @@ export function buildColumns(b_id_farm: string, calendar: string): ColumnDef<Fie
     {
       accessorKey: "a_som_loi",
       enableSorting: true,
-      sortingFn: "alphanumeric",
+      sortFn: "alphanumeric",
       header: ({ column }) => {
         return <DataTableColumnHeader column={column} title="OS" />
       },
@@ -217,7 +221,7 @@ export function buildColumns(b_id_farm: string, calendar: string): ColumnDef<Fie
       id: "bcs",
       accessorFn: (row) => row.bcs?.d_bcs ?? null,
       enableSorting: true,
-      sortingFn: "alphanumeric",
+      sortFn: "alphanumeric",
       header: ({ column }) => {
         return <DataTableColumnHeader column={column} title="BCS" />
       },
@@ -250,7 +254,7 @@ export function buildColumns(b_id_farm: string, calendar: string): ColumnDef<Fie
     {
       accessorKey: "b_soiltype_agr",
       enableSorting: true,
-      sortingFn: "alphanumeric",
+      sortFn: "alphanumeric",
       header: ({ column }) => {
         return <DataTableColumnHeader column={column} title="Bodemtype" />
       },
@@ -263,7 +267,7 @@ export function buildColumns(b_id_farm: string, calendar: string): ColumnDef<Fie
     {
       accessorKey: "b_area",
       enableSorting: true,
-      sortingFn: "alphanumeric",
+      sortFn: "alphanumeric",
       header: ({ column }) => {
         return <DataTableColumnHeader column={column} title="Oppervlakte" />
       },

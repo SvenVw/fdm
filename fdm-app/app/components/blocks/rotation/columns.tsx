@@ -1,8 +1,9 @@
-import type { ColumnDef } from "@tanstack/react-table"
+import { createColumnHelper } from "@tanstack/react-table"
 import { ChevronRight } from "lucide-react"
 import React from "react"
 import { NavLink } from "react-router"
 import { cn } from "@/app/lib/utils"
+import { DataTableColumnHeader } from "~/components/blocks/data-table/column-header"
 import { getHarvestTerm } from "~/components/blocks/harvest/utils"
 import { Button } from "~/components/ui/button"
 import { Checkbox } from "~/components/ui/checkbox"
@@ -14,13 +15,13 @@ import {
 } from "~/components/ui/dropdown-menu"
 import { ScrollArea } from "~/components/ui/scroll-area"
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
-import { DataTableColumnHeader } from "./column-header"
 import { CropResidueCheckbox } from "./crop-residue-checkbox"
 import { DateRangeDisplay } from "./date-range-display"
 import { TableDateSelector } from "./date-selector"
 import { FertilizerDisplay } from "./fertilizer-display"
 import { HarvestDatesDisplay } from "./harvest-dates-display"
 import { NameCell } from "./name-cell"
+import { rotationTableFeatures } from "./table-features"
 import { TableVarietySelector } from "./variety-selector"
 
 export type CropRow = {
@@ -76,8 +77,13 @@ export type FieldRow = {
 
 export type RotationExtended = CropRow | FieldRow
 
-export const columns: ColumnDef<RotationExtended>[] = [
-  {
+export type MemoizedFieldRow = FieldRow & { searchTarget: string }
+export type MemoizedCropRow = CropRow & { searchTarget: string; fields: MemoizedFieldRow[] }
+export type MemoizedRotationExtended = MemoizedCropRow | MemoizedFieldRow
+
+const columnHelper = createColumnHelper<typeof rotationTableFeatures, MemoizedRotationExtended>()
+export const columns = columnHelper.columns([
+  columnHelper.display({
     id: "Children",
     enableHiding: false,
     cell: ({ row }) => {
@@ -98,8 +104,8 @@ export const columns: ColumnDef<RotationExtended>[] = [
         ""
       )
     },
-  },
-  {
+  }),
+  columnHelper.display({
     id: "select",
     header: ({ table }) => (
       <div className="pe-4">
@@ -127,20 +133,19 @@ export const columns: ColumnDef<RotationExtended>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
-  },
-  {
+  }),
+  columnHelper.accessor((row) => (row.type === "crop" ? row.b_lu_name : row.b_name), {
     id: "name",
-    accessorFn: (row) => (row.type === "crop" ? row.b_lu_name : row.b_name),
     enableSorting: true,
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Gewas" />
     },
     cell: (context) => <NameCell {...context} />,
-  },
-  {
-    accessorKey: "b_lu_start",
+  }),
+  columnHelper.display({
+    id: "b_lu_start",
     enableSorting: true,
-    sortingFn: "datetime",
+    sortFn: "datetime",
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Zaaidatum" />
     },
@@ -158,11 +163,11 @@ export const columns: ColumnDef<RotationExtended>[] = [
         <TableDateSelector name="b_lu_start" row={row} cellId={cell.id} required={true} />
       )
     },
-  },
-  {
-    accessorKey: "b_lu_end",
+  }),
+  columnHelper.display({
+    id: "b_lu_end",
     enableSorting: true,
-    sortingFn: "datetime",
+    sortFn: "datetime",
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Einddatum" />
     },
@@ -204,9 +209,9 @@ export const columns: ColumnDef<RotationExtended>[] = [
         <TableDateSelector name="b_lu_end" row={row} cellId={cell.id} required={false} />
       )
     },
-  },
-  {
-    accessorKey: "b_harvest_date",
+  }),
+  columnHelper.display({
+    id: "b_harvest_date",
     enableSorting: false,
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Oogst/Maaidata" />
@@ -215,9 +220,9 @@ export const columns: ColumnDef<RotationExtended>[] = [
     cell: ({ row }) => {
       return <HarvestDatesDisplay row={row} />
     },
-  },
-  {
-    accessorKey: "b_lu_variety",
+  }),
+  columnHelper.display({
+    id: "b_lu_variety",
     enableSorting: false,
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Variëteit" />
@@ -231,9 +236,9 @@ export const columns: ColumnDef<RotationExtended>[] = [
         canModify={row.original.canModify}
       />
     ),
-  },
-  {
-    accessorKey: "m_cropresidue",
+  }),
+  columnHelper.display({
+    id: "m_cropresidue",
     enableSorting: false,
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Gewasresten" />
@@ -241,9 +246,9 @@ export const columns: ColumnDef<RotationExtended>[] = [
     enableHiding: true, // Enable hiding for mobile
     cell: (props) =>
       props.row.original.b_lu_croprotation === "cereal" && <CropResidueCheckbox {...props} />,
-  },
-  {
-    accessorKey: "fertilizers",
+  }),
+  columnHelper.display({
+    id: "fertilizers",
     enableSorting: false,
     enableHiding: true, // Enable hiding for mobile
     header: ({ column }) => {
@@ -252,11 +257,11 @@ export const columns: ColumnDef<RotationExtended>[] = [
     cell: ({ row }) => {
       return <FertilizerDisplay row={row} />
     },
-  },
-  {
-    accessorKey: "b_name",
+  }),
+  columnHelper.display({
+    id: "b_name",
     enableSorting: true,
-    sortingFn: (rowA, rowB, _columnId) => {
+    sortFn: (rowA, rowB, _columnId) => {
       const fieldA = rowA.original.fields?.length ?? 0
       const fieldB = rowB.original.fields?.length ?? 0
       return fieldA - fieldB
@@ -306,21 +311,10 @@ export const columns: ColumnDef<RotationExtended>[] = [
 
       return fieldsDisplay
     },
-  },
-  {
-    accessorKey: "b_area",
+  }),
+  columnHelper.accessor("b_area", {
     enableSorting: true,
-    sortingFn: (rowA, rowB, _columnId) => {
-      const areaA =
-        rowA.original.type === "field"
-          ? rowA.original.b_area
-          : rowA.original.fields.reduce((acc, field) => acc + field.b_area, 0)
-      const areaB =
-        rowB.original.type === "field"
-          ? rowB.original.b_area
-          : rowB.original.fields.reduce((acc, field) => acc + field.b_area, 0)
-      return areaA - areaB
-    },
+    sortFn: "basic",
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Oppervlakte" />
     },
@@ -342,5 +336,5 @@ export const columns: ColumnDef<RotationExtended>[] = [
 
       return <p className="text-muted-foreground">{formattedArea}</p>
     },
-  },
-]
+  }),
+])

@@ -1,9 +1,16 @@
 import {
-  createColumnHelper,
   flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
+  useTable,
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  createFilteredRowModel,
+  createSortedRowModel,
+  globalFilteringFeature,
+  rowSelectionFeature,
+  rowSortingFeature,
+  sortFn_text,
+  tableFeatures,
+  createColumnHelper,
 } from "@tanstack/react-table"
 import { CheckCircle2, ChevronDown, ChevronUp, Info } from "lucide-react"
 import { Fragment } from "react"
@@ -28,9 +35,20 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/comp
 import type { ParsedPlan, PlanRow } from "./types"
 import { getApplicationAmountUnitLabel } from "../fertilizer-applications/utils"
 
-const columnHelper = createColumnHelper<PlanRow>()
+const planTableFeatures = tableFeatures({
+  columnFilteringFeature: columnFilteringFeature,
+  columnVisibilityFeature: columnVisibilityFeature,
+  filteredRowModel: createFilteredRowModel(),
+  globalFilteringFeature: globalFilteringFeature,
+  rowSelectionFeature: rowSelectionFeature,
+  rowSortingFeature: rowSortingFeature,
+  sortedRowModel: createSortedRowModel(),
+  sortFns: { text: sortFn_text },
+})
 
-const columns = [
+const columnHelper = createColumnHelper<typeof planTableFeatures, PlanRow>()
+
+const columns = columnHelper.columns([
   columnHelper.accessor("b_name", {
     header: "Perceel",
     cell: (info) => <span className="text-foreground font-medium">{info.getValue()}</span>,
@@ -111,7 +129,7 @@ const columns = [
       )
     },
   }),
-]
+])
 
 interface PlanTableProps {
   plan: ParsedPlan & { plan: PlanRow[] }
@@ -121,11 +139,10 @@ interface PlanTableProps {
 }
 
 export function PlanTable({ plan, isSaving, expandedRows, toggleRow }: PlanTableProps) {
-  const table = useReactTable({
-    data: plan.plan || [],
+  const table = useTable({
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    features: planTableFeatures,
+    data: plan.plan || [],
   })
 
   return (

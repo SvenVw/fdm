@@ -7,10 +7,10 @@ import type {
 import { getItemId } from "@nmi-agro/fdm-rvo/utils"
 import {
   type ColumnDef,
+  columnVisibilityFeature,
   flexRender,
-  getCoreRowModel,
-  type RowData,
-  useReactTable,
+  tableFeatures,
+  useTable,
 } from "@tanstack/react-table"
 import { area } from "@turf/area"
 import { format, parseISO } from "date-fns"
@@ -37,17 +37,6 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip"
 import { acquiringMethodOptions } from "~/lib/constants"
 import { cn } from "~/lib/utils"
-
-declare module "@tanstack/react-table" {
-  interface TableMeta<TData extends RowData> {
-    calendar: string
-    userChoices: UserChoiceMap
-    flags?: ImportReviewFlags
-    /** Function to replace a review item. `getItemId(replacement)` will return the same value as the original. */
-    onItemChange?: (id: string, item: ReviewItem) => void
-    onChoiceChange: (id: string, action: ImportReviewAction) => void
-  }
-}
 
 type ReviewItem = RvoImportReviewItem<Field>
 
@@ -186,7 +175,22 @@ const DiffCell = ({
   return null
 }
 
-export const columns: ColumnDef<ReviewItem>[] = [
+interface ImportReviewTableMeta {
+  canModify: boolean
+  calendar: string
+  userChoices: UserChoiceMap
+  flags?: ImportReviewFlags
+  /** Function to replace a review item. `getItemId(replacement)` will return the same value as the original. */
+  onItemChange?: (id: string, item: ReviewItem) => void
+  onChoiceChange: (id: string, action: ImportReviewAction) => void
+}
+
+const importReviewTableFeatures = tableFeatures({
+  columnVisibilityFeature: columnVisibilityFeature,
+  tableMeta: {} as ImportReviewTableMeta,
+})
+
+export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] = [
   {
     accessorKey: "status",
     header: () => (
@@ -658,10 +662,10 @@ export function RvoImportReviewTable({
     bufferstrook_editable: !b_bufferstrip_info_available,
   }
 
-  const table = useReactTable({
+  const table = useTable({
     data: sortedData,
+    features: importReviewTableFeatures,
     columns,
-    getCoreRowModel: getCoreRowModel(),
     meta: {
       canModify: true,
       userChoices,
@@ -697,7 +701,7 @@ export function RvoImportReviewTable({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

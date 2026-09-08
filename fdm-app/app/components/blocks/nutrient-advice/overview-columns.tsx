@@ -1,4 +1,4 @@
-import type { Column, ColumnDef, RowData } from "@tanstack/react-table"
+import type { Column, ColumnDef } from "@tanstack/react-table"
 import { ArrowDown, ArrowUp } from "lucide-react"
 import { NavLink } from "react-router"
 import { CultivationSuggestionBadge } from "~/components/blocks/cultivation/suggestion"
@@ -8,15 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip
 import { cn } from "~/lib/utils"
 import type { FieldNutrientRow, UnitMode } from "./overview-types"
 import type { NutrientDescription } from "./types"
-
-// Lets each nutrient column carry its group ("Primair" etc.) for the divider styling and the
-// "Bekijk" column-visibility dropdown, without needing a nested (and fragile) grouped header row.
-declare module "@tanstack/react-table" {
-  interface ColumnMeta<TData extends RowData, TValue> {
-    groupStart?: boolean
-    groupLabel?: string
-  }
-}
+import { overviewTableFeatures } from "./overview-table-features"
 
 // A field is considered under-fertilized below this % of advice, and over-fertilized at or above it.
 const DEFICIT_THRESHOLD = 90
@@ -86,7 +78,7 @@ function NutrientColumnHeader({
   nutrient,
   unitMode,
 }: {
-  column: Column<FieldNutrientRow, unknown>
+  column: Column<typeof overviewTableFeatures, FieldNutrientRow, unknown>
   nutrient: NutrientDescription
   unitMode: UnitMode
 }) {
@@ -174,7 +166,7 @@ function buildNutrientColumn(
   nutrient: NutrientDescription,
   unitMode: UnitMode,
   isGroupStart: boolean,
-): ColumnDef<FieldNutrientRow> {
+): ColumnDef<typeof overviewTableFeatures, FieldNutrientRow> {
   return {
     id: nutrient.symbol,
     accessorFn: (row) => {
@@ -217,7 +209,11 @@ function buildNutrientColumn(
   }
 }
 
-function FieldColumnHeader({ column }: { column: Column<FieldNutrientRow, unknown> }) {
+function FieldColumnHeader({
+  column,
+}: {
+  column: Column<typeof overviewTableFeatures, FieldNutrientRow, unknown>
+}) {
   const sorted = column.getIsSorted()
   return (
     <button
@@ -245,7 +241,10 @@ function FieldColumnHeader({ column }: { column: Column<FieldNutrientRow, unknow
   )
 }
 
-export function buildFieldColumn(b_id_farm: string, calendar: string): ColumnDef<FieldNutrientRow> {
+export function buildFieldColumn(
+  b_id_farm: string,
+  calendar: string,
+): ColumnDef<typeof overviewTableFeatures, FieldNutrientRow> {
   return {
     id: "field",
     accessorKey: "b_name",
@@ -317,7 +316,7 @@ export function buildOverviewColumns(
   unitMode: UnitMode,
   b_id_farm: string,
   calendar: string,
-): ColumnDef<FieldNutrientRow>[] {
+): ColumnDef<typeof overviewTableFeatures, FieldNutrientRow>[] {
   const order: NutrientDescription["type"][] = ["primary", "secondary", "trace"]
   const orderedNutrients = order.flatMap((type) =>
     nutrients.filter((nutrient) => nutrient.type === type),
