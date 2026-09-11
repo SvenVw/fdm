@@ -4,7 +4,9 @@ import { ArrowUpRightFromSquare, MoreHorizontal } from "lucide-react"
 import { NavLink } from "react-router"
 import type { BcsColor } from "~/components/blocks/soil-visual/bcs-color-utils"
 import type { CultivationSuggestion } from "~/lib/cultivation-suggestion.server"
+import { CultivationSuggestionBadge } from "~/components/blocks/cultivation/suggestion"
 import { DataTableColumnHeader } from "~/components/blocks/data-table/column-header"
+import { getFertilizerCategoryFromRvoCode } from "~/components/blocks/fertilizer/utils"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
 import { FertilizerIcon } from "~/components/custom/fertilizer-icon"
 import { Badge } from "~/components/ui/badge"
@@ -17,8 +19,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
-import { CultivationSuggestionBadge } from "../cultivation/suggestion"
-import { getFertilizerCategoryFromRvoCode } from "../fertilizer/utils"
 import { BufferStripCheckbox } from "./buffer-strip-checkbox"
 import { fieldsTableFeatures } from "./table-features"
 
@@ -60,8 +60,11 @@ export function buildColumns(
       header: ({ table }) => (
         <Checkbox
           checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+            table.getIsAllRowsSelected()
+              ? true
+              : table.getIsSomeRowsSelected()
+                ? "indeterminate"
+                : false
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"

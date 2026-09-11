@@ -1,14 +1,7 @@
-import {
-  type ColumnFiltersState,
-  FlexRender,
-  type Row,
-  RowSelectionState,
-  type SortingState,
-  useTable,
-} from "@tanstack/react-table"
+import { FlexRender, type Row, RowSelectionState, useTable } from "@tanstack/react-table"
 import fuzzysort from "fuzzysort"
 import { ChevronDown, Plus } from "lucide-react"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { NavLink, useParams } from "react-router"
 import { useFieldFilterStore } from "@/app/store/field-filter"
 import { useFieldSelectionStore } from "@/app/store/field-selection"
@@ -46,8 +39,6 @@ export function DataTable<TData extends FieldExtended>({
   data,
   canAddItem,
 }: DataTableProps<TData>) {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const isMobile = useIsMobile()
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(
     isMobile ? { a_som_loi: false, b_soiltype_agr: false, b_area: false } : {},
@@ -55,7 +46,6 @@ export function DataTable<TData extends FieldExtended>({
   const fieldIds = useFieldSelectionStore((state) => state.fieldIds)
   const setFieldIds = useFieldSelectionStore((state) => state.setFieldIds)
   const syncFarm = useFieldSelectionStore((state) => state.syncFarm)
-  const lastSelectedRowIndex = useRef<number | null>(null)
   const fieldFilter = useFieldFilterStore()
 
   const rowSelection = useMemo(
@@ -95,23 +85,12 @@ export function DataTable<TData extends FieldExtended>({
       return
     }
 
-    if (event.shiftKey && lastSelectedRowIndex.current !== null) {
-      const currentIndex = row.index
-      const start = Math.min(currentIndex, lastSelectedRowIndex.current)
-      const end = Math.max(currentIndex, lastSelectedRowIndex.current)
+    document.getSelection()?.removeAllRanges()
 
-      const rowsToSelect = table
-        .getRowModel()
-        .rows.slice(start, end + 1)
-        .map((r) => r.original.b_id) // Use b_id directly
-
-      const newFieldIds = new Set(fieldIds)
-      rowsToSelect.forEach((id) => newFieldIds.add(id))
-      setFieldIds(Array.from(newFieldIds))
-    } else {
-      row.toggleSelected()
-    }
-    lastSelectedRowIndex.current = row.index
+    row.getToggleSelectedHandler()({
+      ...event,
+      target: { checked: !row.getIsSelected() },
+    })
   }
 
   const memoizedData = useMemo(() => {
@@ -126,8 +105,6 @@ export function DataTable<TData extends FieldExtended>({
     features: fieldsTableFeatures,
     columns,
     getRowId: (row) => row.b_id,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onGlobalFilterChange: (fn) => {
       const result = typeof fn === "function" ? fn(fieldFilter) : fn
@@ -147,11 +124,9 @@ export function DataTable<TData extends FieldExtended>({
       return result.length > 0
     },
     state: {
-      sorting,
-      columnFilters,
       columnVisibility,
       globalFilter: fieldFilter,
-      rowSelection,
+      rowSelection: rowSelection,
     },
   })
 

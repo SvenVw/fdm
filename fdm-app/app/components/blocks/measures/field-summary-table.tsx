@@ -8,6 +8,7 @@
  */
 import {
   FlexRender,
+  Row,
   type RowSelectionState,
   type SortingState,
   useTable,
@@ -93,6 +94,28 @@ export function FieldSummaryTable({
     enableRowSelection: canModify,
   })
 
+  const handleRowClick = (
+    row: Row<typeof fieldSummaryTableFeatures, FieldSummaryRow>,
+    event: React.MouseEvent<HTMLTableRowElement>,
+  ) => {
+    // Ignore clicks on interactive elements inside the row
+    const isInteractive = (target: EventTarget | null): boolean => {
+      if (!(target instanceof Element)) return false
+      return !!target.closest(
+        'a,button,input,label,select,textarea,[role="button"],[role="link"],[role="checkbox"],[data-prevent-row-click="true"]',
+      )
+    }
+
+    if (isInteractive(event.target)) {
+      // If a link was clicked, let the default navigation happen
+      return
+    }
+
+    document.getSelection()?.removeAllRanges()
+
+    row.getToggleSelectedHandler()({ ...event, target: { checked: !row.getIsSelected() } })
+  }
+
   const selectedIds = Object.keys(rowSelection).filter((k) => rowSelection[k])
   const hasSelection = selectedIds.length > 0
 
@@ -151,7 +174,11 @@ export function FieldSummaryTable({
           <TableBody>
             {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  onClick={(event) => handleRowClick(row, event)}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}

@@ -35,10 +35,13 @@ export function getFieldSummaryColumns(): ColumnDef<
       header: ({ table }) => (
         <Checkbox
           checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+            table.getIsAllRowsSelected()
+              ? true
+              : table.getIsSomeRowsSelected()
+                ? "indeterminate"
+                : false
           }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
           aria-label="Selecteer alles"
         />
       ),
