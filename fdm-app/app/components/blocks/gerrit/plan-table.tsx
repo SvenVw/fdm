@@ -1,5 +1,4 @@
 import {
-  flexRender,
   useTable,
   columnFilteringFeature,
   columnVisibilityFeature,
@@ -11,6 +10,7 @@ import {
   sortFn_text,
   tableFeatures,
   createColumnHelper,
+  FlexRender,
 } from "@tanstack/react-table"
 import { CheckCircle2, ChevronDown, ChevronUp, Info } from "lucide-react"
 import { Fragment } from "react"
@@ -170,11 +170,9 @@ export function PlanTable({ plan, isSaving, expandedRows, toggleRow }: PlanTable
             <TableHeader className="bg-muted/30">
               {table.getHeaderGroups().map((hg) => (
                 <TableRow key={hg.id}>
-                  {hg.headers.map((h) => (
-                    <TableHead key={h.id} className="font-semibold">
-                      {h.isPlaceholder
-                        ? null
-                        : flexRender(h.column.columnDef.header, h.getContext())}
+                  {hg.headers.map((header) => (
+                    <TableHead key={header.id} className="font-semibold">
+                      <FlexRender header={header} />
                     </TableHead>
                   ))}
                   <TableHead className="w-8" />
@@ -203,7 +201,7 @@ export function PlanTable({ plan, isSaving, expandedRows, toggleRow }: PlanTable
                       >
                         {row.getVisibleCells().map((cell) => (
                           <TableCell key={cell.id} className="py-3">
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            <FlexRender cell={cell} />
                           </TableCell>
                         ))}
                         <TableCell className="py-3">

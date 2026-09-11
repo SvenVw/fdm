@@ -1,4 +1,4 @@
-import { flexRender, type SortingState, useTable } from "@tanstack/react-table"
+import { FlexRender, type SortingState, useTable } from "@tanstack/react-table"
 import { Plus, Search } from "lucide-react"
 import { useState } from "react"
 import { Button } from "~/components/ui/button"
@@ -75,9 +75,7 @@ export function MeasuresDataTable({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                    <FlexRender header={header} />
                   </TableHead>
                 ))}
               </TableRow>
@@ -89,7 +87,7 @@ export function MeasuresDataTable({
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      <FlexRender cell={cell} />
                     </TableCell>
                   ))}
                 </TableRow>

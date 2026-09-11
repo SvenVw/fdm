@@ -1,6 +1,6 @@
 import {
   type ColumnFiltersState,
-  flexRender,
+  FlexRender,
   type Row,
   RowSelectionState,
   type SortingState,
@@ -270,9 +270,7 @@ export function DataTable<TData extends FieldExtended>({
                         "bg-background sticky right-0": header.column.id === "actions",
                       })}
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                      <FlexRender header={header} />
                     </TableHead>
                   )
                 })}
@@ -295,7 +293,7 @@ export function DataTable<TData extends FieldExtended>({
                         "bg-background sticky right-0": cell.column.id === "actions",
                       })}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      <FlexRender cell={cell} />
                     </TableCell>
                   ))}
                 </TableRow>

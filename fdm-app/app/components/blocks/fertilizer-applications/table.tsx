@@ -1,4 +1,4 @@
-import { flexRender, useTable } from "@tanstack/react-table"
+import { FlexRender, useTable } from "@tanstack/react-table"
 import { useMemo } from "react"
 import { cn } from "@/app/lib/utils"
 import {
@@ -213,9 +213,7 @@ export function DataTable({
                     "sticky right-0": header.column.id === "modify",
                   })}
                 >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
+                  <FlexRender header={header} />
                 </TableHead>
               )
             })}
@@ -232,7 +230,7 @@ export function DataTable({
                   "sticky right-0 pe-0": cell.column.id === "modify",
                 })}
               >
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                <FlexRender cell={cell} />
               </TableCell>
             ))}
           </TableRow>

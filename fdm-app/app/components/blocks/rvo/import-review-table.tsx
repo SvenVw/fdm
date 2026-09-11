@@ -8,7 +8,7 @@ import { getItemId } from "@nmi-agro/fdm-rvo/utils"
 import {
   type ColumnDef,
   columnVisibilityFeature,
-  flexRender,
+  FlexRender,
   tableFeatures,
   useTable,
 } from "@tanstack/react-table"
@@ -689,9 +689,7 @@ export function RvoImportReviewTable({
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                      <FlexRender header={header} />
                     </TableHead>
                   )
                 })}
@@ -704,7 +702,7 @@ export function RvoImportReviewTable({
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      <FlexRender cell={cell} />
                     </TableCell>
                   ))}
                 </TableRow>

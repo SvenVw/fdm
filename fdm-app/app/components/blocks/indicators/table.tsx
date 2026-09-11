@@ -1,4 +1,4 @@
-import { type ColumnDef, flexRender, tableFeatures, useTable } from "@tanstack/react-table"
+import { type ColumnDef, FlexRender, tableFeatures, useTable } from "@tanstack/react-table"
 import { useMemo } from "react"
 import { NavLink } from "react-router"
 import type { FieldBln3Score } from "~/integrations/bln3.server"
@@ -290,7 +290,7 @@ export function HeatmapTable({
                     )}
                   >
                     <div className="truncate px-1" title={cat}>
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      <FlexRender header={header} />
                     </div>
                   </th>
                 )
@@ -322,7 +322,7 @@ export function HeatmapTable({
                         "border-border w-12 min-w-[48px] border-r border-b px-1 pb-2 text-center align-middle",
                       )}
                     >
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      <FlexRender header={header} />
                     </th>
                   )
                 }
@@ -350,11 +350,11 @@ export function HeatmapTable({
                           )
                         }
                       >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        <FlexRender header={header} />
                       </button>
                     ) : (
                       <div className="flex h-full items-end justify-center overflow-hidden">
-                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        <FlexRender header={header} />
                       </div>
                     )}
                   </th>
@@ -419,7 +419,7 @@ export function HeatmapTable({
                         key={cell.id}
                         className={cn(stickyCol, "border-border border-r border-b px-3 py-2")}
                       >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        <FlexRender cell={cell} />
                       </td>
                     )
                   }
@@ -432,13 +432,13 @@ export function HeatmapTable({
                           "border-border border-r border-b px-1 py-2 text-center",
                         )}
                       >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        <FlexRender cell={cell} />
                       </td>
                     )
                   }
                   return (
                     <td key={cell.id} className={tdBase}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      <FlexRender cell={cell} />
                     </td>
                   )
                 })}

@@ -1,6 +1,6 @@
 import type { SoilParameterDescription } from "@nmi-agro/fdm-core"
 import type React from "react"
-import { type ColumnDef, flexRender, tableFeatures, useTable } from "@tanstack/react-table"
+import { type ColumnDef, FlexRender, tableFeatures, useTable } from "@tanstack/react-table"
 import * as chrono from "chrono-node"
 import { format, isValid, parseISO } from "date-fns"
 import { nl } from "date-fns/locale/nl"
@@ -476,9 +476,7 @@ export function BulkSoilAnalysisReview({
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
                       <TableHead key={header.id}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
+                        <FlexRender header={header} />
                       </TableHead>
                     ))}
                   </TableRow>
@@ -490,7 +488,7 @@ export function BulkSoilAnalysisReview({
                     <TableRow key={row.id}>
                       {row.getAllCells().map((cell) => (
                         <TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          <FlexRender cell={cell} />
                         </TableCell>
                       ))}
                     </TableRow>

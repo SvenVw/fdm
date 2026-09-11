@@ -1,7 +1,7 @@
 /* eslint-disable typescript/unbound-method -- TanStack React Table row models are designed to use destructured methods directly in columns. */
 import {
   ColumnVisibilityState,
-  flexRender,
+  FlexRender,
   type Row,
   type RowSelectionState,
   useTable,
@@ -541,9 +541,7 @@ export function DataTable<TData extends RotationExtended>({
                         "min-w-35": header.column.id === "name",
                       })}
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                      <FlexRender header={header} />
                     </TableHead>
                   )
                 })}
@@ -580,7 +578,7 @@ export function DataTable<TData extends RotationExtended>({
                         "sticky right-0": cell.column.id === "actions",
                       })}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      <FlexRender cell={cell} />
                     </TableCell>
                   ))}
                 </TableRow>

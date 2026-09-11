@@ -7,7 +7,7 @@
  *  - Sortable columns (field name, cultivation, area, measure count)
  */
 import {
-  flexRender,
+  FlexRender,
   type RowSelectionState,
   type SortingState,
   useTable,
@@ -142,9 +142,7 @@ export function FieldSummaryTable({
                       "bg-background sticky left-0 w-[40px]": header.column.id === "select",
                     })}
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                    <FlexRender header={header} />
                   </TableHead>
                 ))}
               </TableRow>
@@ -161,7 +159,7 @@ export function FieldSummaryTable({
                         "bg-background sticky left-0": cell.column.id === "select",
                       })}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      <FlexRender cell={cell} />
                     </TableCell>
                   ))}
                 </TableRow>

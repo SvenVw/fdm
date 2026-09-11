@@ -1,4 +1,4 @@
-import { ColumnDef, flexRender, useTable } from "@tanstack/react-table"
+import { ColumnDef, FlexRender, useTable } from "@tanstack/react-table"
 import { useCallback, useState } from "react"
 import { useFetcher } from "react-router"
 import {
@@ -88,9 +88,7 @@ export function DataTable<TData extends BemestingsplanRowData>({
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                      <FlexRender header={header} />
                     </TableHead>
                   )
                 })}
@@ -103,7 +101,7 @@ export function DataTable<TData extends BemestingsplanRowData>({
                 <TableRow key={row.id}>
                   {row.getAllCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      <FlexRender cell={cell} />
                     </TableCell>
                   ))}
                 </TableRow>

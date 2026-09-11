@@ -1,4 +1,4 @@
-import { type ColumnDef, flexRender, type SortingState, useTable } from "@tanstack/react-table"
+import { type ColumnDef, FlexRender, type SortingState, useTable } from "@tanstack/react-table"
 import { ChevronDown, TriangleAlert } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router"
@@ -225,9 +225,7 @@ export function NutrientAdviceOverviewTable({
                       "border-l-2": header.column.columnDef.meta?.groupStart,
                     })}
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                    <FlexRender header={header} />
                   </TableHead>
                 ))}
               </TableRow>
@@ -245,9 +243,7 @@ export function NutrientAdviceOverviewTable({
                           "border-l-2": header.column.columnDef.meta?.groupStart,
                         })}
                       >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.footer, header.getContext())}
+                        <FlexRender footer={header} />
                       </TableHead>
                     ))}
                   </TableRow>
@@ -273,7 +269,7 @@ export function NutrientAdviceOverviewTable({
                         "border-l-2": cell.column.columnDef.meta?.groupStart,
                       })}
                     >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      <FlexRender cell={cell} />
                     </TableCell>
                   ))}
                 </TableRow>

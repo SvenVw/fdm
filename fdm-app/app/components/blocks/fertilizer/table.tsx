@@ -1,6 +1,6 @@
 import {
   type ColumnFiltersState,
-  flexRender,
+  FlexRender,
   RowData,
   type SortingState,
   useTable,
@@ -162,9 +162,7 @@ export function DataTable<TData extends Fertilizer>({
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                      <FlexRender header={header} />
                     </TableHead>
                   )
                 })}
@@ -188,10 +186,10 @@ export function DataTable<TData extends Fertilizer>({
                             className="focus-visible:ring-ring block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                             aria-label={`Bekijk details van ${p_name}`}
                           >
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            <FlexRender cell={cell} />
                           </NavLink>
                         ) : (
-                          flexRender(cell.column.columnDef.cell, cell.getContext())
+                          <FlexRender cell={cell} />
                         )}
                       </TableCell>
                     ))}

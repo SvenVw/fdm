@@ -1,4 +1,4 @@
-import { flexRender, RowData, type SortingState, useTable } from "@tanstack/react-table"
+import { FlexRender, RowData, type SortingState, useTable } from "@tanstack/react-table"
 import fuzzysort from "fuzzysort"
 import { ChevronDown } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
@@ -131,9 +131,7 @@ export function DataTable<TData extends FarmExtended>({ columns, data }: DataTab
                         "bg-background sticky right-0": header.column.id === "actions",
                       })}
                     >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                      <FlexRender header={header} />
                     </TableHead>
                   )
                 })}
@@ -167,7 +165,7 @@ export function DataTable<TData extends FarmExtended>({ columns, data }: DataTab
                           "bg-background sticky right-0": cell.column.id === "actions",
                         })}
                       >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        <FlexRender cell={cell} />
                       </TableCell>
                     ))}
                   </TableRow>
