@@ -136,6 +136,15 @@ export function NutrientAdviceOverviewTable({
     [nutrients],
   )
 
+  const headerGroups = table.getHeaderGroups()
+
+  // Set of headerGroups[1][number].id where there should be a border on the left
+  const headersWithLeftBorder = new Set(
+    headerGroups[0].headers.flatMap((header, i) =>
+      i !== 0 && header.subHeaders.length > 0 ? [header.subHeaders[0].id] : [],
+    ),
+  )
+
   // Surfaced as a static, always-visible summary (not only a per-cell hover tooltip) so the reason
   // is discoverable for keyboard/screen-reader users too, without adding a tab stop to every "–" cell.
   const erroredFields = useMemo(() => data.filter((row) => row.errorMessage), [data])
@@ -144,7 +153,7 @@ export function NutrientAdviceOverviewTable({
     <div className="flex h-full w-full flex-col gap-4">
       {erroredFields.length > 0 ? (
         <Alert className="border-amber-200 bg-amber-50 text-amber-800">
-          <TriangleAlert className="h-4 w-4 !text-amber-800" />
+          <TriangleAlert className="h-4 w-4 text-amber-800!" />
           <AlertDescription className="text-amber-800">
             We konden voor {erroredFields.length}{" "}
             {erroredFields.length === 1 ? "perceel" : "percelen"} geen bemestingsadvies berekenen:{" "}
@@ -215,40 +224,59 @@ export function NutrientAdviceOverviewTable({
       <div className="relative grow overflow-x-auto rounded-md border">
         <Table>
           <TableHeader className="bg-background sticky top-0 z-10">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
+            <TableRow>
+              {headerGroups[0].headers.map((header, i) =>
+                header.rowSpan === 0 ? null : (
                   <TableHead
                     key={header.id}
-                    className={cn("text-right", {
+                    rowSpan={header.rowSpan}
+                    colSpan={header.colSpan}
+                    className={cn("text-center", {
                       "bg-background sticky left-0 z-20 text-left": header.column.id === "field",
-                      "border-l-2": header.column.columnDef.meta?.groupStart,
+                      "border-muted border-l-2": i !== 0,
                     })}
                   >
                     <FlexRender header={header} />
                   </TableHead>
-                ))}
+                ),
+              )}
+            </TableRow>
+            {headerGroups.length > 1 && (
+              <TableRow>
+                {headerGroups[1].headers.map((header) =>
+                  header.rowSpan === 0 ? null : (
+                    <TableHead
+                      key={header.id}
+                      rowSpan={header.rowSpan}
+                      colSpan={header.colSpan}
+                      className={cn("text-right", {
+                        "bg-background sticky left-0 z-20 text-left": header.column.id === "field",
+                        "border-muted border-l-2": headersWithLeftBorder.has(header.id),
+                      })}
+                    >
+                      <FlexRender header={header} />
+                    </TableHead>
+                  ),
+                )}
               </TableRow>
-            ))}
+            )}
             {/* Farm-level totals, pinned at the top (inside the sticky header) instead of a footer, so they stay visible while scrolling through fields. */}
-            {table.getRowModel().rows?.length
-              ? table.getFooterGroups().map((footerGroup) => (
-                  <TableRow key={footerGroup.id} className="bg-muted/50">
-                    {footerGroup.headers.map((header) => (
-                      <TableHead
-                        key={header.id}
-                        className={cn("text-right font-medium", {
-                          // Opaque (not /50) so scrolled-under nutrient columns don't bleed through the pinned cell.
-                          "bg-muted sticky left-0 z-20 text-left": header.column.id === "field",
-                          "border-l-2": header.column.columnDef.meta?.groupStart,
-                        })}
-                      >
-                        <FlexRender footer={header} />
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))
-              : null}
+            <TableRow className="bg-muted/50">
+              {table.getRowModel().rows?.length
+                ? table.getFooterGroups()[0].headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      className={cn("text-right font-medium", {
+                        // Opaque (not /50) so scrolled-under nutrient columns don't bleed through the pinned cell.
+                        "bg-muted sticky left-0 z-20 text-left": header.column.id === "field",
+                        "border-l-2": headersWithLeftBorder.has(header.column.id),
+                      })}
+                    >
+                      <FlexRender footer={header} />
+                    </TableHead>
+                  ))
+                : null}
+            </TableRow>
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
@@ -266,7 +294,7 @@ export function NutrientAdviceOverviewTable({
                       key={cell.id}
                       className={cn({
                         "bg-background sticky left-0 z-10": cell.column.id === "field",
-                        "border-l-2": cell.column.columnDef.meta?.groupStart,
+                        "border-l-2": headersWithLeftBorder.has(cell.column.id),
                       })}
                     >
                       <FlexRender cell={cell} />

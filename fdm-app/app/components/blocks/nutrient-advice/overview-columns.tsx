@@ -1,4 +1,4 @@
-import type { Column, ColumnDef } from "@tanstack/react-table"
+import { createColumnHelper, type Column, type ColumnDef } from "@tanstack/react-table"
 import { ArrowDown, ArrowUp } from "lucide-react"
 import { NavLink } from "react-router"
 import { CultivationSuggestionBadge } from "~/components/blocks/cultivation/suggestion"
@@ -165,7 +165,6 @@ function NutrientCell({
 function buildNutrientColumn(
   nutrient: NutrientDescription,
   unitMode: UnitMode,
-  isGroupStart: boolean,
 ): ColumnDef<typeof overviewTableFeatures, FieldNutrientRow> {
   return {
     id: nutrient.symbol,
@@ -176,7 +175,6 @@ function buildNutrientColumn(
       return status.hasData ? status.percentage : -1
     },
     enableHiding: true,
-    meta: { groupStart: isGroupStart, groupLabel: GROUP_LABELS[nutrient.type] },
     header: ({ column }) => (
       <NutrientColumnHeader column={column} nutrient={nutrient} unitMode={unitMode} />
     ),
@@ -305,29 +303,45 @@ export function buildFieldColumn(
   }
 }
 
+const columnHelper = createColumnHelper<typeof overviewTableFeatures, FieldNutrientRow>()
+
+const typeOrder = ["primary", "secondary", "trace"] as const
 /**
- * Flat (non-nested) column list: field name + one column per nutrient, ordered
- * Primair / Secundair / Sporenelementen. A nested header-group row was tried first but
- * broke sticky-column alignment; grouping is instead conveyed via a left divider on each
- * group's first column, the header tooltip, and the "Bekijk" dropdown's group labels.
+ * Builds column groups for each nutrient type. Also include a standalone column for field.
+ *
+ * The field column's header will spawn 2 rows this way. We just ignore the row span value for
+ * the footer, but that also spans 2 rows.
+ *
+ * @param nutrients Nutrient descriptions for the nutrients displayed on the table.
+ * @param unitMode Whether to display per-ha or total nutrient advice on the table.
+ * @param b_id_farm ID of the farm to be used for links.
+ * @param calendar Current calendar to be used for links.
  */
 export function buildOverviewColumns(
   nutrients: NutrientDescription[],
   unitMode: UnitMode,
   b_id_farm: string,
   calendar: string,
-): ColumnDef<typeof overviewTableFeatures, FieldNutrientRow>[] {
-  const order: NutrientDescription["type"][] = ["primary", "secondary", "trace"]
-  const orderedNutrients = order.flatMap((type) =>
-    nutrients.filter((nutrient) => nutrient.type === type),
+) {
+  type ColGroup = ReturnType<typeof columnHelper.group>
+  const fieldColumns = columnHelper.columns([buildFieldColumn(b_id_farm, calendar)])
+
+  const nutrientColumns = columnHelper.columns(
+    typeOrder.map((type) =>
+      columnHelper.group({ id: `type_${type}`, header: GROUP_LABELS[type], columns: [] }),
+    ),
   )
+  const nutrientColumnsMap = Object.fromEntries(
+    nutrientColumns.map((col, i) => [typeOrder[i] as string, col]),
+  ) as Record<string, ColGroup>
 
-  let previousType: NutrientDescription["type"] | null = null
-  const nutrientColumns = orderedNutrients.map((nutrient) => {
-    const isGroupStart = nutrient.type !== previousType
-    previousType = nutrient.type
-    return buildNutrientColumn(nutrient, unitMode, isGroupStart)
-  })
+  for (const nutrient of nutrients) {
+    let group = nutrientColumnsMap[nutrient.type]
+    if (typeof group === "undefined") {
+      continue
+    }
+    ;(group.columns as any[]).push(buildNutrientColumn(nutrient, unitMode))
+  }
 
-  return [buildFieldColumn(b_id_farm, calendar), ...nutrientColumns]
+  return [...fieldColumns, ...nutrientColumns]
 }
