@@ -1,11 +1,9 @@
 /* eslint-disable typescript/unbound-method -- TanStack React Table row models are designed to use destructured methods directly in columns. */
 import {
-  type ColumnFiltersState,
   ColumnVisibilityState,
   flexRender,
   type Row,
   type RowSelectionState,
-  type SortingState,
   useTable,
 } from "@tanstack/react-table"
 import { format } from "date-fns"
@@ -56,6 +54,14 @@ interface DataTableProps<TData> {
   canAddItem: boolean
 }
 
+/**
+ * Check if the given rotation table row matches the search terms and the productivity filter.
+ *
+ * @param data Row data to test.
+ * @param searchTerms Search terms as found in the field filter state.
+ * @param showProductiveOnly Productivity filter as found in the field filter state.
+ * @returns true iff the filters match.
+ */
 function fuzzySearchAndProductivityFilter(
   data: MemoizedRotationExtended,
   searchTerms: string,
@@ -78,8 +84,6 @@ export function DataTable<TData extends RotationExtended>({
   data,
   canAddItem,
 }: DataTableProps<TData>) {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const fieldFilter = useFieldFilterStore()
   const isMobile = useIsMobile()
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibilityState>(
@@ -213,8 +217,6 @@ export function DataTable<TData extends RotationExtended>({
     columns: columns,
     getRowId: (row) =>
       row.type === "crop" ? `crop_${row.b_lu_catalogue}` : `${row.b_lu_catalogue}_${row.b_id}`,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     getSubRows: (row) => (row.type === "crop" ? row.fields : undefined),
     // Only used when selecting using the select column.
     enableMultiRowSelection: true,
@@ -243,8 +245,6 @@ export function DataTable<TData extends RotationExtended>({
     getColumnCanGlobalFilter: (column) => column.id === "name",
     filterFromLeafRows: true,
     state: {
-      sorting,
-      columnFilters,
       columnVisibility,
       globalFilter: fieldFilter,
       rowSelection,

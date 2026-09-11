@@ -1,4 +1,4 @@
-import { createColumnHelper } from "@tanstack/react-table"
+import { createColumnHelper, type Row } from "@tanstack/react-table"
 import { ChevronRight } from "lucide-react"
 import { useMemo } from "react"
 import { NavLink } from "react-router"
@@ -75,6 +75,22 @@ export type RotationExtended = CropRow | FieldRow
 export type MemoizedFieldRow = FieldRow & { searchTarget: string }
 export type MemoizedCropRow = CropRow & { searchTarget: string; fields: MemoizedFieldRow[] }
 export type MemoizedRotationExtended = MemoizedCropRow | MemoizedFieldRow
+
+/**
+ * Get the total area of the fields associated with a row.
+ *
+ * @param row Either a crop row, representing the field rows below it, or a field row.
+ * @returns the total field area.
+ */
+function getRowTotalArea(row: Row<typeof rotationTableFeatures, MemoizedRotationExtended>): number {
+  if (row.original.type === "field") {
+    return row.original.b_area ?? 0
+  }
+  return (row.subRows ?? []).reduce(
+    (total, fieldRow) => total + (fieldRow.original as FieldRow).b_area,
+    0,
+  )
+}
 
 const columnHelper = createColumnHelper<typeof rotationTableFeatures, MemoizedRotationExtended>()
 export const columns = columnHelper.columns([
@@ -311,29 +327,27 @@ export const columns = columnHelper.columns([
       return fieldsDisplay
     },
   }),
-  columnHelper.accessor("b_area", {
-    enableSorting: true,
-    sortFn: "basic",
-    header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Oppervlakte" />
+  // This column needs an accessor function to indicate that it is sortable. TanStack Table seems
+  // to make false assumptions if we simply give "b_area". We also need a sortFn to make sure we
+  // sort based only on the fields that pass the filter.
+  columnHelper.accessor(
+    (row) =>
+      row.type === "field"
+        ? row.b_area
+        : (row.fields ?? []).reduce((total, fieldRow) => total + (fieldRow as FieldRow).b_area, 0),
+    {
+      id: "column",
+      enableSorting: true,
+      sortFn: (rowA, rowB, _columnId) => getRowTotalArea(rowA) - getRowTotalArea(rowB),
+      header: ({ column }) => {
+        return <DataTableColumnHeader column={column} title="Oppervlakte" />
+      },
+      enableHiding: true, // Enable hiding for mobile
+      cell: ({ row }) => {
+        const b_area = getRowTotalArea(row)
+        const formattedArea = b_area < 0.1 ? "< 0.1 ha" : `${b_area.toFixed(1)} ha`
+        return <p className="text-muted-foreground">{formattedArea}</p>
+      },
     },
-    enableHiding: true, // Enable hiding for mobile
-    cell: ({ row }) => {
-      const formattedArea = useMemo(() => {
-        // There will always be some field rows below the crop row
-        // Otherwise, the crop row wouldn't be displayed altogether
-        const b_area =
-          row.original.type === "field"
-            ? (row.original.b_area ?? 0)
-            : (row.subRows ?? []).reduce(
-                (total, fieldRow) => total + (fieldRow.original as FieldRow).b_area,
-                0,
-              )
-
-        return b_area < 0.1 ? "< 0.1 ha" : `${b_area.toFixed(1)} ha`
-      }, [row.original, row.subRows])
-
-      return <p className="text-muted-foreground">{formattedArea}</p>
-    },
-  }),
+  ),
 ])
