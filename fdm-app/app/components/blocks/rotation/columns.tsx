@@ -1,6 +1,6 @@
 import { createColumnHelper } from "@tanstack/react-table"
 import { ChevronRight } from "lucide-react"
-import React from "react"
+import { useMemo } from "react"
 import { NavLink } from "react-router"
 import { cn } from "@/app/lib/utils"
 import { DataTableColumnHeader } from "~/components/blocks/data-table/column-header"
@@ -28,7 +28,6 @@ export type CropRow = {
   type: "crop"
   canModify: boolean
   b_lu_catalogue: string
-  b_lu: string[]
   b_lu_name: string
   b_lu_eom_residue: number | null
   b_lu_variety_options: { label: string; value: string }[] | null
@@ -62,10 +61,6 @@ export type FieldRow = {
   calendar: string
   b_lu_start: Date[]
   b_lu_end: Date[]
-  fertilizerApplications: {
-    p_name_nl: string | null
-    p_id: string
-  }[]
   fertilizers: {
     p_name_nl: string | null
     p_id: string
@@ -107,27 +102,31 @@ export const columns = columnHelper.columns([
   }),
   columnHelper.display({
     id: "select",
-    header: ({ table }) => (
-      <div className="pe-4">
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Selecteer alle rijen"
-        />
-      </div>
-    ),
+    header: ({ table }) => {
+      return (
+        <div className="pe-4">
+          <Checkbox
+            checked={
+              table.getIsAllRowsSelected()
+                ? true
+                : table.getIsSomeRowsSelected()
+                  ? "indeterminate"
+                  : false
+            }
+            onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
+            aria-label="Selecteer alle rijen"
+          />
+        </div>
+      )
+    },
     cell: ({ row }) => (
       <div className={cn(row.original.type === "field" ? "ps-4" : "pe-4")}>
         <Checkbox
           checked={row.getIsSelected() ? true : row.getIsSomeSelected() ? "indeterminate" : false}
-          onCheckedChange={(value) => {
-            row.toggleSelected(!!value)
-          }}
+          // Do not use row.getToggleSelectedHandler() here since it doesn't have the exact child-parent selection behavior we want.
+          // It selects all children of the last crop row, while we want to only select until the last clicked field row.
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Selecteer deze rij"
-          className="text-muted-foreground"
         />
       </div>
     ),
@@ -273,7 +272,7 @@ export const columns = columnHelper.columns([
     cell: ({ row }) => {
       const cultivation = row.original
 
-      const fieldsDisplay = React.useMemo(() => {
+      const fieldsDisplay = useMemo(() => {
         if (cultivation.type === "field") return null
         const fieldsSorted = (row.subRows ?? [])
           .map((row) => row.original as FieldRow)
@@ -320,7 +319,7 @@ export const columns = columnHelper.columns([
     },
     enableHiding: true, // Enable hiding for mobile
     cell: ({ row }) => {
-      const formattedArea = React.useMemo(() => {
+      const formattedArea = useMemo(() => {
         // There will always be some field rows below the crop row
         // Otherwise, the crop row wouldn't be displayed altogether
         const b_area =
