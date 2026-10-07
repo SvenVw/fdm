@@ -64,6 +64,7 @@ import {
 } from "~/components/ui/dialog"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { useAnalytics } from "~/hooks/use-analytics"
+import { useKeyedState } from "~/hooks/use-keyed-state"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -276,7 +277,6 @@ export default function GerritApp() {
   const navigation = useNavigation()
   const { capture } = useAnalytics()
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     capture("gerrit_opened", { b_id_farm: farm.b_id_farm, calendar })
   }, [capture, farm.b_id_farm, calendar])
@@ -524,7 +524,6 @@ export default function GerritApp() {
         startPlanStream(formData)
       }) as EventListener)
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [addEvent, buildSearchParams, closeEventSource, startPlanStream],
   )
 
@@ -567,10 +566,12 @@ export default function GerritApp() {
       isAIGenerating && currentLocation.pathname !== nextLocation.pathname,
   )
 
-  // When the user confirms navigation away, close the stream
+  // When the user confirms navigation away, close the stream. Reacts to the router's navigation
+  // blocker proceeding (an external system), not a direct user event this component can hook into.
   useEffect(() => {
     if (blocker.state === "proceeding") {
       closeEventSource()
+      // oxlint-disable-next-line react/set-state-in-effect
       setPhase("idle")
     }
   }, [blocker.state, closeEventSource])
@@ -582,12 +583,10 @@ export default function GerritApp() {
   const isRateLimited =
     gerritUsage.limit !== null && optimisticUsed >= (gerritUsage.limit ?? Number.POSITIVE_INFINITY)
 
-  const [showStrategyForm, setShowStrategyForm] = useState(true)
+  // Hides once a plan is generated; the user can reopen it ("edit strategy") until a new plan
+  // replaces this one.
+  const [showStrategyForm, setShowStrategyForm] = useKeyedState(plan, (p) => !p)
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
-
-  useEffect(() => {
-    if (plan) setShowStrategyForm(false)
-  }, [plan])
 
   function toggleRow(b_id: string) {
     setExpandedRows((prev) => {

@@ -45,7 +45,7 @@ export function NewFieldsForm({
       b_lu_catalogue: b_lu_catalogue ?? "",
       b_bufferstrip: b_bufferstrip ?? false,
     })
-  }, [form.reset, b_name, b_area, b_lu_catalogue, b_bufferstrip])
+  }, [form, b_name, b_area, b_lu_catalogue, b_bufferstrip])
 
   return (
     <RemixFormProvider {...form}>

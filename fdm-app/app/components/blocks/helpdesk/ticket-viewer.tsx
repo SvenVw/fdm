@@ -2,7 +2,7 @@ import type { TagSummary, Ticket, TicketFilters, TicketSorting } from "@nmi-agro
 import throttle from "lodash.throttle"
 import { ArrowUpDown, ChevronLeft, Filter, Plus, X } from "lucide-react"
 import { Dialog } from "radix-ui"
-import { useCallback, useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { NavLink, Outlet, useLocation, useParams, useSearchParams } from "react-router"
 import { cn } from "@/app/lib/utils"
 import { Paginator } from "~/components/custom/paginator"
@@ -86,20 +86,16 @@ function TicketList({
     }
   })
 
-  // For setting search params in a debounced manner
-  const searchParamsToNavigateTo = useRef({
-    filters: {} as TicketFilters,
-    sorting: "created" as TicketSorting,
-  })
-
+  // For setting search params in a debounced manner. Takes the latest filters/sorting as
+  // arguments (rather than a ref) so the throttled function doesn't need recreating on every
+  // change, which would reset its timer.
   const navigateWithFilters = useMemo(
     () =>
       throttle(
-        // oxlint-disable-next-line react/refs This gets called only on user input.
-        () => {
+        (nextFilters: TicketFilters, nextSorting: TicketSorting) => {
           setSearchParams((searchParams) => {
-            searchParams.set("filters", JSON.stringify(searchParamsToNavigateTo.current.filters))
-            searchParams.set("sorting", searchParamsToNavigateTo.current.sorting)
+            searchParams.set("filters", JSON.stringify(nextFilters))
+            searchParams.set("sorting", nextSorting)
             return searchParams
           })
         },
@@ -109,16 +105,14 @@ function TicketList({
     [setSearchParams],
   )
 
-  function handleNewFilters(filters: TicketFilters) {
-    setFilters(filters)
-    searchParamsToNavigateTo.current.filters = filters
-    navigateWithFilters()
+  function handleNewFilters(newFilters: TicketFilters) {
+    setFilters(newFilters)
+    navigateWithFilters(newFilters, sorting)
   }
 
-  function handleNewSorting(sorting: TicketSorting) {
-    setSorting(sorting)
-    searchParamsToNavigateTo.current.sorting = sorting
-    navigateWithFilters()
+  function handleNewSorting(newSorting: TicketSorting) {
+    setSorting(newSorting)
+    navigateWithFilters(filters, newSorting)
   }
 
   return (

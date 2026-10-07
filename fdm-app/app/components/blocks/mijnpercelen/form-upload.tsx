@@ -64,14 +64,6 @@ export function MijnPercelenUploadForm({
   const location = useLocation()
   const isSubmitting = navigation.state !== "idle" && navigation.formMethod != null
 
-  // Effect to start the animation
-  useEffect(() => {
-    if (isSubmitting) {
-      setUploadState("animating")
-      uploadStartTime.current = Date.now()
-    }
-  }, [isSubmitting])
-
   // Effect to handle the end of the animation
   useEffect(() => {
     if (actionData && uploadState === "animating") {
@@ -100,7 +92,7 @@ export function MijnPercelenUploadForm({
       }, 3000)
       return () => clearTimeout(timer)
     }
-  }, [uploadState, form.reset])
+  }, [uploadState, form])
 
   const selectedFiles = useWatch({
     control: form.control,
@@ -117,7 +109,7 @@ export function MijnPercelenUploadForm({
     return () => {
       form.reset()
     }
-  }, [form.reset])
+  }, [form])
 
   const handleFilesSet = async (validFiles: File[]) => {
     form.setValue("shapefile", validFiles)
@@ -217,7 +209,15 @@ export function MijnPercelenUploadForm({
           </CardHeader>
           <CardContent className="space-y-6">
             <RemixFormProvider {...form}>
-              <Form id="MijnPercelenUploadForm" method="post" encType="multipart/form-data">
+              <Form
+                id="MijnPercelenUploadForm"
+                method="post"
+                encType="multipart/form-data"
+                onSubmit={() => {
+                  setUploadState("animating")
+                  uploadStartTime.current = Date.now()
+                }}
+              >
                 <fieldset disabled={isSubmitting}>
                   <input name="intent" type="hidden" value="upload" />
                   <div className="space-y-6">

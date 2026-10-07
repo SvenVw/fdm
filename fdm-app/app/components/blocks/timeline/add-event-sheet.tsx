@@ -81,6 +81,8 @@ export function AddEventSheet({
   const navigation = useNavigation()
   const deleteFetcher = useFetcher()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+  // Computed once, not on every render: used only as a fallback start date for new cultivations.
+  const [today] = useState(() => new Date())
   const submittedDeleteInteractionRef = useRef<AddEventSheetRequest | undefined>(null)
 
   const fertilizerApplication = useMemo(() => {
@@ -293,8 +295,7 @@ export function AddEventSheet({
               b_lu={undefined}
               defaultValues={{
                 b_lu_catalogue: "",
-                // oxlint-disable-next-line react/purity this never gets rendered server-side
-                b_lu_start: request.context.date ?? new Date(),
+                b_lu_start: request.context.date ?? today,
                 b_lu_end: undefined,
               }}
               options={cultivationOptions}
@@ -309,8 +310,7 @@ export function AddEventSheet({
               b_lu={request.context.b_lu}
               defaultValues={{
                 b_lu_catalogue: cultivation?.b_lu_catalogue ?? "",
-                // oxlint-disable-next-line react/purity this never gets rendered server-side
-                b_lu_start: cultivation?.b_lu_start ?? new Date(),
+                b_lu_start: cultivation?.b_lu_start ?? today,
                 b_lu_end:
                   request.type === "cultivation-end" && request.context.date
                     ? request.context.date

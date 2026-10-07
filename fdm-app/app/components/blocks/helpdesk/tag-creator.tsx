@@ -128,7 +128,7 @@ export function TagCreator({
       intent: intent,
       color: unusedColor?.value,
     })
-  }, [intent, availableTags, form.reset])
+  }, [intent, availableTags, form])
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

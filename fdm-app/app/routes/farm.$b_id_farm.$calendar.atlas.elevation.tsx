@@ -457,11 +457,17 @@ export default function FarmAtlasElevationBlock() {
 
   const throttledUpdate = useMemo(
     () =>
-      // oxlint-disable-next-line react/refs This gets called only on user input.
-      throttle(() => updateRef.current(), 500, {
-        leading: true,
-        trailing: true,
-      }),
+      throttle(
+        // Reads the latest updateVisibleTiles via a ref kept fresh above, so the throttle
+        // wrapper (and its internal timer) never needs recreating when it changes.
+        // oxlint-disable-next-line react/refs
+        () => updateRef.current(),
+        500,
+        {
+          leading: true,
+          trailing: true,
+        },
+      ),
     [],
   )
 
@@ -482,7 +488,9 @@ export default function FarmAtlasElevationBlock() {
   // Handle hover to show elevation value
   const handleMouseMove = useMemo(
     () =>
-      // oxlint-disable-next-line react/refs This gets called only on user input.
+      // Reads the latest indexData/activeTiles via a ref kept fresh above; this callback only
+      // ever runs from a real mouse event, never during render.
+      // oxlint-disable-next-line react/refs
       throttle(async (event: MapLayerMouseEvent) => {
         const { indexData, activeTiles } = stateRef.current
 

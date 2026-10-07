@@ -16,7 +16,7 @@ import { simplify } from "@turf/simplify"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import { Pencil, Plus, Trash2 } from "lucide-react"
-import { lazy, Suspense, useEffect, useState } from "react"
+import { lazy, Suspense, useState } from "react"
 import { Controller } from "react-hook-form"
 import {
   type ActionFunctionArgs,
@@ -633,14 +633,10 @@ export default function MeasuresFieldDetail() {
   // refresh — and removed when the dialog closes.
   const openMeasure = searchParams.get("openMeasure")
   const indicator = searchParams.get("indicator") ?? undefined
-
-  useEffect(() => {
-    if (!openMeasure) return
-    setInitialMeasureId(openMeasure)
-    setFocusIndicatorId(indicator)
-    setDialogOpen(true)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openMeasure, indicator])
+  // The URL is the source of truth for a deep-linked measure: no effect needed to open it.
+  const measureDialogOpen = dialogOpen || !!openMeasure
+  const measureDialogMeasureId = openMeasure ?? initialMeasureId
+  const measureDialogIndicatorId = openMeasure ? indicator : focusIndicatorId
 
   return (
     <div className="flex flex-col gap-6 p-4 md:px-8 md:pb-8">
@@ -864,7 +860,7 @@ export default function MeasuresFieldDetail() {
 
       {/* Add Measure dialog */}
       <AddMeasureDialog
-        open={dialogOpen}
+        open={measureDialogOpen}
         onOpenChange={(next) => {
           setDialogOpen(next)
           if (!next) {
@@ -890,8 +886,8 @@ export default function MeasuresFieldDetail() {
         applicabilityMap={applicabilityMap ?? undefined}
         topOpportunities={topOpportunities}
         measureImpacts={measureImpacts}
-        focusIndicatorId={focusIndicatorId}
-        initialMeasureId={initialMeasureId}
+        focusIndicatorId={measureDialogIndicatorId}
+        initialMeasureId={measureDialogMeasureId}
       />
 
       {/* Edit Measure dialog */}

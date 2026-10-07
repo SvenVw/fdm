@@ -70,7 +70,7 @@ export function SoilAnalysisForm(props: {
     if (form.formState.isSubmitSuccessful) {
       form.reset()
     }
-  }, [form.formState, form.reset])
+  }, [form, form.formState, form.reset])
 
   return (
     <RemixFormProvider {...form}>

@@ -206,7 +206,6 @@ function RowClickCatcher({
 
   return (
     <TimelineContextMenu sections={sections}>
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: mirrors kibo-ui's own GanttColumn */}
       <div
         className="absolute inset-y-0 left-0 min-h-full cursor-pointer"
         onClick={handleClick}

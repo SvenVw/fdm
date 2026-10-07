@@ -91,7 +91,6 @@ export function AbsenceDialog({
   })
 
   // Reset the form whenever the dialog is (re)opened for a different absence/range.
-  // biome-ignore-start lint/correctness/useExhaustiveDependencies: intentionally only depends on identity of open target
   const formReset = form.reset
   useEffect(() => {
     if (!open) return
@@ -114,7 +113,6 @@ export function AbsenceDialog({
         note: absence.note ?? "",
       })
     }
-    // biome-ignore-end lint/correctness/useExhaustiveDependencies
   }, [formReset, isCreating, principal_id, absence, open, defaultRange?.start, defaultRange?.end])
 
   // Close the dialog once the submission succeeds.
