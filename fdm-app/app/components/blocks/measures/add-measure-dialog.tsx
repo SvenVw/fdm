@@ -17,7 +17,7 @@ import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import fuzzysort from "fuzzysort"
 import { AlertTriangle, ChevronLeft, Search, Sparkles, X } from "lucide-react"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Controller } from "react-hook-form"
 import { useFetcher } from "react-router"
 import { useRemixForm } from "remix-hook-form"
@@ -402,16 +402,19 @@ export function AddMeasureDialog({
     return map
   }, [effectiveTopOpportunities])
 
-  const impactFor = (m_id: string): number => {
-    const opp = opportunityMap.get(m_id)
-    if (!opp) return 0
-    if (focusIndicatorId) {
-      return (
-        opp.indicatorImpacts.find((i) => i.indicator_id === focusIndicatorId)?.measure_impact ?? 0
-      )
-    }
-    return opp.aggregateImpact
-  }
+  const impactFor = useCallback(
+    (m_id: string): number => {
+      const opp = opportunityMap.get(m_id)
+      if (!opp) return 0
+      if (focusIndicatorId) {
+        return (
+          opp.indicatorImpacts.find((i) => i.indicator_id === focusIndicatorId)?.measure_impact ?? 0
+        )
+      }
+      return opp.aggregateImpact
+    },
+    [opportunityMap, focusIndicatorId],
+  )
 
   // Cap the "Aanbevolen" badge to a small top-N (independent of sortMode) so
   // it stays a genuine highlight instead of tagging most of the catalogue —
@@ -479,7 +482,7 @@ export function AddMeasureDialog({
       }
       return 0
     })
-  }, [filteredCatalogue, computedApplicabilityMap, sortMode, opportunityMap, focusIndicatorId])
+  }, [filteredCatalogue, computedApplicabilityMap, sortMode, impactFor])
 
   // Impact bars use the true scale: NMI confirms measure_impact is always
   // between 0 and 1, so a bar is simply impact × 100% — comparable across

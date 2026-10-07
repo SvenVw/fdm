@@ -57,6 +57,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/u
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field"
 import { Label } from "~/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group"
+import { useLaterOnce } from "~/hooks/use-later-once"
 import {
   getIndicatorsForField,
   getMeasureAdviceForField,
@@ -460,14 +461,15 @@ function MeasureEditDialog({
 
   // Reset form when measure or mode changes
   const { reset } = form
+  const setDoorlopendLater = useLaterOnce(setDoorlopend)
   useEffect(() => {
     if (!measure) return
     reset({
       m_start: toIso(measure.m_start),
       m_end: measure.m_end ? toIso(measure.m_end) : null,
     })
-    setDoorlopend(closeMode ? false : !measure.m_end)
-  }, [measure, closeMode, reset])
+    setDoorlopendLater(closeMode ? false : !measure.m_end)
+  }, [measure, closeMode, reset, setDoorlopendLater])
 
   return (
     <Dialog open={measure !== null} onOpenChange={(v) => !v && onClose()}>

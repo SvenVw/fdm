@@ -457,6 +457,7 @@ export default function FarmAtlasElevationBlock() {
 
   const throttledUpdate = useMemo(
     () =>
+      // oxlint-disable-next-line react/refs This gets called only on user input.
       throttle(() => updateRef.current(), 500, {
         leading: true,
         trailing: true,
@@ -481,6 +482,7 @@ export default function FarmAtlasElevationBlock() {
   // Handle hover to show elevation value
   const handleMouseMove = useMemo(
     () =>
+      // oxlint-disable-next-line react/refs This gets called only on user input.
       throttle(async (event: MapLayerMouseEvent) => {
         const { indexData, activeTiles } = stateRef.current
 

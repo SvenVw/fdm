@@ -14,6 +14,7 @@ import {
 import { Input } from "~/components/ui/input"
 import { Popover, PopoverAnchor, PopoverContent } from "~/components/ui/popover"
 import { Spinner } from "~/components/ui/spinner"
+import { useLaterOnce } from "~/hooks/use-later-once"
 import { cn } from "~/lib/utils"
 
 // Stable empty array
@@ -90,6 +91,9 @@ export function AutoComplete<
   }, [selectedValue, items, allowValuesOutsideList])
 
   // Effect to fetch data when input value changes (debounced)
+  const setItemsLater = useLaterOnce(setItems)
+  const setIsLoadingLater = useLaterOnce(setIsLoading)
+  const setInputValueLater = useLaterOnce(setInputValue)
   useEffect(() => {
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current)
@@ -106,8 +110,8 @@ export function AutoComplete<
         void fetcher.load(url) // Use GET request via fetcher.load
       }, 300)
     } else if (!inputValue || inputValue.length < 1) {
-      setItems([]) // Clear items if input is empty
-      setIsLoading(false)
+      setItemsLater([]) // Clear items if input is empty
+      setIsLoadingLater(false)
     }
 
     return () => {
@@ -115,17 +119,17 @@ export function AutoComplete<
         clearTimeout(debounceTimeout.current)
       }
     }
-  }, [inputValue, lookupUrl, searchParamName, fetcher])
+  }, [inputValue, lookupUrl, searchParamName, fetcher, setItemsLater, setIsLoadingLater])
 
   // Effect to process fetched data
   useEffect(() => {
     if (fetcher.data) {
       const filteredItems = fetcher.data.filter((item) => !excludeValues.includes(item.value))
-      setItems(filteredItems)
+      setItemsLater(filteredItems)
     }
     // Stop loading regardless of data presence, but only if fetcher is idle
     if (fetcher.state === "idle") {
-      setIsLoading(false)
+      setIsLoadingLater(false)
       // Refocus the input if it's still open after loading suggestions
       // Use setTimeout to ensure focus happens after potential DOM updates
       if (open && inputRef.current) {
@@ -134,7 +138,7 @@ export function AutoComplete<
         }, 0)
       }
     }
-  }, [fetcher.data, fetcher.state, excludeValues, open])
+  }, [fetcher.data, fetcher.state, excludeValues, open, setItemsLater, setIsLoadingLater])
 
   // Effect to sync input field when selectedValue changes externally
   useEffect(() => {
@@ -146,14 +150,14 @@ export function AutoComplete<
     // If a value is selected externally, update the input field to its label
     // This handles cases where the form is reset or pre-populated
     if (selectedValue && selectedLabel) {
-      setInputValue(selectedLabel)
+      setInputValueLater(selectedLabel)
     } else if (!selectedValue) {
       // If selectedValue is cleared externally, clear the input
-      setInputValue("")
+      setInputValueLater("")
     }
     // We only want this effect to run when selectedValue changes externally,
     // not when selectedLabel changes due to items loading.
-  }, [selectedValue, selectedLabel])
+  }, [selectedValue, selectedLabel, setInputValueLater])
 
   const handleInputChange = (value: string) => {
     setInputValue(value)

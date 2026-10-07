@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table"
+import { useLaterOnce } from "~/hooks/use-later-once"
 import { useIsMobile } from "~/hooks/use-mobile"
 import { cn } from "~/lib/utils"
 import type { columns as ColumnsT, FarmExtended } from "./columns"
@@ -46,9 +47,10 @@ export function DataTable<TData extends FarmExtended>({ columns, data }: DataTab
     isMobile ? { owner: false, b_area: false } : {},
   )
 
+  const setColumnVisibilityLater = useLaterOnce(setColumnVisibility)
   useEffect(() => {
-    setColumnVisibility(isMobile ? { owner: false, b_area: false } : {})
-  }, [isMobile])
+    setColumnVisibilityLater(isMobile ? { owner: false, b_area: false } : {})
+  }, [isMobile, setColumnVisibilityLater])
 
   const memoizedData = useMemo(() => {
     return data.map((data) => withSearchTarget(data))

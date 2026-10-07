@@ -60,6 +60,7 @@ import { Label } from "~/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group"
 import { Separator } from "~/components/ui/separator"
 import { Spinner } from "~/components/ui/spinner"
+import { useLaterOnce } from "~/hooks/use-later-once"
 import {
   getMeasureApplicabilityForFields,
   getIndicatorsForFarm,
@@ -731,6 +732,7 @@ function MeasureEditDialog({
 
   // Reset form when the row or mode changes
   const { reset } = form
+  const setDoorlopendLater = useLaterOnce(setDoorlopend)
   useEffect(() => {
     if (!row) return
     const firstField = row.fields[0]
@@ -738,8 +740,8 @@ function MeasureEditDialog({
       m_start: firstField?.m_start ? new Date(firstField.m_start).toISOString() : "",
       m_end: firstField?.m_end ? new Date(firstField.m_end).toISOString() : null,
     })
-    setDoorlopend(closeMode ? false : !firstField?.m_end)
-  }, [row, closeMode, reset])
+    setDoorlopendLater(closeMode ? false : !firstField?.m_end)
+  }, [row, closeMode, reset, setDoorlopendLater])
 
   return (
     <Dialog open={row !== null} onOpenChange={(v) => !v && onClose()}>
@@ -879,7 +881,7 @@ export default function MeasuresFarmIndex() {
   const [editingRow, setEditingRow] = useState<MeasureTableRow | null>(null)
   const [closingRow, setClosingRow] = useState<MeasureTableRow | null>(null)
 
-  const calendarYearStart = calendar ? `${calendar}-01-01` : `${new Date().getFullYear()}-01-01`
+  const calendarYearStart = `${calendar}-01-01`
 
   const handleFieldClick = useCallback(
     (b_id: string) => {
@@ -912,11 +914,14 @@ export default function MeasuresFarmIndex() {
   )
 
   const openMeasure = searchParams.get("openMeasure")
-  useEffect(() => {
-    if (!openMeasure) return
+  const showMeasureLater = useLaterOnce((openMeasure: string) => {
     setInitialMeasureId(openMeasure)
     setAddDialogOpen(true)
-  }, [openMeasure])
+  })
+  useEffect(() => {
+    if (!openMeasure) return
+    showMeasureLater(openMeasure)
+  }, [openMeasure, showMeasureLater])
 
   const columns = getColumns(
     (b_id) => `${basePath}/${b_id}`,

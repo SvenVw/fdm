@@ -42,6 +42,7 @@ import {
   SelectValue,
 } from "~/components/ui/select"
 import { Separator } from "~/components/ui/separator"
+import { useLaterOnce } from "~/hooks/use-later-once"
 import {
   type FieldBln3Score,
   getFieldMeasuresForIndicators,
@@ -546,15 +547,16 @@ export default function IndicatorsFieldDetail() {
 
   // If a deep-linked indicator is specified and the current category filter
   // excludes its category, select/retain that category so it remains visible
+  const setActiveCategoriesLater = useLaterOnce(setActiveCategories)
   useEffect(() => {
     if (!deepLinkIndicator) return
-    setActiveCategories((prev) => {
+    setActiveCategoriesLater((prev) => {
       if (prev.length > 0 && !prev.includes(deepLinkIndicator.ecosysteemdienst)) {
         return [...prev, deepLinkIndicator.ecosysteemdienst]
       }
       return prev
     })
-  }, [deepLinkIndicator])
+  }, [deepLinkIndicator, setActiveCategoriesLater])
 
   useEffect(() => {
     if (!indicatorId) return
