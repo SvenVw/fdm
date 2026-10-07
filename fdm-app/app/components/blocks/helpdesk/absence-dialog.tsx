@@ -1,7 +1,7 @@
 import type { AgentSummary } from "@nmi-agro/fdm-helpdesk"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
-import { useEffect, useId, useState } from "react"
+import { useEffect, useId } from "react"
 import { Controller } from "react-hook-form"
 import { useFetcher } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
@@ -27,7 +27,6 @@ import {
 } from "~/components/ui/select"
 import { Spinner } from "~/components/ui/spinner"
 import { Textarea } from "~/components/ui/textarea"
-import { useLaterOnce } from "~/hooks/use-later-once"
 import type { AbsenceCalendarItem } from "./absence-calendar"
 import { getAgentColor } from "./absence-colors"
 import { AbsenceReasonOptions, ScheduleAbsenceSchema, UpdateAbsenceSchema } from "./absence-schema"
@@ -65,7 +64,6 @@ export function AbsenceDialog({
   const formId = useId()
   const isSubmitting = fetcher.state !== "idle"
   const isCreating = !absence
-  const [isDeleting, setIsDeleting] = useState(false)
 
   // Can the current viewer edit (or delete) this absence?
   const canEdit = isCreating || isAdmin || absence?.agent_id === principal_id
@@ -126,22 +124,13 @@ export function AbsenceDialog({
     }
   }, [form.formState.isSubmitSuccessful, onOpenChange])
 
-  // Close the dialog once a delete request succeeds.
-  const setIsDeletingLater = useLaterOnce(setIsDeleting)
-  useEffect(() => {
-    if (isDeleting && fetcher.state === "idle") {
-      setIsDeletingLater(false)
-      onOpenChange(false)
-    }
-  }, [isDeleting, fetcher.state, onOpenChange, setIsDeletingLater])
-
-  function handleDelete() {
+  async function handleDelete() {
     if (!absence) return
-    setIsDeleting(true)
     const formData = new FormData()
     formData.append("intent", "delete_absence")
     formData.append("absence_id", absence.absence_id)
-    void fetcher.submit(formData, { method: "post" })
+    await fetcher.submit(formData, { method: "post" })
+    onOpenChange(false)
   }
 
   const colors = absence ? getAgentColor(absence.agent_id, true) : null
@@ -297,7 +286,7 @@ export function AbsenceDialog({
                   variant="destructive"
                   className="sm:mr-auto"
                   disabled={isSubmitting}
-                  onClick={handleDelete}
+                  onClick={() => void handleDelete()}
                 >
                   Verwijderen
                 </Button>

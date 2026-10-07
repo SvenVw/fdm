@@ -53,7 +53,6 @@ import { TimelineToolbar } from "~/components/blocks/timeline/toolbar"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { useAnalytics } from "~/hooks/use-analytics"
-import { useLaterOnce } from "~/hooks/use-later-once"
 import { useIsMobile } from "~/hooks/use-mobile"
 import { deleteObject } from "~/integrations/gcs.server"
 import { captureEvent } from "~/lib/analytics.server"
@@ -639,7 +638,6 @@ export default function TimelinePage() {
   const isMobile = useIsMobile()
   const { capture } = useAnalytics()
   const actionData = useActionData()
-  const lastActionData = useRef<unknown>(undefined)
   const storedCalendar = useCalendarStore((store) => store.calendar)
 
   const [isLandscape, setIsLandscape] = useState<boolean>(() =>
@@ -691,7 +689,11 @@ export default function TimelinePage() {
     showFutureEvents: false,
   })
 
-  const [sheetRequest, setSheetRequest] = useState<AddEventSheetRequest>()
+  // The sheet request, tagged with the actionData it was opened under. Closed by the user
+  // (setSheetState(undefined)) or by a *newer* actionData reporting closeSheet (see sheetRequest below).
+  const [sheetState, setSheetState] = useState<
+    { request: AddEventSheetRequest; openedWithActionData: unknown } | undefined
+  >()
   const [undo, setUndo] = useState<{ run: () => void } | null>(null)
   const handleUndoChange = useCallback(
     (run: (() => void) | null) => setUndo(run ? { run } : null),
@@ -729,19 +731,19 @@ export default function TimelinePage() {
     })
   }, [registerJumpToYear])
 
-  // Close the sheet if the action succeeds.
-  const setSheetRequestLater = useLaterOnce(setSheetRequest)
-  useEffect(() => {
-    if (lastActionData.current === actionData) {
-      return
-    }
+  // Close the sheet once the action that was submitted while it was open succeeds.
+  const sheetRequest =
+    sheetState &&
+    !(
+      actionData !== sheetState.openedWithActionData &&
+      (actionData as { closeSheet?: boolean } | undefined)?.closeSheet
+    )
+      ? sheetState.request
+      : undefined
 
-    if ((actionData as any)?.closeSheet) {
-      setSheetRequestLater(undefined)
-    }
-
-    lastActionData.current = actionData
-  }, [actionData, setSheetRequestLater])
+  function setSheetRequest(request: AddEventSheetRequest | undefined) {
+    setSheetState(request ? { request, openedWithActionData: actionData } : undefined)
+  }
 
   const action = {
     to: `/farm/${loaderData.b_id_farm}`,

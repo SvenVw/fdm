@@ -2,7 +2,7 @@ import type { TagSummary, Ticket, TicketFilters, TicketSorting } from "@nmi-agro
 import throttle from "lodash.throttle"
 import { ArrowUpDown, ChevronLeft, Filter, Plus, X } from "lucide-react"
 import { Dialog } from "radix-ui"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useRef, useState } from "react"
 import { NavLink, Outlet, useLocation, useParams, useSearchParams } from "react-router"
 import { cn } from "@/app/lib/utils"
 import { Paginator } from "~/components/custom/paginator"
@@ -20,7 +20,7 @@ import { Input } from "~/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover"
 import { Sheet, SheetClose, SheetPortal } from "~/components/ui/sheet"
 import { useIsXl } from "~/hooks/use-is-xl"
-import { useLaterOnce } from "~/hooks/use-later-once"
+import { useKeyedState } from "~/hooks/use-keyed-state"
 import type { HelpdeskUser } from "./types"
 import { useCurrentHelpdeskPage } from "./navigation"
 import { TicketSearch } from "./search"
@@ -257,17 +257,12 @@ export function TicketViewer({
 }) {
   const params = useParams()
   const isXl = useIsXl()
-  const [sidebarOpen, setSidebarOpen] = useState(!params.ticket_id)
+  const [sidebarOpen, setSidebarOpen] = useKeyedState(params.ticket_id, (ticketId) => !ticketId)
   // Track the container element so SheetPortal can scope the Sheet within this div.
   const [container, setContainer] = useState<HTMLDivElement | null>(null)
   const containerRef = useCallback((node: HTMLDivElement | null) => {
     setContainer(node)
   }, [])
-
-  const setSidebarOpenLater = useLaterOnce(setSidebarOpen)
-  useEffect(() => {
-    setSidebarOpenLater(!params.ticket_id)
-  }, [params.ticket_id, setSidebarOpenLater])
 
   const ticketListProps = {
     tickets,

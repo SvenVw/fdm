@@ -10,7 +10,7 @@ import { Label } from "~/components/ui/label"
 import { Spinner } from "~/components/ui/spinner"
 import { Switch } from "~/components/ui/switch"
 import { Textarea } from "~/components/ui/textarea"
-import { useLaterOnce } from "~/hooks/use-later-once"
+import { useKeyedState } from "~/hooks/use-keyed-state"
 import { cn } from "~/lib/utils"
 import { type GerritFormValues, STRATEGY_LABELS } from "./schema"
 
@@ -47,7 +47,11 @@ export function StrategyForm({
   const additionalContextLength = additionalContextValue?.length ?? 0
   const showDerogation = Number.parseInt(calendar, 10) < 2026
   const showRenure = Number.parseInt(calendar, 10) >= 2026
-  const [fertOpen, setFertOpen] = useState(false)
+  const fertError = (form.formState.errors as any)?.selectedFertilizerIds?.message as
+    | string
+    | undefined
+  // Auto-open the picker when a (new) validation error appears; the user can still close it.
+  const [fertOpen, setFertOpen] = useKeyedState(fertError, (error) => !!error)
   const [fertSearch, setFertSearch] = useState("")
 
   // All available IDs; default = all selected
@@ -86,15 +90,6 @@ export function StrategyForm({
   const selectedCount = selectedSet.size
   const totalCount = allIds.length
   const isRestricted = selectedCount < totalCount
-  const fertError = (form.formState.errors as any)?.selectedFertilizerIds?.message as
-    | string
-    | undefined
-
-  // Auto-open picker when there's a validation error on fertilizers
-  const setFertOpenLater = useLaterOnce(setFertOpen)
-  useEffect(() => {
-    if (fertError) setFertOpenLater(true)
-  }, [fertError, setFertOpenLater])
 
   const includeRenure = form.watch("includeRenure")
 

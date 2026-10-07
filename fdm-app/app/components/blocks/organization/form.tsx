@@ -24,7 +24,6 @@ import { Field, FieldError, FieldLabel } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
 import { Spinner } from "~/components/ui/spinner"
 import { Textarea } from "~/components/ui/textarea"
-import { useLaterOnce } from "~/hooks/use-later-once"
 import { OrganizationInfoSchema } from "./schema"
 
 const FormSchema = OrganizationInfoSchema.extend({ intent: z.literal("update_organization_info") })
@@ -84,19 +83,6 @@ export function OrganizationSettingsForm({
       .replace(/--+/g, "-") // Replace multiple - with single -
       .replace(/^-|-$/g, "") // Trim - from start and end
   }
-
-  // Reset the form when the organization changes
-  const formReset = form.reset
-  const setProfilePictureFilesLater = useLaterOnce(setProfilePictureFiles)
-  useEffect(() => {
-    formReset({
-      intent: "update_organization_info" as const,
-      name: organization?.name,
-      slug: organization?.slug,
-      description: organization?.metadata?.data?.description,
-    })
-    setProfilePictureFilesLater([])
-  }, [formReset, organization, setProfilePictureFilesLater])
 
   // Update slug when name changes
   const organizationName = form.getValues("name")

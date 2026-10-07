@@ -19,7 +19,6 @@ import {
 } from "~/components/ui/select"
 import { Separator } from "~/components/ui/separator"
 import { Spinner } from "~/components/ui/spinner"
-import { useLaterOnce } from "~/hooks/use-later-once"
 import { auth, getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { isInactiveRecipientError, renderInvitationEmail, sendEmail } from "~/lib/email.server"
@@ -227,7 +226,8 @@ const MemberAction = ({
 }) => {
   const fetcher = useFetcher()
   const disabled = fetcher.state !== "idle" && Boolean(fetcher.formData)
-  const [role, setRole] = useState(member.role)
+  // Reflect the in-flight submission optimistically; fall back to the server value otherwise.
+  const role = (fetcher.formData?.get("role") as OrganizationRole["role"] | null) ?? member.role
 
   function submitRoleChange(role: OrganizationRole["role"]) {
     void fetcher.submit(
@@ -239,12 +239,6 @@ const MemberAction = ({
       { method: "post" },
     )
   }
-
-  const setRoleLater = useLaterOnce(setRole)
-
-  useEffect(() => {
-    setRoleLater(member.role)
-  }, [setRoleLater, member.role])
 
   return (
     <fetcher.Form method="post" className="flex items-center space-x-4">

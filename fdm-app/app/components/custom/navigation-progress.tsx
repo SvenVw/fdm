@@ -3,7 +3,6 @@ import { AnimatePresence, motion } from "framer-motion"
 import { Loader2 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { useLocation, useMatches, useNavigation } from "react-router"
-import { useLaterOnce } from "~/hooks/use-later-once"
 import { clientConfig } from "~/lib/config"
 import { normalizePage } from "~/lib/url-utils"
 
@@ -15,7 +14,8 @@ import { normalizePage } from "~/lib/url-utils"
  * Routes can opt out by exporting `export const handle = { hideNavigationProgress: true }`.
  */
 export function NavigationProgress() {
-  const { state } = useNavigation()
+  const navigation = useNavigation()
+  const { state } = navigation
   const { pathname } = useLocation()
   const matches = useMatches()
   const hideProgress = matches.some(
@@ -24,20 +24,24 @@ export function NavigationProgress() {
       typeof m.handle === "object" &&
       (m.handle as Record<string, unknown>).hideNavigationProgress === true,
   )
-  const [show, setShow] = useState(false)
+  // The navigation key the 500ms timer last fired for. Comparing against the current
+  // navigation's key means an overlapping navigation is never shown using a stale timer.
+  const [shownFor, setShownFor] = useState<string | null>(null)
   const startTimeRef = useRef<number | null>(null)
   const startPathnameRef = useRef<string | null>(null)
+  const visible =
+    state !== "idle" && !hideProgress && shownFor === (navigation.location?.key ?? null)
 
   // Show after 500ms — emit a count metric when it appears
-  const setShowLater = useLaterOnce(setShow)
   useEffect(() => {
     if (state !== "idle" && !hideProgress) {
       if (startTimeRef.current === null) {
         startTimeRef.current = Date.now()
         startPathnameRef.current = pathname
       }
+      const key = navigation.location?.key ?? null
       const timer = setTimeout(() => {
-        setShow(true)
+        setShownFor(key)
         if (clientConfig.analytics.sentry) {
           Sentry.withScope((scope) => {
             scope.setTag("page", normalizePage(startPathnameRef.current ?? pathname))
@@ -48,8 +52,8 @@ export function NavigationProgress() {
       return () => clearTimeout(timer)
     }
 
-    // Navigation finished — emit duration metric and hide
-    if (show && startTimeRef.current !== null) {
+    // Navigation finished — emit duration metric
+    if (visible && startTimeRef.current !== null) {
       const duration = Date.now() - startTimeRef.current
       if (clientConfig.analytics.sentry) {
         Sentry.withScope((scope) => {
@@ -58,14 +62,13 @@ export function NavigationProgress() {
         })
       }
     }
-    setShowLater(false)
     startTimeRef.current = null
     startPathnameRef.current = null
-  }, [state, show, hideProgress, pathname, setShowLater])
+  }, [state, visible, hideProgress, pathname, navigation.location])
 
   return (
     <AnimatePresence>
-      {show && (
+      {visible && (
         <>
           {/* Backdrop blur */}
           <motion.div

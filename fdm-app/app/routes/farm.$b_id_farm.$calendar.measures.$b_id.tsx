@@ -57,7 +57,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/u
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field"
 import { Label } from "~/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group"
-import { useLaterOnce } from "~/hooks/use-later-once"
 import {
   getIndicatorsForField,
   getMeasureAdviceForField,
@@ -435,18 +434,53 @@ function MeasureEditDialog({
   onClose: () => void
   action?: string
 }) {
+  return (
+    <Dialog open={measure !== null} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>{closeMode ? "Maatregel afsluiten" : "Maatregel bewerken"}</DialogTitle>
+        </DialogHeader>
+        {measure && (
+          // Remount on measure/mode change instead of resetting in an effect.
+          <MeasureEditForm
+            key={`${measure.b_id_measure}-${closeMode}`}
+            measure={measure}
+            closeMode={closeMode}
+            onClose={onClose}
+            action={action}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function MeasureEditForm({
+  measure,
+  closeMode,
+  onClose,
+  action,
+}: {
+  measure: EditingMeasure
+  closeMode: boolean
+  onClose: () => void
+  action: string
+}) {
   const fetcher = useFetcher()
-  const [doorlopend, setDoorlopend] = useState(true)
+  const [doorlopend, setDoorlopend] = useState(closeMode ? false : !measure.m_end)
 
   const form = useRemixForm<MeasureDateFormValues>({
     fetcher,
     resolver: zodResolver(MeasureDateSchema),
-    defaultValues: { m_start: "", m_end: null },
+    defaultValues: {
+      m_start: toIso(measure.m_start),
+      m_end: measure.m_end ? toIso(measure.m_end) : null,
+    },
     submitHandlers: {
       onValid: (data) => {
         const fd = new FormData()
         fd.append("intent", "update")
-        fd.append("b_id_measure", measure?.b_id_measure ?? "")
+        fd.append("b_id_measure", measure.b_id_measure)
         fd.append("m_start", data.m_start)
         if (data.m_end) fd.append("m_end", data.m_end)
         else fd.append("m_end", "")
@@ -459,121 +493,100 @@ function MeasureEditDialog({
     },
   })
 
-  // Reset form when measure or mode changes
-  const { reset } = form
-  const setDoorlopendLater = useLaterOnce(setDoorlopend)
-  useEffect(() => {
-    if (!measure) return
-    reset({
-      m_start: toIso(measure.m_start),
-      m_end: measure.m_end ? toIso(measure.m_end) : null,
-    })
-    setDoorlopendLater(closeMode ? false : !measure.m_end)
-  }, [measure, closeMode, reset, setDoorlopendLater])
-
   return (
-    <Dialog open={measure !== null} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader>
-          <DialogTitle>{closeMode ? "Maatregel afsluiten" : "Maatregel bewerken"}</DialogTitle>
-        </DialogHeader>
-        {measure && (
-          <form onSubmit={form.handleSubmit}>
-            <FieldGroup className="py-2">
-              <p className="text-sm font-medium">{measure.m_name}</p>
+    <form onSubmit={form.handleSubmit}>
+      <FieldGroup className="py-2">
+        <p className="text-sm font-medium">{measure.m_name}</p>
 
-              {!closeMode && (
-                <Controller
-                  control={form.control}
-                  name="m_start"
-                  render={({ field, fieldState }) => (
-                    <DatePicker
-                      label="Startdatum"
-                      field={{
-                        ...field,
-                        value: field.value,
-                      }}
-                      fieldState={fieldState}
-                      required
-                    />
-                  )}
-                />
-              )}
-
-              {closeMode ? (
-                <Controller
-                  control={form.control}
-                  name="m_end"
-                  render={({ field, fieldState }) => (
-                    <DatePicker
-                      label="Einddatum"
-                      field={{
-                        ...field,
-                        value: field.value,
-                      }}
-                      fieldState={fieldState}
-                      required
-                    />
-                  )}
-                />
-              ) : (
-                <Field>
-                  <FieldLabel>Einddatum</FieldLabel>
-                  <RadioGroup
-                    value={doorlopend ? "doorlopend" : "einddatum"}
-                    onValueChange={(v) => {
-                      const isDoorlopend = v === "doorlopend"
-                      setDoorlopend(isDoorlopend)
-                      if (isDoorlopend) form.setValue("m_end", null)
-                      else form.setValue("m_end", "")
-                    }}
-                    className="space-y-1"
-                  >
-                    <div className="flex items-center gap-2">
-                      <RadioGroupItem value="doorlopend" id="field-edit-doorlopend" />
-                      <Label htmlFor="field-edit-doorlopend" className="cursor-pointer font-normal">
-                        Doorlopend
-                      </Label>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <RadioGroupItem value="einddatum" id="field-edit-einddatum" />
-                      <Label htmlFor="field-edit-einddatum" className="cursor-pointer font-normal">
-                        Vaste einddatum
-                      </Label>
-                    </div>
-                  </RadioGroup>
-                  {!doorlopend && (
-                    <Controller
-                      control={form.control}
-                      name="m_end"
-                      render={({ field, fieldState }) => (
-                        <DatePicker
-                          label=""
-                          field={{
-                            ...field,
-                            value: field.value,
-                          }}
-                          fieldState={fieldState}
-                        />
-                      )}
-                    />
-                  )}
-                </Field>
-              )}
-
-              <div className="flex justify-end gap-2 pt-1">
-                <Button type="button" variant="outline" onClick={onClose}>
-                  Annuleren
-                </Button>
-                <Button type="submit" disabled={fetcher.state !== "idle"}>
-                  {fetcher.state !== "idle" ? "Opslaan…" : closeMode ? "Afsluiten" : "Opslaan"}
-                </Button>
-              </div>
-            </FieldGroup>
-          </form>
+        {!closeMode && (
+          <Controller
+            control={form.control}
+            name="m_start"
+            render={({ field, fieldState }) => (
+              <DatePicker
+                label="Startdatum"
+                field={{
+                  ...field,
+                  value: field.value,
+                }}
+                fieldState={fieldState}
+                required
+              />
+            )}
+          />
         )}
-      </DialogContent>
-    </Dialog>
+
+        {closeMode ? (
+          <Controller
+            control={form.control}
+            name="m_end"
+            render={({ field, fieldState }) => (
+              <DatePicker
+                label="Einddatum"
+                field={{
+                  ...field,
+                  value: field.value,
+                }}
+                fieldState={fieldState}
+                required
+              />
+            )}
+          />
+        ) : (
+          <Field>
+            <FieldLabel>Einddatum</FieldLabel>
+            <RadioGroup
+              value={doorlopend ? "doorlopend" : "einddatum"}
+              onValueChange={(v) => {
+                const isDoorlopend = v === "doorlopend"
+                setDoorlopend(isDoorlopend)
+                if (isDoorlopend) form.setValue("m_end", null)
+                else form.setValue("m_end", "")
+              }}
+              className="space-y-1"
+            >
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="doorlopend" id="field-edit-doorlopend" />
+                <Label htmlFor="field-edit-doorlopend" className="cursor-pointer font-normal">
+                  Doorlopend
+                </Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="einddatum" id="field-edit-einddatum" />
+                <Label htmlFor="field-edit-einddatum" className="cursor-pointer font-normal">
+                  Vaste einddatum
+                </Label>
+              </div>
+            </RadioGroup>
+            {!doorlopend && (
+              <Controller
+                control={form.control}
+                name="m_end"
+                render={({ field, fieldState }) => (
+                  <DatePicker
+                    label=""
+                    field={{
+                      ...field,
+                      value: field.value,
+                    }}
+                    fieldState={fieldState}
+                  />
+                )}
+              />
+            )}
+          </Field>
+        )}
+
+        <div className="flex justify-end gap-2 pt-1">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Annuleren
+          </Button>
+          <Button type="submit" disabled={fetcher.state !== "idle"}>
+            {fetcher.state !== "idle" ? "Opslaan…" : closeMode ? "Afsluiten" : "Opslaan"}
+          </Button>
+        </div>
+      </FieldGroup>
+    </form>
   )
 }
 

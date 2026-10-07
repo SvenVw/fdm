@@ -2,7 +2,6 @@ import type React from "react"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
 import { BadgeCheck } from "lucide-react"
-import { useEffect, useState } from "react"
 import { useFetcher } from "react-router"
 import {
   AlertDialog,
@@ -27,7 +26,6 @@ import {
 } from "~/components/ui/select"
 import { Spinner } from "~/components/ui/spinner"
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
-import { useLaterOnce } from "~/hooks/use-later-once"
 
 // Define the props type based on usage in the original file
 type PrincipalRowProps = {
@@ -63,11 +61,8 @@ export const PrincipalRow = ({
 }: PrincipalRowProps) => {
   const fetcher = useFetcher()
 
-  const [selectedRole, setSelectedRole] = useState(role)
-  const setSelectedRoleLater = useLaterOnce(setSelectedRole)
-  useEffect(() => {
-    setSelectedRoleLater(role)
-  }, [role, setSelectedRoleLater])
+  // Reflect the in-flight submission optimistically; fall back to the server value otherwise.
+  const selectedRole = (fetcher.formData?.get("role") as typeof role | null) ?? role
 
   // Handler for removing the user/principal
   const handleRemove = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -174,7 +169,6 @@ export const PrincipalRow = ({
               value={selectedRole}
               name="role"
               onValueChange={(value) => {
-                setSelectedRole(value as typeof role)
                 const formData = new FormData()
                 formData.append("intent", "update_role")
                 formData.append("username", username)
