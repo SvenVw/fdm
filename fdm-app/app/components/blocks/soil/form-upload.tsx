@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AlertCircle, CheckCircle, FileUp, Upload } from "lucide-react"
 import { useEffect, useMemo } from "react"
+import { useWatch } from "react-hook-form"
 import { Form, useActionData, useNavigation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { z } from "zod"
@@ -36,7 +37,7 @@ export function SoilAnalysisUploadForm({ disabled }: { disabled?: boolean } = {}
     },
   })
 
-  const selectedFile = form.watch("soilAnalysisFile")
+  const selectedFile = useWatch({ control: form.control, name: "soilAnalysisFile" })
   const dropzoneValue = useMemo(() => (selectedFile ? [selectedFile] : []), [selectedFile])
 
   const actionData = useActionData<ActionData>()

@@ -6,7 +6,7 @@ import { formatDate } from "date-fns"
 import { nl } from "date-fns/locale"
 import { Plus } from "lucide-react"
 import { useEffect, useId } from "react"
-import { Controller } from "react-hook-form"
+import { Controller, useWatch } from "react-hook-form"
 import { Form, useNavigate, useSearchParams } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { cn } from "@/app/lib/utils"
@@ -100,7 +100,7 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
     },
   })
 
-  const p_id = form.watch("p_id")
+  const p_id = useWatch({ control: form.control, name: "p_id" })
   const selectedFertilizer = options.find((option) => option.value === p_id)
   const isSubmitting = navigation.state !== "idle"
 

@@ -18,7 +18,7 @@ import { nl } from "date-fns/locale"
 import fuzzysort from "fuzzysort"
 import { AlertTriangle, ChevronLeft, Search, Sparkles, X } from "lucide-react"
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
-import { Controller } from "react-hook-form"
+import { Controller, useWatch } from "react-hook-form"
 import { useFetcher } from "react-router"
 import { useRemixForm } from "remix-hook-form"
 import type { FieldTopOpportunity, MeasureApplicabilityInfo } from "~/integrations/bln3.server"
@@ -509,8 +509,8 @@ export function AddMeasureDialog({
     else form.setValue("m_end", null)
   }
 
-  const mStart = form.watch("m_start")
-  const mEnd = form.watch("m_end")
+  const mStart = useWatch({ control: form.control, name: "m_start" })
+  const mEnd = useWatch({ control: form.control, name: "m_end" })
 
   const canSubmit =
     selected !== null &&

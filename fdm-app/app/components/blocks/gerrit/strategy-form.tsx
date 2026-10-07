@@ -1,6 +1,6 @@
 import { Bot, ChevronDown } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Controller, type UseFormReturn } from "react-hook-form"
+import { Controller, useWatch, type UseFormReturn } from "react-hook-form"
 import { RemixFormProvider } from "remix-hook-form"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
@@ -56,7 +56,11 @@ export function StrategyForm({
 
   // All available IDs; default = all selected
   const allIds = fertilizerOptions.map((f) => f.p_id_catalogue)
-  const currentSelected = (form.watch("selectedFertilizerIds") as string[] | undefined) ?? allIds
+  const watchedSelectedFertilizerIds = useWatch({
+    control: form.control,
+    name: "selectedFertilizerIds" as any,
+  }) as string[] | undefined
+  const currentSelected = watchedSelectedFertilizerIds ?? allIds
   const selectedSet = new Set(currentSelected)
 
   const groupedByType = fertilizerOptions.reduce<Record<string, FertilizerOption[]>>((acc, f) => {
@@ -91,7 +95,7 @@ export function StrategyForm({
   const totalCount = allIds.length
   const isRestricted = selectedCount < totalCount
 
-  const includeRenure = form.watch("includeRenure")
+  const includeRenure = useWatch({ control: form.control, name: "includeRenure" as any })
 
   useEffect(() => {
     if (!showRenure) return

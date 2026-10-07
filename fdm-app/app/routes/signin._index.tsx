@@ -1,4 +1,3 @@
-import type { Resolver } from "react-hook-form"
 import type {
   ActionFunctionArgs,
   LinksFunction,
@@ -40,6 +39,7 @@ import {
   Users,
 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
+import { useWatch, type Resolver } from "react-hook-form"
 import { Form, Link, redirect, useSearchParams } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
@@ -248,7 +248,7 @@ export default function SignIn() {
     formSetValue("timeZone", timeZone)
   }, [formSetValue])
 
-  const emailValue = form.watch("email") ?? ""
+  const emailValue = useWatch({ control: form.control, name: "email" }) ?? ""
   const emailHasError = !!form.formState.errors.email
   const emailIsTouched = form.getFieldState("email").isTouched
   const emailIsValid = emailValue.length > 0 && emailIsTouched && !emailHasError

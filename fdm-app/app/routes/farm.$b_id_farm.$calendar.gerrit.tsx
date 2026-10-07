@@ -16,6 +16,7 @@ import {
 import { Bot, FlaskConical } from "lucide-react"
 import { useFeatureFlagEnabled } from "posthog-js/react"
 import { useCallback, useEffect, useRef, useState } from "react"
+import { useWatch } from "react-hook-form"
 import {
   type ActionFunctionArgs,
   data,
@@ -547,7 +548,7 @@ export default function GerritApp() {
     },
   })
 
-  const additionalContextValue = form.watch("additionalContext")
+  const additionalContextValue = useWatch({ control: form.control, name: "additionalContext" })
 
   const isSaving =
     navigation.state === "submitting" && navigation.formData?.get("intent") === "accept"
