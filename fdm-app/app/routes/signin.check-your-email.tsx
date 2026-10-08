@@ -19,6 +19,7 @@ import { AuthLayout } from "~/components/blocks/auth/auth-layout"
 import { Button } from "~/components/ui/button"
 import { Spinner } from "~/components/ui/spinner"
 import { useAnalytics } from "~/hooks/use-analytics"
+import { useKeyedState } from "~/hooks/use-keyed-state"
 import { auth } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
@@ -78,54 +79,12 @@ export default function SignIn() {
   const pendingCodeRef = useRef<string | null>(null)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const [resendCooldown, setResendCooldown] = useState(0)
-  const resendCooldownIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined)
-  const resendCooldownInitializeRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-
-  /**
-   * Cleans up any previously-started resend cooldown countdown.
-   */
-  function cleanupPrevResendCooldown() {
-    if (typeof resendCooldownIntervalRef.current !== "undefined") {
-      clearInterval(resendCooldownIntervalRef.current)
-    }
-
-    if (typeof resendCooldownInitializeRef.current !== "undefined") {
-      clearTimeout(resendCooldownInitializeRef.current)
-    }
-  }
-
-  /**
-   * Resets the resend button cooldown for the new number of seconds.
-   * @param seconds number of seconds before the resend button gets activated again.
-   */
-  function startResendCooldown(seconds: number) {
-    cleanupPrevResendCooldown()
-
-    // Interval that decrements the cooldown counter every second.
-    const interval = setInterval(() => {
-      setResendCooldown((current) => {
-        const nextValue = current - 1
-        if (nextValue <= 0) {
-          clearInterval(interval)
-          if (resendCooldownIntervalRef.current === interval) {
-            resendCooldownIntervalRef.current = undefined
-          }
-          return 0
-        }
-
-        return nextValue
-      })
-    }, 1000)
-
-    // Keep a reference to the interval to be able to clear it externally.
-    resendCooldownIntervalRef.current = interval
-
-    // Set the initial state asynchronously so we don't get lint warnings.
-    resendCooldownInitializeRef.current = setTimeout(() => {
-      if (resendCooldownIntervalRef.current === interval) setResendCooldown(seconds)
-    })
-  }
+  // Resets to a fresh cooldown whenever a new resend completes (keyed on the
+  // fetcher's data identity); the interval below then owns counting it down.
+  const [resendCooldown, setResendCooldown] = useKeyedState<typeof resendFetcher.data, number>(
+    resendFetcher.data,
+    (data) => (data && "success" in data ? RESEND_COOLDOWN_SECONDS : 0),
+  )
 
   // Clean-up when the component unmounts
   useEffect(() => {
@@ -133,14 +92,19 @@ export default function SignIn() {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
       }
-
-      cleanupPrevResendCooldown()
     }
   }, [])
 
   useEffect(() => {
+    if (resendCooldown <= 0) return
+    const interval = setInterval(() => {
+      setResendCooldown((current) => Math.max(0, current - 1))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [resendCooldown, setResendCooldown])
+
+  useEffect(() => {
     if (resendFetcher.state === "idle" && resendFetcher.data && "success" in resendFetcher.data) {
-      startResendCooldown(RESEND_COOLDOWN_SECONDS)
       capture("signin_code_resend_succeeded")
     }
     if (resendFetcher.state === "idle" && resendFetcher.data && "error" in resendFetcher.data) {

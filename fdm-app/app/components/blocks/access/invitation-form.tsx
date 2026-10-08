@@ -71,7 +71,7 @@ export const InvitationForm = ({ principals }: InvitationFormProps) => {
       formReset({ role: formGetValues("role"), intent: "invite_user" })
     }
     wasSubmitting.current = navigation.state !== "idle"
-  }, [navigation.state, formReset, formGetValues, form.reset])
+  }, [navigation.state, formReset, formGetValues])
 
   // Define icon map for AutoComplete
   const iconMap = { user: User, organization: Users }

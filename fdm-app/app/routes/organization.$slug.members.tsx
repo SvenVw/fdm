@@ -1,7 +1,6 @@
 import type { Invitation, Member, Organization, OrganizationRole } from "better-auth/plugins"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
-import { useEffect, useRef, useState } from "react"
 import { data, useFetcher, useLoaderData } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 import { z } from "zod"
@@ -19,6 +18,7 @@ import {
 } from "~/components/ui/select"
 import { Separator } from "~/components/ui/separator"
 import { Spinner } from "~/components/ui/spinner"
+import { useKeyedState } from "~/hooks/use-keyed-state"
 import { auth, getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { isInactiveRecipientError, renderInvitationEmail, sendEmail } from "~/lib/email.server"
@@ -313,34 +313,12 @@ const InvitationRow = ({ invitation }: { invitation: Invitation }) => {
 
 const InvitationForm = ({ organizationId }: { organizationId: Organization["id"] }) => {
   const fetcher = useFetcher()
-  const [email, setEmail] = useState("")
-
-  const lastHandledFetcherState = useRef<{ data: unknown; state: unknown }>({
-    data: undefined,
-    state: undefined,
-  })
-
-  const formClearTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
-  useEffect(() => {
-    if (
-      lastHandledFetcherState.current.data !== fetcher.data ||
-      lastHandledFetcherState.current.state !== fetcher.state
-    ) {
-      if (fetcher.state === "idle" && fetcher.data?.ok) {
-        if (typeof formClearTimeout.current !== "undefined") {
-          clearTimeout(formClearTimeout.current)
-        }
-        formClearTimeout.current = setTimeout(() => setEmail(""))
-      }
-      lastHandledFetcherState.current = { data: fetcher.data, state: fetcher.state }
-    }
-  }, [fetcher.state, fetcher.data])
-
-  useEffect(() => () => {
-    if (typeof formClearTimeout.current !== "undefined") {
-      clearTimeout(formClearTimeout.current)
-    }
-  })
+  // Keyed on a successful fetcher result only, so a failed invite leaves the
+  // typed address in place while a successful one clears the field.
+  const [email, setEmail] = useKeyedState(
+    fetcher.data?.ok === true ? fetcher.data : undefined,
+    () => "",
+  )
 
   return (
     <fetcher.Form method="post" className="flex space-x-2">

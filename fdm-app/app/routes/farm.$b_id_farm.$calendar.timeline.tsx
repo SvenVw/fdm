@@ -24,7 +24,7 @@ import {
 import { ApplicationMethods } from "@nmi-agro/fdm-data"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react"
 import { data, type MetaFunction, useActionData, useLoaderData, useParams } from "react-router"
 import { dataWithError, dataWithSuccess, dataWithWarning } from "remix-toast"
 import z from "zod"
@@ -632,6 +632,41 @@ export async function action({ request, params }: Route.LoaderArgs) {
   }
 }
 
+/**
+ * CSS media query that is assumed to match when the device is landscape.
+ */
+const LANDSCAPE_QUERY = "(max-width: 1024px) and (orientation: landscape)"
+
+/**
+ * Starts listening to window.matchMedia(<landscape CSS query>) if it is available, and calls the passed function
+ * whenever the match state changes. Also returns a function that lets the caller stop the
+ * listening.
+ * @param onChange Callback to call with updates.
+ * @returns a function that stops the listening.
+ */
+function subscribeToLandscapeQuery(onChange: () => void) {
+  if (typeof window === "undefined" || !window.matchMedia) return () => {}
+  const mql = window.matchMedia(LANDSCAPE_QUERY)
+  mql.addEventListener("change", onChange)
+  return () => mql.removeEventListener("change", onChange)
+}
+
+/**
+ * Runs the landscape CSS media query in the browser.
+ * @returns whether the query matches.
+ */
+function getLandscapeQuerySnapshot() {
+  return window.matchMedia(LANDSCAPE_QUERY).matches
+}
+
+/**
+ * "Runs" the landscape CSS media query if this is not the browser.
+ * @returns just false, since don't have a device that could be landscape.
+ */
+function getLandscapeQueryServerSnapshot() {
+  return false
+}
+
 export default function TimelinePage() {
   const loaderData = useLoaderData<typeof loader>()
   const { calendar } = useParams()
@@ -640,23 +675,14 @@ export default function TimelinePage() {
   const actionData = useActionData()
   const storedCalendar = useCalendarStore((store) => store.calendar)
 
-  const [isLandscape, setIsLandscape] = useState<boolean>(() =>
-    typeof window === "undefined" || !window.matchMedia
-      ? true
-      : window.matchMedia("(max-width: 1024px) and (orientation: landscape").matches,
+  // We don't have access to the screen on the server and assume the device is not landscape.
+  // We use useSyncExternalStore to also render client-side once with this placeholder value
+  // so we don't get hydration errors.
+  const isLandscape = useSyncExternalStore(
+    subscribeToLandscapeQuery,
+    getLandscapeQuerySnapshot,
+    getLandscapeQueryServerSnapshot,
   )
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) {
-      return
-    }
-    const mql = window.matchMedia("(max-width: 1024px) and (orientation: landscape)")
-    const onChange = (e: MediaQueryListEvent) => {
-      setIsLandscape(e.matches)
-    }
-    mql.addEventListener("change", onChange)
-    return () => mql.removeEventListener("change", onChange)
-  }, [])
 
   const showMobileView = isMobile || isLandscape
   const showMobileViewRef = useRef(showMobileView)
