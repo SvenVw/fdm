@@ -61,15 +61,16 @@ export function SoilAnalysisUploadForm({ disabled }: { disabled?: boolean } = {}
   const uploadProgress = isSubmitting ? 100 : 0
 
   // Reset to idle a short delay after a result is shown, for visual feedback.
+  const formReset = form.reset
   useEffect(() => {
     if (!isSubmitting && actionData && !dismissed) {
       const timer = setTimeout(() => {
         setDismissed(true)
-        form.reset()
+        formReset()
       }, 2000)
       return () => clearTimeout(timer)
     }
-  }, [isSubmitting, actionData, dismissed, setDismissed, form])
+  }, [formReset, isSubmitting, actionData, dismissed, setDismissed])
 
   const handleFilesChange = (files: File[]) => {
     form.setValue("soilAnalysisFile", files[0])

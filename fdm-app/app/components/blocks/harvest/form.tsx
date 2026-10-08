@@ -5,7 +5,7 @@ import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import { CircleQuestionMark } from "lucide-react"
 import { type MouseEventHandler, useEffect, useMemo, useState, useSyncExternalStore } from "react"
-import { Controller, type Resolver } from "react-hook-form"
+import { Controller, useWatch, type Resolver } from "react-hook-form"
 import { Form, useFetcher, useNavigate } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { z } from "zod"
@@ -194,13 +194,22 @@ function useHarvestRemixForm({
 
   // When the calendar store is populated after initial render, re-evaluate the
   // default harvest date, but only if the user has not already entered a value.
+  const form_b_lu_harvest_date = useWatch({ control: form.control, name: "b_lu_harvest_date" })
+  const formGetFieldState = form.getFieldState
+  const formSetValue = form.setValue
   useEffect(() => {
-    const currentValue = form.getValues("b_lu_harvest_date")
-    const { isDirty } = form.getFieldState("b_lu_harvest_date")
-    if (!b_lu_harvest_date && !example_b_lu_harvest_date && !currentValue && !isDirty) {
-      form.setValue("b_lu_harvest_date", defaultHarvestDate ?? null)
+    const { isDirty } = formGetFieldState("b_lu_harvest_date")
+    if (!b_lu_harvest_date && !example_b_lu_harvest_date && !form_b_lu_harvest_date && !isDirty) {
+      formSetValue("b_lu_harvest_date", defaultHarvestDate ?? null)
     }
-  }, [form, example_b_lu_harvest_date, defaultHarvestDate, b_lu_harvest_date])
+  }, [
+    form_b_lu_harvest_date,
+    formGetFieldState,
+    formSetValue,
+    example_b_lu_harvest_date,
+    defaultHarvestDate,
+    b_lu_harvest_date,
+  ])
 
   return form
 }

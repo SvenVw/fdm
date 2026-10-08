@@ -105,25 +105,34 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
   const isSubmitting = navigation.state !== "idle"
 
   // If the user switched the fertilizer, clear the application method and amount
+  const formSetValue = form.setValue
   useEffect(() => {
     if (p_id && (!fertilizerApplication || fertilizerApplication.p_id !== p_id)) {
-      form.setValue("p_app_method", "")
-      form.setValue("p_app_amount_display", undefined as unknown as number)
+      formSetValue("p_app_method", "")
+      formSetValue("p_app_amount_display", undefined as unknown as number)
     }
-  }, [p_id, fertilizerApplication, form])
+  }, [formSetValue, p_id, fertilizerApplication])
 
+  const formGetFieldState = form.getFieldState
+  const form_p_app_date = useWatch({ control: form.control, name: "p_app_date" })
   useEffect(() => {
-    const currentValue = form.getValues("p_app_date")
-    const { isDirty } = form.getFieldState("p_app_date")
+    const { isDirty } = formGetFieldState("p_app_date")
     if (
       !fertilizerApplication?.p_app_date &&
       !exampleFertilizerApplication &&
-      !currentValue &&
+      !form_p_app_date &&
       !isDirty
     ) {
-      form.setValue("p_app_date", getContextualDate(calendar, 3, 1))
+      formSetValue("p_app_date", getContextualDate(calendar, 3, 1))
     }
-  }, [calendar, exampleFertilizerApplication, fertilizerApplication?.p_app_date, form])
+  }, [
+    formSetValue,
+    formGetFieldState,
+    form_p_app_date,
+    calendar,
+    exampleFertilizerApplication,
+    fertilizerApplication?.p_app_date,
+  ])
 
   // Selected individually: these action methods are referentially stable forever, unlike the
   // store object itself (which changes identity on every state update, including from other forms).
@@ -148,17 +157,17 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
   useEffect(() => {
     const p_app_amount_display = fertilizerApplication?.p_app_amount_display
     if (p_app_amount_display !== null && typeof p_app_amount_display !== "undefined") {
-      form.setValue("p_app_amount_display", Math.round(100 * p_app_amount_display) / 100)
+      formSetValue("p_app_amount_display", Math.round(100 * p_app_amount_display) / 100)
     }
-  }, [fertilizerApplication?.p_app_amount_display, form])
+  }, [formSetValue, fertilizerApplication?.p_app_amount_display])
 
   // Change fertilizer selection if the user has added a new fertilizer
   const new_p_id = searchParams.get("p_id")
   useEffect(() => {
     if (new_p_id) {
-      form.setValue("p_id", new_p_id)
+      formSetValue("p_id", new_p_id)
     }
-  }, [new_p_id, form])
+  }, [formSetValue, new_p_id])
 
   useEffect(() => {
     if (form.formState.isSubmitSuccessful) {

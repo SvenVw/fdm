@@ -165,15 +165,16 @@ export default function FarmFieldSettingsBlock() {
     },
   })
 
+  const formReset = form.reset
   useEffect(() => {
-    form.reset({
+    formReset({
       b_name: loaderData.field.b_name,
       b_acquiring_method: loaderData.field.b_acquiring_method,
       b_start: loaderData.field.b_start ?? today,
       b_end: loaderData.field.b_end,
       b_bufferstrip: loaderData.field.b_bufferstrip ?? false,
     })
-  }, [loaderData, form, today])
+  }, [loaderData, formReset, today])
 
   const fieldGeo = loaderData.fieldGeo
   const mapId = "fieldsSaved"

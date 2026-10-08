@@ -84,15 +84,16 @@ export function MijnPercelenUploadForm({
   }, [actionData, uploadState])
 
   // Effect to reset the form after success message (errors stay visible until the user tries again)
+  const formReset = form.reset
   useEffect(() => {
     if (uploadState === "success") {
       const timer = setTimeout(() => {
         setUploadState("idle")
-        form.reset()
+        formReset()
       }, 3000)
       return () => clearTimeout(timer)
     }
-  }, [uploadState, form])
+  }, [formReset, uploadState])
 
   const selectedFiles = useWatch({
     control: form.control,
@@ -107,9 +108,9 @@ export function MijnPercelenUploadForm({
 
   useEffect(() => {
     return () => {
-      form.reset()
+      formReset()
     }
-  }, [form])
+  }, [formReset])
 
   const handleFilesSet = async (validFiles: File[]) => {
     form.setValue("shapefile", validFiles)
