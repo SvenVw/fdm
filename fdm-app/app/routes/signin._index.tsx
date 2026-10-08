@@ -75,6 +75,7 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { magicLinkCookie } from "~/lib/magic-link-cookie.server"
 import { modifySearchParams, getSafeRedirect } from "~/lib/url-utils"
 import { cn } from "~/lib/utils"
+import { useCookieConsentStore } from "~/store/cookie-consent"
 import { extractFormValuesFromRequest } from "../lib/form"
 
 export const meta: MetaFunction = () => {
@@ -217,14 +218,7 @@ export default function SignIn() {
     )
     console.error("Social sign-in failed:", error)
   }
-  const openCookieSettings = () => {
-    if (window?.openCookieSettings) {
-      window.openCookieSettings()
-    }
-  }
-  const onOpenCookieSettings = () => {
-    openCookieSettings()
-  }
+  const onOpenCookieSettings = useCookieConsentStore((state) => state.openCookieSettings)
 
   const scrollToMoreInfo = () => {
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches
