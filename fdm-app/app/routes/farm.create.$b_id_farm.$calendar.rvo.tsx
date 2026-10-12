@@ -1,22 +1,21 @@
-import type {
-  ImportReviewAction,
-  RvoImportReviewItem,
-  UserChoiceMap,
-} from "@nmi-agro/fdm-rvo/types"
-import type { ZodError } from "zod"
+import type { RvoImportReviewItem } from "@nmi-agro/fdm-rvo/types"
 import {
+  addCultivation,
   addFarmVerification,
+  addField,
   addSoilAnalysis,
   type Cultivation,
-  type FdmType,
   type Field,
   type FieldGeometry,
   getCultivationsFromCatalogue,
+  getDefaultDatesOfCultivation,
   getFarm,
+  removeCultivation,
+  removeField,
+  updateField,
 } from "@nmi-agro/fdm-core"
-import { getItemId } from "@nmi-agro/fdm-rvo/utils"
 import { AlertTriangle, Loader2 } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import {
   type ActionFunctionArgs,
   data,
@@ -29,13 +28,15 @@ import {
   useLocation,
   useNavigation,
 } from "react-router"
+import { type ZodError } from "zod"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { RvoConnectCard } from "~/components/blocks/rvo/connect-card"
 import { RvoErrorAlert } from "~/components/blocks/rvo/error-alert"
-import { RvoImportReviewTable } from "~/components/blocks/rvo/import-review-table"
+import { RvoImportReviewTable, useRvoImportForm } from "~/components/blocks/rvo/import-review-table"
+import { ImportReviewChoicesSchema } from "~/components/blocks/rvo/schema"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
@@ -56,7 +57,6 @@ import {
   fetchRvoFields,
   generateAuthUrl,
   isRvoPermissionDeniedError,
-  processRvoImport,
 } from "~/lib/rvo.server"
 
 type ReviewItem = RvoImportReviewItem<Field>
@@ -83,6 +83,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const rvoAccessToken = await rvoTokenCookie.parse(request.headers.get("Cookie"))
 
   let rvoImportReviewData: ReviewItem[] = []
+  let cultivationOptions: { value: string; label: string }[] = []
   let error: string | null = null
   let b_businessid_farm: string | null = null
   let b_name_farm: string | null | undefined = null
@@ -187,6 +188,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         year,
         cultivationsCatalogue,
       )
+      cultivationOptions = cultivationsCatalogue.map((c) => ({
+        value: c.b_lu_catalogue,
+        label: c.b_lu_name,
+      }))
     } catch (e) {
       console.error("RVO Import Fout:", e)
       if (e instanceof Response && e.status === 403) {
@@ -209,6 +214,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         noRvoParcelsFound: false,
         isRvoConfigured,
         b_name_farm,
+        cultivationOptions: cultivationOptions,
       },
       { headers: { "Set-Cookie": clearedTokenCookie } },
     )
@@ -227,6 +233,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       noRvoParcelsFound,
       isRvoConfigured,
       b_name_farm,
+      cultivationOptions: cultivationOptions,
     },
     { headers: { "Set-Cookie": clearedTokenCookie } },
   )
@@ -243,6 +250,7 @@ export default function RvoImportCreatePage() {
     noRvoParcelsFound,
     isRvoConfigured,
     b_name_farm,
+    cultivationOptions,
   } = useLoaderData<typeof loader>()
   const actionData = useActionData<typeof action>()
   const navigation = useNavigation()
@@ -253,28 +261,7 @@ export default function RvoImportCreatePage() {
   const isSaving =
     navigation.state === "submitting" && navigation.formData?.get("intent") === "save_fields"
 
-  const [userChoices, setUserChoices] = useState<UserChoiceMap>({})
-
-  useEffect(() => {
-    // Initialize user choices with defaults
-    const initialChoices: UserChoiceMap = {}
-    rvoImportReviewData.forEach((item) => {
-      const id = getItemId(item)
-      let defaultAction: ImportReviewAction
-
-      switch (item.status) {
-        case "NEW_REMOTE":
-          defaultAction = "ADD_REMOTE"
-          break
-        // In creation wizard, other statuses are unlikely but good to handle defaults
-        default:
-          defaultAction = "NO_ACTION"
-          break
-      }
-      initialChoices[id] = defaultAction
-    })
-    setUserChoices(initialChoices)
-  }, [rvoImportReviewData])
+  const { formValues, ...tableMeta } = useRvoImportForm(rvoImportReviewData)
 
   // Warn the user before refreshing or leaving when data is present
   useEffect(() => {
@@ -289,10 +276,6 @@ export default function RvoImportCreatePage() {
       return () => window.removeEventListener("beforeunload", handleBeforeUnload)
     }
   }, [rvoImportReviewData])
-
-  const handleChoiceChange = (id: string, action: ImportReviewAction) => {
-    setUserChoices((prev: UserChoiceMap) => ({ ...prev, [id]: action }))
-  }
 
   if (error) {
     return (
@@ -391,7 +374,21 @@ export default function RvoImportCreatePage() {
                 <div className="flex justify-end">
                   <Form method="post" action={`/farm/create/${b_id_farm}/${calendar}/rvo`}>
                     <input type="hidden" name="intent" value="save_fields" />
-                    <input type="hidden" name="userChoices" value={JSON.stringify(userChoices)} />
+                    <input
+                      type="hidden"
+                      name="fieldsToAdd"
+                      value={JSON.stringify(formValues.fieldsToAdd)}
+                    />
+                    <input
+                      type="hidden"
+                      name="fieldsToRemove"
+                      value={JSON.stringify(formValues.fieldsToRemove)}
+                    />
+                    <input
+                      type="hidden"
+                      name="fieldsToUpdate"
+                      value={JSON.stringify(formValues.fieldsToUpdate)}
+                    />
                     <input
                       type="hidden"
                       name="RvoImportReviewDataJson"
@@ -413,8 +410,8 @@ export default function RvoImportCreatePage() {
                   <RvoImportReviewTable
                     calendar={calendar}
                     data={rvoImportReviewData}
-                    userChoices={userChoices}
-                    onChoiceChange={handleChoiceChange}
+                    cultivationOptions={cultivationOptions}
+                    {...tableMeta}
                   />
                 </div>
               </div>
@@ -471,13 +468,15 @@ export async function action({ request, params, url }: ActionFunctionArgs) {
   }
 
   if (intent === "save_fields") {
-    const RvoImportReviewDataJson = formData.get("RvoImportReviewDataJson")
-    const userChoicesJson = formData.get("userChoices")
+    const fieldsToAddJson = formData.get("fieldsToAdd")
+    const fieldsToRemoveJson = formData.get("fieldsToRemove")
+    const fieldsToUpdateJson = formData.get("fieldsToUpdate")
 
-    let rvoImportReviewData: ReviewItem[] = []
-    let userChoices: UserChoiceMap = {}
-
-    if (typeof RvoImportReviewDataJson !== "string" || typeof userChoicesJson !== "string") {
+    if (
+      typeof fieldsToAddJson !== "string" ||
+      typeof fieldsToRemoveJson !== "string" ||
+      typeof fieldsToUpdateJson !== "string"
+    ) {
       return {
         success: false,
         message: "Geen data gevonden om te verwerken. Start de RVO import opnieuw.",
@@ -485,27 +484,104 @@ export async function action({ request, params, url }: ActionFunctionArgs) {
     }
 
     try {
-      rvoImportReviewData = JSON.parse(RvoImportReviewDataJson)
-      userChoices = JSON.parse(userChoicesJson)
-
-      if (!Array.isArray(rvoImportReviewData)) {
-        throw new Error("Invalid review data format")
-      }
+      const formValues = ImportReviewChoicesSchema.parse({
+        fieldsToAdd: JSON.parse(fieldsToAddJson),
+        fieldsToRemove: JSON.parse(fieldsToRemoveJson),
+        fieldsToUpdate: JSON.parse(fieldsToUpdateJson),
+      })
 
       const addedFields: { b_id: string; geometry: FieldGeometry }[] = []
-      const onFieldAdded = async (_: FdmType, b_id: string, geometry: FieldGeometry) => {
-        addedFields.push({ b_id, geometry })
-      }
 
-      await processRvoImport(
-        fdm,
-        session.principal_id,
-        b_id_farm,
-        rvoImportReviewData,
-        userChoices,
-        year,
-        onFieldAdded,
-      )
+      await fdm.transaction(async (tx) => {
+        for (const field of formValues.fieldsToAdd) {
+          const b_id = await addField(
+            tx,
+            session.principal_id,
+            b_id_farm,
+            field.b_name,
+            field.b_id_source,
+            field.b_geometry as unknown as FieldGeometry,
+            field.b_start,
+            field.b_acquiring_method,
+            field.b_end,
+            field.b_bufferstrip,
+          )
+
+          if (typeof field.b_lu_catalogue === "string") {
+            const defaultDates = await getDefaultDatesOfCultivation(
+              tx,
+              session.principal_id,
+              b_id_farm,
+              field.b_lu_catalogue,
+              year,
+            )
+
+            await addCultivation(
+              tx,
+              session.principal_id,
+              field.b_lu_catalogue,
+              b_id,
+              defaultDates.b_lu_start,
+              defaultDates.b_lu_end,
+            )
+
+            addedFields.push({
+              b_id: b_id,
+              geometry: field.b_geometry as unknown as FieldGeometry,
+            })
+          }
+        }
+
+        for (const field of formValues.fieldsToUpdate) {
+          const b_id = field.b_id
+          const b_bufferstrip = field.b_bufferstrip
+
+          await updateField(
+            tx,
+            session.principal_id,
+            b_id,
+            field.b_name ?? undefined,
+            field.b_id_source,
+            field.b_geometry as unknown as FieldGeometry,
+            field.b_start,
+            field.b_acquiring_method,
+            field.b_end,
+            b_bufferstrip,
+          )
+
+          if (typeof field.b_lu_catalogue !== "undefined") {
+            if (field.b_lu) {
+              // Always remove the existing cultivation
+              await removeCultivation(tx, session.principal_id, field.b_lu)
+            }
+
+            if (field.b_lu_catalogue) {
+              // Add the new cultivation if not null
+              const b_lu_catalogue = field.b_lu_catalogue
+              const defaultDates = await getDefaultDatesOfCultivation(
+                tx,
+                session.principal_id,
+                b_id_farm,
+                field.b_lu_catalogue,
+                year,
+              )
+
+              await addCultivation(
+                tx,
+                session.principal_id,
+                b_lu_catalogue,
+                b_id,
+                defaultDates.b_lu_start,
+                defaultDates.b_lu_end,
+              )
+            }
+          }
+        }
+
+        for (const b_id of formValues.fieldsToRemove) {
+          await removeField(tx, session.principal_id, b_id)
+        }
+      })
 
       const nmiApiKey = getNmiApiKey()
       if (nmiApiKey) {
