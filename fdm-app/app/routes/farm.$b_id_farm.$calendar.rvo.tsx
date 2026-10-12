@@ -283,7 +283,7 @@ export default function RvoImportReviewPage() {
   const isApplying =
     navigation.state === "submitting" && navigation.formData?.get("intent") === "apply_changes"
 
-  const { formValues, ...tableMeta } = useRvoImportForm(rvoImportReviewData)
+  const { formValues } = useRvoImportForm(rvoImportReviewData)
 
   // Warn the user before refreshing or leaving when data is present
   useEffect(() => {
@@ -494,7 +494,6 @@ export default function RvoImportReviewPage() {
                     calendar={calendar}
                     data={rvoImportReviewData}
                     cultivationOptions={cultivationOptions}
-                    {...tableMeta}
                   />
                 </div>
               </div>

@@ -15,6 +15,8 @@ import type { genericAction, loader } from "./loader-and-action.server"
 type ReviewItem = RvoImportReviewItem<Field>
 
 const emptyReviewData: ReviewItem[] = []
+const mijnPercelenReviewFlags = { b_bufferstrip_info_available: false }
+
 /**
  * Renders a single-page wizard that handles MijnPercelen shapefile uploads.
  *
@@ -44,7 +46,7 @@ export function UploadMijnPercelenPage({
     navigation.state === "submitting" && navigation.formData?.get("intent") === "save_fields"
 
   const [canUnloadSafely, setCanUnloadSafely] = useState(true)
-  const { formValues, ...tableMeta } = useRvoImportForm(rvoImportReviewData ?? emptyReviewData)
+  const { formValues } = useRvoImportForm(rvoImportReviewData ?? emptyReviewData)
 
   // Warn the user before refreshing or leaving when data is present
   useEffect(() => {
@@ -186,10 +188,7 @@ export function UploadMijnPercelenPage({
                   data={rvoImportReviewData}
                   calendar={calendar}
                   cultivationOptions={cultivationOptions}
-                  flags={{
-                    b_bufferstrip_info_available: false,
-                  }}
-                  {...tableMeta}
+                  flags={mijnPercelenReviewFlags}
                 />
               </div>
             </div>

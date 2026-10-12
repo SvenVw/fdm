@@ -11,9 +11,7 @@ import {
 import { area } from "@turf/area"
 import { format as libFormatDate, parseISO } from "date-fns"
 import { Archive, ArrowLeftRight, Check, Info, Pencil, Plus, Trash2, X } from "lucide-react"
-import { ReactNode, useCallback, useLayoutEffect, useMemo, useRef, useState } from "react"
-import { clientConfig } from "@/app/lib/config"
-import { useActiveTableFormStore } from "@/app/store/active-table-form"
+import { memo, ReactNode, useCallback, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { DatePicker } from "~/components/custom/date-picker-v2"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
@@ -36,8 +34,17 @@ import {
   TableRow,
 } from "~/components/ui/table"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip"
+import { clientConfig } from "~/lib/config"
 import { acquiringMethodOptions } from "~/lib/constants"
 import { cn } from "~/lib/utils"
+import { useActiveTableFormStore } from "~/store/active-table-form"
+import {
+  useRvoFieldToAdd,
+  useRvoFieldToRemove,
+  useRvoImportReviewStore,
+  useRvoUserChoice,
+  useRvoUserChoices,
+} from "~/store/rvo-import-review"
 
 type ReviewItem = RvoImportReviewItem<Field>
 type ReviewItemFieldKey =
@@ -70,12 +77,6 @@ interface ImportReviewTableMeta {
   calendar: string
   flags?: ImportReviewFlags
   cultivationOptions: { value: string; label: string }[]
-  getUserChoice(itemId: string, key: ReviewItemFieldKey): any
-  setUserChoice(itemId: string, key: ReviewItemFieldKey, value: any): void
-  fieldsToRemove: Set<string>
-  setFieldToRemove(itemId: string, remove: boolean): void
-  fieldsToAdd: Set<string>
-  setFieldToAdd(itemId: string, add: boolean): void
 }
 
 const importReviewTableFeatures = tableFeatures({
@@ -287,8 +288,6 @@ function ActionCell({
   formattedLocal,
   formattedRemote,
   allowCustomValue,
-  getUserChoice,
-  setUserChoice,
 }: {
   id: string
   name: ReviewItemFieldKey
@@ -300,10 +299,9 @@ function ActionCell({
   formattedLocal?: string
   formattedRemote?: string
   allowCustomValue: boolean
-  getUserChoice: ImportReviewTableMeta["getUserChoice"]
-  setUserChoice: ImportReviewTableMeta["setUserChoice"]
 }) {
-  const userChoice = getUserChoice(id, name)
+  const userChoice = useRvoUserChoice(id, name)
+  const setUserChoice = useRvoImportReviewStore((state) => state.setUserChoice)
   const value = typeof userChoice !== "undefined" ? userChoice : local
   const activeForm = useActiveTableFormStore((store) => store.activeForm)
   const setActiveForm = useActiveTableFormStore((store) => store.setActiveForm)
@@ -597,10 +595,9 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
         <TooltipContent>De naam en het RVO ID van het perceel.</TooltipContent>
       </Tooltip>
     ),
-    cell: ({ row, table }) => {
+    cell: ({ row }) => {
       const item = row.original
       const id = getItemId(item)
-      const { getUserChoice, setUserChoice } = table.options.meta!
       return (
         <ActionCell
           id={id}
@@ -610,8 +607,6 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
           remote={item.rvoField?.properties.CropFieldDesignator}
           status={item.status}
           allowCustomValue={true}
-          getUserChoice={getUserChoice}
-          setUserChoice={setUserChoice}
         />
       )
     },
@@ -624,10 +619,9 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
         <TooltipContent>De oppervlakte van het perceel in hectaren.</TooltipContent>
       </Tooltip>
     ),
-    cell: ({ row, table }) => {
+    cell: ({ row }) => {
       const item = row.original
       const id = getItemId(item)
-      const { getUserChoice, setUserChoice } = table.options.meta!
 
       const localArea = item.localField
         ? `${(item.localField.b_area ?? 0).toFixed(2)} ha`
@@ -645,8 +639,6 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
           formattedRemote={remoteArea}
           status={item.status}
           allowCustomValue={false}
-          getUserChoice={getUserChoice}
-          setUserChoice={setUserChoice}
         />
       )
     },
@@ -662,7 +654,7 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
     cell: ({ row, table }) => {
       const item = row.original
       const id = getItemId(item)
-      const { getUserChoice, setUserChoice, cultivationOptions } = table.options.meta!
+      const { cultivationOptions } = table.options.meta!
       return (
         <ActionCell
           id={id}
@@ -672,8 +664,6 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
           remote={`nl_${item.rvoField?.properties.CropTypeCode}`}
           status={item.status}
           allowCustomValue={true}
-          getUserChoice={getUserChoice}
-          setUserChoice={setUserChoice}
           options={cultivationOptions}
         />
       )
@@ -687,10 +677,9 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
         <TooltipContent>De datum vanaf wanneer het perceel actief is.</TooltipContent>
       </Tooltip>
     ),
-    cell: ({ row, table }) => {
+    cell: ({ row }) => {
       const item = row.original
       const id = getItemId(item)
-      const { getUserChoice, setUserChoice } = table.options.meta!
       return (
         <ActionCell
           id={id}
@@ -700,8 +689,6 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
           remote={item.rvoField?.properties.BeginDate}
           status={item.status}
           allowCustomValue={true}
-          getUserChoice={getUserChoice}
-          setUserChoice={setUserChoice}
         />
       )
     },
@@ -717,7 +704,7 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
     cell: ({ row, table }) => {
       const item = row.original
       const id = getItemId(item)
-      const { calendar, getUserChoice, setUserChoice } = table.options.meta!
+      const { calendar } = table.options.meta!
       return (
         <ActionCell
           id={id}
@@ -731,8 +718,6 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
           }
           status={item.status}
           allowCustomValue={true}
-          getUserChoice={getUserChoice}
-          setUserChoice={setUserChoice}
         />
       )
     },
@@ -745,10 +730,9 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
         <TooltipContent>De vorm van gebruikstitel (bv. eigendom, pacht).</TooltipContent>
       </Tooltip>
     ),
-    cell: ({ row, table }) => {
+    cell: ({ row }) => {
       const item = row.original
       const id = getItemId(item)
-      const { getUserChoice, setUserChoice } = table.options.meta!
 
       return (
         <ActionCell
@@ -760,8 +744,6 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
           remote={`nl_${item.rvoField?.properties.UseTitleCode}`}
           status={item.status}
           allowCustomValue={true}
-          getUserChoice={getUserChoice}
-          setUserChoice={setUserChoice}
         />
       )
     },
@@ -776,10 +758,9 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
         </TooltipContent>
       </Tooltip>
     ),
-    cell: ({ row, table }) => {
+    cell: ({ row }) => {
       const item = row.original
       const id = getItemId(item)
-      const { getUserChoice, setUserChoice } = table.options.meta!
 
       const indBufferstrook = item.rvoField?.properties.mestData?.IndBufferstrook
       const rvoValue = indBufferstrook === undefined ? undefined : indBufferstrook === "J"
@@ -793,8 +774,6 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
           remote={rvoValue}
           status={item.status}
           allowCustomValue={true}
-          getUserChoice={getUserChoice}
-          setUserChoice={setUserChoice}
         />
       )
     },
@@ -815,12 +794,12 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
         </TooltipContent>
       </Tooltip>
     ),
-    cell: ({ row, table }) => {
+    cell: ({ row }) => {
       const item = row.original
       const id = getItemId(item)
-      const { getUserChoice, setUserChoice } = table.options.meta!
-      const value =
-        getUserChoice(id, "b_bufferstrip") ?? row.original.localField?.b_bufferstrip ?? false
+      const userChoice = useRvoUserChoice<boolean>(id, "b_bufferstrip")
+      const setUserChoice = useRvoImportReviewStore((state) => state.setUserChoice)
+      const value = userChoice ?? row.original.localField?.b_bufferstrip ?? false
 
       return (
         <label className="text-muted-foreground flex flex-row items-center gap-1">
@@ -844,18 +823,14 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
     cell: ({ row, table }) => {
       const item = row.original
       const id = getItemId(item)
-      const {
-        getUserChoice,
-        setUserChoice,
-        fieldsToRemove,
-        setFieldToRemove,
-        fieldsToAdd,
-        setFieldToAdd,
-        flags,
-      } = table.options.meta!
+      const { flags } = table.options.meta!
 
-      const field_to_remove = fieldsToRemove.has(id)
-      const field_to_add = fieldsToAdd.has(id)
+      const userChoices = useRvoUserChoices(id)
+      const setUserChoice = useRvoImportReviewStore((state) => state.setUserChoice)
+      const field_to_remove = useRvoFieldToRemove(id)
+      const setFieldToRemove = useRvoImportReviewStore((state) => state.setFieldToRemove)
+      const field_to_add = useRvoFieldToAdd(id)
+      const setFieldToAdd = useRvoImportReviewStore((state) => state.setFieldToAdd)
 
       if (item.status === "MATCH") {
         return (
@@ -867,13 +842,13 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
       }
 
       if (item.status === "CONFLICT") {
-        const value_b_name = getUserChoice(id, "b_name")
-        const value_b_geometry = getUserChoice(id, "b_geometry")
-        const value_b_lu_catalogue = getUserChoice(id, "b_lu_catalogue")
-        const value_b_start = getUserChoice(id, "b_start")
-        const value_b_end = getUserChoice(id, "b_end")
-        const value_b_acquiring_method = getUserChoice(id, "b_acquiring_method")
-        const value_b_bufferstrip = getUserChoice(id, "b_bufferstrip")
+        const value_b_name = userChoices?.b_name
+        const value_b_geometry = userChoices?.b_geometry
+        const value_b_lu_catalogue = userChoices?.b_lu_catalogue
+        const value_b_start = userChoices?.b_start
+        const value_b_end = userChoices?.b_end
+        const value_b_acquiring_method = userChoices?.b_acquiring_method
+        const value_b_bufferstrip = userChoices?.b_bufferstrip
 
         let action: "OTHER" | "KEEP_LOCAL" | "UPDATE_FROM_REMOTE" = "OTHER"
         if (
@@ -1017,7 +992,7 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
       }
 
       if (item.status === "EXPIRED_LOCAL") {
-        const value_b_end = getUserChoice(id, "b_end")
+        const value_b_end = userChoices?.b_end
 
         return (
           <Select
@@ -1089,61 +1064,17 @@ export function useKeyedState<K, V>(
   return [value, setValue]
 }
 
+/**
+ * Computes the form values to submit for an RVO import review, reactively reading the user's
+ * choices from {@link useRvoImportReviewStore}.
+ */
 export function useRvoImportForm(data: ReviewItem[]) {
-  const [userChoices, setUserChoices] = useKeyedState(data, () => {
-    return new Map<string, Partial<Record<ReviewItemFieldKey, any>>>()
-  })
-  const [fieldsToAdd, setFieldsToAdd] = useKeyedState(data, () => new Set<string>())
-  const [fieldsToRemove, setFieldsToRemove] = useKeyedState(data, () => new Set<string>())
-
-  const getUserChoice = useCallback(
-    (id: string, key: ReviewItemFieldKey) => {
-      return userChoices.get(id)?.[key]
-    },
-    [userChoices],
-  )
-
-  const setUserChoice = useCallback((id: string, key: ReviewItemFieldKey, value: any) => {
-    setUserChoices((current) => {
-      const newUserChoices = new Map(current)
-      newUserChoices.set(id, { ...current.get(id), [key]: value })
-      return newUserChoices
-    })
-  }, [])
-
-  const setFieldToAdd = useCallback((id: string, add: boolean) => {
-    setFieldsToAdd((current) => {
-      if (add) {
-        if (!current.has(id)) {
-          return new Set([...current, id])
-        }
-      } else {
-        if (current.has(id)) {
-          const newSet = new Set(current)
-          newSet.delete(id)
-          return newSet
-        }
-      }
-      return current
-    })
-  }, [])
-
-  const setFieldToRemove = useCallback((id: string, add: boolean) => {
-    setFieldsToRemove((current) => {
-      if (add) {
-        if (!current.has(id)) {
-          return new Set([...current, id])
-        }
-      } else {
-        if (current.has(id)) {
-          const newSet = new Set(current)
-          newSet.delete(id)
-          return newSet
-        }
-      }
-      return current
-    })
-  }, [])
+  const userChoices = useRvoImportReviewStore((state) => state.userChoices) as Map<
+    string,
+    Partial<Record<ReviewItemFieldKey, any>>
+  >
+  const fieldsToAdd = useRvoImportReviewStore((state) => state.fieldsToAdd)
+  const fieldsToRemove = useRvoImportReviewStore((state) => state.fieldsToRemove)
 
   const formValues = useMemo(() => {
     const formFieldsToAdd: Partial<SubmittedFieldInit>[] = []
@@ -1247,29 +1178,21 @@ export function useRvoImportForm(data: ReviewItem[]) {
       fieldsToRemove: formFieldsToRemove,
       fieldsToUpdate: formFieldsToUpdate,
     }
-  }, [userChoices, fieldsToAdd, fieldsToRemove])
+  }, [data, userChoices, fieldsToAdd, fieldsToRemove])
 
-  return {
-    getUserChoice,
-    setUserChoice,
-    fieldsToAdd,
-    setFieldToAdd,
-    fieldsToRemove,
-    setFieldToRemove,
-    formValues,
-  }
+  return { formValues }
 }
 
-export function RvoImportReviewTable({
+/**
+ * Renders the RVO import review table.
+ *
+ * The user choice state is driven by {@link useRvoImportReviewStore} which is a
+ * Zustand store.
+ */
+function RvoImportReviewTableComponent({
   data,
   calendar,
   flags,
-  setUserChoice,
-  getUserChoice,
-  fieldsToAdd,
-  setFieldToAdd,
-  fieldsToRemove,
-  setFieldToRemove,
   cultivationOptions,
 }: RvoImportReviewTableProps) {
   const clearActiveForm = useActiveTableFormStore((store) => store.clearActiveForm)
@@ -1303,6 +1226,7 @@ export function RvoImportReviewTable({
 
   useLayoutEffect(() => {
     clearActiveForm()
+    useRvoImportReviewStore.getState().reset()
   }, [data])
 
   const table = useTable({
@@ -1313,12 +1237,6 @@ export function RvoImportReviewTable({
       canModify: true,
       calendar,
       flags,
-      setUserChoice,
-      getUserChoice,
-      fieldsToAdd,
-      setFieldToAdd,
-      fieldsToRemove,
-      setFieldToRemove,
       cultivationOptions,
     },
     state: {
@@ -1367,3 +1285,5 @@ export function RvoImportReviewTable({
     </TooltipProvider>
   )
 }
+
+export const RvoImportReviewTable = memo(RvoImportReviewTableComponent)

@@ -261,7 +261,7 @@ export default function RvoImportCreatePage() {
   const isSaving =
     navigation.state === "submitting" && navigation.formData?.get("intent") === "save_fields"
 
-  const { formValues, ...tableMeta } = useRvoImportForm(rvoImportReviewData)
+  const { formValues } = useRvoImportForm(rvoImportReviewData)
 
   // Warn the user before refreshing or leaving when data is present
   useEffect(() => {
@@ -411,7 +411,6 @@ export default function RvoImportCreatePage() {
                     calendar={calendar}
                     data={rvoImportReviewData}
                     cultivationOptions={cultivationOptions}
-                    {...tableMeta}
                   />
                 </div>
               </div>
