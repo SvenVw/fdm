@@ -527,8 +527,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
       returnUrlParam && isOfOrigin(returnUrlParam, url.origin)
         ? returnUrlParam
         : url.searchParams.has("create")
-          ? `/farm/create/${b_id_farm}/${calendar}/rotation`
-          : `/farm/${b_id_farm}/${calendar}/rotation`
+          ? `/farm/create/${b_id_farm}/${calendar}/field`
+          : `/farm/${b_id_farm}/${calendar}/field`
 
     if (url.searchParams.has("appIds")) {
       const validatedData = await extractFormValuesFromRequest(request, FormSchemaPartialModify)

@@ -2,7 +2,7 @@ import type { ApplicationMethods } from "@nmi-agro/fdm-data"
 import type { Navigation } from "react-router"
 import {
   addFertilizerApplication,
-  getCultivations,
+  getCultivationsForFarm,
   getCultivationsFromCatalogue,
   getFarms,
   getFertilizerParametersDescription,
@@ -124,9 +124,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     })
 
     // Get all fields for the farm and their cultivations
+    const cultivationsForFarm = await getCultivationsForFarm(fdm, session.principal_id, b_id_farm)
     const allFieldsWithCultivations = await Promise.all(
       (await getFields(fdm, session.principal_id, b_id_farm, timeframe)).map(async (field) => {
-        const cultivations = await getCultivations(fdm, session.principal_id, field.b_id, timeframe)
+        const cultivations = cultivationsForFarm.get(field.b_id) ?? []
         return {
           ...field,
           cultivations: cultivations.map((c) => c.b_lu_catalogue),

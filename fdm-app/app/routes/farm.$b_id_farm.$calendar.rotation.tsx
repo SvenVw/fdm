@@ -1,6 +1,5 @@
 import {
   checkPermission,
-  getCultivations,
   getCultivationsForFarm,
   getCultivationsFromCatalogue,
   getCurrentSoilDataForFarm,
@@ -438,28 +437,34 @@ export async function action({ params, request }: Route.ActionArgs) {
       const fields = (await getFields(fdm, session.principal_id, b_id_farm, timeframe)).filter(
         (field) => fieldIds.has(field.b_id),
       )
-      await Promise.all(
-        fields.map(async (field) => {
-          const cultivations = (
-            await getCultivations(fdm, session.principal_id, field.b_id, timeframe)
-          ).filter((cultivation) => cultivationIds.has(cultivation.b_lu_catalogue))
-
-          return Promise.all(
-            cultivations.map((cultivation) => {
-              return updateCultivation(
-                fdm,
-                session.principal_id,
-                cultivation.b_lu,
-                undefined,
-                cultivationUpdates.b_lu_start,
-                cultivationUpdates.b_lu_end,
-                cultivationUpdates.m_cropresidue,
-                cultivationUpdates.b_lu_variety,
-              )
-            }),
-          )
-        }),
-      )
+      await fdm.transaction(async (tx) => {
+        const cultivationsForFarm = await getCultivationsForFarm(
+          tx,
+          session.principal_id,
+          b_id_farm,
+        )
+        await Promise.all(
+          fields.map(async (field) => {
+            const cultivations = (cultivationsForFarm.get(field.b_id) ?? []).filter((cultivation) =>
+              cultivationIds.has(cultivation.b_lu_catalogue),
+            )
+            return Promise.all(
+              cultivations.map((cultivation) => {
+                return updateCultivation(
+                  tx,
+                  session.principal_id,
+                  cultivation.b_lu,
+                  undefined,
+                  cultivationUpdates.b_lu_start,
+                  cultivationUpdates.b_lu_end,
+                  cultivationUpdates.m_cropresidue,
+                  cultivationUpdates.b_lu_variety,
+                )
+              }),
+            )
+          }),
+        )
+      })
     }
 
     return dataWithSuccess(null, {
