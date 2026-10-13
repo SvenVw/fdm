@@ -33,6 +33,20 @@ function getCalendarYearsTimeframe(startYear: number, endYear: number): Timefram
 }
 
 /**
+ * Adjusts an end date on 1 January (Europe/Amsterdam) to the end of 31 December of the previous
+ * year, the same way fdm-core returns `b_end` and `m_end`. Any other date is returned unchanged.
+ *
+ * Mirrors `adjustEndDateAtYearStart` of fdm-core, so it can be used in client components.
+ */
+export function adjustEndDateAtYearStart(end: Date): Date {
+  const zoned = new TZDate(end.getTime(), calendarTimeZone)
+  if (zoned.getMonth() !== 0 || zoned.getDate() !== 1) {
+    return end
+  }
+  return new Date(new TZDate(zoned.getFullYear(), 0, 1, calendarTimeZone).getTime() - 1)
+}
+
+/**
  * Returns the timeframe of the calendar year in the route params (Europe/Amsterdam), or of all
  * supported years when the calendar is not a year (e.g. `all`).
  */

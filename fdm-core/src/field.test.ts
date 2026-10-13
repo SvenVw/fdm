@@ -4,7 +4,7 @@ import type { FdmServerType } from "./fdm-server.types"
 import type { FdmType } from "./fdm.types"
 import { enableCultivationCatalogue } from "./catalogues"
 import { addCultivation, addCultivationToCatalogue } from "./cultivation"
-import { normalizeEndDate } from "./date"
+import { adjustEndDateAtYearStart } from "./date"
 import * as schema from "./db/schema"
 import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
@@ -109,7 +109,7 @@ describe("Farm Data Model", () => {
       expect(field.b_perimeter).toBeGreaterThan(0)
       expect(field.b_bufferstrip).toBe(false)
       expect(field.b_start).toEqual(AcquireDate)
-      expect(field.b_end).toEqual(normalizeEndDate(discardingDate))
+      expect(field.b_end).toEqual(discardingDate)
       expect(field.b_acquiring_method).toBe(AcquiringMethod)
     })
 
@@ -488,7 +488,10 @@ describe("Farm Data Model", () => {
             )
 
             const field = await getField(fdm, principal_id, b_id)
-            expect(field.b_end?.toISOString()).toBe("2025-12-31T22:59:59.999Z")
+            expect(field.b_end).toEqual(adjustEndDateAtYearStart(new Date(b_end)))
+            expect(field.b_end?.getTime()).toBeLessThanOrEqual(
+              new Date("2025-12-31T22:59:59.999Z").getTime(),
+            )
 
             for (const [name, timeframe] of Object.entries(timeframes)) {
               const fields = await getFields(fdm, principal_id, b_id_farm, timeframe)
@@ -502,7 +505,7 @@ describe("Farm Data Model", () => {
           },
         )
 
-        it("should normalise b_end when updating a field", async () => {
+        it("should store b_end as entered and adjust it when read", async () => {
           const b_id = await addField(
             fdm,
             principal_id,
@@ -526,6 +529,12 @@ describe("Farm Data Model", () => {
             new Date("2026-01-01T00:00:00.000Z"),
           )
           expect(updated.b_end?.toISOString()).toBe("2025-12-31T22:59:59.999Z")
+
+          const stored = await fdm
+            .select({ b_end: schema.fieldDiscarding.b_end })
+            .from(schema.fieldDiscarding)
+            .where(eq(schema.fieldDiscarding.b_id, b_id))
+          expect(stored[0].b_end?.toISOString()).toBe("2026-01-01T00:00:00.000Z")
 
           const fields2026 = await getFields(fdm, principal_id, b_id_farm, timeframes["2026 (UTC)"])
           expect(fields2026.map((f) => f.b_id)).not.toContain(b_id)
@@ -623,7 +632,7 @@ describe("Farm Data Model", () => {
       expect(updatedField.b_id_source).toBe(updatedFieldIDSource)
       expect(updatedField.b_geometry).toStrictEqual(updatedFieldGeometry)
       expect(updatedField.b_start).toEqual(updatedAcquireDate)
-      expect(updatedField.b_end).toEqual(normalizeEndDate(updatedDiscardingDate))
+      expect(updatedField.b_end).toEqual(updatedDiscardingDate)
       expect(updatedField.b_acquiring_method).toBe(updatedAcquiringMethod)
     })
 
@@ -688,7 +697,7 @@ describe("Farm Data Model", () => {
       expect(updatedField.b_id_source).toBe(fieldIDSource) // Should remain the same
       expect(updatedField.b_geometry).toStrictEqual(fieldGeometry) // Should remain the same
       expect(updatedField.b_start).toEqual(AcquireDate) // Should remain the same
-      expect(updatedField.b_end).toEqual(normalizeEndDate(discardingDate)) // Should remain the same
+      expect(updatedField.b_end).toEqual(discardingDate) // Should remain the same
       expect(updatedField.b_acquiring_method).toBe(AcquiringMethod) // Should remain the same
 
       // Update only the manage type
@@ -708,7 +717,7 @@ describe("Farm Data Model", () => {
       expect(updatedField2.b_id_source).toBe(fieldIDSource) // Should remain the same
       expect(updatedField2.b_geometry).toStrictEqual(fieldGeometry) // Should remain the same
       expect(updatedField2.b_start).toEqual(AcquireDate) // Should remain the same
-      expect(updatedField2.b_end).toEqual(normalizeEndDate(discardingDate)) // Should remain the same
+      expect(updatedField2.b_end).toEqual(discardingDate) // Should remain the same
       expect(updatedField2.b_acquiring_method).toBe(updatedAcquiringMethod) // Should be updated
 
       //Partial updates for `fields` table
@@ -728,7 +737,7 @@ describe("Farm Data Model", () => {
       expect(updatedField3.b_id_source).toBe(updatedFieldIDSource) // Should be updated
       expect(updatedField3.b_geometry).toStrictEqual(fieldGeometry) // Should remain the same
       expect(updatedField3.b_start).toEqual(AcquireDate) // Should remain the same
-      expect(updatedField3.b_end).toEqual(normalizeEndDate(discardingDate)) // Should remain the same
+      expect(updatedField3.b_end).toEqual(discardingDate) // Should remain the same
       expect(updatedField3.b_acquiring_method).toBe(updatedAcquiringMethod) // Should remain the same
 
       // Partial updates for `farmManaging` table
@@ -748,7 +757,7 @@ describe("Farm Data Model", () => {
       expect(updatedField4.b_id_source).toBe(updatedFieldIDSource) // Should remain the same
       expect(updatedField4.b_geometry).toStrictEqual(fieldGeometry) // Should remain the same
       expect(updatedField4.b_start).toEqual(updatedAcquireDate) // Should be updated
-      expect(updatedField4.b_end).toEqual(normalizeEndDate(discardingDate)) // Should remain the same
+      expect(updatedField4.b_end).toEqual(discardingDate) // Should remain the same
       expect(updatedField4.b_acquiring_method).toBe(updatedAcquiringMethod) // Should remain the same
     })
 

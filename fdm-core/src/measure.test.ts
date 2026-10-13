@@ -3,7 +3,7 @@ import { afterAll, beforeEach, describe, expect, inject, it } from "vitest"
 import type { FdmServerType } from "./fdm-server.types"
 import type { FdmType } from "./fdm.types"
 import { enableMeasureCatalogue, syncMeasuresCatalogueArray } from "./catalogues"
-import { normalizeEndDate } from "./date"
+import { adjustEndDateAtYearStart } from "./date"
 import * as schema from "./db/schema"
 import { addFarm, removeFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
@@ -146,7 +146,7 @@ describe("Measure Data Model", () => {
       expect(applyingRow.length).toBe(1)
       expect(applyingRow[0].b_id).toBe(b_id)
       expect(applyingRow[0].m_start).toEqual(new Date("2023-03-01"))
-      expect(applyingRow[0].m_end).toEqual(normalizeEndDate(new Date("2023-12-31")))
+      expect(applyingRow[0].m_end).toEqual(new Date("2023-12-31"))
     })
 
     it("should set m_end to null when not provided (doorlopend)", async () => {
@@ -310,7 +310,7 @@ describe("Measure Data Model", () => {
       expect(measure.m_summary).toBe("Compost toedienen")
       expect(measure.m_conflicts).toEqual(["bln_BM2"])
       expect(measure.m_start).toEqual(new Date("2023-03-01"))
-      expect(measure.m_end).toEqual(normalizeEndDate(new Date("2023-12-31")))
+      expect(measure.m_end).toEqual(new Date("2023-12-31"))
     })
 
     it("should throw when b_id_measure does not exist", async () => {
@@ -380,7 +380,7 @@ describe("Measure Data Model", () => {
       )
 
       const measure = await getMeasure(fdm, principal_id, b_id_measure)
-      expect(measure.m_end?.toISOString()).toBe("2025-12-31T22:59:59.999Z")
+      expect(measure.m_end).toEqual(adjustEndDateAtYearStart(new Date(m_end)))
 
       const timeframes = {
         "2025 (UTC)": [new Date("2025-01-01T00:00:00.000Z"), new Date("2025-12-31T23:59:59.999Z")],
@@ -474,7 +474,7 @@ describe("Measure Data Model", () => {
   })
 
   describe("updateMeasure", () => {
-    it("should normalise m_end to the end of the last day", async () => {
+    it("should store m_end as entered and adjust it when read", async () => {
       const b_id_measure = await addMeasure(
         fdm,
         principal_id,
@@ -493,6 +493,12 @@ describe("Measure Data Model", () => {
 
       const measure = await getMeasure(fdm, principal_id, b_id_measure)
       expect(measure.m_end?.toISOString()).toBe("2025-12-31T22:59:59.999Z")
+
+      const stored = await fdm
+        .select({ m_end: schema.measureAdopting.m_end })
+        .from(schema.measureAdopting)
+        .where(eq(schema.measureAdopting.b_id_measure, b_id_measure))
+      expect(stored[0].m_end?.toISOString()).toBe("2026-01-01T00:00:00.000Z")
     })
 
     it("should update start date", async () => {

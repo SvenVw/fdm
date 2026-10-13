@@ -189,7 +189,7 @@ export async function processRvoImport(
           break
         case "CLOSE_LOCAL":
           if (item.localField) {
-            // Close the field on Dec 31st of the previous year (fdm-core stores it as the end of that day)
+            // Close the field on Dec 31st of the previous year (the last day the field is managed)
             const closeDate = new Date(Date.UTC(year - 1, 11, 31))
             const fieldStart =
               item.localField.b_start instanceof Date

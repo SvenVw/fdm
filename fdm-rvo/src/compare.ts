@@ -1,5 +1,9 @@
 import type { Cultivation, CultivationCatalogue, Field } from "@nmi-agro/fdm-core"
-import { normalizeEndDate, startOfDayInFdmTimeZone } from "@nmi-agro/fdm-core"
+import {
+  adjustEndDateAtYearStart,
+  startOfDayInFdmTimeZone,
+  toFdmDateString,
+} from "@nmi-agro/fdm-core"
 import bbox from "@turf/bbox"
 import {
   type FieldDiff,
@@ -215,7 +219,7 @@ export function compareFields(
           : new Date(local.b_end)
         : null
       // If it has no end date, OR the end date is after the start of the import year.
-      // `b_end` is stored as the end of the last day the field is managed, so a field ended on
+      // fdm-core returns a `b_end` on Jan 1st as the end of Dec 31st, so a field ended on
       // Dec 31st or Jan 1st does not end in the import year.
       const isOpenOrEndsInYear = !localEnd || localEnd >= importYearStart
 
@@ -283,11 +287,10 @@ function detectDiffs(local: Field, rvo: RvoField): FieldDiff[] {
     }
   }
 
-  // 3. Dates (Start)
-  const localStart =
-    local.b_start instanceof Date ? local.b_start.toISOString().split("T")[0] : local.b_start
+  // 3. Dates (Start), compared as calendar dates in Europe/Amsterdam
+  const localStart = local.b_start instanceof Date ? toFdmDateString(local.b_start) : local.b_start
   const rvoStart = rvo.properties.BeginDate
-    ? new Date(rvo.properties.BeginDate).toISOString().split("T")[0]
+    ? toFdmDateString(new Date(rvo.properties.BeginDate))
     : null
 
   // Treat null/undefined as equal if both are missing
@@ -298,13 +301,13 @@ function detectDiffs(local: Field, rvo: RvoField): FieldDiff[] {
   // 4. Dates (End)
   const localEnd =
     local.b_end instanceof Date
-      ? local.b_end.toISOString().split("T")[0]
+      ? toFdmDateString(local.b_end)
       : typeof local.b_end === "string"
         ? local.b_end
         : null
-  // Normalise the RVO end date the same way fdm-core stores `b_end` (1 January becomes 31 December)
+  // Adjust the RVO end date the same way fdm-core returns `b_end` (1 January becomes 31 December)
   const rvoEnd = rvo.properties.EndDate
-    ? normalizeEndDate(new Date(rvo.properties.EndDate)).toISOString().split("T")[0]
+    ? toFdmDateString(adjustEndDateAtYearStart(new Date(rvo.properties.EndDate)))
     : null
 
   // Treat null/undefined as equal if both are missing

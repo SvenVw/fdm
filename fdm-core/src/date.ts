@@ -70,36 +70,48 @@ export function startOfDayInFdmTimeZone(year: number, month: number, day: number
 }
 
 /**
- * Normalises an end date to the end of the last day of a period, such as the end date of a field
- * (`b_end`) or of a measure (`m_end`).
+ * Adjusts an end date on 1 January to the end of 31 December of the previous year, such as the end
+ * date of a field (`b_end`) or of a measure (`m_end`).
  *
- * The end date is the last day of the period, inclusive, as a calendar date in Europe/Amsterdam.
- * The value is stored as the last millisecond of that day (`23:59:59.999` Europe/Amsterdam).
+ * An end date on 1 January (as a calendar date in Europe/Amsterdam) is interpreted as "not active
+ * anymore from this date", so the period is not part of the new calendar year. It is returned as
+ * the last millisecond of 31 December of the previous year (`23:59:59.999` Europe/Amsterdam).
+ * Any other date, including an invalid date, is returned unchanged.
  *
- * If the date is 1 January, it is interpreted as "not active anymore from this date" and stored
- * as the end of 31 December of the previous year instead. Both conventions for ending a period
- * at the turn of the year therefore lead to the same value, and the period is not part of the new
- * calendar year.
+ * The end dates are stored as entered; this adjustment is applied when they are read.
  *
- * The function is idempotent: normalising an already normalised value returns the same value.
- *
- * @param end - The end date as entered.
- * @returns The normalised end date.
- * @throws {Error} If `end` is an invalid date.
+ * @param end - The end date as stored.
+ * @returns The adjusted end date.
  *
  * @example
  * ```ts
- * normalizeEndDate(new Date("2025-12-31")) // 2025-12-31T22:59:59.999Z
- * normalizeEndDate(new Date("2026-01-01")) // 2025-12-31T22:59:59.999Z
+ * adjustEndDateAtYearStart(new Date("2026-01-01")) // 2025-12-31T22:59:59.999Z
+ * adjustEndDateAtYearStart(new Date("2025-12-31")) // 2025-12-31T00:00:00.000Z (unchanged)
  * ```
  */
-export function normalizeEndDate(end: Date): Date {
+export function adjustEndDateAtYearStart(end: Date): Date {
   if (Number.isNaN(end.getTime())) {
-    throw new Error("Invalid end date")
+    return end
   }
   const { year, month, day } = getZonedParts(end)
-  // 1 January is treated as the end of 31 December of the previous year (day 0 rolls back)
-  const lastDay = month === 1 && day === 1 ? 0 : day
-  const startOfNextDay = startOfDayInFdmTimeZone(year, month, lastDay + 1)
-  return new Date(startOfNextDay.getTime() - 1)
+  if (month !== 1 || day !== 1) {
+    return end
+  }
+  return new Date(startOfDayInFdmTimeZone(year, 1, 1).getTime() - 1)
+}
+
+/**
+ * Formats a moment as its calendar date in Europe/Amsterdam.
+ *
+ * @param date - The moment to format.
+ * @returns The calendar date as `YYYY-MM-DD`.
+ *
+ * @example
+ * ```ts
+ * toFdmDateString(new Date("2025-12-30T23:00:00Z")) // "2025-12-31"
+ * ```
+ */
+export function toFdmDateString(date: Date): string {
+  const { year, month, day } = getZonedParts(date)
+  return `${String(year).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
 }

@@ -72,7 +72,7 @@ const CreateFieldBodySchema = z
     b_end: DateStringSchema.nullable()
       .optional()
       .describe(
-        "Last day the field is managed (inclusive, Europe/Amsterdam), in YYYY-MM-DD format. A date on 1 January is stored as 31 December of the previous year.",
+        "Last day the field is managed (inclusive, Europe/Amsterdam), in YYYY-MM-DD format. A date on 1 January is returned as 31 December of the previous year.",
       ),
     b_bufferstrip: z.boolean().optional().describe("Whether the field is a buffer strip."),
   })
@@ -90,7 +90,7 @@ const UpdateFieldBodySchema = z
     b_end: DateStringSchema.nullable()
       .optional()
       .describe(
-        "Last day the field is managed (inclusive, Europe/Amsterdam), in YYYY-MM-DD format. A date on 1 January is stored as 31 December of the previous year.",
+        "Last day the field is managed (inclusive, Europe/Amsterdam), in YYYY-MM-DD format. A date on 1 January is returned as 31 December of the previous year.",
       ),
     b_bufferstrip: z.boolean().optional().describe("Whether the field is a buffer strip."),
   })

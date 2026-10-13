@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { normalizeEndDate, startOfDayInFdmTimeZone } from "./date"
+import { adjustEndDateAtYearStart, startOfDayInFdmTimeZone, toFdmDateString } from "./date"
 
 describe("startOfDayInFdmTimeZone", () => {
   it("should return the start of a winter day in Europe/Amsterdam", () => {
@@ -23,40 +23,44 @@ describe("startOfDayInFdmTimeZone", () => {
   })
 })
 
-describe("normalizeEndDate", () => {
+describe("adjustEndDateAtYearStart", () => {
   const endOf2025 = "2025-12-31T22:59:59.999Z"
+
+  it.each([
+    ["1 January, UTC midnight", "2026-01-01T00:00:00.000Z"],
+    ["1 January, Amsterdam midnight", "2025-12-31T23:00:00.000Z"],
+    ["1 January, noon UTC", "2026-01-01T12:00:00.000Z"],
+  ])("should adjust %s to the end of 31 December", (_label, input) => {
+    expect(adjustEndDateAtYearStart(new Date(input)).toISOString()).toBe(endOf2025)
+  })
 
   it.each([
     ["31 December, UTC midnight", "2025-12-31T00:00:00.000Z"],
     ["31 December, Amsterdam midnight", "2025-12-30T23:00:00.000Z"],
-    ["1 January, UTC midnight", "2026-01-01T00:00:00.000Z"],
-    ["1 January, Amsterdam midnight", "2025-12-31T23:00:00.000Z"],
-    ["1 January, noon UTC", "2026-01-01T12:00:00.000Z"],
-    ["31 December, end of day UTC", "2025-12-31T23:59:59.999Z"],
-  ])("should normalise %s to the end of 31 December", (_label, input) => {
-    expect(normalizeEndDate(new Date(input)).toISOString()).toBe(endOf2025)
-  })
-
-  it("should normalise to the end of the day in summer time", () => {
-    expect(normalizeEndDate(new Date("2026-07-15T00:00:00.000Z")).toISOString()).toBe(
-      "2026-07-15T21:59:59.999Z",
-    )
-  })
-
-  it("should not move other dates to the previous day", () => {
-    expect(normalizeEndDate(new Date("2026-01-02T00:00:00.000Z")).toISOString()).toBe(
-      "2026-01-02T22:59:59.999Z",
-    )
+    ["2 January, Amsterdam midnight", "2026-01-01T23:00:00.000Z"],
+    ["a summer date", "2026-07-15T00:00:00.000Z"],
+  ])("should not change %s", (_label, input) => {
+    expect(adjustEndDateAtYearStart(new Date(input)).toISOString()).toBe(input)
   })
 
   it("should be idempotent", () => {
-    const once = normalizeEndDate(new Date("2026-01-01T00:00:00.000Z"))
-    expect(normalizeEndDate(once).toISOString()).toBe(once.toISOString())
-    const summer = normalizeEndDate(new Date("2026-07-15T00:00:00.000Z"))
-    expect(normalizeEndDate(summer).toISOString()).toBe(summer.toISOString())
+    const once = adjustEndDateAtYearStart(new Date("2026-01-01T00:00:00.000Z"))
+    expect(adjustEndDateAtYearStart(once).toISOString()).toBe(once.toISOString())
   })
 
-  it("should throw for an invalid date", () => {
-    expect(() => normalizeEndDate(new Date("invalid"))).toThrowError("Invalid end date")
+  it("should return an invalid date unchanged", () => {
+    expect(Number.isNaN(adjustEndDateAtYearStart(new Date("invalid")).getTime())).toBe(true)
+  })
+})
+
+describe("toFdmDateString", () => {
+  it.each([
+    ["2025-12-30T23:00:00.000Z", "2025-12-31"],
+    ["2025-12-31T00:00:00.000Z", "2025-12-31"],
+    ["2025-12-31T22:59:59.999Z", "2025-12-31"],
+    ["2025-12-31T23:00:00.000Z", "2026-01-01"],
+    ["2026-07-14T22:00:00.000Z", "2026-07-15"],
+  ])("should format %s as %s", (input, expected) => {
+    expect(toFdmDateString(new Date(input))).toBe(expected)
   })
 })

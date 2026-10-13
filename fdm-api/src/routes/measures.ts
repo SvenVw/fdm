@@ -56,7 +56,7 @@ const CreateMeasureBodySchema = z
     m_end: DateStringSchema.nullable()
       .optional()
       .describe(
-        "Last day the measure is applied (inclusive, Europe/Amsterdam), in YYYY-MM-DD format. A date on 1 January is stored as 31 December of the previous year.",
+        "Last day the measure is applied (inclusive, Europe/Amsterdam), in YYYY-MM-DD format. A date on 1 January is returned as 31 December of the previous year.",
       ),
   })
   .openapi("CreateMeasure")
@@ -67,7 +67,7 @@ const UpdateMeasureBodySchema = z
     m_end: DateStringSchema.nullable()
       .optional()
       .describe(
-        "Last day the measure is applied (inclusive, Europe/Amsterdam), in YYYY-MM-DD format. A date on 1 January is stored as 31 December of the previous year.",
+        "Last day the measure is applied (inclusive, Europe/Amsterdam), in YYYY-MM-DD format. A date on 1 January is returned as 31 December of the previous year.",
       ),
   })
   .openapi("UpdateMeasure")

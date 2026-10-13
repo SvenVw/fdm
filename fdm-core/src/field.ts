@@ -4,7 +4,7 @@ import type { FdmType } from "./fdm.types"
 import type { Field } from "./field.types"
 import type { Timeframe } from "./timeframe"
 import { checkPermission } from "./authorization"
-import { normalizeEndDate } from "./date"
+import { adjustEndDateAtYearStart } from "./date"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import { createId } from "./id"
@@ -18,9 +18,9 @@ import { createId } from "./id"
  * date is earlier than the discarding date, throwing an error otherwise.
  *
  * `b_end` is the last day the field is managed (inclusive), interpreted as a calendar date in
- * Europe/Amsterdam. It is stored as the end of that day (`23:59:59.999` Europe/Amsterdam). A date on
- * 1 January is stored as the end of 31 December of the previous year, so that a field ended "on
- * 1 January" is not part of that new calendar year. See {@link normalizeEndDate}.
+ * Europe/Amsterdam. It is stored as entered. When the field is read, a date on 1 January is
+ * returned as the end of 31 December of the previous year, so that a field ended "on 1 January" is
+ * not part of that new calendar year. See {@link adjustEndDateAtYearStart}.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The unique identifier of the principal performing the operation.
@@ -51,9 +51,6 @@ export async function addField(
 ): Promise<schema.fieldsTypeInsert["b_id"]> {
   try {
     await checkPermission(fdm, "farm", "write", b_id_farm, principal_id, "addField")
-
-    // Normalise the end date to the end of the last day the field is managed
-    const b_end_normalized = b_end ? normalizeEndDate(b_end) : b_end
 
     return await fdm.transaction(async (tx) => {
       // Generate an ID for the field
@@ -88,14 +85,14 @@ export async function addField(
       await tx.insert(schema.fieldAcquiring).values(fieldAcquiringData)
 
       // Check that acquire date is before discarding date
-      if (b_end_normalized && b_start && b_start.getTime() >= b_end_normalized.getTime()) {
+      if (b_end && b_start && b_start.getTime() >= adjustEndDateAtYearStart(b_end).getTime()) {
         throw new Error("Acquiring date must be before discarding date")
       }
 
       // Insert relation between field and discarding
       const fieldDiscardingData = {
         b_id,
-        b_end: b_end_normalized,
+        b_end,
       }
       await tx.insert(schema.fieldDiscarding).values(fieldDiscardingData)
 
@@ -192,6 +189,7 @@ export async function getField(
     const { b_centroid_x, b_centroid_y, ...rest } = field[0]
     return {
       ...rest,
+      b_end: rest.b_end ? adjustEndDateAtYearStart(rest.b_end) : rest.b_end,
       b_centroid: [b_centroid_x, b_centroid_y] as [number, number],
     } as Field
   } catch (err) {
@@ -208,8 +206,9 @@ export async function getField(
  *
  * When a timeframe is provided, only fields that are managed during (part of) the timeframe are
  * returned: fields acquired on or before the end of the timeframe and not ended before its start.
- * As `b_end` is stored as the end of the last day the field is managed, a field ended on 31
- * December or 1 January is not returned for the next calendar year.
+ * A `b_end` on 1 January is returned as the end of 31 December of the previous year (see
+ * {@link adjustEndDateAtYearStart}), so a field ended on 31 December or 1 January is not returned
+ * for the next calendar year.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The ID of the principal making the request.
@@ -289,11 +288,17 @@ export async function getFields(
       .where(whereClause)
       .orderBy(desc(sql<number>`ST_Area(b_geometry::geography)`))
 
-    // Process the centroids into a tuple
-    return fields.map(({ b_centroid_x, b_centroid_y, ...rest }) => ({
-      ...rest,
-      b_centroid: [b_centroid_x, b_centroid_y] as [number, number],
-    })) as Field[]
+    // Process the centroids into a tuple and adjust end dates on 1 January
+    return fields
+      .map(({ b_centroid_x, b_centroid_y, ...rest }) => ({
+        ...rest,
+        b_end: rest.b_end ? adjustEndDateAtYearStart(rest.b_end) : rest.b_end,
+        b_centroid: [b_centroid_x, b_centroid_y] as [number, number],
+      }))
+      .filter(
+        // Exclude fields that, after adjustment, ended before the start of the timeframe
+        (field) => !(timeframe?.start && field.b_end && field.b_end < timeframe.start),
+      ) as Field[]
   } catch (err) {
     throw handleError(err, "Exception for getFields", { b_id_farm })
   }
@@ -305,9 +310,8 @@ export async function getFields(
  * This function applies updates to the field's basic information and its associated acquiring and discarding records.
  * It performs a permission check to ensure the principal has write access and validates that the acquiring date is earlier than the discarding date, when applicable.
  *
- * `b_end` is normalised in the same way as in {@link addField}: it is stored as the end of the
- * last day the field is managed in Europe/Amsterdam, and 1 January is treated as 31 December of the
- * previous year. See {@link normalizeEndDate}.
+ * `b_end` is stored as entered. When the field is read, a date on 1 January is returned as the end
+ * of 31 December of the previous year. See {@link adjustEndDateAtYearStart}.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal performing the update.
@@ -369,7 +373,7 @@ export async function updateField(
 
       const setfieldDiscarding: Partial<schema.fieldDiscardingTypeInsert> = {}
       if (b_end !== undefined) {
-        setfieldDiscarding.b_end = b_end ? normalizeEndDate(b_end) : b_end
+        setfieldDiscarding.b_end = b_end
       }
       setfieldDiscarding.updated = updated
 
@@ -403,6 +407,9 @@ export async function updateField(
         .where(eq(schema.fields.b_id, b_id))
         .limit(1)
       const field = result[0] as unknown as Field
+      if (field.b_end) {
+        field.b_end = adjustEndDateAtYearStart(field.b_end)
+      }
 
       // Check if acquiring date is before discarding date
       if (field.b_end && field.b_start && field.b_start.getTime() >= field.b_end.getTime()) {
