@@ -402,13 +402,13 @@ export default function FarmRotationIndex() {
   )
 }
 
-export async function action({ params, request }: Route.ActionArgs) {
+export async function action({ params, request, url }: Route.ActionArgs) {
   try {
     const session = await getSession(request)
     const timeframe = getTimeframe(params)
     const b_id_farm = params.b_id_farm
 
-    const searchParams = new URL(request.url).searchParams
+    const searchParams = url.searchParams
 
     const fieldIdsParam = searchParams.get("fieldIds") ?? ""
     const cultivationIdsParam = searchParams.get("cultivationIds") ?? ""

@@ -516,7 +516,7 @@ export default function FarmRotationFertilizerAddIndex() {
   )
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params, url }: ActionFunctionArgs) {
   try {
     const { b_id_farm, calendar = "all" } = params
     if (!b_id_farm) {
@@ -524,7 +524,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
 
     const session = await getSession(request)
-    const url = new URL(request.url)
     const fieldIds = url.searchParams.get("fieldIds")?.split(",").filter(Boolean) ?? []
 
     if (!fieldIds || fieldIds.length === 0) {
