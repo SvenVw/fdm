@@ -403,9 +403,16 @@ export function FertilizerApplicationMetricsCard({
                             <div className="flex min-w-0 flex-col space-y-4">
                               <div className="min-w-0 space-y-1.5">
                                 <div className="flex items-center justify-between gap-2">
-                                  <p className="text-muted-foreground truncate text-[11px] font-medium tracking-wider uppercase">
-                                    Stikstof (werkzaam)
-                                  </p>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <p className="text-muted-foreground truncate text-[11px] font-medium tracking-wider uppercase">
+                                        Stikstof
+                                      </p>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Werkzame stikstof</p>
+                                    </TooltipContent>
+                                  </Tooltip>
                                   <span className="shrink-0 text-right text-xs font-bold whitespace-nowrap">
                                     {Math.round(dose.p_dose_nw)} /{" "}
                                     {Math.round(resolvedNutrientAdvice.d_n_req)} kg N
