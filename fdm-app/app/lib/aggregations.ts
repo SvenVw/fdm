@@ -7,7 +7,7 @@ export const AGG_IDS: AggregationId[] = [
   "S_NUT",
   "S_CLIM",
   "S_PROD_T",
-  "S_WAT_GWQUANT",
+  "S_WAT_GWQUAN",
   "S_WAT_GWQUAL",
   "S_WAT_SWQUAL",
   "S_PROD_B",
@@ -22,7 +22,7 @@ export type AggregationId =
   | "S_NUT"
   | "S_CLIM"
   | "S_PROD_T"
-  | "S_WAT_GWQUANT"
+  | "S_WAT_GWQUAN"
   | "S_WAT_GWQUAL"
   | "S_WAT_SWQUAL"
   | "S_PROD_B"
@@ -84,8 +84,8 @@ export const AGGREGATIONS: Record<AggregationId, AggregationInfo> = {
     parent: "S_BLN",
     color: "#f97316", // Orange-500
   },
-  S_WAT_GWQUANT: {
-    id: "S_WAT_GWQUANT",
+  S_WAT_GWQUAN: {
+    id: "S_WAT_GWQUAN",
     name: "Grondwaterkwantiteit",
     description:
       "Het vermogen van de bodem om regenwater te infiltreren en vast te houden ter aanvulling van het grondwater en bescherming tegen droogte.",
@@ -148,7 +148,7 @@ export const LEAF_AGGREGATION_INDICATORS: Record<AggregationId, string[]> = {
   S_BBWP: ["GW_GWR", "GW_NLEA", "GW_WHC", "P_DS", "P_WS", "NUT_N", "NUT_P", "SW_NLEA", "SW_PLEA"],
 
   // Leaves under Water
-  S_WAT_GWQUANT: ["GW_GWR", "GW_WHC"],
+  S_WAT_GWQUAN: ["GW_GWR", "GW_WHC"],
   S_WAT_GWQUAL: ["GW_NLEA", "GW_PEST"],
   S_WAT_SWQUAL: ["SW_NLEA", "SW_PLEA"],
 
@@ -167,7 +167,7 @@ export const LEAF_AGGREGATION_INDICATORS: Record<AggregationId, string[]> = {
 export const TOP_LEVEL_AGGREGATION_IDS: AggregationId[] = ["S_WAT", "S_NUT", "S_CLIM", "S_PROD_T"]
 
 export const LEAF_AGGREGATION_IDS: AggregationId[] = [
-  "S_WAT_GWQUANT",
+  "S_WAT_GWQUAN",
   "S_WAT_GWQUAL",
   "S_WAT_SWQUAL",
   "S_NUT",

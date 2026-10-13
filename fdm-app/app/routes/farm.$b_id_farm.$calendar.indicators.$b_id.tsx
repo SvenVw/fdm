@@ -90,7 +90,7 @@ const MAP_SCORE_OPTION_GROUPS: ScoreOptionGroup[] = [
   {
     group: "Water Subaggregaties",
     options: [
-      { value: "S_WAT_GWQUANT", label: "Grondwaterkwantiteit" },
+      { value: "S_WAT_GWQUAN", label: "Grondwaterkwantiteit" },
       { value: "S_WAT_GWQUAL", label: "Grondwaterkwaliteit" },
       { value: "S_WAT_SWQUAL", label: "Oppervlaktewaterkwaliteit" },
     ],
