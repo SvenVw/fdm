@@ -1,13 +1,13 @@
 import { calculateNlv } from "@nmi-agro/fdm-calculator"
 import {
   checkPermission,
-  getCultivations,
-  getCurrentSoilData,
+  getCultivationsForFarm,
+  getCurrentSoilDataForFarm,
   getFarms,
-  getFertilizerApplications,
+  getFertilizerApplicationsForFarm,
   getFertilizers,
   getFields,
-  getSoilAnalyses,
+  getSoilAnalysesForFarm,
   updateField,
 } from "@nmi-agro/fdm-core"
 import { useMemo } from "react"
@@ -164,16 +164,33 @@ export async function loader({ request, params, url }: LoaderFunctionArgs) {
     const calendar = params.calendar ?? new Date().getFullYear().toString()
     const nmiApiKey = getNmiApiKey()
 
+    const cultivationsForFarm = await getCultivationsForFarm(
+      fdm,
+      session.principal_id,
+      b_id_farm,
+      timeframe,
+    )
+    const fertilizerApplicationsForFarm = await getFertilizerApplicationsForFarm(
+      fdm,
+      session.principal_id,
+      b_id_farm,
+      timeframe,
+    )
+    const currentSoilDataForFarm = await getCurrentSoilDataForFarm(
+      fdm,
+      session.principal_id,
+      b_id_farm,
+      timeframe,
+    )
+    const soilAnalysesForFarm = await getSoilAnalysesForFarm(fdm, session.principal_id, b_id_farm, {
+      start: undefined,
+      end: timeframe?.end,
+    })
     const fieldsExtended = await Promise.all(
       fields.map(async (field) => {
-        const cultivations = await getCultivations(fdm, session.principal_id, field.b_id, timeframe)
+        const cultivations = cultivationsForFarm.get(field.b_id) ?? []
 
-        const fertilizerApplications = await getFertilizerApplications(
-          fdm,
-          session.principal_id,
-          field.b_id,
-          timeframe,
-        )
+        const fertilizerApplications = fertilizerApplicationsForFarm.get(field.b_id) ?? []
 
         const fertilizersFiltered = fertilizers.filter((fertilizer) => {
           return fertilizerApplications.some((application) => {
@@ -181,12 +198,7 @@ export async function loader({ request, params, url }: LoaderFunctionArgs) {
           })
         })
 
-        const currentSoilData = await getCurrentSoilData(
-          fdm,
-          session.principal_id,
-          field.b_id,
-          timeframe,
-        )
+        const currentSoilData = currentSoilDataForFarm.get(field.b_id) ?? []
         const a_som_loi = Number(
           currentSoilData.find((x) => x.parameter === "a_som_loi")?.value ?? 0,
         )
@@ -213,10 +225,7 @@ export async function loader({ request, params, url }: LoaderFunctionArgs) {
         )
 
         // Fetch latest BCS analysis up to end of this calendar year.
-        const soilAnalyses = await getSoilAnalyses(fdm, session.principal_id, field.b_id, {
-          start: undefined,
-          end: timeframe?.end,
-        })
+        const soilAnalyses = soilAnalysesForFarm.get(field.b_id) ?? []
         const latestBcs = soilAnalyses.filter(isBcsAnalysis).sort((a, b) => {
           const da = a.b_sampling_date?.getTime() ?? 0
           const db = b.b_sampling_date?.getTime() ?? 0
