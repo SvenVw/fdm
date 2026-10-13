@@ -125,8 +125,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm),
       getCultivationsForFarm(fdm, session.principal_id, b_id_farm, timeframe),
       getHarvestsForFarm(fdm, session.principal_id, b_id_farm, timeframe),
-      getFertilizerApplicationsForFarm(fdm, session.principal_id, b_id_farm),
-      getCurrentSoilDataForFarm(fdm, session.principal_id, b_id_farm),
+      getFertilizerApplicationsForFarm(fdm, session.principal_id, b_id_farm, timeframe),
+      getCurrentSoilDataForFarm(fdm, session.principal_id, b_id_farm, timeframe),
       checkPermission(
         fdm,
         "farm",
@@ -442,6 +442,7 @@ export async function action({ params, request, url }: Route.ActionArgs) {
           tx,
           session.principal_id,
           b_id_farm,
+          timeframe,
         )
         await Promise.all(
           fields.map(async (field) => {

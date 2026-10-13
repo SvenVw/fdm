@@ -124,7 +124,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     })
 
     // Get all fields for the farm and their cultivations
-    const cultivationsForFarm = await getCultivationsForFarm(fdm, session.principal_id, b_id_farm)
+    const cultivationsForFarm = await getCultivationsForFarm(
+      fdm,
+      session.principal_id,
+      b_id_farm,
+      timeframe,
+    )
     const allFieldsWithCultivations = await Promise.all(
       (await getFields(fdm, session.principal_id, b_id_farm, timeframe)).map(async (field) => {
         const cultivations = cultivationsForFarm.get(field.b_id) ?? []
