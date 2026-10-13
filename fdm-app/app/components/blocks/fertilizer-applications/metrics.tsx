@@ -419,8 +419,8 @@ export function FertilizerApplicationMetricsCard({
                                   </span>
                                 </div>
                                 <AdviceProgressBar
-                                  key={`n-${dose.p_dose_n}`}
-                                  current={dose.p_dose_n}
+                                  key={`n-${dose.p_dose_nw}`}
+                                  current={dose.p_dose_nw}
                                   target={resolvedNutrientAdvice.d_n_req}
                                 />
                               </div>
