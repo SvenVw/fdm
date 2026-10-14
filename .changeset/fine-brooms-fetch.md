@@ -1,5 +1,5 @@
 ---
-"@nmi-agro/fdm-app": minor
+"@nmi-agro/fdm-app": patch
 ---
 
-Fertilizer application metrics nutrient advice section now shows the workable nitrogen, staying consistent with the tooltip and the norms section.
+Fixes that fertilizer application metrics nutrient advice section now shows the workable nitrogen, instead of total nitrogen, to align with nutrient advices.
