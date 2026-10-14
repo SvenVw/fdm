@@ -1,3 +1,4 @@
+import { toFdmDateString } from "@nmi-agro/fdm-core"
 import { z } from "zod"
 
 /**
@@ -37,11 +38,11 @@ export const PaginationQuerySchema = z.object({
 export const DateStringSchema = z.string().date().openapi({ example: "2024-01-15" })
 
 /**
- * Serializes a date value to a YYYY-MM-DD string for API responses.
- * Returns null for null/undefined inputs.
+ * Serializes a date value to a YYYY-MM-DD string for API responses, as its calendar date in
+ * Europe/Amsterdam. Returns null for null/undefined inputs.
  */
 export function serializeDate(date: Date | string | null | undefined): string | null {
-  if (date instanceof Date) return date.toISOString().slice(0, 10)
+  if (date instanceof Date) return toFdmDateString(date)
   if (typeof date === "string" && date.length >= 10) return date.slice(0, 10)
   return null
 }

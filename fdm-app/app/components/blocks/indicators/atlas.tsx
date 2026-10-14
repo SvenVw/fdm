@@ -253,7 +253,7 @@ export function ScoreSelect({
               <SelectSeparator />
               <SelectGroup>
                 <SelectLabel className="text-muted-foreground text-xs">Waterthema's</SelectLabel>
-                <SelectItem value="S_WAT_GWQUANT">Grondwaterkwantiteit</SelectItem>
+                <SelectItem value="S_WAT_GWQUAN">Grondwaterkwantiteit</SelectItem>
                 <SelectItem value="S_WAT_GWQUAL">Grondwaterkwaliteit</SelectItem>
                 <SelectItem value="S_WAT_SWQUAL">Oppervlaktewaterkwaliteit</SelectItem>
               </SelectGroup>

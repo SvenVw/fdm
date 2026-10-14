@@ -53,7 +53,9 @@ const FieldSchema = z
     b_perimeter: z.number().nullable(),
     b_bufferstrip: z.boolean(),
     b_start: DateStringSchema.nullable().describe("Date in YYYY-MM-DD format."),
-    b_end: DateStringSchema.nullable().describe("Date in YYYY-MM-DD format."),
+    b_end: DateStringSchema.nullable().describe(
+      "Last day the field is managed (inclusive, Europe/Amsterdam), in YYYY-MM-DD format.",
+    ),
     b_acquiring_method: z.string(),
   })
   .openapi("Field")
@@ -67,7 +69,11 @@ const CreateFieldBodySchema = z
     ),
     b_start: DateStringSchema.describe("Date in YYYY-MM-DD format."),
     b_acquiring_method: z.string().describe("Method by which the field was acquired."),
-    b_end: DateStringSchema.nullable().optional().describe("Date in YYYY-MM-DD format."),
+    b_end: DateStringSchema.nullable()
+      .optional()
+      .describe(
+        "Last day the field is managed (inclusive, Europe/Amsterdam), in YYYY-MM-DD format. A date on 1 January is returned as 31 December of the previous year.",
+      ),
     b_bufferstrip: z.boolean().optional().describe("Whether the field is a buffer strip."),
   })
   .openapi("CreateField")
@@ -81,7 +87,11 @@ const UpdateFieldBodySchema = z
       .describe("Field boundary as GeoJSON Polygon or MultiPolygon."),
     b_start: DateStringSchema.optional().describe("Date in YYYY-MM-DD format."),
     b_acquiring_method: z.string().optional().describe("Method by which the field was acquired."),
-    b_end: DateStringSchema.nullable().optional().describe("Date in YYYY-MM-DD format."),
+    b_end: DateStringSchema.nullable()
+      .optional()
+      .describe(
+        "Last day the field is managed (inclusive, Europe/Amsterdam), in YYYY-MM-DD format. A date on 1 January is returned as 31 December of the previous year.",
+      ),
     b_bufferstrip: z.boolean().optional().describe("Whether the field is a buffer strip."),
   })
   .openapi("UpdateField")
@@ -301,11 +311,8 @@ export function registerFieldRoutes(
         : existing.b_geometry,
       body.b_start !== undefined ? new Date(body.b_start) : (existing.b_start ?? undefined),
       body.b_acquiring_method !== undefined ? body.b_acquiring_method : existing.b_acquiring_method,
-      body.b_end !== undefined
-        ? body.b_end !== null
-          ? new Date(body.b_end)
-          : null
-        : (existing.b_end ?? undefined),
+      // Omit b_end when not provided, so the stored end date is left untouched
+      body.b_end !== undefined ? (body.b_end !== null ? new Date(body.b_end) : null) : undefined,
       body.b_bufferstrip !== undefined ? body.b_bufferstrip : existing.b_bufferstrip,
     )
     if (!updated?.b_id) {
