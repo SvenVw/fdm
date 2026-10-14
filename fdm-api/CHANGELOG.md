@@ -1,5 +1,17 @@
 # @nmi-agro/fdm-api
 
+## 0.2.9
+
+### Patch Changes
+
+- [#852](https://github.com/nmi-agro/fdm/pull/852) [`83f37d5`](https://github.com/nmi-agro/fdm/commit/83f37d5594d6359c6f557a6f4f6456a2fe640148) Thanks [@SvenVw](https://github.com/SvenVw)! - Document that `b_end` and `m_end` are the last day a field is managed or a measure is applied (inclusive, Europe/Amsterdam), and that an end date on 1 January is returned as 31 December of the previous year.
+
+  Dates in API responses are now serialised as their calendar date in Europe/Amsterdam instead of UTC, so a date stored at midnight in Europe/Amsterdam is no longer returned as the previous day. Updating a field without `b_end` now leaves its stored end date untouched.
+
+- Updated dependencies [[`702c643`](https://github.com/nmi-agro/fdm/commit/702c643678d15caae37cffd7a1497c0ce73954ad)]:
+  - @nmi-agro/fdm-core@0.38.1
+  - @nmi-agro/fdm-calculator@0.19.3
+
 ## 0.2.8
 
 ### Patch Changes

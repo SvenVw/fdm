@@ -1,5 +1,13 @@
 # @nmi-agro/fdm-rvo
 
+## 0.6.2
+
+### Patch Changes
+
+- [#852](https://github.com/nmi-agro/fdm/pull/852) [`f33e384`](https://github.com/nmi-agro/fdm/commit/f33e3847dd0e5b5222bfa9e8767cbf61f7e48fff) Thanks [@SvenVw](https://github.com/SvenVw)! - Compare field start and end dates, and the start of the import year, as calendar dates in Europe/Amsterdam, consistent with how fdm-core returns `b_end`. An RVO end date on 1 January now matches a local field that ends on 31 December.
+- Updated dependencies [[`702c643`](https://github.com/nmi-agro/fdm/commit/702c643678d15caae37cffd7a1497c0ce73954ad)]:
+  - @nmi-agro/fdm-core@0.38.1
+
 ## 0.6.1
 
 ### Patch Changes

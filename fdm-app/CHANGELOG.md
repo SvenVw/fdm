@@ -1,5 +1,23 @@
 # Changelog fdm-app
 
+## 0.38.3
+
+### Patch Changes
+
+- [#852](https://github.com/nmi-agro/fdm/pull/852) [`0da61be`](https://github.com/nmi-agro/fdm/commit/0da61be1e8c3ffd33ab4a74ca77cf1b5ec19dfd7) Thanks [@SvenVw](https://github.com/SvenVw)! - Calendar years are now interpreted in Europe/Amsterdam instead of UTC, so a field ended on 31 December or 1 January is no longer shown in, or included in calculations for, the next calendar year.
+
+  When a page of a field (field pages, nitrogen and organic matter balance, norms, nutrient advice, indicators, measures and mineralization) is opened for a calendar year in which the field is not managed, the page now shows a message instead of an empty result. The message names the field and its start or end date, links to the same page in the field's first or last year, and links to the field's settings page to correct the dates. Calculations for that page are skipped. The settings and delete pages of the field remain available.
+
+  The field picker in the header now shows the name of the selected field when it is not managed in the selected calendar year, instead of "Onbekend perceel".
+
+  The RVO import review table shows an RVO end date on 1 January as 31 December of the previous year, consistent with the local end date.
+
+- [#852](https://github.com/nmi-agro/fdm/pull/852) [`f187547`](https://github.com/nmi-agro/fdm/commit/f18754758d0e1b60d89a7ba5289d8a165a968613) Thanks [@SvenVw](https://github.com/SvenVw)! - Fix name of `S_WAT_GWQUAN` instead of `S_WAT_GWQUANT`
+- Updated dependencies [[`702c643`](https://github.com/nmi-agro/fdm/commit/702c643678d15caae37cffd7a1497c0ce73954ad), [`f33e384`](https://github.com/nmi-agro/fdm/commit/f33e3847dd0e5b5222bfa9e8767cbf61f7e48fff)]:
+  - @nmi-agro/fdm-core@0.38.1
+  - @nmi-agro/fdm-rvo@0.6.2
+  - @nmi-agro/fdm-agents@0.6.0
+
 ## 0.38.2
 
 ### Patch Changes
