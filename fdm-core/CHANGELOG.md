@@ -1,5 +1,15 @@
 # Changelog fdm-core
 
+## 0.38.1
+
+### Patch Changes
+
+- [#852](https://github.com/nmi-agro/fdm/pull/852) [`702c643`](https://github.com/nmi-agro/fdm/commit/702c643678d15caae37cffd7a1497c0ce73954ad) Thanks [@SvenVw](https://github.com/SvenVw)! - Fix fields and measures that end exactly at the start of a calendar year still being returned for that year:
+
+  - `b_end` and `m_end` are stored as entered. When fields and measures are read (`getField`, `getFields`, `updateField`, `getMeasure`, `getMeasures` and `getMeasuresForFarm`), an end date on 1 January (Europe/Amsterdam) is returned as the end of 31 December of the previous year. Ending a field or measure on 31 December or on 1 January therefore gives the same result, and it is no longer returned for the next calendar year.
+  - A measure ended on 1 January no longer overlaps a measure of the same type that starts on 1 January.
+  - Add `adjustEndDateAtYearStart`, `toFdmDateString`, `startOfDayInFdmTimeZone` and `FDM_TIME_ZONE`.
+
 ## 0.38.0
 
 ### Minor Changes
