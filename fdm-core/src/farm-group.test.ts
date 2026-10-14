@@ -193,7 +193,7 @@ describe("Farm group functions", () => {
 
     it("should record a leaving event instead of deleting the joining", async () => {
       const b_id_group = await createFarmGroup(fdm, member_id, b_id_organization, "Leaving group")
-      await addFarmToGroup(fdm, member_id, b_id_group, b_id_farm_a)
+      await addFarmToGroup(fdm, member_id, b_id_group, b_id_farm_a, new Date("2020-01-01T00:00:00Z"))
       await removeFarmFromGroup(fdm, member_id, b_id_group, b_id_farm_a)
       // Removing a non-member is a no-op
       await removeFarmFromGroup(fdm, member_id, b_id_group, b_id_farm_a)
@@ -209,6 +209,26 @@ describe("Farm group functions", () => {
         .where(eq(schema.farmGroupLeaving.b_id_group, b_id_group))
       expect(joinings).toHaveLength(1)
       expect(leavings).toHaveLength(1)
+    })
+
+    it("should cancel a membership that starts today when no date is given", async () => {
+      const b_id_group = await createFarmGroup(fdm, member_id, b_id_organization, "Cancel group")
+      await addFarmToGroup(fdm, member_id, b_id_group, b_id_farm_a)
+      await removeFarmFromGroup(fdm, member_id, b_id_group, b_id_farm_a)
+
+      const group = await getFarmGroup(fdm, member_id, b_id_group)
+      expect(group.b_id_farms).toEqual([])
+      expect(group.memberships).toEqual([])
+      const joinings = await fdm
+        .select()
+        .from(schema.farmGroupJoining)
+        .where(eq(schema.farmGroupJoining.b_id_group, b_id_group))
+      const leavings = await fdm
+        .select()
+        .from(schema.farmGroupLeaving)
+        .where(eq(schema.farmGroupLeaving.b_id_group, b_id_group))
+      expect(joinings).toHaveLength(0)
+      expect(leavings).toHaveLength(0)
     })
 
     it("should allow a farm to rejoin after leaving, repeatedly", async () => {

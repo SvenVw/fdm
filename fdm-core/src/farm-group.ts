@@ -517,7 +517,9 @@ export async function addFarmToGroup(
  * The date is the date until which the farm is part of the group, as chosen by the user. It is
  * not the moment this function is called, so it can lie in the past or in the future. Without a
  * date the farm leaves the group at the start of today (UTC). No rows are deleted, so the history
- * stays available. Does nothing if the farm is not part of the group on that date, unless the date
+ * stays available, except when no date is given for a membership that starts today: that
+ * membership is cancelled by deleting its joining event, because it never took effect. Does
+ * nothing if the farm is not part of the group on that date, unless the date
  * lies on or before the start of the open period of the farm; that is rejected. Without a date, a
  * membership that starts in the future is rejected as well, because it has not started yet.
  *
@@ -556,7 +558,7 @@ export async function removeFarmFromGroup(
 
       // Without a date the farm leaves today, but never before it last joined
       const latestJoined = Math.max(0, ...periods.map((p) => p.b_group_joined.getTime()))
-      let leaved =
+      const leaved =
         b_group_leaved ?? new Date(Math.max(startOfUtcDay(new Date()).getTime(), latestJoined))
       const period = periods.find(
         (p) =>
@@ -594,8 +596,17 @@ export async function removeFarmFromGroup(
             "The membership has not started yet; give an end date or change the period",
           )
         }
-        // Without a date, a farm that joined today leaves a moment later
-        leaved = new Date(leaved.getTime() + 1)
+        // Without a date, a membership that starts today is cancelled instead of ended
+        await tx
+          .delete(schema.farmGroupJoining)
+          .where(
+            and(
+              eq(schema.farmGroupJoining.b_id_group, b_id_group),
+              eq(schema.farmGroupJoining.b_id_farm, b_id_farm),
+              eq(schema.farmGroupJoining.b_group_joined, period.b_group_joined),
+            ),
+          )
+        return
       }
       if (period.b_group_leaved !== null) {
         throw new Error("The membership already has an end date")
