@@ -311,11 +311,8 @@ export function registerFieldRoutes(
         : existing.b_geometry,
       body.b_start !== undefined ? new Date(body.b_start) : (existing.b_start ?? undefined),
       body.b_acquiring_method !== undefined ? body.b_acquiring_method : existing.b_acquiring_method,
-      body.b_end !== undefined
-        ? body.b_end !== null
-          ? new Date(body.b_end)
-          : null
-        : (existing.b_end ?? undefined),
+      // Omit b_end when not provided, so the stored end date is left untouched
+      body.b_end !== undefined ? (body.b_end !== null ? new Date(body.b_end) : null) : undefined,
       body.b_bufferstrip !== undefined ? body.b_bufferstrip : existing.b_bufferstrip,
     )
     if (!updated?.b_id) {

@@ -184,6 +184,21 @@ describe("GET /fields/:b_id", () => {
     const body = await res.json()
     expect(body.b_end).toBe("2025-12-31")
   })
+
+  it("serialises dates stored at midnight in Europe/Amsterdam to that calendar date", async () => {
+    const field = {
+      ...baseField,
+      b_start: new Date("2024-12-31T23:00:00.000Z"),
+      b_end: new Date("2025-12-30T23:00:00.000Z"),
+    }
+    const app = makeApp({ getField: vi.fn().mockResolvedValue(field) })
+    const res = await app.request("/fields/field-1", {
+      headers: { "x-api-key": "valid" },
+    })
+    const body = await res.json()
+    expect(body.b_start).toBe("2025-01-01")
+    expect(body.b_end).toBe("2025-12-31")
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -337,6 +352,26 @@ describe("PATCH /fields/:b_id", () => {
     })
     expect(res.status).toBe(200)
     expect((await res.json()).b_name).toBe("Perceel Zuid")
+  })
+
+  it("leaves b_end untouched when it is not provided", async () => {
+    const updateField = vi.fn().mockResolvedValue(baseField)
+    const app = makeApp({
+      getField: vi
+        .fn()
+        .mockResolvedValue({ ...baseField, b_end: new Date("2025-12-31T22:59:59.999Z") }),
+      updateField,
+    })
+    const res = await app.request("/fields/field-1", {
+      method: "PATCH",
+      headers: {
+        "x-api-key": "valid",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ b_name: "Perceel Zuid" }),
+    })
+    expect(res.status).toBe(200)
+    expect(updateField.mock.calls[0][8]).toBeUndefined()
   })
 
   it("returns 400 when the body is empty", async () => {
