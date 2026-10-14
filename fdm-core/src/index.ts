@@ -147,6 +147,12 @@ export type {
   FertilizerParameters,
   FertilizerType,
 } from "./fertilizer.types"
+export {
+  adjustEndDateAtYearStart,
+  FDM_TIME_ZONE,
+  startOfDayInFdmTimeZone,
+  toFdmDateString,
+} from "./date"
 export type { AppAmountUnit } from "./fertilizer-application-unit-conversion"
 export { fromKgPerHa, toKgPerHa } from "./fertilizer-application-unit-conversion"
 export {
