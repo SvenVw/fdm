@@ -16,6 +16,7 @@ import { area } from "@turf/area"
 import { format, parseISO } from "date-fns"
 import { Archive, ArrowLeftRight, Check, Info, Plus, Trash2, X } from "lucide-react"
 import { useMemo } from "react"
+import { adjustEndDateAtYearStart } from "@/app/lib/calendar"
 import { clientConfig } from "@/app/lib/config"
 import { Badge } from "~/components/ui/badge"
 import { Checkbox } from "~/components/ui/checkbox"
@@ -381,9 +382,10 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
           ? formatDate(item.localField.b_end)
           : "-"
         : undefined
+      // Show the RVO end date the same way fdm-core returns `b_end` (1 January becomes 31 December)
       const remote = item.rvoField
         ? item.rvoField.properties.EndDate
-          ? formatDate(item.rvoField.properties.EndDate)
+          ? formatDate(adjustEndDateAtYearStart(parseISO(item.rvoField.properties.EndDate)))
           : "-"
         : undefined
 
