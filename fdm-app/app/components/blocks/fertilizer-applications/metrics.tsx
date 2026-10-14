@@ -414,13 +414,13 @@ export function FertilizerApplicationMetricsCard({
                                     </TooltipContent>
                                   </Tooltip>
                                   <span className="shrink-0 text-right text-xs font-bold whitespace-nowrap">
-                                    {Math.round(dose.p_dose_n)} /{" "}
+                                    {Math.round(dose.p_dose_nw)} /{" "}
                                     {Math.round(resolvedNutrientAdvice.d_n_req)} kg N
                                   </span>
                                 </div>
                                 <AdviceProgressBar
-                                  key={`n-${dose.p_dose_n}`}
-                                  current={dose.p_dose_n}
+                                  key={`n-${dose.p_dose_nw}`}
+                                  current={dose.p_dose_nw}
                                   target={resolvedNutrientAdvice.d_n_req}
                                 />
                               </div>
