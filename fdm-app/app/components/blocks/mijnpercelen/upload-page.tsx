@@ -46,7 +46,10 @@ export function UploadMijnPercelenPage({
     navigation.state === "submitting" && navigation.formData?.get("intent") === "save_fields"
 
   const [canUnloadSafely, setCanUnloadSafely] = useState(true)
-  const { formValues } = useRvoImportForm(rvoImportReviewData ?? emptyReviewData)
+  const { formValues } = useRvoImportForm(rvoImportReviewData ?? emptyReviewData, {
+    calendar,
+    flags: mijnPercelenReviewFlags,
+  })
 
   // Warn the user before refreshing or leaving when data is present
   useEffect(() => {

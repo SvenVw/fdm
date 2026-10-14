@@ -1,16 +1,19 @@
 import { create } from "zustand"
+import type { ReviewChoices, ReviewItemFieldKey } from "~/components/blocks/rvo/review-fields"
 
 /**
  * Per-field user choices made while reviewing an RVO import, keyed by review item id and
  * then by field key (e.g. `b_name`, `b_start`).
  */
-type UserChoices = Map<string, Record<string, unknown>>
+type UserChoices = Map<string, ReviewChoices>
 
 interface RvoImportReviewState {
   userChoices: UserChoices
   fieldsToAdd: Set<string>
   fieldsToRemove: Set<string>
-  setUserChoice(itemId: string, key: string, value: unknown): void
+  setUserChoice(itemId: string, key: ReviewItemFieldKey, value: unknown): void
+  /** Sets several choices for one review item in a single update. */
+  setUserChoices(itemId: string, values: ReviewChoices): void
   setFieldToAdd(itemId: string, add: boolean): void
   setFieldToRemove(itemId: string, remove: boolean): void
   reset(): void
@@ -31,6 +34,13 @@ export const useRvoImportReviewStore = create<RvoImportReviewState>((set) => ({
     set((state) => {
       const userChoices = new Map(state.userChoices)
       userChoices.set(itemId, { ...userChoices.get(itemId), [key]: value })
+      return { userChoices }
+    })
+  },
+  setUserChoices(itemId, values) {
+    set((state) => {
+      const userChoices = new Map(state.userChoices)
+      userChoices.set(itemId, { ...userChoices.get(itemId), ...values })
       return { userChoices }
     })
   },
@@ -64,12 +74,15 @@ export const useRvoImportReviewStore = create<RvoImportReviewState>((set) => ({
 }))
 
 /** Subscribes to a single field's user choice for one review item. */
-export function useRvoUserChoice<T = unknown>(itemId: string, key: string): T | undefined {
+export function useRvoUserChoice<T = unknown>(
+  itemId: string,
+  key: ReviewItemFieldKey,
+): T | undefined {
   return useRvoImportReviewStore((state) => state.userChoices.get(itemId)?.[key] as T | undefined)
 }
 
 /** Subscribes to all user choices for one review item at once. */
-export function useRvoUserChoices(itemId: string): Record<string, unknown> | undefined {
+export function useRvoUserChoices(itemId: string): ReviewChoices | undefined {
   return useRvoImportReviewStore((state) => state.userChoices.get(itemId))
 }
 

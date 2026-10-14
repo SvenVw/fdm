@@ -30,7 +30,7 @@ const NewFieldInitSchema = z.object({
 
 const UpdateFieldInitSchema = NewFieldInitSchema.partial().extend({
   b_id: z.string(),
-  b_lu: z.string(),
+  b_lu: z.string().optional(),
 })
 
 export const ImportReviewChoicesSchema = z.object({
