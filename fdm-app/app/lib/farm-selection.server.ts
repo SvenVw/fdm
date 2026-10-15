@@ -1,7 +1,7 @@
 import { listFarmGroups } from "@nmi-agro/fdm-core"
 import { data } from "react-router"
-import type { OrganizationFarmGroup } from "~/lib/farm-groups"
 import { reportError } from "~/lib/error"
+import { getFarmIdsInCalendar, type OrganizationFarmGroup } from "~/lib/farm-groups"
 import { fdm } from "~/lib/fdm.server"
 
 /**
@@ -55,18 +55,21 @@ export function selectFarms<T extends { b_id_farm: string }>(
 /**
  * Loads the farm groups of an organization for the group picker.
  *
+ * A farm is a member when it is part of the group at some point in the selected calendar year.
  * Only farms the organization has access to are returned as member. Failures are reported and
  * result in no groups, so a problem with groups never blocks the page itself.
  *
  * @param principal_id - The signed-in user.
  * @param b_id_organization - The organization.
  * @param farmIds - The ids of the farms of the organization.
+ * @param calendar - The selected calendar, a year such as `"2025"` or `"all"`.
  * @returns The groups of the organization, an empty list when there are none.
  */
 export async function getOrganizationFarmGroups(
   principal_id: string,
   b_id_organization: string,
   farmIds: string[],
+  calendar: string,
 ): Promise<OrganizationFarmGroup[]> {
   try {
     const known = new Set(farmIds)
@@ -74,7 +77,9 @@ export async function getOrganizationFarmGroups(
     return groups.map((group) => ({
       b_id_group: group.b_id_group,
       b_name_group: group.b_name_group,
-      b_id_farms: group.b_id_farms.filter((b_id_farm) => known.has(b_id_farm)),
+      b_id_farms: getFarmIdsInCalendar(group.memberships, calendar).filter((b_id_farm) =>
+        known.has(b_id_farm),
+      ),
     }))
   } catch (error) {
     reportError(error)

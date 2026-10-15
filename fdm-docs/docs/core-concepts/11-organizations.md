@@ -16,7 +16,7 @@ The organization-related tables are part of the `fdm-authn` schema, which is bas
 
 Organizations can organize their farms into **farm groups**, stored in the `fdm` schema (`farm_groups`, `farm_group_joining` and `farm_group_leaving`). A farm can belong to multiple groups. Groups are organizational metadata: they do not grant access to farms, access remains controlled per farm. The organization holds the `owner` role on the `farm_group` resource, so all members of the organization can use the groups.
 
-For every farm in a group, users choose the dates from which (`b_group_joined`) and until which (`b_group_leaved`, optional) the farm is part of the group. These are the dates of the period itself, not the moment the farm was assigned to or removed from the group, so a period can lie in the past or the future. A farm can be part of a group in several periods. Pages that select the farms of a group use the farms that are part of the group today.
+For every farm in a group, users choose the dates from which (`b_group_joined`) and until which (`b_group_leaved`, optional) the farm is part of the group. These are the dates of the period itself, not the moment the farm was assigned to or removed from the group, so a period can lie in the past or the future. A farm can be part of a group in several periods. In the application, pages of an organization use the selected calendar year: a farm belongs to a group in that year when it is part of the group at some point in the year.
 
 ## Multi-Farm Access and Management
 

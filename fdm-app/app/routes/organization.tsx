@@ -134,10 +134,8 @@ function OrganizationShell({
 
   // On the page of a single group, back leads to the list of groups instead of the organization
   const location = useLocation()
-  const groupsPath = loaderData.selectedOrganizationSlug
-    ? `/organization/${loaderData.selectedOrganizationSlug}/groups`
-    : undefined
-  const isGroupPage = groupsPath !== undefined && location.pathname.startsWith(`${groupsPath}/`)
+  const groupsPath = /^\/organization\/[^/]+\/[^/]+\/groups(?=\/[^/]+)/.exec(location.pathname)?.[0]
+  const isGroupPage = groupsPath !== undefined
 
   return (
     <SidebarProvider>

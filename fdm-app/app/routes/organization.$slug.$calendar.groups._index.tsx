@@ -4,23 +4,23 @@ import { NavLink, redirect, useFetcher, useLoaderData } from "react-router"
 import { dataWithError } from "remix-toast"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Input } from "~/components/ui/input"
 import { Spinner } from "~/components/ui/spinner"
 import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
-import { getFarmGroupErrorMessage, summarizeMemberships } from "~/lib/farm-groups"
-import { fdm } from "~/lib/fdm.server"
 import {
-  getOrganizationForGroups,
-  serializeGroup,
-  toDateString,
-} from "~/lib/organization-groups.server"
+  formatCalendarLabel,
+  getFarmGroupErrorMessage,
+  summarizeMemberships,
+} from "~/lib/farm-groups"
+import { fdm } from "~/lib/fdm.server"
+import { getOrganizationForGroups, serializeGroup } from "~/lib/organization-groups.server"
 import { cn } from "~/lib/utils"
-import type { Route } from "./+types/organization.$slug.groups._index"
+import type { Route } from "./+types/organization.$slug.$calendar.groups._index"
 
 // Meta
 export const meta: Route.MetaFunction = () => {
@@ -37,6 +37,9 @@ export const meta: Route.MetaFunction = () => {
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   try {
+    // Rejects an unsupported calendar year
+    getTimeframe(params)
+    const calendar = getCalendar(params)
     const session = await getSession(request)
     const organization = await getOrganizationForGroups(request, params.slug)
 
@@ -46,7 +49,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
     return {
       organization: { id: organization.id, name: organization.name, slug: organization.slug },
-      today: toDateString(new Date()),
+      calendar,
       groups: groups
         .map((group) => serializeGroup(group, farmNames))
         .sort((a, b) => a.b_name_group.localeCompare(b.b_name_group, "nl")),
@@ -76,7 +79,9 @@ export async function action({ request, params }: Route.ActionArgs) {
         b_name_group,
       )
       // Continue on the page of the new group to add farms
-      return redirect(`/organization/${organization.slug}/groups/${b_id_group}`)
+      return redirect(
+        `/organization/${organization.slug}/${getCalendar(params)}/groups/${b_id_group}`,
+      )
     } catch (error) {
       const message = getFarmGroupErrorMessage(error)
       if (message) {
@@ -90,7 +95,8 @@ export async function action({ request, params }: Route.ActionArgs) {
 }
 
 export default function OrganizationGroups() {
-  const { organization, groups, today } = useLoaderData<typeof loader>()
+  const { organization, groups, calendar } = useLoaderData<typeof loader>()
+  const calendarLabel = formatCalendarLabel(calendar)
 
   return (
     <main>
@@ -101,7 +107,13 @@ export default function OrganizationGroups() {
       <FarmContent>
         <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
           <section className="space-y-4">
-            <h2 className="text-2xl font-semibold tracking-tight">Groepen</h2>
+            <div className="space-y-1">
+              <h2 className="text-2xl font-semibold tracking-tight">Groepen in {calendarLabel}</h2>
+              <p className="text-muted-foreground text-sm">
+                De bedrijven per groep gelden voor {calendarLabel}. Kies een ander jaar in de
+                kalender om een ander jaar te zien.
+              </p>
+            </div>
             {groups.length === 0 ? (
               <p className="text-muted-foreground text-sm">
                 Deze organisatie heeft nog geen groepen. Maak rechts de eerste groep aan.
@@ -109,7 +121,7 @@ export default function OrganizationGroups() {
             ) : (
               <div className="grid gap-4 md:grid-cols-2">
                 {groups.map((group) => {
-                  const summary = summarizeMemberships(group.memberships, today)
+                  const summary = summarizeMemberships(group.memberships, calendar)
                   return (
                     <NavLink key={group.b_id_group} to={`./${group.b_id_group}`} className="block">
                       <Card className="hover:border-primary/50 h-full transition-all hover:shadow-md">
@@ -123,32 +135,20 @@ export default function OrganizationGroups() {
                                 {group.b_name_group}
                               </CardTitle>
                               <CardDescription>
-                                {summary.activeCount}{" "}
-                                {summary.activeCount === 1 ? "bedrijf" : "bedrijven"} nu
+                                {summary.farmCount}{" "}
+                                {summary.farmCount === 1 ? "bedrijf" : "bedrijven"} in{" "}
+                                {calendarLabel}
                               </CardDescription>
                             </div>
                           </div>
                         </CardHeader>
-                        <CardContent className="space-y-3">
-                          {summary.activeNames.length > 0 && (
+                        {summary.farmNames.length > 0 && (
+                          <CardContent>
                             <p className="text-muted-foreground line-clamp-2 text-sm">
-                              {summary.activeNames.join(", ")}
+                              {summary.farmNames.join(", ")}
                             </p>
-                          )}
-                          {(summary.plannedCount > 0 || summary.endedCount > 0) && (
-                            <div className="flex flex-wrap gap-1">
-                              {summary.plannedCount > 0 && (
-                                <Badge variant="outline">{summary.plannedCount} gepland</Badge>
-                              )}
-                              {summary.endedCount > 0 && (
-                                <Badge variant="secondary">
-                                  {summary.endedCount} eerder{" "}
-                                  {summary.endedCount === 1 ? "lidmaatschap" : "lidmaatschappen"}
-                                </Badge>
-                              )}
-                            </div>
-                          )}
-                        </CardContent>
+                          </CardContent>
+                        )}
                       </Card>
                     </NavLink>
                   )

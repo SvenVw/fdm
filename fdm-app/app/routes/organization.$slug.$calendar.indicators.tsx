@@ -2,6 +2,7 @@ import { getFarms, getFields } from "@nmi-agro/fdm-core"
 import { Map as MapIcon } from "lucide-react"
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react"
 import { data, type MetaFunction, NavLink, useLoaderData, useParams } from "react-router"
+import { GroupPicker } from "~/components/blocks/farm-groups/group-picker"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { AggregationPainpoints } from "~/components/blocks/indicators/aggregation-painpoints"
 import { AggregationTree } from "~/components/blocks/indicators/aggregation-tree"
@@ -25,13 +26,16 @@ import {
   computeAreaWeightedAggregation,
   getFieldAggregationScore,
 } from "~/lib/aggregations"
-import { GroupPicker } from "~/components/blocks/farm-groups/group-picker"
 import { auth, getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError, reportError } from "~/lib/error"
+import {
+  getOrganizationFarmGroups,
+  parseFarmIdsParam,
+  selectFarms,
+} from "~/lib/farm-selection.server"
 import { fdm } from "~/lib/fdm.server"
-import { getOrganizationFarmGroups, parseFarmIdsParam, selectFarms } from "~/lib/farm-selection.server"
 import { type Ecosysteemdienst, INDICATORS } from "~/lib/indicators"
 import { cn } from "~/lib/utils"
 import type { Route } from "./+types/organization.$slug.$calendar.indicators"
@@ -131,6 +135,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       session.principal_id,
       organization.id,
       allFarms.map((farm) => farm.b_id_farm),
+      getCalendar(params),
     )
 
     // Sequential score promises: farm i+1 starts only after farm i finishes

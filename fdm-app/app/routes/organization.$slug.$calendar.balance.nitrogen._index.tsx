@@ -26,6 +26,7 @@ import {
   useLocation,
   useParams,
 } from "react-router"
+import type { OrganizationFarmGroup } from "~/lib/farm-groups"
 import { BufferStripInfo } from "~/components/blocks/balance/buffer-strip-info"
 import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons"
@@ -34,12 +35,11 @@ import { NoFarmsMessage } from "~/components/blocks/organization/no-farms-messag
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
 import { auth, getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError, reportError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
-import type { OrganizationFarmGroup } from "~/lib/farm-groups"
 import { getOrganizationFarmGroups, parseFarmIdsParam } from "~/lib/farm-selection.server"
+import { fdm } from "~/lib/fdm.server"
 import { FarmSelectDialog } from "../components/blocks/balance/farm-select-dialog"
 
 type Farm = Awaited<ReturnType<typeof getFarms>>[number]
@@ -278,6 +278,7 @@ export async function loader({ request, params }: LoaderFunctionArgs): Promise<L
       session.principal_id,
       organization.id,
       farms.map((farm) => farm.b_id_farm),
+      getCalendar(params),
     )
 
     const asyncData = getAsyncData(organization.id)

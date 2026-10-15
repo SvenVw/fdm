@@ -23,7 +23,12 @@ import { auth, getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
-import { getDefaultJoinDate, getFarmGroupErrorMessage, parseDateInput } from "~/lib/farm-groups"
+import {
+  getDefaultJoinDate,
+  getFarmGroupErrorMessage,
+  isMembershipInCalendar,
+  parseDateInput,
+} from "~/lib/farm-groups"
 import { fdm } from "~/lib/fdm.server"
 import type { Route } from "./+types/organization.$slug.$calendar.farms._index"
 
@@ -59,9 +64,16 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     const session = await getSession(request)
     const farms = await getFarms(fdm, organization.id)
     const groups = await listFarmGroups(fdm, session.principal_id, organization.id)
+    // A farm belongs to a group when it is part of it at some point in the selected calendar year
     const groupsOfFarm = (b_id_farm: string) =>
       groups
-        .filter((group) => group.b_id_farms.includes(b_id_farm))
+        .filter((group) =>
+          group.memberships.some(
+            (membership) =>
+              membership.b_id_farm === b_id_farm &&
+              isMembershipInCalendar(membership, params.calendar),
+          ),
+        )
         .map((group) => ({ b_id_group: group.b_id_group, b_name_group: group.b_name_group }))
 
     const allFarms: FarmExtended[] = await Promise.all(
@@ -190,6 +202,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     return {
       data: allFarms,
       organization,
+      calendar: params.calendar,
       defaultJoined: getDefaultJoinDate(params.calendar),
       groups: groups.map((group) => ({
         b_id_group: group.b_id_group,
@@ -298,7 +311,8 @@ export async function action({ request, params }: Route.ActionArgs) {
 }
 
 export default function OrganizationFarmsPage() {
-  const { data, organization, groups, defaultJoined } = useLoaderData<typeof loader>()
+  const { data, organization, groups, defaultJoined, calendar } = useLoaderData<typeof loader>()
+  const groupsPath = `/organization/${organization.slug}/${calendar}/groups`
   return (
     <main>
       <FarmTitle
@@ -310,7 +324,7 @@ export default function OrganizationFarmsPage() {
         }}
         rightNode={
           <Button variant="outline" asChild>
-            <NavLink to={`/organization/${organization.slug}/groups`}>Groepen beheren</NavLink>
+            <NavLink to={groupsPath}>Groepen beheren</NavLink>
           </Button>
         }
       />
@@ -321,7 +335,7 @@ export default function OrganizationFarmsPage() {
               columns={columns}
               data={data}
               groups={groups}
-              organizationSlug={organization.slug}
+              groupsPath={groupsPath}
               defaultJoined={defaultJoined}
             />
           </div>

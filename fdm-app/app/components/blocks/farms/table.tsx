@@ -36,8 +36,8 @@ interface DataTableProps<TData extends RowData> {
   data: TData[]
   /** The groups of the organization. Grouping features are only shown when there is at least one. */
   groups?: { b_id_group: string; b_name_group: string }[]
-  /** Slug of the organization, used to link to the group management page. */
-  organizationSlug?: string
+  /** Path of the group management page for the selected calendar year. */
+  groupsPath?: string
   /** Default start date (`YYYY-MM-DD`) when assigning farms to groups: 1 January of the selected year. */
   defaultJoined?: string
 }
@@ -56,7 +56,7 @@ export function DataTable<TData extends FarmExtended>({
   columns: baseColumns,
   data,
   groups = [],
-  organizationSlug = "",
+  groupsPath = "",
   defaultJoined = "",
 }: DataTableProps<TData>) {
   const hasGroups = groups.length > 0
@@ -133,7 +133,7 @@ export function DataTable<TData extends FarmExtended>({
             <AssignGroupsDialog
               groups={groups}
               farms={selectedFarms}
-              organizationSlug={organizationSlug}
+              groupsPath={groupsPath}
               defaultJoined={defaultJoined}
               onAssigned={() => setRowSelection({})}
             />

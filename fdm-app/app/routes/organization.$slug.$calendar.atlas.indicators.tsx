@@ -3,6 +3,7 @@ import { getFarms, getFields } from "@nmi-agro/fdm-core"
 import { featureCollection } from "@turf/helpers"
 import { lazy, Suspense, useEffect, useMemo, useState } from "react"
 import { data, type MetaFunction, useLoaderData } from "react-router"
+import { GroupPicker } from "~/components/blocks/farm-groups/group-picker"
 import { ScoreSelect } from "~/components/blocks/indicators/atlas"
 import { Badge } from "~/components/ui/badge"
 import { getIndicatorsForFarm } from "~/integrations/bln3.server"
@@ -14,13 +15,16 @@ import {
   getAggregationInfo,
   getFieldAggregationScore,
 } from "~/lib/aggregations"
-import { GroupPicker } from "~/components/blocks/farm-groups/group-picker"
 import { auth, getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError, reportError } from "~/lib/error"
+import {
+  getOrganizationFarmGroups,
+  parseFarmIdsParam,
+  selectFarms,
+} from "~/lib/farm-selection.server"
 import { fdm } from "~/lib/fdm.server"
-import { getOrganizationFarmGroups, parseFarmIdsParam, selectFarms } from "~/lib/farm-selection.server"
 import { INDICATORS } from "~/lib/indicators"
 import type { Route } from "./+types/organization.$slug.$calendar.atlas.indicators"
 import { computeFieldAvgScore } from "./farm.$b_id_farm.$calendar.atlas.indicators"
@@ -79,6 +83,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       session.principal_id,
       organization.id,
       allFarms.map((farm) => farm.b_id_farm),
+      calendar,
     )
 
     // Sequential score promises: farm i+1 starts only after farm i finishes

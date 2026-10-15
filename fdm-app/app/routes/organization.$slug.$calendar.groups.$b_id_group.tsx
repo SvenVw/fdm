@@ -39,26 +39,24 @@ import {
 } from "~/components/ui/select"
 import { Spinner } from "~/components/ui/spinner"
 import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import {
+  formatCalendarLabel,
   formatPeriodDate,
   getDefaultJoinDate,
   getFarmGroupErrorMessage,
+  getMembershipCoverage,
   getPeriodError,
-  getPeriodStatus,
   type GroupMembership,
+  isMembershipInCalendar,
   parseDateInput,
 } from "~/lib/farm-groups"
 import { fdm } from "~/lib/fdm.server"
-import {
-  getOrganizationForGroups,
-  serializeGroup,
-  toDateString,
-} from "~/lib/organization-groups.server"
+import { getOrganizationForGroups, serializeGroup } from "~/lib/organization-groups.server"
 import { cn } from "~/lib/utils"
-import { useCalendarStore } from "~/store/calendar"
-import type { Route } from "./+types/organization.$slug.groups.$b_id_group"
+import type { Route } from "./+types/organization.$slug.$calendar.groups.$b_id_group"
 
 // Meta
 export const meta: Route.MetaFunction = ({ loaderData }) => {
@@ -68,7 +66,7 @@ export const meta: Route.MetaFunction = ({ loaderData }) => {
     },
     {
       name: "description",
-      content: "Beheer de bedrijven in deze groep, inclusief eerdere perioden.",
+      content: "Beheer de bedrijven in deze groep in het geselecteerde jaar.",
     },
   ]
 }
@@ -91,6 +89,9 @@ async function getGroup(
 
 export async function loader({ request, params }: Route.LoaderArgs) {
   try {
+    // Rejects an unsupported calendar year
+    getTimeframe(params)
+    const calendar = getCalendar(params)
     const session = await getSession(request)
     const organization = await getOrganizationForGroups(request, params.slug)
 
@@ -100,7 +101,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
     return {
       organization: { id: organization.id, name: organization.name, slug: organization.slug },
-      today: toDateString(new Date()),
+      calendar,
+      defaultJoined: getDefaultJoinDate(calendar),
       farms: farms
         .map((farm) => ({ b_id_farm: farm.b_id_farm, b_name_farm: farm.b_name_farm }))
         .sort((a, b) => (a.b_name_farm ?? "").localeCompare(b.b_name_farm ?? "", "nl")),
@@ -152,9 +154,12 @@ export async function action({ request, params }: Route.ActionArgs) {
       }
       if (intent === "delete_group") {
         await removeFarmGroup(fdm, session.principal_id, group.b_id_group)
-        return redirectWithSuccess(`/organization/${organization.slug}/groups`, {
-          message: `Groep ${group.b_name_group} is verwijderd.`,
-        })
+        return redirectWithSuccess(
+          `/organization/${organization.slug}/${getCalendar(params)}/groups`,
+          {
+            message: `Groep ${group.b_name_group} is verwijderd.`,
+          },
+        )
       }
       if (!b_id_farm) {
         throw data("missing: b_id_farm", { status: 400, statusText: "missing: b_id_farm" })
@@ -208,22 +213,18 @@ export async function action({ request, params }: Route.ActionArgs) {
   }
 }
 
-const statusVariant = {
-  active: "default",
-  planned: "outline",
-  ended: "secondary",
-} as const
-
 export default function OrganizationGroup() {
-  const { group, farms, today } = useLoaderData<typeof loader>()
+  const { group, farms, calendar, defaultJoined } = useLoaderData<typeof loader>()
+  const calendarLabel = formatCalendarLabel(calendar)
 
-  const current: GroupMembership[] = []
-  const past: GroupMembership[] = []
-  for (const membership of group.memberships) {
-    ;(getPeriodStatus(membership, today).key === "ended" ? past : current).push(membership)
-  }
-  // Most recent periods first for the history
-  past.sort((a, b) => b.b_group_joined.localeCompare(a.b_group_joined))
+  // Only the periods in the selected calendar year, by farm and then by start date
+  const memberships = group.memberships
+    .filter((membership) => isMembershipInCalendar(membership, calendar))
+    .sort(
+      (a, b) =>
+        (a.b_name_farm ?? "").localeCompare(b.b_name_farm ?? "", "nl") ||
+        a.b_group_joined.localeCompare(b.b_group_joined),
+    )
 
   return (
     <main>
@@ -236,52 +237,25 @@ export default function OrganizationGroup() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Bedrijven in deze groep</CardTitle>
+                <CardTitle>Bedrijven in {calendarLabel}</CardTitle>
                 <CardDescription>
-                  Elke regel is een periode waarin het bedrijf deel uitmaakt van de groep. Het gaat
-                  om de datums van die periode, niet om het moment waarop u de wijziging invoert.
+                  Elke regel is een periode waarin het bedrijf in {calendarLabel} deel uitmaakt van
+                  de groep. Kies een ander jaar in de kalender om andere jaren te zien.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {current.length === 0 ? (
+                {memberships.length === 0 ? (
                   <p className="text-muted-foreground text-sm">
-                    Er zijn geen bedrijven actief of gepland in deze groep.
+                    In {calendarLabel} maken geen bedrijven deel uit van deze groep.
                   </p>
                 ) : (
                   <ul className="divide-y rounded-md border">
-                    {current.map((membership) => (
+                    {memberships.map((membership) => (
                       <MembershipRow
                         key={`${membership.b_id_farm}-${membership.b_group_joined}`}
                         groupId={group.b_id_group}
                         membership={membership}
-                        today={today}
-                      />
-                    ))}
-                  </ul>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Eerdere lidmaatschappen</CardTitle>
-                <CardDescription>
-                  Periodes waarin een bedrijf deel uitmaakte van de groep en die zijn afgelopen.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {past.length === 0 ? (
-                  <p className="text-muted-foreground text-sm">
-                    Er zijn nog geen afgelopen lidmaatschappen.
-                  </p>
-                ) : (
-                  <ul className="divide-y rounded-md border">
-                    {past.map((membership) => (
-                      <MembershipRow
-                        key={`${membership.b_id_farm}-${membership.b_group_joined}`}
-                        groupId={group.b_id_group}
-                        membership={membership}
-                        today={today}
+                        calendar={calendar}
                       />
                     ))}
                   </ul>
@@ -291,7 +265,7 @@ export default function OrganizationGroup() {
           </div>
 
           <div className="space-y-6">
-            <AddFarmCard group={group} farms={farms} />
+            <AddFarmCard group={group} farms={farms} defaultJoined={defaultJoined} />
             <RenameGroupCard group={group} />
             <DeleteGroupCard group={group} />
           </div>
@@ -304,15 +278,15 @@ export default function OrganizationGroup() {
 function MembershipRow({
   groupId,
   membership,
-  today,
+  calendar,
 }: {
   groupId: string
   membership: GroupMembership
-  today: string
+  calendar: string
 }) {
   const fetcher = useFetcher<typeof action>()
   const isSubmitting = fetcher.state !== "idle"
-  const status = getPeriodStatus(membership, today)
+  const coverage = getMembershipCoverage(membership, calendar)
   const [editing, setEditing] = useState(false)
   const [joined, setJoined] = useState(membership.b_group_joined)
   const [leaved, setLeaved] = useState(membership.b_group_leaved ?? "")
@@ -324,7 +298,11 @@ function MembershipRow({
         <span className="grow truncate text-sm font-medium">
           {membership.b_name_farm ?? "Onbekend"}
         </span>
-        <Badge variant={statusVariant[status.key]}>{status.label}</Badge>
+        {coverage && (
+          <Badge variant={coverage === "full" ? "default" : "outline"}>
+            {coverage === "full" ? `Heel ${calendar}` : `Deel van ${calendar}`}
+          </Badge>
+        )}
         {!editing && (
           <Button type="button" variant="outline" size="sm" onClick={() => setEditing(true)}>
             Wijzigen
@@ -394,13 +372,12 @@ function MembershipRow({
 function AddFarmCard({
   group,
   farms,
+  defaultJoined,
 }: {
   group: { b_id_group: string; memberships: GroupMembership[] }
   farms: { b_id_farm: string; b_name_farm: string | null }[]
+  defaultJoined: string
 }) {
-  const calendar = useCalendarStore((state) => state.calendar)
-  const defaultJoined = getDefaultJoinDate(calendar)
-
   return (
     // Remount after a period is added, so the form starts again with the defaults
     <AddFarmForm

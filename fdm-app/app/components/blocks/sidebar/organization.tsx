@@ -226,7 +226,7 @@ export function SidebarOrganization({
           <SidebarMenuItem>
             {organization ? (
               <SidebarMenuButton asChild isActive={activeTab === "groups"}>
-                <NavLink to={`/organization/${organization.slug}/groups`}>
+                <NavLink to={`/organization/${organization.slug}/${selectedCalendar}/groups`}>
                   <UserGroup />
                   <span>Groepen</span>
                 </NavLink>

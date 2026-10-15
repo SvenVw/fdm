@@ -123,6 +123,7 @@ export async function loader({ params, request, url }: Route.LoaderArgs) {
       session.principal_id,
       organization.id,
       farms.map((farm) => farm.b_id_farm),
+      activeYear,
     )
 
     const farmsExtended: (FarmWithRoles & {
@@ -364,7 +365,7 @@ export default function AppIndex() {
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-semibold tracking-tight">Groepen</h2>
                   <Button asChild variant="outline">
-                    <NavLink to="./groups">Beheer</NavLink>
+                    <NavLink to={`./${loaderData.calendar}/groups`}>Beheer</NavLink>
                   </Button>
                 </div>
                 <Card>
@@ -378,7 +379,7 @@ export default function AppIndex() {
                         {loaderData.groups.map((group) => (
                           <li key={group.b_id_group}>
                             <NavLink
-                              to={`./groups/${group.b_id_group}`}
+                              to={`./${loaderData.calendar}/groups/${group.b_id_group}`}
                               className="hover:text-primary flex items-center gap-3"
                             >
                               <div className="bg-muted text-muted-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
@@ -390,7 +391,8 @@ export default function AppIndex() {
                                 </p>
                                 <p className="text-muted-foreground mt-1 text-xs">
                                   {group.farmCount}{" "}
-                                  {group.farmCount === 1 ? "bedrijf" : "bedrijven"}
+                                  {group.farmCount === 1 ? "bedrijf" : "bedrijven"} in{" "}
+                                  {loaderData.calendar}
                                 </p>
                               </div>
                             </NavLink>

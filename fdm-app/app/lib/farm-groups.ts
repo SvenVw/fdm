@@ -1,5 +1,6 @@
 /**
- * A farm group of an organization as used by the interface, with the farms that are part of it today.
+ * A farm group of an organization as used by the interface, with the farms that are part of it in
+ * the selected calendar year.
  */
 export type OrganizationFarmGroup = {
   b_id_group: string
@@ -114,53 +115,117 @@ export type GroupMembership = {
 }
 
 /**
- * Describes a period relative to today: planned (starts later), ended (the end date has passed)
- * or active.
- *
- * @param membership - The period.
- * @param today - Today as `YYYY-MM-DD`.
- * @returns The status key and its Dutch label.
+ * The dates of a period in a farm group, as `Date` or as `YYYY-MM-DD`.
  */
-export function getPeriodStatus(
-  membership: GroupMembership,
-  today: string,
-): { key: "planned" | "ended" | "active"; label: string } {
-  if (membership.b_group_joined > today) {
-    return { key: "planned", label: "Gepland" }
-  }
-  if (membership.b_group_leaved && membership.b_group_leaved <= today) {
-    return { key: "ended", label: "Beëindigd" }
-  }
-  return { key: "active", label: "Actief" }
+type PeriodDates = {
+  b_group_joined: Date | string
+  b_group_leaved: Date | string | null
+}
+
+/** Returns a date as `YYYY-MM-DD`, the format in which periods are compared. */
+function toDay(date: Date | string): string {
+  return typeof date === "string" ? date.slice(0, 10) : date.toISOString().slice(0, 10)
+}
+
+/** Returns the year of a calendar selection, or `undefined` for anything but a year (e.g. `all`). */
+function getCalendarYear(calendar: string | undefined | null): number | undefined {
+  return calendar && /^\d{4}$/.test(calendar) ? Number(calendar) : undefined
 }
 
 /**
- * Counts the farms and periods of a group for an overview.
+ * Checks whether a period in a farm group lies (partly) in the selected calendar year.
+ *
+ * The end date is the first day the farm is no longer part of the group, so a period that ends on
+ * 1 January does not reach into that year.
+ *
+ * @param membership - The period.
+ * @param calendar - The selected calendar, a year such as `"2025"` or `"all"`.
+ * @returns `true` when the period overlaps the year, and always for anything but a year.
+ */
+export function isMembershipInCalendar(
+  membership: PeriodDates,
+  calendar: string | undefined | null,
+): boolean {
+  const year = getCalendarYear(calendar)
+  if (year === undefined) {
+    return true
+  }
+  return (
+    toDay(membership.b_group_joined) < `${year + 1}-01-01` &&
+    (membership.b_group_leaved === null || toDay(membership.b_group_leaved) > `${year}-01-01`)
+  )
+}
+
+/**
+ * Describes how much of the selected calendar year a period covers.
+ *
+ * @param membership - A period that lies (partly) in the year.
+ * @param calendar - The selected calendar, a year such as `"2025"` or `"all"`.
+ * @returns `full` when the period spans the whole year, `partial` when it covers part of it, or
+ *   `undefined` for anything but a year.
+ */
+export function getMembershipCoverage(
+  membership: PeriodDates,
+  calendar: string | undefined | null,
+): "full" | "partial" | undefined {
+  const year = getCalendarYear(calendar)
+  if (year === undefined) {
+    return undefined
+  }
+  const full =
+    toDay(membership.b_group_joined) <= `${year}-01-01` &&
+    (membership.b_group_leaved === null || toDay(membership.b_group_leaved) >= `${year + 1}-01-01`)
+  return full ? "full" : "partial"
+}
+
+/**
+ * Formats the selected calendar for running text, for example `2025` or `alle jaren`.
+ */
+export function formatCalendarLabel(calendar: string | undefined | null): string {
+  const year = getCalendarYear(calendar)
+  return year === undefined ? "alle jaren" : String(year)
+}
+
+/**
+ * Returns the ids of the farms that are part of a group in the selected calendar year.
  *
  * @param memberships - All periods of the group.
- * @param today - Today as `YYYY-MM-DD`.
- * @returns The number of farms that are part of the group today, the number of planned and ended
- *   periods, and the names of the farms that are part of the group today.
+ * @param calendar - The selected calendar, a year such as `"2025"` or `"all"`.
+ * @returns The unique farm ids, in the order of the periods.
  */
-export function summarizeMemberships(memberships: GroupMembership[], today: string) {
-  const active = new Map<string, string | null>()
-  let planned = 0
-  let ended = 0
+export function getFarmIdsInCalendar(
+  memberships: (PeriodDates & { b_id_farm: string })[],
+  calendar: string | undefined | null,
+): string[] {
+  return [
+    ...new Set(
+      memberships
+        .filter((membership) => isMembershipInCalendar(membership, calendar))
+        .map((membership) => membership.b_id_farm),
+    ),
+  ]
+}
+
+/**
+ * Counts the farms of a group in the selected calendar year for an overview.
+ *
+ * @param memberships - All periods of the group.
+ * @param calendar - The selected calendar, a year such as `"2025"` or `"all"`.
+ * @returns The number and names of the farms that are part of the group in that year.
+ */
+export function summarizeMemberships(
+  memberships: GroupMembership[],
+  calendar: string | undefined | null,
+) {
+  const farms = new Map<string, string | null>()
   for (const membership of memberships) {
-    const status = getPeriodStatus(membership, today).key
-    if (status === "active") {
-      active.set(membership.b_id_farm, membership.b_name_farm)
-    } else if (status === "planned") {
-      planned += 1
-    } else {
-      ended += 1
+    if (isMembershipInCalendar(membership, calendar)) {
+      farms.set(membership.b_id_farm, membership.b_name_farm)
     }
   }
   return {
-    activeCount: active.size,
-    plannedCount: planned,
-    endedCount: ended,
-    activeNames: [...active.values()].map((name) => name ?? "Onbekend"),
+    farmCount: farms.size,
+    farmNames: [...farms.values()].map((name) => name ?? "Onbekend"),
   }
 }
 

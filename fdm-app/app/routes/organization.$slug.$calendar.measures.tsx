@@ -10,6 +10,7 @@ import { ClipboardList } from "lucide-react"
 import { lazy, Suspense, useMemo } from "react"
 import { data, type MetaFunction, useLoaderData, useNavigate, useParams } from "react-router"
 import { DataTableColumnHeader } from "@/app/components/blocks/data-table/column-header"
+import { GroupPicker } from "~/components/blocks/farm-groups/group-picker"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { getColumns, type MeasureTableRow } from "~/components/blocks/measures/columns"
 import { getFieldSummaryColumns } from "~/components/blocks/measures/field-summary-columns"
@@ -18,13 +19,16 @@ import { MeasuresDataTable } from "~/components/blocks/measures/table"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "~/components/ui/empty"
 import { Separator } from "~/components/ui/separator"
 import { getMapStyle } from "~/integrations/map"
-import { GroupPicker } from "~/components/blocks/farm-groups/group-picker"
 import { auth, getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
+import {
+  getOrganizationFarmGroups,
+  parseFarmIdsParam,
+  selectFarms,
+} from "~/lib/farm-selection.server"
 import { fdm } from "~/lib/fdm.server"
-import { getOrganizationFarmGroups, parseFarmIdsParam, selectFarms } from "~/lib/farm-selection.server"
 import { getMainCultivation } from "~/lib/hoofdteelt.server"
 import { isExcludedFromBln3 } from "~/lib/indicators"
 import type { Route } from "./+types/organization.$slug.$calendar.measures"
@@ -106,6 +110,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       session.principal_id,
       organization.id,
       allFarms.map((farm) => farm.b_id_farm),
+      calendar,
     )
 
     function combineMeasureAggregate(

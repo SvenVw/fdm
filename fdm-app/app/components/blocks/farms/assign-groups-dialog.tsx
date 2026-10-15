@@ -43,20 +43,20 @@ function getInitialState(group: GroupOption, farms: FarmExtended[]): GroupState 
  * @param props.groups - The groups of the organization.
  * @param props.farms - The selected farms (no field rows).
  * @param props.defaultJoined - The default start date as `YYYY-MM-DD`: 1 January of the selected year.
- * @param props.organizationSlug - Slug used to link to the group management page.
+ * @param props.groupsPath - Path of the group management page for the selected calendar year.
  * @param props.onAssigned - Called after the changes were submitted.
  * @returns A React node.
  */
 export function AssignGroupsDialog({
   groups,
   farms,
-  organizationSlug,
+  groupsPath,
   defaultJoined,
   onAssigned,
 }: {
   groups: GroupOption[]
   farms: FarmExtended[]
-  organizationSlug: string
+  groupsPath: string
   defaultJoined: string
   onAssigned: () => void
 }) {
@@ -124,7 +124,7 @@ export function AssignGroupsDialog({
         {groups.length === 0 ? (
           <p className="text-muted-foreground text-sm">
             Er zijn nog geen groepen.{" "}
-            <NavLink to={`/organization/${organizationSlug}/groups`} className="underline">
+            <NavLink to={groupsPath} className="underline">
               Maak eerst een groep aan.
             </NavLink>
           </p>
@@ -168,11 +168,6 @@ export function AssignGroupsDialog({
                 {periodError}
               </p>
             )}
-            <p className="text-muted-foreground text-xs">
-              Dit zijn de datums van de periode zelf, niet het moment waarop u de wijziging invoert.
-              Bij een groep die u uitvinkt, is dit de datum tot wanneer het bedrijf nog deel
-              uitmaakt van de groep (leeg = vandaag).
-            </p>
           </fieldset>
         )}
         <DialogFooter>
