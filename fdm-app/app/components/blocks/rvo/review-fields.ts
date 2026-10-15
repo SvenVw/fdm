@@ -3,6 +3,7 @@ import type { FieldDiff, RvoImportReviewItem } from "@nmi-agro/fdm-rvo/types"
 import { getItemId } from "@nmi-agro/fdm-rvo/utils"
 import { area } from "@turf/area"
 import { format as formatDateFns, parseISO } from "date-fns"
+import { adjustEndDateAtYearStart } from "@/app/lib/calendar"
 import { acquiringMethodOptions } from "~/lib/constants"
 
 export type ReviewItem = RvoImportReviewItem<Field>
@@ -248,6 +249,10 @@ const definitions = [
         : item.rvoField
           ? (item.rvoField.properties.EndDate ?? null)
           : undefined,
+    formatRemote: (item) =>
+      item.rvoField?.properties.EndDate
+        ? formatDate(adjustEndDateAtYearStart(parseISO(item.rvoField.properties.EndDate)))
+        : "-",
   },
   {
     key: "b_acquiring_method",

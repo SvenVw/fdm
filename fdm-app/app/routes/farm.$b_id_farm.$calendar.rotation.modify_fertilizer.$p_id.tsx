@@ -23,11 +23,9 @@ interface FertilizerInfo {
   p_name_nl: string | null
 }
 
-export async function loader({ params, request }: Route.LoaderArgs) {
+export async function loader({ params, request, url }: Route.LoaderArgs) {
   try {
     const session = await getSession(request)
-
-    const url = new URL(request.url)
 
     const fieldIds = url.searchParams
       .get("fieldIds")

@@ -80,7 +80,7 @@ export const meta: MetaFunction = () => {
   ]
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params, url }: LoaderFunctionArgs) {
   try {
     // Get the active farm
     const b_id_farm = params.b_id_farm
@@ -90,8 +90,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         statusText: "missing: b_id_farm",
       })
     }
-
-    const url = new URL(request.url)
 
     // Determine where to return after saving/cancelling
     const returnUrlParam = url.searchParams.get("returnUrl")
@@ -512,7 +510,7 @@ export default function FarmFieldFertilizerAddIndex() {
   )
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params, url }: ActionFunctionArgs) {
   try {
     const { b_id_farm, calendar = "all" } = params
     if (!b_id_farm) {
@@ -520,15 +518,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
 
     const session = await getSession(request)
-    const url = new URL(request.url)
 
     const returnUrlParam = url.searchParams.get("returnUrl")
     const returnUrl =
       returnUrlParam && isOfOrigin(returnUrlParam, url.origin)
         ? returnUrlParam
         : url.searchParams.has("create")
-          ? `/farm/create/${b_id_farm}/${calendar}/rotation`
-          : `/farm/${b_id_farm}/${calendar}/rotation`
+          ? `/farm/create/${b_id_farm}/${calendar}/field`
+          : `/farm/${b_id_farm}/${calendar}/field`
 
     if (url.searchParams.has("appIds")) {
       const validatedData = await extractFormValuesFromRequest(request, FormSchemaPartialModify)
