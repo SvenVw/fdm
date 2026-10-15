@@ -3,6 +3,11 @@ export type ActivityFilter = {
   isActive?: boolean
 }
 
+export type AgentFilter = {
+  /** Agent IDs involved */
+  agents?: string[]
+}
+
 export type AssigneeFilter = {
   /** Is the ticket assigned at all */
   assigned?: boolean
@@ -58,6 +63,11 @@ export type TagsFilter = {
   tags?: string[]
 }
 
+export type TargetPrincipalFilter = {
+  /** Principal IDs that the requests are targeting */
+  targetPrincipals?: string[]
+}
+
 export type TextFilter = {
   /** Text to search for */
   text?: string
@@ -102,3 +112,9 @@ export type TicketFilters = AssigneeFilter &
   ViewedByFilter
 
 export type TicketSorting = "created" | "priority" | "text_relevance"
+
+export type ImpersonationRequestFilters =
+  | AgentFilter
+  | PaginationFilter
+  | TargetPrincipalFilter
+  | TimeframeFilter

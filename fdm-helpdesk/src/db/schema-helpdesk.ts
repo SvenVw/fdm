@@ -3,6 +3,7 @@ import {
   boolean,
   index,
   integer,
+  interval,
   jsonb,
   pgSchema,
   primaryKey,
@@ -328,3 +329,25 @@ export const blockedEmails = fdmHelpdeskSchema.table("blocked_emails", {
 })
 export type BlockedEmailTypeSelect = typeof blockedEmails.$inferSelect
 export type BlockedEmailTypeInsert = typeof blockedEmails.$inferInsert
+
+/* IMPERSONATION REQUEST */
+/**
+ * Tracks the impersonation request and whether it is accepted.
+ */
+export const impersonationRequests = fdmHelpdeskSchema.table("impersonation_requests", {
+  impersonation_request_id: text().primaryKey(),
+  goal: text(),
+  target_principal_id: text().notNull(),
+  agent_id: text()
+    .notNull()
+    .references(() => agents.agent_id, { onDelete: "cascade" }),
+  ticket_id: text().notNull(),
+  status: text().notNull().default("pending"), // 'pending', 'accepted', 'declined'
+  duration: interval().notNull(),
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  expires_at: timestamp({ withTimezone: true }),
+  accepted_at: timestamp({ withTimezone: true }),
+  cancelled_at: timestamp({ withTimezone: true }),
+})
+export type ImpersonationRequestTypeSelect = typeof impersonationRequests.$inferSelect
+export type ImpersonationRequestTypeInsert = typeof impersonationRequests.$inferInsert
