@@ -16,7 +16,8 @@ interface RvoImportReviewState {
   setUserChoices(itemId: string, values: ReviewChoices): void
   setFieldToAdd(itemId: string, add: boolean): void
   setFieldToRemove(itemId: string, remove: boolean): void
-  reset(): void
+  /** Clears all choices, optionally starting from the given initial choices per review item. */
+  reset(initialChoices?: UserChoices): void
 }
 
 /**
@@ -68,8 +69,12 @@ export const useRvoImportReviewStore = create<RvoImportReviewState>((set) => ({
       return { fieldsToRemove }
     })
   },
-  reset() {
-    set({ userChoices: new Map(), fieldsToAdd: new Set(), fieldsToRemove: new Set() })
+  reset(initialChoices) {
+    set({
+      userChoices: new Map(initialChoices),
+      fieldsToAdd: new Set(),
+      fieldsToRemove: new Set(),
+    })
   },
 }))
 

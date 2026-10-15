@@ -54,6 +54,7 @@ import {
   type ImportReviewFlags,
   isRemoteAvailable,
   type ReviewField,
+  type ReviewChoices,
   type ReviewFieldContext,
   type ReviewFieldType,
   type ReviewItem,
@@ -768,10 +769,19 @@ function RvoImportReviewTableComponent({
     [calendar, bufferstripInfoAvailable, cultivationOptions],
   )
 
+  // Conflicting and expired fields start out with the RVO values selected.
   useLayoutEffect(() => {
     clearActiveForm()
-    useRvoImportReviewStore.getState().reset()
-  }, [data])
+    const initialChoices = new Map<string, ReviewChoices>()
+    for (const item of data) {
+      if (item.status === "CONFLICT") {
+        initialChoices.set(getItemId(item), getRowActionValues("UPDATE_FROM_REMOTE", item, ctx))
+      } else if (item.status === "EXPIRED_LOCAL") {
+        initialChoices.set(getItemId(item), getExpiredRowValues("CLOSE_LOCAL", item, ctx))
+      }
+    }
+    useRvoImportReviewStore.getState().reset(initialChoices)
+  }, [data, ctx])
 
   const table = useTable({
     data: sortedData,
