@@ -11,13 +11,15 @@ interface RvoImportReviewState {
   userChoices: UserChoices
   fieldsToAdd: Set<string>
   fieldsToRemove: Set<string>
-  setUserChoice(itemId: string, key: ReviewItemFieldKey, value: unknown): void
+  showCustomValueButtons: boolean
+  setUserChoice: (itemId: string, key: ReviewItemFieldKey, value: unknown) => void
   /** Sets several choices for one review item in a single update. */
-  setUserChoices(itemId: string, values: ReviewChoices): void
-  setFieldToAdd(itemId: string, add: boolean): void
-  setFieldToRemove(itemId: string, remove: boolean): void
+  setUserChoices: (itemId: string, values: ReviewChoices) => void
+  setFieldToAdd: (itemId: string, add: boolean) => void
+  setFieldToRemove: (itemId: string, remove: boolean) => void
   /** Clears all choices, optionally starting from the given initial choices per review item. */
-  reset(initialChoices?: UserChoices): void
+  reset: (initialChoices: UserChoices) => void
+  setShowCustomValueButtons: (value: boolean) => void
 }
 
 /**
@@ -31,6 +33,7 @@ export const useRvoImportReviewStore = create<RvoImportReviewState>((set) => ({
   userChoices: new Map(),
   fieldsToAdd: new Set(),
   fieldsToRemove: new Set(),
+  showCustomValueButtons: false,
   setUserChoice(itemId, key, value) {
     set((state) => {
       const userChoices = new Map(state.userChoices)
@@ -74,6 +77,11 @@ export const useRvoImportReviewStore = create<RvoImportReviewState>((set) => ({
       userChoices: new Map(initialChoices),
       fieldsToAdd: new Set(),
       fieldsToRemove: new Set(),
+    })
+  },
+  setShowCustomValueButtons(value: boolean) {
+    set({
+      showCustomValueButtons: value,
     })
   },
 }))

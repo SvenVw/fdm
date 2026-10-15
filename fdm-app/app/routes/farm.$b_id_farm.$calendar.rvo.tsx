@@ -35,7 +35,11 @@ import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { RvoConnectCard } from "~/components/blocks/rvo/connect-card"
 import { RvoErrorAlert } from "~/components/blocks/rvo/error-alert"
-import { RvoImportReviewTable, useRvoImportForm } from "~/components/blocks/rvo/import-review-table"
+import {
+  CustomValueButtonsToggle,
+  RvoImportReviewTable,
+  useRvoImportForm,
+} from "~/components/blocks/rvo/import-review-table"
 import { ImportReviewChoicesSchema } from "~/components/blocks/rvo/schema"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
@@ -410,6 +414,7 @@ export default function RvoImportReviewPage() {
             <FarmContent>
               <div className="flex flex-col space-y-4 pb-10">
                 <div className="flex justify-end">
+                  <CustomValueButtonsToggle />
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button disabled={isApplying}>

@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-table"
 import { area } from "@turf/area"
 import { Archive, ArrowLeftRight, Check, Info, Pencil, Plus, Trash2, X } from "lucide-react"
-import { memo, useCallback, useLayoutEffect, useMemo, useRef, useState } from "react"
+import { memo, useCallback, useId, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { DatePicker } from "~/components/custom/date-picker-v2"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select"
+import { Switch } from "~/components/ui/switch"
 import {
   Table,
   TableBody,
@@ -31,6 +32,7 @@ import {
   TableRow,
 } from "~/components/ui/table"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip"
+import { useIsMobile } from "~/hooks/use-mobile"
 import { clientConfig } from "~/lib/config"
 import { cn } from "~/lib/utils"
 import { useActiveTableFormStore } from "~/store/active-table-form"
@@ -231,6 +233,7 @@ function FieldCell({
 }) {
   const id = getItemId(item)
   const userChoice = useRvoUserChoice(id, field.key)
+  const showCustomValueButtons = useRvoImportReviewStore((state) => state.showCustomValueButtons)
   const setUserChoice = useRvoImportReviewStore((state) => state.setUserChoice)
   const activeForm = useActiveTableFormStore((store) => store.activeForm)
   const setActiveForm = useActiveTableFormStore((store) => store.setActiveForm)
@@ -320,10 +323,10 @@ function FieldCell({
 
   const editButton = (
     <div>
-      {field.allowCustomValue && !showInput && (
+      {showCustomValueButtons && field.allowCustomValue && !showInput && (
         <Button
           variant="ghost"
-          className={"invisible size-auto group-hover:visible has-[>svg]:p-1"}
+          className={"size-auto has-[>svg]:p-1"}
           title="Aanpassen..."
           onClick={() => setInputActive(true)}
         >
@@ -657,6 +660,43 @@ export const columns: ColumnDef<typeof importReviewTableFeatures, ReviewItem>[] 
 ]
 
 /**
+ * Shows a "show custom value buttons" toggle for the RVO import review table.
+ */
+export function CustomValueButtonsToggle() {
+  const showCustomValueButtons = useRvoImportReviewStore((state) => state.showCustomValueButtons)
+  const setShowCustomValueButtons = useRvoImportReviewStore(
+    (state) => state.setShowCustomValueButtons,
+  )
+  const isMobile = useIsMobile()
+  const switchId = useId()
+  const descriptionId = useId()
+
+  return isMobile ? null : (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <label htmlFor={switchId} className="flex items-center gap-2 self-center text-sm">
+          <Switch
+            id={switchId}
+            aria-describedby={descriptionId}
+            checked={showCustomValueButtons}
+            onCheckedChange={setShowCustomValueButtons}
+          />
+          Aanpasknopjes tonen
+          <span id={descriptionId} className="sr-only">
+            Hiermee kun je voor elke kolom een aangepaste waarde toevoegen.
+          </span>
+        </label>
+      </TooltipTrigger>
+      <TooltipContent>
+        {showCustomValueButtons
+          ? "Klik om de potloodknopjes te verbergen."
+          : "Hiermee kun je voor elke kolom een aangepaste waarde toevoegen."}
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
+/**
  * Works like setState, however only allows a next value argument, and resets the state whenever
  * `key` changes.
  *
@@ -737,6 +777,16 @@ function RvoImportReviewTableComponent({
 }: RvoImportReviewTableProps) {
   const clearActiveForm = useActiveTableFormStore((store) => store.clearActiveForm)
 
+  const setShowCustomValueButtons = useRvoImportReviewStore(
+    (state) => state.setShowCustomValueButtons,
+  )
+  const isMobile = useIsMobile()
+  useLayoutEffect(() => {
+    if (isMobile) {
+      setShowCustomValueButtons(true)
+    }
+  }, [isMobile, setShowCustomValueButtons])
+
   const sortedData = useMemo(() => {
     return [...data].sort((a, b) => {
       const getArea = (item: typeof a): number | null => {
@@ -781,7 +831,7 @@ function RvoImportReviewTableComponent({
       }
     }
     useRvoImportReviewStore.getState().reset(initialChoices)
-  }, [data, ctx])
+  }, [data, ctx, clearActiveForm])
 
   const table = useTable({
     data: sortedData,

@@ -35,7 +35,11 @@ import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { RvoConnectCard } from "~/components/blocks/rvo/connect-card"
 import { RvoErrorAlert } from "~/components/blocks/rvo/error-alert"
-import { RvoImportReviewTable, useRvoImportForm } from "~/components/blocks/rvo/import-review-table"
+import {
+  CustomValueButtonsToggle,
+  RvoImportReviewTable,
+  useRvoImportForm,
+} from "~/components/blocks/rvo/import-review-table"
 import { ImportReviewChoicesSchema } from "~/components/blocks/rvo/schema"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
@@ -372,6 +376,7 @@ export default function RvoImportCreatePage() {
             <FarmContent>
               <div className="flex flex-col space-y-4 pb-10">
                 <div className="flex justify-end">
+                  <CustomValueButtonsToggle />
                   <Form method="post" action={`/farm/create/${b_id_farm}/${calendar}/rvo`}>
                     <input type="hidden" name="intent" value="save_fields" />
                     <input

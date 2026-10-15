@@ -7,7 +7,11 @@ import { toast } from "sonner"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { MijnPercelenUploadForm } from "~/components/blocks/mijnpercelen/form-upload"
-import { RvoImportReviewTable, useRvoImportForm } from "~/components/blocks/rvo/import-review-table"
+import {
+  CustomValueButtonsToggle,
+  RvoImportReviewTable,
+  useRvoImportForm,
+} from "~/components/blocks/rvo/import-review-table"
 import { Button } from "~/components/ui/button"
 import { cn } from "~/lib/utils"
 import type { genericAction, loader } from "./loader-and-action.server"
@@ -157,6 +161,8 @@ export function UploadMijnPercelenPage({
                     name="fieldsToUpdate"
                     value={JSON.stringify(formValues.fieldsToUpdate)}
                   />
+
+                  <CustomValueButtonsToggle />
 
                   <Button asChild variant="outline" className={cn(isSaving && "opacity-50")}>
                     {/* Vanilla anchor triggers refresh behavior */}
