@@ -36,6 +36,13 @@
       "when": 1789552297423,
       "tag": "0004_luxuriant_goliath",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792076654377,
+      "tag": "0005_famous_gravity",
+      "breakpoints": true
     }
   ]
 }

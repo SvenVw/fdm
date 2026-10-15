@@ -113,8 +113,7 @@ export type TicketFilters = AssigneeFilter &
 
 export type TicketSorting = "created" | "priority" | "text_relevance"
 
-export type ImpersonationRequestFilters =
-  | AgentFilter
-  | PaginationFilter
-  | TargetPrincipalFilter
-  | TimeframeFilter
+export type ImpersonationRequestFilters = AgentFilter &
+  PaginationFilter &
+  TargetPrincipalFilter &
+  TimeframeFilter

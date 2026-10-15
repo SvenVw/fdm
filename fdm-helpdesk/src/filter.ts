@@ -14,8 +14,36 @@ import {
   sql,
 } from "drizzle-orm"
 import type { FdmHelpdeskType } from "./fdm-helpdesk.types"
-import type { AgentFilters, MessageFilters, TicketFilters } from "./filter.types"
+import type {
+  AgentFilters,
+  ImpersonationRequestFilters,
+  MessageFilters,
+  TicketFilters,
+} from "./filter.types"
 import * as schema from "./db/schema-helpdesk"
+
+/**
+ * Gets the WHERE clause to filter a database impersonation request selection
+ *
+ * The query needs to start by selecting "fdm-helpdesk"."impersonation_requests"
+ *
+ * @param filters filters to apply
+ * @returns a drizzle-orm SQL object
+ */
+export function getImpersonationRequestWhereClause(filters: ImpersonationRequestFilters) {
+  return and(
+    // To not have an empty case
+    sql`TRUE`,
+    Array.isArray(filters.agents) && filters.agents.length > 0
+      ? inArray(schema.impersonationRequests.agent_id, filters.agents)
+      : undefined,
+    Array.isArray(filters.targetPrincipals) && filters.targetPrincipals.length > 0
+      ? inArray(schema.impersonationRequests.target_principal_id, filters.targetPrincipals)
+      : undefined,
+    filters.fromDate ? gte(schema.impersonationRequests.created, filters.fromDate) : undefined,
+    filters.toDate ? lte(schema.impersonationRequests.created, filters.toDate) : undefined,
+  )
+}
 
 /**
  * Gets the WHERE clause to filter a database agent selection
