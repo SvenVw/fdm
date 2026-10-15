@@ -3,6 +3,7 @@ import {
   getFarms,
   listFarmGroups,
   removeFarmGroup,
+  removeFarmGroupMembership,
   renameFarmGroup,
   updateFarmGroupMembership,
 } from "@nmi-agro/fdm-core"
@@ -114,7 +115,13 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 }
 
 const FormSchema = z.object({
-  intent: z.enum(["rename_group", "delete_group", "add_farm", "update_membership"]),
+  intent: z.enum([
+    "rename_group",
+    "delete_group",
+    "add_farm",
+    "update_membership",
+    "delete_membership",
+  ]),
   b_id_farm: z.string().optional(),
   b_name_group: z.string().trim().min(1, { error: "Geef de groep een naam" }).optional(),
 })
@@ -199,6 +206,21 @@ export async function action({ request, params }: Route.ActionArgs) {
           { b_group_joined, b_group_leaved: b_group_leaved ?? null },
         )
         return dataWithSuccess(null, { message: "De periode is bijgewerkt." })
+      }
+      if (intent === "delete_membership") {
+        const b_group_joined_current = parseDateInput(formData.get("b_group_joined_current"))
+        if (!b_group_joined_current) {
+          return dataWithError(null, { message: "Vul een geldige startdatum in." })
+        }
+        // Deletes the period itself, as if the farm never was part of the group in it
+        await removeFarmGroupMembership(
+          fdm,
+          session.principal_id,
+          group.b_id_group,
+          b_id_farm,
+          b_group_joined_current,
+        )
+        return dataWithSuccess(null, { message: "De periode is verwijderd." })
       }
     } catch (error) {
       const message = getFarmGroupErrorMessage(error)
@@ -308,6 +330,7 @@ function MembershipRow({
             Wijzigen
           </Button>
         )}
+        {!editing && <DeleteMembershipButton groupId={groupId} membership={membership} />}
       </div>
       <p className="text-muted-foreground text-sm">
         Maakt deel uit van de groep vanaf {formatPeriodDate(membership.b_group_joined)}
@@ -503,6 +526,65 @@ function RenameGroupCard({ group }: { group: { b_id_group: string; b_name_group:
         </fetcher.Form>
       </CardContent>
     </Card>
+  )
+}
+
+/**
+ * Deletes a period after confirmation, as if the farm never was part of the group in it. Ending a
+ * membership instead is done by setting an end date.
+ */
+function DeleteMembershipButton({
+  groupId,
+  membership,
+}: {
+  groupId: string
+  membership: GroupMembership
+}) {
+  const fetcher = useFetcher<typeof action>()
+  const isSubmitting = fetcher.state !== "idle"
+  const farmName = membership.b_name_farm ?? "Onbekend"
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="text-destructive"
+          disabled={isSubmitting}
+          aria-label={`Periode van ${farmName} verwijderen`}
+        >
+          <Trash2 className="size-4" />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Periode van {farmName} verwijderen?</AlertDialogTitle>
+          <AlertDialogDescription>
+            De periode vanaf {formatPeriodDate(membership.b_group_joined)}
+            {membership.b_group_leaved
+              ? ` tot ${formatPeriodDate(membership.b_group_leaved)}`
+              : ", zonder einddatum,"}{" "}
+            wordt verwijderd, alsof het bedrijf in die periode nooit deel uitmaakte van de groep.
+            Andere periodes van het bedrijf blijven bestaan. Wilt u alleen vastleggen dat het
+            bedrijf de groep verlaat? Kies dan Wijzigen en vul een einddatum in. Verwijderen kan
+            niet worden teruggedraaid.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Annuleren</AlertDialogCancel>
+          <fetcher.Form method="post">
+            <input type="hidden" name="b_id_group" value={groupId} />
+            <input type="hidden" name="b_id_farm" value={membership.b_id_farm} />
+            <input type="hidden" name="b_group_joined_current" value={membership.b_group_joined} />
+            <AlertDialogAction type="submit" name="intent" value="delete_membership">
+              Verwijderen
+            </AlertDialogAction>
+          </fetcher.Form>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
 

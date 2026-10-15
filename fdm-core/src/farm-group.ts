@@ -746,3 +746,76 @@ export async function updateFarmGroupMembership(
     })
   }
 }
+
+/**
+ * Deletes a period in which a farm is part of a group, as if the farm never was part of the group
+ * in that period.
+ *
+ * Unlike {@link removeFarmFromGroup}, which records an end date and keeps the history, this deletes
+ * the joining event and, when present, the leaving event of the period. Use it to correct a period
+ * that was recorded by mistake. Other periods of the farm in the group are kept.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal deleting the period. Needs write permission on the group.
+ * @param b_id_group - The identifier of the group.
+ * @param b_id_farm - The identifier of the farm.
+ * @param b_group_joined - The start date of the period, which identifies it.
+ *
+ * @throws {Error} If the principal lacks write permission, the date is invalid or the period does not exist.
+ *
+ * @alpha
+ */
+export async function removeFarmGroupMembership(
+  fdm: FdmType,
+  principal_id: string,
+  b_id_group: schema.farmGroupsTypeSelect["b_id_group"],
+  b_id_farm: schema.farmsTypeSelect["b_id_farm"],
+  b_group_joined: schema.farmGroupJoiningTypeSelect["b_group_joined"],
+): Promise<void> {
+  try {
+    await fdm.transaction(async (tx: FdmType) => {
+      await checkPermission(
+        tx,
+        "farm_group",
+        "write",
+        b_id_group,
+        principal_id,
+        "removeFarmGroupMembership",
+      )
+      assertValidDate(b_group_joined, "The start date of the period")
+
+      const periods = (await getPeriods(tx, [b_id_group])).get(b_id_group)?.get(b_id_farm) ?? []
+      const period = periods.find((p) => p.b_group_joined.getTime() === b_group_joined.getTime())
+      if (!period) {
+        throw new Error("Farm group membership not found")
+      }
+
+      await tx
+        .delete(schema.farmGroupJoining)
+        .where(
+          and(
+            eq(schema.farmGroupJoining.b_id_group, b_id_group),
+            eq(schema.farmGroupJoining.b_id_farm, b_id_farm),
+            eq(schema.farmGroupJoining.b_group_joined, period.b_group_joined),
+          ),
+        )
+      if (period.b_group_leaved) {
+        await tx
+          .delete(schema.farmGroupLeaving)
+          .where(
+            and(
+              eq(schema.farmGroupLeaving.b_id_group, b_id_group),
+              eq(schema.farmGroupLeaving.b_id_farm, b_id_farm),
+              eq(schema.farmGroupLeaving.b_group_leaved, period.b_group_leaved),
+            ),
+          )
+      }
+    })
+  } catch (err) {
+    throw handleError(err, "Exception for removeFarmGroupMembership", {
+      b_id_group,
+      b_id_farm,
+      b_group_joined: b_group_joined?.toString(),
+    })
+  }
+}

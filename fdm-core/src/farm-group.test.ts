@@ -14,6 +14,7 @@ import {
   listFarmGroups,
   removeFarmFromGroup,
   removeFarmGroup,
+  removeFarmGroupMembership,
   renameFarmGroup,
   updateFarmGroupMembership,
 } from "./farm-group"
@@ -193,7 +194,13 @@ describe("Farm group functions", () => {
 
     it("should record a leaving event instead of deleting the joining", async () => {
       const b_id_group = await createFarmGroup(fdm, member_id, b_id_organization, "Leaving group")
-      await addFarmToGroup(fdm, member_id, b_id_group, b_id_farm_a, new Date("2020-01-01T00:00:00Z"))
+      await addFarmToGroup(
+        fdm,
+        member_id,
+        b_id_group,
+        b_id_farm_a,
+        new Date("2020-01-01T00:00:00Z"),
+      )
       await removeFarmFromGroup(fdm, member_id, b_id_group, b_id_farm_a)
       // Removing a non-member is a no-op
       await removeFarmFromGroup(fdm, member_id, b_id_group, b_id_farm_a)
@@ -446,6 +453,63 @@ describe("Farm group functions", () => {
         update(outsider_id, "2022-01-01T00:00:00Z", { b_group_leaved: t("2023-01-01T00:00:00Z") }),
         DENIED,
       )
+    })
+
+    it("should delete a period as if the farm never was part of the group then", async () => {
+      const b_id_group = await createFarmGroup(fdm, member_id, b_id_organization, "Delete period")
+      const t = (iso: string) => new Date(iso)
+      await addFarmToGroup(fdm, member_id, b_id_group, b_id_farm_a, t("2020-01-01T00:00:00Z"))
+      await removeFarmFromGroup(fdm, member_id, b_id_group, b_id_farm_a, t("2021-01-01T00:00:00Z"))
+      await addFarmToGroup(fdm, member_id, b_id_group, b_id_farm_a, t("2022-01-01T00:00:00Z"))
+
+      await expectCause(
+        removeFarmGroupMembership(
+          fdm,
+          outsider_id,
+          b_id_group,
+          b_id_farm_a,
+          t("2020-01-01T00:00:00Z"),
+        ),
+        DENIED,
+      )
+      await removeFarmGroupMembership(
+        fdm,
+        member_id,
+        b_id_group,
+        b_id_farm_a,
+        t("2020-01-01T00:00:00Z"),
+      )
+      await expectCause(
+        removeFarmGroupMembership(
+          fdm,
+          member_id,
+          b_id_group,
+          b_id_farm_a,
+          t("2020-01-01T00:00:00Z"),
+        ),
+        "not found",
+      )
+
+      // Only the other period remains, without any trace of the deleted one
+      const group = await getFarmGroup(fdm, member_id, b_id_group)
+      expect(group.memberships).toEqual([
+        { b_id_farm: b_id_farm_a, b_group_joined: t("2022-01-01T00:00:00Z"), b_group_leaved: null },
+      ])
+      const leavings = await fdm
+        .select()
+        .from(schema.farmGroupLeaving)
+        .where(eq(schema.farmGroupLeaving.b_id_group, b_id_group))
+      expect(leavings).toHaveLength(0)
+
+      // Deleting the open period too leaves the farm with no history in the group
+      await removeFarmGroupMembership(
+        fdm,
+        member_id,
+        b_id_group,
+        b_id_farm_a,
+        t("2022-01-01T00:00:00Z"),
+      )
+      expect((await getFarmGroup(fdm, member_id, b_id_group)).memberships).toEqual([])
     })
 
     it("should store the start and end date of a period in one step", async () => {

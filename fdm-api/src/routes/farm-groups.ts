@@ -6,6 +6,7 @@ import type {
   getFarmGroup,
   listFarmGroups,
   removeFarmFromGroup,
+  removeFarmGroupMembership,
   updateFarmGroupMembership,
   removeFarmGroup,
   renameFarmGroup,
@@ -44,7 +45,10 @@ export interface FarmGroupServices {
   addFarmToGroup: typeof addFarmToGroup
   /** Records a farm leaving a group. */
   removeFarmFromGroup: typeof removeFarmFromGroup
+  /** Changes the dates of a period in which a farm is part of a group. */
   updateFarmGroupMembership: typeof updateFarmGroupMembership
+  /** Deletes a period in which a farm is part of a group, without keeping history. */
+  removeFarmGroupMembership: typeof removeFarmGroupMembership
 }
 
 const FarmGroupMembershipSchema = z
@@ -289,6 +293,29 @@ const updateGroupMembershipRoute = createRoute({
       content: { "application/json": { schema: FarmGroupSchema } },
     },
     ...writeErrorResponses,
+  },
+})
+
+const deleteGroupMembershipRoute = createRoute({
+  method: "delete",
+  path: "/farm-groups/{b_id_group}/farms/{b_id_farm}/{b_group_joined}",
+  tags: ["Farm Groups"],
+  summary: "Delete a membership period",
+  description:
+    "Deletes a period in which a farm is part of the group, as if the farm never was part of the group in that period. The period is identified by the b_group_joined in the path, its join date. Unlike removing a farm from a group, which records an end date and keeps the history, this removes the period itself, for example to correct a mistake. Other periods of the farm in the group are kept.",
+  security: [{ ApiKeyHeader: [] }, { BearerAuth: [] }],
+  request: {
+    params: z.object({
+      b_id_group: z.string(),
+      b_id_farm: z.string(),
+      b_group_joined: DateStringSchema.describe(
+        "Join date of the period (YYYY-MM-DD). It identifies the period to delete.",
+      ),
+    }),
+  },
+  responses: {
+    204: { description: "Membership period deleted." },
+    ...commonErrorResponses,
   },
 })
 
@@ -552,6 +579,30 @@ export function registerFarmGroupRoutes(
     return c.json(serialiseFarmGroup(group), 200)
   }
 
+  const deleteGroupMembershipHandler: RouteHandler<typeof deleteGroupMembershipRoute> = async (
+    c,
+  ) => {
+    const principal = c.get("principal") as unknown as ApiPrincipalContext
+    // @ts-expect-error: @hono/zod-openapi type inference is broken with TypeScript 6 + Zod v4
+    const { b_id_group, b_id_farm, b_group_joined } = c.req.valid("param") as {
+      b_id_group: string
+      b_id_farm: string
+      b_group_joined: string
+    }
+    try {
+      await services.removeFarmGroupMembership(
+        fdm,
+        principal.effectivePrincipalId,
+        b_id_group,
+        b_id_farm,
+        new Date(b_group_joined),
+      )
+    } catch (err) {
+      translateFarmGroupError(err)
+    }
+    return c.newResponse(null, 204)
+  }
+
   app.openapi(listFarmGroupsRoute, listFarmGroupsHandler)
   app.openapi(createFarmGroupRoute, createFarmGroupHandler)
   app.openapi(getFarmGroupRoute, getFarmGroupHandler)
@@ -560,4 +611,5 @@ export function registerFarmGroupRoutes(
   app.openapi(addFarmToGroupRoute, addFarmToGroupHandler)
   app.openapi(removeFarmFromGroupRoute, removeFarmFromGroupHandler)
   app.openapi(updateGroupMembershipRoute, updateGroupMembershipHandler)
+  app.openapi(deleteGroupMembershipRoute, deleteGroupMembershipHandler)
 }

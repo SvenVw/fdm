@@ -88,6 +88,7 @@ export {
   listFarmGroups,
   removeFarmFromGroup,
   removeFarmGroup,
+  removeFarmGroupMembership,
   renameFarmGroup,
   updateFarmGroupMembership,
 } from "./farm-group"

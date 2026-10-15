@@ -506,3 +506,47 @@ describe("PATCH /farm-groups/{b_id_group}/farms/{b_id_farm}", () => {
     expect(noKey.status).toBe(401)
   })
 })
+
+describe("DELETE /farm-groups/{b_id_group}/farms/{b_id_farm}/{b_group_joined}", () => {
+  beforeEach(() => validKey())
+
+  it("deletes the period and returns 204", async () => {
+    const removeFarmGroupMembership = vi.fn().mockResolvedValue(undefined)
+    const res = await makeApp({ removeFarmGroupMembership }).request(
+      "/farm-groups/group-1/farms/farm-1/2020-01-01",
+      { method: "DELETE", headers },
+    )
+    expect(res.status).toBe(204)
+    expect(removeFarmGroupMembership).toHaveBeenCalledWith(
+      mockFdm,
+      "user-1",
+      "group-1",
+      "farm-1",
+      new Date("2020-01-01"),
+    )
+  })
+
+  it("returns 404 when no period starts on that date", async () => {
+    const removeFarmGroupMembership = vi
+      .fn()
+      .mockRejectedValue(coreError("Farm group membership not found"))
+    const res = await makeApp({ removeFarmGroupMembership }).request(
+      "/farm-groups/group-1/farms/farm-1/2020-01-01",
+      { method: "DELETE", headers },
+    )
+    expect(res.status).toBe(404)
+    expect(res.headers.get("content-type")).toContain("application/problem+json")
+  })
+
+  it("returns 400 for an invalid join date in the path and 401 without a key", async () => {
+    const bad = await makeApp().request("/farm-groups/group-1/farms/farm-1/not-a-date", {
+      method: "DELETE",
+      headers,
+    })
+    expect(bad.status).toBe(400)
+    const noKey = await makeApp().request("/farm-groups/group-1/farms/farm-1/2020-01-01", {
+      method: "DELETE",
+    })
+    expect(noKey.status).toBe(401)
+  })
+})

@@ -64,6 +64,7 @@ import {
   removeDerogation,
   removeFarm,
   removeFarmFromGroup,
+  removeFarmGroupMembership,
   updateFarmGroupMembership,
   removeFarmGroup,
   renameFarmGroup,
@@ -128,6 +129,7 @@ export interface FdmApiServices {
   addFarmToGroup: typeof addFarmToGroup
   removeFarmFromGroup: typeof removeFarmFromGroup
   updateFarmGroupMembership: typeof updateFarmGroupMembership
+  removeFarmGroupMembership: typeof removeFarmGroupMembership
   // Fields
   getFields: typeof getFields
   getField: typeof getField
@@ -226,6 +228,7 @@ const defaultServices: FdmApiServices = {
   addFarmToGroup,
   removeFarmFromGroup,
   updateFarmGroupMembership,
+  removeFarmGroupMembership,
   getFields,
   getField,
   addField,
