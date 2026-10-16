@@ -38,6 +38,8 @@ interface DataTableProps<TData extends RowData> {
   groups?: { b_id_group: string; b_name_group: string }[]
   /** Path of the group management page for the selected calendar year. */
   groupsPath?: string
+  /** The selected calendar, a year such as `"2025"` or `"all"`. */
+  calendar?: string
   /** Default start date (`YYYY-MM-DD`) when assigning farms to groups: 1 January of the selected year. */
   defaultJoined?: string
 }
@@ -57,6 +59,7 @@ export function DataTable<TData extends FarmExtended>({
   data,
   groups = [],
   groupsPath = "",
+  calendar = "all",
   defaultJoined = "",
 }: DataTableProps<TData>) {
   const hasGroups = groups.length > 0
@@ -134,6 +137,7 @@ export function DataTable<TData extends FarmExtended>({
               groups={groups}
               farms={selectedFarms}
               groupsPath={groupsPath}
+              calendar={calendar}
               defaultJoined={defaultJoined}
               onAssigned={() => setRowSelection({})}
             />

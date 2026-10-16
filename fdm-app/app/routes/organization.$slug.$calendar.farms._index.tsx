@@ -345,6 +345,7 @@ export default function OrganizationFarmsPage() {
               data={data}
               groups={groups}
               groupsPath={groupsPath}
+              calendar={calendar}
               defaultJoined={defaultJoined}
             />
           </div>
