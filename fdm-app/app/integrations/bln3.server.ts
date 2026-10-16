@@ -355,6 +355,10 @@ export async function getMeasureAdviceForField({
     }
 
     const nmiApiKey = getNmiApiKey()
+    if (!nmiApiKey) {
+      return null
+    }
+
     return await getBln3MeasureAdvice(fdm, {
       ...inputs,
       nmiApiKey,

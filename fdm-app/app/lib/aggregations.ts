@@ -2,7 +2,7 @@ import type { Bln3Score } from "@nmi-agro/fdm-calculator"
 import {
   computeAreaWeightedAggregation,
   getFieldAggregationScore,
-} from "@nmi-agro/fdm-calculator"
+} from "@nmi-agro/fdm-calculator/indicators"
 
 export const AGG_IDS: AggregationId[] = [
   "S_BLN",

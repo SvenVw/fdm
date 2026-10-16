@@ -7,6 +7,8 @@ import type {
 import type { FdmType, getFarm, getField } from "@nmi-agro/fdm-core"
 import { createRoute, z } from "@hono/zod-openapi"
 import { IndicatorsUnavailableError } from "@nmi-agro/fdm-calculator"
+import * as Sentry from "@sentry/node"
+import { nanoid } from "nanoid"
 import type { ApiEnv, ApiPrincipalContext } from "../types"
 import { ApiError } from "../error"
 import { rateLimitMiddleware } from "../rate-limit"
@@ -225,7 +227,8 @@ const fieldMeasureOptionsRoute = createRoute({
 
 /**
  * Maps failures of Indicator calculations to a generic 503 problem response, keeping upstream
- * details and credentials out of the response. Other errors (permissions, missing
+ * details and credentials out of the response. The underlying cause is logged and reported
+ * server-side under the same `error_id` as the response. Other errors (permissions, missing
  * resources) pass through to the central error handler.
  */
 async function guardIndicators<T>(work: () => Promise<T>): Promise<T> {
@@ -233,10 +236,18 @@ async function guardIndicators<T>(work: () => Promise<T>): Promise<T> {
     return await work()
   } catch (err) {
     if (err instanceof IndicatorsUnavailableError) {
+      const error_id = nanoid()
+      console.error(`[fdm-api] error_id=${error_id} Indicator calculation failed:`, err)
+      Sentry.withScope((scope) => {
+        scope.setTag("error_id", error_id)
+        Sentry.captureException(err)
+      })
       throw new ApiError(
         503,
         "service-unavailable",
         "Indicator results are temporarily unavailable. Try again later.",
+        undefined,
+        error_id,
       )
     }
     throw err
