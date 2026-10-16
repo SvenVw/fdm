@@ -2,7 +2,7 @@ import type { GoogleOptions, User } from "better-auth"
 import { apiKey } from "@better-auth/api-key"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { betterAuth } from "better-auth/minimal"
-import { magicLink, organization, username } from "better-auth/plugins"
+import { admin, magicLink, organization, username } from "better-auth/plugins"
 import { eq } from "drizzle-orm"
 import { customAlphabet } from "nanoid"
 import { generateFromEmail } from "unique-username-generator"
@@ -123,6 +123,9 @@ export function createFdmAuth(
       enabled: emailAndPassword || false,
     },
     plugins: [
+      admin({
+        adminRoles: ["user"],
+      }),
       apiKey({
         references: "user",
         rateLimit: {
