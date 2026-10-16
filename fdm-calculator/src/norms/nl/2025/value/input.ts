@@ -7,6 +7,9 @@ import {
   getField,
   getFields,
   getGrazingIntention,
+  getHarvests,
+  getHarvestsForFarm,
+  type Harvest,
   isDerogationGrantedForYear,
   type PrincipalId,
   type Timeframe,
@@ -21,6 +24,8 @@ export type NL2025FdmCoreOperations = {
   getCurrentSoilData: typeof getCurrentSoilData
   getCurrentSoilDataForFarm: typeof getCurrentSoilDataForFarm
   getGrazingIntention: typeof getGrazingIntention
+  getHarvests: typeof getHarvests
+  getHarvestsForFarm: typeof getHarvestsForFarm
   isDerogationGrantedForYear: typeof isDerogationGrantedForYear
 }
 
@@ -28,6 +33,7 @@ export type NL2025SingleFdmCoreOperations = Pick<
   NL2025FdmCoreOperations,
   | "getField"
   | "getCultivations"
+  | "getHarvests"
   | "getCurrentSoilData"
   | "getGrazingIntention"
   | "isDerogationGrantedForYear"
@@ -37,6 +43,7 @@ export type NL2025FarmFdmCoreOperations = Pick<
   NL2025FdmCoreOperations,
   | "getFields"
   | "getCultivationsForFarm"
+  | "getHarvestsForFarm"
   | "getCurrentSoilDataForFarm"
   | "getGrazingIntention"
   | "isDerogationGrantedForYear"
@@ -50,13 +57,26 @@ const defaultOperations: NL2025FdmCoreOperations = {
   getCurrentSoilData,
   getCurrentSoilDataForFarm,
   getGrazingIntention,
+  getHarvests,
+  getHarvestsForFarm,
   isDerogationGrantedForYear,
+}
+
+/**
+ * Reduces harvest records to the fields needed for the norm calculation.
+ *
+ * @param harvests - Harvest records of a cultivation.
+ * @returns The harvest dates, one entry per harvest.
+ */
+function pickHarvestDates(harvests: Harvest[]): Pick<Harvest, "b_lu_harvest_date">[] {
+  return harvests.map(({ b_lu_harvest_date }) => ({ b_lu_harvest_date }))
 }
 
 /**
  * Collects all necessary input data from the FDM to calculate the Dutch (NL) norms for the year 2025.
  *
- * This function orchestrates fetching data for a given farm, its fields, cultivations, and soil analyses,
+ * This function orchestrates fetching data for a given farm, its fields, cultivations (with their
+ * harvests in the norm year), and soil analyses,
  * and structures it into a format suitable for the various NL 2025 norm calculation functions.
  *
  * @param fdm - An initialized FdmType instance for data access.
@@ -108,6 +128,19 @@ export async function collectNL2025InputForNorms(
     timeframe2025Cultivation,
   )
 
+  // Attach the harvests within the norm year, to tell eenmalige from meermalige oogst
+  const cultivationsWithHarvests = await Promise.all(
+    cultivations.map(async (cultivation) => {
+      const harvests = await operations.getHarvests(
+        fdm,
+        principal_id,
+        cultivation.b_lu,
+        timeframe2025,
+      )
+      return { ...cultivation, harvests: pickHarvestDates(harvests) }
+    }),
+  )
+
   // 4. Get the details of the soil analyses
   const soilAnalysis = await operations.getCurrentSoilData(
     fdm,
@@ -132,7 +165,7 @@ export async function collectNL2025InputForNorms(
       has_grazing_intention,
     },
     field: field,
-    cultivations: cultivations,
+    cultivations: cultivationsWithHarvests,
     soilAnalysis: soilAnalysisPicked,
   }
 }
@@ -141,7 +174,8 @@ export async function collectNL2025InputForNorms(
  * Collects all necessary input data for the NL 2025 norms for every field on a farm.
  *
  * Farm-level data (`isDerogationGrantedForYear`, `getGrazingIntention`) is fetched once.
- * Per-field data (`getCultivations`, `getCurrentSoilData`) is fetched in two farm-level queries.
+ * Per-field data (`getCultivations`, `getHarvests`, `getCurrentSoilData`) is fetched in three
+ * farm-level queries. Harvests are limited to the norm year and attached to each cultivation by `b_lu`.
  *
  * @param fdm - An initialized FdmType instance for data access.
  * @param principal_id - The ID of the principal initiating the data collection.
@@ -168,12 +202,14 @@ export async function collectNL2025InputForNormsForFarm(
     is_derogatie_bedrijf,
     has_grazing_intention,
     cultivationsByField,
+    harvestsByCultivation,
     soilDataByField,
   ] = await Promise.all([
     operations.getFields(fdm, principal_id, b_id_farm, timeframe2025Cultivation),
     operations.isDerogationGrantedForYear(fdm, principal_id, b_id_farm, year),
     operations.getGrazingIntention(fdm, principal_id, b_id_farm, year),
     operations.getCultivationsForFarm(fdm, principal_id, b_id_farm, timeframe2025Cultivation),
+    operations.getHarvestsForFarm(fdm, principal_id, b_id_farm, timeframe2025),
     operations.getCurrentSoilDataForFarm(fdm, principal_id, b_id_farm, timeframe2025),
   ])
 
@@ -193,7 +229,10 @@ export async function collectNL2025InputForNormsForFarm(
     result.set(field.b_id, {
       farm: { is_derogatie_bedrijf, has_grazing_intention },
       field,
-      cultivations: cultivationsByField.get(field.b_id) ?? [],
+      cultivations: (cultivationsByField.get(field.b_id) ?? []).map((cultivation) => ({
+        ...cultivation,
+        harvests: pickHarvestDates(harvestsByCultivation.get(cultivation.b_lu) ?? []),
+      })),
       soilAnalysis: soilAnalysisPicked,
     })
   }
