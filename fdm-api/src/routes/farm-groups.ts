@@ -254,7 +254,7 @@ const removeFarmFromGroupRoute = createRoute({
   tags: ["Farm Groups"],
   summary: "Remove a farm from a group",
   description:
-    "Records the date until which a farm is part of the group (default: today). The membership history is kept. Removing a farm that is not part of the group on that date has no effect. Without a date, a planned end date after today is moved to today, and a membership that starts in the future is rejected with a conflict.",
+    "Records the date until which a farm is part of the group (default: today). The membership history is kept. Removing a farm that is not part of the group on that date has no effect. A planned end date later than the given date (default: today) is moved forward to it. Without a date, a membership that starts in the future is rejected with a conflict.",
   security: [{ ApiKeyHeader: [] }, { BearerAuth: [] }],
   request: {
     params: z.object({ b_id_group: z.string(), b_id_farm: z.string() }),

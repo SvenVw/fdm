@@ -338,7 +338,7 @@ describe("Farm group functions", () => {
       )
     })
 
-    it("should reject a second end date and an earlier start date", async () => {
+    it("should move a later end date forward and reject an earlier start date", async () => {
       const b_id_group = await createFarmGroup(fdm, member_id, b_id_organization, "Conflict group")
       await addFarmToGroup(
         fdm,
@@ -354,16 +354,28 @@ describe("Farm group functions", () => {
         b_id_farm_a,
         new Date("2025-01-01T00:00:00Z"),
       )
-      await expectCause(
-        removeFarmFromGroup(
-          fdm,
-          member_id,
-          b_id_group,
-          b_id_farm_a,
-          new Date("2024-01-01T00:00:00Z"),
-        ),
-        "already has an end date",
+      // Ending earlier than the planned end date moves the end date forward
+      await removeFarmFromGroup(
+        fdm,
+        member_id,
+        b_id_group,
+        b_id_farm_a,
+        new Date("2024-01-01T00:00:00Z"),
       )
+      const group = await getFarmGroup(fdm, member_id, b_id_group)
+      expect(group.memberships).toEqual([
+        {
+          b_id_farm: b_id_farm_a,
+          b_group_joined: new Date("2020-03-01T00:00:00Z"),
+          b_group_leaved: new Date("2024-01-01T00:00:00Z"),
+        },
+      ])
+      const leavings = await fdm
+        .select()
+        .from(schema.farmGroupLeaving)
+        .where(eq(schema.farmGroupLeaving.b_id_group, b_id_group))
+      expect(leavings).toHaveLength(1)
+
       await expectCause(
         addFarmToGroup(fdm, member_id, b_id_group, b_id_farm_a, new Date("2019-01-01T00:00:00Z")),
         "later date",

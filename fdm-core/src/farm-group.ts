@@ -549,8 +549,9 @@ export async function addFarmToGroup(
  *
  * The date is the date until which the farm is part of the group, as chosen by the user. It is
  * not the moment this function is called, so it can lie in the past or in the future. Without a
- * date the farm leaves the group at the start of today (UTC); a planned end date after today is
- * then moved to today. The history stays available, except when no date is given for a
+ * date the farm leaves the group at the start of today (UTC). When the membership already has a
+ * later end date, that end date is moved forward to the given date (or today). The history stays
+ * available, except when no date is given for a
  * membership that starts today: that membership is cancelled by deleting its events, because it
  * never took effect. Does nothing if the farm is not part of the group on that date, unless the date
  * lies on or before the start of the open period of the farm; that is rejected. Without a date, a
@@ -562,7 +563,7 @@ export async function addFarmToGroup(
  * @param b_id_farm - The identifier of the farm.
  * @param b_group_leaved - Optional. The date until which the farm is part of the group. Defaults to the start of today (UTC).
  *
- * @throws {Error} If the principal lacks write permission, the date is invalid or not after the date from which the farm is part of the group, a date is given while the membership already has an end date, or no date is given for a membership that starts in the future.
+ * @throws {Error} If the principal lacks write permission, the date is invalid or not after the date from which the farm is part of the group, or no date is given for a membership that starts in the future.
  *
  * @alpha
  */
@@ -641,10 +642,7 @@ export async function removeFarmFromGroup(
         return
       }
       if (period.b_group_leaved !== null) {
-        if (b_group_leaved !== undefined) {
-          throw new Error("The membership already has an end date")
-        }
-        // Without a date, a planned end date after today is moved to today
+        // A planned end date later than the given date (or today) is moved forward to it
         await deleteLeaving(tx, b_id_group, b_id_farm, period.b_group_leaved)
       }
 

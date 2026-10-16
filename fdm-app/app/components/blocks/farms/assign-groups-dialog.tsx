@@ -283,7 +283,9 @@ export function AssignGroupsDialog({
             )}
             {removes.length > 0 && (
               <p className="text-muted-foreground text-xs">
-                Een lidmaatschap dat al is afgelopen verandert niet. Pas zo'n periode aan via{" "}
+                Heeft het lidmaatschap al een latere einddatum, dan wordt die vervroegd naar deze
+                datum. Een lidmaatschap dat al eerder is afgelopen verandert niet; pas zo'n periode
+                aan via{" "}
                 <NavLink to={groupsPath} className="underline">
                   Groepen beheren
                 </NavLink>
