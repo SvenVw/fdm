@@ -240,8 +240,17 @@ export async function action({ request, params }: Route.ActionArgs) {
     const farmIds = formData.getAll("b_id_farm").map(String)
     const addGroupIds = formData.getAll("add_group").map(String)
     const removeGroupIds = formData.getAll("remove_group").map(String)
-    const b_group_joined = parseDateInput(formData.get("b_group_joined"))
-    const b_group_leaved = parseDateInput(formData.get("b_group_leaved"))
+    const joinedField = formData.get("b_group_joined")
+    const leavedField = formData.get("b_group_leaved")
+    const b_group_joined = parseDateInput(joinedField)
+    const b_group_leaved = parseDateInput(leavedField)
+    // A filled in but impossible date is an error, not a missing date
+    if (
+      (typeof joinedField === "string" && joinedField !== "" && !b_group_joined) ||
+      (typeof leavedField === "string" && leavedField !== "" && !b_group_leaved)
+    ) {
+      return dataWithError(null, { message: "Vul een geldige datum in." })
+    }
     if (b_group_joined && b_group_leaved && b_group_leaved <= b_group_joined) {
       return dataWithError(null, {
         message:

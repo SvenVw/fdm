@@ -370,6 +370,92 @@ describe("Farm group functions", () => {
       )
     })
 
+    it("should allow a closed period before a later period, but not an overlapping one", async () => {
+      const b_id_group = await createFarmGroup(fdm, member_id, b_id_organization, "Earlier group")
+      const t = (iso: string) => new Date(iso)
+      await addFarmToGroup(fdm, member_id, b_id_group, b_id_farm_a, t("2024-01-01T00:00:00Z"))
+
+      await expectCause(
+        addFarmToGroup(
+          fdm,
+          member_id,
+          b_id_group,
+          b_id_farm_a,
+          t("2020-01-01T00:00:00Z"),
+          t("2025-01-01T00:00:00Z"),
+        ),
+        "overlaps",
+      )
+      await addFarmToGroup(
+        fdm,
+        member_id,
+        b_id_group,
+        b_id_farm_a,
+        t("2020-01-01T00:00:00Z"),
+        t("2021-01-01T00:00:00Z"),
+      )
+
+      const group = await getFarmGroup(fdm, member_id, b_id_group)
+      expect(group.memberships).toEqual([
+        {
+          b_id_farm: b_id_farm_a,
+          b_group_joined: t("2020-01-01T00:00:00Z"),
+          b_group_leaved: t("2021-01-01T00:00:00Z"),
+        },
+        { b_id_farm: b_id_farm_a, b_group_joined: t("2024-01-01T00:00:00Z"), b_group_leaved: null },
+      ])
+    })
+
+    it("should move a planned end date to today when removing without a date", async () => {
+      const b_id_group = await createFarmGroup(fdm, member_id, b_id_organization, "Earlier end")
+      const from = new Date("2020-01-01T00:00:00Z")
+      await addFarmToGroup(fdm, member_id, b_id_group, b_id_farm_a, from)
+      await removeFarmFromGroup(
+        fdm,
+        member_id,
+        b_id_group,
+        b_id_farm_a,
+        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      )
+      await removeFarmFromGroup(fdm, member_id, b_id_group, b_id_farm_a)
+
+      const now = new Date()
+      const midnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+      const group = await getFarmGroup(fdm, member_id, b_id_group)
+      expect(group.memberships).toEqual([
+        { b_id_farm: b_id_farm_a, b_group_joined: from, b_group_leaved: midnight },
+      ])
+      const leavings = await fdm
+        .select()
+        .from(schema.farmGroupLeaving)
+        .where(eq(schema.farmGroupLeaving.b_id_group, b_id_group))
+      expect(leavings).toHaveLength(1)
+    })
+
+    it("should cancel a membership that starts today including its end date", async () => {
+      const b_id_group = await createFarmGroup(fdm, member_id, b_id_organization, "Cancel ended")
+      await addFarmToGroup(
+        fdm,
+        member_id,
+        b_id_group,
+        b_id_farm_a,
+        undefined,
+        new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      )
+      await removeFarmFromGroup(fdm, member_id, b_id_group, b_id_farm_a)
+
+      const joinings = await fdm
+        .select()
+        .from(schema.farmGroupJoining)
+        .where(eq(schema.farmGroupJoining.b_id_group, b_id_group))
+      const leavings = await fdm
+        .select()
+        .from(schema.farmGroupLeaving)
+        .where(eq(schema.farmGroupLeaving.b_id_group, b_id_group))
+      expect(joinings).toHaveLength(0)
+      expect(leavings).toHaveLength(0)
+    })
+
     it("should reject an end date before the start of the open period", async () => {
       const b_id_group = await createFarmGroup(fdm, member_id, b_id_organization, "Before group")
       await addFarmToGroup(

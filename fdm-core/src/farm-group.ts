@@ -161,6 +161,26 @@ async function getPeriods(
 }
 
 /**
+ * Deletes the leaving event of a farm in a group on a date.
+ */
+async function deleteLeaving(
+  tx: FdmType,
+  b_id_group: string,
+  b_id_farm: string,
+  b_group_leaved: Date,
+): Promise<void> {
+  await tx
+    .delete(schema.farmGroupLeaving)
+    .where(
+      and(
+        eq(schema.farmGroupLeaving.b_id_group, b_id_group),
+        eq(schema.farmGroupLeaving.b_id_farm, b_id_farm),
+        eq(schema.farmGroupLeaving.b_group_leaved, b_group_leaved),
+      ),
+    )
+}
+
+/**
  * Checks whether a farm is part of the group at a moment in time.
  */
 function isMemberAt(periods: Period[] | undefined, at: Date): boolean {
@@ -411,7 +431,8 @@ export async function removeFarmGroup(
  * already is part of the group on that date.
  *
  * Optionally the date until which the farm is part of the group can be given. Both dates are then
- * recorded in one transaction, so either the whole period is stored or nothing is.
+ * recorded in one transaction, so either the whole period is stored or nothing is. A period with
+ * an end date may lie before a later period of the farm, as long as the periods do not overlap.
  *
  * The farm must belong to the organization of the group, meaning the organization holds a role on it.
  *
@@ -422,7 +443,7 @@ export async function removeFarmGroup(
  * @param b_group_joined - Optional. The date from which the farm is part of the group. Defaults to the start of today (UTC).
  * @param b_group_leaved - Optional. The date until which the farm is part of the group. Must be after the date from which the farm is part of the group.
  *
- * @throws {Error} If the principal lacks permission, a date is invalid, the end date is not after the start date, the farm does not belong to the organization of the group, the farm already is part of the group from a later date, or an end date is given while the farm already is part of the group on the start date.
+ * @throws {Error} If the principal lacks permission, a date is invalid, the end date is not after the start date, the farm does not belong to the organization of the group, no end date is given while the farm already is part of the group from a later date, or an end date is given while the farm already is part of the group on the start date or the period overlaps another period of the farm.
  *
  * @alpha
  */
@@ -490,8 +511,20 @@ export async function addFarmToGroup(
         }
         return
       }
-      if (periods.some((period) => period.b_group_joined.getTime() > joined.getTime())) {
-        throw new Error("Farm already is part of the group from a later date")
+      if (b_group_leaved === undefined) {
+        // An open period would run into a later period of the farm
+        if (periods.some((period) => period.b_group_joined.getTime() > joined.getTime())) {
+          throw new Error("Farm already is part of the group from a later date")
+        }
+      } else if (
+        // A closed period may lie before a later period, but periods may touch, not overlap
+        periods.some(
+          (period) =>
+            joined.getTime() < (period.b_group_leaved?.getTime() ?? Number.POSITIVE_INFINITY) &&
+            period.b_group_joined.getTime() < b_group_leaved.getTime(),
+        )
+      ) {
+        throw new Error("The period overlaps another period of the farm in the group")
       }
 
       await tx
@@ -516,10 +549,10 @@ export async function addFarmToGroup(
  *
  * The date is the date until which the farm is part of the group, as chosen by the user. It is
  * not the moment this function is called, so it can lie in the past or in the future. Without a
- * date the farm leaves the group at the start of today (UTC). No rows are deleted, so the history
- * stays available, except when no date is given for a membership that starts today: that
- * membership is cancelled by deleting its joining event, because it never took effect. Does
- * nothing if the farm is not part of the group on that date, unless the date
+ * date the farm leaves the group at the start of today (UTC); a planned end date after today is
+ * then moved to today. The history stays available, except when no date is given for a
+ * membership that starts today: that membership is cancelled by deleting its events, because it
+ * never took effect. Does nothing if the farm is not part of the group on that date, unless the date
  * lies on or before the start of the open period of the farm; that is rejected. Without a date, a
  * membership that starts in the future is rejected as well, because it has not started yet.
  *
@@ -529,7 +562,7 @@ export async function addFarmToGroup(
  * @param b_id_farm - The identifier of the farm.
  * @param b_group_leaved - Optional. The date until which the farm is part of the group. Defaults to the start of today (UTC).
  *
- * @throws {Error} If the principal lacks write permission, the date is invalid or not after the date from which the farm is part of the group, the membership already has an end date, or no date is given for a membership that starts in the future.
+ * @throws {Error} If the principal lacks write permission, the date is invalid or not after the date from which the farm is part of the group, a date is given while the membership already has an end date, or no date is given for a membership that starts in the future.
  *
  * @alpha
  */
@@ -580,10 +613,6 @@ export async function removeFarmFromGroup(
         }
         return
       }
-      // Without a date there is nothing to do for a membership that already ended
-      if (b_group_leaved === undefined && period.b_group_leaved !== null) {
-        return
-      }
       if (period.b_group_joined.getTime() === leaved.getTime()) {
         if (b_group_leaved !== undefined) {
           throw new Error(
@@ -606,10 +635,17 @@ export async function removeFarmFromGroup(
               eq(schema.farmGroupJoining.b_group_joined, period.b_group_joined),
             ),
           )
+        if (period.b_group_leaved !== null) {
+          await deleteLeaving(tx, b_id_group, b_id_farm, period.b_group_leaved)
+        }
         return
       }
       if (period.b_group_leaved !== null) {
-        throw new Error("The membership already has an end date")
+        if (b_group_leaved !== undefined) {
+          throw new Error("The membership already has an end date")
+        }
+        // Without a date, a planned end date after today is moved to today
+        await deleteLeaving(tx, b_id_group, b_id_farm, period.b_group_leaved)
       }
 
       await tx
@@ -800,15 +836,7 @@ export async function removeFarmGroupMembership(
           ),
         )
       if (period.b_group_leaved) {
-        await tx
-          .delete(schema.farmGroupLeaving)
-          .where(
-            and(
-              eq(schema.farmGroupLeaving.b_id_group, b_id_group),
-              eq(schema.farmGroupLeaving.b_id_farm, b_id_farm),
-              eq(schema.farmGroupLeaving.b_group_leaved, period.b_group_leaved),
-            ),
-          )
+        await deleteLeaving(tx, b_id_group, b_id_farm, period.b_group_leaved)
       }
     })
   } catch (err) {
