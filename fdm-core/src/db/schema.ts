@@ -482,6 +482,7 @@ export const cultivationsCatalogue = fdmSchema.table(
     b_lu_source: text().notNull(),
     b_lu_name: text().notNull(),
     b_lu_name_en: text(),
+    b_lu_ya: integer().array(),
     b_lu_harvestable: harvestableEnum().notNull(),
     b_lu_harvestcat: harvestCatEnum(),
     b_lu_hcat3: text(),
@@ -505,6 +506,7 @@ export const cultivationsCatalogue = fdmSchema.table(
   },
   (table) => [
     uniqueIndex("b_lu_catalogue_idx").on(table.b_lu_catalogue),
+    index("b_lu_ya_idx").using("gin", table.b_lu_ya),
     check(
       "b_lu_start_default_format",
       sql`b_lu_start_default IS NULL OR b_lu_start_default ~ '^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'`,

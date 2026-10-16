@@ -158,6 +158,7 @@ describe("Cultivation Data Model", () => {
         b_lu_variety_options: ["variety1", "variety2"] as string[],
         b_lu_start_default: "03-01",
         b_date_harvest_default: "09-15",
+        b_lu_ya: null,
       } as const
       await addCultivationToCatalogue(fdm, {
         ...details,
@@ -297,6 +298,7 @@ describe("Cultivation Data Model", () => {
         b_lu_variety_options: ["variety1", "variety2"],
         b_lu_start_default: "03-01",
         b_date_harvest_default: "09-15",
+        b_lu_ya: null,
       })
 
       const cultivations = await getCultivationsFromCatalogue(fdm, principal_id, b_id_farm)
@@ -346,6 +348,7 @@ describe("Cultivation Data Model", () => {
           b_lu_variety_options: null,
           b_lu_start_default: "03-01",
           b_date_harvest_default: "09-15",
+          b_lu_ya: null,
         }),
       ).rejects.toThrow()
     })
@@ -516,6 +519,7 @@ describe("Cultivation Data Model", () => {
         b_lu_eom: null,
         b_lu_eom_residue: null,
         b_date_harvest_default: "09-15",
+        b_lu_ya: null,
       })
 
       await updateCultivation(fdm, principal_id, b_lu, newCatalogueId, newSowingDate)
@@ -570,6 +574,7 @@ describe("Cultivation Data Model", () => {
         b_lu_eom: null,
         b_lu_eom_residue: null,
         b_date_harvest_default: "09-15",
+        b_lu_ya: null,
       })
 
       const newSowingDate = new Date("2024-02-01")
@@ -616,6 +621,7 @@ describe("Cultivation Data Model", () => {
         b_lu_eom: null,
         b_lu_eom_residue: null,
         b_date_harvest_default: "09-15",
+        b_lu_ya: null,
       })
 
       await updateCultivation(fdm, principal_id, b_lu, newCatalogueId)
@@ -703,6 +709,7 @@ describe("Cultivation Data Model", () => {
         b_lu_variety_options: ["variety1", "variety2"],
         b_lu_start_default: "03-01",
         b_date_harvest_default: "09-15",
+        b_lu_ya: null,
       })
 
       const b_lu = await addCultivation(fdm, principal_id, b_lu_catalogue, b_id, b_lu_start)
@@ -885,6 +892,7 @@ describe("Cultivation Data Model", () => {
         b_lu_eom: null,
         b_lu_eom_residue: null,
         b_date_harvest_default: "09-15",
+        b_lu_ya: null,
       })
 
       const cultivations = await getCultivationsFromCatalogue(fdm, principal_id, b_id_farm)
@@ -920,6 +928,7 @@ describe("Cultivation Data Model", () => {
           b_lu_eom: null,
           b_lu_eom_residue: null,
           b_date_harvest_default: "09-15",
+          b_lu_ya: null,
         }),
       ).rejects.toThrow("Exception for addCultivationToCatalogue")
     })
@@ -949,6 +958,7 @@ describe("Cultivation Data Model", () => {
           b_lu_eom: null,
           b_lu_eom_residue: null,
           b_date_harvest_default: "2024-09-15", // Invalid format
+          b_lu_ya: null,
         }),
       ).rejects.toThrow("Exception for addCultivationToCatalogue")
     })
@@ -979,6 +989,7 @@ describe("Cultivation Data Model", () => {
           b_lu_eom: null,
           b_lu_eom_residue: null,
           b_date_harvest_default: "09-15",
+          b_lu_ya: null,
         }),
       ).resolves.not.toThrow()
     })
@@ -1009,6 +1020,7 @@ describe("Cultivation Data Model", () => {
           b_lu_eom: null,
           b_lu_eom_residue: null,
           b_date_harvest_default: null,
+          b_lu_ya: null,
         }),
       ).resolves.not.toThrow()
     })
@@ -1052,6 +1064,7 @@ describe("Cultivation Data Model", () => {
           b_lu_eom: null,
           b_lu_eom_residue: null,
           b_date_harvest_default: "07-20", // July 20th
+          b_lu_ya: null,
         })
 
         const year = 2024
@@ -1092,6 +1105,7 @@ describe("Cultivation Data Model", () => {
           b_lu_eom: null,
           b_lu_eom_residue: null,
           b_date_harvest_default: null,
+          b_lu_ya: null,
         })
 
         const year = 2024
@@ -1132,6 +1146,7 @@ describe("Cultivation Data Model", () => {
           b_lu_eom: null,
           b_lu_eom_residue: null,
           b_date_harvest_default: null,
+          b_lu_ya: null,
         })
 
         const year = 2024
@@ -1172,6 +1187,7 @@ describe("Cultivation Data Model", () => {
           b_lu_eom: null,
           b_lu_eom_residue: null,
           b_date_harvest_default: "09-15",
+          b_lu_ya: null,
         })
 
         const year = 2024
@@ -1281,6 +1297,7 @@ describe("Cultivation Data Model", () => {
         b_lu_eom: null,
         b_lu_eom_residue: null,
         b_date_harvest_default: "09-15",
+        b_lu_ya: null,
       })
 
       await addCultivation(fdm, principal_id, b_lu_catalogue, b_id, new Date("2024-03-01"))
@@ -1437,6 +1454,7 @@ describe("Cultivation Data Model", () => {
         b_lu_eom: null,
         b_lu_eom_residue: null,
         b_date_harvest_default: "09-15",
+        b_lu_ya: null,
       })
 
       // Add a second field
@@ -1566,6 +1584,7 @@ describe("Cultivation Data Model", () => {
         b_lu_eom: null,
         b_lu_eom_residue: null,
         b_date_harvest_default: "09-15",
+        b_lu_ya: null,
       })
 
       // Add a cultivation 'Wheat' within the timeframe
@@ -1627,6 +1646,7 @@ describe("Cultivation Data Model", () => {
         b_lu_eom: null,
         b_lu_eom_residue: null,
         b_date_harvest_default: "09-15",
+        b_lu_ya: null,
       })
 
       // Add a cultivation 'Wheat'
@@ -1766,6 +1786,7 @@ describe("Cultivation Data Model", () => {
         b_lu_eom: null,
         b_lu_eom_residue: null,
         b_date_harvest_default: "09-15",
+        b_lu_ya: null,
       })
 
       // Add a cultivation 'Wheat' - outside timeframe
@@ -1897,6 +1918,7 @@ describe("buildCultivationTimeframeCondition", () => {
       b_lu_eom: null,
       b_lu_eom_residue: null,
       b_date_harvest_default: "09-15",
+      b_lu_ya: null,
     })
   })
 
@@ -2190,6 +2212,7 @@ describe("getCultivationsForFarm", () => {
       b_lu_eom: null,
       b_lu_eom_residue: null,
       b_date_harvest_default: "09-15",
+      b_lu_ya: null,
     })
   })
 

@@ -47,10 +47,11 @@ export async function getCultivationsFromCatalogue(
   fdm: FdmType,
   principal_id: PrincipalId,
   b_id_farm: schema.farmsTypeSelect["b_id_farm"],
+  year?: number,
 ): Promise<CultivationCatalogue[]> {
   try {
     const catalogueIds = await getEnabledCultivationCatalogues(fdm, principal_id, b_id_farm)
-    return await getCultivationsFromCatalogues(fdm, catalogueIds)
+    return await getCultivationsFromCatalogues(fdm, catalogueIds, year)
   } catch (err) {
     throw handleError(err, "Exception for getCultivationsFromCatalogue", {
       principal_id,
@@ -72,6 +73,7 @@ export async function getCultivationsFromCatalogue(
 export async function getCultivationsFromCatalogues(
   fdm: FdmType,
   catalogueIds: schema.cultivationCatalogueSelectingTypeSelect["b_lu_source"][],
+  year?: number,
 ): Promise<CultivationCatalogue[]> {
   try {
     if (catalogueIds.length === 0) {
@@ -81,7 +83,17 @@ export async function getCultivationsFromCatalogues(
     return fdm
       .select()
       .from(schema.cultivationsCatalogue)
-      .where(inArray(schema.cultivationsCatalogue.b_lu_source, catalogueIds))
+      .where(
+        and(
+          inArray(schema.cultivationsCatalogue.b_lu_source, catalogueIds),
+          typeof year === "number"
+            ? or(
+                isNull(schema.cultivationsCatalogue.b_lu_ya),
+                sql`${year}=ANY(${schema.cultivationsCatalogue.b_lu_ya})`,
+              )
+            : undefined,
+        ),
+      )
       .orderBy(
         asc(schema.cultivationsCatalogue.b_lu_source),
         asc(schema.cultivationsCatalogue.b_lu_name),
@@ -126,6 +138,7 @@ export async function addCultivationToCatalogue(
     b_lu_variety_options: schema.cultivationsCatalogueTypeInsert["b_lu_variety_options"]
     b_lu_start_default: schema.cultivationsCatalogueTypeInsert["b_lu_start_default"]
     b_date_harvest_default: schema.cultivationsCatalogueTypeInsert["b_date_harvest_default"]
+    b_lu_ya: schema.cultivationsCatalogueTypeInsert["b_lu_ya"]
   },
 ): Promise<void> {
   try {
