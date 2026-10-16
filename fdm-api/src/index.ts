@@ -30,6 +30,7 @@ import {
   addFertilizerApplication,
   addField,
   addHarvest,
+  addFarmToGroup,
   addMeasure,
   addOrganicCertification,
   addSoilAnalysis,
@@ -39,6 +40,7 @@ import {
   getCurrentSoilData,
   // getCultivationsFromCatalogue,
   getFarm,
+  getFarmGroup,
   getFarms,
   getFertilizer,
   getFertilizerApplication,
@@ -64,6 +66,13 @@ import {
   removeCultivation,
   removeDerogation,
   removeFarm,
+  removeFarmFromGroup,
+  removeFarmGroupMembership,
+  updateFarmGroupMembership,
+  removeFarmGroup,
+  renameFarmGroup,
+  createFarmGroup,
+  listFarmGroups,
   removeFertilizer,
   removeFertilizerApplication,
   removeField,
@@ -114,6 +123,16 @@ export interface FdmApiServices {
   addFarm: typeof addFarm
   updateFarm: typeof updateFarm
   removeFarm: typeof removeFarm
+  // Farm groups
+  listFarmGroups: typeof listFarmGroups
+  getFarmGroup: typeof getFarmGroup
+  createFarmGroup: typeof createFarmGroup
+  renameFarmGroup: typeof renameFarmGroup
+  removeFarmGroup: typeof removeFarmGroup
+  addFarmToGroup: typeof addFarmToGroup
+  removeFarmFromGroup: typeof removeFarmFromGroup
+  updateFarmGroupMembership: typeof updateFarmGroupMembership
+  removeFarmGroupMembership: typeof removeFarmGroupMembership
   // Fields
   getFields: typeof getFields
   getField: typeof getField
@@ -210,6 +229,15 @@ const defaultServices: FdmApiServices = {
   addFarm,
   updateFarm,
   removeFarm,
+  listFarmGroups,
+  getFarmGroup,
+  createFarmGroup,
+  renameFarmGroup,
+  removeFarmGroup,
+  addFarmToGroup,
+  removeFarmFromGroup,
+  updateFarmGroupMembership,
+  removeFarmGroupMembership,
   getFields,
   getField,
   addField,

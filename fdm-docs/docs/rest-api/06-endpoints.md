@@ -130,6 +130,28 @@ Authorization: Bearer fdm_live_xxxxxxxxxxxxxxxxxxxx
 
 ---
 
+## Farm groups
+
+Farm groups are named, organization-scoped groupings of farms. The API key owner must be a member of the organization. Group membership is recorded as events: adding a farm records the date from which it is part of the group (`b_group_joined`, default today) and optionally the date until which (`b_group_leaved`). Removing a farm records the date until which it is part of the group (query parameter `b_group_leaved`, default today). When both dates are given on adding a farm they are stored together, so a period is never half recorded. These are the dates of the period itself, not the moment of the request, so they can lie in the past or the future. Dates use the format `YYYY-MM-DD`. Ending a membership records an end date and preserves the membership history; a later planned end date is moved forward to the given date; only a membership that starts today and is removed without a date is cancelled instead. `PATCH` (`updateFarmGroupMembership`) replaces the dates of a period rather than adding to its history, and `DELETE` on a period (`removeFarmGroupMembership`) deletes the period itself, for example to correct a mistake.
+
+| Method   | Path                                                               | Description                                                                            | `fdm-core` mapping          |
+| -------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------- | --------------------------- |
+| `GET`    | `/api/organizations/{organization_id}/farm-groups`                 | List the farm groups of an organization                                                | `listFarmGroups`            |
+| `POST`   | `/api/organizations/{organization_id}/farm-groups`                 | Create a farm group                                                                    | `createFarmGroup`           |
+| `GET`    | `/api/farm-groups/{b_id_group}`                                    | Get a group including its current member farm ids                                      | `getFarmGroup`              |
+| `PATCH`  | `/api/farm-groups/{b_id_group}`                                    | Rename a group                                                                         | `renameFarmGroup`           |
+| `DELETE` | `/api/farm-groups/{b_id_group}`                                    | Delete a group and its membership history                                              | `removeFarmGroup`           |
+| `POST`   | `/api/farm-groups/{b_id_group}/farms`                              | Add a farm to a group (body: `b_id_farm`, optional `b_group_joined`, `b_group_leaved`) | `addFarmToGroup`            |
+| `DELETE` | `/api/farm-groups/{b_id_group}/farms/{b_id_farm}`                  | End the membership of a farm (optional `b_group_leaved`)                               | `removeFarmFromGroup`       |
+| `PATCH`  | `/api/farm-groups/{b_id_group}/farms/{b_id_farm}/{b_group_joined}` | Change the dates of a membership period                                                | `updateFarmGroupMembership` |
+| `DELETE` | `/api/farm-groups/{b_id_group}/farms/{b_id_farm}/{b_group_joined}` | Delete a membership period, as if the farm never was part of the group then            | `removeFarmGroupMembership` |
+
+`PATCH` changes the dates of an existing period. The `b_group_joined` in the path is the current join date of the period and identifies it. A `b_group_joined` in the body updates the join date to that new date, and a `b_group_leaved` in the body updates the end date (`null` removes it). A period may not overlap another period of the same farm.
+
+`GET /api/farms` also accepts a `b_id_group` query parameter to list only the farms of a group.
+
+---
+
 ## Calculations
 
 Calculation endpoints operate on **stored FDM resource identifiers** — they do not accept standalone calculation payloads that are not linked to stored data.

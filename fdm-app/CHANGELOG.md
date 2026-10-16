@@ -1,5 +1,70 @@
 # Changelog fdm-app
 
+## 0.38.3
+
+### Patch Changes
+
+- [#852](https://github.com/nmi-agro/fdm/pull/852) [`0da61be`](https://github.com/nmi-agro/fdm/commit/0da61be1e8c3ffd33ab4a74ca77cf1b5ec19dfd7) Thanks [@SvenVw](https://github.com/SvenVw)! - Calendar years are now interpreted in Europe/Amsterdam instead of UTC, so a field ended on 31 December or 1 January is no longer shown in, or included in calculations for, the next calendar year.
+
+  When a page of a field (field pages, nitrogen and organic matter balance, norms, nutrient advice, indicators, measures and mineralization) is opened for a calendar year in which the field is not managed, the page now shows a message instead of an empty result. The message names the field and its start or end date, links to the same page in the field's first or last year, and links to the field's settings page to correct the dates. Calculations for that page are skipped. The settings and delete pages of the field remain available.
+
+  The field picker in the header now shows the name of the selected field when it is not managed in the selected calendar year, instead of "Onbekend perceel".
+
+  The RVO import review table shows an RVO end date on 1 January as 31 December of the previous year, consistent with the local end date.
+
+- [#852](https://github.com/nmi-agro/fdm/pull/852) [`f187547`](https://github.com/nmi-agro/fdm/commit/f18754758d0e1b60d89a7ba5289d8a165a968613) Thanks [@SvenVw](https://github.com/SvenVw)! - Fix name of `S_WAT_GWQUAN` instead of `S_WAT_GWQUANT`
+- Updated dependencies [[`702c643`](https://github.com/nmi-agro/fdm/commit/702c643678d15caae37cffd7a1497c0ce73954ad), [`f33e384`](https://github.com/nmi-agro/fdm/commit/f33e3847dd0e5b5222bfa9e8767cbf61f7e48fff)]:
+  - @nmi-agro/fdm-core@0.38.1
+  - @nmi-agro/fdm-rvo@0.6.2
+  - @nmi-agro/fdm-agents@0.6.0
+
+## 0.38.2
+
+### Patch Changes
+
+- [#848](https://github.com/nmi-agro/fdm/pull/848) [`79acc99`](https://github.com/nmi-agro/fdm/commit/79acc99385c5e9d6be4064b249fe6eb1cac938f3) Thanks [@SvenVw](https://github.com/SvenVw)! - Fix importing fields from RVO for your own farm:
+
+  - Before connecting to RVO, the user now chooses which eHerkenning they log in with: the eHerkenning of the farm itself, or the eHerkenning of their own organisation with a machtiging for the farm at RVO. The options mention the farm by name. The KvK number is only sent to RVO for a machtiging, so farmers who log in with the eHerkenning of their own farm no longer get "Toegang geweigerd".
+  - When RVO denies access, the import page now shows a message for the chosen option with an "Opnieuw verbinden" button that pre-selects the other option, instead of a generic "page not available" page.
+  - Updated the design of the "Percelen ophalen bij RVO" card. It now asks the choice first, explains what is read from RVO and that nothing changes before the user reviews the differences, shows the KvK number as plain text with a link to change it, and explains inline when no option is chosen yet.
+  - When RVO returns no fields, the message now depends on the chosen option.
+  - Farm verifications are only recorded for requests with a machtiging, as a request for the own farm does not prove the farm's KvK number.
+  - The farm verification status, badges and explanations are hidden for now. The KvK number of a farm that is already verified stays locked.
+
+- Updated dependencies [[`3ec0953`](https://github.com/nmi-agro/fdm/commit/3ec0953a87fcc2615e58f0c127b109ecacc18f7a)]:
+  - @nmi-agro/fdm-rvo@0.6.1
+
+## 0.38.1
+
+### Patch Changes
+
+- [#844](https://github.com/nmi-agro/fdm/pull/844) [`8cc7fb3`](https://github.com/nmi-agro/fdm/commit/8cc7fb3e92dc47d79d3f768de4e148c9f5346c59) Thanks [@SvenVw](https://github.com/SvenVw)! - Switch to the new BLN3 aggregation codes returned by the NMI API (for example `S_WAT_BLN` → `S_WAT`, `S_PROD_BLN` → `S_PROD_T`, `S_GW_QUANT_BLN` → `S_WAT_GWQUANT`). The aggregation tree, atlas map selector, field overview cards and indicators page now match on the new codes. A stored map score that is no longer valid falls back to `S_BLN`. The calculator version bump invalidates cached BLN3 results that still hold the old codes.
+- Updated dependencies [[`8cc7fb3`](https://github.com/nmi-agro/fdm/commit/8cc7fb3e92dc47d79d3f768de4e148c9f5346c59)]:
+  - @nmi-agro/fdm-calculator@0.19.3
+  - @nmi-agro/fdm-agents@0.6.0
+
+## 0.38.0
+
+### Minor Changes
+
+- [#831](https://github.com/nmi-agro/fdm/pull/831) [`0ff6213`](https://github.com/nmi-agro/fdm/commit/0ff6213fff255cc5facca238c8c2b4f999a7446c) Thanks [@BoraIneviNMI](https://github.com/BoraIneviNMI)! - Now the fields table also shows the selected rows in green.
+
+- [#823](https://github.com/nmi-agro/fdm/pull/823) [`ddcd887`](https://github.com/nmi-agro/fdm/commit/ddcd887f4f9a25e545f0de354bb7a5d11af45341) Thanks [@BoraIneviNMI](https://github.com/BoraIneviNMI)! - BodemConditieScore analyses on the timeline now have a distinct icon, say "BodemConditieScore" in their popup, and link to the correct analysis view and edit pages.
+
+### Patch Changes
+
+- [#824](https://github.com/nmi-agro/fdm/pull/824) [`605a77c`](https://github.com/nmi-agro/fdm/commit/605a77c410bd33d921a5a398f94e4a04b013df9c) Thanks [@BoraIneviNMI](https://github.com/BoraIneviNMI)! - Users can no longer select text (accidentally) on the rotation table by shift-clicking.
+
+- [#822](https://github.com/nmi-agro/fdm/pull/822) [`3911253`](https://github.com/nmi-agro/fdm/commit/3911253dc4657e5ffdc2032ae138168c4d486897) Thanks [@BoraIneviNMI](https://github.com/BoraIneviNMI)! - BRP cultivation suggestions on the field dashboard and field table are now correctly shown to the user in the next route when the user tries to add them.
+
+- [#823](https://github.com/nmi-agro/fdm/pull/823) [`ddcd887`](https://github.com/nmi-agro/fdm/commit/ddcd887f4f9a25e545f0de354bb7a5d11af45341) Thanks [@BoraIneviNMI](https://github.com/BoraIneviNMI)! - Standalone fertilizer and soil analysis markers on the timeline now have a rounded shape.
+
+## 0.37.2
+
+### Patch Changes
+
+- [#835](https://github.com/nmi-agro/fdm/pull/835) [`175f367`](https://github.com/nmi-agro/fdm/commit/175f36705e0a13aad2ca61d220a580b844b50c46) Thanks [@SvenVw](https://github.com/SvenVw)! - Stop reporting React Router's internal 404 and 405 responses (unmatched routes and unsupported methods, typically from bots and scanners) to Sentry. These are now logged as a single debug line with status, method and path instead of a multi-line error with stack trace.
+
 ## 0.37.1
 
 ### Patch Changes

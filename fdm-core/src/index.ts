@@ -82,6 +82,18 @@ export {
   removeDerogation,
 } from "./derogation"
 export {
+  addFarmToGroup,
+  createFarmGroup,
+  getFarmGroup,
+  listFarmGroups,
+  removeFarmFromGroup,
+  removeFarmGroup,
+  removeFarmGroupMembership,
+  renameFarmGroup,
+  updateFarmGroupMembership,
+} from "./farm-group"
+export type { FarmGroup, FarmGroupMembership } from "./farm-group.types"
+export {
   addFarm,
   cancelInvitationForFarm,
   getFarm,
@@ -136,6 +148,12 @@ export type {
   FertilizerParameters,
   FertilizerType,
 } from "./fertilizer.types"
+export {
+  adjustEndDateAtYearStart,
+  FDM_TIME_ZONE,
+  startOfDayInFdmTimeZone,
+  toFdmDateString,
+} from "./date"
 export type { AppAmountUnit } from "./fertilizer-application-unit-conversion"
 export { fromKgPerHa, toKgPerHa } from "./fertilizer-application-unit-conversion"
 export {

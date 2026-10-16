@@ -84,7 +84,7 @@ export const meta: MetaFunction<typeof loader> = ({ loaderData }) => {
   ]
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params, url }: LoaderFunctionArgs) {
   try {
     // Get the active farm
     const b_id_farm = params.b_id_farm
@@ -96,7 +96,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get cultivationIds from search params
-    const url = new URL(request.url)
     const cultivationIds = url.searchParams.get("cultivationIds")?.split(",").filter(Boolean) ?? []
 
     if (cultivationIds.length === 0) {
@@ -714,7 +713,7 @@ const ActionSchema = z.discriminatedUnion("intent", [
   FormSchema.extend({ intent: z.literal("single_harvest") }),
   BatchFormSchema.extend({ intent: z.literal("batch_harvest") }),
 ])
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params, url }: ActionFunctionArgs) {
   try {
     const { b_id_farm, calendar = "all" } = params
     if (!b_id_farm) {
@@ -722,7 +721,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
 
     const session = await getSession(request)
-    const url = new URL(request.url)
     const timeframe = getTimeframe(params)
 
     const fieldIds = url.searchParams.get("fieldIds")?.split(",").filter(Boolean) ?? []

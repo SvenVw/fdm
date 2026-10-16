@@ -12,32 +12,7 @@ import type {
 } from "./types"
 import { bln3Client } from "../nmi/client"
 import pkg from "../package"
-
-/**
- * Fields that FDM collects only to decide locally whether a field is excluded. They are
- * not part of the NMI BLN3 request schema (NMI rejects e.g. an unknown `b_lu_croprotation`),
- * so they must not be sent.
- */
-const LOCAL_ONLY_FIELDS = [
-  "nmiApiKey",
-  "isExcluded",
-  "b_bufferstrip",
-  "b_lu_croprotation",
-  "b_lu_catalogue",
-] as const
-
-/**
- * Builds the JSON body for an NMI BLN3 request by removing the API key and the fields that
- * are only used locally.
- *
- * @param inputs - Collected inputs including the NMI API key.
- * @returns The inputs without the API key and local-only fields.
- */
-function toNmiPayload<T extends object>(inputs: T): Omit<T, (typeof LOCAL_ONLY_FIELDS)[number]> {
-  const payload = { ...inputs } as Record<string, unknown>
-  for (const field of LOCAL_ONLY_FIELDS) delete payload[field]
-  return payload as Omit<T, (typeof LOCAL_ONLY_FIELDS)[number]>
-}
+import { pickBln3Payload } from "./payload"
 
 /**
  * Requests a BLN3 score from the NMI API for a single field.
@@ -65,7 +40,7 @@ export async function requestBln3Score(inputs: Bln3ScoreInputs): Promise<Bln3Sco
   }
 
   const { nmiApiKey } = inputs
-  const fieldData = toNmiPayload(inputs)
+  const fieldData = pickBln3Payload("score", inputs)
 
   if (!nmiApiKey) {
     throw new Error("NMI API key not provided")
@@ -156,7 +131,7 @@ export async function requestBln3MeasureApplicability(
   }
 
   const { nmiApiKey } = inputs
-  const fieldData = toNmiPayload(inputs)
+  const fieldData = pickBln3Payload("applicability", inputs)
 
   if (!nmiApiKey) {
     throw new Error("NMI API key not provided")
@@ -279,7 +254,7 @@ export async function requestBln3MeasureAdvice(
   }
 
   const { nmiApiKey } = inputs
-  const fieldData = toNmiPayload(inputs)
+  const fieldData = pickBln3Payload("advice", inputs)
 
   if (!nmiApiKey) {
     throw new Error("NMI API key not provided")
