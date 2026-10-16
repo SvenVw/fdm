@@ -195,6 +195,26 @@ describe("BLN3 score", () => {
       })
     })
 
+    it("should drop aggregations without a numeric score", async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          ...mockBln3ScoreResponse,
+          data: {
+            ...mockBln3ScoreResponse.data,
+            aggregations: [
+              { aggregation_id: "B_ID", score: "field" },
+              { aggregation_id: "S_BLN", score: 0.7 },
+            ],
+          },
+        }),
+      } as Response)
+
+      const result = await requestBln3Score(baseInputs)
+
+      expect(result?.aggregations).toEqual([{ aggregation_id: "S_BLN", score: 0.7 }])
+    })
+
     it("should throw if the NMI API returns a non-ok response", async () => {
       vi.mocked(fetch).mockResolvedValue({
         ok: false,
@@ -333,6 +353,25 @@ describe("BLN3 score", () => {
       expect(fetch).not.toHaveBeenCalled()
       expect(mockFdm.select).toHaveBeenCalled()
       expect(mockFdm.insert).not.toHaveBeenCalled()
+    })
+
+    it("should drop aggregations without a numeric score from cached results", async () => {
+      mockRows = [
+        {
+          result: {
+            ...mockResult,
+            aggregations: [
+              { aggregation_id: "B_ID", score: "field" },
+              { aggregation_id: "S_BLN", score: 0.7 },
+            ],
+          },
+        },
+      ]
+
+      const result = await getBln3Score(mockFdm, baseInputs)
+
+      expect(result?.aggregations).toEqual([{ aggregation_id: "S_BLN", score: 0.7 }])
+      expect(fetch).not.toHaveBeenCalled()
     })
 
     it("should proceed with calculation and log error if cache read fails", async () => {

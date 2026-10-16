@@ -1,3 +1,4 @@
+import type { FdmType } from "@nmi-agro/fdm-core"
 import { withCalculationCache } from "@nmi-agro/fdm-core"
 import type {
   Bln3MeasureAdviceInputs,
@@ -77,10 +78,10 @@ export async function requestBln3Score(inputs: Bln3ScoreInputs): Promise<Bln3Sco
     }
 
     // Map the API's "indicator" (singular) to "indicators" (plural) for ergonomics
-    return {
+    return withNumericAggregations({
       indicators: result.data.indicator,
       aggregations: result.data.aggregations,
-    }
+    })
   } catch (err) {
     if (err instanceof Error && err.name === "TimeoutError") {
       throw new Error("BLN3 score request timed out. The NMI API did not respond in time.")
@@ -90,20 +91,52 @@ export async function requestBln3Score(inputs: Bln3ScoreInputs): Promise<Bln3Sco
 }
 
 /**
+ * Removes aggregation entries without a numeric score.
+ *
+ * The NMI API can include non-score rows in `aggregations`, such as the field identifier
+ * (`aggregation_id: "B_ID"` with the score `"field"`). Only real aggregation scores are kept.
+ *
+ * @param score - BLN3 score as returned by the NMI API or read from the cache.
+ * @returns The score with only aggregations whose score is a finite number.
+ */
+function withNumericAggregations(score: Bln3Score): Bln3Score {
+  if (!score.aggregations) return score
+  return {
+    ...score,
+    aggregations: score.aggregations.filter(
+      (aggregation) => typeof aggregation.score === "number" && Number.isFinite(aggregation.score),
+    ),
+  }
+}
+
+const getBln3ScoreCached = withCalculationCache(
+  requestBln3Score,
+  "requestBln3Score",
+  pkg.calculatorVersion,
+  ["nmiApiKey"],
+)
+
+/**
  * Cached version of `requestBln3Score`.
  *
  * Uses `withCalculationCache` to store and retrieve results from the
  * `fdm-calculator.calculation_cache` table. The cache key is a SHA-256 hash
  * of the function name, calculator version, and sanitized inputs (API key
  * redacted). Bumping `calculatorVersion` in `package.ts` invalidates all
- * existing cache entries.
+ * existing cache entries. Aggregations without a numeric score are also removed
+ * from cached results stored before they were filtered.
+ *
+ * @param fdm - The FDM instance used for the cache.
+ * @param inputs - Field data and NMI API key, as for `requestBln3Score`.
+ * @returns The BLN3 score, or `null` if the field is excluded.
  */
-export const getBln3Score = withCalculationCache(
-  requestBln3Score,
-  "requestBln3Score",
-  pkg.calculatorVersion,
-  ["nmiApiKey"],
-)
+export async function getBln3Score(
+  fdm: FdmType,
+  inputs: Bln3ScoreInputs,
+): Promise<Bln3Score | null> {
+  const score = await getBln3ScoreCached(fdm, inputs)
+  return score ? withNumericAggregations(score) : null
+}
 
 /**
  * Requests BLN3 measure applicability from the NMI API for a single field.
