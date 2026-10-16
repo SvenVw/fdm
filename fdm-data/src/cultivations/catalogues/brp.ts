@@ -2,6 +2,10 @@ import type { CatalogueCultivation, CatalogueCultivationItem } from "../d"
 import { hashCultivation } from "../hash"
 import brp from "./brp.json"
 
+// b_lu_ya years that fall out of this range, inclusive, will be ignored. Mostly as a sanity check.
+const MIN_ALLOWED_AVAILABLE_YEAR = 1000
+const MAX_ALLOWED_AVAILABLE_YEAR = 3000
+
 /**
  * Retrieves the BRP (Basisregistratie Perceel) cultivation catalogue.
  *
@@ -13,6 +17,35 @@ import brp from "./brp.json"
  * @throws {Error} Throws an error if an invalid value is found for `b_lu_harvestable` in the JSON data.
  */
 export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
+  if (brp.length === 0) return []
+
+  // Find the minimum and maximum availability year in the b_lu_ya entries.
+  let firstAvailabilityYear: number | undefined = undefined
+  let lastAvailabilityYear: number | undefined = undefined
+  for (const cultivation of brp) {
+    const years = cultivation.b_lu_ya.split("||")
+    for (const year of years) {
+      const parsed = Number.parseInt(year)
+      if (
+        Number.isNaN(parsed) ||
+        parsed < MIN_ALLOWED_AVAILABLE_YEAR ||
+        parsed > MAX_ALLOWED_AVAILABLE_YEAR
+      )
+        continue
+      firstAvailabilityYear =
+        typeof firstAvailabilityYear !== "undefined"
+          ? Math.min(firstAvailabilityYear, parsed)
+          : parsed
+      lastAvailabilityYear =
+        typeof lastAvailabilityYear !== "undefined"
+          ? Math.max(lastAvailabilityYear, parsed)
+          : parsed
+    }
+  }
+  if (typeof firstAvailabilityYear === "undefined" || typeof lastAvailabilityYear === "undefined") {
+    throw new Error("There was no valid b_lu_ya in the BRP catalogue.")
+  }
+
   const catalogueBrpPromises = brp.map(async (cultivation) => {
     // Validate b_lu_harvestable
     const harvestable =
@@ -60,6 +93,20 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
           })()
         : cultivation.b_lu_harvestcat
 
+    const yearsAvailable = cultivation.b_lu_ya
+      .split("||")
+      .map((item) => Number.parseInt(item))
+      .filter(
+        (item) =>
+          !Number.isNaN(item) &&
+          item >= MIN_ALLOWED_AVAILABLE_YEAR &&
+          item <= MAX_ALLOWED_AVAILABLE_YEAR,
+      )
+    const b_lu_ya =
+      yearsAvailable.length === lastAvailabilityYear - firstAvailabilityYear + 1
+        ? null
+        : yearsAvailable.sort((a, b) => a - b)
+
     // Transform to CatalogueCultivationItem
     const item: CatalogueCultivationItem = {
       b_lu_source: "brp",
@@ -99,6 +146,7 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
         )
           ? cultivation.b_date_harvest_default.trim()
           : null,
+      b_lu_ya: b_lu_ya,
       hash: null,
     }
 

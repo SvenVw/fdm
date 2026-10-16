@@ -35,6 +35,13 @@ describe("getCultivationCatalogue", () => {
       expect(["once", "multiple", "none"]).toContain(item.b_lu_harvestable)
     }
   })
+
+  it("should not have any items with an empty b_lu_ya array", async () => {
+    const catalogue = await getCultivationCatalogue("brp")
+    for (const item of catalogue) {
+      expect(item.b_lu_ya === null || item.b_lu_ya.length > 0).toBe(true)
+    }
+  })
 })
 
 describe("getCatalogueBrp", () => {
@@ -58,6 +65,7 @@ describe("getCatalogueBrp", () => {
       expect(item).toHaveProperty("b_lu_n_harvestable")
       expect(item).toHaveProperty("b_lu_n_residue")
       expect(item).toHaveProperty("b_n_fixation")
+      expect(item).toHaveProperty("b_lu_ya")
       expect(item).toHaveProperty("hash")
     }
   })
