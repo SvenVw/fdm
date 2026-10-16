@@ -87,6 +87,11 @@ export async function collectNL2026InputForNorms(
   const startOfYear = new Date(year, 0, 1)
   const endOfYear = new Date(year, 11, 31)
   const timeframe2026: Timeframe = { start: startOfYear, end: endOfYear }
+  // Harvest dates are timestamps: include every harvest on 31 December, not only those at midnight
+  const timeframe2026Harvests: Timeframe = {
+    start: startOfYear,
+    end: new Date(year, 11, 31, 23, 59, 59, 999),
+  }
   const timeframe2026Cultivation: Timeframe = {
     start: new Date(year - 1, 0, 1),
     end: endOfYear,
@@ -118,7 +123,7 @@ export async function collectNL2026InputForNorms(
         fdm,
         principal_id,
         cultivation.b_lu,
-        timeframe2026,
+        timeframe2026Harvests,
       )
       return { ...cultivation, harvests: pickHarvestDates(harvests) }
     }),
@@ -176,6 +181,11 @@ export async function collectNL2026InputForNormsForFarm(
   const startOfYear = new Date(year, 0, 1)
   const endOfYear = new Date(year, 11, 31)
   const timeframe2026: Timeframe = { start: startOfYear, end: endOfYear }
+  // Harvest dates are timestamps: include every harvest on 31 December, not only those at midnight
+  const timeframe2026Harvests: Timeframe = {
+    start: startOfYear,
+    end: new Date(year, 11, 31, 23, 59, 59, 999),
+  }
   const timeframe2026Cultivation: Timeframe = {
     start: new Date(year - 1, 0, 1),
     end: endOfYear,
@@ -191,7 +201,7 @@ export async function collectNL2026InputForNormsForFarm(
     operations.getFields(fdm, principal_id, b_id_farm, timeframe2026Cultivation),
     operations.getGrazingIntention(fdm, principal_id, b_id_farm, year),
     operations.getCultivationsForFarm(fdm, principal_id, b_id_farm, timeframe2026Cultivation),
-    operations.getHarvestsForFarm(fdm, principal_id, b_id_farm, timeframe2026),
+    operations.getHarvestsForFarm(fdm, principal_id, b_id_farm, timeframe2026Harvests),
     operations.getCurrentSoilDataForFarm(fdm, principal_id, b_id_farm, timeframe2026),
   ])
 

@@ -204,7 +204,7 @@ describe("NL2025 norm input harvests", () => {
     b_id_harvesting: `harvest-${i}`,
     b_lu_harvest_date,
   })) as unknown as Harvest[]
-  const normYear = { start: new Date(2025, 0, 1), end: new Date(2025, 11, 31) }
+  const normYear = { start: new Date(2025, 0, 1), end: new Date(2025, 11, 31, 23, 59, 59, 999) }
 
   it("attaches the harvests of the norm year to each cultivation of a field", async () => {
     const getHarvests = vi.fn(async (_fdm: FdmType, _principal: string, b_lu: string) =>
@@ -262,5 +262,44 @@ describe("NL2025 norm input harvests", () => {
       },
       { ...mockCultivations[1], harvests: [] },
     ])
+  })
+
+  it("includes harvests at any time on 31 December and excludes 1 January 2026", async () => {
+    const isInWindow = (timeframe: { start: Date; end: Date }, date: Date) =>
+      date >= timeframe.start && date <= timeframe.end
+    const lateOnLastDay = new Date(2025, 11, 31, 23, 30)
+    const utcMidnightLastDay = new Date(Date.UTC(2025, 11, 31))
+    const nextYear = new Date(2026, 0, 1)
+
+    const getHarvests = vi.fn(async () => [])
+    await collectNL2025InputForNorms(mockFdm, mockPrincipalId, mockFieldId, {
+      getField: async () => mockField,
+      getCultivations: async () => mockCultivations,
+      getHarvests,
+      getCurrentSoilData: async () => [] as unknown as CurrentSoilData,
+      getGrazingIntention: async () => false,
+      isDerogationGrantedForYear: async () => false,
+    } as unknown as NL2025SingleFdmCoreOperations)
+
+    const getHarvestsForFarm = vi.fn(async () => new Map())
+    await collectNL2025InputForNormsForFarm(mockFdm, mockPrincipalId, mockFarmId, {
+      getFields: async () => [mockField],
+      getGrazingIntention: async () => false,
+      getCultivationsForFarm: async () => new Map([[mockFieldId, mockCultivations]]),
+      getHarvestsForFarm,
+      getCurrentSoilDataForFarm: async () => new Map(),
+      isDerogationGrantedForYear: async () => false,
+    } as unknown as NL2025FarmFdmCoreOperations)
+
+    const timeframes = [
+      ...getHarvests.mock.calls.map((call) => (call as unknown[])[3]),
+      ...getHarvestsForFarm.mock.calls.map((call) => (call as unknown[])[3]),
+    ] as { start: Date; end: Date }[]
+    expect(timeframes).toHaveLength(mockCultivations.length + 1)
+    for (const timeframe of timeframes) {
+      expect(isInWindow(timeframe, lateOnLastDay)).toBe(true)
+      expect(isInWindow(timeframe, utcMidnightLastDay)).toBe(true)
+      expect(isInWindow(timeframe, nextYear)).toBe(false)
+    }
   })
 })
