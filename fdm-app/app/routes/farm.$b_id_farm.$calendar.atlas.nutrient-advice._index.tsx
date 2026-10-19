@@ -145,33 +145,40 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * the same rows. Returns `null` while loading and again whenever a new promise arrives
  * (farm or year switch).
  *
+ * The resolved rows are stored together with the promise they came from. "Loading" is then
+ * derived during render (stored promise ≠ current promise) instead of resetting state inside the
+ * effect, which `react/set-state-in-effect` forbids. State is only set from the async callbacks.
+ *
  * @param asyncData - Deferred loader data, or `null` without a farm.
  * @returns The rows, or `null` while loading.
  */
 function useStreamedRows(
   asyncData: Promise<{ rows: AtlasNutrientAdviceRow[] }> | null,
 ): AtlasNutrientAdviceRow[] | null {
-  const [rows, setRows] = useState<AtlasNutrientAdviceRow[] | null>(null)
+  const [resolved, setResolved] = useState<{
+    source: Promise<{ rows: AtlasNutrientAdviceRow[] }>
+    rows: AtlasNutrientAdviceRow[]
+  } | null>(null)
 
   useEffect(() => {
-    setRows(null)
     if (!asyncData) return
     let cancelled = false
     asyncData
       .then((data) => {
-        if (!cancelled) setRows(data.rows)
+        if (!cancelled) setResolved({ source: asyncData, rows: data.rows })
       })
       .catch((error: unknown) => {
         // The helper never rejects for data problems; this only covers transport errors.
         console.error("Failed to load nutrient advice for the atlas:", error)
-        if (!cancelled) setRows([])
+        if (!cancelled) setResolved({ source: asyncData, rows: [] })
       })
     return () => {
       cancelled = true
     }
   }, [asyncData])
 
-  return rows
+  // Rows from a previous farm/year promise are stale and read as "loading".
+  return resolved && resolved.source === asyncData ? resolved.rows : null
 }
 
 /**
