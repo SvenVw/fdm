@@ -1,7 +1,7 @@
 import type { Cultivation } from "@nmi-agro/fdm-core"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AlertTriangle } from "lucide-react"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useWatch, type FieldValues, type Resolver, type UseFormReturn } from "react-hook-form"
 import { Form, useFetcher, useLocation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
@@ -44,13 +44,15 @@ export function CultivationDetailsCard({
   editable?: boolean
 }) {
   const fetcher = useFetcher()
+  // Computed once, not on every render: used only as the default when there's no start date yet.
+  const [today] = useState(() => new Date())
   const form = useRemixForm<CultivationDetailsFormSchemaType>({
     resolver: zodResolver(
       CultivationDetailsFormSchema,
     ) as Resolver<CultivationDetailsFormSchemaType>,
     mode: "onTouched",
     defaultValues: {
-      b_lu_start: toDate(cultivation.b_lu_start) ?? new Date(),
+      b_lu_start: toDate(cultivation.b_lu_start) ?? today,
       b_lu_end: toDate(cultivation.b_lu_end) ?? null,
       m_cropresidue:
         cultivation.b_lu_croprotation === "cereal"
@@ -63,9 +65,10 @@ export function CultivationDetailsCard({
   const { pathname } = useLocation()
   const isCreateWizard = pathname.includes("/farm/create/")
 
+  const formReset = form.reset
   useEffect(() => {
-    form.reset({
-      b_lu_start: toDate(cultivation.b_lu_start) ?? new Date(),
+    formReset({
+      b_lu_start: toDate(cultivation.b_lu_start) ?? today,
       b_lu_end: toDate(cultivation.b_lu_end) ?? null,
       m_cropresidue:
         cultivation.b_lu_croprotation === "cereal"
@@ -73,7 +76,7 @@ export function CultivationDetailsCard({
           : undefined,
       b_lu_variety: cultivation.b_lu_variety ?? undefined,
     })
-  }, [cultivation, form.reset])
+  }, [formReset, cultivation, today])
 
   const handleDeleteCultivation = () => {
     return fetcher.submit(null, { method: "delete" })

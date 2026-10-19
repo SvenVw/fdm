@@ -41,14 +41,15 @@ export function NewFieldsForm({
     },
   })
 
+  const formReset = form.reset
   useEffect(() => {
-    form.reset({
+    formReset({
       b_name: b_name ?? "",
       b_area: Math.round(b_area * 10) / 10,
       b_lu_catalogue: b_lu_catalogue ?? "",
       b_bufferstrip: b_bufferstrip ?? false,
     })
-  }, [form.reset, b_name, b_area, b_lu_catalogue, b_bufferstrip])
+  }, [formReset, b_name, b_area, b_lu_catalogue, b_bufferstrip])
 
   const current_b_lu_catalogue = useWatch({ control: form.control, name: "b_lu_catalogue" })
   const currentSelection = cultivationOptions.find((c) => c.value === current_b_lu_catalogue)

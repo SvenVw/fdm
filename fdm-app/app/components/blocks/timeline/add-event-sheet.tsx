@@ -83,14 +83,9 @@ export function AddEventSheet({
   const navigation = useNavigation()
   const deleteFetcher = useFetcher()
   const [confirmingDelete, setConfirmingDelete] = useState(false)
-  const interactionIdRef = useRef(0)
-  const previousRequestRef = useRef(request)
-  const submittedDeleteInteractionRef = useRef<number | null>(null)
-
-  if (request !== previousRequestRef.current) {
-    if (request) interactionIdRef.current += 1
-    previousRequestRef.current = request
-  }
+  // Computed once, not on every render: used only as a fallback start date for new cultivations.
+  const [today] = useState(() => new Date())
+  const submittedDeleteInteractionRef = useRef<AddEventSheetRequest | undefined>(null)
 
   const fertilizerApplication = useMemo(() => {
     if (!request || request.type !== "fertilizer-edit" || !field) return undefined
@@ -156,7 +151,7 @@ export function AddEventSheet({
         })
       })
     }
-  }, [cultivation?.b_lu_catalogue])
+  }, [cultivation?.b_lu_catalogue, request?.type, calendar, cultivation, b_id_farm])
 
   // Abort any fetches on unmount. This will also end the transition if it was ongoing.
   useEffect(() => {
@@ -169,7 +164,7 @@ export function AddEventSheet({
 
   const handleConfirmDelete = () => {
     if (!request || !field) return
-    submittedDeleteInteractionRef.current = interactionIdRef.current
+    submittedDeleteInteractionRef.current = request
     if (request.type === "cultivation-edit") {
       const formData = new FormData()
       formData.set("intent", "remove_cultivation")
@@ -201,7 +196,7 @@ export function AddEventSheet({
     if (
       (deleteFetcher.data as any)?.closeSheet &&
       submittedInteraction !== null &&
-      submittedInteraction === interactionIdRef.current
+      submittedInteraction === request
     ) {
       onOpenChange(false)
     }
@@ -316,7 +311,7 @@ export function AddEventSheet({
               b_lu={undefined}
               defaultValues={{
                 b_lu_catalogue: "",
-                b_lu_start: request.context.date ?? new Date(),
+                b_lu_start: request.context.date ?? today,
                 b_lu_end: undefined,
               }}
               options={cultivationOptions.filter(
@@ -340,7 +335,7 @@ export function AddEventSheet({
               b_lu={request.context.b_lu}
               defaultValues={{
                 b_lu_catalogue: cultivation?.b_lu_catalogue ?? "",
-                b_lu_start: cultivation?.b_lu_start ?? new Date(),
+                b_lu_start: cultivation?.b_lu_start ?? today,
                 b_lu_end:
                   request.type === "cultivation-end" && request.context.date
                     ? request.context.date
