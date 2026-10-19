@@ -162,6 +162,14 @@ export async function addCultivationToCatalogue(
       if (properties.b_date_harvest_default && !dateRegex.test(properties.b_date_harvest_default)) {
         throw new Error("Invalid b_date_harvest_default format. Expected MM-dd.")
       }
+      if (
+        Array.isArray(properties.b_lu_ya) &&
+        (properties.b_lu_ya.length === 0 || properties.b_lu_ya.some((x) => typeof x !== "number"))
+      ) {
+        throw new Error(
+          "Invalid b_lu_ya. Expected null, undefined, or an array of numbers with a minimum length of 1.",
+        )
+      }
 
       // Insert the cultivation in the db
       await tx.insert(schema.cultivationsCatalogue).values(properties)

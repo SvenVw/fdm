@@ -33,6 +33,7 @@ describe("Cultivation Data Model", () => {
   let fdm: FdmServerType
   let b_lu_catalogue: string
   let b_lu_catalogue_2: string
+  let b_lu_catalogue_3: string
   let b_id_farm: string
   let b_id_farm_2: string
   let b_id: string
@@ -53,6 +54,7 @@ describe("Cultivation Data Model", () => {
 
     b_lu_catalogue = createId()
     b_lu_catalogue_2 = createId()
+    b_lu_catalogue_3 = createId()
     const farmName = "Test Farm"
     const farmName2 = "Test Farm 2"
     const farmBusinessId = "123456"
@@ -172,6 +174,13 @@ describe("Cultivation Data Model", () => {
         b_lu_source: b_lu_source_2,
         b_lu_name: "test-name-2",
       })
+      await addCultivationToCatalogue(fdm, {
+        ...details,
+        b_lu_catalogue: b_lu_catalogue_3,
+        b_lu_source: b_lu_source,
+        b_lu_name: "test-name-3",
+        b_lu_ya: [2025],
+      })
 
       b_lu_start = new Date("2024-01-01")
       b_lu = await addCultivation(fdm, principal_id, b_lu_catalogue, b_id, b_lu_start)
@@ -209,6 +218,16 @@ describe("Cultivation Data Model", () => {
           (c) => c.b_lu_catalogue === b_lu_catalogue_2 && farmSources2.has(c.b_lu_source),
         ),
       ).toBeDefined()
+    })
+
+    it("should get all cultivations for farms from catalogue only for a given year", async () => {
+      const cultivations = await getCultivationsFromCatalogue(fdm, principal_id, b_id_farm, 2026)
+      expect(
+        cultivations.find((cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue),
+      ).toBeDefined() // b_lu_ya is null for this cultivation.
+      expect(
+        cultivations.find((cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue_3),
+      ).toBeUndefined() // b_lu_ya is [2025] for this cultivation.
     })
 
     it("should handle empty catalogues", async () => {
@@ -349,6 +368,68 @@ describe("Cultivation Data Model", () => {
           b_lu_start_default: "03-01",
           b_date_harvest_default: "09-15",
           b_lu_ya: null,
+        }),
+      ).rejects.toThrow()
+    })
+
+    it("should throw an error when adding a cultivation with invalid b_lu_ya", async () => {
+      const b_lu_catalogue = createId()
+
+      await expect(
+        addCultivationToCatalogue(fdm, {
+          b_lu_catalogue,
+          b_lu_source: b_lu_source,
+          b_lu_name: "test-name",
+          b_lu_name_en: "test-name-en",
+          b_lu_harvestable: "invalid-value" as any,
+          b_lu_hcat3: "test-hcat3",
+          b_lu_hcat3_name: "test-hcat3-name",
+          b_lu_croprotation: "cereal",
+          b_lu_harvestcat: "HC050",
+          b_lu_yield: 6000,
+          b_lu_dm: 500,
+          b_lu_hi: 0.4,
+          b_lu_n_harvestable: 4,
+          b_lu_n_residue: 2,
+          b_n_fixation: 0,
+          b_lu_eom: 100,
+          b_lu_eom_residue: 50,
+          b_lu_rest_oravib: false,
+          b_lu_variety_options: null,
+          b_lu_start_default: "03-01",
+          b_date_harvest_default: "09-15",
+          b_lu_ya: ["4"] as any,
+        }),
+      ).rejects.toThrow()
+    })
+
+    it("should not allow an empty array of b_lu_ya", async () => {
+      const b_lu_catalogue = createId()
+
+      await expect(
+        addCultivationToCatalogue(fdm, {
+          b_lu_catalogue,
+          b_lu_source: b_lu_source,
+          b_lu_name: "test-name",
+          b_lu_name_en: "test-name-en",
+          b_lu_harvestable: "invalid-value" as any,
+          b_lu_hcat3: "test-hcat3",
+          b_lu_hcat3_name: "test-hcat3-name",
+          b_lu_croprotation: "cereal",
+          b_lu_harvestcat: "HC050",
+          b_lu_yield: 6000,
+          b_lu_dm: 500,
+          b_lu_hi: 0.4,
+          b_lu_n_harvestable: 4,
+          b_lu_n_residue: 2,
+          b_n_fixation: 0,
+          b_lu_eom: 100,
+          b_lu_eom_residue: 50,
+          b_lu_rest_oravib: false,
+          b_lu_variety_options: null,
+          b_lu_start_default: "03-01",
+          b_date_harvest_default: "09-15",
+          b_lu_ya: [],
         }),
       ).rejects.toThrow()
     })
