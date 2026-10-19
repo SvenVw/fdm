@@ -23,6 +23,7 @@ import { captureEvent } from "~/lib/analytics.server"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
+import { serverConfig } from "~/lib/config.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
@@ -110,7 +111,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     // Get available cultivations for the farm
     const availabilityYearRaw = Number.parseInt(calendar)
-    const availabilityYear = Number.isNaN(availabilityYearRaw) ? undefined : availabilityYearRaw
+    const availabilityYear = Number.isNaN(availabilityYearRaw)
+      ? undefined
+      : Math.min(
+          serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
+          availabilityYearRaw,
+        )
     const cultivationsCatalogue = await getCultivationsFromCatalogue(
       fdm,
       session.principal_id,

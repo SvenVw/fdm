@@ -57,6 +57,7 @@ export function AddEventSheet({
   onOpenChange,
   b_id_farm,
   calendar,
+  maxCultivationAvailabilityYear,
   canModify,
   fields,
   fertilizerOptions,
@@ -66,6 +67,7 @@ export function AddEventSheet({
   onOpenChange: (open: boolean) => void
   b_id_farm: string
   calendar: string
+  maxCultivationAvailabilityYear: number
   canModify: boolean
   fields: TimelineField[]
   fertilizerOptions: {
@@ -209,10 +211,16 @@ export function AddEventSheet({
 
   // Allow some wiggle room for the cultivations. Between 1 october and 1 january options for the next year will also be shown.
   const cultivationAvailabilityYearForPrev = request?.context.date
-    ? new Date(request.context.date.getTime() + 93 * 24 * 60 * 60 * 1000).getFullYear()
+    ? Math.min(
+        maxCultivationAvailabilityYear,
+        new Date(request.context.date.getTime() + 93 * 24 * 60 * 60 * 1000).getFullYear(),
+      )
     : undefined
   const cultivationAvailabilityYearForNext = request?.context.date
-    ? new Date(request.context.date.getTime() - 1 * 24 * 60 * 60 * 1000).getFullYear()
+    ? Math.min(
+        maxCultivationAvailabilityYear,
+        new Date(request.context.date.getTime() - 1 * 24 * 60 * 60 * 1000).getFullYear(),
+      )
     : undefined
 
   return (

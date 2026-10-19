@@ -26,6 +26,7 @@ import { getEffectiveHarvestable } from "~/components/blocks/harvest/utils"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
+import { serverConfig } from "~/lib/config.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
@@ -129,7 +130,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     )
     // Map cultivations to options for the combobox
     const availabilityYearRaw = Number.parseInt(calendar)
-    const availabilityYear = Number.isNaN(availabilityYearRaw) ? undefined : availabilityYearRaw
+    const availabilityYear = Number.isNaN(availabilityYearRaw)
+      ? undefined
+      : Math.min(
+          serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
+          availabilityYearRaw,
+        )
 
     const cultivationsCatalogueOptions = cultivationsCatalogue
       .filter(

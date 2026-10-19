@@ -63,6 +63,7 @@ import { getSession } from "~/lib/auth.server"
 import { isBcsAnalysis } from "~/lib/bcs"
 import { endMonth, getTimeframeForYears, startMonth } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
+import { serverConfig } from "~/lib/config.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
@@ -188,6 +189,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     return {
       b_id_farm,
       calendar,
+      maxCultivationAvailabilityYear:
+        serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
       farmWritePermission,
       farmOptions,
       fields: timelineFields,
@@ -829,6 +832,7 @@ export default function TimelinePage() {
       <AddEventSheet
         b_id_farm={loaderData.b_id_farm}
         calendar={loaderData.calendar}
+        maxCultivationAvailabilityYear={loaderData.maxCultivationAvailabilityYear}
         canModify={loaderData.farmWritePermission}
         fertilizerOptions={loaderData.fertilizerOptions}
         cultivationOptions={loaderData.cultivationOptions}
