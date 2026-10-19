@@ -3059,7 +3059,9 @@ describe("calculateNL2025StikstofGebruiksNorm - overwintered temporary grassland
       ]),
     )
 
-    expect(result.normSource).toContain("Tijdelijk grasland (van 1 januari tot minstens 15 april) (60 kg N/ha)")
+    expect(result.normSource).toContain(
+      "Tijdelijk grasland (van 1 januari tot minstens 15 april) (60 kg N/ha)",
+    )
     // Maïs (klei) 185 + tijdelijk grasland "van 1 januari tot minstens 15 april" 60
     expect(result.normValue).toBe(245)
   })
@@ -3086,5 +3088,55 @@ describe("calculateNL2025StikstofGebruiksNorm - overwintered temporary grassland
     // The grass ending on 1 January does not block the new grass ("heringezaaid")
     expect(result.normValue).toBe(310)
     expect(result.normSource).not.toContain("heringezaaid")
+  })
+
+  it("lets re-sown grass carry the norm when it meets its minimum period", async () => {
+    setupGeoMock(1, 0) // klei, non-NV
+    const result = await calculateNL2025StikstofGebruiksNorm(
+      baseInput([
+        {
+          b_lu: "grass-old",
+          b_lu_catalogue: "nl_266",
+          b_lu_start: new Date(2024, 8, 1),
+          b_lu_end: new Date(2025, 4, 1),
+        } as NL2025NormsInputForCultivation,
+        {
+          b_lu: "grass-new",
+          b_lu_catalogue: "nl_266",
+          b_lu_start: new Date(2025, 4, 5),
+          b_lu_end: null,
+        } as unknown as NL2025NormsInputForCultivation,
+      ]),
+    )
+
+    // The re-sown grass carries the norm and is marked as heringezaaid
+    expect(result.normValue).toBe(310)
+    expect(result.normSource).toBe(
+      "Tijdelijk grasland (vanaf 15 april tot minstens 15 oktober) (heringezaaid).",
+    )
+  })
+
+  it("keeps overwintered temporary grassland when renewed grass does not meet its minimum period", async () => {
+    setupGeoMock(1, 0) // klei, non-NV
+    const result = await calculateNL2025StikstofGebruiksNorm(
+      baseInput([
+        {
+          b_lu: "grass-old",
+          b_lu_catalogue: "nl_266",
+          b_lu_start: new Date(2024, 8, 1),
+          b_lu_end: new Date(2025, 4, 1),
+        } as NL2025NormsInputForCultivation,
+        {
+          b_lu: "grass-new",
+          b_lu_catalogue: "nl_266",
+          b_lu_start: new Date(2025, 4, 5),
+          b_lu_end: new Date(2025, 8, 1),
+        } as NL2025NormsInputForCultivation,
+      ]),
+    )
+
+    expect(result.normValue).toBe(60)
+    expect(result.normSource).toContain("van 1 januari tot minstens 15 april")
+    expect(result.normSource).toContain("heringezaaid")
   })
 })

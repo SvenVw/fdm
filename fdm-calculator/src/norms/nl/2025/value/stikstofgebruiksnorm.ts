@@ -910,9 +910,31 @@ export async function calculateNL2025StikstofGebruiksNorm(
   const yearStart = new Date(2025, 0, 1)
   const yearEnd = new Date(2025, 11, 31, 23, 59, 59, 999)
 
+  // A stand is replaced (grassland renewal, heringezaaid) when a later grass cultivation starts after
+  // it ends, before 15 October, and is still present on 15 October. The re-sown grass then carries
+  // the norm and is marked as heringezaaid.
+  const october15 = new Date(2025, 9, 15)
+  const renewedGrassCultivations = new Set<NL2025NormsInputForCultivation>()
+  const isReplacedByGrass = (c: NL2025NormsInputForCultivation) => {
+    if (!c.b_lu_end) return false
+    const standEnd = new Date(c.b_lu_end)
+    const replacement = cultivations.find(
+      (other) =>
+        other !== c &&
+        nonBouwlandCodes.includes(other.b_lu_catalogue) &&
+        other.b_lu_start &&
+        new Date(other.b_lu_start) >= standEnd &&
+        new Date(other.b_lu_start) < october15 &&
+        (!other.b_lu_end || new Date(other.b_lu_end) >= october15),
+    )
+    if (replacement) renewedGrassCultivations.add(replacement)
+    return Boolean(replacement)
+  }
+
   const isOverwinteredTijdelijkGrasland = (c: NL2025NormsInputForCultivation) =>
     tijdelijkGraslandCodes.includes(c.b_lu_catalogue) &&
-    (!c.b_lu_end || new Date(c.b_lu_end) >= new Date(2025, 3, 15))
+    (!c.b_lu_end || new Date(c.b_lu_end) >= new Date(2025, 3, 15)) &&
+    !isReplacedByGrass(c)
 
   let yearCultivations = cultivations.filter((c) => {
     // Must overlap with the norm year
@@ -922,7 +944,8 @@ export async function calculateNL2025StikstofGebruiksNorm(
 
     // If it started before the norm year, it is only included if it is the hoofdteelt of the norm year,
     // or temporary grassland that lasts until at least 15 April ("van 1 januari tot minstens …" rows in
-    // Tabel 2, e.g. grass before maize). Temporary grassland ending earlier receives no norm.
+    // Tabel 2, e.g. grass before maize) and is not replaced by renewed grass. Temporary grassland
+    // ending earlier receives no norm.
     if (c.b_lu_start && new Date(c.b_lu_start).getFullYear() < 2025) {
       return c === hoofdteelt || isOverwinteredTijdelijkGrasland(c)
     }
@@ -974,6 +997,9 @@ export async function calculateNL2025StikstofGebruiksNorm(
       region,
       is_nv_area,
     )
+    if (renewedGrassCultivations.has(cult) && !result.noteText.includes("heringezaaid")) {
+      result.noteText = `${result.noteText} (heringezaaid)`
+    }
 
     totalNormValue = totalNormValue.plus(result.normValue)
     normBreakdownItems.push(result)
