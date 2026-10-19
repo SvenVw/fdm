@@ -131,11 +131,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     // Map catalogue cultivations to options for the combobox
     // Include those that already exist on the farm, or available in this year
-    const cultivationOptions = cultivationsCatalogue.map((cultivation) => ({
-      value: cultivation.b_lu_catalogue,
-      label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
-      b_lu_ya: cultivation.b_lu_ya,
-    }))
+    const availabilityYearRaw = Number.parseInt(calendar)
+    const availabilityYear = Number.isNaN(availabilityYearRaw) ? undefined : availabilityYearRaw
+    const b_lu_catalogue_set = new Set(cultivations.map((c) => c.b_lu_catalogue))
+    const isAvailableThisYear = (cultivation: CultivationCatalogue) =>
+      typeof availabilityYear === "undefined" ||
+      cultivation.b_lu_ya === null ||
+      cultivation.b_lu_ya.includes(availabilityYear)
+    const cultivationOptions = cultivationsCatalogue
+      .filter(
+        (cultivation) =>
+          cultivation?.b_lu_catalogue &&
+          cultivation?.b_lu_name &&
+          (b_lu_catalogue_set.has(cultivation.b_lu_catalogue) || isAvailableThisYear(cultivation)),
+      )
+      .map((cultivation) => ({
+        value: cultivation.b_lu_catalogue,
+        label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
+        availableThisYear: isAvailableThisYear(cultivation),
+      }))
 
     // Get Map Style
     const mapStyle = getMapStyle("satellite")
