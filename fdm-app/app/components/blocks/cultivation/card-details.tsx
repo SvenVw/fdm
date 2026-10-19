@@ -1,8 +1,8 @@
 import type { Cultivation } from "@nmi-agro/fdm-core"
-import type { FieldValues, Resolver, UseFormReturn } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AlertTriangle } from "lucide-react"
 import { useEffect } from "react"
+import { useWatch, type FieldValues, type Resolver, type UseFormReturn } from "react-hook-form"
 import { Form, useFetcher, useLocation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { DatePicker } from "~/components/custom/date-picker"
@@ -32,12 +32,14 @@ function toDate(value: Date | string | null | undefined) {
 export function CultivationDetailsCard({
   cultivation,
   b_lu_variety_options,
-  showAvailabilityYearWarning,
+  b_lu_ya,
+  maxCultivationAvailabilityYear,
   editable = true,
 }: {
   cultivation: Cultivation
   b_lu_variety_options: { value: string; label: string }[]
-  showAvailabilityYearWarning?: boolean
+  b_lu_ya: number[] | null
+  maxCultivationAvailabilityYear?: number
   editable?: boolean
 }) {
   const fetcher = useFetcher()
@@ -76,6 +78,35 @@ export function CultivationDetailsCard({
     return fetcher.submit(null, { method: "delete" })
   }
 
+  const current_b_lu_start = useWatch({ control: form.control, name: "b_lu_start" })
+  const current_b_lu_end = useWatch({ control: form.control, name: "b_lu_end" })
+  const currentStartYear = new Date(current_b_lu_start.getTime() + 24 * 60 * 1000).getFullYear()
+  const currentEndYear = current_b_lu_end
+    ? new Date(current_b_lu_end?.getTime() - 24 * 60 * 1000).getFullYear()
+    : null
+
+  let showAvailabilityYearWarning: boolean
+  if (b_lu_ya === null || typeof maxCultivationAvailabilityYear !== "number") {
+    showAvailabilityYearWarning = false
+  } else {
+    const currentEndYearForAvailability = currentEndYear ?? maxCultivationAvailabilityYear
+    if (
+      currentStartYear <= currentEndYearForAvailability &&
+      currentEndYearForAvailability - currentStartYear <= 100
+    ) {
+      showAvailabilityYearWarning = false
+      for (let y = currentStartYear; y <= currentEndYearForAvailability; y++) {
+        if (!b_lu_ya.includes(y)) {
+          showAvailabilityYearWarning = true
+          break
+        }
+      }
+    } else {
+      // User is doing very wrong things so show a warning.
+      showAvailabilityYearWarning = true
+    }
+  }
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -103,7 +134,7 @@ export function CultivationDetailsCard({
         {showAvailabilityYearWarning && (
           <Alert className="border-amber-600 bg-amber-100">
             <AlertTriangle className="size-4 stroke-amber-600" />
-            <p>Deze gewascode kan dit jaar volgens de RVO niet worden gebruikt.</p>
+            <p>Volgens de RVO kan deze gewascode in deze periode niet worden gebruikt.</p>
           </Alert>
         )}
         <RemixFormProvider {...form}>

@@ -129,28 +129,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       session.principal_id,
       b_id_farm,
     )
-    // Map cultivations to options for the combobox
-    const availabilityYearRaw = Number.parseInt(calendar)
-    const availabilityYear = Number.isNaN(availabilityYearRaw)
-      ? undefined
-      : Math.min(
-          serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
-          availabilityYearRaw,
-        )
-
-    const cultivationsCatalogueOptions = cultivationsCatalogue
-      .filter(
-        (item) =>
-          typeof availabilityYear === "undefined" ||
-          item.b_lu_ya === null ||
-          item.b_lu_ya.includes(availabilityYear),
-      )
-      .map((cultivation) => {
-        return {
-          value: cultivation.b_lu_catalogue,
-          label: cultivation.b_lu_name,
-        }
-      })
 
     // Get cultivation
     const cultivation = await getCultivation(fdm, session.principal_id, b_lu)
@@ -179,19 +157,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           }),
         )
       }
-      const availabilityYear = Number.isNaN(availabilityYearRaw)
-        ? undefined
-        : Math.min(
-            serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
-            availabilityYearRaw,
-          )
-      if (
-        typeof availabilityYear === "number" &&
-        cultivationCatalogueItem.b_lu_ya !== null &&
-        !cultivationCatalogueItem.b_lu_ya.includes(availabilityYear)
-      ) {
-        showAvailabilityYearWarning = true
-      }
     }
 
     const harvestParameters = getParametersForHarvestCat(cultivation.b_lu_harvestcat)
@@ -199,14 +164,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Return user information from loader
     return {
       field: field,
-      cultivationsCatalogueOptions: cultivationsCatalogueOptions,
       cultivation: cultivation,
       harvests: harvests,
       b_lu_harvestable: b_lu_harvestable,
       harvestParameters: harvestParameters,
+      b_lu_ya: cultivationCatalogueItem?.b_lu_ya ?? null,
       b_lu_variety_options: b_lu_variety_options,
       b_id_farm: b_id_farm,
       calendar: calendar,
+      maxCultivationAvailabilityYear:
+        serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
       showAvailabilityYearWarning: showAvailabilityYearWarning,
       cultivationWritePermission: await cultivationWritePermission,
     }
@@ -226,10 +193,11 @@ export default function FarmFieldsOverviewBlock() {
   return (
     <div className="space-y-6">
       <CultivationDetailsCard
-        showAvailabilityYearWarning={loaderData.showAvailabilityYearWarning}
         cultivation={loaderData.cultivation}
+        b_lu_ya={loaderData.b_lu_ya}
         b_lu_variety_options={loaderData.b_lu_variety_options}
         editable={loaderData.cultivationWritePermission}
+        maxCultivationAvailabilityYear={loaderData.maxCultivationAvailabilityYear}
       />
       <CultivationHarvestsCard
         harvests={loaderData.harvests}
