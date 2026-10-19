@@ -12,4 +12,6 @@ Fix the selection of the period-based nitrogen usage norm for temporary grasslan
 
 Gras voor industriële verwerking now also takes the sowing date into account: grass sown before 15 May in its first year receives the "inzaai voor 15 mei en volgende jaren" norm instead of the "inzaai in september en eerste jaar" norm.
 
+The norm description (`normSource`) of temporary grassland now includes the selected period, e.g. "Tijdelijk grasland (vanaf 15 oktober) (0 kg N/ha)".
+
 The period selection is available as `selectSubTypeByPeriod` and is shared by the 2025 and 2026 calculators.

@@ -38,6 +38,11 @@ export interface ApplicableNitrogenNorms {
    * not meet the minimum period ("tot minstens …") of any row. In that case all norms are 0.
    */
   minimumPeriodNotMet?: boolean
+  /**
+   * Description of the period row that was selected by period, e.g. "vanaf 15 oktober".
+   * Not set when the sub-type was matched on description or the standard has no sub-types.
+   */
+  periodDescription?: string
 }
 
 const zeroNormsByRegion: NormsByRegion = {
@@ -90,7 +95,10 @@ export function getNormsForCultivation(
   if ("minimumPeriodNotMet" in selection) {
     return { norms: zeroNormsByRegion, minimumPeriodNotMet: true }
   }
-  return { norms: selection.subType.norms }
+  return {
+    norms: selection.subType.norms,
+    periodDescription: selection.subType.period_description ?? undefined,
+  }
 }
 
 /**
@@ -615,7 +623,8 @@ function calculateSingleCultivationNorm(
     noteText = " (heringezaaid)"
   }
 
-  const subTypeText = subTypeOmschrijving ? ` (${subTypeOmschrijving})` : ""
+  const subTypeDescription = subTypeOmschrijving ?? applicableNorms.periodDescription
+  const subTypeText = subTypeDescription ? ` (${subTypeDescription})` : ""
   return {
     normValue,
     sourceName: selectedStandard.cultivation_rvo_table2,

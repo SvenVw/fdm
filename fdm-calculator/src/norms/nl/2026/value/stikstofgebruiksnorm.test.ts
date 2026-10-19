@@ -142,7 +142,7 @@ describe("calculateNL2026StikstofGebruiksNorm", () => {
     // Tijdelijk grasland "van 1 jan tot minstens 15 mei" -> 90 (zand_nwc standard), 72 (zand_nwc nv_area)
     // Should have no korting applied
     expect(result.normValue).toBe(72)
-    expect(result.normSource).toContain("Tijdelijk grasland.")
+    expect(result.normSource).toContain("Tijdelijk grasland (van 1 januari tot minstens 15 mei).")
   })
 
   it("should apply 0 korting if vanggewas is present (sown <= Oct 1st)", async () => {
@@ -2547,7 +2547,7 @@ describe("getNormsForCultivation - tijdelijk grasland periods (RVO Tabel 2)", ()
     )
 
     expect(result.normValue).toBe(250)
-    expect(result.normSource).toContain("Tijdelijk grasland (0 kg N/ha)")
+    expect(result.normSource).toContain("Tijdelijk grasland (vanaf 15 oktober) (0 kg N/ha)")
   })
 
   it("gives the full-year norm to temporary grassland that continues into the next year", async () => {
@@ -2608,7 +2608,7 @@ describe("calculateNL2026StikstofGebruiksNorm - overwintered temporary grassland
       ]),
     )
 
-    expect(result.normSource).toContain("Tijdelijk grasland (60 kg N/ha)")
+    expect(result.normSource).toContain("Tijdelijk grasland (van 1 januari tot minstens 15 april) (60 kg N/ha)")
     // Maïs (klei) 185 + tijdelijk grasland "van 1 januari tot minstens 15 april" 60
     expect(result.normValue).toBe(245)
   })
