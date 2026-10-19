@@ -5,6 +5,7 @@ import {
   getFields,
   getMeasures,
   getMeasuresFromCatalogue,
+  startOfDayInFdmTimeZone,
 } from "@nmi-agro/fdm-core"
 import type { Bln3Score } from "./types"
 import { getBln3MeasureAdvice, getBln3MeasureApplicability, getBln3Score } from "./api"
@@ -27,15 +28,16 @@ export {
 const FARM_BATCH_SIZE = 5
 
 /**
- * Builds the inclusive 1 January to 31 December timeframe of a calendar year.
+ * Builds the timeframe of a calendar year, from 1 January 00:00 up to and including
+ * 31 December 23:59:59.999 in Europe/Amsterdam, matching how fdm-core interprets calendar dates.
  *
  * @param year - Four-digit calendar year.
  * @returns The timeframe covering the full year.
  */
 export function getYearTimeframe(year: number): Timeframe {
   return {
-    start: new Date(Date.UTC(year, 0, 1)),
-    end: new Date(Date.UTC(year, 11, 31, 23, 59, 59, 999)),
+    start: startOfDayInFdmTimeZone(year, 1, 1),
+    end: new Date(startOfDayInFdmTimeZone(year + 1, 1, 1).getTime() - 1),
   }
 }
 
