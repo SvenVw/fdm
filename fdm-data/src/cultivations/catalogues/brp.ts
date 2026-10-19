@@ -106,19 +106,24 @@ export async function getCatalogueBrp(aggregatedInfo: AggregatedCultivationCatal
           })()
         : cultivation.b_lu_harvestcat
 
-    const yearsAvailable = cultivation.b_lu_ya
-      .split("||")
-      .map((item) => Number.parseInt(item))
-      .filter(
-        (item) =>
-          !Number.isNaN(item) &&
-          item >= MIN_ALLOWED_AVAILABLE_YEAR &&
-          item <= MAX_ALLOWED_AVAILABLE_YEAR,
-      )
+    const yearsAvailable = [
+      ...new Set(
+        cultivation.b_lu_ya
+          .split("||")
+          .map((item) => Number.parseInt(item))
+          .filter(
+            (item) =>
+              !Number.isNaN(item) &&
+              item >= MIN_ALLOWED_AVAILABLE_YEAR &&
+              item <= MAX_ALLOWED_AVAILABLE_YEAR,
+          ),
+      ),
+    ]
     const b_lu_ya =
-      typeof aggregatedInfo.b_lu_ya_min === "number" &&
-      typeof aggregatedInfo.b_lu_ya_max === "number" &&
-      yearsAvailable.length === aggregatedInfo.b_lu_ya_max - aggregatedInfo.b_lu_ya_min + 1
+      yearsAvailable.length === 0 ||
+      (typeof aggregatedInfo.b_lu_ya_min === "number" &&
+        typeof aggregatedInfo.b_lu_ya_max === "number" &&
+        yearsAvailable.length === aggregatedInfo.b_lu_ya_max - aggregatedInfo.b_lu_ya_min + 1)
         ? null
         : yearsAvailable.sort((a, b) => a - b)
 
