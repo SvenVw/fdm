@@ -29,6 +29,7 @@ const YearQuerySchema = z.object({
   year: z
     .string()
     .regex(/^\d{4}$/, "year must be a four-digit calendar year.")
+    .refine((y) => Number.parseInt(y, 10) >= 1900, "year must be 1900 or later.")
     .describe(
       "Calendar year (four digits, e.g. 2026). Soil analyses and adopted measures are limited to 1 January through 31 December of this year; the cultivation history needed for the indicators is not.",
     ),
