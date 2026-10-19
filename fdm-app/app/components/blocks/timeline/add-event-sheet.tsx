@@ -74,7 +74,7 @@ export function AddEventSheet({
     p_app_amount_unit: AppAmountUnit
     applicationMethodOptions: { value: ApplicationMethods; label: string }[]
   }[]
-  cultivationOptions: { value: string; label: string }[]
+  cultivationOptions: { value: string; label: string; b_lu_ya: number[] | null }[]
 }) {
   const open = !!request
   const field = request ? fields.find((f) => f.b_id === request.context.b_id) : undefined
@@ -207,6 +207,14 @@ export function AddEventSheet({
     submittedDeleteInteractionRef.current = null
   })
 
+  // Allow some wiggle room for the cultivations. Between 1 october and 1 january options for the next year will also be shown.
+  const cultivationAvailabilityYearForPrev = request?.context.date
+    ? new Date(request.context.date.getTime() + 93 * 24 * 60 * 60 * 1000).getFullYear()
+    : undefined
+  const cultivationAvailabilityYearForNext = request?.context.date
+    ? new Date(request.context.date.getTime() - 1 * 24 * 60 * 60 * 1000).getFullYear()
+    : undefined
+
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
       <SheetContent className="w-full gap-0 overflow-y-auto sm:max-w-lg">
@@ -303,7 +311,16 @@ export function AddEventSheet({
                 b_lu_start: request.context.date ?? new Date(),
                 b_lu_end: undefined,
               }}
-              options={cultivationOptions}
+              options={cultivationOptions.filter(
+                (c) =>
+                  c.value === request.context.b_lu ||
+                  (request.context.date &&
+                    (typeof cultivationAvailabilityYearForPrev !== "number" ||
+                      typeof cultivationAvailabilityYearForNext !== "number" ||
+                      c.b_lu_ya === null ||
+                      c.b_lu_ya.includes(cultivationAvailabilityYearForPrev) ||
+                      c.b_lu_ya.includes(cultivationAvailabilityYearForNext))),
+              )}
             />
           ) : null}
           {request &&

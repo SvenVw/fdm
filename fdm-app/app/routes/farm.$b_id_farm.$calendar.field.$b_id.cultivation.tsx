@@ -21,7 +21,7 @@ import { CultivationListCard } from "~/components/blocks/cultivation/card-list"
 import { CultivationAddFormSchema } from "~/components/blocks/cultivation/schema"
 import { captureEvent } from "~/lib/analytics.server"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -86,6 +86,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const session = await getSession(request)
 
     // Get timeframe from calendar store
+    const calendar = getCalendar(params)
     const timeframe = getTimeframe(params)
 
     const fieldWritePermission = await checkPermission(
@@ -108,18 +109,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get available cultivations for the farm
+    const availabilityYearRaw = Number.parseInt(calendar)
+    const availabilityYear = Number.isNaN(availabilityYearRaw) ? undefined : availabilityYearRaw
     const cultivationsCatalogue = await getCultivationsFromCatalogue(
       fdm,
       session.principal_id,
       b_id_farm,
+      availabilityYear,
     )
+
     // Map cultivations to options for the combobox
-    const cultivationsCatalogueOptions = cultivationsCatalogue.map((cultivation) => {
-      return {
-        value: cultivation.b_lu_catalogue,
-        label: cultivation.b_lu_name,
-      }
-    })
+    const cultivationsCatalogueOptions = cultivationsCatalogue
+      .filter(
+        (item) =>
+          typeof availabilityYear === "undefined" ||
+          item.b_lu_ya === null ||
+          item.b_lu_ya.includes(availabilityYear),
+      )
+      .map((cultivation) => {
+        return {
+          value: cultivation.b_lu_catalogue,
+          label: cultivation.b_lu_name,
+        }
+      })
 
     // Get cultivations for the field
     const cultivations = await getCultivations(fdm, session.principal_id, b_id, timeframe)

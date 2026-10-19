@@ -1,5 +1,6 @@
 import type { FeatureCollection } from "geojson"
 import {
+  CultivationCatalogue,
   getCultivations,
   getCultivationsFromCatalogue,
   getCurrentSoilData,
@@ -74,6 +75,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the session
     const session = await getSession(request)
 
+    const calendar = getCalendar(params)
     const timeframe = getTimeframe(params)
 
     // Get the field data
@@ -117,22 +119,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       currentSoilData.length > 0 && currentSoilData.every((i) => i.a_source === "nl-other-nmi")
 
     // Get the available cultivations
-    let cultivationOptions = []
     const cultivationsCatalogue = await getCultivationsFromCatalogue(
       fdm,
       session.principal_id,
       b_id_farm,
     )
-    cultivationOptions = cultivationsCatalogue
-      .filter((cultivation) => cultivation?.b_lu_catalogue && cultivation?.b_lu_name)
-      .map((cultivation) => ({
-        value: cultivation.b_lu_catalogue,
-        label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
-      }))
 
     // Get the cultivation
     const cultivations = await getCultivations(fdm, session.principal_id, b_id, timeframe)
     const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
+
+    // Map catalogue cultivations to options for the combobox
+    // Include those that already exist on the farm, or available in this year
+    const cultivationOptions = cultivationsCatalogue.map((cultivation) => ({
+      value: cultivation.b_lu_catalogue,
+      label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
+      b_lu_ya: cultivation.b_lu_ya,
+    }))
 
     // Get Map Style
     const mapStyle = getMapStyle("satellite")

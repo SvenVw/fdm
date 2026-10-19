@@ -120,18 +120,30 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     let b_lu_variety_options: { value: string; label: string }[] = []
     let b_lu_harvestable: HarvestableType = "none"
 
+    // First load all cultivations then filter because the previously selected cultivation might have
+    // been selected before we added the b_lu_ya gating.
     const cultivationsCatalogue: CultivationCatalogue[] = await getCultivationsFromCatalogue(
       fdm,
       session.principal_id,
       b_id_farm,
     )
     // Map cultivations to options for the combobox
-    const cultivationsCatalogueOptions = cultivationsCatalogue.map((cultivation) => {
-      return {
-        value: cultivation.b_lu_catalogue,
-        label: cultivation.b_lu_name,
-      }
-    })
+    const availabilityYearRaw = Number.parseInt(calendar)
+    const availabilityYear = Number.isNaN(availabilityYearRaw) ? undefined : availabilityYearRaw
+
+    const cultivationsCatalogueOptions = cultivationsCatalogue
+      .filter(
+        (item) =>
+          typeof availabilityYear === "undefined" ||
+          item.b_lu_ya === null ||
+          item.b_lu_ya.includes(availabilityYear),
+      )
+      .map((cultivation) => {
+        return {
+          value: cultivation.b_lu_catalogue,
+          label: cultivation.b_lu_name,
+        }
+      })
 
     // Get cultivation
     const cultivation = await getCultivation(fdm, session.principal_id, b_lu)
