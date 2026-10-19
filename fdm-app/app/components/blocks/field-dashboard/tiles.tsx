@@ -1,6 +1,7 @@
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import {
+  AlertTriangle,
   Calculator,
   CheckCircle2,
   ClipboardCheck,
@@ -21,6 +22,7 @@ import { BCS_COLOR_CLASSES, BCS_SCORE_DOT } from "~/components/blocks/soil-visua
 import { BcsScoreCard } from "~/components/blocks/soil-visual/bcs-score-card"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
 import { PdfViewerDialogContent, ViewPdfButton } from "~/components/custom/pdf-viewer"
+import { Alert } from "~/components/ui/alert"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
@@ -255,6 +257,12 @@ export function FieldDashboardCurrentCultivationTile({ dashboard, tile }: FieldD
             Gestart op {formatDateLabel(activeCultivation.startDate)}.
           </p>
         </div>
+        {activeCultivation.showAvailabilityYearWarning && (
+          <Alert className="border-amber-200 bg-amber-50 text-amber-700">
+            <AlertTriangle className="size-4 stroke-amber-700" />
+            <p>Volgens de RVO kan deze gewascode in deze periode niet worden gebruikt.</p>
+          </Alert>
+        )}
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-lg border p-3">
             <p className="text-muted-foreground text-xs uppercase">Teeltperiode</p>

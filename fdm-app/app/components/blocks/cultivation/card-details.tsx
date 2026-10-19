@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "~/components/ui/select"
 import { Spinner } from "~/components/ui/spinner"
+import { isCultivationUnavailableInPeriod } from "~/lib/cultivation-availability"
 import { cn } from "~/lib/utils"
 import { CultivationDetailsFormSchema, type CultivationDetailsFormSchemaType } from "./schema"
 
@@ -80,32 +81,11 @@ export function CultivationDetailsCard({
 
   const current_b_lu_start = useWatch({ control: form.control, name: "b_lu_start" })
   const current_b_lu_end = useWatch({ control: form.control, name: "b_lu_end" })
-  const currentStartYear = new Date(current_b_lu_start.getTime() + 24 * 60 * 1000).getFullYear()
-  const currentEndYear = current_b_lu_end
-    ? new Date(current_b_lu_end?.getTime() - 24 * 60 * 1000).getFullYear()
-    : null
-
-  let showAvailabilityYearWarning: boolean
-  if (b_lu_ya === null || typeof maxCultivationAvailabilityYear !== "number") {
-    showAvailabilityYearWarning = false
-  } else {
-    const currentEndYearForAvailability = currentEndYear ?? maxCultivationAvailabilityYear
-    if (
-      currentStartYear <= currentEndYearForAvailability &&
-      currentEndYearForAvailability - currentStartYear <= 100
-    ) {
-      showAvailabilityYearWarning = false
-      for (let y = currentStartYear; y <= currentEndYearForAvailability; y++) {
-        if (!b_lu_ya.includes(y)) {
-          showAvailabilityYearWarning = true
-          break
-        }
-      }
-    } else {
-      // User is doing very wrong things so show a warning.
-      showAvailabilityYearWarning = true
-    }
-  }
+  const showAvailabilityYearWarning = isCultivationUnavailableInPeriod(
+    { b_lu_start: current_b_lu_start, b_lu_end: current_b_lu_end },
+    b_lu_ya,
+    maxCultivationAvailabilityYear,
+  )
 
   return (
     <Card>
@@ -132,8 +112,8 @@ export function CultivationDetailsCard({
       </CardHeader>
       <CardContent className="space-y-6">
         {showAvailabilityYearWarning && (
-          <Alert className="border-amber-600 bg-amber-100">
-            <AlertTriangle className="size-4 stroke-amber-600" />
+          <Alert className="border-amber-200 bg-amber-50 text-amber-700">
+            <AlertTriangle className="size-4 stroke-amber-700" />
             <p>Volgens de RVO kan deze gewascode in deze periode niet worden gebruikt.</p>
           </Alert>
         )}

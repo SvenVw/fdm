@@ -14,6 +14,7 @@ import {
   type Cultivation,
   getCultivations,
   getCultivationsForFarm,
+  getCultivationsFromCatalogue,
   getCurrentSoilData,
   getField,
   getFields,
@@ -70,6 +71,8 @@ import { deriveBcsScores } from "~/lib/bcs-derived.server"
 import { computeBcs } from "~/lib/bcs.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
+import { serverConfig } from "~/lib/config.server"
+import { isCultivationUnavailableInPeriod } from "~/lib/cultivation-availability"
 import { getCultivationSuggestionResult } from "~/lib/cultivation-suggestion.server"
 import { handleLoaderError, reportError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -369,8 +372,26 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           getNmiApiKey(),
         )
 
+    // The catalogue holds the years in which each RVO crop code is available.
+    const cultivationCatalogue = activeCultivation
+      ? await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
+      : []
+    const activeCatalogueItem = activeCultivation
+      ? cultivationCatalogue.find(
+          (item) => item.b_lu_catalogue === activeCultivation.b_lu_catalogue,
+        )
+      : undefined
+    const showAvailabilityYearWarning = activeCultivation
+      ? isCultivationUnavailableInPeriod(
+          activeCultivation,
+          activeCatalogueItem?.b_lu_ya,
+          serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
+        )
+      : false
+
     const cultivationSummary = activeCultivation
       ? {
+          showAvailabilityYearWarning,
           id: activeCultivation.b_lu,
           name: activeCultivation.b_lu_name ?? "Onbekend gewas",
           startDate: toIsoString(activeCultivation.b_lu_start),
