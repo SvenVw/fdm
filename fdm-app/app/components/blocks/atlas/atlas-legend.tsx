@@ -8,6 +8,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { ChartContainer } from "~/components/ui/chart"
 import { Spinner } from "~/components/ui/spinner"
 import {
+  formatKgPerHa,
+  NUTRIENT_ADVICE_COPY,
+  NUTRIENT_ADVICE_NONE_COLOR,
+  NUTRIENT_ADVICE_SEQUENTIAL_RAMP,
+  NUTRIENT_ADVICE_STATUS_COLORS,
+  type NutrientAdviceMode,
+  type NutrientAdviceScale,
+} from "./atlas-nutrient-advice"
+import {
   GRADIENT_DEFINITIONS,
   GRADIENT_SHADED_SOIL_PARAMETERS,
   getShadedSoilParameters,
@@ -352,5 +361,96 @@ function GradientSoilAnalysisLegend(
         />
       </BarChart>
     </ChartContainer>
+  )
+}
+
+interface NutrientAdviceLegendProps {
+  /** Display mode of the layer. */
+  mode: NutrientAdviceMode
+  /** Name of the selected nutrient, e.g. "Stikstof, werkzaam". */
+  nutrientName: string
+  /** Unit of the selected nutrient, always kg/ha (e.g. "kg N/ha"). */
+  unit: string
+  /** Farm-wide scale, or `null` while the advice is still loading. */
+  scale: NutrientAdviceScale | null
+  /** Whether at least one field has no advice, to show the "Geen advies" swatch. */
+  hasFieldsWithoutAdvice: boolean
+}
+
+/**
+ * Legend of the Atlas "Bemestingsadvies" layer.
+ *
+ * - Comparison modes ("Nog te geven", "% van advies"): three swatches — yellow (less applied than
+ *   advised, < 90 %), green (advice met, 90–110 %), red (more applied than advised, > 110 %).
+ * - "Advies" mode: a blue colour bar from the lowest to the highest advice on the farm.
+ *
+ * Every colour has a text label next to it (DESIGN.md: colour is never the only signal).
+ */
+export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
+  const { mode, nutrientName, unit, scale, hasFieldsWithoutAdvice } = props
+  const isLoading = scale === null
+
+  const statusItems = [
+    { color: NUTRIENT_ADVICE_STATUS_COLORS.under, label: NUTRIENT_ADVICE_COPY.legendUnder },
+    { color: NUTRIENT_ADVICE_STATUS_COLORS["on-target"], label: NUTRIENT_ADVICE_COPY.legendMet },
+    { color: NUTRIENT_ADVICE_STATUS_COLORS.over, label: NUTRIENT_ADVICE_COPY.legendOver },
+  ]
+
+  return (
+    <Card className="min-h-0 w-60 flex-initial space-y-2 overflow-y-auto p-4 shadow-xs">
+      <CardHeader className="p-0">
+        <CardTitle className="text-muted-foreground text-center text-xs">
+          {nutrientName} ({unit}) · {NUTRIENT_ADVICE_COPY.modes[mode]}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className={cn("space-y-1.5 p-0", isLoading && "opacity-60")}>
+        {mode === "advice" ? (
+          <>
+            <div
+              className={cn("h-4 w-full rounded-sm", isLoading && "animate-pulse")}
+              style={{
+                background: `linear-gradient(to right, ${NUTRIENT_ADVICE_SEQUENTIAL_RAMP.join(", ")})`,
+              }}
+              role="img"
+              aria-label="Kleurschaal advies: van laag naar hoog"
+            />
+            <div className="text-muted-foreground flex justify-between text-[11px] leading-tight">
+              <span>{scale ? `${formatKgPerHa(scale.minAdvice)} ${unit}` : "…"}</span>
+              <span>{scale ? `${formatKgPerHa(scale.maxAdvice)} ${unit}` : "…"}</span>
+            </div>
+          </>
+        ) : (
+          <ul className="space-y-1">
+            {statusItems.map((item) => (
+              <li
+                key={item.label}
+                className="text-muted-foreground flex items-center gap-2 text-xs"
+              >
+                <span
+                  className="inline-block size-3 shrink-0 rounded-sm"
+                  style={{ backgroundColor: item.color }}
+                />
+                {item.label}
+              </li>
+            ))}
+          </ul>
+        )}
+        {hasFieldsWithoutAdvice && (
+          <p className="text-muted-foreground flex items-center gap-2 text-xs">
+            <span
+              className="inline-block size-3 shrink-0 rounded-sm"
+              style={{ backgroundColor: NUTRIENT_ADVICE_NONE_COLOR }}
+            />
+            {NUTRIENT_ADVICE_COPY.noAdvice}
+          </p>
+        )}
+        {isLoading && (
+          <p className="text-muted-foreground flex items-center gap-2 text-xs">
+            <Spinner className="size-3" />
+            {NUTRIENT_ADVICE_COPY.loading}
+          </p>
+        )}
+      </CardContent>
+    </Card>
   )
 }

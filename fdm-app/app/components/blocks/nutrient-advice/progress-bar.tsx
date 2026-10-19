@@ -29,10 +29,13 @@ export function computeAdviceProgress(current: number, target: number, excessExe
   }
 
   const rawPercentage = (current / target) * 100
+  // Round away floating-point noise before comparing, so exactly 90 % and 110 % count as
+  // on-target (e.g. 110 / 100 * 100 = 110.00000000000001 would otherwise read as "over").
+  const comparablePercentage = Math.round(rawPercentage * 1e6) / 1e6
   const status: AdviceProgressStatus =
-    rawPercentage < ADVICE_UNDER_THRESHOLD
+    comparablePercentage < ADVICE_UNDER_THRESHOLD
       ? "under"
-      : rawPercentage > ADVICE_OVER_THRESHOLD && !excessExempt
+      : comparablePercentage > ADVICE_OVER_THRESHOLD && !excessExempt
         ? "over"
         : "on-target"
 
