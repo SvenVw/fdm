@@ -120,6 +120,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get available cultivations for the farm
     let b_lu_variety_options: { value: string; label: string }[] = []
     let b_lu_harvestable: HarvestableType = "none"
+    let showAvailabilityYearWarning = false
 
     // First load all cultivations then filter because the previously selected cultivation might have
     // been selected before we added the b_lu_ya gating.
@@ -178,6 +179,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           }),
         )
       }
+      const availabilityYear = Number.isNaN(availabilityYearRaw)
+        ? undefined
+        : Math.min(
+            serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
+            availabilityYearRaw,
+          )
+      if (
+        typeof availabilityYear === "number" &&
+        cultivationCatalogueItem.b_lu_ya !== null &&
+        !cultivationCatalogueItem.b_lu_ya.includes(availabilityYear)
+      ) {
+        showAvailabilityYearWarning = true
+      }
     }
 
     const harvestParameters = getParametersForHarvestCat(cultivation.b_lu_harvestcat)
@@ -193,6 +207,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       b_lu_variety_options: b_lu_variety_options,
       b_id_farm: b_id_farm,
       calendar: calendar,
+      showAvailabilityYearWarning: showAvailabilityYearWarning,
       cultivationWritePermission: await cultivationWritePermission,
     }
   } catch (error) {
@@ -211,6 +226,7 @@ export default function FarmFieldsOverviewBlock() {
   return (
     <div className="space-y-6">
       <CultivationDetailsCard
+        showAvailabilityYearWarning={loaderData.showAvailabilityYearWarning}
         cultivation={loaderData.cultivation}
         b_lu_variety_options={loaderData.b_lu_variety_options}
         editable={loaderData.cultivationWritePermission}

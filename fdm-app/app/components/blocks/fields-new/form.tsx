@@ -1,8 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { AlertTriangle } from "lucide-react"
 import { useEffect } from "react"
+import { useWatch } from "react-hook-form"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { Combobox } from "~/components/custom/combobox"
+import { Alert } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "~/components/ui/card"
 import { Checkbox } from "~/components/ui/checkbox"
@@ -46,6 +49,9 @@ export function NewFieldsForm({
       b_bufferstrip: b_bufferstrip ?? false,
     })
   }, [form.reset, b_name, b_area, b_lu_catalogue, b_bufferstrip])
+
+  const current_b_lu_catalogue = useWatch({ control: form.control, name: "b_lu_catalogue" })
+  const currentSelection = cultivationOptions.find((c) => c.value === current_b_lu_catalogue)
 
   return (
     <RemixFormProvider {...form}>
@@ -98,6 +104,12 @@ export function NewFieldsForm({
                         label={"Hoofdgewas"}
                         defaultValue={b_lu_catalogue}
                       />
+                      {currentSelection && currentSelection.availableThisYear === false && (
+                        <Alert className="border-amber-600 bg-amber-100">
+                          <AlertTriangle className="size-4 stroke-amber-600" />
+                          <p>Deze gewascode kan dit jaar volgens de RVO niet worden gebruikt.</p>
+                        </Alert>
+                      )}
                       <Input type="hidden" {...field} />
                       <FormDescription />
                       <FormMessage />
@@ -154,5 +166,6 @@ type NewFieldsFormProps = {
   cultivationOptions: {
     value: string
     label: string
+    availableThisYear?: boolean
   }[]
 }

@@ -1,10 +1,12 @@
 import type { Cultivation } from "@nmi-agro/fdm-core"
 import type { FieldValues, Resolver, UseFormReturn } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { AlertTriangle } from "lucide-react"
 import { useEffect } from "react"
 import { Form, useFetcher, useLocation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { DatePicker } from "~/components/custom/date-picker"
+import { Alert } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Checkbox } from "~/components/ui/checkbox"
@@ -30,10 +32,12 @@ function toDate(value: Date | string | null | undefined) {
 export function CultivationDetailsCard({
   cultivation,
   b_lu_variety_options,
+  showAvailabilityYearWarning,
   editable = true,
 }: {
   cultivation: Cultivation
   b_lu_variety_options: { value: string; label: string }[]
+  showAvailabilityYearWarning?: boolean
   editable?: boolean
 }) {
   const fetcher = useFetcher()
@@ -96,6 +100,12 @@ export function CultivationDetailsCard({
         ) : null}
       </CardHeader>
       <CardContent className="space-y-6">
+        {showAvailabilityYearWarning && (
+          <Alert className="border-amber-600 bg-amber-100">
+            <AlertTriangle className="size-4 stroke-amber-600" />
+            <p>Deze gewascode kan dit jaar volgens de RVO niet worden gebruikt.</p>
+          </Alert>
+        )}
         <RemixFormProvider {...form}>
           <Form onSubmit={form.handleSubmit} method="post">
             <fieldset
