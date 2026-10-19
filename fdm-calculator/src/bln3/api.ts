@@ -13,6 +13,7 @@ import type {
 } from "./types"
 import { bln3Client } from "../nmi/client"
 import pkg from "../package"
+import { isExcludedFromBln3 } from "./exclusion"
 import { pickBln3Payload } from "./payload"
 
 /**
@@ -30,13 +31,7 @@ import { pickBln3Payload } from "./payload"
  * @throws If the NMI API key is not provided or the API request fails.
  */
 export async function requestBln3Score(inputs: Bln3ScoreInputs): Promise<Bln3Score | null> {
-  if (
-    inputs.isExcluded ||
-    inputs.b_bufferstrip === true ||
-    inputs.b_lu_croprotation === "nature" ||
-    inputs.b_lu_catalogue === "nl_343" ||
-    inputs.b_lu_catalogue === "nl_6801"
-  ) {
+  if (inputs.isExcluded || isExcludedFromBln3(inputs)) {
     return null
   }
 
@@ -153,13 +148,7 @@ export async function getBln3Score(
 export async function requestBln3MeasureApplicability(
   inputs: Bln3MeasureApplicabilityInputs,
 ): Promise<Bln3MeasureApplicabilityResult> {
-  if (
-    inputs.isExcluded ||
-    inputs.b_bufferstrip === true ||
-    inputs.b_lu_croprotation === "nature" ||
-    inputs.b_lu_catalogue === "nl_343" ||
-    inputs.b_lu_catalogue === "nl_6801"
-  ) {
+  if (inputs.isExcluded || isExcludedFromBln3(inputs)) {
     return { applicability: [] }
   }
 
@@ -276,13 +265,7 @@ export const getBln3MeasureApplicability = withCalculationCache(
 export async function requestBln3MeasureAdvice(
   inputs: Bln3MeasureAdviceInputs,
 ): Promise<Bln3MeasureAdviceResult | null> {
-  if (
-    inputs.isExcluded ||
-    inputs.b_bufferstrip === true ||
-    inputs.b_lu_croprotation === "nature" ||
-    inputs.b_lu_catalogue === "nl_343" ||
-    inputs.b_lu_catalogue === "nl_6801"
-  ) {
+  if (inputs.isExcluded || isExcludedFromBln3(inputs)) {
     return null
   }
 

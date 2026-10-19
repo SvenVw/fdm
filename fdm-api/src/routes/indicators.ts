@@ -100,6 +100,13 @@ const ImpactSchema = z.object({
   measure_impact: z.number().describe("Predicted positive impact on the indicator (0..1 scale)."),
 })
 
+const RecommendationImpactSchema = z.object({
+  indicator_id: z.string(),
+  measure_impact: z
+    .number()
+    .describe("Predicted impact on the indicator (0..1 scale); can be negative."),
+})
+
 const MeasureOptionSchema = z
   .object({
     m_id: z.string().describe("Catalogue identifier; use it to create a measure on the field."),
@@ -133,10 +140,16 @@ const MeasureOptionSchema = z
     recommendation: z
       .object({
         rank: z.number().int().min(1).max(5),
-        aggregate_impact: z.number(),
+        aggregate_impact: z
+          .number()
+          .describe(
+            "Sum of the impacts on the weak (non-green) indicators; negative impacts lower the sum. Options are ranked by this value.",
+          ),
         indicator_impacts: z
-          .array(ImpactSchema)
-          .describe("Impacts on the weak (non-green) indicators used for ranking."),
+          .array(RecommendationImpactSchema)
+          .describe(
+            "Impacts on the weak (non-green) indicators used for ranking, including negative impacts.",
+          ),
       })
       .nullable()
       .describe("`null` when the option is not recommended."),
@@ -194,7 +207,7 @@ const farmIndicatorsRoute = createRoute({
   "x-badges": [NEW_BADGE],
   summary: "Get indicator scores of a farm",
   description:
-    "Returns indicator scores of all eligible fields of a farm and the area-weighted farm scores for a calendar year. Fields that cannot be scored fail the whole request with 503. A farm without eligible fields returns empty `fields` and empty farm aggregates. Counts against the `nmi` rate limit.",
+    "Returns indicator scores of all eligible fields of a farm and the area-weighted farm scores for a calendar year. Fields that cannot be scored fail the whole request with 503. A farm without eligible fields returns empty `fields` and empty farm aggregates. Counts as one request against the `nmi` rate limit, regardless of the number of fields.",
   security: [{ ApiKeyHeader: [] }, { BearerAuth: [] }],
   request: { params: z.object({ b_id_farm: z.string() }), query: YearQuerySchema },
   responses: {

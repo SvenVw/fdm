@@ -57,9 +57,9 @@ export type MeasureOptionApplicability = {
 export type MeasureRecommendation = {
   /** Position, starting at 1 for the highest summed impact */
   rank: number
-  /** Sum of the positive impacts over the weak (non-green) indicators */
+  /** Sum of the impacts over the weak (non-green) indicators; negative impacts lower the sum */
   aggregate_impact: number
-  /** Positive impacts on the weak indicators used for ranking */
+  /** Impacts on the weak indicators used for ranking, including negative impacts */
   indicator_impacts: IndicatorImpact[]
 }
 
