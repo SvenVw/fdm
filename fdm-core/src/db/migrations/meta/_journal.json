@@ -271,8 +271,15 @@
     {
       "idx": 38,
       "version": "7",
-      "when": 1792152838511,
-      "tag": "0038_abandoned_dazzler",
+      "when": 1791281209822,
+      "tag": "0038_jazzy_eddie_brock",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1792404545744,
+      "tag": "0039_fluffy_sprite",
       "breakpoints": true
     }
   ]
