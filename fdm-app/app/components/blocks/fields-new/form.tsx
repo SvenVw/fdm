@@ -108,7 +108,10 @@ export function NewFieldsForm({
                       {currentSelection && currentSelection.availableThisYear === false && (
                         <Alert className="border-amber-200 bg-amber-50 text-amber-700">
                           <AlertTriangle className="size-4 stroke-amber-700" />
-                          <p>Deze gewascode kan dit jaar volgens de RVO niet worden gebruikt.</p>
+                          <p>
+                            Deze gewascode kan volgens de RVO niet worden gebruikt voor het
+                            geselecteerde jaar.
+                          </p>
                         </Alert>
                       )}
                       <Input type="hidden" {...field} />

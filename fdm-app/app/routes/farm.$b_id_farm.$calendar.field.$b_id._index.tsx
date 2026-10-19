@@ -372,26 +372,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           getNmiApiKey(),
         )
 
-    // The catalogue holds the years in which each RVO crop code is available.
-    const cultivationCatalogue = activeCultivation
-      ? await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
-      : []
-    const activeCatalogueItem = activeCultivation
-      ? cultivationCatalogue.find(
-          (item) => item.b_lu_catalogue === activeCultivation.b_lu_catalogue,
-        )
-      : undefined
-    const showAvailabilityYearWarning = activeCultivation
-      ? isCultivationUnavailableInPeriod(
-          activeCultivation,
-          activeCatalogueItem?.b_lu_ya,
-          serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
-        )
-      : false
-
     const cultivationSummary = activeCultivation
       ? {
-          showAvailabilityYearWarning,
           id: activeCultivation.b_lu,
           name: activeCultivation.b_lu_name ?? "Onbekend gewas",
           startDate: toIsoString(activeCultivation.b_lu_start),
@@ -528,6 +510,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           }
         })()
       : null
+
+    const showAvailabilityYearWarningPromise = (async function getShowAvailabilityYearWarning() {
+      // The catalogue holds the years in which each RVO crop code is available.
+      const cultivationCatalogue = activeCultivation
+        ? await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
+        : []
+      const activeCatalogueItem = activeCultivation
+        ? cultivationCatalogue.find(
+            (item) => item.b_lu_catalogue === activeCultivation.b_lu_catalogue,
+          )
+        : undefined
+      return activeCultivation
+        ? isCultivationUnavailableInPeriod(
+            activeCultivation,
+            activeCatalogueItem?.b_lu_ya,
+            serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
+          )
+        : false
+    })()
 
     const cultivationHistoryPromise = (async (): Promise<
       AsyncTileResult<FieldDashboardCultivationHistoryEntry[]>
@@ -958,6 +959,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         endedCount: measures.filter((measure) => !!measure.m_end).length,
       },
       asyncInsights: {
+        showAvailabilityYearWarning: showAvailabilityYearWarningPromise,
         fertilizer: fertilizerAsyncPromise,
         bln: blnPromise,
         cultivationHistory: cultivationHistoryPromise,

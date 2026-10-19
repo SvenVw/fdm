@@ -42,8 +42,6 @@ export interface FieldDashboardCultivationSummary {
   harvestTermPlural: string
   harvestDateTerm: string
   harvests: FieldDashboardHarvestSummary[]
-  /** True when the RVO crop code is unavailable in at least one year the cultivation is active. */
-  showAvailabilityYearWarning: boolean
 }
 
 export interface FieldDashboardCultivationHistoryEntry extends CultivationHistory {
@@ -186,6 +184,7 @@ export interface FieldDashboardData {
     endedCount: number
   }
   asyncInsights: {
+    showAvailabilityYearWarning: Promise<boolean>
     fertilizer: Promise<FieldDashboardFertilizerAsyncSummary>
     bln: Promise<AsyncTileResult<FieldDashboardBlnSummary>>
     cultivationHistory: Promise<AsyncTileResult<FieldDashboardCultivationHistoryEntry[]>>

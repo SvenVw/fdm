@@ -1,5 +1,5 @@
 // Offset used to keep the year derived from a date stable around midnight/timezone boundaries.
-const BOUNDARY_OFFSET_MS = 24 * 60 * 1000
+const BOUNDARY_OFFSET_MS = 24 * 60 * 60 * 1000
 
 // Guards against runaway loops when the dates are clearly wrong.
 const MAX_PERIOD_YEARS = 100

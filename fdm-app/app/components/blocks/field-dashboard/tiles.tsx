@@ -257,12 +257,18 @@ export function FieldDashboardCurrentCultivationTile({ dashboard, tile }: FieldD
             Gestart op {formatDateLabel(activeCultivation.startDate)}.
           </p>
         </div>
-        {activeCultivation.showAvailabilityYearWarning && (
-          <Alert className="border-amber-200 bg-amber-50 text-amber-700">
-            <AlertTriangle className="size-4 stroke-amber-700" />
-            <p>Volgens de RVO kan deze gewascode in deze periode niet worden gebruikt.</p>
-          </Alert>
-        )}
+        <Suspense>
+          <Await resolve={dashboard.asyncInsights.showAvailabilityYearWarning}>
+            {(showAvailabilityYearWarning) =>
+              showAvailabilityYearWarning && (
+                <Alert className="border-amber-200 bg-amber-50 text-amber-700">
+                  <AlertTriangle className="size-4 stroke-amber-700" />
+                  <p>Volgens de RVO kan deze gewascode in deze periode niet worden gebruikt.</p>
+                </Alert>
+              )
+            }
+          </Await>
+        </Suspense>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-lg border p-3">
             <p className="text-muted-foreground text-xs uppercase">Teeltperiode</p>

@@ -120,7 +120,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get available cultivations for the farm
     let b_lu_variety_options: { value: string; label: string }[] = []
     let b_lu_harvestable: HarvestableType = "none"
-    let showAvailabilityYearWarning = false
 
     // First load all cultivations then filter because the previously selected cultivation might have
     // been selected before we added the b_lu_ya gating.
@@ -174,7 +173,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       calendar: calendar,
       maxCultivationAvailabilityYear:
         serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
-      showAvailabilityYearWarning: showAvailabilityYearWarning,
       cultivationWritePermission: await cultivationWritePermission,
     }
   } catch (error) {
