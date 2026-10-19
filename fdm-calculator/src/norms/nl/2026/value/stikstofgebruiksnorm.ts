@@ -5,15 +5,16 @@ import type {
   NitrogenStandard,
   NL2026NormsInput,
   NL2026NormsInputForCultivation,
+  NormsByRegion,
   RegionKey,
 } from "./types"
 import { NormNotApplicableError } from "../../../../error"
 import pkg from "../../../../package"
 import { findHoofdteelt } from "../../../../shared/hoofdteelt"
 import {
-  getNormsForCultivation,
   getRegion,
   isFieldInNVGebied,
+  selectSubTypeByPeriod,
 } from "../../2025/value/stikstofgebruiksnorm"
 import { calculateVanggewasWinterteeltKorting } from "../../2025/value/vanggewas-winterteelt"
 import {
@@ -25,6 +26,80 @@ import {
   tijdelijkGraslandCodes,
 } from "../../constant"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
+
+/**
+ * Result of {@link getNormsForCultivation}.
+ */
+export interface ApplicableNitrogenNorms {
+  /** Standard and NV-gebied norms per soil region. */
+  norms: NormsByRegion
+  /**
+   * `true` when the cultivation falls under a period-based norm (e.g. temporary grassland) but does
+   * not meet the minimum period ("tot minstens …") of any row. In that case all norms are 0.
+   */
+  minimumPeriodNotMet?: boolean
+  /**
+   * Description of the period row that was selected by period, e.g. "vanaf 15 oktober".
+   * Not set when the sub-type was matched on description or the standard has no sub-types.
+   */
+  periodDescription?: string
+}
+
+const zeroNormsByRegion: NormsByRegion = {
+  klei: { standard: 0, nv_area: 0 },
+  zand_nwc: { standard: 0, nv_area: 0 },
+  zand_zuid: { standard: 0, nv_area: 0 },
+  loess: { standard: 0, nv_area: 0 },
+  veen: { standard: 0, nv_area: 0 },
+}
+
+/**
+ * Retrieves the appropriate set of nitrogen norms (`NormsByRegion`) for a given cultivation in 2026.
+ *
+ * If the standard has sub-types, a sub-type is first matched on `subTypeOmschrijving`. Otherwise a
+ * sub-type is selected by period with {@link selectSubTypeByPeriod}. When a period row applies but
+ * its minimum period is not met, all norms are 0 and `minimumPeriodNotMet` is set.
+ *
+ * @param selectedStandard - The `NitrogenStandard` that matches the cultivation.
+ * @param b_lu_end - The end date of the cultivation (use 31 December 2026 when unknown).
+ * @param b_lu_start - The start (sowing) date of the cultivation. When missing, 1 January 2026 is
+ *   assumed.
+ * @param subTypeOmschrijving - Optional sub-type description to match directly (e.g. "beweiden").
+ * @returns The applicable norms, or `undefined` if no sub-type can be matched.
+ */
+export function getNormsForCultivation(
+  selectedStandard: NitrogenStandard,
+  b_lu_end: Date,
+  b_lu_start: Date | null | undefined,
+  subTypeOmschrijving?: string,
+): ApplicableNitrogenNorms | undefined {
+  if (!selectedStandard.sub_types) {
+    return selectedStandard.norms ? { norms: selectedStandard.norms } : undefined
+  }
+
+  // 1. Check for a direct match on omschrijving
+  if (subTypeOmschrijving) {
+    const matchingSubType = selectedStandard.sub_types.find(
+      (sub) => sub.omschrijving === subTypeOmschrijving,
+    )
+    if (matchingSubType) {
+      return { norms: matchingSubType.norms }
+    }
+  }
+
+  // 2. Select by period (RVO Tabel 2 "van 1 januari tot minstens …" and "vanaf …" rows)
+  const selection = selectSubTypeByPeriod(selectedStandard.sub_types, b_lu_start, b_lu_end, 2026)
+  if (!selection) {
+    return undefined
+  }
+  if ("minimumPeriodNotMet" in selection) {
+    return { norms: zeroNormsByRegion, minimumPeriodNotMet: true }
+  }
+  return {
+    norms: selection.subType.norms,
+    periodDescription: selection.subType.period_description ?? undefined,
+  }
+}
 
 /**
  * Determines the specific sub-type 'omschrijving' for a cultivation in 2026.
@@ -99,7 +174,10 @@ function determineSubTypeOmschrijving(
     if (cultivation.b_lu_catalogue === "nl_1923") return "zomer"
   }
 
-  // Gras voor industriële verwerking logic based on cultivation history
+  // Gras voor industriële verwerking logic based on cultivation history and sowing date:
+  // sown in a previous year or before 15 May gets "inzaai voor 15 mei en volgende jaren",
+  // other sowing dates in the first year get "inzaai in september en eerste jaar".
+  // A missing start date is treated as 1 January.
   if (standard.cultivation_rvo_table2 === "Akkerbouwgewassen, Gras voor industriële verwerking") {
     const grasCultivationCodes = standard.b_lu_catalogue_match
     const hasGrasCultivationInPreviousYear = cultivations.some(
@@ -108,7 +186,9 @@ function determineSubTypeOmschrijving(
         c.b_lu_start &&
         c.b_lu_start.getFullYear() <= 2025,
     )
-    return hasGrasCultivationInPreviousYear
+    const isSownBefore15May =
+      !cultivation.b_lu_start || cultivation.b_lu_start < new Date(2026, 4, 15)
+    return hasGrasCultivationInPreviousYear || isSownBefore15May
       ? "inzaai voor 15 mei en volgende jaren"
       : "inzaai in september en eerste jaar"
   }
@@ -429,7 +509,7 @@ function calculateSingleCultivationNorm(
     )
   }
 
-  const normsForRegion: { standard: number; nv_area: number } = applicableNorms[region]
+  const normsForRegion: { standard: number; nv_area: number } = applicableNorms.norms[region]
 
   if (!normsForRegion) {
     throw new Error(
@@ -438,7 +518,9 @@ function calculateSingleCultivationNorm(
   }
 
   let normValue = new Decimal(is_nv_area ? normsForRegion.nv_area : normsForRegion.standard)
-  let noteText = ""
+  let noteText = applicableNorms.minimumPeriodNotMet
+    ? " (geen ruimte: minimale periode niet gehaald)"
+    : ""
 
   // Footnote 2 & 6: Suppression of groenbemester, tijdelijk grasland and vanggewas norms after maize
   const immediatePrecedingCrop =
@@ -541,7 +623,8 @@ function calculateSingleCultivationNorm(
     noteText = " (heringezaaid)"
   }
 
-  const subTypeText = subTypeOmschrijving ? ` (${subTypeOmschrijving})` : ""
+  const subTypeDescription = subTypeOmschrijving ?? applicableNorms.periodDescription
+  const subTypeText = subTypeDescription ? ` (${subTypeDescription})` : ""
   return {
     normValue,
     sourceName: selectedStandard.cultivation_rvo_table2,
@@ -600,15 +683,44 @@ export async function calculateNL2026StikstofGebruiksNorm(
   const yearStart = new Date(2026, 0, 1)
   const yearEnd = new Date(2026, 11, 31, 23, 59, 59, 999)
 
+  // A stand is replaced (grassland renewal, heringezaaid) when a later grass cultivation starts after
+  // it ends, before 15 October, and is still present on 15 October. The re-sown grass then carries
+  // the norm and is marked as heringezaaid.
+  const october15 = new Date(2026, 9, 15)
+  const renewedGrassCultivations = new Set<NL2026NormsInputForCultivation>()
+  const isReplacedByGrass = (c: NL2026NormsInputForCultivation) => {
+    if (!c.b_lu_end) return false
+    const standEnd = new Date(c.b_lu_end)
+    const replacement = cultivations.find(
+      (other) =>
+        other !== c &&
+        nonBouwlandCodes.includes(other.b_lu_catalogue) &&
+        other.b_lu_start &&
+        new Date(other.b_lu_start) >= standEnd &&
+        new Date(other.b_lu_start) < october15 &&
+        (!other.b_lu_end || new Date(other.b_lu_end) >= october15),
+    )
+    if (replacement) renewedGrassCultivations.add(replacement)
+    return Boolean(replacement)
+  }
+
+  const isOverwinteredTijdelijkGrasland = (c: NL2026NormsInputForCultivation) =>
+    tijdelijkGraslandCodes.includes(c.b_lu_catalogue) &&
+    (!c.b_lu_end || new Date(c.b_lu_end) >= new Date(2026, 3, 15)) &&
+    !isReplacedByGrass(c)
+
   let yearCultivations = cultivations.filter((c) => {
     // Must overlap with the norm year
     const start = c.b_lu_start ? new Date(c.b_lu_start) : yearStart
     const end = c.b_lu_end ? new Date(c.b_lu_end) : yearEnd
     if (start > yearEnd || end < yearStart) return false
 
-    // If it started before the norm year, it is only included if it is the hoofdteelt of the norm year
+    // If it started before the norm year, it is only included if it is the hoofdteelt of the norm year,
+    // or temporary grassland that lasts until at least 15 April ("van 1 januari tot minstens …" rows in
+    // Tabel 2, e.g. grass before maize) and is not replaced by renewed grass. Temporary grassland
+    // ending earlier receives no norm.
     if (c.b_lu_start && new Date(c.b_lu_start).getFullYear() < 2026) {
-      return c === hoofdteelt
+      return c === hoofdteelt || isOverwinteredTijdelijkGrasland(c)
     }
     // If it started after the norm year, it is not part of this year
     if (c.b_lu_start && new Date(c.b_lu_start).getFullYear() > 2026) {
@@ -657,6 +769,9 @@ export async function calculateNL2026StikstofGebruiksNorm(
       region,
       is_nv_area,
     )
+    if (renewedGrassCultivations.has(cult) && !result.noteText.includes("heringezaaid")) {
+      result.noteText = `${result.noteText} (heringezaaid)`
+    }
 
     totalNormValue = totalNormValue.plus(result.normValue)
     normBreakdownItems.push(result)
