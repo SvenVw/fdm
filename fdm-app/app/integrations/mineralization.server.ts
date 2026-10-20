@@ -13,14 +13,10 @@ import {
   type DynaV2Request,
   type DynaV2Result,
   deriveMineralizationInsights,
-  type FieldExclusionReason,
   getDynaV2,
   getWeatherForecast,
   type MineralizationCultivation,
-  type MineralizationEvent,
   type MineralizationFieldData,
-  type MineralizationInsights,
-  type MineralizationUsedInput,
   NmiApiError,
   prepareMineralizationInput,
   restrictToMainCultivation,
@@ -41,6 +37,10 @@ import {
   type Timeframe,
   toFdmDateString,
 } from "@nmi-agro/fdm-core"
+import type {
+  FieldMineralizationOutcome,
+  MineralizationMainCultivation,
+} from "~/lib/mineralization"
 import { getNmiApiKey } from "~/integrations/nmi.server"
 import { fdm } from "~/lib/fdm.server"
 
@@ -52,44 +52,6 @@ export interface FarmMineralizationContext {
   data: Map<string, MineralizationFieldData>
   fertilizers: Fertilizer[]
 }
-
-/** Main cultivation summary that is sent to the browser. */
-export type MineralizationMainCultivation = Pick<
-  MineralizationCultivation,
-  "b_lu" | "b_lu_catalogue" | "b_lu_name" | "b_lu_harvestable"
->
-
-interface OutcomeBase {
-  b_id: string
-  b_name: string | null
-  b_area: number | null
-}
-
-/** Result of the mineralization calculation of one field. */
-export type FieldMineralizationOutcome =
-  | (OutcomeBase & { status: "excluded"; reason: FieldExclusionReason })
-  | (OutcomeBase & { status: "missing_location" | "no_cultivation" })
-  | (OutcomeBase & {
-      status: "missing_harvest"
-      mainCultivation: MineralizationMainCultivation
-      defaultHarvestDate: string | null
-    })
-  | (OutcomeBase & { status: "error"; message: string })
-  | (OutcomeBase & {
-      status: "ok"
-      mainCultivation: MineralizationMainCultivation
-      result: DynaV2Result
-      insights: MineralizationInsights
-      events: MineralizationEvent[]
-      usedInput: MineralizationUsedInput
-      forecast: WeatherForecast | null
-      /** Start of the main cultivation as sent to Dyna (`YYYY-MM-DD`). */
-      mainStart: string
-      /** (Last) harvest of the main cultivation (`YYYY-MM-DD`). */
-      mainHarvest: string
-      /** Whether cultivations after the main crop had to be left out of the calculation. */
-      partial: boolean
-    })
 
 /**
  * Returns the timeframe of a calendar year in Europe/Amsterdam.
@@ -228,7 +190,7 @@ export async function calculateFieldMineralization(
   } = {},
 ): Promise<FieldMineralizationOutcome> {
   const field = ctx.fields.find((f) => f.b_id === b_id)
-  const base: OutcomeBase = {
+  const base = {
     b_id,
     b_name: field?.b_name ?? null,
     b_area: field?.b_area ?? null,
