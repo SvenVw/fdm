@@ -437,11 +437,6 @@ export default function RvoImportCreatePage() {
                       name="fieldsToUpdate"
                       value={JSON.stringify(formValues.fieldsToUpdate)}
                     />
-                    <input
-                      type="hidden"
-                      name="RvoImportReviewDataJson"
-                      value={JSON.stringify(rvoImportReviewData)}
-                    />
                     <Button type="submit" disabled={isSaving}>
                       {isSaving ? (
                         <>
