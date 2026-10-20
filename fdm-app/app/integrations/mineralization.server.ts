@@ -141,24 +141,42 @@ export async function loadFarmMineralizationContext(args: {
  * Requests with several cultivations can fail at the API. In that case the calculation is
  * repeated with only the main cultivation and the outcome is marked as partial.
  */
+/**
+ * Requests with several cultivations that the API could not calculate, so they are not sent again
+ * while this server runs. Bounded to keep memory use small.
+ */
+const failedMultiCultivationRequests = new Set<string>()
+const MAX_REMEMBERED_FAILURES = 1000
+
 async function runDyna(
   nmiApiKey: string,
   request: DynaV2Request,
   mainB_lu: string,
   calculationDate: string,
 ): Promise<{ result: DynaV2Result; partial: boolean }> {
+  const multipleCultivations = (request.cultivations?.length ?? 0) > 1
+  const requestKey = multipleCultivations ? JSON.stringify(request) : ""
+  const fallback = async () => ({
+    result: await getDynaV2(fdm, {
+      nmiApiKey,
+      request: restrictToMainCultivation(request, mainB_lu),
+      calculationDate,
+    }),
+    partial: true,
+  })
+  if (multipleCultivations && failedMultiCultivationRequests.has(requestKey)) {
+    return fallback()
+  }
   try {
     const result = await getDynaV2(fdm, { nmiApiKey, request, calculationDate })
     return { result, partial: false }
   } catch (error) {
-    const multipleCultivations = (request.cultivations?.length ?? 0) > 1
     if (error instanceof NmiApiError && error.status >= 500 && multipleCultivations) {
-      const result = await getDynaV2(fdm, {
-        nmiApiKey,
-        request: restrictToMainCultivation(request, mainB_lu),
-        calculationDate,
-      })
-      return { result, partial: true }
+      if (failedMultiCultivationRequests.size >= MAX_REMEMBERED_FAILURES) {
+        failedMultiCultivationRequests.clear()
+      }
+      failedMultiCultivationRequests.add(requestKey)
+      return fallback()
     }
     throw error
   }
@@ -334,7 +352,19 @@ export async function calculateScenario(args: {
   year: number
   scenario: MineralizationScenario
 }): Promise<FieldMineralizationOutcome> {
-  const ctx = await loadFarmMineralizationContext(args)
+  let ctx: FarmMineralizationContext
+  try {
+    ctx = await loadFarmMineralizationContext(args)
+  } catch (error) {
+    console.error(`Loading mineralization data failed for field ${args.b_id}:`, error)
+    return {
+      b_id: args.b_id,
+      b_name: null,
+      b_area: null,
+      status: "error",
+      message: "De gegevens van dit perceel konden niet worden geladen.",
+    }
+  }
   const fertilizers = new Map(ctx.fertilizers.map((f) => [f.p_id, f]))
   return calculateFieldMineralization(ctx, args.b_id, args.principal_id, args.b_id_farm, {
     transformRequest: (request, main) =>
@@ -361,6 +391,8 @@ export async function saveScenario(args: {
   b_id: string
   year: number
   scenario: MineralizationScenario
+  /** The scenario as the user started editing it; only its applications can be changed. */
+  base: MineralizationScenario
 }): Promise<void> {
   const { principal_id, b_id, year, scenario } = args
   const ctx = await loadFarmMineralizationContext(args)
@@ -395,6 +427,7 @@ export async function saveScenario(args: {
         }
       : null,
     scenario,
+    args.base,
   )
 
   const toDate = (date: string) => {

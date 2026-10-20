@@ -160,6 +160,9 @@ export function applyScenarioToRequest(args: {
  * @param current - Current fertilizer applications of the field in the scenario's year.
  * @param currentHarvest - Current (last) harvest of the main cultivation, or `null`.
  * @param scenario - Scenario to save.
+ * @param base - The scenario as it was before the user edited it. When given, only applications
+ *   in the base can be updated or removed, and they only count as changed when they differ from
+ *   the base; applications the scenario did not show are left untouched.
  * @returns Applications to add, update and remove, and the harvest to add or update.
  */
 export function diffScenario(
@@ -170,9 +173,13 @@ export function diffScenario(
     b_lu_yield: number | null
   } | null,
   scenario: MineralizationScenario,
+  base?: MineralizationScenario,
 ): ScenarioDiff {
   const diff: ScenarioDiff = { add: [], update: [], remove: [], harvest: null }
   const scenarioIds = new Set<string>()
+  const baseById = new Map(
+    (base?.fertilizerApplications ?? []).flatMap((a) => (a.p_app_id ? [[a.p_app_id, a]] : [])),
+  )
 
   for (const application of scenario.fertilizerApplications) {
     if (!application.p_app_id) {
@@ -185,6 +192,18 @@ export function diffScenario(
       diff.add.push(application)
       continue
     }
+    const baseApplication = baseById.get(application.p_app_id)
+    if (baseApplication) {
+      // Compare with what the user started from, so values the scenario filled in for missing
+      // data (e.g. a default method) do not count as a change
+      const changedFromBase =
+        baseApplication.p_id !== application.p_id ||
+        baseApplication.p_app_amount_display !== application.p_app_amount_display ||
+        baseApplication.p_app_method !== application.p_app_method ||
+        baseApplication.p_app_date !== application.p_app_date
+      if (changedFromBase) diff.update.push({ ...application, p_app_id: application.p_app_id })
+      continue
+    }
     const changed =
       existing.p_id !== application.p_id ||
       (existing.p_app_amount_display ?? existing.p_app_amount) !==
@@ -195,7 +214,9 @@ export function diffScenario(
   }
 
   for (const existing of current) {
-    if (!scenarioIds.has(existing.p_app_id)) diff.remove.push(existing.p_app_id)
+    // With a base, only applications that were part of the scenario can be removed by it
+    const removable = base ? baseById.has(existing.p_app_id) : true
+    if (removable && !scenarioIds.has(existing.p_app_id)) diff.remove.push(existing.p_app_id)
   }
 
   if (scenario.harvest) {

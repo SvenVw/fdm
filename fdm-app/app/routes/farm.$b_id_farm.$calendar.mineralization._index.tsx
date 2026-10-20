@@ -58,6 +58,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       b_id_farm,
       year,
     })
+    // Rows handle a failed load themselves; without rows nothing else observes the promise
+    contextPromise.catch(() => undefined)
 
     const rows = fields.map((field) => ({
       b_id: field.b_id,
@@ -95,7 +97,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function MineralizationFarmOverview() {
-  const { b_id_farm, calendar, year, isCurrentYear, rows } = useLoaderData<typeof loader>()
+  const loaderData = useLoaderData<typeof loader>()
+  // Remount per farm and year, so outcomes of another year are never shown
+  return <FarmOverview key={`${loaderData.b_id_farm}-${loaderData.year}`} {...loaderData} />
+}
+
+function FarmOverview({
+  b_id_farm,
+  calendar,
+  year,
+  isCurrentYear,
+  rows,
+}: ReturnType<typeof useLoaderData<typeof loader>>) {
   const outcomes = useSettledOutcomes(rows)
   const { capture } = useAnalytics()
 

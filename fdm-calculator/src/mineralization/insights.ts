@@ -53,6 +53,8 @@ export type MineralizationSignal =
       eventType: "fertilizer" | "harvest"
       rainMm: number
       p_app_id?: string
+      /** Cultivation of a harvest event. */
+      b_lu?: string
     }
 
 /** Key figures of a simulation, in kg N/ha unless stated otherwise. */
@@ -228,6 +230,7 @@ export function deriveMineralizationInsights(args: {
           eventType: event.type,
           rainMm,
           ...(event.p_app_id ? { p_app_id: event.p_app_id } : {}),
+          ...(event.type === "harvest" && event.b_lu ? { b_lu: event.b_lu } : {}),
         })
       }
     }

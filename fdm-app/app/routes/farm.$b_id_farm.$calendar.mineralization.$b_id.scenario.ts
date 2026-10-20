@@ -8,8 +8,9 @@ import { handleLoaderError } from "~/lib/error"
 /**
  * Calculates a what-if scenario for a field without saving it.
  *
- * The scenario is passed as JSON in the `scenario` search parameter. Problems with the scenario
- * or the calculation are returned as an outcome with `status: "error"`, so the page keeps working.
+ * The scenario is passed as JSON in the `scenario` search parameter and echoed back as `key`.
+ * Problems with the scenario or the calculation are returned as an outcome with
+ * `status: "error"`, so the page keeps working.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
@@ -28,22 +29,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       status: "error",
       message: "Het scenario is niet compleet: controleer de datums en hoeveelheden.",
     }
+    // The key lets the page ignore results of an earlier version of the scenario
+    const key = new URL(request.url).searchParams.get("scenario") ?? ""
     let raw: unknown
     try {
-      raw = JSON.parse(new URL(request.url).searchParams.get("scenario") ?? "")
+      raw = JSON.parse(key)
     } catch {
-      return invalid
+      return { key, outcome: invalid }
     }
     const parsed = getMineralizationScenarioSchema(year).safeParse(raw)
-    if (!parsed.success) return invalid
+    if (!parsed.success) return { key, outcome: invalid }
 
-    return await calculateScenario({
+    const outcome = await calculateScenario({
       principal_id: session.principal_id,
       b_id_farm,
       b_id,
       year,
       scenario: parsed.data,
     })
+    return { key, outcome }
   } catch (error) {
     const normalized = handleLoaderError(error)
     throw normalized ?? error

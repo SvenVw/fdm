@@ -123,6 +123,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   }
 }
 
+export { shouldRevalidateMineralization as shouldRevalidate } from "~/lib/mineralization"
+
 export default function MineralizationLayout() {
   const loaderData = useLoaderData<typeof loader>()
   const { b_id } = useParams() // Get the field ID from child routes

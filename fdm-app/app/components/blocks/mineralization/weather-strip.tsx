@@ -43,10 +43,13 @@ export function WeatherStrip({
   forecast,
   signals,
   onSuggestShift,
+  canSuggestShift,
 }: {
   forecast: WeatherForecast
   signals: MineralizationSignal[]
   onSuggestShift?: (suggestion: ShiftSuggestion) => void
+  /** Whether the event of a signal can be shifted in the scenario. */
+  canSuggestShift?: (signal: RainSignal) => boolean
 }) {
   const rainSignals = signals.filter((s): s is RainSignal => s.type === "rain_near_event")
   const maxRain = Math.max(10, ...forecast.days.map((d) => d.w_prec_sum_day))
@@ -111,7 +114,7 @@ export function WeatherStrip({
                     {formatNumber(signal.rainMm, 1)} mm regen. Overweeg te verschuiven.
                   </span>
                 </span>
-                {onSuggestShift ? (
+                {onSuggestShift && (canSuggestShift?.(signal) ?? true) ? (
                   <Button
                     variant="outline"
                     size="sm"

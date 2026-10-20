@@ -302,6 +302,62 @@ describe("diffScenario", () => {
     expect(diff.harvest).toBeNull()
   })
 
+  it("only removes and updates applications the scenario was built from", () => {
+    const withNullMethod: MineralizationApplication[] = [
+      ...current,
+      {
+        p_app_id: "app_skipped",
+        p_id: "fert_unknown",
+        p_name_nl: null,
+        p_app_amount: 50,
+        p_app_amount_display: 50,
+        p_app_amount_unit: "kg/ha",
+        p_app_method: null,
+        p_app_date: new Date("2026-04-01T00:00:00+02:00"),
+      },
+      {
+        p_app_id: "app_null_method",
+        p_id: "fert_kas",
+        p_name_nl: "KAS",
+        p_app_amount: 150,
+        p_app_amount_display: 150,
+        p_app_amount_unit: "kg/ha",
+        p_app_method: null,
+        p_app_date: new Date("2026-08-01T00:00:00+02:00"),
+      },
+    ]
+    const base: MineralizationScenario = {
+      fertilizerApplications: [
+        ...scenario.fertilizerApplications.slice(0, 1),
+        {
+          p_app_id: "app_moved",
+          p_id: "fert_kas",
+          p_app_amount_display: 200,
+          p_app_method: "broadcasting",
+          p_app_date: "2026-06-01",
+        },
+        {
+          p_app_id: "app_null_method",
+          p_id: "fert_kas",
+          p_app_amount_display: 150,
+          p_app_method: "broadcasting",
+          p_app_date: "2026-08-01",
+        },
+      ],
+    }
+    const edited: MineralizationScenario = {
+      fertilizerApplications: [
+        base.fertilizerApplications[0],
+        { ...base.fertilizerApplications[1], p_app_date: "2026-06-04" },
+        base.fertilizerApplications[2],
+      ],
+    }
+    const diff = diffScenario(withNullMethod, null, edited, base)
+    expect(diff.remove).toEqual([])
+    expect(diff.update.map((a) => a.p_app_id)).toEqual(["app_moved"])
+    expect(diff.add).toEqual([])
+  })
+
   it("updates an existing harvest or adds a new one", () => {
     const withHarvest = { ...scenario, harvest: { b_date_harvest: "2026-09-25" } }
     expect(

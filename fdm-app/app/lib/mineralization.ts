@@ -1,8 +1,3 @@
-/**
- * Shared types and formatting helpers for the Mineralisatie pages.
- *
- * Safe to import from both server and client code: it only contains types and pure functions.
- */
 import type {
   DynaV2DailyPoint,
   DynaV2Result,
@@ -15,6 +10,12 @@ import type {
   SeasonPhase,
   WeatherForecast,
 } from "@nmi-agro/fdm-calculator"
+/**
+ * Shared types and formatting helpers for the Mineralisatie pages.
+ *
+ * Safe to import from both server and client code: it only contains types and pure functions.
+ */
+import type { ShouldRevalidateFunctionArgs } from "react-router"
 
 /** Main cultivation summary that is sent to the browser. */
 export type MineralizationMainCultivation = Pick<
@@ -187,4 +188,23 @@ export function describeAttentionItem(item: AttentionItem): string {
     case "residual_n":
       return `${formatKgN(signal.availableN)} over bij oogst`
   }
+}
+
+/**
+ * Skips reloading the mineralization loaders when only the `phase` search parameter changes; the
+ * phase is a view setting and does not change any calculation.
+ */
+export function shouldRevalidateMineralization({
+  currentUrl,
+  nextUrl,
+  formMethod,
+  defaultShouldRevalidate,
+}: ShouldRevalidateFunctionArgs): boolean {
+  if (formMethod || currentUrl.pathname !== nextUrl.pathname) return defaultShouldRevalidate
+  const current = new URLSearchParams(currentUrl.search)
+  const next = new URLSearchParams(nextUrl.search)
+  current.delete("phase")
+  next.delete("phase")
+  if (current.toString() === next.toString()) return false
+  return defaultShouldRevalidate
 }

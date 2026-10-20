@@ -66,6 +66,8 @@ import {
   seriesInYear,
 } from "~/lib/mineralization"
 
+export { shouldRevalidateMineralization as shouldRevalidate } from "~/lib/mineralization"
+
 export const meta: MetaFunction = () => {
   return [
     { title: `Mineralisatie | Perceel | ${clientConfig.name}` },
@@ -192,15 +194,18 @@ export async function action({ request, params }: ActionFunctionArgs) {
         throw data("invalid: b_id_farm", { status: 400, statusText: "invalid: b_id_farm" })
       }
       const year = getMineralizationYear(params.calendar)
-      let raw: unknown
-      try {
-        const value = formData.get("scenario")
-        raw = JSON.parse(typeof value === "string" ? value : "")
-      } catch {
-        throw data("Ongeldig scenario", { status: 400 })
+      const schema = getMineralizationScenarioSchema(year)
+      const parseField = (name: string) => {
+        try {
+          const value = formData.get(name)
+          return schema.safeParse(JSON.parse(typeof value === "string" ? value : ""))
+        } catch {
+          return null
+        }
       }
-      const parsed = getMineralizationScenarioSchema(year).safeParse(raw)
-      if (!parsed.success) {
+      const parsed = parseField("scenario")
+      const parsedBase = parseField("base")
+      if (!parsed?.success || !parsedBase?.success) {
         throw data("Ongeldig scenario", { status: 400 })
       }
       await saveScenario({
@@ -209,6 +214,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         b_id: params.b_id,
         year,
         scenario: parsed.data,
+        base: parsedBase.data,
       })
       return dataWithSuccess(
         { result: "ok" },
@@ -349,7 +355,7 @@ function FieldMineralizationResult(
 
   // What-if scenario: edited locally, calculated through the scenario resource route
   const [scenario, setScenario] = useState(base)
-  const scenarioFetcher = useFetcher<FieldMineralizationOutcome>()
+  const scenarioFetcher = useFetcher<{ key: string; outcome: FieldMineralizationOutcome }>()
   const saveFetcher = useFetcher()
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(
@@ -372,10 +378,15 @@ function FieldMineralizationResult(
     }, SCENARIO_DEBOUNCE_MS)
     capture("mineralization_scenario_changed", { action: action.type })
   }
-  const scenarioOutcome = dirty ? scenarioFetcher.data : undefined
+  // A result only counts when it was calculated for exactly the scenario on screen
+  const scenarioKey = JSON.stringify(scenario)
+  const scenarioOutcome =
+    dirty && scenarioFetcher.state === "idle" && scenarioFetcher.data?.key === scenarioKey
+      ? scenarioFetcher.data.outcome
+      : undefined
   const scenarioOk = scenarioOutcome?.status === "ok" ? scenarioOutcome : null
   const scenarioError = scenarioOutcome?.status === "error" ? scenarioOutcome.message : null
-  const scenarioPending = dirty && (scenarioFetcher.state !== "idle" || !scenarioOutcome)
+  const scenarioPending = dirty && !scenarioOutcome
   const saving = saveFetcher.state !== "idle"
   const [searchParams, setSearchParams] = useSearchParams()
   const requested = searchParams.get("phase")
@@ -453,6 +464,12 @@ function FieldMineralizationResult(
         <WeatherStrip
           forecast={outcome.forecast}
           signals={outcome.insights.signals}
+          canSuggestShift={(signal) =>
+            signal.eventType === "fertilizer"
+              ? scenario.fertilizerApplications.some((a) => a.p_app_id === signal.p_app_id)
+              : signal.b_lu === outcome.mainCultivation.b_lu &&
+                signal.eventDate === base.harvest?.b_date_harvest
+          }
           onSuggestShift={(suggestion) =>
             dispatch({
               type: "shift",
@@ -480,7 +497,11 @@ function FieldMineralizationResult(
           onSave={() => {
             capture("mineralization_scenario_saved", { b_id_farm: props.b_id_farm, year })
             void saveFetcher.submit(
-              { intent: "save_scenario", scenario: JSON.stringify(scenario) },
+              {
+                intent: "save_scenario",
+                scenario: JSON.stringify(scenario),
+                base: JSON.stringify(base),
+              },
               { method: "post" },
             )
           }}

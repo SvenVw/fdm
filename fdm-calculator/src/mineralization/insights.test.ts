@@ -158,6 +158,34 @@ describe("deriveMineralizationInsights", () => {
     ])
   })
 
+  it("names the cultivation of a harvest with rain around it", () => {
+    const points = series("2026-04-01", 150, () => ({ b_nw: 200, b_n_uptake: 100 }))
+    const forecast: WeatherForecast = {
+      notifications: [],
+      days: Array.from({ length: 14 }, (_, i) => ({
+        date: addDays("2026-06-01", i),
+        w_temp_min_day: 10,
+        w_temp_max_day: 20,
+        w_temp_mean_day: 15,
+        w_prec_sum_day: 6,
+        w_et_ref_day: 2,
+        w_icon: 1,
+      })),
+    }
+    const insights = deriveMineralizationInsights({
+      ...base,
+      result: result(points),
+      forecast,
+      events: [
+        { date: "2026-06-05", type: "harvest", label: "Gras", planned: true, b_lu: "lu_grass" },
+      ],
+    })
+    expect(insights.signals.find((s) => s.type === "rain_near_event")).toMatchObject({
+      eventType: "harvest",
+      b_lu: "lu_grass",
+    })
+  })
+
   it("computes KPIs", () => {
     const points = series("2026-04-01", 184, (i) => ({
       b_nw: 100 + i,
