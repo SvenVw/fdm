@@ -51,8 +51,11 @@ export function DateField({
       }
       const date = format(new Date(next), "yyyy-MM-dd")
       if ((min && date < min) || (max && date > max)) {
+        const year = min?.slice(0, 4)
         setError(
-          `Kies een datum tussen ${formatLongDate(min ?? date)} en ${formatLongDate(max ?? date)}.`,
+          year && min === `${year}-01-01` && max === `${year}-12-31`
+            ? `Kies een datum in ${year}.`
+            : `Kies een datum tussen ${formatLongDate(min ?? date)} en ${formatLongDate(max ?? date)}.`,
         )
         return
       }

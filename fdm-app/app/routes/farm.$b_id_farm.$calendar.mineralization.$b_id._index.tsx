@@ -70,6 +70,7 @@ import {
   getNotCalculatedReason,
   getSeasonTiming,
 } from "~/lib/mineralization"
+import { cn } from "~/lib/utils"
 
 export { shouldRevalidateMineralization as shouldRevalidate } from "~/lib/mineralization"
 
@@ -409,6 +410,7 @@ function getScenarioEvents(
 
 const SCENARIO_DEBOUNCE_MS = 600
 const SCENARIO_PANEL_ID = "scenario"
+const CHART_ID = "stikstof-grafiek"
 const USED_INPUT_ID = "gebruikte-gegevens"
 
 function isPhase(value: string | null): value is SeasonPhase {
@@ -526,7 +528,7 @@ function FieldMineralizationResult(
         </Alert>
       ) : null}
 
-      <Card>
+      <Card id={CHART_ID} className="scroll-mt-4">
         <CardHeader className="space-y-4">
           <div className="space-y-1.5">
             <CardTitle>Stikstof door het seizoen</CardTitle>
@@ -536,9 +538,13 @@ function FieldMineralizationResult(
           </div>
           <KeyFigures insights={outcome.insights} phase={phase} timing={timing} />
           {dirty && phase !== "evaluation" ? (
+            // Remounts with every new result, so the highlight plays once per recalculation
             <div
-              className="bg-muted/50 flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between"
-              aria-live="polite"
+              key={scenarioOk ? scenarioKey : "pending"}
+              className={cn(
+                "bg-muted/50 flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between",
+                scenarioOk && "motion-safe:animate-just-updated",
+              )}
             >
               <div className="min-w-0 space-y-1">
                 <p className="text-sm font-medium">
@@ -643,6 +649,11 @@ function FieldMineralizationResult(
             setScenario(base)
           }}
           onRetry={() => loadScenario(scenario)}
+          resultKey={scenarioKey}
+          onShowChart={() => {
+            const chart = document.getElementById(CHART_ID)
+            chart?.scrollIntoView({ behavior: "smooth", block: "start" })
+          }}
         />
       ) : null}
 

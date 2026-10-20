@@ -1,5 +1,12 @@
 import type { MineralizationKpis, MineralizationScenario } from "@nmi-agro/fdm-calculator"
-import { CircleAlert, Plus, Trash2 } from "lucide-react"
+import {
+  ArrowUp,
+  ChartLine as LineChart,
+  CircleAlert,
+  CircleCheck,
+  Plus,
+  Trash2,
+} from "lucide-react"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
@@ -21,6 +28,7 @@ import {
 } from "~/lib/mineralization"
 import { cn } from "~/lib/utils"
 import { DateField } from "./date-field"
+import { FertilizerField } from "./fertilizer-field"
 
 type ScenarioApplication = MineralizationScenario["fertilizerApplications"][number]
 
@@ -219,9 +227,36 @@ export function ScenarioDeltas({
   )
 }
 
+/** The effect of a scenario on one line, for the status bar of the scenario panel. */
+function ScenarioDeltasInline({
+  current,
+  result,
+}: {
+  current: MineralizationKpis
+  result: MineralizationKpis
+}) {
+  const deltas = getScenarioDeltas(current, result)
+  const items = [
+    { label: "Bij oogst", value: deltas.residualNAtHarvest },
+    { label: "N-opname", value: deltas.totalUptake },
+    { label: "Uitspoeling", value: deltas.totalLeaching },
+  ]
+  return (
+    <dl className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-0.5 text-sm">
+      {items.map((item) => (
+        <div key={item.label} className="flex gap-1">
+          <dt>{item.label}</dt>
+          <dd className="text-foreground font-medium tabular-nums">{formatDelta(item.value)}</dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
+
 /**
  * Edits a what-if scenario of fertilizer applications and the harvest, shows its effect and what
- * saving changes in the fertilization plan, and lets the user save or discard it.
+ * saving changes in the fertilization plan, and lets the user save or discard it. A status bar at
+ * the bottom stays in view and shows that the chart recalculates with every change.
  */
 export function ScenarioPanel({
   id,
@@ -241,6 +276,8 @@ export function ScenarioPanel({
   onSave,
   onDiscard,
   onRetry,
+  onShowChart,
+  resultKey,
 }: {
   id?: string
   /** The current plan, to show what the scenario changes. */
@@ -261,6 +298,10 @@ export function ScenarioPanel({
   onSave: () => void
   onDiscard: () => void
   onRetry: () => void
+  /** Scrolls the chart with the scenario into view. */
+  onShowChart: () => void
+  /** Changes with every new calculation result, to mark the status as just updated. */
+  resultKey: string
 }) {
   const optionById = new Map(fertilizerOptions.map((o) => [o.p_id, o]))
   const min = `${year}-01-01`
@@ -283,8 +324,9 @@ export function ScenarioPanel({
       <CardHeader>
         <CardTitle>Scenario: wat als…</CardTitle>
         <CardDescription>
-          Verschuif of wijzig bemestingen en de oogst en zie direct het effect in de grafiek
-          (gestippeld). Je bemestingsplan verandert pas als je het scenario opslaat.
+          Verschuif of wijzig bemestingen en de oogst. Elke wijziging wordt direct doorgerekend en
+          verschijnt gestippeld in de grafiek. Je bemestingsplan verandert pas als je het scenario
+          opslaat.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
@@ -322,13 +364,12 @@ export function ScenarioPanel({
                     dispatch({ type: "update_application", index, patch: { p_app_date } })
                   }
                 />
-                <div className="grid gap-1">
-                  <Label htmlFor={`${rowId}-product`} className="text-xs">
-                    Meststof
-                  </Label>
-                  <Select
+                <div className="min-w-0 [&_button]:text-base sm:[&_button]:text-sm [&_label]:text-xs">
+                  <FertilizerField
+                    label="Meststof"
                     value={app.p_id}
-                    onValueChange={(p_id) => {
+                    options={fertilizerOptions}
+                    onChange={(p_id) => {
                       const next = optionById.get(p_id)
                       dispatch({
                         type: "update_application",
@@ -343,18 +384,7 @@ export function ScenarioPanel({
                         },
                       })
                     }}
-                  >
-                    <SelectTrigger id={`${rowId}-product`} className="w-full text-base sm:text-sm">
-                      <SelectValue placeholder="Kies een meststof" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {fertilizerOptions.map((o) => (
-                        <SelectItem key={o.p_id} value={o.p_id}>
-                          {o.p_name_nl ?? o.p_id}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
                 <div className="grid gap-1">
                   <Label htmlFor={`${rowId}-amount`} className="text-xs">
@@ -493,67 +523,86 @@ export function ScenarioPanel({
           </fieldset>
         ) : null}
 
-        <div
-          className={cn("space-y-4 border-t pt-4", !dirty && "text-muted-foreground")}
-          aria-live="polite"
-        >
-          {!dirty ? (
-            <p className="text-sm">Pas een gift of de oogst aan om het effect te zien.</p>
-          ) : pending ? (
-            <p className="flex items-center gap-2 text-sm">
-              <Spinner /> Scenario wordt berekend…
-            </p>
-          ) : error ? (
-            <div className="flex flex-wrap items-center gap-3 text-sm">
-              <p className="text-destructive flex items-center gap-1.5">
-                <CircleAlert className="size-4 shrink-0" aria-hidden />
-                {error}
-              </p>
-              <Button type="button" variant="outline" size="sm" onClick={onRetry}>
-                Opnieuw berekenen
+        {noEffect ? (
+          <p className="bg-muted/60 flex gap-2 rounded-md p-3 text-sm">
+            <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
+            De berekening laat vrijwel geen verschil zien, terwijl je de bemesting hebt gewijzigd.
+            Controleer het stikstofgehalte van de meststof voordat je opslaat.
+          </p>
+        ) : null}
+
+        {changes.length > 0 ? (
+          <div className="space-y-1.5">
+            <p className="text-sm font-medium">Dit verandert in je bemestingsplan:</p>
+            <ul className="text-muted-foreground list-disc space-y-0.5 pl-5 text-sm">
+              {changes.map((change) => (
+                <li key={change}>{change}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        {/* Stays in view while editing, so the live recalculation is always visible */}
+        <div className="bg-card sticky bottom-0 z-10 -mx-6 -mb-6 rounded-b-xl border-t px-6 py-3">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0 space-y-1" aria-live="polite">
+              {!dirty ? (
+                <p className="text-muted-foreground flex items-center gap-2 text-sm">
+                  <LineChart className="size-4 shrink-0" aria-hidden />
+                  Pas een gift of de oogst aan: de grafiek rekent direct mee.
+                </p>
+              ) : pending ? (
+                <p className="flex items-center gap-2 text-sm">
+                  <Spinner className="shrink-0" />
+                  De grafiek rekent je scenario door…
+                </p>
+              ) : error ? (
+                <p className="text-destructive flex items-center gap-2 text-sm">
+                  <CircleAlert className="size-4 shrink-0" aria-hidden />
+                  {error}
+                </p>
+              ) : result ? (
+                <>
+                  <p
+                    key={resultKey}
+                    className="motion-safe:animate-just-updated -mx-1.5 flex w-fit items-center gap-2 rounded-md px-1.5 text-sm font-medium"
+                  >
+                    <CircleCheck className="size-4 shrink-0" aria-hidden />
+                    Grafiek bijgewerkt met je scenario (gestippeld)
+                  </p>
+                  <ScenarioDeltasInline current={current} result={result} />
+                </>
+              ) : null}
+              {dirty && missingAmount ? (
+                <p className="text-muted-foreground text-xs">
+                  Vul eerst bij elke gift een hoeveelheid in om op te slaan.
+                </p>
+              ) : null}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {error ? (
+                <Button type="button" variant="outline" onClick={onRetry}>
+                  Opnieuw berekenen
+                </Button>
+              ) : null}
+              {dirty && result && !pending ? (
+                <Button type="button" variant="outline" onClick={onShowChart}>
+                  <ArrowUp aria-hidden />
+                  Bekijk in grafiek
+                </Button>
+              ) : null}
+              <Button type="button" variant="ghost" onClick={onDiscard} disabled={!dirty || saving}>
+                Verwerpen
+              </Button>
+              <Button
+                type="button"
+                onClick={onSave}
+                disabled={!dirty || pending || !!error || !result || saving || missingAmount}
+              >
+                {saving ? <Spinner /> : null}
+                Opslaan in bemestingsplan
               </Button>
             </div>
-          ) : result ? (
-            <ScenarioDeltas current={current} result={result} />
-          ) : null}
-
-          {noEffect ? (
-            <p className="bg-muted/60 flex gap-2 rounded-md p-3 text-sm">
-              <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
-              De berekening laat vrijwel geen verschil zien, terwijl je de bemesting hebt gewijzigd.
-              Controleer het stikstofgehalte van de meststof voordat je opslaat.
-            </p>
-          ) : null}
-
-          {changes.length > 0 ? (
-            <div className="space-y-1.5">
-              <p className="text-sm font-medium">Dit verandert in je bemestingsplan:</p>
-              <ul className="text-muted-foreground list-disc space-y-0.5 pl-5 text-sm">
-                {changes.map((change) => (
-                  <li key={change}>{change}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              className="w-full sm:w-auto"
-              onClick={onSave}
-              disabled={!dirty || pending || !!error || !result || saving || missingAmount}
-            >
-              {saving ? <Spinner /> : null}
-              Opslaan in bemestingsplan
-            </Button>
-            <Button type="button" variant="ghost" onClick={onDiscard} disabled={!dirty || saving}>
-              Verwerpen
-            </Button>
-            {dirty && missingAmount ? (
-              <p className="text-muted-foreground text-xs">
-                Vul eerst bij elke gift een hoeveelheid in.
-              </p>
-            ) : null}
           </div>
         </div>
       </CardContent>
