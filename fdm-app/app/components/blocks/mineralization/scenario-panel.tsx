@@ -20,6 +20,7 @@ import {
   type ScenarioFertilizerOption,
 } from "~/lib/mineralization"
 import { cn } from "~/lib/utils"
+import { DateField } from "./date-field"
 
 type ScenarioApplication = MineralizationScenario["fertilizerApplications"][number]
 
@@ -305,36 +306,22 @@ export function ScenarioPanel({
               <div
                 key={app.p_app_id ?? `new-${index}`}
                 className={cn(
-                  "grid gap-2 rounded-lg border p-3 sm:grid-cols-2 lg:grid-cols-[9rem_minmax(0,1fr)_9rem_minmax(0,1fr)_auto] lg:items-start",
+                  "grid gap-2 rounded-lg border p-3 sm:grid-cols-2 lg:grid-cols-[11rem_minmax(0,1fr)_8rem_minmax(0,1fr)_auto] lg:items-start",
                   change !== null && "border-foreground/30 bg-muted/40",
                 )}
               >
-                <div className="grid gap-1">
-                  <Label htmlFor={`${rowId}-date`} className="text-xs">
-                    Datum
-                    {change ? (
-                      <Badge variant="outline" className="ml-1 px-1.5 py-0 text-xs font-normal">
-                        {change === "new" ? "Nieuw" : "Gewijzigd"}
-                      </Badge>
-                    ) : null}
-                  </Label>
-                  <Input
-                    className="text-base sm:text-sm"
-                    id={`${rowId}-date`}
-                    type="date"
-                    min={min}
-                    max={max}
-                    value={app.p_app_date}
-                    onChange={(e) =>
-                      e.target.value &&
-                      dispatch({
-                        type: "update_application",
-                        index,
-                        patch: { p_app_date: e.target.value },
-                      })
-                    }
-                  />
-                </div>
+                <DateField
+                  name={`${rowId}-date`}
+                  label="Datum"
+                  className="[&_input]:text-base sm:[&_input]:text-sm [&>label]:text-xs"
+                  min={min}
+                  max={max}
+                  required
+                  value={app.p_app_date}
+                  onChange={(p_app_date) =>
+                    dispatch({ type: "update_application", index, patch: { p_app_date } })
+                  }
+                />
                 <div className="grid gap-1">
                   <Label htmlFor={`${rowId}-product`} className="text-xs">
                     Meststof
@@ -425,16 +412,23 @@ export function ScenarioPanel({
                     </SelectContent>
                   </Select>
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="justify-self-end lg:mt-5 pointer-coarse:size-11"
-                  aria-label={`Gift van ${formatShortDate(app.p_app_date)} verwijderen`}
-                  onClick={() => dispatch({ type: "remove_application", index })}
-                >
-                  <Trash2 aria-hidden />
-                </Button>
+                <div className="flex items-center justify-end gap-2 lg:mt-5">
+                  {change ? (
+                    <Badge variant="outline" className="font-normal">
+                      {change === "new" ? "Nieuw" : "Gewijzigd"}
+                    </Badge>
+                  ) : null}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="pointer-coarse:size-11"
+                    aria-label={`Gift van ${formatShortDate(app.p_app_date)} verwijderen`}
+                    onClick={() => dispatch({ type: "remove_application", index })}
+                  >
+                    <Trash2 aria-hidden />
+                  </Button>
+                </div>
               </div>
             )
           })}
@@ -459,23 +453,18 @@ export function ScenarioPanel({
         {scenario.harvest ? (
           <fieldset className="grid gap-2 sm:grid-cols-2 lg:max-w-xl">
             <legend className="mb-2 text-sm font-semibold">Oogst hoofdteelt</legend>
-            <div className="grid gap-1">
-              <Label htmlFor="scenario-harvest-date" className="text-xs">
-                Oogstdatum
-              </Label>
-              <Input
-                className="text-base sm:text-sm"
-                id="scenario-harvest-date"
-                type="date"
-                min={min}
-                max={max}
-                value={scenario.harvest.b_date_harvest}
-                onChange={(e) =>
-                  e.target.value &&
-                  dispatch({ type: "update_harvest", patch: { b_date_harvest: e.target.value } })
-                }
-              />
-            </div>
+            <DateField
+              name="scenario-harvest-date"
+              label="Oogstdatum"
+              className="[&_input]:text-base sm:[&_input]:text-sm [&>label]:text-xs"
+              min={min}
+              max={max}
+              required
+              value={scenario.harvest.b_date_harvest}
+              onChange={(b_date_harvest) =>
+                dispatch({ type: "update_harvest", patch: { b_date_harvest } })
+              }
+            />
             <div className="grid gap-1">
               <Label htmlFor="scenario-harvest-yield" className="text-xs">
                 Opbrengst (kg DS/ha)

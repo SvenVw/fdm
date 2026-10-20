@@ -1,4 +1,5 @@
 import { ArrowRight, CalendarX2 } from "lucide-react"
+import { useState } from "react"
 import { NavLink, useFetcher } from "react-router"
 import type { MineralizationMainCultivation } from "~/lib/mineralization"
 import { getEffectiveHarvestable, getHarvestTerm } from "~/components/blocks/harvest/utils"
@@ -7,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { Spinner } from "~/components/ui/spinner"
+import { DateField } from "./date-field"
 
 /**
  * Asks for the measured or planned harvest of the main cultivation; the calculation needs it.
@@ -27,6 +29,7 @@ export function MissingHarvestCard({
   bulkHarvestHref: string
 }) {
   const fetcher = useFetcher()
+  const [harvestDate, setHarvestDate] = useState(defaultHarvestDate ?? "")
   const busy = fetcher.state !== "idle"
   const cropName = mainCultivation.b_lu_name ?? mainCultivation.b_lu_catalogue
   const multiple =
@@ -66,19 +69,17 @@ export function MissingHarvestCard({
           >
             <input type="hidden" name="intent" value="save_harvest" />
             <input type="hidden" name="b_lu" value={mainCultivation.b_lu} />
-            <div className="grid gap-1.5">
-              <Label htmlFor="b_lu_harvest_date">Oogstdatum</Label>
-              <Input
-                id="b_lu_harvest_date"
-                name="b_lu_harvest_date"
-                type="date"
-                className="text-base sm:text-sm"
-                required
-                min={`${year}-01-01`}
-                max={`${year}-12-31`}
-                defaultValue={defaultHarvestDate ?? ""}
-              />
-            </div>
+            <input type="hidden" name="b_lu_harvest_date" value={harvestDate} />
+            <DateField
+              name="b_lu_harvest_date_input"
+              label="Oogstdatum"
+              className="[&_input]:text-base sm:[&_input]:text-sm"
+              min={`${year}-01-01`}
+              max={`${year}-12-31`}
+              required
+              value={harvestDate}
+              onChange={setHarvestDate}
+            />
             <div className="grid gap-1.5">
               <Label htmlFor="b_lu_yield">
                 Opbrengst{" "}
@@ -94,7 +95,7 @@ export function MissingHarvestCard({
                 className="text-base sm:text-sm"
               />
             </div>
-            <Button type="submit" disabled={busy}>
+            <Button type="submit" disabled={busy || !harvestDate}>
               {busy ? <Spinner /> : null}
               Oogst opslaan
             </Button>
