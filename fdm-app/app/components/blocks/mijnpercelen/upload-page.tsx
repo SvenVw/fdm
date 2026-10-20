@@ -45,7 +45,18 @@ export function UploadMijnPercelenPage({
   const navigation = useNavigation()
   const location = useLocation()
 
-  const rvoImportReviewData = actionData?.RvoImportReviewData
+  const actionRvoImportReviewData = actionData?.RvoImportReviewData
+  const [rvoImportReviewData, setRvoImportReviewData] = useState<ReviewItem[] | null>()
+
+  // Update rvoImportReviewData whenever actionRvoImportReviewData is available and is different than the last one recorded.
+  const [lastResetRvoImportReviewData, setLastResetRvoImportReviewData] = useState<
+    typeof actionRvoImportReviewData | undefined
+  >(undefined)
+  if (actionRvoImportReviewData && lastResetRvoImportReviewData !== actionRvoImportReviewData) {
+    setRvoImportReviewData(actionRvoImportReviewData)
+    setLastResetRvoImportReviewData(actionRvoImportReviewData)
+  }
+
   const isSaving =
     navigation.state === "submitting" && navigation.formData?.get("intent") === "save_fields"
 
@@ -93,19 +104,15 @@ export function UploadMijnPercelenPage({
     }
   }, [actionData])
 
-  // Mark unload as not safe if action data changes to unsuccessful
-  useEffect(() => {
-    if (!actionData?.success && rvoImportReviewData?.length) {
-      setCanUnloadSafely(false)
-    }
-  }, [actionData?.success, rvoImportReviewData])
+  // A failed save re-arms the guard even if the user had just disarmed it to submit.
+  const effectiveCanUnloadSafely = canUnloadSafely && actionData?.success !== false
 
   // Warn the user before refreshing or leaving when data is present
   useEffect(() => {
     if (rvoImportReviewData && rvoImportReviewData.length > 0) {
       const handleBeforeUnload = (e: BeforeUnloadEvent) => {
         // If this redirect should have been initiated by the route action, do nothing
-        if (canUnloadSafely) {
+        if (effectiveCanUnloadSafely) {
           return
         }
         e.preventDefault()
@@ -122,7 +129,7 @@ export function UploadMijnPercelenPage({
       window.addEventListener("beforeunload", handleBeforeUnload)
       return () => window.removeEventListener("beforeunload", handleBeforeUnload)
     }
-  }, [canUnloadSafely, rvoImportReviewData])
+  }, [effectiveCanUnloadSafely, rvoImportReviewData])
 
   return (
     <main className="flex-1 overflow-auto">
