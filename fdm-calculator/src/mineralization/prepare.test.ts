@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
+  type MineralizationApplication,
   type MineralizationCultivation,
   type MineralizationFertilizer,
   type MineralizationFieldData,
@@ -186,6 +187,44 @@ describe("prepareMineralizationInput", () => {
     if (result.status !== "ready") return
     expect(result.request.cultivations?.map((c) => c.b_lu_id)).toEqual(["lu_main", "lu_after"])
     expect(result.usedInput.cultivations.map((c) => c.role)).toEqual(["main", "after"])
+  })
+
+  it("orders the cultivations after the main crop and marks their end within the year", () => {
+    const data = fieldData({
+      cultivations: [
+        cultivation({}),
+        cultivation({
+          b_lu: "lu_late",
+          b_lu_catalogue: "nl_427",
+          b_lu_name: "Gele mosterd",
+          b_lu_croprotation: "catchcrop",
+          b_lu_harvestable: "none",
+          b_lu_start: summerDate("2026-10-15"),
+          b_lu_end: null,
+        }),
+        cultivation({
+          b_lu: "lu_early",
+          b_lu_catalogue: "nl_427",
+          b_lu_name: "Groenbemester",
+          b_lu_croprotation: "catchcrop",
+          b_lu_harvestable: "none",
+          b_lu_start: summerDate("2026-09-25"),
+          b_lu_end: winterDate("2026-11-15"),
+        }),
+      ],
+    })
+    const result = prepareMineralizationInput(data, YEAR, TODAY)
+    if (result.status !== "ready") throw new Error("not ready")
+    expect(result.request.cultivations?.map((c) => c.b_lu_id)).toEqual([
+      "lu_main",
+      "lu_early",
+      "lu_late",
+    ])
+    expect(result.request.cultivations?.[1]?.b_lu_end).toBe("2026-11-15")
+    expect(result.request.cultivations?.[2]?.b_lu_end).toBe("2026-12-31")
+    expect(result.events).toContainEqual(
+      expect.objectContaining({ type: "cultivation_end", date: "2026-11-15", b_lu: "lu_early" }),
+    )
   })
 
   it("keeps the sowing date of winter crops and ends crops harvested once at the harvest", () => {
@@ -398,6 +437,54 @@ describe("prepareMineralizationInput", () => {
     expect(result.usedInput.missingSoilParameters).toContain("a_silt_mi")
     expect(result.usedInput.missingSoilParameters).not.toContain("a_som_loi")
     expect(result.usedInput.location).toEqual({ a_lat: 52, a_lon: 5.6 })
+  })
+
+  it("only sends groundwater levels as a pair", () => {
+    const data = fieldData({
+      soil: [
+        ...fieldData().soil,
+        {
+          // Not (yet) a stored soil parameter; the guard protects the request once it is mapped
+          parameter: "b_gwl_glg" as MineralizationFieldData["soil"][number]["parameter"],
+          value: 120,
+          a_source: "lab_a",
+          b_sampling_date: winterDate("2026-02-01"),
+        },
+      ],
+    })
+    const result = prepareMineralizationInput(data, YEAR, TODAY)
+    if (result.status !== "ready") throw new Error("not ready")
+    expect(result.request.soil_analysis).toEqual({ a_som_loi: 3.1, a_clay_mi: 6 })
+  })
+
+  it("sends the applications of the year in date order", () => {
+    const application = (p_app_id: string, date: string): MineralizationApplication => ({
+      p_app_id,
+      p_id: "fert_kas",
+      p_name_nl: "KAS",
+      p_app_amount: 200,
+      p_app_amount_display: 200,
+      p_app_amount_unit: "kg/ha",
+      p_app_method: "broadcasting",
+      p_app_date: summerDate(date),
+    })
+    const data = fieldData({
+      applications: [
+        application("app_june", "2026-06-10"),
+        application("app_april", "2026-04-20"),
+        application("app_last_year", "2025-08-01"),
+      ],
+    })
+    const result = prepareMineralizationInput(data, YEAR, TODAY)
+    if (result.status !== "ready") throw new Error("not ready")
+    expect(result.request.fertilizer_applications?.map((a) => a.p_date_fertilization)).toEqual([
+      "2026-04-20",
+      "2026-06-10",
+    ])
+    expect(result.usedInput.fertilizerApplications.map((a) => a.p_app_id)).toEqual([
+      "app_april",
+      "app_june",
+    ])
   })
 
   it("adds sowing and harvest events", () => {

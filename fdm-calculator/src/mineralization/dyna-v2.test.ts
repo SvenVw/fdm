@@ -134,6 +134,59 @@ describe("requestDynaV2", () => {
     expect((error as NmiApiError).message).toBe("De NMI API is tijdelijk niet beschikbaar.")
   })
 
+  it("throws NmiApiError 400 without a message when the error body is not JSON", async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response("Bad Request", { status: 400 }))
+
+    const error = await requestDynaV2(input).catch((e: unknown) => e)
+
+    expect(error).toBeInstanceOf(NmiApiError)
+    expect((error as NmiApiError).status).toBe(400)
+    expect((error as NmiApiError).message).toBe("Dyna kon niet rekenen met deze gegevens:")
+  })
+
+  it.each([401, 403])("throws NmiApiError %i when access is denied", async (status) => {
+    vi.mocked(fetch).mockResolvedValue(errorResponse(status, "Unauthorized"))
+
+    const error = await requestDynaV2(input).catch((e: unknown) => e)
+
+    expect(error).toBeInstanceOf(NmiApiError)
+    expect((error as NmiApiError).status).toBe(status)
+    expect((error as NmiApiError).message).toBe("Geen toegang tot de NMI API.")
+  })
+
+  it("throws a generic NmiApiError for other error statuses", async () => {
+    vi.mocked(fetch).mockResolvedValue(errorResponse(404, "Not found"))
+
+    const error = await requestDynaV2(input).catch((e: unknown) => e)
+
+    expect(error).toBeInstanceOf(NmiApiError)
+    expect((error as NmiApiError).status).toBe(404)
+    expect((error as NmiApiError).message).toBe("Er is een fout opgetreden bij de Dyna-berekening.")
+  })
+
+  it("throws NmiApiError 408 when the request times out", async () => {
+    const timeout = new Error("Timed out")
+    timeout.name = "TimeoutError"
+    vi.mocked(fetch).mockRejectedValue(timeout)
+
+    const error = await requestDynaV2(input).catch((e: unknown) => e)
+
+    expect(error).toBeInstanceOf(NmiApiError)
+    expect((error as NmiApiError).status).toBe(408)
+  })
+
+  it("rethrows other network errors", async () => {
+    vi.mocked(fetch).mockRejectedValue(new TypeError("fetch failed"))
+
+    await expect(requestDynaV2(input)).rejects.toThrow("fetch failed")
+  })
+
+  it("throws when the response body is not JSON", async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response("<html>", { status: 200 }))
+
+    await expect(requestDynaV2(input)).rejects.toThrow("Ongeldig antwoord van Dyna ontvangen")
+  })
+
   it("throws when calculation_dyna is empty", async () => {
     vi.mocked(fetch).mockResolvedValue(okResponse({ calculation_dyna: [] }))
 

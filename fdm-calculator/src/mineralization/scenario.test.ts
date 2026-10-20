@@ -358,6 +358,23 @@ describe("diffScenario", () => {
     expect(diff.add).toEqual([])
   })
 
+  it("adds an application whose id is no longer in the plan", () => {
+    const withDeleted: MineralizationScenario = {
+      fertilizerApplications: [
+        {
+          p_app_id: "app_deleted_meanwhile",
+          p_id: "fert_kas",
+          p_app_amount_display: 150,
+          p_app_method: "broadcasting",
+          p_app_date: "2026-05-15",
+        },
+      ],
+    }
+    const diff = diffScenario(current, null, withDeleted)
+    expect(diff.add.map((a) => a.p_app_id)).toEqual(["app_deleted_meanwhile"])
+    expect(diff.update).toEqual([])
+  })
+
   it("updates an existing harvest or adds a new one", () => {
     const withHarvest = { ...scenario, harvest: { b_date_harvest: "2026-09-25" } }
     expect(

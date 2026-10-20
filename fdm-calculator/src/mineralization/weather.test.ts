@@ -85,6 +85,26 @@ describe("requestWeatherForecast", () => {
     expect(error).toBeInstanceOf(NmiApiError)
     expect((error as NmiApiError).status).toBe(429)
   })
+
+  it("throws NmiApiError with a generic message for other errors", async () => {
+    vi.mocked(fetch).mockResolvedValue(Response.json({ message: "forbidden" }, { status: 403 }))
+
+    const error = await requestWeatherForecast(input).catch((e: unknown) => e)
+
+    expect(error).toBeInstanceOf(NmiApiError)
+    expect((error as NmiApiError).status).toBe(403)
+    expect((error as NmiApiError).message).toBe(
+      "De weersverwachting is tijdelijk niet beschikbaar.",
+    )
+  })
+
+  it("throws when the response is not a forecast", async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response("not json", { status: 200 }))
+
+    await expect(requestWeatherForecast(input)).rejects.toThrow(
+      "Ongeldige weersverwachting ontvangen",
+    )
+  })
 })
 
 describe("roundCoordinate", () => {
