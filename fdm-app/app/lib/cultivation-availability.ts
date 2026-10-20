@@ -28,21 +28,29 @@ export function isCultivationUnavailableInPeriod(
 
   const start = new Date(period.b_lu_start)
   const end = period.b_lu_end ? new Date(period.b_lu_end) : null
+  if (end && end.getTime() < start.getTime()) {
+    // End before start: show a warning.
+    return true
+  }
   const startYear = Math.min(
     maxCultivationAvailabilityYear,
     new Date(start.getTime() + BOUNDARY_OFFSET_MS).getFullYear(),
   )
-  const endYear = Math.min(
-    maxCultivationAvailabilityYear,
-    end
-      ? new Date(end.getTime() - BOUNDARY_OFFSET_MS).getFullYear()
-      : maxCultivationAvailabilityYear,
+  // The boundary offsets can invert the years for very short periods around 1 January.
+  const endYear = Math.max(
+    startYear,
+    Math.min(
+      maxCultivationAvailabilityYear,
+      end
+        ? new Date(end.getTime() - BOUNDARY_OFFSET_MS).getFullYear()
+        : maxCultivationAvailabilityYear,
+    ),
   )
 
   if (Number.isNaN(startYear) || Number.isNaN(endYear)) {
     return false
   }
-  if (startYear > endYear || endYear - startYear > MAX_PERIOD_YEARS) {
+  if (endYear - startYear > MAX_PERIOD_YEARS) {
     // User is doing very wrong things so show a warning.
     return true
   }
