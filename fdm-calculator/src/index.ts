@@ -111,12 +111,6 @@ export type { Dose } from "./doses/d"
 export { getDoseForField } from "./doses/get-dose-field"
 export { NormNotApplicableError } from "./error"
 export type {
-  DataCompleteness,
-  DynaComputeInput,
-  DynaDailyPoint,
-  DynaFertilizerAdvice,
-  DynaNitrogenBalance,
-  DynaResult,
   DynaV2ApplicationMethod,
   DynaV2ComputeInput,
   DynaV2DailyPoint,
@@ -136,10 +130,6 @@ export type {
   MineralizationSignal,
   MineralizationSoilItem,
   MineralizationUsedInput,
-  NSupplyComputeInput,
-  NSupplyDataPoint,
-  NSupplyMethod,
-  NSupplyResult,
   ScenarioDiff,
   ScenarioFertilizer,
   ScenarioFertilizerApplication,
@@ -149,17 +139,8 @@ export type {
   WeatherForecastInput,
 } from "./mineralization"
 export {
-  assessDataCompleteness,
-  buildDynaRequest,
-  buildNSupplyRequest,
-  dynaResponseDataSchema,
-  getDyna,
   getMainCultivation,
-  getNSupply,
-  methodRequirements,
   NmiApiError,
-  requestDyna,
-  requestNSupply,
   applyScenarioToRequest,
   deriveMineralizationInsights,
   determineSeasonPhase,
