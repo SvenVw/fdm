@@ -545,7 +545,7 @@ export function ScenarioPanel({
         {/* Stays in view while editing, so the live recalculation is always visible */}
         <div className="bg-card sticky bottom-0 z-10 -mx-6 -mb-6 rounded-b-xl border-t px-6 py-3">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="min-w-0 space-y-1" aria-live="polite">
+            <div className="min-w-0 flex-1 space-y-1" aria-live="polite">
               {!dirty ? (
                 <p className="text-muted-foreground flex items-center gap-2 text-sm">
                   <LineChart className="size-4 shrink-0" aria-hidden />
@@ -579,7 +579,7 @@ export function ScenarioPanel({
                 </p>
               ) : null}
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
               {error ? (
                 <Button type="button" variant="outline" onClick={onRetry}>
                   Opnieuw berekenen
