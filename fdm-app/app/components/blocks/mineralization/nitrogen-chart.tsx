@@ -1,4 +1,9 @@
-import type { DynaV2DailyPoint, MineralizationEvent } from "@nmi-agro/fdm-calculator"
+import type {
+  DynaV2DailyPoint,
+  MineralizationEvent,
+  SeasonPhase,
+  WeatherForecastDay,
+} from "@nmi-agro/fdm-calculator"
 import {
   ChevronDown,
   CloudRain,
@@ -12,7 +17,7 @@ import {
 import { useState } from "react"
 import {
   Area,
-  Brush,
+  Bar,
   CartesianGrid,
   ComposedChart,
   Line,
@@ -34,72 +39,95 @@ import {
   TableRow,
 } from "~/components/ui/table"
 import { Tooltip as UiTooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
-import { formatKgN, formatLongDate, formatNumber, formatShortDate } from "~/lib/mineralization"
+import {
+  addDays,
+  formatKgN,
+  formatLongDate,
+  formatNumber,
+  formatShortDate,
+} from "~/lib/mineralization"
 import { cn } from "~/lib/utils"
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const Y_AXIS_WIDTH = 56
 const MARGIN = { top: 16, right: 16, left: 0, bottom: 0 }
+/** Days before and after today shown during the growing season. */
+const IN_SEASON_DAYS_BACK = 30
+const IN_SEASON_DAYS_AHEAD = 14
+/** Dash pattern for days after today (expected values). */
+const FUTURE_DASH = "6 4"
+/** Dash pattern for the scenario; dotted so it differs from the future dash. */
+const SCENARIO_DASH = "1 4"
 
 type SeriesKey = "b_nw" | "b_n_uptake" | "b_n_available"
+const SERIES_KEYS: SeriesKey[] = ["b_nw", "b_n_uptake", "b_n_available"]
 
 const chartConfig = {
   b_nw: { label: "N-aanbod", color: "var(--chart-3)" },
   b_n_uptake: { label: "N-opname", color: "var(--chart-2)" },
   b_n_available: { label: "Beschikbare N", color: "var(--chart-5)" },
   b_no3_leach: { label: "Nitraatuitspoeling", color: "var(--chart-1)" },
+  w_prec_sum_day: { label: "Neerslag", color: "var(--chart-3)" },
 } satisfies ChartConfig
 
+type ValueKey = SeriesKey | "b_no3_leach"
+
+/** One day of the chart; values are split in a part up to today (`p_`) and after today (`f_`). */
 interface ChartRow {
   t: number
   date: string
-  b_nw: number
-  b_n_uptake: number
-  b_n_available: number
-  b_no3_leach: number
-  s_b_nw?: number
-  s_b_n_uptake?: number
-  s_b_n_available?: number
-  s_b_no3_leach?: number
+  values: Partial<Record<ValueKey, number>>
+  scenario: Partial<Record<ValueKey, number>>
+  [key: string]: unknown
 }
 
 function toTime(date: string): number {
   return Date.parse(`${date}T00:00:00Z`)
 }
 
-function buildRows(series: DynaV2DailyPoint[], scenario?: DynaV2DailyPoint[]): ChartRow[] {
-  const scenarioByDate = new Map(scenario?.map((p) => [p.b_date_calculation, p]))
-  const dates = [
-    ...new Set([...series.map((p) => p.b_date_calculation), ...scenarioByDate.keys()]),
-  ].sort()
+/**
+ * Builds the rows within the visible period. Each value is written to `p_<key>` up to and
+ * including the cut date and to `f_<key>` from the cut date on, so past and future can be drawn
+ * as solid and dashed lines that connect at the cut.
+ */
+function buildRows(
+  series: DynaV2DailyPoint[],
+  scenario: DynaV2DailyPoint[] | undefined,
+  from: string,
+  to: string,
+  cut: string,
+): ChartRow[] {
+  const keys: ValueKey[] = [...SERIES_KEYS, "b_no3_leach"]
   const byDate = new Map(series.map((p) => [p.b_date_calculation, p]))
-  return dates.flatMap((date) => {
+  const scenarioByDate = new Map(scenario?.map((p) => [p.b_date_calculation, p]))
+  const dates = [...new Set([...byDate.keys(), ...scenarioByDate.keys()])]
+    .filter((d) => d >= from && d <= to)
+    .sort()
+  return dates.map((date) => {
     const p = byDate.get(date)
     const s = scenarioByDate.get(date)
-    if (!p && !s) return []
-    return [
-      {
-        t: toTime(date),
-        date,
-        b_nw: p?.b_nw ?? Number.NaN,
-        b_n_uptake: p?.b_n_uptake ?? Number.NaN,
-        b_n_available: p?.b_n_available ?? Number.NaN,
-        b_no3_leach: p?.b_no3_leach ?? Number.NaN,
-        ...(s
-          ? {
-              s_b_nw: s.b_nw,
-              s_b_n_uptake: s.b_n_uptake,
-              s_b_n_available: s.b_n_available,
-              s_b_no3_leach: s.b_no3_leach,
-            }
-          : {}),
-      },
-    ]
+    const row: ChartRow = { t: toTime(date), date, values: {}, scenario: {} }
+    for (const key of keys) {
+      if (p) {
+        row.values[key] = p[key]
+        if (date <= cut) row[`p_${key}`] = p[key]
+        if (date >= cut) row[`f_${key}`] = p[key]
+      }
+      if (s) {
+        row.scenario[key] = s[key]
+        row[`s_${key}`] = s[key]
+      }
+    }
+    return row
   })
 }
 
-function monthTicks(from: number, to: number): number[] {
+function buildTicks(from: number, to: number): number[] {
   const ticks: number[] = []
+  if (to - from <= 70 * DAY_MS) {
+    for (let t = from; t <= to; t += 7 * DAY_MS) ticks.push(t)
+    return ticks
+  }
   const d = new Date(from)
   d.setUTCDate(1)
   if (d.getTime() < from) d.setUTCMonth(d.getUTCMonth() + 1)
@@ -146,32 +174,29 @@ function TooltipContentBox({
   active,
   payload,
   hasScenario,
+  cut,
 }: {
   active?: boolean
   payload?: { payload: ChartRow }[]
   hasScenario: boolean
+  cut: string
 }) {
   const row = payload?.[0]?.payload
   if (!active || !row) return null
-  const lines: { key: string; label: string; value: number | undefined; scenario?: number }[] = [
-    { key: "b_nw", label: "N-aanbod", value: row.b_nw, scenario: row.s_b_nw },
-    { key: "b_n_uptake", label: "N-opname", value: row.b_n_uptake, scenario: row.s_b_n_uptake },
-    {
-      key: "b_n_available",
-      label: "Beschikbare N",
-      value: row.b_n_available,
-      scenario: row.s_b_n_available,
-    },
-    {
-      key: "b_no3_leach",
-      label: "Uitspoeling",
-      value: row.b_no3_leach,
-      scenario: row.s_b_no3_leach,
-    },
+  const lines: { key: ValueKey; label: string }[] = [
+    { key: "b_nw", label: "N-aanbod" },
+    { key: "b_n_uptake", label: "N-opname" },
+    { key: "b_n_available", label: "Beschikbare N" },
+    { key: "b_no3_leach", label: "Uitspoeling" },
   ]
   return (
     <div className="bg-background grid min-w-48 gap-1.5 rounded-lg border px-3 py-2 text-xs shadow-md">
-      <p className="font-medium">{formatLongDate(row.date)}</p>
+      <p className="font-medium">
+        {formatLongDate(row.date)}
+        {row.date > cut ? (
+          <span className="text-muted-foreground font-normal"> · verwacht</span>
+        ) : null}
+      </p>
       {lines.map((line) => (
         <div key={line.key} className="flex items-center justify-between gap-4">
           <span className="text-muted-foreground flex items-center gap-1.5">
@@ -183,9 +208,9 @@ function TooltipContentBox({
             {line.label}
           </span>
           <span className="text-foreground tabular-nums">
-            {Number.isNaN(line.value) ? "–" : formatKgN(line.value)}
-            {hasScenario && line.scenario !== undefined ? (
-              <span className="text-muted-foreground"> → {formatKgN(line.scenario)}</span>
+            {formatKgN(row.values[line.key])}
+            {hasScenario && row.scenario[line.key] !== undefined ? (
+              <span className="text-muted-foreground"> → {formatKgN(row.scenario[line.key])}</span>
             ) : null}
           </span>
         </div>
@@ -196,54 +221,60 @@ function TooltipContentBox({
 
 /** Props of {@link NitrogenChart}. */
 export interface NitrogenChartProps {
-  /** Simulation days of the selected year. */
+  /** Full simulation (may start before the selected year). */
   series: DynaV2DailyPoint[]
-  /** Simulation days of a scenario, drawn dashed. */
+  /** Simulation of a scenario, drawn dotted. */
   scenarioSeries?: DynaV2DailyPoint[]
   events: MineralizationEvent[]
-  /** Today (`YYYY-MM-DD`) when it falls within the selected year. */
-  today: string | null
-  /** Last day of the weather forecast (`YYYY-MM-DD`) when today falls within the selected year. */
-  forecastEnd: string | null
+  /** Selected calendar year. */
+  year: number
+  /** Today (`YYYY-MM-DD`). */
+  today: string
+  /** Selected phase: the growing season shows the last 30 and next 14 days, others the full year. */
+  phase: SeasonPhase
+  /** Weather forecast per day, when available. */
+  forecastDays?: WeatherForecastDay[]
   /** Dates of planned events with rain in the forecast. */
   rainEventDates?: string[]
 }
 
 /**
  * Interactive season chart: nitrogen supply, uptake and available nitrogen, with nitrate leaching
- * in a synchronised panel below and the field events on a lane above.
+ * and precipitation in synchronised panels below and the field events on a lane above. Days
+ * after today are dashed; a scenario is dotted.
  */
 export function NitrogenChart({
   series,
   scenarioSeries,
   events,
+  year,
   today,
-  forecastEnd,
+  phase,
+  forecastDays = [],
   rainEventDates = [],
 }: NitrogenChartProps) {
-  const rows = buildRows(series, scenarioSeries)
   const [hidden, setHidden] = useState<Set<SeriesKey>>(new Set())
-  const [range, setRange] = useState<{ startIndex: number; endIndex: number } | null>(null)
   const hasScenario = !!scenarioSeries
 
-  if (rows.length < 2) {
-    return (
-      <p className="text-muted-foreground text-sm">
-        Er zijn geen berekende dagen in dit jaar om te tonen.
-      </p>
-    )
-  }
+  const todayInYear = today.startsWith(`${year}-`)
+  const inSeason = phase === "growing" && todayInYear
+  const fromDate = inSeason ? addDays(today, -IN_SEASON_DAYS_BACK) : `${year}-01-01`
+  const toDate = inSeason ? addDays(today, IN_SEASON_DAYS_AHEAD) : `${year}-12-31`
+  // Everything up to the cut is measured weather; past years are fully measured, future years fully expected
+  const cut = todayInYear ? today : today > `${year}-12-31` ? "9999-12-31" : "0000-01-01"
 
-  const startIndex = Math.min(range?.startIndex ?? 0, rows.length - 1)
-  const endIndex = Math.min(range?.endIndex ?? rows.length - 1, rows.length - 1)
-  const visible = rows.slice(startIndex, endIndex + 1)
-  const from = rows[startIndex].t
-  const to = rows[endIndex].t
+  const rows = buildRows(series, scenarioSeries, fromDate, toDate, cut)
+  const from = toTime(fromDate)
+  const to = toTime(toDate)
   const span = Math.max(to - from, DAY_MS)
-  const ticks = monthTicks(from, to)
-  const todayT = today ? toTime(today) : null
+  const ticks = buildTicks(from, to)
+  const shortWindow = to - from <= 70 * DAY_MS
+  const todayT = todayInYear ? toTime(today) : null
+  const forecastEnd = forecastDays.at(-1)?.date
   const forecastEndT = forecastEnd ? toTime(forecastEnd) : null
-  const lastT = rows[rows.length - 1].t
+  const rainRows = forecastDays
+    .filter((d) => d.date >= fromDate && d.date <= toDate)
+    .map((d) => ({ t: toTime(d.date), date: d.date, w_prec_sum_day: d.w_prec_sum_day }))
 
   // Stack events that would overlap on the lane
   const laneEvents = events
@@ -272,7 +303,11 @@ export function NitrogenChart({
       type="number"
       domain={[from, to]}
       ticks={ticks}
-      tickFormatter={(t: number) => monthFormatter.format(new Date(t))}
+      tickFormatter={(t: number) =>
+        shortWindow
+          ? formatShortDate(new Date(t).toISOString().slice(0, 10))
+          : monthFormatter.format(new Date(t))
+      }
       tickLine={false}
       axisLine={false}
       tickMargin={8}
@@ -281,25 +316,23 @@ export function NitrogenChart({
   )
   const zones = (
     <>
-      {todayT !== null && forecastEndT !== null ? (
-        <>
-          <ReferenceArea
-            x1={todayT}
-            x2={Math.min(forecastEndT, to)}
-            fill="var(--muted-foreground)"
-            fillOpacity={0.1}
-            ifOverflow="hidden"
-          />
-          {forecastEndT < lastT ? (
-            <ReferenceArea
-              x1={forecastEndT}
-              x2={to}
-              fill="var(--muted-foreground)"
-              fillOpacity={0.04}
-              ifOverflow="hidden"
-            />
-          ) : null}
-        </>
+      {todayT !== null && forecastEndT !== null && forecastEndT > todayT ? (
+        <ReferenceArea
+          x1={todayT}
+          x2={Math.min(forecastEndT, to)}
+          fill="var(--muted-foreground)"
+          fillOpacity={0.12}
+          ifOverflow="hidden"
+        />
+      ) : null}
+      {todayT !== null && (forecastEndT ?? todayT) < to ? (
+        <ReferenceArea
+          x1={forecastEndT ?? todayT}
+          x2={to}
+          fill="var(--muted-foreground)"
+          fillOpacity={0.05}
+          ifOverflow="hidden"
+        />
       ) : null}
       {todayT !== null ? (
         <ReferenceLine
@@ -307,18 +340,100 @@ export function NitrogenChart({
           stroke="var(--foreground)"
           strokeDasharray="4 4"
           ifOverflow="hidden"
+          label={{
+            value: "Vandaag",
+            position: "insideTopRight",
+            fontSize: 11,
+            fill: "var(--muted-foreground)",
+          }}
         />
       ) : null}
     </>
   )
 
-  const seriesKeys: SeriesKey[] = ["b_nw", "b_n_uptake", "b_n_available"]
+  const solidAndDashed = (key: ValueKey, kind: "line" | "area") => {
+    const color = `var(--color-${key})`
+    if (kind === "area") {
+      return [
+        <Area
+          key={`p_${key}`}
+          dataKey={`p_${key}`}
+          type="monotone"
+          fill={color}
+          fillOpacity={0.18}
+          stroke={color}
+          strokeWidth={2}
+          connectNulls={false}
+          isAnimationActive={false}
+        />,
+        <Area
+          key={`f_${key}`}
+          dataKey={`f_${key}`}
+          type="monotone"
+          fill={color}
+          fillOpacity={0.08}
+          stroke={color}
+          strokeWidth={2}
+          strokeDasharray={FUTURE_DASH}
+          connectNulls={false}
+          isAnimationActive={false}
+        />,
+      ]
+    }
+    return [
+      <Line
+        key={`p_${key}`}
+        dataKey={`p_${key}`}
+        type="monotone"
+        stroke={color}
+        strokeWidth={2}
+        dot={false}
+        connectNulls={false}
+        isAnimationActive={false}
+      />,
+      <Line
+        key={`f_${key}`}
+        dataKey={`f_${key}`}
+        type="monotone"
+        stroke={color}
+        strokeWidth={2}
+        strokeDasharray={FUTURE_DASH}
+        dot={false}
+        connectNulls={false}
+        isAnimationActive={false}
+      />,
+    ]
+  }
+
+  const scenarioLine = (key: ValueKey) => (
+    <Line
+      key={`s_${key}`}
+      dataKey={`s_${key}`}
+      type="monotone"
+      stroke={`var(--color-${key})`}
+      strokeWidth={2.5}
+      strokeDasharray={SCENARIO_DASH}
+      strokeLinecap="round"
+      dot={false}
+      isAnimationActive={false}
+    />
+  )
+
+  if (rows.length < 2) {
+    return (
+      <p className="text-muted-foreground text-sm">
+        {inSeason
+          ? "Er zijn geen berekende dagen rond vandaag. Kies Planning of Evaluatie voor het hele jaar."
+          : "Er zijn geen berekende dagen in dit jaar om te tonen."}
+      </p>
+    )
+  }
 
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap gap-1.5" role="group" aria-label="Lijnen tonen of verbergen">
-          {seriesKeys.map((key) => (
+          {SERIES_KEYS.map((key) => (
             <Button
               key={key}
               type="button"
@@ -339,25 +454,58 @@ export function NitrogenChart({
               {chartConfig[key].label}
             </Button>
           ))}
-          {hasScenario ? (
-            <span className="text-muted-foreground inline-flex items-center gap-1.5 px-1 text-xs">
-              <span className="w-4 border-t-2 border-dashed border-current" aria-hidden />
-              Scenario
-            </span>
-          ) : null}
         </div>
-        {todayT !== null ? (
-          <p className="text-muted-foreground flex items-center gap-3 text-xs">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="bg-muted-foreground/25 size-2.5 rounded-[2px]" aria-hidden />
-              Weersverwachting
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="bg-muted-foreground/10 size-2.5 rounded-[2px]" aria-hidden />
-              Klimaatgemiddelde
-            </span>
-          </p>
-        ) : null}
+        <ul className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+          <li className="inline-flex items-center gap-1.5">
+            <svg width="18" height="4" aria-hidden>
+              <line x1="0" y1="2" x2="18" y2="2" stroke="currentColor" strokeWidth="2" />
+            </svg>
+            Berekend met gemeten weer
+          </li>
+          <li className="inline-flex items-center gap-1.5">
+            <svg width="18" height="4" aria-hidden>
+              <line
+                x1="0"
+                y1="2"
+                x2="18"
+                y2="2"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeDasharray={FUTURE_DASH}
+              />
+            </svg>
+            Verwachting
+          </li>
+          {hasScenario ? (
+            <li className="inline-flex items-center gap-1.5">
+              <svg width="18" height="4" aria-hidden>
+                <line
+                  x1="1"
+                  y1="2"
+                  x2="18"
+                  y2="2"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeDasharray={SCENARIO_DASH}
+                  strokeLinecap="round"
+                />
+              </svg>
+              Scenario
+            </li>
+          ) : null}
+          {todayT !== null ? (
+            <>
+              <li className="inline-flex items-center gap-1.5">
+                <span className="bg-muted-foreground/30 size-2.5 rounded-[2px]" aria-hidden />
+                Weersverwachting
+              </li>
+              <li className="inline-flex items-center gap-1.5">
+                <span className="bg-muted-foreground/15 size-2.5 rounded-[2px]" aria-hidden />
+                Klimaatgemiddelde
+              </li>
+            </>
+          ) : null}
+        </ul>
       </div>
 
       {/* Event lane, aligned with the plot area */}
@@ -436,79 +584,23 @@ export function NitrogenChart({
             ) : null
           })}
           <Tooltip
-            content={<TooltipContentBox hasScenario={hasScenario} />}
+            content={<TooltipContentBox hasScenario={hasScenario} cut={cut} />}
             cursor={{ stroke: "var(--muted-foreground)", strokeWidth: 1 }}
           />
-          {!hidden.has("b_n_available") ? (
-            <Area
-              dataKey="b_n_available"
-              type="monotone"
-              fill="var(--color-b_n_available)"
-              fillOpacity={0.18}
-              stroke="var(--color-b_n_available)"
-              strokeWidth={2}
-              isAnimationActive={false}
-            />
-          ) : null}
-          {!hidden.has("b_nw") ? (
-            <Line
-              dataKey="b_nw"
-              type="monotone"
-              stroke="var(--color-b_nw)"
-              strokeWidth={2}
-              dot={false}
-              isAnimationActive={false}
-            />
-          ) : null}
-          {!hidden.has("b_n_uptake") ? (
-            <Line
-              dataKey="b_n_uptake"
-              type="monotone"
-              stroke="var(--color-b_n_uptake)"
-              strokeWidth={2}
-              dot={false}
-              isAnimationActive={false}
-            />
-          ) : null}
-          {hasScenario
-            ? seriesKeys
-                .filter((key) => !hidden.has(key))
-                .map((key) => (
-                  <Line
-                    key={`s_${key}`}
-                    dataKey={`s_${key}`}
-                    type="monotone"
-                    stroke={`var(--color-${key})`}
-                    strokeWidth={2}
-                    strokeDasharray="5 4"
-                    dot={false}
-                    isAnimationActive={false}
-                  />
-                ))
-            : null}
-          <Brush
-            dataKey="t"
-            height={24}
-            startIndex={startIndex}
-            endIndex={endIndex}
-            travellerWidth={8}
-            stroke="var(--muted-foreground)"
-            fill="var(--background)"
-            tickFormatter={(t: number) => formatShortDate(new Date(t).toISOString().slice(0, 10))}
-            onChange={(next) => {
-              if (typeof next?.startIndex === "number" && typeof next?.endIndex === "number") {
-                setRange({ startIndex: next.startIndex, endIndex: next.endIndex })
-              }
-            }}
-          />
+          {!hidden.has("b_n_available") ? solidAndDashed("b_n_available", "area") : null}
+          {!hidden.has("b_nw") ? solidAndDashed("b_nw", "line") : null}
+          {!hidden.has("b_n_uptake") ? solidAndDashed("b_n_uptake", "line") : null}
+          {hasScenario ? SERIES_KEYS.filter((key) => !hidden.has(key)).map(scenarioLine) : null}
         </ComposedChart>
       </ChartContainer>
 
       <div>
-        <p className="text-muted-foreground mb-1 text-xs font-medium">Nitraatuitspoeling</p>
+        <p className="text-muted-foreground mb-1 text-xs font-medium">
+          Nitraatuitspoeling (kg N/ha)
+        </p>
         <ChartContainer config={chartConfig} className="aspect-auto h-28 w-full">
           <ComposedChart
-            data={visible}
+            data={rows}
             margin={{ ...MARGIN, top: 4 }}
             syncId="mineralization"
             syncMethod="value"
@@ -524,29 +616,54 @@ export function NitrogenChart({
             />
             {zones}
             <Tooltip content={() => null} cursor={{ stroke: "var(--muted-foreground)" }} />
-            <Area
-              dataKey="b_no3_leach"
-              type="monotone"
-              fill="var(--color-b_no3_leach)"
-              fillOpacity={0.2}
-              stroke="var(--color-b_no3_leach)"
-              strokeWidth={2}
-              isAnimationActive={false}
-            />
-            {hasScenario ? (
-              <Line
-                dataKey="s_b_no3_leach"
-                type="monotone"
-                stroke="var(--color-b_no3_leach)"
-                strokeWidth={2}
-                strokeDasharray="5 4"
-                dot={false}
-                isAnimationActive={false}
-              />
-            ) : null}
+            {solidAndDashed("b_no3_leach", "area")}
+            {hasScenario ? scenarioLine("b_no3_leach") : null}
           </ComposedChart>
         </ChartContainer>
       </div>
+
+      {rainRows.length > 0 ? (
+        <div>
+          <p className="text-muted-foreground mb-1 text-xs font-medium">
+            Neerslag volgens de weersverwachting (mm per dag)
+          </p>
+          <ChartContainer config={chartConfig} className="aspect-auto h-24 w-full">
+            <ComposedChart data={rainRows} margin={{ ...MARGIN, top: 4 }}>
+              <CartesianGrid vertical={false} strokeOpacity={0.5} />
+              {xAxis}
+              <YAxis
+                width={Y_AXIS_WIDTH}
+                tickLine={false}
+                axisLine={false}
+                tickCount={3}
+                allowDecimals={false}
+                tickFormatter={(v: number) => formatNumber(v)}
+              />
+              {zones}
+              <Tooltip
+                cursor={{ fill: "var(--muted)" }}
+                content={({ active, payload }) => {
+                  const day = payload?.[0]?.payload as { date: string; w_prec_sum_day: number }
+                  if (!active || !day) return null
+                  return (
+                    <div className="bg-background rounded-lg border px-3 py-2 text-xs shadow-md">
+                      <p className="font-medium">{formatLongDate(day.date)}</p>
+                      <p className="tabular-nums">{formatNumber(day.w_prec_sum_day, 1)} mm</p>
+                    </div>
+                  )
+                }}
+              />
+              <Bar
+                dataKey="w_prec_sum_day"
+                fill="var(--color-w_prec_sum_day)"
+                radius={[3, 3, 0, 0]}
+                maxBarSize={shortWindow ? 14 : 4}
+                isAnimationActive={false}
+              />
+            </ComposedChart>
+          </ChartContainer>
+        </div>
+      ) : null}
 
       <SeriesTable rows={rows} />
     </div>
@@ -555,7 +672,8 @@ export function NitrogenChart({
 
 /** Weekly values as a table, for screen readers and exact reading. */
 function SeriesTable({ rows }: { rows: ChartRow[] }) {
-  const weekly = rows.filter((_, i) => i % 7 === 0 || i === rows.length - 1)
+  const step = rows.length > 70 ? 7 : 1
+  const shown = rows.filter((_, i) => i % step === 0 || i === rows.length - 1)
   return (
     <Collapsible>
       <CollapsibleTrigger asChild>
@@ -580,18 +698,20 @@ function SeriesTable({ rows }: { rows: ChartRow[] }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {weekly.map((row) => (
+              {shown.map((row) => (
                 <TableRow key={row.date}>
                   <TableCell>{formatShortDate(row.date)}</TableCell>
-                  <TableCell className="text-right tabular-nums">{formatKgN(row.b_nw)}</TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {formatKgN(row.b_n_uptake)}
+                    {formatKgN(row.values.b_nw)}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {formatKgN(row.b_n_available)}
+                    {formatKgN(row.values.b_n_uptake)}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {formatKgN(row.b_no3_leach)}
+                    {formatKgN(row.values.b_n_available)}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums">
+                    {formatKgN(row.values.b_no3_leach)}
                   </TableCell>
                 </TableRow>
               ))}

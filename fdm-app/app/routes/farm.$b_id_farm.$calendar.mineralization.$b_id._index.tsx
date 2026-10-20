@@ -63,7 +63,6 @@ import {
   type FieldMineralizationOutcome,
   getAttentionItems,
   getNotCalculatedReason,
-  seriesInYear,
 } from "~/lib/mineralization"
 
 export { shouldRevalidateMineralization as shouldRevalidate } from "~/lib/mineralization"
@@ -392,8 +391,6 @@ function FieldMineralizationResult(
   const requested = searchParams.get("phase")
   const phase: SeasonPhase = isPhase(requested) ? requested : outcome.insights.defaultPhase
 
-  const series = seriesInYear(outcome.result.series, year)
-  const forecastEnd = outcome.forecast?.days.at(-1)?.date ?? null
   const rainEventDates = outcome.insights.signals.flatMap((s) =>
     s.type === "rain_near_event" ? [s.eventDate] : [],
   )
@@ -445,22 +442,20 @@ function FieldMineralizationResult(
         </CardHeader>
         <CardContent className="space-y-2">
           <NitrogenChart
-            series={series}
-            scenarioSeries={
-              scenarioOk && !scenarioPending
-                ? seriesInYear(scenarioOk.result.series, year)
-                : undefined
-            }
+            series={outcome.result.series}
+            scenarioSeries={scenarioOk && !scenarioPending ? scenarioOk.result.series : undefined}
             events={outcome.events}
-            today={isCurrentYear ? today : null}
-            forecastEnd={isCurrentYear ? forecastEnd : null}
+            year={year}
+            today={today}
+            phase={phase}
+            forecastDays={outcome.forecast?.days}
             rainEventDates={rainEventDates}
           />
           <ChartExplainer />
         </CardContent>
       </Card>
 
-      {phase !== "evaluation" && outcome.forecast && outcome.forecast.days.length > 0 ? (
+      {outcome.forecast && outcome.forecast.days.length > 0 ? (
         <WeatherStrip
           forecast={outcome.forecast}
           signals={outcome.insights.signals}

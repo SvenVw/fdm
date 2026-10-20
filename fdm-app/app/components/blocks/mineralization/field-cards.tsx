@@ -96,9 +96,11 @@ export function ChartExplainer() {
             <dd className="inline">stikstof die als nitraat naar het grondwater verdwijnt.</dd>
           </div>
           <p>
-            Tot vandaag rekent het model met gemeten weer, daarna met de weersverwachting en na
-            afloop van de verwachting met het langjarig klimaatgemiddelde. De iconen boven de
-            grafiek tonen zaai, bemesting en oogst; een gestippelde rand betekent gepland.
+            Tot vandaag rekent het model met gemeten weer (doorgetrokken lijnen), daarna met de
+            weersverwachting en na afloop van de verwachting met het langjarig klimaatgemiddelde
+            (gestreepte lijnen). In het groeiseizoen zie je de afgelopen 30 en komende 14 dagen; bij
+            planning en evaluatie het hele jaar. De iconen boven de grafiek tonen zaai, bemesting en
+            oogst; een gestippelde rand betekent gepland.
           </p>
         </dl>
       </CollapsibleContent>
