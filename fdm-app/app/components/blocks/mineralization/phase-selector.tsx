@@ -30,6 +30,7 @@ export function PhaseSelector({
         if (next) onChange(next as SeasonPhase)
       }}
       aria-label="Moment in het seizoen"
+      className="w-full sm:w-auto"
     >
       {PHASES.map((phase) => (
         <ToggleGroupItem
@@ -37,7 +38,7 @@ export function PhaseSelector({
           value={phase}
           disabled={disabled[phase] !== undefined}
           title={disabled[phase]}
-          className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-3"
+          className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground flex-1 px-3 sm:flex-none pointer-coarse:h-11"
         >
           {PHASE_LABELS[phase]}
           {phase === currentPhase ? (

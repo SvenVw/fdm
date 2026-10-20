@@ -216,7 +216,7 @@ export function FarmAttentionList({ fields, outcomes, fieldHref, harvestHref }: 
                   <Button
                     variant="outline"
                     size="sm"
-                    className="self-start sm:self-center"
+                    className="w-full sm:w-auto sm:self-center pointer-coarse:h-10"
                     onClick={() => revalidator.revalidate()}
                     disabled={revalidator.state !== "idle"}
                   >
@@ -224,7 +224,12 @@ export function FarmAttentionList({ fields, outcomes, fieldHref, harvestHref }: 
                     Opnieuw berekenen
                   </Button>
                 ) : (
-                  <Button asChild variant="outline" size="sm" className="self-start sm:self-center">
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="w-full sm:w-auto sm:self-center pointer-coarse:h-10"
+                  >
                     <NavLink to={fieldHref(field.b_id)}>
                       Bekijk perceel
                       <ArrowRight aria-hidden />
@@ -276,7 +281,7 @@ export function FarmAttentionList({ fields, outcomes, fieldHref, harvestHref }: 
                       asChild
                       variant="outline"
                       size="sm"
-                      className="self-start sm:self-center"
+                      className="w-full sm:w-auto sm:self-center pointer-coarse:h-10"
                     >
                       <NavLink
                         to={harvestHref(
@@ -351,7 +356,7 @@ function SortableHead({
       <Button
         variant="ghost"
         size="sm"
-        className="-mr-2 h-8 gap-1 px-2 font-medium"
+        className="-mr-2 h-8 gap-1 px-2 font-medium pointer-coarse:h-10"
         onClick={() => onSort(sortKey)}
       >
         {label}

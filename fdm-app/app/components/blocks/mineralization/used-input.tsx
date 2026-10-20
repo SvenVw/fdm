@@ -291,7 +291,7 @@ export function UsedInput({
                         {a.p_name_nl ?? "Meststof"}
                       </FertilizerBadge>
                     </span>
-                    <span className="text-muted-foreground text-right tabular-nums">
+                    <span className="text-muted-foreground ml-auto text-right tabular-nums">
                       {a.amount !== null ? `${formatNumber(a.amount, 1)} ${a.unit}` : "–"}
                       {a.p_n_rt !== null ? ` · ${formatNumber(a.p_n_rt, 1)} g N/kg` : ""}
                     </span>

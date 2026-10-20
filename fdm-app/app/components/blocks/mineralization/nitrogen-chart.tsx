@@ -50,6 +50,8 @@ const IN_SEASON_DAYS_AHEAD = 14
 const FUTURE_DASH = "6 4"
 /** Dash pattern for the scenario; dotted so it differs from the future dash. */
 const SCENARIO_DASH = "1 4"
+/** Plot width below which every other axis tick is shown, so labels do not collide. */
+const COMPACT_PLOT_PX = 440
 /** Width of an event icon on the lane plus a small gap, in pixels. */
 const LANE_ICON_SPACING_PX = 28
 /** Leaching below this amount over the whole window is shown as text instead of a chart. */
@@ -295,7 +297,8 @@ export function NitrogenChart({
     inSeason && lastRowT !== undefined ? Math.min(toTime(toDate), lastRowT) : toTime(toDate)
   const seriesEndT = lastRowT ?? to
   const span = Math.max(to - from, DAY_MS)
-  const ticks = buildTicks(from, to)
+  const compact = laneWidth > 0 && laneWidth < COMPACT_PLOT_PX
+  const ticks = buildTicks(from, to).filter((_, i) => !compact || i % 2 === 0)
   const shortWindow = to - from <= 70 * DAY_MS
   const todayT = todayInYear ? toTime(today) : null
   const forecastEnd = forecastDays.at(-1)?.date
@@ -503,7 +506,7 @@ export function NitrogenChart({
               aria-pressed={!hidden.has(key)}
               onClick={() => toggle(key)}
               className={cn(
-                "h-7 gap-1.5 px-2.5 text-xs",
+                "h-7 gap-1.5 px-2.5 text-xs pointer-coarse:h-10",
                 hidden.has(key) && "text-muted-foreground",
               )}
             >
@@ -600,6 +603,8 @@ export function NitrogenChart({
                       type="button"
                       className={cn(
                         "bg-background text-foreground focus-visible:ring-ring relative flex size-6 items-center justify-center rounded-full border focus-visible:ring-2 focus-visible:outline-none",
+                        // Invisible 40 px hit area, so the small icon can be tapped
+                        "after:absolute after:-inset-2 after:content-['']",
                         event.planned && "border-dashed",
                         scenario && "border-foreground border-2 border-dotted",
                       )}

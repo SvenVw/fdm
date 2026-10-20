@@ -319,6 +319,7 @@ export function ScenarioPanel({
                     ) : null}
                   </Label>
                   <Input
+                    className="text-base sm:text-sm"
                     id={`${rowId}-date`}
                     type="date"
                     min={min}
@@ -356,7 +357,7 @@ export function ScenarioPanel({
                       })
                     }}
                   >
-                    <SelectTrigger id={`${rowId}-product`} className="w-full">
+                    <SelectTrigger id={`${rowId}-product`} className="w-full text-base sm:text-sm">
                       <SelectValue placeholder="Kies een meststof" />
                     </SelectTrigger>
                     <SelectContent>
@@ -373,6 +374,7 @@ export function ScenarioPanel({
                     Hoeveelheid ({option?.p_app_amount_unit ?? "kg/ha"})
                   </Label>
                   <Input
+                    className="text-base sm:text-sm"
                     id={`${rowId}-amount`}
                     type="number"
                     min={0}
@@ -411,7 +413,7 @@ export function ScenarioPanel({
                       dispatch({ type: "update_application", index, patch: { p_app_method } })
                     }
                   >
-                    <SelectTrigger id={`${rowId}-method`} className="w-full">
+                    <SelectTrigger id={`${rowId}-method`} className="w-full text-base sm:text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -427,7 +429,7 @@ export function ScenarioPanel({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="justify-self-end lg:mt-5"
+                  className="justify-self-end lg:mt-5 pointer-coarse:size-11"
                   aria-label={`Gift van ${formatShortDate(app.p_app_date)} verwijderen`}
                   onClick={() => dispatch({ type: "remove_application", index })}
                 >
@@ -462,6 +464,7 @@ export function ScenarioPanel({
                 Oogstdatum
               </Label>
               <Input
+                className="text-base sm:text-sm"
                 id="scenario-harvest-date"
                 type="date"
                 min={min}
@@ -478,6 +481,7 @@ export function ScenarioPanel({
                 Opbrengst (kg DS/ha)
               </Label>
               <Input
+                className="text-base sm:text-sm"
                 id="scenario-harvest-yield"
                 type="number"
                 min={0}
@@ -546,6 +550,7 @@ export function ScenarioPanel({
           <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"
+              className="w-full sm:w-auto"
               onClick={onSave}
               disabled={!dirty || pending || !!error || !result || saving || missingAmount}
             >

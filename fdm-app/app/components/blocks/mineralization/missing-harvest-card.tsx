@@ -72,6 +72,7 @@ export function MissingHarvestCard({
                 id="b_lu_harvest_date"
                 name="b_lu_harvest_date"
                 type="date"
+                className="text-base sm:text-sm"
                 required
                 min={`${year}-01-01`}
                 max={`${year}-12-31`}
@@ -90,6 +91,7 @@ export function MissingHarvestCard({
                 min={0}
                 step="any"
                 inputMode="decimal"
+                className="text-base sm:text-sm"
               />
             </div>
             <Button type="submit" disabled={busy}>

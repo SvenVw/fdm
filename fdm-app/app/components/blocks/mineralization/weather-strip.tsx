@@ -118,7 +118,7 @@ export function WeatherStrip({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="shrink-0 self-start sm:self-center"
+                    className="w-full shrink-0 sm:w-auto sm:self-center pointer-coarse:h-10"
                     onClick={() =>
                       onSuggestShift({
                         eventType: signal.eventType,
