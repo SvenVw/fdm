@@ -97,6 +97,9 @@ export async function collectInputForBln3Score(
     ] as const
     const allNumericFields = [...labNumericFields, ...bcsNumericFields] as const
 
+    // fdm-core uses `ORDER BY b_sampling_date DESC NULLS LAST` for getSoilAnalyses.
+    // Since NMI BodemSchat analyses have their b_sampling_date and a_date set to NULL,
+    // they always appear last so the estimates get considered last here.
     const soilData: Record<string, number> = {}
     for (const f of allNumericFields) {
       const analysis = soilAnalyses.find((a) => typeof a[f] === "number")
@@ -257,6 +260,9 @@ export async function collectInputForBln3MeasureApplicability(
       "a_som_loi",
     ] as const
 
+    // fdm-core uses `ORDER BY b_sampling_date DESC NULLS LAST` for getSoilAnalyses.
+    // Since NMI BodemSchat analyses have their b_sampling_date and a_date set to NULL,
+    // they always appear last so the estimates get considered last here.
     const soilData: Record<string, number> = {}
     for (const f of labNumericFields) {
       const analysis = soilAnalyses.find((a) => typeof a[f] === "number")
