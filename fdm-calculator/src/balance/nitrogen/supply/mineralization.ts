@@ -121,7 +121,7 @@ function calculateNitrogenSupplyBySoilMineralizationUsingDefaults(
  * C/N ratio, and soil bulk density.
  * @param a_c_of - The organic carbon content of the soil (g C / kg soil).
  * @param a_cn_fr - The C/N ratio of the soil organic matter.
- * @param a_density_sa - The soil bulk density (kg / m³).
+ * @param a_density_sa - The soil bulk density (g / cm³).
  * @returns The amount of nitrogen mineralized in kg N / ha.
  * @throws Throws an error if required soil analysis data is missing or average yearly temperature is too high.
  */
