@@ -189,6 +189,7 @@ function summarizeCultivation(c: MineralizationCultivation): MineralizationMainC
     b_lu_catalogue: c.b_lu_catalogue,
     b_lu_name: c.b_lu_name,
     b_lu_harvestable: c.b_lu_harvestable,
+    b_lu_croprotation: c.b_lu_croprotation ?? null,
   }
 }
 
@@ -326,6 +327,7 @@ export async function calculateFieldMineralization(
         p_name_nl: f.p_name_nl,
         p_app_amount_unit: f.p_app_amount_unit,
         p_app_method_options: f.p_app_method_options ?? [],
+        p_type: f.p_type ?? null,
       })),
     }
   } catch (error) {

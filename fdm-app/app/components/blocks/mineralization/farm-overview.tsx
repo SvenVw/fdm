@@ -1,6 +1,16 @@
-import { ArrowRight, ChevronDown, CircleCheck } from "lucide-react"
-import { NavLink } from "react-router"
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUp,
+  ArrowUpDown,
+  ChevronDown,
+  CircleAlert,
+  CircleCheck,
+} from "lucide-react"
+import { useState } from "react"
+import { NavLink, useRevalidator } from "react-router"
 import { Line, LineChart } from "recharts"
+import { getHarvestTerm } from "~/components/blocks/harvest/utils"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible"
@@ -14,15 +24,16 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table"
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
 import {
   type AttentionItem,
   type FieldMineralizationOk,
   type FieldMineralizationOutcome,
-  formatKgN,
+  formatKg,
   getAttentionItems,
   getAttentionPriority,
   getNotCalculatedReason,
-  PHASE_LABELS,
+  type MineralizationMainCultivation,
   seriesInYear,
 } from "~/lib/mineralization"
 import { SignalChips } from "./signal-chips"
@@ -40,6 +51,8 @@ interface FarmOverviewProps {
   year: number
   isCurrentYear: boolean
   fieldHref: (b_id: string) => string
+  /** Link to the bulk harvest form for one crop and the given fields. */
+  harvestHref: (b_lu_catalogue: string, fieldIds: string[]) => string
 }
 
 function cropName(outcome: FieldMineralizationOutcome | undefined): string | null {
@@ -49,42 +62,102 @@ function cropName(outcome: FieldMineralizationOutcome | undefined): string | nul
   return null
 }
 
-/** One line summary of the calculation progress and the number of fields needing attention. */
+function plural(count: number, singular: string, plural: string): string {
+  return `${count} ${count === 1 ? singular : plural}`
+}
+
+/** Counts the outcomes per status. */
+function countOutcomes(fields: FarmOverviewField[], outcomes: FarmOverviewProps["outcomes"]) {
+  const counts = { pending: 0, ok: 0, missingHarvest: 0, error: 0, attention: 0 }
+  for (const field of fields) {
+    const outcome = outcomes[field.b_id]
+    if (!outcome) counts.pending++
+    else if (outcome.status === "ok") {
+      counts.ok++
+      if (outcome.insights.signals.length > 0) counts.attention++
+    } else if (outcome.status === "missing_harvest") counts.missingHarvest++
+    else if (outcome.status === "error") counts.error++
+  }
+  return counts
+}
+
+/**
+ * One line summary of the calculation: how many fields have a result, how many wait for a harvest
+ * and how many show a signal.
+ */
 export function FarmSummary({ fields, outcomes }: Pick<FarmOverviewProps, "fields" | "outcomes">) {
-  const settled = fields.filter((f) => outcomes[f.b_id])
-  const calculable = settled.filter((f) => {
-    const status = outcomes[f.b_id]?.status
-    return status === "ok" || status === "missing_harvest" || status === "error"
-  })
-  const attention = settled.filter((f) => getAttentionItems(outcomes[f.b_id]).length > 0)
-  const pending = fields.length - settled.length
+  const counts = countOutcomes(fields, outcomes)
+  const calculable = counts.ok + counts.missingHarvest + counts.error + counts.pending
 
   return (
     <p className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-      {pending > 0 ? (
-        <span className="text-foreground inline-flex items-center gap-1.5">
-          <Spinner />
-          {settled.length} van {fields.length} percelen berekend
-        </span>
-      ) : (
-        <span className="text-foreground">{calculable.length} percelen berekend</span>
-      )}
+      <span className="text-foreground inline-flex items-center gap-1.5">
+        {counts.pending > 0 ? <Spinner /> : null}
+        {counts.ok === calculable
+          ? `${plural(calculable, "perceel", "percelen")} berekend`
+          : `${counts.ok} van ${plural(calculable, "perceel", "percelen")} berekend`}
+      </span>
+      {counts.missingHarvest > 0 ? (
+        <>
+          <span aria-hidden>·</span>
+          <span>{counts.missingHarvest} wachten op een oogst</span>
+        </>
+      ) : null}
+      {counts.error > 0 ? (
+        <>
+          <span aria-hidden>·</span>
+          <span>{counts.error} niet gelukt</span>
+        </>
+      ) : null}
       <span aria-hidden>·</span>
       <span>
-        {attention.length === 1 ? "1 perceel vraagt" : `${attention.length} percelen vragen`}{" "}
+        {counts.attention === 1 ? "1 perceel vraagt" : `${counts.attention} percelen vragen`}{" "}
         aandacht
       </span>
     </p>
   )
 }
 
-/** List of fields with signals, most urgent first. */
-export function FarmAttentionList({ fields, outcomes, fieldHref }: FarmOverviewProps) {
+interface MissingHarvestGroup {
+  mainCultivation: MineralizationMainCultivation
+  fields: FarmOverviewField[]
+}
+
+/** Groups the fields without a harvest by the crop of their main cultivation. */
+function groupMissingHarvests(
+  fields: FarmOverviewField[],
+  outcomes: FarmOverviewProps["outcomes"],
+): MissingHarvestGroup[] {
+  const groups = new Map<string, MissingHarvestGroup>()
+  for (const field of fields) {
+    const outcome = outcomes[field.b_id]
+    if (outcome?.status !== "missing_harvest") continue
+    const key = outcome.mainCultivation.b_lu_catalogue
+    const group = groups.get(key) ?? { mainCultivation: outcome.mainCultivation, fields: [] }
+    group.fields.push(field)
+    groups.set(key, group)
+  }
+  return [...groups.values()].sort((a, b) => b.fields.length - a.fields.length)
+}
+
+function fieldNames(fields: FarmOverviewField[], max = 4): string {
+  const names = fields.map((f) => f.b_name ?? "Perceel")
+  if (names.length <= max) return names.join(", ")
+  return `${names.slice(0, max).join(", ")} en ${names.length - max} andere`
+}
+
+/**
+ * Fields that need attention: agronomic signals first, then the fields that wait for a harvest,
+ * grouped per crop so they can be completed at once.
+ */
+export function FarmAttentionList({ fields, outcomes, fieldHref, harvestHref }: FarmOverviewProps) {
+  const revalidator = useRevalidator()
   const pending = fields.some((f) => !outcomes[f.b_id])
   const items = fields
     .map((field) => {
       const outcome = outcomes[field.b_id]
-      const attention = outcome ? getAttentionItems(outcome) : []
+      const attention =
+        outcome && outcome.status !== "missing_harvest" ? getAttentionItems(outcome) : []
       return { field, outcome, attention }
     })
     .filter((row) => row.attention.length > 0)
@@ -93,17 +166,18 @@ export function FarmAttentionList({ fields, outcomes, fieldHref }: FarmOverviewP
         getAttentionPriority(a.attention[0] as AttentionItem) -
         getAttentionPriority(b.attention[0] as AttentionItem),
     )
+  const missingHarvests = groupMissingHarvests(fields, outcomes)
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Aandacht nodig</CardTitle>
         <CardDescription>
-          Percelen waar een oogst ontbreekt, een stikstoftekort dreigt, regen rond een geplande gift
-          valt of veel stikstof verloren kan gaan.
+          Percelen waar een stikstoftekort dreigt, regen rond een geplande gift valt, veel stikstof
+          verloren kan gaan of de berekening niet lukte.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         {items.length === 0 ? (
           <p className="text-muted-foreground flex items-center gap-2 text-sm">
             {pending ? (
@@ -112,7 +186,10 @@ export function FarmAttentionList({ fields, outcomes, fieldHref }: FarmOverviewP
               </>
             ) : (
               <>
-                <CircleCheck className="size-4" aria-hidden /> Geen percelen die nu aandacht vragen.
+                <CircleCheck className="size-4" aria-hidden />
+                {missingHarvests.length > 0
+                  ? "Geen signalen bij de berekende percelen."
+                  : "Geen percelen die nu aandacht vragen."}
               </>
             )}
           </p>
@@ -135,16 +212,88 @@ export function FarmAttentionList({ fields, outcomes, fieldHref }: FarmOverviewP
                   </p>
                   <SignalChips items={attention} />
                 </div>
-                <Button asChild variant="outline" size="sm" className="self-start sm:self-center">
-                  <NavLink to={fieldHref(field.b_id)}>
-                    {attention[0]?.kind === "missing_harvest" ? "Oogst invullen" : "Bekijk perceel"}
-                    <ArrowRight aria-hidden />
-                  </NavLink>
-                </Button>
+                {attention[0]?.kind === "error" ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="self-start sm:self-center"
+                    onClick={() => revalidator.revalidate()}
+                    disabled={revalidator.state !== "idle"}
+                  >
+                    {revalidator.state !== "idle" ? <Spinner /> : null}
+                    Opnieuw berekenen
+                  </Button>
+                ) : (
+                  <Button asChild variant="outline" size="sm" className="self-start sm:self-center">
+                    <NavLink to={fieldHref(field.b_id)}>
+                      Bekijk perceel
+                      <ArrowRight aria-hidden />
+                    </NavLink>
+                  </Button>
+                )}
               </li>
             ))}
           </ul>
         )}
+
+        {missingHarvests.length > 0 ? (
+          <section className="space-y-3 border-t pt-5" aria-labelledby="ontbrekende-oogsten">
+            <div className="space-y-1">
+              <h3 id="ontbrekende-oogsten" className="text-sm font-semibold">
+                Oogst ontbreekt
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                Zonder gemeten of geplande oogst kan de mineralisatie niet worden berekend. Vul ze
+                per gewas in één keer in.
+              </p>
+            </div>
+            <ul className="divide-y">
+              {missingHarvests.map(({ mainCultivation, fields: groupFields }) => {
+                const term = getHarvestTerm(
+                  mainCultivation.b_lu_croprotation,
+                  true,
+                  mainCultivation.b_lu_harvestable,
+                  true,
+                )
+                return (
+                  <li
+                    key={mainCultivation.b_lu_catalogue}
+                    className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center"
+                  >
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <p className="text-sm font-medium">
+                        {mainCultivation.b_lu_name ?? mainCultivation.b_lu_catalogue}
+                        <span className="text-muted-foreground font-normal">
+                          {" "}
+                          · {plural(groupFields.length, "perceel", "percelen")}
+                        </span>
+                      </p>
+                      <p className="text-muted-foreground truncate text-sm">
+                        {fieldNames(groupFields)}
+                      </p>
+                    </div>
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="self-start sm:self-center"
+                    >
+                      <NavLink
+                        to={harvestHref(
+                          mainCultivation.b_lu_catalogue,
+                          groupFields.map((f) => f.b_id),
+                        )}
+                      >
+                        {term} invullen
+                        <ArrowRight aria-hidden />
+                      </NavLink>
+                    </Button>
+                  </li>
+                )
+              })}
+            </ul>
+          </section>
+        ) : null}
       </CardContent>
     </Card>
   )
@@ -158,7 +307,7 @@ function AvailableNSparkline({ outcome, year }: { outcome: FieldMineralizationOk
       <Line
         type="monotone"
         dataKey="b_n_available"
-        stroke="var(--chart-2)"
+        stroke="var(--chart-5)"
         strokeWidth={1.5}
         dot={false}
         isAnimationActive={false}
@@ -167,7 +316,70 @@ function AvailableNSparkline({ outcome, year }: { outcome: FieldMineralizationOk
   )
 }
 
-/** Table with the key figures of every calculated field. */
+type SortKey = "available" | "uptake" | "leaching"
+
+/** Values of the sortable columns of a calculated field. */
+function tableValues(outcome: FieldMineralizationOk, isCurrentYear: boolean) {
+  const { kpis } = outcome.insights
+  return {
+    available: isCurrentYear ? kpis.availableNNow : kpis.residualNAtHarvest,
+    uptake: kpis.uptakeToDate,
+    leaching: kpis.leachingToDate,
+  } satisfies Record<SortKey, number | null>
+}
+
+function SortableHead({
+  label,
+  sortKey,
+  sort,
+  onSort,
+  className,
+}: {
+  label: string
+  sortKey: SortKey
+  sort: { key: SortKey; dir: "asc" | "desc" } | null
+  onSort: (key: SortKey) => void
+  className?: string
+}) {
+  const active = sort?.key === sortKey
+  const Icon = !active ? ArrowUpDown : sort.dir === "asc" ? ArrowUp : ArrowDown
+  return (
+    <TableHead
+      className={className}
+      aria-sort={active ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}
+    >
+      <Button
+        variant="ghost"
+        size="sm"
+        className="-mr-2 h-8 gap-1 px-2 font-medium"
+        onClick={() => onSort(sortKey)}
+      >
+        {label}
+        <Icon className={active ? "" : "text-muted-foreground"} aria-hidden />
+      </Button>
+    </TableHead>
+  )
+}
+
+/** Available nitrogen; a negative value is flagged, because uptake then exceeds the supply. */
+function AvailableNCell({ value }: { value: number | null }) {
+  if (value === null || value >= 0) return <>{formatKg(value)}</>
+  return (
+    <Tooltip>
+      <TooltipTrigger className="inline-flex items-center gap-1 underline decoration-dotted underline-offset-4">
+        <CircleAlert className="text-muted-foreground size-3.5" aria-hidden />
+        {formatKg(value)}
+        <span className="sr-only">: opname groter dan aanbod</span>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-64">
+        Het gewas nam meer stikstof op dan er volgens de berekening beschikbaar kwam, bijvoorbeeld
+        door stikstofbinding van vlinderbloemigen. Controleer de gegevens van dit perceel.
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
+/** Sortable table with the key figures of every calculable field. */
 export function FarmFieldTable({
   fields,
   outcomes,
@@ -175,12 +387,40 @@ export function FarmFieldTable({
   isCurrentYear,
   fieldHref,
 }: FarmOverviewProps) {
+  const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" } | null>(null)
+  const onSort = (key: SortKey) =>
+    setSort((prev) =>
+      prev?.key !== key ? { key, dir: "desc" } : prev.dir === "desc" ? { key, dir: "asc" } : null,
+    )
+
   const rows = fields.filter((f) => {
     const status = outcomes[f.b_id]?.status
     return (
       status === undefined || status === "ok" || status === "missing_harvest" || status === "error"
     )
   })
+  if (!sort) {
+    // Calculated fields first; fields waiting for a harvest or with an error below them
+    const rank = (field: FarmOverviewField) => {
+      const status = outcomes[field.b_id]?.status
+      return status === "ok" || status === undefined ? 0 : 1
+    }
+    rows.sort((a, b) => rank(a) - rank(b))
+  } else {
+    const value = (field: FarmOverviewField) => {
+      const outcome = outcomes[field.b_id]
+      return outcome?.status === "ok" ? tableValues(outcome, isCurrentYear)[sort.key] : null
+    }
+    // Fields without a value stay at the bottom in both directions
+    rows.sort((a, b) => {
+      const va = value(a)
+      const vb = value(b)
+      if (va === null && vb === null) return 0
+      if (va === null) return 1
+      if (vb === null) return -1
+      return sort.dir === "asc" ? va - vb : vb - va
+    })
+  }
 
   return (
     <Card>
@@ -188,8 +428,8 @@ export function FarmFieldTable({
         <CardTitle>Alle percelen</CardTitle>
         <CardDescription>
           {isCurrentYear
-            ? "Beschikbare stikstof vandaag, en opname en uitspoeling tot nu toe."
-            : `Beschikbare stikstof bij de oogst, en opname en uitspoeling over ${year}.`}
+            ? "Beschikbare stikstof vandaag, en opname en uitspoeling tot nu toe, in kg N/ha."
+            : `Beschikbare stikstof bij de oogst, en opname en uitspoeling over ${year}, in kg N/ha.`}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -198,12 +438,27 @@ export function FarmFieldTable({
             <TableRow>
               <TableHead>Perceel</TableHead>
               <TableHead className="hidden md:table-cell">Hoofdteelt</TableHead>
-              <TableHead className="hidden lg:table-cell">Fase</TableHead>
-              <TableHead className="text-right">
-                {isCurrentYear ? "Beschikbare N nu" : "Beschikbare N bij oogst"}
-              </TableHead>
-              <TableHead className="hidden text-right sm:table-cell">N-opname</TableHead>
-              <TableHead className="hidden text-right sm:table-cell">Uitspoeling</TableHead>
+              <SortableHead
+                label={isCurrentYear ? "Beschikbare N" : "Bij oogst"}
+                sortKey="available"
+                sort={sort}
+                onSort={onSort}
+                className="text-right"
+              />
+              <SortableHead
+                label="N-opname"
+                sortKey="uptake"
+                sort={sort}
+                onSort={onSort}
+                className="hidden text-right sm:table-cell"
+              />
+              <SortableHead
+                label="Uitspoeling"
+                sortKey="leaching"
+                sort={sort}
+                onSort={onSort}
+                className="hidden text-right sm:table-cell"
+              />
               <TableHead className="hidden xl:table-cell">
                 <span className="sr-only">Verloop beschikbare N</span>
               </TableHead>
@@ -227,17 +482,14 @@ export function FarmFieldTable({
                     <TableCell className="hidden md:table-cell">
                       <Skeleton className="h-4 w-24" />
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell">
-                      <Skeleton className="h-4 w-20" />
-                    </TableCell>
                     <TableCell>
-                      <Skeleton className="ml-auto h-4 w-20" />
+                      <Skeleton className="ml-auto h-4 w-12" />
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
-                      <Skeleton className="ml-auto h-4 w-20" />
+                      <Skeleton className="ml-auto h-4 w-12" />
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
-                      <Skeleton className="ml-auto h-4 w-16" />
+                      <Skeleton className="ml-auto h-4 w-10" />
                     </TableCell>
                     <TableCell className="hidden xl:table-cell">
                       <Skeleton className="h-6 w-24" />
@@ -252,31 +504,32 @@ export function FarmFieldTable({
                     <TableCell className="hidden md:table-cell">
                       {cropName(outcome) ?? "–"}
                     </TableCell>
-                    <TableCell colSpan={5} className="text-muted-foreground text-sm">
+                    <TableCell
+                      colSpan={4}
+                      className="text-muted-foreground text-right text-sm sm:text-left"
+                    >
                       {outcome.status === "missing_harvest"
-                        ? "Vul de gemeten of geplande oogst in om te rekenen."
+                        ? "Wacht op oogst"
                         : outcome.status === "error"
-                          ? outcome.message
+                          ? "Berekening niet gelukt"
                           : null}
                     </TableCell>
                   </TableRow>
                 )
               }
-              const { kpis, defaultPhase } = outcome.insights
-              const availableN = isCurrentYear ? kpis.availableNNow : kpis.residualNAtHarvest
+              const values = tableValues(outcome, isCurrentYear)
               return (
                 <TableRow key={field.b_id}>
                   <TableCell>{name}</TableCell>
                   <TableCell className="hidden md:table-cell">{cropName(outcome)}</TableCell>
-                  <TableCell className="hidden lg:table-cell">
-                    {PHASE_LABELS[defaultPhase]}
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">{formatKgN(availableN)}</TableCell>
-                  <TableCell className="hidden text-right tabular-nums sm:table-cell">
-                    {formatKgN(kpis.uptakeToDate)}
+                  <TableCell className="text-right tabular-nums">
+                    <AvailableNCell value={values.available} />
                   </TableCell>
                   <TableCell className="hidden text-right tabular-nums sm:table-cell">
-                    {formatKgN(kpis.leachingToDate)}
+                    {formatKg(values.uptake)}
+                  </TableCell>
+                  <TableCell className="hidden text-right tabular-nums sm:table-cell">
+                    {formatKg(values.leaching)}
                   </TableCell>
                   <TableCell className="hidden xl:table-cell">
                     <AvailableNSparkline outcome={outcome} year={year} />

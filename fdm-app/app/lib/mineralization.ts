@@ -21,7 +21,7 @@ import type { ShouldRevalidateFunctionArgs } from "react-router"
 export type MineralizationMainCultivation = Pick<
   MineralizationCultivation,
   "b_lu" | "b_lu_catalogue" | "b_lu_name" | "b_lu_harvestable"
->
+> & { b_lu_croprotation: string | null }
 
 interface OutcomeBase {
   b_id: string
@@ -65,6 +65,8 @@ export interface ScenarioFertilizerOption {
   p_app_amount_unit: string
   /** Allowed application methods; empty when not restricted. */
   p_app_method_options: string[]
+  /** Fertilizer type (e.g. `mineral`, `manure`, `compost`), for the icon on the event lane. */
+  p_type: string | null
 }
 
 /** Outcome of a field that could be calculated. */
@@ -77,7 +79,7 @@ export const PHASE_LABELS: Record<SeasonPhase, string> = {
   evaluation: "Evaluatie",
 }
 
-/** Dutch explanation why a field is not calculated. */
+/** Dutch explanation why a field is not calculated, e.g. "Geen teelt in 2026". */
 export function getNotCalculatedReason(
   outcome: Extract<
     FieldMineralizationOutcome,
@@ -102,6 +104,48 @@ const kgFormatter = new Intl.NumberFormat("nl-NL", { maximumFractionDigits: 0 })
 export function formatKgN(value: number | null | undefined): string {
   if (value === null || value === undefined || Number.isNaN(value)) return "–"
   return `${kgFormatter.format(value)} kg N/ha`
+}
+
+/** Formats a nitrogen amount without unit, for tables that show the unit in the header. */
+export function formatKg(value: number | null | undefined): string {
+  if (value === null || value === undefined || Number.isNaN(value)) return "–"
+  return kgFormatter.format(value)
+}
+
+/**
+ * Where today lies relative to the selected year and the harvest of the main crop.
+ *
+ * - `past` / `future`: the selected year is before or after the current year.
+ * - `before_harvest` / `after_harvest`: the selected year is the current year.
+ */
+export type SeasonTiming = "past" | "future" | "before_harvest" | "after_harvest"
+
+/** Determines the {@link SeasonTiming} of a field. */
+export function getSeasonTiming(year: number, today: string, mainHarvest: string): SeasonTiming {
+  const currentYear = Number(today.slice(0, 4))
+  if (year < currentYear) return "past"
+  if (year > currentYear) return "future"
+  return today > mainHarvest ? "after_harvest" : "before_harvest"
+}
+
+/**
+ * Link to the bulk harvest form of the crop rotation, with the given fields selected.
+ *
+ * @param args.returnUrl - Page to return to after saving.
+ */
+export function getBulkHarvestHref(args: {
+  b_id_farm: string
+  calendar: string
+  b_lu_catalogue: string
+  fieldIds: string[]
+  returnUrl: string
+}): string {
+  const search = new URLSearchParams({
+    cultivationIds: args.b_lu_catalogue,
+    fieldIds: args.fieldIds.join(","),
+    returnUrl: args.returnUrl,
+  })
+  return `/farm/${args.b_id_farm}/${args.calendar}/rotation/harvest?${search.toString()}`
 }
 
 /** Formats a number with Dutch separators and the given number of decimals. */

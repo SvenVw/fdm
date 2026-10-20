@@ -1,7 +1,6 @@
 import { getFields, toFdmDateString } from "@nmi-agro/fdm-core"
 import { useEffect } from "react"
 import { data, type LoaderFunctionArgs, type MetaFunction, useLoaderData } from "react-router"
-import type { FieldMineralizationOutcome } from "~/lib/mineralization"
 import {
   FarmAttentionList,
   FarmFieldTable,
@@ -20,6 +19,7 @@ import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError, reportError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { type FieldMineralizationOutcome, getBulkHarvestHref } from "~/lib/mineralization"
 
 export const meta: MetaFunction = () => {
   return [
@@ -117,12 +117,21 @@ function FarmOverview({
   }, [capture, b_id_farm, year])
 
   const fields = rows.map(({ b_id, b_name, b_area }) => ({ b_id, b_name, b_area }))
+  const overviewHref = `/farm/${b_id_farm}/${calendar}/mineralization`
   const props = {
     fields,
     outcomes,
     year,
     isCurrentYear,
-    fieldHref: (b_id: string) => `/farm/${b_id_farm}/${calendar}/mineralization/${b_id}`,
+    fieldHref: (b_id: string) => `${overviewHref}/${b_id}`,
+    harvestHref: (b_lu_catalogue: string, fieldIds: string[]) =>
+      getBulkHarvestHref({
+        b_id_farm,
+        calendar,
+        b_lu_catalogue,
+        fieldIds,
+        returnUrl: overviewHref,
+      }),
   }
 
   return (

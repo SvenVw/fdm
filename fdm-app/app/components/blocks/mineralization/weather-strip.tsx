@@ -1,4 +1,5 @@
 import type { MineralizationSignal, WeatherForecast } from "@nmi-agro/fdm-calculator"
+import type { CSSProperties } from "react"
 import { CloudRain } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
@@ -64,40 +65,38 @@ export function WeatherStrip({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="overflow-x-auto">
-          <ol
-            className="grid min-w-[40rem] gap-1"
-            style={{ gridTemplateColumns: `repeat(${forecast.days.length}, minmax(0, 1fr))` }}
-            aria-label="Weersverwachting per dag"
-          >
-            {forecast.days.map((day) => {
-              const date = new Date(`${day.date}T00:00:00Z`)
-              const height = Math.round((day.w_prec_sum_day / maxRain) * 48)
-              return (
-                <li
-                  key={day.date}
-                  className="flex flex-col items-center gap-1 text-center text-xs"
-                  aria-label={`${formatLongDate(day.date)}: ${formatNumber(day.w_prec_sum_day, 1)} mm neerslag, ${formatNumber(day.w_temp_min_day)} tot ${formatNumber(day.w_temp_max_day)} °C`}
-                >
+        {/* Two rows of a week on small screens, one row from sm on */}
+        <ol
+          className="grid grid-cols-7 gap-x-1 gap-y-4 sm:grid-cols-[repeat(var(--days),minmax(0,1fr))]"
+          style={{ "--days": forecast.days.length } as CSSProperties}
+          aria-label="Weersverwachting per dag"
+        >
+          {forecast.days.map((day) => {
+            const date = new Date(`${day.date}T00:00:00Z`)
+            const height = Math.round((day.w_prec_sum_day / maxRain) * 48)
+            return (
+              <li key={day.date} className="text-center text-xs">
+                <span className="sr-only">
+                  {`${formatLongDate(day.date)}: ${formatNumber(day.w_prec_sum_day, 1)} mm neerslag, ${formatNumber(day.w_temp_min_day)} tot ${formatNumber(day.w_temp_max_day)} °C`}
+                </span>
+                <div className="flex flex-col items-center gap-1" aria-hidden>
                   <span className="font-medium capitalize">{weekdayFormatter.format(date)}</span>
                   <span className="text-muted-foreground">{dayFormatter.format(date)}</span>
-                  <div className="flex h-12 w-full items-end justify-center" aria-hidden>
+                  <div className="flex h-12 w-full items-end justify-center">
                     <div
-                      className="bg-chart-3 w-3 rounded-t-[3px]"
+                      className="bg-foreground/45 w-3 rounded-t-[3px]"
                       style={{ height: `${Math.max(height, day.w_prec_sum_day > 0 ? 2 : 0)}px` }}
                     />
                   </div>
-                  <span className="tabular-nums" aria-hidden>
-                    {formatNumber(day.w_prec_sum_day, 1)} mm
-                  </span>
-                  <span className="text-muted-foreground tabular-nums" aria-hidden>
+                  <span className="tabular-nums">{formatNumber(day.w_prec_sum_day, 1)} mm</span>
+                  <span className="text-muted-foreground tabular-nums">
                     {formatNumber(day.w_temp_min_day)}–{formatNumber(day.w_temp_max_day)}°
                   </span>
-                </li>
-              )
-            })}
-          </ol>
-        </div>
+                </div>
+              </li>
+            )
+          })}
+        </ol>
 
         {rainSignals.length > 0 ? (
           <ul className="space-y-2">
@@ -111,7 +110,8 @@ export function WeatherStrip({
                   <span>
                     Rond je {signal.eventType === "harvest" ? "geplande oogst" : "geplande gift"} op{" "}
                     {formatLongDate(signal.eventDate)} valt naar verwachting{" "}
-                    {formatNumber(signal.rainMm, 1)} mm regen. Overweeg te verschuiven.
+                    {formatNumber(signal.rainMm, 1)} mm regen. Overweeg te verschuiven naar een
+                    drogere dag.
                   </span>
                 </span>
                 {onSuggestShift && (canSuggestShift?.(signal) ?? true) ? (

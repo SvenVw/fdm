@@ -1,7 +1,17 @@
 import type { MineralizationUsedInput } from "@nmi-agro/fdm-calculator"
 import type { ReactNode } from "react"
-import { ArrowRight, ChevronDown } from "lucide-react"
+import {
+  ArrowRight,
+  Calculator,
+  ChevronDown,
+  type LucideIcon,
+  Microscope,
+  Sparkles,
+  User,
+} from "lucide-react"
 import { NavLink } from "react-router"
+import { getCultivationColor } from "~/components/custom/cultivation-colors"
+import { FertilizerBadge } from "~/components/custom/fertilizer-badge"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible"
@@ -9,6 +19,51 @@ import { formatLongDate, formatNumber } from "~/lib/mineralization"
 
 /** Name and unit of a soil parameter. */
 export type SoilParameterLabels = Record<string, { name: string; unit: string }>
+
+/** Source of soil values that are estimated rather than measured (NMI BodemSchat). */
+const ESTIMATED_SOURCE = "nl-other-nmi"
+
+type SoilRow = MineralizationUsedInput["soil"][number]
+
+/** Soil values grouped by where they come from: one lab analysis, an estimate, etc. */
+interface SoilGroup {
+  key: string
+  title: string
+  icon: LucideIcon
+  date: string | null
+  rows: SoilRow[]
+}
+
+function groupSoilBySource(soil: SoilRow[], sourceLabels: Record<string, string>): SoilGroup[] {
+  const groups = new Map<string, SoilGroup>()
+  for (const row of soil) {
+    const source = row.source
+    const estimated = source === ESTIMATED_SOURCE
+    const key = `${source ?? ""}|${estimated ? "" : (row.date ?? "")}`
+    let group = groups.get(key)
+    if (!group) {
+      const label = source ? (sourceLabels[source] ?? source) : null
+      group =
+        source === "calculated"
+          ? { key, title: "Berekend", icon: Calculator, date: null, rows: [] }
+          : estimated
+            ? { key, title: `Geschat met ${label}`, icon: Sparkles, date: null, rows: [] }
+            : !source || source === "other"
+              ? { key, title: "Onbekende bron", icon: User, date: row.date, rows: [] }
+              : { key, title: `Gemeten door ${label}`, icon: Microscope, date: row.date, rows: [] }
+      groups.set(key, group)
+    }
+    group.rows.push(row)
+  }
+  // Measured values first, estimates last
+  return [...groups.values()].sort(
+    (a, b) => Number(a.icon === Sparkles) - Number(b.icon === Sparkles),
+  )
+}
+
+function plural(count: number, singular: string, plural: string): string {
+  return `${count} ${count === 1 ? singular : plural}`
+}
 
 function Section({
   title,
@@ -40,76 +95,139 @@ function Section({
 }
 
 /**
- * Shows exactly which data was sent to Dyna, with links to where it can be completed.
+ * Shows exactly which data was used for the calculation, with links to where it can be completed.
  */
 export function UsedInput({
+  id,
+  open,
+  onOpenChange,
   usedInput,
   soilLabels,
+  sourceLabels,
+  fertilizerTypes,
   fieldHref,
   partial,
 }: {
+  id?: string
+  open: boolean
+  onOpenChange: (open: boolean) => void
   usedInput: MineralizationUsedInput
   soilLabels: SoilParameterLabels
+  /** Labels of the soil analysis sources (labs, NMI BodemSchat). */
+  sourceLabels: Record<string, string>
+  /** Fertilizer type per fertilizer (`p_id`), for the icon of each application. */
+  fertilizerTypes: Record<string, string | null>
   /** Base path of the field pages, e.g. `/farm/:id/:calendar/field/:b_id`. */
   fieldHref: string
   partial: boolean
 }) {
   const label = (parameter: string) => soilLabels[parameter]?.name ?? parameter
-  const unit = (parameter: string) => soilLabels[parameter]?.unit ?? ""
+  // Dimensionless parameters such as pH are stored with "-" as unit; that is not shown
+  const unit = (parameter: string) => {
+    const value = soilLabels[parameter]?.unit ?? ""
+    return value === "-" ? "" : value
+  }
+  const skipped = usedInput.skippedApplications.length
+  const soilGroups = groupSoilBySource(usedInput.soil, sourceLabels)
+  const estimatedSoil = usedInput.soil.filter((s) => s.source === ESTIMATED_SOURCE).length
+  const measuredSoil = usedInput.soil.length - estimatedSoil
+  const summary = [
+    usedInput.soil.length === 0
+      ? "geen bodemgegevens"
+      : estimatedSoil === 0
+        ? `bodem: ${measuredSoil} gemeten`
+        : measuredSoil === 0
+          ? `bodem: ${estimatedSoil} geschat`
+          : `bodem: ${measuredSoil} gemeten, ${estimatedSoil} geschat`,
+    plural(usedInput.cultivations.length, "gewas", "gewassen"),
+    plural(usedInput.harvests.length, "oogst", "oogsten"),
+    plural(usedInput.fertilizerApplications.length, "bemesting", "bemestingen"),
+  ].join(" · ")
 
   return (
-    <Collapsible id="gebruikte-gegevens">
-      <CollapsibleTrigger asChild>
-        <Button variant="ghost" size="sm" className="group -ml-2">
-          <ChevronDown
-            className="transition-transform group-data-[state=open]:rotate-180"
-            aria-hidden
-          />
-          Gebruikte gegevens voor de berekening
-        </Button>
+    <Collapsible
+      id={id}
+      open={open}
+      onOpenChange={onOpenChange}
+      className="scroll-mt-4 rounded-xl border"
+    >
+      <CollapsibleTrigger className="group hover:bg-muted/40 focus-visible:ring-ring flex w-full items-center justify-between gap-4 rounded-xl px-4 py-3 text-left focus-visible:ring-2 focus-visible:outline-none">
+        <span className="min-w-0 space-y-0.5">
+          <span className="block text-sm font-semibold">Gebruikte gegevens voor de berekening</span>
+          <span className="text-muted-foreground block text-sm first-letter:uppercase">
+            {summary}
+          </span>
+        </span>
+        <ChevronDown
+          className="text-muted-foreground size-4 shrink-0 transition-transform group-data-[state=open]:rotate-180"
+          aria-hidden
+        />
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="mt-3 grid gap-6 rounded-xl border p-4 md:grid-cols-2">
+        <div className="grid gap-6 border-t p-4 md:grid-cols-2">
           <Section title="Bodem" editHref={`${fieldHref}/soil`} editLabel="Bodemanalyse toevoegen">
-            {usedInput.soil.length > 0 ? (
-              <ul className="space-y-1 text-sm">
-                {usedInput.soil.map((s) => (
-                  <li key={s.parameter} className="flex justify-between gap-3">
-                    <span className="text-muted-foreground">{label(s.parameter)}</span>
-                    <span className="text-right tabular-nums">
-                      {typeof s.value === "number" ? formatNumber(s.value, 2) : s.value}{" "}
-                      {unit(s.parameter)}
-                      {s.date ? (
-                        <span className="text-muted-foreground"> · {formatLongDate(s.date)}</span>
-                      ) : null}
-                    </span>
-                  </li>
+            {soilGroups.length > 0 ? (
+              <div className="space-y-3">
+                {soilGroups.map((group) => (
+                  <div key={group.key} className="space-y-1">
+                    <p className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
+                      <group.icon className="size-3.5 shrink-0" aria-hidden />
+                      {group.title}
+                      {group.date ? <span> · {formatLongDate(group.date)}</span> : null}
+                    </p>
+                    <ul className="space-y-1 text-sm">
+                      {group.rows.map((s) => (
+                        <li key={s.parameter} className="flex justify-between gap-3">
+                          <span className="text-muted-foreground">{label(s.parameter)}</span>
+                          <span className="text-right tabular-nums">
+                            {typeof s.value === "number" ? formatNumber(s.value, 2) : s.value}{" "}
+                            {unit(s.parameter)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
-              </ul>
+              </div>
             ) : (
               <p className="text-muted-foreground text-sm">Geen bodemanalyse bekend.</p>
             )}
+            {estimatedSoil > 0 ? (
+              <p className="text-muted-foreground text-xs">
+                Geschatte waarden zijn afgeleid uit bodemkaarten en landelijke gegevens, niet
+                gemeten op dit perceel. Een eigen bodemanalyse maakt de berekening nauwkeuriger.
+              </p>
+            ) : null}
             {usedInput.missingSoilParameters.length > 0 ? (
               <p className="text-muted-foreground text-xs">
-                Niet gemeten, Dyna gebruikt een schatting:{" "}
+                Niet bekend; het rekenmodel schat zelf:{" "}
                 {usedInput.missingSoilParameters.map(label).join(", ")}.
               </p>
             ) : null}
           </Section>
 
           <Section
-            title="Teelten"
+            title="Gewassen"
             editHref={`${fieldHref}/cultivation`}
-            editLabel="Teelten bekijken"
+            editLabel="Gewassen bekijken"
           >
             <ul className="space-y-1.5 text-sm">
               {usedInput.cultivations.map((c) => (
                 <li key={c.b_lu} className="flex flex-wrap items-center justify-between gap-2">
                   <span className="flex items-center gap-2">
-                    {c.b_lu_name ?? c.b_lu_catalogue}
-                    <Badge variant="outline" className="font-normal">
-                      {c.role === "main" ? "Hoofdteelt" : "Na hoofdteelt"}
+                    {/* Same crop badge as the crop rotation and field tables */}
+                    <Badge
+                      variant="default"
+                      className="text-white"
+                      style={{
+                        backgroundColor: getCultivationColor(c.b_lu_croprotation ?? undefined),
+                      }}
+                    >
+                      {c.b_lu_name ?? c.b_lu_catalogue}
                     </Badge>
+                    <span className="text-muted-foreground text-xs">
+                      {c.role === "main" ? "Hoofdteelt" : "Na hoofdteelt"}
+                    </span>
                   </span>
                   <span className="text-muted-foreground tabular-nums">
                     {formatLongDate(c.start)} – {formatLongDate(c.end)}
@@ -135,9 +253,11 @@ export function UsedInput({
                   <li key={`${h.b_lu}-${h.date}`} className="flex justify-between gap-3">
                     <span className="flex items-center gap-2">
                       {formatLongDate(h.date)}
-                      <Badge variant={h.planned ? "outline" : "secondary"} className="font-normal">
-                        {h.planned ? "Gepland" : "Gemeten"}
-                      </Badge>
+                      {h.planned ? (
+                        <Badge variant="outline" className="font-normal">
+                          Gepland
+                        </Badge>
+                      ) : null}
                     </span>
                     <span className="text-muted-foreground tabular-nums">
                       {h.b_lu_yield !== null
@@ -160,9 +280,16 @@ export function UsedInput({
             {usedInput.fertilizerApplications.length > 0 ? (
               <ul className="space-y-1 text-sm">
                 {usedInput.fertilizerApplications.map((a) => (
-                  <li key={a.p_app_id} className="flex justify-between gap-3">
-                    <span>
-                      {formatLongDate(a.date)} · {a.p_name_nl ?? "Meststof"}
+                  <li
+                    key={a.p_app_id}
+                    className="flex flex-wrap items-center justify-between gap-2"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="tabular-nums">{formatLongDate(a.date)}</span>
+                      {/* Same fertilizer badge as the crop rotation table */}
+                      <FertilizerBadge variant="outline" showIcon p_type={fertilizerTypes[a.p_id]}>
+                        {a.p_name_nl ?? "Meststof"}
+                      </FertilizerBadge>
                     </span>
                     <span className="text-muted-foreground text-right tabular-nums">
                       {a.amount !== null ? `${formatNumber(a.amount, 1)} ${a.unit}` : "–"}
@@ -176,8 +303,10 @@ export function UsedInput({
             )}
             {usedInput.skippedApplications.length > 0 ? (
               <p className="text-muted-foreground text-xs">
-                {usedInput.skippedApplications.length} bemesting(en) niet meegenomen: de meststof is
-                niet bekend op dit bedrijf.
+                {skipped === 1
+                  ? "1 bemesting is niet meegenomen"
+                  : `${skipped} bemestingen zijn niet meegenomen`}
+                : de meststof is niet bekend op dit bedrijf.
               </p>
             ) : null}
           </Section>

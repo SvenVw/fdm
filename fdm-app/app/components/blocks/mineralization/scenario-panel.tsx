@@ -1,5 +1,6 @@
 import type { MineralizationKpis, MineralizationScenario } from "@nmi-agro/fdm-calculator"
-import { Plus, Trash2 } from "lucide-react"
+import { CircleAlert, Plus, Trash2 } from "lucide-react"
+import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Input } from "~/components/ui/input"
@@ -12,15 +13,22 @@ import {
   SelectValue,
 } from "~/components/ui/select"
 import { Spinner } from "~/components/ui/spinner"
-import { formatKgN, type ScenarioFertilizerOption } from "~/lib/mineralization"
+import {
+  formatKgN,
+  formatNumber,
+  formatShortDate,
+  type ScenarioFertilizerOption,
+} from "~/lib/mineralization"
 import { cn } from "~/lib/utils"
+
+type ScenarioApplication = MineralizationScenario["fertilizerApplications"][number]
 
 /** Change to a scenario. */
 export type ScenarioAction =
   | {
       type: "update_application"
       index: number
-      patch: Partial<MineralizationScenario["fertilizerApplications"][number]>
+      patch: Partial<ScenarioApplication>
     }
   | { type: "add_application"; date: string; option: ScenarioFertilizerOption | undefined }
   | { type: "remove_application"; index: number }
@@ -77,26 +85,150 @@ export function scenarioReducer(
   }
 }
 
-function Delta({ label, value }: { label: string; value: number | null }) {
+/** How an application of the scenario differs from the plan. */
+export type ApplicationChange = "new" | "changed" | null
+
+/** Compares an application of the scenario with the same application in the plan. */
+export function getApplicationChange(
+  app: ScenarioApplication,
+  base: MineralizationScenario,
+): ApplicationChange {
+  if (!app.p_app_id) return "new"
+  const original = base.fertilizerApplications.find((a) => a.p_app_id === app.p_app_id)
+  if (!original) return "new"
+  return original.p_app_date !== app.p_app_date ||
+    original.p_id !== app.p_id ||
+    original.p_app_amount_display !== app.p_app_amount_display ||
+    original.p_app_method !== app.p_app_method
+    ? "changed"
+    : null
+}
+
+/**
+ * Lists in Dutch what saving the scenario changes in the fertilization plan, e.g.
+ * "Verschoven: KAS van 3 apr naar 10 apr".
+ */
+export function describeScenarioChanges(
+  base: MineralizationScenario,
+  scenario: MineralizationScenario,
+  fertilizerOptions: ScenarioFertilizerOption[],
+): string[] {
+  const optionById = new Map(fertilizerOptions.map((o) => [o.p_id, o]))
+  const name = (p_id: string) => optionById.get(p_id)?.p_name_nl ?? "Meststof"
+  const amount = (app: ScenarioApplication) =>
+    `${formatNumber(app.p_app_amount_display, 1)} ${optionById.get(app.p_id)?.p_app_amount_unit ?? "kg/ha"}`
+  const changes: string[] = []
+
+  for (const original of base.fertilizerApplications) {
+    const app = scenario.fertilizerApplications.find((a) => a.p_app_id === original.p_app_id)
+    if (!app) {
+      changes.push(`Verwijderd: ${name(original.p_id)} van ${formatShortDate(original.p_app_date)}`)
+      continue
+    }
+    if (app.p_app_date !== original.p_app_date) {
+      changes.push(
+        `Verschoven: ${name(app.p_id)} van ${formatShortDate(original.p_app_date)} naar ${formatShortDate(app.p_app_date)}`,
+      )
+    }
+    if (app.p_id !== original.p_id) {
+      changes.push(`Andere meststof: ${name(original.p_id)} wordt ${name(app.p_id)}`)
+    }
+    if (app.p_app_amount_display !== original.p_app_amount_display) {
+      changes.push(`Hoeveelheid ${name(app.p_id)}: ${amount(original)} wordt ${amount(app)}`)
+    }
+    if (app.p_app_method !== original.p_app_method && app.p_id === original.p_id) {
+      changes.push(`Andere toediening: ${name(app.p_id)}`)
+    }
+  }
+  for (const app of scenario.fertilizerApplications) {
+    if (getApplicationChange(app, base) === "new") {
+      changes.push(`Nieuw: ${name(app.p_id)}, ${amount(app)} op ${formatShortDate(app.p_app_date)}`)
+    }
+  }
+  if (base.harvest && scenario.harvest) {
+    if (base.harvest.b_date_harvest !== scenario.harvest.b_date_harvest) {
+      changes.push(
+        `Oogst verschoven van ${formatShortDate(base.harvest.b_date_harvest)} naar ${formatShortDate(scenario.harvest.b_date_harvest)}`,
+      )
+    }
+    if (base.harvest.b_lu_yield !== scenario.harvest.b_lu_yield) {
+      changes.push(
+        scenario.harvest.b_lu_yield === undefined
+          ? "Opbrengst verwijderd"
+          : `Opbrengst wordt ${formatNumber(scenario.harvest.b_lu_yield)} kg DS/ha`,
+      )
+    }
+  }
+  return changes
+}
+
+/** Whether the scenario changes which fertilizer, or how much of it, is applied. */
+function changesFertilization(base: MineralizationScenario, scenario: MineralizationScenario) {
+  const key = (apps: ScenarioApplication[]) =>
+    apps
+      .map((a) => JSON.stringify([a.p_app_id ?? "", a.p_id, a.p_app_amount_display]))
+      .sort((x, y) => x.localeCompare(y))
+      .join("|")
+  return key(base.fertilizerApplications) !== key(scenario.fertilizerApplications)
+}
+
+/** Effect of a scenario on the key figures, relative to the plan. */
+export function getScenarioDeltas(current: MineralizationKpis, result: MineralizationKpis) {
+  return {
+    residualNAtHarvest:
+      result.residualNAtHarvest !== null && current.residualNAtHarvest !== null
+        ? result.residualNAtHarvest - current.residualNAtHarvest
+        : null,
+    totalUptake: result.totalUptake - current.totalUptake,
+    totalLeaching: result.totalLeaching - current.totalLeaching,
+  }
+}
+
+function formatDelta(value: number | null): string {
   const rounded = value === null ? null : Math.round(value)
+  if (rounded === null) return "–"
+  return `${rounded > 0 ? "+" : ""}${formatKgN(rounded)}`
+}
+
+/** The effect of a scenario as three compact figures. */
+export function ScenarioDeltas({
+  current,
+  result,
+  className,
+}: {
+  current: MineralizationKpis
+  result: MineralizationKpis
+  className?: string
+}) {
+  const deltas = getScenarioDeltas(current, result)
+  const items = [
+    { label: "Beschikbaar bij oogst", value: deltas.residualNAtHarvest },
+    { label: "N-opname", value: deltas.totalUptake },
+    { label: "Uitspoeling", value: deltas.totalLeaching },
+  ]
   return (
-    <div>
-      <dt className="text-muted-foreground text-xs">{label}</dt>
-      <dd className="font-semibold tabular-nums">
-        {rounded === null ? "–" : `${rounded > 0 ? "+" : ""}${formatKgN(rounded)}`}
-      </dd>
-    </div>
+    <dl className={cn("grid grid-cols-3 gap-4", className)}>
+      {items.map((item) => (
+        <div key={item.label}>
+          <dt className="text-muted-foreground text-xs">{item.label}</dt>
+          <dd className="font-semibold tabular-nums">{formatDelta(item.value)}</dd>
+        </div>
+      ))}
+    </dl>
   )
 }
 
 /**
- * Edits a what-if scenario of fertilizer applications and the harvest, shows its effect and lets
- * the user save it to the fertilization plan or discard it.
+ * Edits a what-if scenario of fertilizer applications and the harvest, shows its effect and what
+ * saving changes in the fertilization plan, and lets the user save or discard it.
  */
 export function ScenarioPanel({
+  id,
+  base,
   scenario,
   dispatch,
   year,
+  newApplicationDate,
   fertilizerOptions,
   methodLabels,
   dirty,
@@ -107,10 +239,16 @@ export function ScenarioPanel({
   saving,
   onSave,
   onDiscard,
+  onRetry,
 }: {
+  id?: string
+  /** The current plan, to show what the scenario changes. */
+  base: MineralizationScenario
   scenario: MineralizationScenario
   dispatch: (action: ScenarioAction) => void
   year: number
+  /** Date of a newly added application. */
+  newApplicationDate: string
   fertilizerOptions: ScenarioFertilizerOption[]
   methodLabels: Record<string, string>
   dirty: boolean
@@ -121,13 +259,26 @@ export function ScenarioPanel({
   saving: boolean
   onSave: () => void
   onDiscard: () => void
+  onRetry: () => void
 }) {
   const optionById = new Map(fertilizerOptions.map((o) => [o.p_id, o]))
   const min = `${year}-01-01`
   const max = `${year}-12-31`
+  // Only applications the user added or changed are checked; the plan itself is left as it is
+  const missingAmount = scenario.fertilizerApplications.some(
+    (app) => getApplicationChange(app, base) !== null && !(app.p_app_amount_display > 0),
+  )
+  const changes = dirty ? describeScenarioChanges(base, scenario, fertilizerOptions) : []
+  const deltas = result ? getScenarioDeltas(current, result) : null
+  const noEffect =
+    deltas !== null &&
+    changesFertilization(base, scenario) &&
+    Math.abs(deltas.totalUptake) < 1 &&
+    Math.abs(deltas.totalLeaching) < 1 &&
+    Math.abs(deltas.residualNAtHarvest ?? 0) < 1
 
   return (
-    <Card>
+    <Card id={id} tabIndex={-1} className="scroll-mt-4 focus-visible:outline-none">
       <CardHeader>
         <CardTitle>Scenario: wat als…</CardTitle>
         <CardDescription>
@@ -147,18 +298,28 @@ export function ScenarioPanel({
               option && option.p_app_method_options.length > 0
                 ? option.p_app_method_options
                 : Object.keys(methodLabels)
-            const id = `scenario-app-${index}`
+            const rowId = `scenario-app-${index}`
+            const change = getApplicationChange(app, base)
+            const amountMissing = change !== null && !(app.p_app_amount_display > 0)
             return (
               <div
                 key={app.p_app_id ?? `new-${index}`}
-                className="grid gap-2 rounded-lg border p-3 sm:grid-cols-2 lg:grid-cols-[9rem_minmax(0,1fr)_9rem_minmax(0,1fr)_auto] lg:items-end"
+                className={cn(
+                  "grid gap-2 rounded-lg border p-3 sm:grid-cols-2 lg:grid-cols-[9rem_minmax(0,1fr)_9rem_minmax(0,1fr)_auto] lg:items-start",
+                  change !== null && "border-foreground/30 bg-muted/40",
+                )}
               >
                 <div className="grid gap-1">
-                  <Label htmlFor={`${id}-date`} className="text-xs">
+                  <Label htmlFor={`${rowId}-date`} className="text-xs">
                     Datum
+                    {change ? (
+                      <Badge variant="outline" className="ml-1 px-1.5 py-0 text-xs font-normal">
+                        {change === "new" ? "Nieuw" : "Gewijzigd"}
+                      </Badge>
+                    ) : null}
                   </Label>
                   <Input
-                    id={`${id}-date`}
+                    id={`${rowId}-date`}
                     type="date"
                     min={min}
                     max={max}
@@ -174,7 +335,7 @@ export function ScenarioPanel({
                   />
                 </div>
                 <div className="grid gap-1">
-                  <Label htmlFor={`${id}-product`} className="text-xs">
+                  <Label htmlFor={`${rowId}-product`} className="text-xs">
                     Meststof
                   </Label>
                   <Select
@@ -195,7 +356,7 @@ export function ScenarioPanel({
                       })
                     }}
                   >
-                    <SelectTrigger id={`${id}-product`} className="w-full">
+                    <SelectTrigger id={`${rowId}-product`} className="w-full">
                       <SelectValue placeholder="Kies een meststof" />
                     </SelectTrigger>
                     <SelectContent>
@@ -208,18 +369,24 @@ export function ScenarioPanel({
                   </Select>
                 </div>
                 <div className="grid gap-1">
-                  <Label htmlFor={`${id}-amount`} className="text-xs">
+                  <Label htmlFor={`${rowId}-amount`} className="text-xs">
                     Hoeveelheid ({option?.p_app_amount_unit ?? "kg/ha"})
                   </Label>
                   <Input
-                    id={`${id}-amount`}
+                    id={`${rowId}-amount`}
                     type="number"
                     min={0}
                     step="any"
                     inputMode="decimal"
+                    aria-invalid={amountMissing || undefined}
+                    aria-describedby={amountMissing ? `${rowId}-amount-error` : undefined}
                     value={
-                      Number.isFinite(app.p_app_amount_display) ? app.p_app_amount_display : ""
+                      Number.isFinite(app.p_app_amount_display) &&
+                      (app.p_app_amount_display > 0 || change === null)
+                        ? app.p_app_amount_display
+                        : ""
                     }
+                    placeholder="0"
                     onChange={(e) =>
                       dispatch({
                         type: "update_application",
@@ -228,9 +395,14 @@ export function ScenarioPanel({
                       })
                     }
                   />
+                  {amountMissing ? (
+                    <p id={`${rowId}-amount-error`} className="text-destructive text-xs">
+                      Vul een hoeveelheid in.
+                    </p>
+                  ) : null}
                 </div>
                 <div className="grid gap-1">
-                  <Label htmlFor={`${id}-method`} className="text-xs">
+                  <Label htmlFor={`${rowId}-method`} className="text-xs">
                     Toediening
                   </Label>
                   <Select
@@ -239,7 +411,7 @@ export function ScenarioPanel({
                       dispatch({ type: "update_application", index, patch: { p_app_method } })
                     }
                   >
-                    <SelectTrigger id={`${id}-method`} className="w-full">
+                    <SelectTrigger id={`${rowId}-method`} className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -255,8 +427,8 @@ export function ScenarioPanel({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="justify-self-end"
-                  aria-label="Gift verwijderen"
+                  className="justify-self-end lg:mt-5"
+                  aria-label={`Gift van ${formatShortDate(app.p_app_date)} verwijderen`}
                   onClick={() => dispatch({ type: "remove_application", index })}
                 >
                   <Trash2 aria-hidden />
@@ -272,7 +444,7 @@ export function ScenarioPanel({
             onClick={() =>
               dispatch({
                 type: "add_application",
-                date: `${year}-04-01`,
+                date: newApplicationDate,
                 option: fertilizerOptions[0],
               })
             }
@@ -303,21 +475,23 @@ export function ScenarioPanel({
             </div>
             <div className="grid gap-1">
               <Label htmlFor="scenario-harvest-yield" className="text-xs">
-                Verwachte opbrengst (kg DS/ha)
+                Opbrengst (kg DS/ha)
               </Label>
               <Input
                 id="scenario-harvest-yield"
                 type="number"
                 min={0}
-                step={100}
-                inputMode="numeric"
+                step="any"
+                inputMode="decimal"
                 value={scenario.harvest.b_lu_yield ?? ""}
                 onChange={(e) =>
                   dispatch({
                     type: "update_harvest",
                     patch: {
                       b_lu_yield:
-                        e.target.value === "" ? undefined : Math.max(0, Number(e.target.value)),
+                        e.target.value === ""
+                          ? undefined
+                          : Math.max(0, Number(e.target.value) || 0),
                     },
                   })
                 }
@@ -327,7 +501,7 @@ export function ScenarioPanel({
         ) : null}
 
         <div
-          className={cn("space-y-3 border-t pt-4", !dirty && "text-muted-foreground")}
+          className={cn("space-y-4 border-t pt-4", !dirty && "text-muted-foreground")}
           aria-live="polite"
         >
           {!dirty ? (
@@ -337,26 +511,43 @@ export function ScenarioPanel({
               <Spinner /> Scenario wordt berekend…
             </p>
           ) : error ? (
-            <p className="text-destructive text-sm">{error}</p>
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+              <p className="text-destructive flex items-center gap-1.5">
+                <CircleAlert className="size-4 shrink-0" aria-hidden />
+                {error}
+              </p>
+              <Button type="button" variant="outline" size="sm" onClick={onRetry}>
+                Opnieuw berekenen
+              </Button>
+            </div>
           ) : result ? (
-            <dl className="grid grid-cols-3 gap-4">
-              <Delta
-                label="Beschikbaar bij oogst"
-                value={
-                  result.residualNAtHarvest !== null && current.residualNAtHarvest !== null
-                    ? result.residualNAtHarvest - current.residualNAtHarvest
-                    : null
-                }
-              />
-              <Delta label="N-opname" value={result.totalUptake - current.totalUptake} />
-              <Delta label="Uitspoeling" value={result.totalLeaching - current.totalLeaching} />
-            </dl>
+            <ScenarioDeltas current={current} result={result} />
           ) : null}
-          <div className="flex flex-wrap gap-2">
+
+          {noEffect ? (
+            <p className="bg-muted/60 flex gap-2 rounded-md p-3 text-sm">
+              <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
+              De berekening laat vrijwel geen verschil zien, terwijl je de bemesting hebt gewijzigd.
+              Controleer het stikstofgehalte van de meststof voordat je opslaat.
+            </p>
+          ) : null}
+
+          {changes.length > 0 ? (
+            <div className="space-y-1.5">
+              <p className="text-sm font-medium">Dit verandert in je bemestingsplan:</p>
+              <ul className="text-muted-foreground list-disc space-y-0.5 pl-5 text-sm">
+                {changes.map((change) => (
+                  <li key={change}>{change}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"
               onClick={onSave}
-              disabled={!dirty || pending || !!error || !result || saving}
+              disabled={!dirty || pending || !!error || !result || saving || missingAmount}
             >
               {saving ? <Spinner /> : null}
               Opslaan in bemestingsplan
@@ -364,6 +555,11 @@ export function ScenarioPanel({
             <Button type="button" variant="ghost" onClick={onDiscard} disabled={!dirty || saving}>
               Verwerpen
             </Button>
+            {dirty && missingAmount ? (
+              <p className="text-muted-foreground text-xs">
+                Vul eerst bij elke gift een hoeveelheid in.
+              </p>
+            ) : null}
           </div>
         </div>
       </CardContent>

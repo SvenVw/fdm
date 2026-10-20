@@ -5,15 +5,20 @@ import { PHASE_LABELS } from "~/lib/mineralization"
 const PHASES: SeasonPhase[] = ["planning", "growing", "evaluation"]
 
 /**
- * Switches between the three moments of the season. The phase that matches today is marked.
+ * Switches between the three moments of the season. The phase of today is marked "(nu)", but only
+ * in the current year; phases that do not apply can be disabled with an explanation.
  */
 export function PhaseSelector({
   value,
-  defaultPhase,
+  currentPhase,
+  disabled = {},
   onChange,
 }: {
   value: SeasonPhase
-  defaultPhase: SeasonPhase
+  /** Phase that matches today; `null` when the selected year is not the current year. */
+  currentPhase: SeasonPhase | null
+  /** Phases that cannot be chosen, with the reason shown as hint. */
+  disabled?: Partial<Record<SeasonPhase, string>>
   onChange: (phase: SeasonPhase) => void
 }) {
   return (
@@ -27,10 +32,16 @@ export function PhaseSelector({
       aria-label="Moment in het seizoen"
     >
       {PHASES.map((phase) => (
-        <ToggleGroupItem key={phase} value={phase} className="px-3">
+        <ToggleGroupItem
+          key={phase}
+          value={phase}
+          disabled={disabled[phase] !== undefined}
+          title={disabled[phase]}
+          className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground px-3"
+        >
           {PHASE_LABELS[phase]}
-          {phase === defaultPhase ? (
-            <span className="text-muted-foreground ml-1 text-xs font-normal">(nu)</span>
+          {phase === currentPhase ? (
+            <span className="ml-1 text-xs font-normal opacity-70">(nu)</span>
           ) : null}
         </ToggleGroupItem>
       ))}

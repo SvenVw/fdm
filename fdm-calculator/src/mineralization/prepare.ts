@@ -116,6 +116,8 @@ export interface MineralizationUsedInput {
     b_lu: string
     b_lu_name: string | null
     b_lu_catalogue: string
+    /** Crop rotation group, e.g. `grass` or `cereal`; used to color the crop in the app. */
+    b_lu_croprotation: string | null
     start: string
     end: string
     role: "main" | "after"
@@ -397,6 +399,7 @@ export function prepareMineralizationInput(
       b_lu: cultivation.b_lu,
       b_lu_name: cultivation.b_lu_name,
       b_lu_catalogue,
+      b_lu_croprotation: cultivation.b_lu_croprotation ?? null,
       start,
       end,
       role: cultivation === main ? "main" : "after",

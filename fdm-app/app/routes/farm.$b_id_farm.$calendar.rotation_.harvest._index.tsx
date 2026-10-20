@@ -67,7 +67,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { modifySearchParams } from "~/lib/url-utils"
+import { isOfOrigin, modifySearchParams } from "~/lib/url-utils"
 
 export const meta: MetaFunction<typeof loader> = ({ loaderData }) => {
   const term = getHarvestTerm(
@@ -83,6 +83,15 @@ export const meta: MetaFunction<typeof loader> = ({ loaderData }) => {
       content: "",
     },
   ]
+}
+
+/**
+ * Page to return to after saving or cancelling, when another page (such as Mineralisatie) opened
+ * this form; only paths within the app are accepted.
+ */
+function getReturnUrl(url: URL): string | null {
+  const returnUrl = url.searchParams.get("returnUrl")
+  return returnUrl?.startsWith("/") && isOfOrigin(returnUrl, url.origin) ? returnUrl : null
 }
 
 export async function loader({ request, params, url }: LoaderFunctionArgs) {
@@ -316,6 +325,7 @@ export async function loader({ request, params, url }: LoaderFunctionArgs) {
       b_lu_end: b_lu_end,
       b_date_harvest_default: b_date_harvest_default,
       create: url.searchParams.has("create"),
+      returnUrl: getReturnUrl(url),
     }
   } catch (error) {
     throw handleLoaderError(error)
@@ -442,15 +452,18 @@ export default function FarmRotationHarvestAddIndex() {
     setShowOverwriteWarning(false)
   }
 
-  const backlink = loaderData.create
-    ? `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`
-    : `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`
+  const backlink =
+    loaderData.returnUrl ??
+    (loaderData.create
+      ? `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`
+      : `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`)
+  const backlinkLabel = loaderData.returnUrl ? "Terug" : "Terug naar bouwplan"
   return (
     <SidebarInset>
       <Header
         action={{
           to: backlink,
-          label: "Terug naar bouwplan",
+          label: backlinkLabel,
           disabled: false,
         }}
       >
@@ -531,7 +544,7 @@ export default function FarmRotationHarvestAddIndex() {
                         filtermogelijkheden.
                       </p>
                       <Button asChild variant="link" className="mt-4">
-                        <NavLink to={backlink}>Terug naar bouwplan</NavLink>
+                        <NavLink to={backlink}>{backlinkLabel}</NavLink>
                       </Button>
                     </div>
                   )}
@@ -752,9 +765,11 @@ export async function action({ request, params, url }: ActionFunctionArgs) {
       return dataWithError(null, "Dit gewas is niet oogstbaar.")
     }
 
-    const redirectURL = url.searchParams.has("create")
-      ? `/farm/create/${b_id_farm}/${calendar}/rotation`
-      : `/farm/${b_id_farm}/${calendar}/rotation`
+    const redirectURL =
+      getReturnUrl(url) ??
+      (url.searchParams.has("create")
+        ? `/farm/create/${b_id_farm}/${calendar}/rotation`
+        : `/farm/${b_id_farm}/${calendar}/rotation`)
 
     const termCapitalizedSingular = getHarvestTerm(
       targetCultivation.b_lu_croprotation,

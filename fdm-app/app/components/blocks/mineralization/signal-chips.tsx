@@ -43,7 +43,8 @@ export function SignalChips({ items, className }: { items: AttentionItem[]; clas
               variant="outline"
               className={cn(
                 "gap-1 font-normal",
-                urgent && "border-destructive/40 text-destructive dark:text-red-400",
+                // red-700 instead of the destructive token: small text needs 4.5:1 contrast
+                urgent && "border-red-700/30 text-red-700 dark:border-red-400/40 dark:text-red-400",
               )}
             >
               <Icon className="size-3.5 shrink-0" aria-hidden />

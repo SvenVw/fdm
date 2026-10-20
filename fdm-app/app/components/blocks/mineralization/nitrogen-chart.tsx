@@ -4,16 +4,7 @@ import type {
   SeasonPhase,
   WeatherForecastDay,
 } from "@nmi-agro/fdm-calculator"
-import {
-  ChevronDown,
-  CloudRain,
-  Droplet,
-  type LucideIcon,
-  Package,
-  Shovel,
-  Sprout,
-  Wheat,
-} from "lucide-react"
+import { ChevronDown, CloudRain, type LucideIcon, Shovel, Sprout, Wheat } from "lucide-react"
 import { useState } from "react"
 import {
   Area,
@@ -27,6 +18,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
+import { FertilizerIcon } from "~/components/custom/fertilizer-icon"
 import { Button } from "~/components/ui/button"
 import { type ChartConfig, ChartContainer } from "~/components/ui/chart"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible"
@@ -58,6 +50,17 @@ const IN_SEASON_DAYS_AHEAD = 14
 const FUTURE_DASH = "6 4"
 /** Dash pattern for the scenario; dotted so it differs from the future dash. */
 const SCENARIO_DASH = "1 4"
+/** Width of an event icon on the lane plus a small gap, in pixels. */
+const LANE_ICON_SPACING_PX = 28
+/** Leaching below this amount over the whole window is shown as text instead of a chart. */
+const LEACHING_NEGLIGIBLE_KG = 0.5
+
+/** Height of one row of the event lane: an icon of 24 px and a gap. */
+const LANE_ROW_PX = 28
+const LANE_ICON_PX = 24
+
+/** Event on the lane; fertilizer events carry the fertilizer type for their icon. */
+export type ChartEvent = MineralizationEvent & { p_type?: string | null }
 
 type SeriesKey = "b_nw" | "b_n_uptake" | "b_n_available"
 const SERIES_KEYS: SeriesKey[] = ["b_nw", "b_n_uptake", "b_n_available"]
@@ -67,7 +70,8 @@ const chartConfig = {
   b_n_uptake: { label: "N-opname", color: "var(--chart-2)" },
   b_n_available: { label: "Beschikbare N", color: "var(--chart-5)" },
   b_no3_leach: { label: "Nitraatuitspoeling", color: "var(--chart-1)" },
-  w_prec_sum_day: { label: "Neerslag", color: "var(--chart-3)" },
+  // Precipitation is context, not a nitrogen flow: neutral, so it never reads as N-aanbod
+  w_prec_sum_day: { label: "Neerslag", color: "var(--color-muted-foreground)" },
 } satisfies ChartConfig
 
 type ValueKey = SeriesKey | "b_no3_leach"
@@ -140,17 +144,24 @@ function buildTicks(from: number, to: number): number[] {
 
 const monthFormatter = new Intl.DateTimeFormat("nl-NL", { month: "short", timeZone: "UTC" })
 
-function getEventIcon(event: MineralizationEvent): LucideIcon {
-  switch (event.type) {
-    case "sowing":
-      return Sprout
-    case "harvest":
-      return Wheat
-    case "cultivation_end":
-      return Shovel
-    case "fertilizer":
-      return event.fertilizerKind === "mineral" ? Package : Droplet
+const CROP_EVENT_ICONS: Record<Exclude<MineralizationEvent["type"], "fertilizer">, LucideIcon> = {
+  sowing: Sprout,
+  harvest: Wheat,
+  cultivation_end: Shovel,
+}
+
+/** Icon of an event; fertilizers use the same shapes and colors as the fertilizer lists. */
+function EventIcon({ event }: { event: ChartEvent }) {
+  if (event.type === "fertilizer") {
+    return (
+      <FertilizerIcon
+        p_type={event.p_type ?? (event.fertilizerKind === "mineral" ? "mineral" : null)}
+        className="size-3 shrink-0"
+      />
+    )
   }
+  const Icon = CROP_EVENT_ICONS[event.type]
+  return <Icon className="size-3.5" aria-hidden />
 }
 
 function describeEvent(event: MineralizationEvent): string {
@@ -225,7 +236,9 @@ export interface NitrogenChartProps {
   series: DynaV2DailyPoint[]
   /** Simulation of a scenario, drawn dotted. */
   scenarioSeries?: DynaV2DailyPoint[]
-  events: MineralizationEvent[]
+  events: ChartEvent[]
+  /** Applications that only exist in the scenario (new or moved), drawn with a dotted border. */
+  scenarioEvents?: ChartEvent[]
   /** Selected calendar year. */
   year: number
   /** Today (`YYYY-MM-DD`). */
@@ -240,13 +253,14 @@ export interface NitrogenChartProps {
 
 /**
  * Interactive season chart: nitrogen supply, uptake and available nitrogen, with nitrate leaching
- * and precipitation in synchronised panels below and the field events on a lane above. Days
- * after today are dashed; a scenario is dotted.
+ * (and, in the short window, precipitation) in synchronised panels below and the field events on
+ * a lane above. Days after today are dashed; a scenario is dotted.
  */
 export function NitrogenChart({
   series,
   scenarioSeries,
   events,
+  scenarioEvents = [],
   year,
   today,
   phase,
@@ -254,6 +268,16 @@ export function NitrogenChart({
   rainEventDates = [],
 }: NitrogenChartProps) {
   const [hidden, setHidden] = useState<Set<SeriesKey>>(new Set())
+  const [laneWidth, setLaneWidth] = useState(0)
+  // Measures the lane, so overlapping icons can be detected in pixels at every screen width
+  const laneRef = (node: HTMLUListElement | null) => {
+    if (!node) return
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) setLaneWidth(entry.contentRect.width)
+    })
+    observer.observe(node)
+    return () => observer.disconnect()
+  }
   const hasScenario = !!scenarioSeries
 
   const todayInYear = today.startsWith(`${year}-`)
@@ -264,27 +288,48 @@ export function NitrogenChart({
   const cut = todayInYear ? today : today > `${year}-12-31` ? "9999-12-31" : "0000-01-01"
 
   const rows = buildRows(series, scenarioSeries, fromDate, toDate, cut)
+  const lastRowT = rows.at(-1)?.t
   const from = toTime(fromDate)
-  const to = toTime(toDate)
+  // In the short window, stop the axis where the simulation stops instead of showing empty days
+  const to =
+    inSeason && lastRowT !== undefined ? Math.min(toTime(toDate), lastRowT) : toTime(toDate)
+  const seriesEndT = lastRowT ?? to
   const span = Math.max(to - from, DAY_MS)
   const ticks = buildTicks(from, to)
   const shortWindow = to - from <= 70 * DAY_MS
   const todayT = todayInYear ? toTime(today) : null
   const forecastEnd = forecastDays.at(-1)?.date
   const forecastEndT = forecastEnd ? toTime(forecastEnd) : null
-  const rainRows = forecastDays
-    .filter((d) => d.date >= fromDate && d.date <= toDate)
-    .map((d) => ({ t: toTime(d.date), date: d.date, w_prec_sum_day: d.w_prec_sum_day }))
+  // Daily rain bars are only readable in the short window; the full year shows them in the strip
+  const rainRows = shortWindow
+    ? forecastDays
+        .filter((d) => d.date >= fromDate && d.date <= toDate)
+        .map((d) => ({ t: toTime(d.date), date: d.date, w_prec_sum_day: d.w_prec_sum_day }))
+    : []
+  const maxLeaching = Math.max(
+    0,
+    ...rows.map((r) => Math.max(r.values.b_no3_leach ?? 0, r.scenario.b_no3_leach ?? 0)),
+  )
 
-  // Stack events that would overlap on the lane
-  const laneEvents = events
-    .map((event) => ({ event, t: toTime(event.date) }))
+  // Stack events that would overlap on the lane, in date order so stacks read left to right
+  const laneEvents = [
+    ...events.map((event) => ({ event, scenario: false })),
+    ...scenarioEvents.map((event) => ({ event, scenario: true })),
+  ]
+    .map((item) => ({ ...item, t: toTime(item.event.date) }))
     .filter(({ t }) => t >= from && t <= to)
-    .map(({ event, t }) => ({ event, left: ((t - from) / span) * 100 }))
-  const placed: { event: MineralizationEvent; left: number; row: number }[] = []
+    .sort((a, b) => a.t - b.t)
+    .map(({ t, ...item }) => ({ ...item, left: ((t - from) / span) * 100 }))
+  const minGap = laneWidth > 0 ? (LANE_ICON_SPACING_PX / laneWidth) * 100 : 2.5
+  const placed: {
+    event: ChartEvent
+    scenario: boolean
+    left: number
+    row: number
+  }[] = []
   for (const item of laneEvents) {
     let row = 0
-    while (placed.some((p) => p.row === row && Math.abs(p.left - item.left) < 2.5)) row++
+    while (placed.some((p) => p.row === row && Math.abs(p.left - item.left) < minGap)) row++
     placed.push({ ...item, row })
   }
   const laneRows = Math.max(1, ...placed.map((p) => p.row + 1))
@@ -314,37 +359,53 @@ export function NitrogenChart({
       allowDataOverflow
     />
   )
-  const zones = (
+  // Zones stop where the simulation stops, so no shaded block is drawn over empty days
+  const zoneEnd = Math.min(to, seriesEndT)
+  const forecastZoneEnd = forecastEndT !== null ? Math.min(forecastEndT, zoneEnd) : null
+  const climateZoneStart = forecastZoneEnd ?? todayT
+  const zoneLabel = (value: string) => ({
+    value,
+    position: "insideTopLeft" as const,
+    fontSize: 11,
+    fill: "var(--color-muted-foreground)",
+  })
+  const zones = (labelled: boolean) => (
     <>
-      {todayT !== null && forecastEndT !== null && forecastEndT > todayT ? (
+      {todayT !== null && forecastZoneEnd !== null && forecastZoneEnd > todayT ? (
         <ReferenceArea
           x1={todayT}
-          x2={Math.min(forecastEndT, to)}
-          fill="var(--muted-foreground)"
-          fillOpacity={0.12}
+          x2={forecastZoneEnd}
+          fill="var(--color-muted-foreground)"
+          fillOpacity={0.1}
           ifOverflow="hidden"
+          label={labelled && shortWindow ? zoneLabel("Weersverwachting") : undefined}
         />
       ) : null}
-      {todayT !== null && (forecastEndT ?? todayT) < to ? (
+      {todayT !== null && climateZoneStart !== null && climateZoneStart < zoneEnd ? (
         <ReferenceArea
-          x1={forecastEndT ?? todayT}
-          x2={to}
-          fill="var(--muted-foreground)"
-          fillOpacity={0.05}
+          x1={climateZoneStart}
+          x2={zoneEnd}
+          fill="var(--color-muted-foreground)"
+          fillOpacity={0.04}
           ifOverflow="hidden"
+          label={
+            labelled && zoneEnd - climateZoneStart > span * 0.08
+              ? zoneLabel("Klimaatgemiddelde")
+              : undefined
+          }
         />
       ) : null}
       {todayT !== null ? (
         <ReferenceLine
           x={todayT}
-          stroke="var(--foreground)"
+          stroke="var(--color-foreground)"
           strokeDasharray="4 4"
           ifOverflow="hidden"
           label={{
             value: "Vandaag",
             position: "insideTopRight",
             fontSize: 11,
-            fill: "var(--muted-foreground)",
+            fill: "var(--color-muted-foreground)",
           }}
         />
       ) : null}
@@ -463,18 +524,21 @@ export function NitrogenChart({
             Berekend met gemeten weer
           </li>
           <li className="inline-flex items-center gap-1.5">
-            <svg width="18" height="4" aria-hidden>
+            <svg width="18" height="10" aria-hidden>
+              {todayT !== null ? (
+                <rect width="18" height="10" rx="2" fill="currentColor" fillOpacity={0.12} />
+              ) : null}
               <line
                 x1="0"
-                y1="2"
+                y1="5"
                 x2="18"
-                y2="2"
+                y2="5"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeDasharray={FUTURE_DASH}
               />
             </svg>
-            Verwachting
+            {todayT !== null ? "Verwachting (grijs vlak)" : "Verwachting"}
           </li>
           {hasScenario ? (
             <li className="inline-flex items-center gap-1.5">
@@ -493,134 +557,155 @@ export function NitrogenChart({
               Scenario
             </li>
           ) : null}
-          {todayT !== null ? (
-            <>
-              <li className="inline-flex items-center gap-1.5">
-                <span className="bg-muted-foreground/30 size-2.5 rounded-[2px]" aria-hidden />
-                Weersverwachting
-              </li>
-              <li className="inline-flex items-center gap-1.5">
-                <span className="bg-muted-foreground/15 size-2.5 rounded-[2px]" aria-hidden />
-                Klimaatgemiddelde
-              </li>
-            </>
-          ) : null}
         </ul>
       </div>
 
-      {/* Event lane, aligned with the plot area */}
-      <div
-        className="relative"
-        style={{
-          height: `${laneRows * 28}px`,
-          marginLeft: `${Y_AXIS_WIDTH + MARGIN.left}px`,
-          marginRight: `${MARGIN.right}px`,
-        }}
-        aria-label="Gebeurtenissen op het perceel"
-        role="list"
-      >
-        {placed.map(({ event, left, row }) => {
-          const Icon = getEventIcon(event)
-          const rain = event.planned && rainEventDates.includes(event.date)
-          return (
-            <UiTooltip key={`${event.type}-${event.date}-${event.p_app_id ?? event.b_lu ?? ""}`}>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  role="listitem"
-                  className={cn(
-                    "bg-background text-foreground focus-visible:ring-ring absolute flex size-6 -translate-x-1/2 items-center justify-center rounded-full border focus-visible:ring-2 focus-visible:outline-none",
-                    event.planned && "border-dashed",
-                    rain && "border-chart-1 border-2",
-                  )}
-                  style={{ left: `${left}%`, top: `${row * 28}px` }}
-                  aria-label={`${formatShortDate(event.date)}: ${describeEvent(event)}${
-                    rain ? " — regen verwacht" : ""
-                  }`}
-                >
-                  <Icon className="size-3.5" aria-hidden />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="font-medium">{formatLongDate(event.date)}</p>
-                <p>{describeEvent(event)}</p>
-                {rain ? (
-                  <p className="mt-1 inline-flex items-center gap-1">
-                    <CloudRain className="size-3.5" aria-hidden /> Regen verwacht rond deze datum
-                  </p>
-                ) : null}
-              </TooltipContent>
-            </UiTooltip>
-          )
-        })}
-      </div>
-
-      <ChartContainer config={chartConfig} className="aspect-auto h-72 w-full">
-        <ComposedChart data={rows} margin={MARGIN} syncId="mineralization" syncMethod="value">
-          <CartesianGrid vertical={false} strokeOpacity={0.5} />
-          {xAxis}
-          <YAxis
-            width={Y_AXIS_WIDTH}
-            tickLine={false}
-            axisLine={false}
-            tickFormatter={(v: number) => formatNumber(v)}
-            label={{
-              value: "kg N/ha",
-              angle: -90,
-              position: "insideLeft",
-              style: { fontSize: 11, fill: "var(--muted-foreground)" },
-            }}
-          />
-          {zones}
-          {events.map((event) => {
-            const t = toTime(event.date)
-            return t >= from && t <= to ? (
-              <ReferenceLine
-                key={`line-${event.type}-${event.date}-${event.p_app_id ?? event.b_lu ?? ""}`}
-                x={t}
-                stroke="var(--border)"
-                ifOverflow="hidden"
-              />
-            ) : null
-          })}
-          <Tooltip
-            content={<TooltipContentBox hasScenario={hasScenario} cut={cut} />}
-            cursor={{ stroke: "var(--muted-foreground)", strokeWidth: 1 }}
-          />
-          {!hidden.has("b_n_available") ? solidAndDashed("b_n_available", "area") : null}
-          {!hidden.has("b_nw") ? solidAndDashed("b_nw", "line") : null}
-          {!hidden.has("b_n_uptake") ? solidAndDashed("b_n_uptake", "line") : null}
-          {hasScenario ? SERIES_KEYS.filter((key) => !hidden.has(key)).map(scenarioLine) : null}
-        </ComposedChart>
-      </ChartContainer>
-
       <div>
-        <p className="text-muted-foreground mb-1 text-xs font-medium">
-          Nitraatuitspoeling (kg N/ha)
-        </p>
-        <ChartContainer config={chartConfig} className="aspect-auto h-28 w-full">
-          <ComposedChart
-            data={rows}
-            margin={{ ...MARGIN, top: 4 }}
-            syncId="mineralization"
-            syncMethod="value"
-          >
+        {/* Event lane, aligned with the plot area; each icon has a stem down to its date */}
+        <ul
+          ref={laneRef}
+          className="relative"
+          style={{
+            height: `${laneRows * LANE_ROW_PX}px`,
+            marginLeft: `${Y_AXIS_WIDTH + MARGIN.left}px`,
+            marginRight: `${MARGIN.right}px`,
+          }}
+          aria-label="Gebeurtenissen op het perceel"
+        >
+          {placed.map(({ event, scenario, left, row }) => {
+            const rain = !scenario && event.planned && rainEventDates.includes(event.date)
+            const description = `${scenario ? "Scenario: " : ""}${describeEvent(event)}`
+            return (
+              <li
+                key={`${scenario ? "s" : "e"}-${event.type}-${event.date}-${event.p_app_id ?? event.b_lu ?? ""}`}
+                className="absolute -translate-x-1/2"
+                style={{ left: `${left}%`, top: `${row * LANE_ROW_PX}px` }}
+              >
+                {/* Stem from the icon to the top of the plot, where the date line continues */}
+                <span
+                  className={cn(
+                    "border-muted-foreground/50 absolute left-1/2 border-l",
+                    event.planned && "border-dashed",
+                    scenario && "border-foreground/70 border-dotted",
+                  )}
+                  style={{
+                    top: `${LANE_ICON_PX}px`,
+                    height: `${(laneRows - row) * LANE_ROW_PX - LANE_ICON_PX + MARGIN.top}px`,
+                  }}
+                  aria-hidden
+                />
+                <UiTooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      className={cn(
+                        "bg-background text-foreground focus-visible:ring-ring relative flex size-6 items-center justify-center rounded-full border focus-visible:ring-2 focus-visible:outline-none",
+                        event.planned && "border-dashed",
+                        scenario && "border-foreground border-2 border-dotted",
+                      )}
+                      aria-label={`${formatShortDate(event.date)}: ${description}${
+                        rain ? ", regen verwacht" : ""
+                      }`}
+                    >
+                      <EventIcon event={event} />
+                      {rain ? (
+                        <span
+                          className="bg-background absolute -top-1.5 -right-1.5 flex size-3.5 items-center justify-center rounded-full border"
+                          aria-hidden
+                        >
+                          <CloudRain className="size-2.5" />
+                        </span>
+                      ) : null}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="font-medium">{formatLongDate(event.date)}</p>
+                    <p>{description}</p>
+                    {rain ? (
+                      <p className="mt-1 inline-flex items-center gap-1">
+                        <CloudRain className="size-3.5" aria-hidden /> Regen verwacht rond deze
+                        datum
+                      </p>
+                    ) : null}
+                  </TooltipContent>
+                </UiTooltip>
+              </li>
+            )
+          })}
+        </ul>
+
+        <ChartContainer config={chartConfig} className="aspect-auto h-72 w-full">
+          <ComposedChart data={rows} margin={MARGIN} syncId="mineralization" syncMethod="value">
             <CartesianGrid vertical={false} strokeOpacity={0.5} />
             {xAxis}
             <YAxis
               width={Y_AXIS_WIDTH}
               tickLine={false}
               axisLine={false}
-              tickCount={3}
               tickFormatter={(v: number) => formatNumber(v)}
+              label={{
+                value: "kg N/ha",
+                angle: -90,
+                position: "insideLeft",
+                style: { fontSize: 11, fill: "var(--color-muted-foreground)" },
+              }}
             />
-            {zones}
-            <Tooltip content={() => null} cursor={{ stroke: "var(--muted-foreground)" }} />
-            {solidAndDashed("b_no3_leach", "area")}
-            {hasScenario ? scenarioLine("b_no3_leach") : null}
+            {zones(true)}
+            {placed.map(({ event, scenario }) => (
+              <ReferenceLine
+                key={`line-${scenario ? "s" : "e"}-${event.type}-${event.date}-${event.p_app_id ?? event.b_lu ?? ""}`}
+                x={toTime(event.date)}
+                stroke={scenario ? "var(--color-foreground)" : "var(--color-muted-foreground)"}
+                strokeOpacity={scenario ? 0.7 : 0.5}
+                strokeDasharray={scenario ? "1 3" : event.planned ? "4 3" : undefined}
+                ifOverflow="hidden"
+              />
+            ))}
+            <Tooltip
+              content={<TooltipContentBox hasScenario={hasScenario} cut={cut} />}
+              cursor={{ stroke: "var(--color-muted-foreground)", strokeWidth: 1 }}
+            />
+            {!hidden.has("b_n_available") ? solidAndDashed("b_n_available", "area") : null}
+            {!hidden.has("b_nw") ? solidAndDashed("b_nw", "line") : null}
+            {!hidden.has("b_n_uptake") ? solidAndDashed("b_n_uptake", "line") : null}
+            {hasScenario ? SERIES_KEYS.filter((key) => !hidden.has(key)).map(scenarioLine) : null}
           </ComposedChart>
         </ChartContainer>
       </div>
+
+      {maxLeaching < LEACHING_NEGLIGIBLE_KG ? (
+        <p className="text-muted-foreground text-xs">
+          Nitraatuitspoeling: 0 kg N/ha in deze periode.
+        </p>
+      ) : (
+        <div>
+          <p className="text-muted-foreground mb-1 text-xs font-medium">
+            Nitraatuitspoeling (kg N/ha)
+          </p>
+          <ChartContainer config={chartConfig} className="aspect-auto h-28 w-full">
+            <ComposedChart
+              data={rows}
+              margin={{ ...MARGIN, top: 4 }}
+              syncId="mineralization"
+              syncMethod="value"
+            >
+              <CartesianGrid vertical={false} strokeOpacity={0.5} />
+              {xAxis}
+              <YAxis
+                width={Y_AXIS_WIDTH}
+                tickLine={false}
+                axisLine={false}
+                tickCount={3}
+                tickFormatter={(v: number) => formatNumber(v)}
+              />
+              {zones(false)}
+              <Tooltip content={() => null} cursor={{ stroke: "var(--color-muted-foreground)" }} />
+              {solidAndDashed("b_no3_leach", "area")}
+              {hasScenario ? scenarioLine("b_no3_leach") : null}
+            </ComposedChart>
+          </ChartContainer>
+        </div>
+      )}
 
       {rainRows.length > 0 ? (
         <div>
@@ -639,9 +724,9 @@ export function NitrogenChart({
                 allowDecimals={false}
                 tickFormatter={(v: number) => formatNumber(v)}
               />
-              {zones}
+              {zones(false)}
               <Tooltip
-                cursor={{ fill: "var(--muted)" }}
+                cursor={{ fill: "var(--color-muted)" }}
                 content={({ active, payload }) => {
                   const day = payload?.[0]?.payload as { date: string; w_prec_sum_day: number }
                   if (!active || !day) return null
@@ -657,7 +742,7 @@ export function NitrogenChart({
                 dataKey="w_prec_sum_day"
                 fill="var(--color-w_prec_sum_day)"
                 radius={[3, 3, 0, 0]}
-                maxBarSize={shortWindow ? 14 : 4}
+                maxBarSize={14}
                 isAnimationActive={false}
               />
             </ComposedChart>
@@ -665,6 +750,9 @@ export function NitrogenChart({
         </div>
       ) : null}
 
+      <p className="text-muted-foreground text-xs sm:hidden">
+        De grafiek is het best te lezen op een groter scherm, of open hieronder de tabel.
+      </p>
       <SeriesTable rows={rows} />
     </div>
   )

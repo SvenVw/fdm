@@ -3,48 +3,69 @@ import type {
   MineralizationInsights,
   SeasonPhase,
 } from "@nmi-agro/fdm-calculator"
-import { ChevronDown, Lightbulb } from "lucide-react"
+import { ArrowRight, ChevronDown, Lightbulb } from "lucide-react"
+import { NavLink } from "react-router"
 import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible"
-import { formatKgN, formatNumber } from "~/lib/mineralization"
+import { formatKgN, formatNumber, type SeasonTiming } from "~/lib/mineralization"
 import { cn } from "~/lib/utils"
 
-/** Key figures shown above the chart; which figures depends on the phase. */
+/**
+ * Key figures shown above the chart. Which figures, and whether they are called expected, depends
+ * on the phase and on where today lies relative to the harvest.
+ */
 export function KeyFigures({
   insights,
   phase,
-  isCurrentYear,
+  timing,
 }: {
   insights: MineralizationInsights
   phase: SeasonPhase
-  isCurrentYear: boolean
+  timing: SeasonTiming
 }) {
   const { kpis } = insights
-  const figures: { label: string; value: string }[] =
-    phase === "evaluation"
-      ? [
-          { label: "N-opname gewas", value: formatKgN(kpis.totalUptake) },
-          {
-            label: "Benutting",
-            value:
-              kpis.nUseEfficiency === null ? "–" : `${formatNumber(kpis.nUseEfficiency * 100)}%`,
-          },
-          { label: "Uitspoeling", value: formatKgN(kpis.totalLeaching) },
-          { label: "Beschikbaar bij oogst", value: formatKgN(kpis.residualNAtHarvest) },
-        ]
-      : [
-          {
-            label: isCurrentYear ? "Beschikbare N nu" : "Beschikbaar bij oogst",
-            value: formatKgN(isCurrentYear ? kpis.availableNNow : kpis.residualNAtHarvest),
-          },
-          {
-            label: isCurrentYear ? "N-opname tot nu" : "N-opname gewas",
-            value: formatKgN(isCurrentYear ? kpis.uptakeToDate : kpis.totalUptake),
-          },
-          { label: "Verwachte opname seizoen", value: formatKgN(kpis.totalUptake) },
-          { label: "Verwachte uitspoeling", value: formatKgN(kpis.totalLeaching) },
-        ]
+  const efficiency = {
+    label: "Benutting",
+    value: kpis.nUseEfficiency === null ? "–" : `${formatNumber(kpis.nUseEfficiency * 100)}%`,
+  }
+  let figures: { label: string; value: string }[]
+  if (phase === "evaluation" || timing === "past") {
+    figures = [
+      { label: "N-opname gewas", value: formatKgN(kpis.totalUptake) },
+      efficiency,
+      { label: "Uitspoeling", value: formatKgN(kpis.totalLeaching) },
+      { label: "Beschikbaar bij oogst", value: formatKgN(kpis.residualNAtHarvest) },
+    ]
+  } else if (timing === "future") {
+    figures = [
+      { label: "Verwachte opname", value: formatKgN(kpis.totalUptake) },
+      efficiency,
+      { label: "Verwachte uitspoeling", value: formatKgN(kpis.totalLeaching) },
+      { label: "Verwacht bij oogst", value: formatKgN(kpis.residualNAtHarvest) },
+    ]
+  } else if (timing === "after_harvest") {
+    figures = [
+      { label: "Beschikbare N nu", value: formatKgN(kpis.availableNNow) },
+      { label: "N-opname gewas", value: formatKgN(kpis.totalUptake) },
+      { label: "Beschikbaar bij oogst", value: formatKgN(kpis.residualNAtHarvest) },
+      { label: "Uitspoeling tot eind jaar", value: formatKgN(kpis.totalLeaching) },
+    ]
+  } else {
+    figures = [
+      { label: "Beschikbare N nu", value: formatKgN(kpis.availableNNow) },
+      { label: "N-opname tot nu", value: formatKgN(kpis.uptakeToDate) },
+      { label: "Verwachte opname seizoen", value: formatKgN(kpis.totalUptake) },
+      { label: "Verwachte uitspoeling", value: formatKgN(kpis.totalLeaching) },
+    ]
+  }
 
   return (
     <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
@@ -98,9 +119,10 @@ export function ChartExplainer() {
           <p>
             Tot vandaag rekent het model met gemeten weer (doorgetrokken lijnen), daarna met de
             weersverwachting en na afloop van de verwachting met het langjarig klimaatgemiddelde
-            (gestreepte lijnen). In het groeiseizoen zie je de afgelopen 30 en komende 14 dagen; bij
-            planning en evaluatie het hele jaar. De iconen boven de grafiek tonen zaai, bemesting en
-            oogst; een gestippelde rand betekent gepland.
+            (gestreepte lijnen, grijs gearceerd). In het groeiseizoen zie je de afgelopen 30 en
+            komende 14 dagen; bij planning en evaluatie het hele jaar. De iconen boven de grafiek
+            tonen zaai, bemesting (met dezelfde vormen als bij Bemestingen) en oogst, met een lijn
+            naar de datum: gestreept betekent gepland, gestippeld een gift uit je scenario.
           </p>
         </dl>
       </CollapsibleContent>
@@ -108,24 +130,34 @@ export function ChartExplainer() {
   )
 }
 
+/** Tint of the N-supply color of the chart. */
+function supplyTint(percent: number): string {
+  return `color-mix(in oklab, var(--chart-3) ${percent}%, var(--color-background))`
+}
+
+// The sources of supply are tints of the chart's N-aanbod color and uptake uses the N-opname
+// color, so the balance reads the same as the chart; the labels tell the sources apart.
 const BALANCE_PARTS: {
   key: keyof DynaV2NitrogenBalance | "soil"
   label: string
   color: string
 }[] = [
-  { key: "soil", label: "Bodem", color: "var(--chart-3)" },
-  { key: "b_n_fertilizer_mineral", label: "Kunstmest", color: "var(--chart-2)" },
-  { key: "b_n_fertilizer_organic", label: "Organische mest", color: "var(--chart-1)" },
-  {
-    key: "b_n_fertilizer_preceeding",
-    label: "Nawerking eerdere bemesting",
-    color: "var(--chart-5)",
-  },
-  { key: "b_n_greenmanure", label: "Groenbemester", color: "var(--chart-4)" },
+  { key: "soil", label: "Bodem", color: supplyTint(100) },
+  { key: "b_n_fertilizer_mineral", label: "Kunstmest", color: supplyTint(78) },
+  { key: "b_n_fertilizer_organic", label: "Organische mest", color: supplyTint(58) },
+  { key: "b_n_fertilizer_preceeding", label: "Nawerking eerdere bemesting", color: supplyTint(42) },
+  { key: "b_n_greenmanure", label: "Groenbemester", color: supplyTint(28) },
 ]
 
 /** Workable nitrogen balance: where the available nitrogen comes from, against crop uptake. */
-export function NitrogenBalanceCard({ balance }: { balance: DynaV2NitrogenBalance }) {
+export function NitrogenBalanceCard({
+  balance,
+  hasFertilizerApplications,
+}: {
+  balance: DynaV2NitrogenBalance
+  /** Whether fertilizer applications were part of the calculation. */
+  hasFertilizerApplications: boolean
+}) {
   const fromFertilizers =
     balance.b_n_fertilizer_mineral +
     balance.b_n_fertilizer_organic +
@@ -142,6 +174,11 @@ export function NitrogenBalanceCard({ balance }: { balance: DynaV2NitrogenBalanc
   const scale = Math.max(supply, balance.b_n_uptake, 1)
   const parts = BALANCE_PARTS.filter((p) => values[p.key] > 0)
   const surplus = supply - balance.b_n_uptake
+  // Applications were sent, but the result attributes no nitrogen to them: say so rather than
+  // silently showing all supply as soil
+  const fertilizerNotAttributed =
+    hasFertilizerApplications &&
+    balance.b_n_fertilizer_mineral + balance.b_n_fertilizer_organic === 0
 
   return (
     <Card>
@@ -171,12 +208,15 @@ export function NitrogenBalanceCard({ balance }: { balance: DynaV2NitrogenBalanc
           </div>
           <div className="bg-muted h-3 overflow-hidden rounded-sm" aria-hidden>
             <div
-              className="bg-foreground/70 h-full"
-              style={{ width: `${(balance.b_n_uptake / scale) * 100}%` }}
+              className="h-full"
+              style={{
+                width: `${(balance.b_n_uptake / scale) * 100}%`,
+                background: "var(--chart-2)",
+              }}
             />
           </div>
         </div>
-        <ul className="grid gap-1.5 text-sm sm:grid-cols-2">
+        <ul className={cn("grid gap-1.5 text-sm", parts.length > 1 && "sm:grid-cols-2")}>
           {parts.map((part) => (
             <li key={part.key} className="flex items-center justify-between gap-3">
               <span className="text-muted-foreground flex items-center gap-1.5">
@@ -191,18 +231,33 @@ export function NitrogenBalanceCard({ balance }: { balance: DynaV2NitrogenBalanc
             </li>
           ))}
         </ul>
-        <p className={cn("border-t pt-3 text-sm")}>
+        <p className="border-t pt-3 text-sm">
           {surplus >= 0
             ? `Er bleef ${formatKgN(surplus)} meer beschikbaar dan het gewas opnam.`
             : `Het gewas nam ${formatKgN(-surplus)} meer op dan er beschikbaar kwam.`}
         </p>
+        {fertilizerNotAttributed ? (
+          <p className="text-muted-foreground text-xs">
+            Let op: dit perceel heeft bemestingen, maar de berekening wijst er geen stikstof aan
+            toe. Het aanbod staat daardoor volledig onder Bodem.
+          </p>
+        ) : null}
       </CardContent>
     </Card>
   )
 }
 
-/** Season evaluation: what went well and what can be improved. */
-export function EvaluationCard({ insights }: { insights: MineralizationInsights }) {
+/** Season evaluation: what went well and what can be improved, with a link to plan next year. */
+export function EvaluationCard({
+  insights,
+  nextYear,
+  nextYearHref,
+}: {
+  insights: MineralizationInsights
+  nextYear: number
+  /** Planning view of the same field in the next year. */
+  nextYearHref: string
+}) {
   return (
     <Card>
       <CardHeader>
@@ -225,6 +280,14 @@ export function EvaluationCard({ insights }: { insights: MineralizationInsights 
           </ul>
         )}
       </CardContent>
+      <CardFooter>
+        <Button asChild variant="outline" size="sm">
+          <NavLink to={nextYearHref}>
+            Plan {nextYear}
+            <ArrowRight aria-hidden />
+          </NavLink>
+        </Button>
+      </CardFooter>
     </Card>
   )
 }

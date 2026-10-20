@@ -32,10 +32,12 @@ import {
   NitrogenBalanceCard,
 } from "~/components/blocks/mineralization/field-cards"
 import { MissingHarvestCard } from "~/components/blocks/mineralization/missing-harvest-card"
-import { NitrogenChart } from "~/components/blocks/mineralization/nitrogen-chart"
+import { type ChartEvent, NitrogenChart } from "~/components/blocks/mineralization/nitrogen-chart"
 import { PhaseSelector } from "~/components/blocks/mineralization/phase-selector"
 import {
+  getApplicationChange,
   type ScenarioAction,
+  ScenarioDeltas,
   ScenarioPanel,
   scenarioReducer,
 } from "~/components/blocks/mineralization/scenario-panel"
@@ -47,6 +49,7 @@ import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "~/components/ui/empty"
+import { Spinner } from "~/components/ui/spinner"
 import { useAnalytics } from "~/hooks/use-analytics"
 import {
   calculateFieldMineralization,
@@ -61,8 +64,11 @@ import { fdm } from "~/lib/fdm.server"
 import {
   type FieldMineralizationOk,
   type FieldMineralizationOutcome,
+  formatShortDate,
   getAttentionItems,
+  getBulkHarvestHref,
   getNotCalculatedReason,
+  getSeasonTiming,
 } from "~/lib/mineralization"
 
 export { shouldRevalidateMineralization as shouldRevalidate } from "~/lib/mineralization"
@@ -112,8 +118,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
       })
 
-    const soilLabels: SoilParameterLabels = {}
+    // Parameters the calculation accepts but that are not stored as soil analysis parameters
+    const soilLabels: SoilParameterLabels = {
+      a_nmin_cc_d30: { name: "Minerale stikstof 0–30 cm", unit: "kg N/ha" },
+      a_nmin_cc_d60: { name: "Minerale stikstof 30–60 cm", unit: "kg N/ha" },
+      b_gwl_glg: { name: "Gemiddeld laagste grondwaterstand (GLG)", unit: "cm-mv" },
+      b_gwl_ghg: { name: "Gemiddeld hoogste grondwaterstand (GHG)", unit: "cm-mv" },
+    }
+    const sourceLabels: Record<string, string> = {}
     for (const description of getSoilParametersDescription()) {
+      if (description.parameter === "a_source") {
+        for (const option of description.options ?? []) {
+          sourceLabels[String(option.value)] = option.label
+        }
+      }
       if (DYNA_V2_SOIL_PARAMETERS.includes(description.parameter)) {
         soilLabels[description.parameter] = {
           name: description.description ?? description.name,
@@ -139,6 +157,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       today,
       isCurrentYear: Number(today.slice(0, 4)) === year,
       soilLabels,
+      sourceLabels,
       outcome,
     }
   } catch (error) {
@@ -262,8 +281,9 @@ function FieldMineralization(props: LoaderData) {
             <EmptyMedia variant="icon">
               <MapPinOff />
             </EmptyMedia>
-            <EmptyTitle>Niet berekend: {getNotCalculatedReason(outcome, props.year)}</EmptyTitle>
+            <EmptyTitle>Niet berekend</EmptyTitle>
             <EmptyDescription>
+              {getNotCalculatedReason(outcome, props.year)}.{" "}
               {outcome.status === "excluded"
                 ? "Voor bufferstroken, natuur en landschapselementen wordt de mineralisatie niet berekend."
                 : outcome.status === "no_cultivation"
@@ -279,6 +299,13 @@ function FieldMineralization(props: LoaderData) {
           mainCultivation={outcome.mainCultivation}
           defaultHarvestDate={outcome.defaultHarvestDate}
           year={props.year}
+          bulkHarvestHref={getBulkHarvestHref({
+            b_id_farm: props.b_id_farm,
+            calendar: props.calendar,
+            b_lu_catalogue: outcome.mainCultivation.b_lu_catalogue,
+            fieldIds: [props.b_id],
+            returnUrl: `/farm/${props.b_id_farm}/${props.calendar}/mineralization/${props.b_id}`,
+          })}
         />
       )
     case "error":
@@ -337,7 +364,52 @@ function getScenarioBase(outcome: FieldMineralizationOk): MineralizationScenario
   }
 }
 
+/** The events of the calculation, with the fertilizer type of each application for its icon. */
+function getChartEvents(outcome: FieldMineralizationOk): ChartEvent[] {
+  const typeById = new Map(outcome.fertilizerOptions.map((o) => [o.p_id, o.p_type]))
+  const productByApplication = new Map(
+    outcome.usedInput.fertilizerApplications.map((a) => [a.p_app_id, a.p_id]),
+  )
+  return outcome.events.map((event) => {
+    const p_id = event.p_app_id ? productByApplication.get(event.p_app_id) : undefined
+    return p_id ? { ...event, p_type: typeById.get(p_id) ?? null } : event
+  })
+}
+
+/**
+ * Applications of the scenario that are new or moved, as events for the lane of the chart; the
+ * plan's own events stay in place, so the shift is visible.
+ */
+function getScenarioEvents(
+  outcome: FieldMineralizationOk,
+  base: MineralizationScenario,
+  scenario: MineralizationScenario,
+): ChartEvent[] {
+  const optionById = new Map(outcome.fertilizerOptions.map((o) => [o.p_id, o]))
+  return scenario.fertilizerApplications.flatMap((app): ChartEvent[] => {
+    const original = base.fertilizerApplications.find((a) => a.p_app_id === app.p_app_id)
+    const isNew = getApplicationChange(app, base) === "new"
+    if (!isNew && original?.p_app_date === app.p_app_date) return []
+    const option = optionById.get(app.p_id)
+    return [
+      {
+        date: app.p_app_date,
+        type: "fertilizer",
+        label: option?.p_name_nl ?? "Meststof",
+        planned: true,
+        ...(app.p_app_id ? { p_app_id: app.p_app_id } : {}),
+        fertilizerKind: option?.p_type === "mineral" ? "mineral" : "organic",
+        p_type: option?.p_type ?? null,
+        amount: app.p_app_amount_display,
+        unit: option?.p_app_amount_unit ?? "kg/ha",
+      },
+    ]
+  })
+}
+
 const SCENARIO_DEBOUNCE_MS = 600
+const SCENARIO_PANEL_ID = "scenario"
+const USED_INPUT_ID = "gebruikte-gegevens"
 
 function isPhase(value: string | null): value is SeasonPhase {
   return value === "planning" || value === "growing" || value === "evaluation"
@@ -365,18 +437,17 @@ function FieldMineralizationResult(
   )
   const scenarioUrl = `/farm/${props.b_id_farm}/${props.calendar}/mineralization/${props.b_id}/scenario`
   const dirty = JSON.stringify(scenario) !== JSON.stringify(base)
+  const loadScenario = (next: MineralizationScenario) =>
+    void scenarioFetcher.load(`${scenarioUrl}?scenario=${encodeURIComponent(JSON.stringify(next))}`)
   const dispatch = (action: ScenarioAction) => {
     const next = scenarioReducer(scenario, action)
     setScenario(next)
     if (timer.current) clearTimeout(timer.current)
     if (JSON.stringify(next) === JSON.stringify(base)) return
-    timer.current = setTimeout(() => {
-      void scenarioFetcher.load(
-        `${scenarioUrl}?scenario=${encodeURIComponent(JSON.stringify(next))}`,
-      )
-    }, SCENARIO_DEBOUNCE_MS)
+    timer.current = setTimeout(() => loadScenario(next), SCENARIO_DEBOUNCE_MS)
     capture("mineralization_scenario_changed", { action: action.type })
   }
+  const [usedInputOpen, setUsedInputOpen] = useState(false)
   // A result only counts when it was calculated for exactly the scenario on screen
   const scenarioKey = JSON.stringify(scenario)
   const scenarioOutcome =
@@ -388,21 +459,39 @@ function FieldMineralizationResult(
   const scenarioPending = dirty && !scenarioOutcome
   const saving = saveFetcher.state !== "idle"
   const [searchParams, setSearchParams] = useSearchParams()
+  const timing = getSeasonTiming(year, today, outcome.mainHarvest)
+  // The growing season view (last 30 and next 14 days) only applies while the main crop grows
+  const inGrowingSeason = timing === "before_harvest" && today >= outcome.mainStart
+  const growingUnavailable = inGrowingSeason
+    ? undefined
+    : timing === "after_harvest"
+      ? `De hoofdteelt is op ${formatShortDate(outcome.mainHarvest)} geoogst.`
+      : timing === "before_harvest"
+        ? "De hoofdteelt is nog niet gestart."
+        : "Alleen beschikbaar in het lopende jaar."
   const requested = searchParams.get("phase")
-  const phase: SeasonPhase = isPhase(requested) ? requested : outcome.insights.defaultPhase
+  const phase: SeasonPhase =
+    isPhase(requested) && !(requested === "growing" && growingUnavailable)
+      ? requested
+      : outcome.insights.defaultPhase
+  const newApplicationDate =
+    timing === "before_harvest" || timing === "after_harvest" ? today : `${year}-04-01`
+  const scenarioEvents = dirty ? getScenarioEvents(outcome, base, scenario) : []
 
   const rainEventDates = outcome.insights.signals.flatMap((s) =>
     s.type === "rain_near_event" ? [s.eventDate] : [],
   )
   const attention = getAttentionItems(outcome)
   const fieldHref = `/farm/${props.b_id_farm}/${props.calendar}/field/${props.b_id}`
+  const nextYearHref = `/farm/${props.b_id_farm}/${year + 1}/mineralization/${props.b_id}?phase=planning`
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <PhaseSelector
           value={phase}
-          defaultPhase={outcome.insights.defaultPhase}
+          currentPhase={isCurrentYear ? outcome.insights.defaultPhase : null}
+          disabled={growingUnavailable ? { growing: growingUnavailable } : undefined}
           onChange={(next) =>
             setSearchParams(
               (prev) => {
@@ -414,9 +503,17 @@ function FieldMineralizationResult(
           }
         />
         <Button asChild variant="link" size="sm" className="text-muted-foreground">
-          <a href="#gebruikte-gegevens">Welke gegevens zijn gebruikt?</a>
+          <a href={`#${USED_INPUT_ID}`} onClick={() => setUsedInputOpen(true)}>
+            Welke gegevens zijn gebruikt?
+          </a>
         </Button>
       </div>
+      {isCurrentYear && growingUnavailable ? (
+        <p className="text-muted-foreground -mt-4 text-xs">
+          Groeiseizoen is niet beschikbaar: {growingUnavailable.charAt(0).toLowerCase()}
+          {growingUnavailable.slice(1)}
+        </p>
+      ) : null}
 
       {outcome.partial ? (
         <Alert>
@@ -437,14 +534,48 @@ function FieldMineralizationResult(
               {outcome.mainCultivation.b_lu_name ?? outcome.mainCultivation.b_lu_catalogue}, {year}
             </CardDescription>
           </div>
-          <KeyFigures insights={outcome.insights} phase={phase} isCurrentYear={isCurrentYear} />
-          <SignalChips items={attention} />
+          <KeyFigures insights={outcome.insights} phase={phase} timing={timing} />
+          {dirty && phase !== "evaluation" ? (
+            <div
+              className="bg-muted/50 flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between"
+              aria-live="polite"
+            >
+              <div className="min-w-0 space-y-1">
+                <p className="text-sm font-medium">
+                  Scenario (gestippeld) ten opzichte van je plan
+                </p>
+                {scenarioPending ? (
+                  <p className="text-muted-foreground flex items-center gap-2 text-sm">
+                    <Spinner /> Wordt berekend…
+                  </p>
+                ) : scenarioError ? (
+                  <p className="text-destructive text-sm">
+                    De berekening van het scenario is niet gelukt.
+                  </p>
+                ) : scenarioOk ? (
+                  <ScenarioDeltas
+                    current={outcome.insights.kpis}
+                    result={scenarioOk.insights.kpis}
+                  />
+                ) : null}
+              </div>
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="shrink-0 self-start sm:self-center"
+              >
+                <a href={`#${SCENARIO_PANEL_ID}`}>Naar scenario</a>
+              </Button>
+            </div>
+          ) : null}
         </CardHeader>
         <CardContent className="space-y-2">
           <NitrogenChart
             series={outcome.result.series}
             scenarioSeries={scenarioOk && !scenarioPending ? scenarioOk.result.series : undefined}
-            events={outcome.events}
+            events={getChartEvents(outcome)}
+            scenarioEvents={scenarioEvents}
             year={year}
             today={today}
             phase={phase}
@@ -455,7 +586,7 @@ function FieldMineralizationResult(
         </CardContent>
       </Card>
 
-      {outcome.forecast && outcome.forecast.days.length > 0 ? (
+      {phase !== "evaluation" && outcome.forecast && outcome.forecast.days.length > 0 ? (
         <WeatherStrip
           forecast={outcome.forecast}
           signals={outcome.insights.signals}
@@ -465,22 +596,29 @@ function FieldMineralizationResult(
               : signal.b_lu === outcome.mainCultivation.b_lu &&
                 signal.eventDate === base.harvest?.b_date_harvest
           }
-          onSuggestShift={(suggestion) =>
+          onSuggestShift={(suggestion) => {
             dispatch({
               type: "shift",
               eventType: suggestion.eventType,
               p_app_id: suggestion.p_app_id,
               newDate: suggestion.newDate,
             })
-          }
+            // Bring the changed scenario into view, so the effect of the shift is not off-screen
+            const panel = document.getElementById(SCENARIO_PANEL_ID)
+            panel?.scrollIntoView({ behavior: "smooth", block: "start" })
+            panel?.focus({ preventScroll: true })
+          }}
         />
       ) : null}
 
       {phase !== "evaluation" ? (
         <ScenarioPanel
+          id={SCENARIO_PANEL_ID}
+          base={base}
           scenario={scenario}
           dispatch={dispatch}
           year={year}
+          newApplicationDate={newApplicationDate}
           fertilizerOptions={outcome.fertilizerOptions}
           methodLabels={props.methodLabels}
           dirty={dirty}
@@ -504,13 +642,21 @@ function FieldMineralizationResult(
             if (timer.current) clearTimeout(timer.current)
             setScenario(base)
           }}
+          onRetry={() => loadScenario(scenario)}
         />
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <NitrogenBalanceCard balance={outcome.result.balance} />
+        <NitrogenBalanceCard
+          balance={outcome.result.balance}
+          hasFertilizerApplications={outcome.usedInput.fertilizerApplications.length > 0}
+        />
         {phase === "evaluation" ? (
-          <EvaluationCard insights={outcome.insights} />
+          <EvaluationCard
+            insights={outcome.insights}
+            nextYear={year + 1}
+            nextYearHref={nextYearHref}
+          />
         ) : (
           <Card>
             <CardHeader>
@@ -535,8 +681,15 @@ function FieldMineralizationResult(
       </div>
 
       <UsedInput
+        id={USED_INPUT_ID}
+        open={usedInputOpen}
+        onOpenChange={setUsedInputOpen}
         usedInput={outcome.usedInput}
         soilLabels={props.soilLabels}
+        sourceLabels={props.sourceLabels}
+        fertilizerTypes={Object.fromEntries(
+          outcome.fertilizerOptions.map((o) => [o.p_id, o.p_type]),
+        )}
         fieldHref={fieldHref}
         partial={outcome.partial}
       />

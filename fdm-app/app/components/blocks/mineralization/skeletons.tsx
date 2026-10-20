@@ -26,7 +26,7 @@ export function FieldMineralizationSkeleton() {
           <div className="bg-muted/40 flex h-80 flex-col items-center justify-center gap-2 rounded-lg">
             <Spinner className="size-5" />
             <p className="text-muted-foreground text-sm">
-              Dyna rekent de stikstof door het seizoen door…
+              De stikstof door het seizoen wordt berekend. Dit duurt meestal enkele seconden.
             </p>
           </div>
         </CardContent>
