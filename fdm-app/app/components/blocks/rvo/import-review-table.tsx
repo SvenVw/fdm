@@ -819,9 +819,18 @@ function RvoImportReviewTableComponent({
     [calendar, bufferstripInfoAvailable, cultivationOptions],
   )
 
+  // Keep the latest context in a ref so that the reset below only runs when the data changes.
+  // Loaders revalidate after a failed action, which gives `ctx` a new identity (new
+  // `cultivationOptions`); resetting then would discard the user's choices.
+  const ctxRef = useRef(ctx)
+  useLayoutEffect(() => {
+    ctxRef.current = ctx
+  })
+
   // Conflicting and expired fields start out with the RVO values selected.
   useLayoutEffect(() => {
     clearActiveForm()
+    const ctx = ctxRef.current
     const initialChoices = new Map<string, ReviewChoices>()
     for (const item of data) {
       if (item.status === "CONFLICT") {
@@ -831,7 +840,7 @@ function RvoImportReviewTableComponent({
       }
     }
     useRvoImportReviewStore.getState().reset(initialChoices)
-  }, [data, ctx, clearActiveForm])
+  }, [data, clearActiveForm])
 
   const table = useTable({
     data: sortedData,
