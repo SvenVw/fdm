@@ -309,6 +309,9 @@ export function NitrogenChart({
         .filter((d) => d.date >= fromDate && d.date <= toDate)
         .map((d) => ({ t: toTime(d.date), date: d.date, w_prec_sum_day: d.w_prec_sum_day }))
     : []
+  // The legend only explains line styles that are actually drawn in this window
+  const hasMeasured = rows.some((r) => r.date <= cut)
+  const hasExpected = rows.some((r) => r.date > cut)
   const maxLeaching = Math.max(
     0,
     ...rows.map((r) => Math.max(r.values.b_no3_leach ?? 0, r.scenario.b_no3_leach ?? 0)),
@@ -520,29 +523,33 @@ export function NitrogenChart({
           ))}
         </div>
         <ul className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-          <li className="inline-flex items-center gap-1.5">
-            <svg width="18" height="4" aria-hidden>
-              <line x1="0" y1="2" x2="18" y2="2" stroke="currentColor" strokeWidth="2" />
-            </svg>
-            Berekend met gemeten weer
-          </li>
-          <li className="inline-flex items-center gap-1.5">
-            <svg width="18" height="10" aria-hidden>
-              {todayT !== null ? (
-                <rect width="18" height="10" rx="2" fill="currentColor" fillOpacity={0.12} />
-              ) : null}
-              <line
-                x1="0"
-                y1="5"
-                x2="18"
-                y2="5"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeDasharray={FUTURE_DASH}
-              />
-            </svg>
-            {todayT !== null ? "Verwachting (grijs vlak)" : "Verwachting"}
-          </li>
+          {hasMeasured ? (
+            <li className="inline-flex items-center gap-1.5">
+              <svg width="18" height="4" aria-hidden>
+                <line x1="0" y1="2" x2="18" y2="2" stroke="currentColor" strokeWidth="2" />
+              </svg>
+              Berekend met gemeten weer
+            </li>
+          ) : null}
+          {hasExpected ? (
+            <li className="inline-flex items-center gap-1.5">
+              <svg width="18" height="10" aria-hidden>
+                {todayT !== null ? (
+                  <rect width="18" height="10" rx="2" fill="currentColor" fillOpacity={0.12} />
+                ) : null}
+                <line
+                  x1="0"
+                  y1="5"
+                  x2="18"
+                  y2="5"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeDasharray={FUTURE_DASH}
+                />
+              </svg>
+              {todayT !== null ? "Verwachting (grijs vlak)" : "Verwachting"}
+            </li>
+          ) : null}
           {hasScenario ? (
             <li className="inline-flex items-center gap-1.5">
               <svg width="18" height="4" aria-hidden>

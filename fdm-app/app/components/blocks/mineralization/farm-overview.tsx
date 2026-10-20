@@ -7,10 +7,12 @@ import {
   CircleAlert,
   CircleCheck,
 } from "lucide-react"
-import { useState } from "react"
+import { useId, useState } from "react"
 import { NavLink, useRevalidator } from "react-router"
-import { Line, LineChart } from "recharts"
+import { Line, LineChart, ReferenceLine, Tooltip as ChartTooltip, YAxis } from "recharts"
 import { getHarvestTerm } from "~/components/blocks/harvest/utils"
+import { getCultivationColor } from "~/components/custom/cultivation-colors"
+import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible"
@@ -30,6 +32,8 @@ import {
   type FieldMineralizationOk,
   type FieldMineralizationOutcome,
   formatKg,
+  formatKgN,
+  formatLongDate,
   getAttentionItems,
   getAttentionPriority,
   getNotCalculatedReason,
@@ -60,6 +64,25 @@ function cropName(outcome: FieldMineralizationOutcome | undefined): string | nul
     return outcome.mainCultivation.b_lu_name ?? outcome.mainCultivation.b_lu_catalogue
   }
   return null
+}
+
+/** Main crop as the colored crop badge used in the crop rotation and field tables. */
+function CropBadge({ outcome }: { outcome: FieldMineralizationOutcome }) {
+  if (outcome.status !== "ok" && outcome.status !== "missing_harvest") {
+    return <span className="text-muted-foreground">–</span>
+  }
+  const { mainCultivation } = outcome
+  return (
+    <Badge
+      variant="default"
+      className="max-w-56 whitespace-normal text-white"
+      style={{
+        backgroundColor: getCultivationColor(mainCultivation.b_lu_croprotation ?? undefined),
+      }}
+    >
+      {mainCultivation.b_lu_name ?? mainCultivation.b_lu_catalogue}
+    </Badge>
+  )
 }
 
 function plural(count: number, singular: string, plural: string): string {
@@ -304,18 +327,73 @@ export function FarmAttentionList({ fields, outcomes, fieldHref, harvestHref }: 
   )
 }
 
+/** Sparkline colors: green while nitrogen is available, orange where uptake exceeds the supply. */
+const SPARK_POSITIVE = "var(--color-green-600, #16a34a)"
+const SPARK_NEGATIVE = "var(--color-orange-500, #f97316)"
+
+type SparkPoint = FieldMineralizationOk["result"]["series"][number]
+
 function AvailableNSparkline({ outcome, year }: { outcome: FieldMineralizationOk; year: number }) {
+  const gradientId = `spark-${useId().replace(/:/g, "")}`
   const data = seriesInYear(outcome.result.series, year).filter((_, i) => i % 3 === 0)
   if (data.length < 2) return null
+  const values = data.map((p) => p.b_n_available)
+  const max = Math.max(...values)
+  const min = Math.min(...values)
+  // Where zero lies in the gradient, from the top (max) to the bottom (min) of the line
+  const zero = max <= 0 ? 0 : min >= 0 ? 1 : max / (max - min)
   return (
+    // The values are in the row as text; the tooltip is a mouse aid, hidden from screen readers
     <LineChart width={96} height={28} data={data} aria-hidden>
+      <defs>
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset={zero} stopColor={SPARK_POSITIVE} />
+          <stop offset={zero} stopColor={SPARK_NEGATIVE} />
+        </linearGradient>
+      </defs>
+      <YAxis hide domain={["dataMin", "dataMax"]} />
+      {min < 0 && max > 0 ? (
+        <ReferenceLine
+          y={0}
+          stroke="var(--color-muted-foreground)"
+          strokeOpacity={0.4}
+          strokeDasharray="2 2"
+        />
+      ) : null}
       <Line
         type="monotone"
         dataKey="b_n_available"
-        stroke="var(--chart-5)"
+        // A gradient on a flat line has no height to work with; use a plain color then
+        stroke={max === min ? (max < 0 ? SPARK_NEGATIVE : SPARK_POSITIVE) : `url(#${gradientId})`}
         strokeWidth={1.5}
         dot={false}
+        activeDot={({ cx, cy, payload }: { cx?: number; cy?: number; payload?: SparkPoint }) => (
+          <circle
+            cx={cx}
+            cy={cy}
+            r={2.5}
+            fill={(payload?.b_n_available ?? 0) < 0 ? SPARK_NEGATIVE : SPARK_POSITIVE}
+          />
+        )}
         isAnimationActive={false}
+      />
+      <ChartTooltip
+        // Fixed to the left of the sparkline, so it stays within the table row
+        position={{ x: -132, y: -8 }}
+        allowEscapeViewBox={{ x: true, y: true }}
+        wrapperStyle={{ zIndex: 20, pointerEvents: "none" }}
+        cursor={{ stroke: "var(--color-muted-foreground)", strokeOpacity: 0.4 }}
+        isAnimationActive={false}
+        content={({ active, payload }) => {
+          const point = payload?.[0]?.payload as SparkPoint | undefined
+          if (!active || !point) return null
+          return (
+            <div className="bg-background w-32 rounded-md border px-2 py-1 text-xs shadow-md">
+              <p className="text-muted-foreground">{formatLongDate(point.b_date_calculation)}</p>
+              <p className="font-medium tabular-nums">{formatKgN(point.b_n_available)}</p>
+            </div>
+          )
+        }}
       />
     </LineChart>
   )
@@ -444,7 +522,7 @@ export function FarmFieldTable({
               <TableHead>Perceel</TableHead>
               <TableHead className="hidden md:table-cell">Hoofdteelt</TableHead>
               <SortableHead
-                label={isCurrentYear ? "Beschikbare N" : "Bij oogst"}
+                label={isCurrentYear ? "Beschikbaar nu" : "Bij oogst"}
                 sortKey="available"
                 sort={sort}
                 onSort={onSort}
@@ -464,8 +542,8 @@ export function FarmFieldTable({
                 onSort={onSort}
                 className="hidden text-right sm:table-cell"
               />
-              <TableHead className="hidden xl:table-cell">
-                <span className="sr-only">Verloop beschikbare N</span>
+              <TableHead className="hidden whitespace-nowrap xl:table-cell">
+                Beschikbare N<span className="sr-only"> door het jaar</span>
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -505,20 +583,30 @@ export function FarmFieldTable({
               if (outcome.status !== "ok") {
                 return (
                   <TableRow key={field.b_id}>
-                    <TableCell>{name}</TableCell>
+                    {/* The reason sits under the name, so the number columns stay aligned */}
+                    <TableCell>
+                      {name}
+                      <span className="text-muted-foreground block text-xs">
+                        {outcome.status === "missing_harvest"
+                          ? `Wacht op ${getHarvestTerm(
+                              outcome.mainCultivation.b_lu_croprotation,
+                              true,
+                              outcome.mainCultivation.b_lu_harvestable,
+                            )}`
+                          : "Berekening niet gelukt"}
+                      </span>
+                    </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      {cropName(outcome) ?? "–"}
+                      <CropBadge outcome={outcome} />
                     </TableCell>
-                    <TableCell
-                      colSpan={4}
-                      className="text-muted-foreground text-right text-sm sm:text-left"
-                    >
-                      {outcome.status === "missing_harvest"
-                        ? "Wacht op oogst"
-                        : outcome.status === "error"
-                          ? "Berekening niet gelukt"
-                          : null}
+                    <TableCell className="text-muted-foreground text-right">–</TableCell>
+                    <TableCell className="text-muted-foreground hidden text-right sm:table-cell">
+                      –
                     </TableCell>
+                    <TableCell className="text-muted-foreground hidden text-right sm:table-cell">
+                      –
+                    </TableCell>
+                    <TableCell className="hidden xl:table-cell" />
                   </TableRow>
                 )
               }
@@ -526,7 +614,9 @@ export function FarmFieldTable({
               return (
                 <TableRow key={field.b_id}>
                   <TableCell>{name}</TableCell>
-                  <TableCell className="hidden md:table-cell">{cropName(outcome)}</TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    <CropBadge outcome={outcome} />
+                  </TableCell>
                   <TableCell className="text-right tabular-nums">
                     <AvailableNCell value={values.available} />
                   </TableCell>

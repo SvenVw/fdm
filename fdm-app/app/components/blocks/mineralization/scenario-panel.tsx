@@ -543,7 +543,13 @@ export function ScenarioPanel({
         ) : null}
 
         {/* Stays in view while editing, so the live recalculation is always visible */}
-        <div className="bg-card sticky bottom-0 z-10 -mx-6 -mb-6 rounded-b-xl border-t px-6 py-3">
+        <div
+          className={cn(
+            "bg-card -mx-6 -mb-6 rounded-b-xl border-t px-6 py-3",
+            // Only sticks while there is something to follow or save
+            dirty && "sticky bottom-0 z-10",
+          )}
+        >
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0 flex-1 space-y-1" aria-live="polite">
               {!dirty ? (
