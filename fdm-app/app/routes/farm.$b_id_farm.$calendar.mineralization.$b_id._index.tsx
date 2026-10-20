@@ -30,6 +30,7 @@ import { PhaseSelector } from "~/components/blocks/mineralization/phase-selector
 import { SignalChips } from "~/components/blocks/mineralization/signal-chips"
 import { FieldMineralizationSkeleton } from "~/components/blocks/mineralization/skeletons"
 import { type SoilParameterLabels, UsedInput } from "~/components/blocks/mineralization/used-input"
+import { WeatherStrip } from "~/components/blocks/mineralization/weather-strip"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
@@ -320,6 +321,10 @@ function FieldMineralizationResult(
           <ChartExplainer />
         </CardContent>
       </Card>
+
+      {phase !== "evaluation" && outcome.forecast && outcome.forecast.days.length > 0 ? (
+        <WeatherStrip forecast={outcome.forecast} signals={outcome.insights.signals} />
+      ) : null}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <NitrogenBalanceCard balance={outcome.result.balance} />
