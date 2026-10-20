@@ -257,8 +257,8 @@ export function FieldDashboardCurrentCultivationTile({ dashboard, tile }: FieldD
             Gestart op {formatDateLabel(activeCultivation.startDate)}.
           </p>
         </div>
-        <Suspense>
-          <Await resolve={dashboard.asyncInsights.showAvailabilityYearWarning}>
+        <Suspense fallback={null}>
+          <Await resolve={dashboard.asyncInsights.showAvailabilityYearWarning} errorElement={<></>}>
             {(showAvailabilityYearWarning) =>
               showAvailabilityYearWarning && (
                 <Alert className="border-amber-200 bg-amber-50 text-amber-700">
