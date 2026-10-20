@@ -101,9 +101,13 @@ export const serverConfig: ServerConfig = {
         ? Number.parseInt(process.env.MAX_CULTIVATION_AVAILABILITY_YEAR ?? "")
         : 2026,
     },
-    nmi: {
-      api_key: String(process.env.NMI_API_KEY),
-    },
+    ...(process.env.NMI_API_KEY?.trim()
+      ? {
+          nmi: {
+            api_key: process.env.NMI_API_KEY.trim(),
+          },
+        }
+      : {}),
     rvo: {
       clientId: String(process.env.RVO_CLIENT_ID),
       redirectUri: String(process.env.RVO_REDIRECT_URI),
