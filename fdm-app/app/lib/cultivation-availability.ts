@@ -28,10 +28,16 @@ export function isCultivationUnavailableInPeriod(
 
   const start = new Date(period.b_lu_start)
   const end = period.b_lu_end ? new Date(period.b_lu_end) : null
-  const startYear = new Date(start.getTime() + BOUNDARY_OFFSET_MS).getFullYear()
-  const endYear = end
-    ? new Date(end.getTime() - BOUNDARY_OFFSET_MS).getFullYear()
-    : maxCultivationAvailabilityYear
+  const startYear = Math.min(
+    maxCultivationAvailabilityYear,
+    new Date(start.getTime() + BOUNDARY_OFFSET_MS).getFullYear(),
+  )
+  const endYear = Math.min(
+    maxCultivationAvailabilityYear,
+    end
+      ? new Date(end.getTime() - BOUNDARY_OFFSET_MS).getFullYear()
+      : maxCultivationAvailabilityYear,
+  )
 
   if (Number.isNaN(startYear) || Number.isNaN(endYear)) {
     return false
