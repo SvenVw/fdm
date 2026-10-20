@@ -187,6 +187,34 @@ export function mapApplicationMethod(method: string | null): DynaV2ApplicationMe
 }
 
 /**
+ * Builds the Dyna v2 composition of a fertilizer; only known nutrient contents are included.
+ *
+ * @param fertilizer - Fertilizer of the farm.
+ * @returns The fertilizer properties for the Dyna v2 request.
+ */
+export function buildFertilizerProperties(
+  fertilizer: MineralizationFertilizer,
+): NonNullable<DynaV2Request["fertilizer_properties"]>[number] {
+  const props: NonNullable<DynaV2Request["fertilizer_properties"]>[number] = {
+    p_id: fertilizer.p_id,
+    p_type_mineral: fertilizer.p_type === "mineral",
+  }
+  for (const key of [
+    "p_n_rt",
+    "p_n_if",
+    "p_n_of",
+    "p_om",
+    "p_no3_rt",
+    "p_nh4_rt",
+    "p_s_rt",
+  ] as const) {
+    const value = fertilizer[key]
+    if (value != null) props[key] = value
+  }
+  return props
+}
+
+/**
  * Determines the main cultivation for a given year using the "May 15th" rule.
  *
  * The crop that is active on 15 May of the year is the main cultivation; catch crops only count
@@ -451,23 +479,7 @@ export function prepareMineralizationInput(
       p_app_method: mapApplicationMethod(application.p_app_method),
     })
     if (!properties.has(fertilizer.p_id)) {
-      const props: NonNullable<DynaV2Request["fertilizer_properties"]>[number] = {
-        p_id: fertilizer.p_id,
-        p_type_mineral: kind === "mineral",
-      }
-      for (const key of [
-        "p_n_rt",
-        "p_n_if",
-        "p_n_of",
-        "p_om",
-        "p_no3_rt",
-        "p_nh4_rt",
-        "p_s_rt",
-      ] as const) {
-        const value = fertilizer[key]
-        if (value != null) props[key] = value
-      }
-      properties.set(fertilizer.p_id, props)
+      properties.set(fertilizer.p_id, buildFertilizerProperties(fertilizer))
     }
     const amount = application.p_app_amount_display ?? application.p_app_amount
     usedInput.fertilizerApplications.push({

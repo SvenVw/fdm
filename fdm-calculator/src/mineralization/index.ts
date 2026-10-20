@@ -39,7 +39,45 @@ export { assessDataCompleteness, methodRequirements } from "./assessment"
 export { buildDynaRequest, buildNSupplyRequest, getMainCultivation } from "./builders"
 export { getDyna, requestDyna } from "./dyna"
 export { NmiApiError } from "./errors"
+export { getDynaV2, requestDynaV2 } from "./dyna-v2"
+export type {
+  MineralizationInsights,
+  MineralizationKpis,
+  MineralizationSignal,
+  SeasonPhase,
+} from "./insights"
+export {
+  deriveMineralizationInsights,
+  determineSeasonPhase,
+  MINERALIZATION_THRESHOLDS,
+} from "./insights"
 export { getNSupply, requestNSupply } from "./nsupply"
+export type {
+  MineralizationApplication,
+  MineralizationCultivation,
+  MineralizationEvent,
+  MineralizationFertilizer,
+  MineralizationFieldData,
+  MineralizationHarvest,
+  MineralizationPreparation,
+  MineralizationSoilItem,
+  MineralizationUsedInput,
+} from "./prepare"
+export {
+  DYNA_V2_SOIL_PARAMETERS,
+  mapApplicationMethod,
+  prepareMineralizationInput,
+  restrictToMainCultivation,
+} from "./prepare"
+export type {
+  MineralizationScenario,
+  ScenarioDiff,
+  ScenarioFertilizer,
+  ScenarioFertilizerApplication,
+} from "./scenario"
+export { applyScenarioToRequest, diffScenario, getMineralizationScenarioSchema } from "./scenario"
+export type { WeatherForecast, WeatherForecastDay, WeatherForecastInput } from "./weather"
+export { getWeatherForecast, requestWeatherForecast, roundCoordinate } from "./weather"
 export { dynaResponseDataSchema } from "./schemas"
 export type {
   DataCompleteness,
@@ -48,6 +86,12 @@ export type {
   DynaFertilizerAdvice,
   DynaNitrogenBalance,
   DynaResult,
+  DynaV2ApplicationMethod,
+  DynaV2ComputeInput,
+  DynaV2DailyPoint,
+  DynaV2NitrogenBalance,
+  DynaV2Request,
+  DynaV2Result,
   NSupplyComputeInput,
   NSupplyDataPoint,
   NSupplyMethod,
