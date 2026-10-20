@@ -15,69 +15,9 @@
 
 import type { Timeframe } from "@nmi-agro/fdm-core"
 import type { NSupplyMethod } from "./types"
+import { getMainCultivation } from "./prepare"
 
-// ─── Internal helpers ─────────────────────────────────────────────────────────
-
-/**
- * Determines the main cultivation for a given year using the "May 15th" rule.
- *
- * The NMI models expect one principal cultivation per rotation year. This rule
- * identifies the crop that is active on May 15th of the specified year. If no
- * cultivation spans that date (e.g. a late-starting crop), the function falls
- * back to the first non-catchcrop in the year, then to any cultivation.
- *
- * When multiple cultivations overlap May 15th, the most recently started one
- * takes precedence (sorted descending by `b_lu_start`).
- *
- * @param cultivations - All cultivations for the given year.
- * @param year - Calendar year to evaluate (e.g. `2026`).
- * @returns The main cultivation for the year, or `undefined` if the list is empty.
- *
- * @internal
- */
-export function getMainCultivation<
-  T extends {
-    b_lu_catalogue?: string | null
-    b_lu_start?: Date | null
-    b_lu_end?: Date | null
-    b_lu_croprotation?: string | null
-  },
->(cultivations: T[], year: number): T | undefined {
-  // Use 12:00 noon to avoid timezone edge cases at midnight
-  const targetDate = new Date(`${year}-05-15T12:00:00`)
-
-  // 1. First priority: a non-catchcrop that spans May 15th
-  // If multiple candidates span the date, pick the one with the most recent start date.
-  const activeMainOnMay15 = cultivations
-    .filter(
-      (c) =>
-        c.b_lu_start &&
-        c.b_lu_croprotation !== "catchcrop" &&
-        (c.b_lu_end ?? targetDate) >= targetDate &&
-        c.b_lu_start <= targetDate,
-    )
-    .reduce<T | undefined>(
-      (best, c) =>
-        !best || (c.b_lu_start?.getTime() ?? 0) > (best.b_lu_start?.getTime() ?? 0) ? c : best,
-      undefined,
-    )
-  if (activeMainOnMay15) return activeMainOnMay15
-
-  // 2. Second priority: any crop that spans May 15th (including catchcrops)
-  const activeAnyOnMay15 = cultivations
-    .filter(
-      (c) => c.b_lu_start && (c.b_lu_end ?? targetDate) >= targetDate && c.b_lu_start <= targetDate,
-    )
-    .reduce<T | undefined>(
-      (best, c) =>
-        !best || (c.b_lu_start?.getTime() ?? 0) > (best.b_lu_start?.getTime() ?? 0) ? c : best,
-      undefined,
-    )
-  if (activeAnyOnMay15) return activeAnyOnMay15
-
-  // 3. Fallback: first non-catchcrop in the year, then any crop
-  return cultivations.find((c) => c.b_lu_croprotation !== "catchcrop") ?? cultivations[0]
-}
+export { getMainCultivation }
 
 // ─── N-Supply request builder ─────────────────────────────────────────────────
 
