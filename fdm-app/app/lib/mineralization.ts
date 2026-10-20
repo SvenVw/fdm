@@ -52,7 +52,19 @@ export type FieldMineralizationOutcome =
       mainHarvest: string
       /** Whether cultivations after the main crop had to be left out of the calculation. */
       partial: boolean
+      /** Fertilizers of the farm that can be used in a scenario. */
+      fertilizerOptions: ScenarioFertilizerOption[]
     })
+
+/** Fertilizer that can be chosen in a scenario. */
+export interface ScenarioFertilizerOption {
+  p_id: string
+  p_name_nl: string | null
+  /** Unit in which the amount is entered, e.g. `kg/ha` or `m3/ha`. */
+  p_app_amount_unit: string
+  /** Allowed application methods; empty when not restricted. */
+  p_app_method_options: string[]
+}
 
 /** Outcome of a field that could be calculated. */
 export type FieldMineralizationOk = Extract<FieldMineralizationOutcome, { status: "ok" }>

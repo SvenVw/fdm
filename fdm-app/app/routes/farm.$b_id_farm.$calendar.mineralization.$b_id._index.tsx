@@ -1,17 +1,24 @@
-import { DYNA_V2_SOIL_PARAMETERS, type SeasonPhase } from "@nmi-agro/fdm-calculator"
+import {
+  DYNA_V2_SOIL_PARAMETERS,
+  getMineralizationScenarioSchema,
+  type MineralizationScenario,
+  type SeasonPhase,
+} from "@nmi-agro/fdm-calculator"
 import {
   addHarvest,
+  getFertilizerParametersDescription,
   getSoilParametersDescription,
   startOfDayInFdmTimeZone,
   toFdmDateString,
 } from "@nmi-agro/fdm-core"
 import { CircleAlert, CircleCheck, Info, MapPinOff } from "lucide-react"
-import { Suspense, use, useEffect } from "react"
+import { Suspense, use, useEffect, useRef, useState } from "react"
 import {
   type ActionFunctionArgs,
   data,
   type LoaderFunctionArgs,
   type MetaFunction,
+  useFetcher,
   useLoaderData,
   useRevalidator,
   useSearchParams,
@@ -27,6 +34,11 @@ import {
 import { MissingHarvestCard } from "~/components/blocks/mineralization/missing-harvest-card"
 import { NitrogenChart } from "~/components/blocks/mineralization/nitrogen-chart"
 import { PhaseSelector } from "~/components/blocks/mineralization/phase-selector"
+import {
+  type ScenarioAction,
+  ScenarioPanel,
+  scenarioReducer,
+} from "~/components/blocks/mineralization/scenario-panel"
 import { SignalChips } from "~/components/blocks/mineralization/signal-chips"
 import { FieldMineralizationSkeleton } from "~/components/blocks/mineralization/skeletons"
 import { type SoilParameterLabels, UsedInput } from "~/components/blocks/mineralization/used-input"
@@ -40,6 +52,7 @@ import {
   calculateFieldMineralization,
   getMineralizationYear,
   loadFarmMineralizationContext,
+  saveScenario,
 } from "~/integrations/mineralization.server"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
@@ -108,10 +121,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       }
     }
 
+    const methodLabels: Record<string, string> = {}
+    const methodDescription = getFertilizerParametersDescription().find(
+      (x: { parameter: string }) => x.parameter === "p_app_method_options",
+    )
+    for (const option of methodDescription?.options ?? []) {
+      if (option.value !== null) methodLabels[String(option.value)] = option.label
+    }
+
     return {
       b_id_farm,
       b_id,
       calendar: params.calendar ?? String(year),
+      methodLabels,
       year,
       today,
       isCurrentYear: Number(today.slice(0, 4)) === year,
@@ -161,6 +183,36 @@ export async function action({ request, params }: ActionFunctionArgs) {
       return dataWithSuccess(
         { result: "ok" },
         { message: "Oogst opgeslagen. De mineralisatie wordt opnieuw berekend." },
+      )
+    }
+
+    if (intent === "save_scenario") {
+      const b_id_farm = params.b_id_farm
+      if (!b_id_farm) {
+        throw data("invalid: b_id_farm", { status: 400, statusText: "invalid: b_id_farm" })
+      }
+      const year = getMineralizationYear(params.calendar)
+      let raw: unknown
+      try {
+        const value = formData.get("scenario")
+        raw = JSON.parse(typeof value === "string" ? value : "")
+      } catch {
+        throw data("Ongeldig scenario", { status: 400 })
+      }
+      const parsed = getMineralizationScenarioSchema(year).safeParse(raw)
+      if (!parsed.success) {
+        throw data("Ongeldig scenario", { status: 400 })
+      }
+      await saveScenario({
+        principal_id: session.principal_id,
+        b_id_farm,
+        b_id: params.b_id,
+        year,
+        scenario: parsed.data,
+      })
+      return dataWithSuccess(
+        { result: "ok" },
+        { message: "Scenario opgeslagen in het bemestingsplan." },
       )
     }
 
@@ -242,19 +294,89 @@ function FieldMineralization(props: LoaderData) {
           </AlertDescription>
         </Alert>
       )
-    case "ok":
-      return <FieldMineralizationResult {...props} outcome={outcome} />
+    case "ok": {
+      const base = getScenarioBase(outcome)
+      return (
+        <FieldMineralizationResult
+          key={JSON.stringify(base)}
+          {...props}
+          outcome={outcome}
+          base={base}
+        />
+      )
+    }
   }
 }
+
+/** The current fertilization plan and harvest of the year, as the starting point of a scenario. */
+function getScenarioBase(outcome: FieldMineralizationOk): MineralizationScenario {
+  const mainHarvest = outcome.usedInput.harvests
+    .filter((h) => h.b_lu === outcome.mainCultivation.b_lu)
+    .at(-1)
+  return {
+    fertilizerApplications: outcome.usedInput.fertilizerApplications.map((a) => ({
+      p_app_id: a.p_app_id,
+      p_id: a.p_id,
+      p_app_amount_display: a.amount ?? 0,
+      p_app_method: a.method ?? "broadcasting",
+      p_app_date: a.date,
+    })),
+    ...(mainHarvest
+      ? {
+          harvest: {
+            b_date_harvest: mainHarvest.date,
+            ...(mainHarvest.b_lu_yield !== null ? { b_lu_yield: mainHarvest.b_lu_yield } : {}),
+          },
+        }
+      : {}),
+  }
+}
+
+const SCENARIO_DEBOUNCE_MS = 600
 
 function isPhase(value: string | null): value is SeasonPhase {
   return value === "planning" || value === "growing" || value === "evaluation"
 }
 
 function FieldMineralizationResult(
-  props: Omit<LoaderData, "outcome"> & { outcome: FieldMineralizationOk },
+  props: Omit<LoaderData, "outcome"> & {
+    outcome: FieldMineralizationOk
+    base: MineralizationScenario
+  },
 ) {
-  const { outcome, year, today, isCurrentYear } = props
+  const { outcome, base, year, today, isCurrentYear } = props
+  const { capture } = useAnalytics()
+
+  // What-if scenario: edited locally, calculated through the scenario resource route
+  const [scenario, setScenario] = useState(base)
+  const scenarioFetcher = useFetcher<FieldMineralizationOutcome>()
+  const saveFetcher = useFetcher()
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current)
+    },
+    [],
+  )
+  const scenarioUrl = `/farm/${props.b_id_farm}/${props.calendar}/mineralization/${props.b_id}/scenario`
+  const dirty = JSON.stringify(scenario) !== JSON.stringify(base)
+  const dispatch = (action: ScenarioAction) => {
+    const next = scenarioReducer(scenario, action)
+    setScenario(next)
+    if (timer.current) clearTimeout(timer.current)
+    if (JSON.stringify(next) === JSON.stringify(base)) return
+    timer.current = setTimeout(() => {
+      void scenarioFetcher.load(
+        `${scenarioUrl}?scenario=${encodeURIComponent(JSON.stringify(next))}`,
+      )
+    }, SCENARIO_DEBOUNCE_MS)
+    capture("mineralization_scenario_changed", { action: action.type })
+  }
+  const scenarioOutcome = dirty ? scenarioFetcher.data : undefined
+  const scenarioOk = scenarioOutcome?.status === "ok" ? scenarioOutcome : null
+  const scenarioError = scenarioOutcome?.status === "error" ? scenarioOutcome.message : null
+  const scenarioPending = dirty && (scenarioFetcher.state !== "idle" || !scenarioOutcome)
+  const saving = saveFetcher.state !== "idle"
   const [searchParams, setSearchParams] = useSearchParams()
   const requested = searchParams.get("phase")
   const phase: SeasonPhase = isPhase(requested) ? requested : outcome.insights.defaultPhase
@@ -313,6 +435,11 @@ function FieldMineralizationResult(
         <CardContent className="space-y-2">
           <NitrogenChart
             series={series}
+            scenarioSeries={
+              scenarioOk && !scenarioPending
+                ? seriesInYear(scenarioOk.result.series, year)
+                : undefined
+            }
             events={outcome.events}
             today={isCurrentYear ? today : null}
             forecastEnd={isCurrentYear ? forecastEnd : null}
@@ -323,7 +450,45 @@ function FieldMineralizationResult(
       </Card>
 
       {phase !== "evaluation" && outcome.forecast && outcome.forecast.days.length > 0 ? (
-        <WeatherStrip forecast={outcome.forecast} signals={outcome.insights.signals} />
+        <WeatherStrip
+          forecast={outcome.forecast}
+          signals={outcome.insights.signals}
+          onSuggestShift={(suggestion) =>
+            dispatch({
+              type: "shift",
+              eventType: suggestion.eventType,
+              p_app_id: suggestion.p_app_id,
+              newDate: suggestion.newDate,
+            })
+          }
+        />
+      ) : null}
+
+      {phase !== "evaluation" ? (
+        <ScenarioPanel
+          scenario={scenario}
+          dispatch={dispatch}
+          year={year}
+          fertilizerOptions={outcome.fertilizerOptions}
+          methodLabels={props.methodLabels}
+          dirty={dirty}
+          pending={scenarioPending}
+          error={scenarioError}
+          current={outcome.insights.kpis}
+          result={scenarioOk?.insights.kpis ?? null}
+          saving={saving}
+          onSave={() => {
+            capture("mineralization_scenario_saved", { b_id_farm: props.b_id_farm, year })
+            void saveFetcher.submit(
+              { intent: "save_scenario", scenario: JSON.stringify(scenario) },
+              { method: "post" },
+            )
+          }}
+          onDiscard={() => {
+            if (timer.current) clearTimeout(timer.current)
+            setScenario(base)
+          }}
+        />
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-2">

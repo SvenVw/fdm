@@ -9,7 +9,10 @@
  * never breaks a page.
  */
 
+import type { ApplicationMethods } from "@nmi-agro/fdm-data"
 import {
+  applyScenarioToRequest,
+  diffScenario,
   type DynaV2Request,
   type DynaV2Result,
   deriveMineralizationInsights,
@@ -17,6 +20,7 @@ import {
   getWeatherForecast,
   type MineralizationCultivation,
   type MineralizationFieldData,
+  type MineralizationScenario,
   NmiApiError,
   prepareMineralizationInput,
   restrictToMainCultivation,
@@ -24,6 +28,8 @@ import {
   type WeatherForecast,
 } from "@nmi-agro/fdm-calculator"
 import {
+  addFertilizerApplication,
+  addHarvest,
   type Fertilizer,
   type Field,
   getCultivationsForFarm,
@@ -33,9 +39,12 @@ import {
   getFertilizers,
   getFields,
   getHarvestsForFarm,
+  removeFertilizerApplication,
   startOfDayInFdmTimeZone,
   type Timeframe,
   toFdmDateString,
+  updateFertilizerApplication,
+  updateHarvest,
 } from "@nmi-agro/fdm-core"
 import type {
   FieldMineralizationOutcome,
@@ -294,6 +303,12 @@ export async function calculateFieldMineralization(
       mainStart,
       mainHarvest,
       partial,
+      fertilizerOptions: ctx.fertilizers.map((f) => ({
+        p_id: f.p_id,
+        p_name_nl: f.p_name_nl,
+        p_app_amount_unit: f.p_app_amount_unit,
+        p_app_method_options: f.p_app_method_options ?? [],
+      })),
     }
   } catch (error) {
     console.error(`Mineralization calculation failed for field ${b_id}:`, error)
@@ -303,4 +318,136 @@ export async function calculateFieldMineralization(
       message: error instanceof NmiApiError ? error.message : "Er ging iets mis bij de berekening.",
     }
   }
+}
+
+/**
+ * Calculates a what-if scenario for a field without saving it.
+ *
+ * @param args.scenario - Applications and harvest of the scenario; validate with
+ *   `getMineralizationScenarioSchema(year)` first.
+ * @returns The outcome of the field with the scenario applied.
+ */
+export async function calculateScenario(args: {
+  principal_id: string
+  b_id_farm: string
+  b_id: string
+  year: number
+  scenario: MineralizationScenario
+}): Promise<FieldMineralizationOutcome> {
+  const ctx = await loadFarmMineralizationContext(args)
+  const fertilizers = new Map(ctx.fertilizers.map((f) => [f.p_id, f]))
+  return calculateFieldMineralization(ctx, args.b_id, args.principal_id, args.b_id_farm, {
+    transformRequest: (request, main) =>
+      applyScenarioToRequest({
+        request,
+        scenario: args.scenario,
+        fertilizers,
+        mainB_lu: main.b_lu,
+        mainHarvestable: main.b_lu_harvestable,
+      }),
+  })
+}
+
+/**
+ * Saves a scenario to the fertilization plan of a field: fertilizer applications in the year are
+ * added, changed or removed and the harvest of the main cultivation is added or changed, all in
+ * one transaction.
+ *
+ * @throws `Error` when the field has no main cultivation in the year.
+ */
+export async function saveScenario(args: {
+  principal_id: string
+  b_id_farm: string
+  b_id: string
+  year: number
+  scenario: MineralizationScenario
+}): Promise<void> {
+  const { principal_id, b_id, year, scenario } = args
+  const ctx = await loadFarmMineralizationContext(args)
+  const data = ctx.data.get(b_id)
+  if (!data) throw new Error("Perceel niet gevonden")
+
+  const preparation = prepareMineralizationInput(data, year, ctx.today)
+  if (preparation.status !== "ready" && preparation.status !== "missing_harvest") {
+    throw new Error("Dit perceel heeft geen hoofdteelt om een scenario voor op te slaan")
+  }
+  const main = preparation.mainCultivation
+
+  const prefix = `${year}-`
+  const currentApplications = data.applications.filter((a) =>
+    toFdmDateString(a.p_app_date).startsWith(prefix),
+  )
+  const currentHarvest =
+    (data.harvests.get(main.b_lu) ?? [])
+      .filter((h) => h.b_lu_harvest_date && toFdmDateString(h.b_lu_harvest_date).startsWith(prefix))
+      .sort(
+        (a, b) => (a.b_lu_harvest_date as Date).getTime() - (b.b_lu_harvest_date as Date).getTime(),
+      )
+      .at(-1) ?? null
+
+  const diff = diffScenario(
+    currentApplications,
+    currentHarvest
+      ? {
+          b_id_harvesting: currentHarvest.b_id_harvesting,
+          b_date_harvest: toFdmDateString(currentHarvest.b_lu_harvest_date as Date),
+          b_lu_yield: currentHarvest.harvestable?.harvestable_analyses?.[0]?.b_lu_yield ?? null,
+        }
+      : null,
+    scenario,
+  )
+
+  const toDate = (date: string) => {
+    const [y, m, d] = date.split("-").map(Number)
+    return startOfDayInFdmTimeZone(y, m, d)
+  }
+
+  await fdm.transaction(async (tx) => {
+    for (const p_app_id of diff.remove) {
+      await removeFertilizerApplication(tx, principal_id, p_app_id)
+    }
+    for (const app of diff.update) {
+      await updateFertilizerApplication(
+        tx,
+        principal_id,
+        app.p_app_id,
+        app.p_id,
+        app.p_app_amount_display,
+        app.p_app_method as ApplicationMethods,
+        toDate(app.p_app_date),
+      )
+    }
+    for (const app of diff.add) {
+      await addFertilizerApplication(
+        tx,
+        principal_id,
+        b_id,
+        app.p_id,
+        app.p_app_amount_display,
+        app.p_app_method as ApplicationMethods,
+        toDate(app.p_app_date),
+      )
+    }
+    if (diff.harvest) {
+      const properties =
+        diff.harvest.b_lu_yield !== undefined ? { b_lu_yield: diff.harvest.b_lu_yield } : undefined
+      if (diff.harvest.b_id_harvesting) {
+        await updateHarvest(
+          tx,
+          principal_id,
+          diff.harvest.b_id_harvesting,
+          toDate(diff.harvest.b_date_harvest),
+          properties,
+        )
+      } else {
+        await addHarvest(
+          tx,
+          principal_id,
+          main.b_lu,
+          toDate(diff.harvest.b_date_harvest),
+          properties,
+        )
+      }
+    }
+  })
 }
