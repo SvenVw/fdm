@@ -30,6 +30,7 @@ import {
   useNavigation,
   useParams,
 } from "react-router"
+import { redirectWithSuccess } from "remix-toast"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
@@ -37,12 +38,20 @@ import { HeaderFarm } from "~/components/blocks/header/farm"
 import { parseRvoRequestMode, RvoConnectCard } from "~/components/blocks/rvo/connect-card"
 import { RvoErrorAlert } from "~/components/blocks/rvo/error-alert"
 import {
+  countImportChanges,
+  ImportChangeList,
+  ImportIssuesAlert,
+} from "~/components/blocks/rvo/import-review-summary"
+import {
   CustomValueButtonsToggle,
   RvoImportReviewTable,
   useRvoImportForm,
 } from "~/components/blocks/rvo/import-review-table"
 import { RvoNoFieldsAlert } from "~/components/blocks/rvo/no-fields-alert"
-import { ImportReviewChoicesSchema } from "~/components/blocks/rvo/schema"
+import {
+  getImportValidationMessage,
+  ImportReviewChoicesSchema,
+} from "~/components/blocks/rvo/schema"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
@@ -320,7 +329,7 @@ export default function RvoImportReviewPage() {
     navigation.state === "submitting" && navigation.formData?.get("intent") === "apply_changes"
 
   const [canUnloadSafely, setCanUnloadSafely] = useState(false)
-  const { formValues } = useRvoImportForm(rvoImportReviewData, { calendar })
+  const { formValues, summary, issues } = useRvoImportForm(rvoImportReviewData, { calendar })
 
   // A failed save re-arms the guard even if the user had just disarmed it to submit.
   const effectiveCanUnloadSafely = canUnloadSafely && actionData?.success !== false
@@ -345,13 +354,9 @@ export default function RvoImportReviewPage() {
 
   const currentFarmName = farms.find((farm) => farm.b_id_farm === b_id_farm)?.b_name_farm ?? ""
 
-  const changes = {
-    add: formValues.fieldsToAdd.length,
-    remove: formValues.fieldsToRemove.length,
-    update: formValues.fieldsToUpdate.length,
-    close: 0,
-  }
-  const hasChanges = Object.values(changes).some((count) => count > 0)
+  const hasChanges = countImportChanges(summary) > 0
+  const hasIssues = issues.length > 0
+  const removesFields = summary.remove.length > 0
 
   if (error) {
     return (
@@ -464,11 +469,11 @@ export default function RvoImportReviewPage() {
             />
             <FarmContent>
               <div className="flex flex-col space-y-4 pb-10">
-                <div className="flex justify-end">
+                <div className="bg-background sticky top-0 z-20 flex items-center justify-end gap-4 border-b py-3">
                   <CustomValueButtonsToggle />
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button disabled={isApplying}>
+                      <Button disabled={isApplying || hasIssues}>
                         {isApplying ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -485,36 +490,17 @@ export default function RvoImportReviewPage() {
                       <DialogHeader>
                         <DialogTitle>Wijzigingen toepassen</DialogTitle>
                         <DialogDescription>
-                          U staat op het punt de volgende wijzigingen door te voeren:
+                          Controleer de wijzigingen voordat u ze toepast.
                         </DialogDescription>
                       </DialogHeader>
-                      <div className="py-4">
-                        <ul className="text-muted-foreground list-disc space-y-2 pl-6">
-                          {changes.add > 0 && (
-                            <li>
-                              {changes.add} {changes.add === 1 ? "perceel" : "percelen"} toevoegen
-                            </li>
-                          )}
-                          {changes.remove > 0 && (
-                            <li>
-                              {changes.remove} {changes.remove === 1 ? "perceel" : "percelen"}{" "}
-                              verwijderen
-                            </li>
-                          )}
-                          {changes.update > 0 && (
-                            <li>
-                              {changes.update} {changes.update === 1 ? "perceel" : "percelen"}{" "}
-                              bijwerken
-                            </li>
-                          )}
-                          {changes.close > 0 && (
-                            <li>
-                              {changes.close} {changes.close === 1 ? "perceel" : "percelen"}{" "}
-                              afsluiten
-                            </li>
-                          )}
-                        </ul>
-                        {!hasChanges && <p>Geen wijzigingen geselecteerd.</p>}
+                      <div className="max-h-[60vh] overflow-y-auto py-4">
+                        {hasChanges ? (
+                          <ImportChangeList summary={summary} />
+                        ) : (
+                          <p className="text-muted-foreground text-sm">
+                            Geen wijzigingen geselecteerd.
+                          </p>
+                        )}
                       </div>
                       <DialogFooter>
                         <DialogClose asChild>
@@ -539,16 +525,18 @@ export default function RvoImportReviewPage() {
                           />
                           <Button
                             type="submit"
-                            disabled={isApplying}
+                            variant={removesFields ? "destructive" : "default"}
+                            disabled={isApplying || hasIssues}
                             onClick={() => setCanUnloadSafely(true)}
                           >
-                            Bevestigen
+                            {removesFields ? "Bevestigen en verwijderen" : "Bevestigen"}
                           </Button>
                         </Form>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
                 </div>
+                <ImportIssuesAlert issues={issues} />
                 <div className="w-full">
                   <RvoImportReviewTable
                     calendar={calendar}
@@ -659,6 +647,12 @@ export async function action({ request, params, url }: Route.ActionArgs) {
             field.b_bufferstrip,
           )
 
+          // Soil estimates depend on the location only, so every added field gets them.
+          addedFields.push({
+            b_id: b_id,
+            geometry: field.b_geometry as unknown as FieldGeometry,
+          })
+
           if (typeof field.b_lu_catalogue === "string") {
             const defaultDates = await getDefaultDatesOfCultivation(
               tx,
@@ -676,11 +670,6 @@ export async function action({ request, params, url }: Route.ActionArgs) {
               defaultDates.b_lu_start,
               defaultDates.b_lu_end,
             )
-
-            addedFields.push({
-              b_id: b_id,
-              geometry: field.b_geometry as unknown as FieldGeometry,
-            })
           }
         }
 
@@ -776,12 +765,23 @@ export async function action({ request, params, url }: Route.ActionArgs) {
         calendar: yearString,
       })
 
-      return redirect(`/farm/${b_id_farm}`)
+      const changedCount =
+        formValues.fieldsToAdd.length +
+        formValues.fieldsToUpdate.length +
+        formValues.fieldsToRemove.length
+      return redirectWithSuccess(
+        `/farm/${b_id_farm}`,
+        changedCount > 0
+          ? `${changedCount} ${changedCount === 1 ? "perceel is" : "percelen zijn"} bijgewerkt met de gegevens van RVO.`
+          : "Er zijn geen wijzigingen opgeslagen.",
+      )
     } catch (e: any) {
       console.error("Error with processing RVO import: ", e)
       return {
         success: false,
-        message: `Error with processing RVO import: ${await extractErrorMessage(e)}`,
+        message:
+          getImportValidationMessage(e) ??
+          `Het verwerken van de percelen is mislukt. Uw keuzes zijn bewaard, probeer het opnieuw. (${await extractErrorMessage(e)})`,
       }
     }
   }

@@ -3,11 +3,26 @@ import {
   type ColumnDef,
   columnVisibilityFeature,
   FlexRender,
+  type Row,
   tableFeatures,
   useTable,
 } from "@tanstack/react-table"
 import { area } from "@turf/area"
-import { Archive, ArrowLeftRight, Check, Info, Pencil, Plus, Trash2, X } from "lucide-react"
+import {
+  AlertCircle,
+  Archive,
+  ArrowLeftRight,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Info,
+  type LucideIcon,
+  Minus,
+  Pencil,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react"
 import { memo, useCallback, useId, useLayoutEffect, useMemo, useRef, useState } from "react"
 import { DatePicker } from "~/components/custom/date-picker-v2"
 import { Badge } from "~/components/ui/badge"
@@ -32,6 +47,7 @@ import {
   TableRow,
 } from "~/components/ui/table"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip"
+import { useKeyedState } from "~/hooks/use-keyed-state"
 import { useIsMobile } from "~/hooks/use-mobile"
 import { clientConfig } from "~/lib/config"
 import { cn } from "~/lib/utils"
@@ -43,6 +59,7 @@ import {
   useRvoUserChoice,
   useRvoUserChoices,
 } from "~/store/rvo-import-review"
+import { type DifferenceCount, ImportDifferenceSummary } from "./import-review-summary"
 import {
   buildImportFormValues,
   createReviewFieldContext,
@@ -50,9 +67,13 @@ import {
   getConflictRowAction,
   getDefaultValue,
   getExpiredRowAction,
+  getDiffKeys,
   getExpiredRowValues,
+  getImportIssues,
+  getItemName,
   getRemoteTarget,
   getRowActionValues,
+  getRowFields,
   type ImportReviewFlags,
   isRemoteAvailable,
   type ReviewField,
@@ -62,13 +83,13 @@ import {
   type ReviewItem,
   type ReviewOption,
   REVIEW_FIELDS,
+  summarizeImportChanges,
   valuesEqual,
 } from "./review-fields"
 
 export type { ImportReviewFlags }
 
 interface ImportReviewTableMeta {
-  canModify: boolean
   ctx: ReviewFieldContext
 }
 
@@ -98,7 +119,7 @@ function ActionItem({
       {typeof badge === "string" && (
         <Badge
           variant="outline"
-          className="text-muted-foreground border-border h-5 min-w-[45px] justify-center px-1 text-[10px]"
+          className="text-muted-foreground border-border h-5 min-w-[45px] justify-center px-1 text-xs font-normal"
         >
           {badge}
         </Badge>
@@ -109,7 +130,7 @@ function ActionItem({
           typeof selected !== "undefined" &&
             !selected &&
             "decoration-muted-foreground/50 text-muted-foreground line-through",
-          typeof selected !== "undefined" && selected && "font-bold",
+          typeof selected !== "undefined" && selected && "font-semibold",
         )}
       >
         {label}
@@ -124,14 +145,20 @@ function ActionInput({
   value,
   onChange,
   setInputActive,
+  label,
+  autoOpen = false,
 }: {
   type: ReviewFieldType
   options?: ReviewOption[]
   value: any
   onChange: (value: any) => void
   setInputActive: (active: boolean) => void
+  /** Accessible name of the input, naming both the column and the field. */
+  label: string
+  /** Opens the option list straight away, for when the user just asked to enter a value. */
+  autoOpen?: boolean
 }) {
-  const [selectOpen, setSelectOpen] = useKeyedState(options, () => true)
+  const [selectOpen, setSelectOpen] = useKeyedState(options, () => autoOpen)
   if (type === "enum" && options) {
     return (
       <Select
@@ -148,7 +175,7 @@ function ActionInput({
           setInputActive(false)
         }}
       >
-        <SelectTrigger>
+        <SelectTrigger aria-label={label}>
           <SelectValue placeholder="Kies een optie" />
         </SelectTrigger>
         <SelectContent>
@@ -163,25 +190,28 @@ function ActionInput({
   }
 
   if (type === "date") {
+    // The date picker has no visible label here, so the group names what the date is for.
     return (
-      <DatePicker
-        label={undefined}
-        field={{
-          onChange: onChange,
-          onBlur: () => setInputActive(false),
-          value: value,
-          disabled: false,
-          name: "date",
-          ref: () => {},
-        }}
-        fieldState={{
-          invalid: false,
-          isTouched: false,
-          isDirty: false,
-          isValidating: false,
-          error: undefined,
-        }}
-      />
+      <div role="group" aria-label={label}>
+        <DatePicker
+          label={undefined}
+          field={{
+            onChange: onChange,
+            onBlur: () => setInputActive(false),
+            value: value,
+            disabled: false,
+            name: "date",
+            ref: () => {},
+          }}
+          fieldState={{
+            invalid: false,
+            isTouched: false,
+            isDirty: false,
+            isValidating: false,
+            error: undefined,
+          }}
+        />
+      </div>
     )
   }
 
@@ -189,6 +219,7 @@ function ActionInput({
     return (
       <label className="text-muted-foreground flex flex-row items-center gap-1">
         <Checkbox
+          aria-label={label}
           checked={value === true}
           onCheckedChange={(checked) => onChange(checked === true)}
         />
@@ -197,12 +228,14 @@ function ActionInput({
     )
   }
 
+  // A geometry is always taken from FDM or RVO and is never entered by the user.
   if (type === "geometry") {
-    return "niet geïmplementeerd"
+    return null
   }
 
   return (
     <Input
+      aria-label={label}
       value={value ?? ""}
       onChange={(e) => {
         onChange(e.currentTarget.value)
@@ -257,6 +290,8 @@ function FieldCell({
   const options = field.getOptions?.(ctx)
   const value = userChoice !== undefined ? userChoice : getDefaultValue(field, item, ctx)
   const onChange = (next: unknown) => setUserChoice(id, field.key, next)
+  const itemName = getItemName(item)
+  const label = `${field.label} van ${itemName}`
 
   // Without RVO information the value is always edited directly.
   if (!isRemoteAvailable(field, ctx)) {
@@ -267,6 +302,7 @@ function FieldCell({
         value={value}
         onChange={onChange}
         setInputActive={setInputActive}
+        label={label}
       />
     )
   }
@@ -302,6 +338,9 @@ function FieldCell({
     if (item.status === "CONFLICT" && candidates.length > 1) {
       candidates[0].badge = clientConfig.name
       candidates[1].badge = "RVO"
+    } else if (item.status === "EXPIRED_LOCAL" && candidates.length > 1) {
+      candidates[0].badge = "Huidig"
+      candidates[1].badge = "Afsluiten"
     }
   }
 
@@ -318,6 +357,8 @@ function FieldCell({
       value={value}
       onChange={onChange}
       setInputActive={setInputActive}
+      label={label}
+      autoOpen={inputActive}
     />
   ) : null
 
@@ -326,8 +367,12 @@ function FieldCell({
       {showCustomValueButtons && field.allowCustomValue && !showInput && (
         <Button
           variant="ghost"
-          className={"size-auto has-[>svg]:p-1"}
-          title="Aanpassen..."
+          size="icon"
+          // Shown only on the row the user works on, or always on touch screens without hover, so
+          // a long table is not covered in edit buttons. A focused button is always visible.
+          className="size-8 opacity-0 group-focus-within/row:opacity-100 group-hover/row:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
+          title="Zelf een waarde invullen"
+          aria-label={`${label}: zelf een waarde invullen`}
           onClick={() => setInputActive(true)}
         >
           <Pencil />
@@ -338,8 +383,9 @@ function FieldCell({
 
   if (showRadio) {
     return (
-      <div className="group flex flex-row items-start gap-1">
+      <div className="flex flex-row items-start gap-1">
         <RadioGroup
+          aria-label={label}
           className="flex flex-col gap-1.5"
           value={action}
           onValueChange={(next) => {
@@ -352,7 +398,7 @@ function FieldCell({
           {candidates.map((candidate) => {
             const isSelected = candidate.action === action
             return (
-              <label key={candidate.action} className="flex items-center">
+              <label key={candidate.action} className="flex items-center gap-1.5">
                 <RadioGroupItem value={candidate.action} />
                 <ActionItem
                   label={candidate.label}
@@ -363,8 +409,8 @@ function FieldCell({
             )
           })}
           {inputItem && (
-            <div className="flex items-center">
-              <RadioGroupItem value="CUSTOM" />
+            <div className="flex items-center gap-1.5">
+              <RadioGroupItem value="CUSTOM" aria-label="Eigen waarde" />
               {inputItem}
             </div>
           )}
@@ -375,7 +421,7 @@ function FieldCell({
   }
 
   return (
-    <div className="group flex flex-row items-start gap-1">
+    <div className="flex flex-row items-start gap-1">
       <div>
         {candidates.map((candidate) => (
           <div key={candidate.action} className="flex items-center">
@@ -393,6 +439,7 @@ function FieldCell({
  */
 function ActionsCell({ item, ctx }: { item: ReviewItem; ctx: ReviewFieldContext }) {
   const id = getItemId(item)
+  const actionLabel = `Actie voor ${getItemName(item)}`
 
   const userChoices = useRvoUserChoices(id)
   const setUserChoices = useRvoImportReviewStore((state) => state.setUserChoices)
@@ -403,9 +450,9 @@ function ActionsCell({ item, ctx }: { item: ReviewItem; ctx: ReviewFieldContext 
 
   if (item.status === "MATCH") {
     return (
-      <div className="flex items-center gap-2 text-sm text-green-600">
+      <div className="text-muted-foreground flex items-center gap-2 text-sm">
         <Check className="h-4 w-4" />
-        <span>Aanwezig</span>
+        <span>Geen actie nodig</span>
       </div>
     )
   }
@@ -422,7 +469,7 @@ function ActionsCell({ item, ctx }: { item: ReviewItem; ctx: ReviewFieldContext 
           }
         }}
       >
-        <SelectTrigger className="z-10 h-8 w-[180px] text-xs">
+        <SelectTrigger aria-label={actionLabel} className="z-10 h-8 w-[180px] text-xs">
           <SelectValue placeholder="Kies actie" />
         </SelectTrigger>
         <SelectContent>
@@ -456,7 +503,7 @@ function ActionsCell({ item, ctx }: { item: ReviewItem; ctx: ReviewFieldContext 
           setFieldToAdd(id, val === "ADD_REMOTE")
         }}
       >
-        <SelectTrigger className="z-10 h-8 w-[180px] text-xs">
+        <SelectTrigger aria-label={actionLabel} className="z-10 h-8 w-[180px] text-xs">
           <SelectValue placeholder="Kies actie" />
         </SelectTrigger>
         <SelectContent>
@@ -483,7 +530,7 @@ function ActionsCell({ item, ctx }: { item: ReviewItem; ctx: ReviewFieldContext 
           setFieldToRemove(id, val === "REMOVE_LOCAL")
         }}
       >
-        <SelectTrigger className="z-10 h-8 w-[180px] text-xs">
+        <SelectTrigger aria-label={actionLabel} className="z-10 h-8 w-[180px] text-xs">
           <SelectValue placeholder="Kies actie" />
         </SelectTrigger>
         <SelectContent>
@@ -512,12 +559,12 @@ function ActionsCell({ item, ctx }: { item: ReviewItem; ctx: ReviewFieldContext 
           }
         }}
       >
-        <SelectTrigger className="z-10 h-8 w-[180px] text-xs">
+        <SelectTrigger aria-label={actionLabel} className="z-10 h-8 w-[180px] text-xs">
           <SelectValue placeholder="Kies actie" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="CLOSE_LOCAL">
-            <div className="flex items-center gap-2 text-orange-700">
+            <div className="flex items-center gap-2">
               <Archive className="h-3 w-3" /> Afsluiten
             </div>
           </SelectItem>
@@ -534,77 +581,131 @@ function ActionsCell({ item, ctx }: { item: ReviewItem; ctx: ReviewFieldContext 
   return null
 }
 
+/**
+ * Label, explanation and icon of each review status, in the order in which the table lists them.
+ * Statuses whose default action changes the
+ * farm's data get a filled badge; the others stay neutral. The icon repeats the meaning, so it does
+ * not depend on color alone.
+ */
+const STATUS_INFO: Record<
+  ReviewItem["status"],
+  {
+    label: string
+    /** Follows a count in the difference summary, e.g. "4 met verschillen". */
+    summaryLabel: string
+    description: string
+    icon: LucideIcon
+    changesData: boolean
+  }
+> = {
+  CONFLICT: {
+    label: "Verschil",
+    summaryLabel: "met verschillen",
+    description: `Het perceel staat in ${clientConfig.name} en bij RVO, maar de gegevens verschillen. Kies per kolom welke waarde u wilt gebruiken.`,
+    icon: ArrowLeftRight,
+    changesData: true,
+  },
+  NEW_REMOTE: {
+    label: "Alleen bij RVO",
+    summaryLabel: "alleen bij RVO",
+    description: `Het perceel staat bij RVO, maar nog niet in ${clientConfig.name}. Het wordt toegevoegd, tenzij u kiest voor Negeren.`,
+    icon: Plus,
+    changesData: true,
+  },
+  EXPIRED_LOCAL: {
+    label: "Niet meer bij RVO",
+    summaryLabel: "niet meer bij RVO",
+    description: `Het perceel is in ${clientConfig.name} nog in gebruik, maar staat dit jaar niet meer bij RVO. Het wordt afgesloten op de getoonde einddatum, tenzij u kiest voor Behouden.`,
+    icon: Archive,
+    changesData: true,
+  },
+  NEW_LOCAL: {
+    label: `Alleen in ${clientConfig.name}`,
+    summaryLabel: `alleen in ${clientConfig.name}`,
+    description: `Het perceel staat in ${clientConfig.name}, maar niet bij RVO. Het blijft behouden, tenzij u kiest voor Verwijderen.`,
+    icon: Minus,
+    changesData: false,
+  },
+  MATCH: {
+    label: "Gelijk",
+    summaryLabel: "gelijk",
+    description: `Het perceel komt in ${clientConfig.name} en bij RVO volledig overeen.`,
+    icon: Check,
+    changesData: false,
+  },
+}
+
+/**
+ * The order of the statuses in the table, which follows {@link STATUS_INFO}: the fields that need a
+ * decision come first.
+ */
+const STATUS_ORDER = Object.keys(STATUS_INFO) as ReviewItem["status"][]
+
+/** Counts the review items per status and, for items that differ, the columns that differ. */
+function countDifferences(
+  data: ReviewItem[],
+  ctx: ReviewFieldContext,
+): { statusCounts: DifferenceCount[]; columnCounts: DifferenceCount[] } {
+  const statusCounts = STATUS_ORDER.map((status) => ({
+    key: status,
+    count: data.filter((item) => item.status === status).length,
+    label: STATUS_INFO[status].summaryLabel,
+    icon: STATUS_INFO[status].icon,
+  }))
+  const columnCounts = getRowFields(ctx)
+    .map((field) => ({
+      key: field.key,
+      count: data.filter((item) => item.status === "CONFLICT" && getDiffKeys(item).has(field.key))
+        .length,
+      label: field.label,
+    }))
+    .filter((column) => column.count > 0)
+    .sort((a, b) => b.count - a.count)
+  return { statusCounts, columnCounts }
+}
+
 const statusColumn: ColumnDef<typeof importReviewTableFeatures, ReviewItem> = {
   accessorKey: "status",
+  // The header explains every status, so keyboard users reach all explanations with a single tab
+  // stop instead of one per row.
   header: () => (
     <Tooltip>
-      <TooltipTrigger>Status</TooltipTrigger>
+      <TooltipTrigger className="flex flex-row items-center gap-1">
+        Status
+        <Info className="h-4 w-4" aria-hidden="true" />
+      </TooltipTrigger>
       <TooltipContent>
-        Geeft de vergelijkingsstatus weer tussen {clientConfig.name} en RVO.
+        <dl className="max-w-80 space-y-1.5">
+          {Object.values(STATUS_INFO).map((info) => (
+            <div key={info.label}>
+              <dt className="font-medium">{info.label}</dt>
+              <dd>{info.description}</dd>
+            </div>
+          ))}
+        </dl>
       </TooltipContent>
     </Tooltip>
   ),
   cell: ({ row }) => {
-    const status = row.getValue("status") as string
-    switch (status) {
-      case "MATCH":
-        return (
-          <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
-            <Tooltip>
-              <TooltipTrigger>Gelijk</TooltipTrigger>
-              <TooltipContent>
-                Perceel komt in {clientConfig.name} en bij RVO volledig overeen.
-              </TooltipContent>
-            </Tooltip>
+    const status = row.original.status
+    const info = STATUS_INFO[status]
+    if (!info) return <Badge variant="secondary">{status}</Badge>
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge
+            variant={info.changesData ? "secondary" : "outline"}
+            className={cn("gap-1", !info.changesData && "text-muted-foreground")}
+          >
+            <info.icon className="size-3" aria-hidden="true" />
+            {info.label}
           </Badge>
-        )
-      case "NEW_REMOTE":
-        return (
-          <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700">
-            <Tooltip>
-              <TooltipTrigger>Nieuw (RVO)</TooltipTrigger>
-              <TooltipContent>
-                Perceel bestaat bij RVO, maar niet in {clientConfig.name}.
-              </TooltipContent>
-            </Tooltip>
-          </Badge>
-        )
-      case "NEW_LOCAL":
-        return (
-          <Badge variant="outline" className="border-yellow-200 bg-yellow-50 text-yellow-700">
-            <Tooltip>
-              <TooltipTrigger>Nieuw ({clientConfig.name})</TooltipTrigger>
-              <TooltipContent>
-                Perceel bestaat in {clientConfig.name}, maar niet bij RVO.
-              </TooltipContent>
-            </Tooltip>
-          </Badge>
-        )
-      case "EXPIRED_LOCAL":
-        return (
-          <Badge variant="outline" className="border-orange-200 bg-orange-50 text-orange-700">
-            <Tooltip>
-              <TooltipTrigger>Niet meer actief</TooltipTrigger>
-              <TooltipContent>
-                Perceel is in {clientConfig.name} nog actief, maar komt niet meer voor bij RVO.
-              </TooltipContent>
-            </Tooltip>
-          </Badge>
-        )
-      case "CONFLICT":
-        return (
-          <Badge variant="destructive" className="border-red-200 bg-red-50 text-red-700">
-            <Tooltip>
-              <TooltipTrigger>Verschil</TooltipTrigger>
-              <TooltipContent>
-                Perceel bestaat in beide, maar met verschillende gegevens.
-              </TooltipContent>
-            </Tooltip>
-          </Badge>
-        )
-      default:
-        return <Badge variant="secondary">{status}</Badge>
-    }
+        </TooltipTrigger>
+        <TooltipContent>
+          <div className="max-w-75">{info.description}</div>
+        </TooltipContent>
+      </Tooltip>
+    )
   },
 }
 
@@ -647,7 +748,7 @@ const actionsColumn: ColumnDef<typeof importReviewTableFeatures, ReviewItem> = {
   header: () => (
     <Tooltip>
       <TooltipTrigger>Actie</TooltipTrigger>
-      <TooltipContent>Kies welke actie moet worden uitgevoerd voor dit perceel.</TooltipContent>
+      <TooltipContent>Kies wat er met het perceel gebeurt.</TooltipContent>
     </Tooltip>
   ),
   cell: ({ row, table }) => <ActionsCell item={row.original} ctx={table.options.meta!.ctx} />,
@@ -681,52 +782,17 @@ export function CustomValueButtonsToggle() {
             checked={showCustomValueButtons}
             onCheckedChange={setShowCustomValueButtons}
           />
-          Aanpasknopjes tonen
+          Waarden zelf aanpassen
           <span id={descriptionId} className="sr-only">
-            Hiermee kun je voor elke kolom een aangepaste waarde toevoegen.
+            Toont bij elke waarde een knop waarmee u zelf een waarde invult.
           </span>
         </label>
       </TooltipTrigger>
       <TooltipContent>
-        {showCustomValueButtons
-          ? "Klik om de potloodknopjes te verbergen."
-          : "Hiermee kun je voor elke kolom een aangepaste waarde toevoegen."}
+        Toont bij elke waarde een knop waarmee u zelf een waarde invult.
       </TooltipContent>
     </Tooltip>
   )
-}
-
-/**
- * Works like setState, however only allows a next value argument, and resets the state whenever
- * `key` changes.
- *
- * Here it is used to reset the user choices when the table data changes.
- *
- * @param key Key used to decide when to reset the state.
- * @param initial Function to compute the state reset value.
- * @returns a tuple of the current state, and a setter function.
- */
-export function useKeyedState<K, V>(
-  key: K,
-  initial: (key: K) => V,
-): [V, (next: V | ((prev: V) => V)) => void] {
-  const [stored, setStored] = useState<{ key: K; value: V } | null>(null)
-  const value = stored !== null && Object.is(stored.key, key) ? stored.value : initial(key)
-
-  const latestRef = useRef({ key, initial })
-  useLayoutEffect(() => {
-    latestRef.current = { key, initial }
-  })
-
-  const setValue = useCallback((next: V | ((prev: V) => V)) => {
-    setStored((prev) => {
-      const { key, initial } = latestRef.current
-      const current = prev !== null && Object.is(prev.key, key) ? prev.value : initial(key)
-      return { key, value: typeof next === "function" ? (next as (prev: V) => V)(current) : next }
-    })
-  }, [])
-
-  return [value, setValue]
 }
 
 /**
@@ -735,6 +801,8 @@ export function useKeyedState<K, V>(
  *
  * @param data The review items shown in the table.
  * @param settings The same `calendar` and `flags` that are passed to {@link RvoImportReviewTable}.
+ * @returns The form values to submit, a summary of the changes by kind, and the problems that
+ *   have to be solved before the review can be submitted.
  */
 export function useRvoImportForm(
   data: ReviewItem[],
@@ -745,22 +813,75 @@ export function useRvoImportForm(
   const fieldsToRemove = useRvoImportReviewStore((state) => state.fieldsToRemove)
   const bufferstripInfoAvailable = flags?.b_bufferstrip_info_available
 
-  const formValues = useMemo(
+  return useMemo(() => {
+    const ctx = createReviewFieldContext({
+      calendar,
+      flags: { b_bufferstrip_info_available: bufferstripInfoAvailable },
+    })
+    const formValues = buildImportFormValues(data, userChoices, fieldsToAdd, fieldsToRemove, ctx)
+    return {
+      formValues,
+      summary: summarizeImportChanges(data, formValues),
+      issues: getImportIssues(data, userChoices, fieldsToAdd, fieldsToRemove, ctx),
+    }
+  }, [data, userChoices, fieldsToAdd, fieldsToRemove, calendar, bufferstripInfoAvailable])
+}
+
+/**
+ * Renders one row of the review table. Fields that will be ignored are dimmed, and a problem with
+ * the chosen values is shown below the status, so the user can find the row that blocks saving.
+ */
+function ReviewRow({
+  row,
+  ctx,
+}: {
+  row: Row<typeof importReviewTableFeatures, ReviewItem>
+  ctx: ReviewFieldContext
+}) {
+  const item = row.original
+  const id = getItemId(item)
+  const choices = useRvoUserChoices(id)
+  const fieldToAdd = useRvoFieldToAdd(id)
+  const fieldToRemove = useRvoFieldToRemove(id)
+
+  const isIgnored = item.status === "NEW_REMOTE" && !fieldToAdd
+  const issues = useMemo(
     () =>
-      buildImportFormValues(
-        data,
-        userChoices,
-        fieldsToAdd,
-        fieldsToRemove,
-        createReviewFieldContext({
-          calendar,
-          flags: { b_bufferstrip_info_available: bufferstripInfoAvailable },
-        }),
+      getImportIssues(
+        [item],
+        choices ? new Map([[id, choices]]) : new Map(),
+        fieldToAdd ? new Set([id]) : new Set(),
+        fieldToRemove ? new Set([id]) : new Set(),
+        ctx,
       ),
-    [data, userChoices, fieldsToAdd, fieldsToRemove, calendar, bufferstripInfoAvailable],
+    [item, id, choices, fieldToAdd, fieldToRemove, ctx],
   )
 
-  return { formValues }
+  return (
+    <TableRow
+      className={cn(
+        "group/row",
+        isIgnored && "[&>td:not(:last-child)]:opacity-50",
+        issues.length > 0 && "bg-destructive/5 hover:bg-destructive/10",
+      )}
+    >
+      {row.getVisibleCells().map((cell, index) => (
+        <TableCell key={cell.id} className="align-top">
+          <FlexRender cell={cell} />
+          {index === 0 &&
+            issues.map((issue) => (
+              <p
+                key={issue.message}
+                className="text-destructive mt-1.5 flex max-w-40 items-start gap-1 text-xs"
+              >
+                <AlertCircle className="mt-px size-3 shrink-0" aria-hidden="true" />
+                {issue.message}
+              </p>
+            ))}
+        </TableCell>
+      ))}
+    </TableRow>
+  )
 }
 
 /**
@@ -789,6 +910,8 @@ function RvoImportReviewTableComponent({
 
   const sortedData = useMemo(() => {
     return [...data].sort((a, b) => {
+      const byStatus = STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status)
+      if (byStatus !== 0) return byStatus
       const getArea = (item: typeof a): number | null => {
         if (item.rvoField?.geometry) {
           return area(item.rvoField.geometry) / 10000
@@ -827,68 +950,111 @@ function RvoImportReviewTableComponent({
     ctxRef.current = ctx
   })
 
-  // Conflicting and expired fields start out with the RVO values selected.
+  // Every field starts out following RVO: conflicting fields take the RVO values, expired fields
+  // are closed and fields that are new at RVO are added.
   useLayoutEffect(() => {
     clearActiveForm()
     const ctx = ctxRef.current
     const initialChoices = new Map<string, ReviewChoices>()
+    const initialFieldsToAdd: string[] = []
     for (const item of data) {
       if (item.status === "CONFLICT") {
         initialChoices.set(getItemId(item), getRowActionValues("UPDATE_FROM_REMOTE", item, ctx))
       } else if (item.status === "EXPIRED_LOCAL") {
         initialChoices.set(getItemId(item), getExpiredRowValues("CLOSE_LOCAL", item, ctx))
+      } else if (item.status === "NEW_REMOTE") {
+        initialFieldsToAdd.push(getItemId(item))
       }
     }
-    useRvoImportReviewStore.getState().reset(initialChoices)
+    useRvoImportReviewStore.getState().reset(initialChoices, initialFieldsToAdd)
   }, [data, clearActiveForm])
 
+  // Fields that match RVO need no decision, so they are collapsed until the user asks for them.
+  const [showMatches, setShowMatches] = useState(false)
+  const matchCount = useMemo(() => data.filter((item) => item.status === "MATCH").length, [data])
+  const visibleData = useMemo(
+    () => (showMatches ? sortedData : sortedData.filter((item) => item.status !== "MATCH")),
+    [sortedData, showMatches],
+  )
+  const differences = useMemo(() => countDifferences(data, ctx), [data, ctx])
+
   const table = useTable({
-    data: sortedData,
+    data: visibleData,
     features: importReviewTableFeatures,
     columns,
-    meta: {
-      canModify: true,
-      ctx,
-    },
+    meta: { ctx },
   })
+
+  const allRows = table.getRowModel().rows
+  const rows = allRows.filter((row) => row.original.status !== "MATCH")
+  const matchRows = allRows.filter((row) => row.original.status === "MATCH")
+  const toggleMatches = () => setShowMatches((show) => !show)
 
   return (
     <TooltipProvider>
-      <div className="rounded-md border bg-white">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      <FlexRender header={header} />
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      <FlexRender cell={cell} />
-                    </TableCell>
-                  ))}
+      <div className="space-y-4">
+        <ImportDifferenceSummary
+          statusCounts={differences.statusCounts}
+          columnCounts={differences.columnCounts}
+          matches={{ expanded: showMatches, onToggle: toggleMatches }}
+        />
+        <div className="bg-card rounded-md border">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        <FlexRender header={header} />
+                      </TableHead>
+                    )
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  Geen resultaten.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {rows.length > 0 ? (
+                rows.map((row) => <ReviewRow key={row.id} row={row} ctx={ctx} />)
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                    {matchCount > 0
+                      ? "Alle percelen komen overeen met RVO. Er hoeft niets te worden aangepast."
+                      : "Er zijn geen percelen om te beoordelen."}
+                  </TableCell>
+                </TableRow>
+              )}
+              {/* The toggle opens the group of matching fields, so it stays right above them. */}
+              {matchCount > 0 && (
+                <TableRow className="bg-muted/40 hover:bg-muted/40">
+                  <TableCell colSpan={columns.length} className="py-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      aria-expanded={showMatches}
+                      onClick={toggleMatches}
+                    >
+                      {showMatches ? (
+                        <ChevronUp aria-hidden="true" />
+                      ) : (
+                        <ChevronDown aria-hidden="true" />
+                      )}
+                      {showMatches
+                        ? "Verberg de percelen die gelijk zijn aan RVO"
+                        : matchCount === 1
+                          ? "Toon 1 perceel dat gelijk is aan RVO"
+                          : `Toon ${matchCount} percelen die gelijk zijn aan RVO`}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )}
+              {matchRows.map((row) => (
+                <ReviewRow key={row.id} row={row} ctx={ctx} />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </TooltipProvider>
   )
