@@ -18,7 +18,7 @@ import {
 } from "@nmi-agro/fdm-core"
 import { type RvoImportReviewItem } from "@nmi-agro/fdm-rvo/types"
 import { AlertTriangle, Loader2 } from "lucide-react"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import {
   data,
   Form,
@@ -319,12 +319,20 @@ export default function RvoImportReviewPage() {
   const isApplying =
     navigation.state === "submitting" && navigation.formData?.get("intent") === "apply_changes"
 
+  const [canUnloadSafely, setCanUnloadSafely] = useState(false)
   const { formValues } = useRvoImportForm(rvoImportReviewData, { calendar })
+
+  // A failed save re-arms the guard even if the user had just disarmed it to submit.
+  const effectiveCanUnloadSafely = canUnloadSafely && actionData?.success !== false
 
   // Warn the user before refreshing or leaving when data is present
   useEffect(() => {
     if (rvoImportReviewData.length > 0) {
       const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        // Submitting the form disarms the guard
+        if (effectiveCanUnloadSafely) {
+          return
+        }
         e.preventDefault()
         e.returnValue =
           "Als u de pagina ververst, wordt de verbinding met RVO verbroken en moet u opnieuw inloggen met eHerkenning. Wilt u doorgaan?"
@@ -333,7 +341,7 @@ export default function RvoImportReviewPage() {
       window.addEventListener("beforeunload", handleBeforeUnload)
       return () => window.removeEventListener("beforeunload", handleBeforeUnload)
     }
-  }, [rvoImportReviewData])
+  }, [effectiveCanUnloadSafely, rvoImportReviewData])
 
   const currentFarmName = farms.find((farm) => farm.b_id_farm === b_id_farm)?.b_name_farm ?? ""
 
@@ -529,7 +537,11 @@ export default function RvoImportReviewPage() {
                             name="fieldsToUpdate"
                             value={JSON.stringify(formValues.fieldsToUpdate)}
                           />
-                          <Button type="submit" disabled={isApplying}>
+                          <Button
+                            type="submit"
+                            disabled={isApplying}
+                            onClick={() => setCanUnloadSafely(true)}
+                          >
                             Bevestigen
                           </Button>
                         </Form>

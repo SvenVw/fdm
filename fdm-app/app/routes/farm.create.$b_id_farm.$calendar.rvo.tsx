@@ -15,7 +15,7 @@ import {
   updateField,
 } from "@nmi-agro/fdm-core"
 import { AlertTriangle, Loader2 } from "lucide-react"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import {
   type ActionFunctionArgs,
   data,
@@ -297,12 +297,20 @@ export default function RvoImportCreatePage() {
   const isSaving =
     navigation.state === "submitting" && navigation.formData?.get("intent") === "save_fields"
 
+  const [canUnloadSafely, setCanUnloadSafely] = useState(false)
   const { formValues } = useRvoImportForm(rvoImportReviewData, { calendar })
+
+  // A failed save re-arms the guard even if the user had just disarmed it to submit.
+  const effectiveCanUnloadSafely = canUnloadSafely && actionData?.success !== false
 
   // Warn the user before refreshing or leaving when data is present
   useEffect(() => {
     if (rvoImportReviewData.length > 0) {
       const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        // Submitting the form disarms the guard
+        if (effectiveCanUnloadSafely) {
+          return
+        }
         e.preventDefault()
         e.returnValue =
           "Als u de pagina ververst, wordt de verbinding met RVO verbroken en moet u opnieuw inloggen met eHerkenning. Wilt u doorgaan?"
@@ -311,7 +319,7 @@ export default function RvoImportCreatePage() {
       window.addEventListener("beforeunload", handleBeforeUnload)
       return () => window.removeEventListener("beforeunload", handleBeforeUnload)
     }
-  }, [rvoImportReviewData])
+  }, [effectiveCanUnloadSafely, rvoImportReviewData])
 
   if (error) {
     return (
@@ -437,7 +445,11 @@ export default function RvoImportCreatePage() {
                       name="fieldsToUpdate"
                       value={JSON.stringify(formValues.fieldsToUpdate)}
                     />
-                    <Button type="submit" disabled={isSaving}>
+                    <Button
+                      type="submit"
+                      disabled={isSaving}
+                      onClick={() => setCanUnloadSafely(true)}
+                    >
                       {isSaving ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />

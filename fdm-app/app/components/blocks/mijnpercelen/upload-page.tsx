@@ -66,20 +66,6 @@ export function UploadMijnPercelenPage({
     flags: mijnPercelenReviewFlags,
   })
 
-  // Warn the user before refreshing or leaving when data is present
-  useEffect(() => {
-    if ((rvoImportReviewData ?? emptyReviewData).length > 0) {
-      const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-        e.preventDefault()
-        e.returnValue =
-          "Als u de pagina ververst, wordt de verbinding met RVO verbroken en moet u opnieuw inloggen met eHerkenning. Wilt u doorgaan?"
-        return e.returnValue
-      }
-      window.addEventListener("beforeunload", handleBeforeUnload)
-      return () => window.removeEventListener("beforeunload", handleBeforeUnload)
-    }
-  }, [rvoImportReviewData])
-
   useEffect(() => {
     if (typeof window === "undefined") return
     function onHashChange(event: HashChangeEvent) {
