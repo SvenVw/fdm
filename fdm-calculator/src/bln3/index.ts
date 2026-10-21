@@ -63,13 +63,16 @@ export type FieldIndicators = {
 /**
  * Retrieves the indicator and aggregation scores of a field for a calendar year.
  *
- * Soil analyses and adopted measures are limited to the year; the cultivation history
- * required for the indicators is not.
+ * Only the adopted measures for the given year are considered.
+ * Meanwhile, all soil analyses up to the given year are used.
+ * The cultivation history for all time is considered, regardless of the given year,
+ * in order to cover the full multi-year history needed for the BLN3 calculation.
  *
  * @param fdm - The FDM instance.
  * @param principal_id - Principal on whose behalf access is checked.
  * @param b_id - Field identifier.
- * @param year - Four-digit calendar year.
+ * @param year - Four-digit calendar year, used to limit adopted measures and soil analyses
+ * considered.
  * @param nmiApiKey - NMI API key resolved server-side.
  * @returns The score, or `is_excluded: true` without score for excluded fields.
  * @throws {IndicatorsUnavailableError} When the score cannot be produced.
