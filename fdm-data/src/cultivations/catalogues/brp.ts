@@ -1,22 +1,27 @@
-import type { AggregatedCultivationCatalogueInfo, CatalogueCultivationItem } from "../d"
+import type {
+  AggregatedCultivationCatalogueInfo,
+  CatalogueCultivationItem,
+  CultivationCatalogueBuildingContext,
+} from "../d"
 import { hashCultivation } from "../hash"
 import brp from "./brp.json"
-
-// b_lu_ya years that fall out of this range, inclusive, will be ignored. Mostly as a sanity check.
-const MIN_ALLOWED_AVAILABLE_YEAR = 1000
-const MAX_ALLOWED_AVAILABLE_YEAR = 3000
 
 /**
  * Aggregates information for the BRP catalogue.
  */
-export async function aggregateCultivationCatalogueInfoBrp(): Promise<AggregatedCultivationCatalogueInfo> {
-  return aggregateCultivationCatalogueInfoBrpInternal(brp)
+export async function aggregateCultivationCatalogueInfoBrp(
+  buildingContext: CultivationCatalogueBuildingContext,
+): Promise<AggregatedCultivationCatalogueInfo> {
+  return aggregateCultivationCatalogueInfoBrpInternal(buildingContext, brp)
 }
 
 /**
  * Aggregates information for the BRP catalogue. The data source needs to be provided.
  */
-export async function aggregateCultivationCatalogueInfoBrpInternal(data: typeof brp) {
+export async function aggregateCultivationCatalogueInfoBrpInternal(
+  buildingContext: CultivationCatalogueBuildingContext,
+  data: typeof brp,
+) {
   // Find the minimum and maximum availability year in the b_lu_ya entries.
   let firstAvailabilityYear: number | undefined = undefined
   let lastAvailabilityYear: number | undefined = undefined
@@ -26,8 +31,8 @@ export async function aggregateCultivationCatalogueInfoBrpInternal(data: typeof 
       const parsed = Number.parseInt(year)
       if (
         Number.isNaN(parsed) ||
-        parsed < MIN_ALLOWED_AVAILABLE_YEAR ||
-        parsed > MAX_ALLOWED_AVAILABLE_YEAR
+        parsed < buildingContext.firstAllowedAvailabilityYear ||
+        parsed > buildingContext.lastAllowedAvailabilityYear
       ) {
         continue
       }
@@ -58,7 +63,10 @@ export async function aggregateCultivationCatalogueInfoBrpInternal(data: typeof 
  * @returns An array of cultivation catalogue entries conforming to the `CatalogueCultivation` type.
  * @throws {Error} Throws an error if an invalid value is found for `b_lu_harvestable` in the JSON data.
  */
-export async function getCatalogueBrp(aggregatedInfo: AggregatedCultivationCatalogueInfo) {
+export async function getCatalogueBrp(
+  buildingContext: CultivationCatalogueBuildingContext,
+  aggregatedInfo: AggregatedCultivationCatalogueInfo,
+) {
   const catalogueBrpPromises = brp.map(async (cultivation) => {
     // Validate b_lu_harvestable
     const harvestable =
@@ -114,8 +122,8 @@ export async function getCatalogueBrp(aggregatedInfo: AggregatedCultivationCatal
           .filter(
             (item) =>
               !Number.isNaN(item) &&
-              item >= MIN_ALLOWED_AVAILABLE_YEAR &&
-              item <= MAX_ALLOWED_AVAILABLE_YEAR,
+              item >= buildingContext.firstAllowedAvailabilityYear &&
+              item <= buildingContext.lastAllowedAvailabilityYear,
           ),
       ),
     ]

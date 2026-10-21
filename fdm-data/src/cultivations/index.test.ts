@@ -5,7 +5,11 @@ import {
   aggregateCultivationCatalogueInfoBrpInternal,
   getCatalogueBrp,
 } from "./catalogues/brp"
-import { aggregateCultivationCatalogueInfo, getCultivationCatalogue } from "./index"
+import {
+  aggregateCultivationCatalogueInfo,
+  getCultivationCatalogue,
+  getCultivationCatalogueBuildingContext,
+} from "./index"
 
 vi.mock("./catalogues/brp", async (importOriginal: () => Promise<typeof brpModule>) => {
   const original = await importOriginal()
@@ -17,7 +21,8 @@ vi.mock("./catalogues/brp", async (importOriginal: () => Promise<typeof brpModul
 
 describe("aggregateCultivationCatalogueInfo", () => {
   it("should skip b_lu_ya that cannot be parsed", async () => {
-    const catalogue = await aggregateCultivationCatalogueInfoBrpInternal([
+    const buildingContext = await getCultivationCatalogueBuildingContext()
+    const catalogue = await aggregateCultivationCatalogueInfoBrpInternal(buildingContext, [
       {
         b_lu_ya: "",
         b_lu_harvestable: "multiple",
@@ -31,14 +36,17 @@ describe("aggregateCultivationCatalogueInfo", () => {
 
   it("should forward any errors in collection from one catalogue", async () => {
     vi.mocked(aggregateCultivationCatalogueInfoBrp).mockRejectedValueOnce("Failed to read JSON")
-    await expect(aggregateCultivationCatalogueInfo()).rejects.toThrow("Failed to read JSON")
+    await expect(aggregateCultivationCatalogueInfo(undefined as any)).rejects.toThrow(
+      "Failed to read JSON",
+    )
   })
 })
 
 describe("getCultivationCatalogue", () => {
   it("should return the BRP catalogue when catalogueName is 'brp'", async () => {
-    const aggregatedInfo = await aggregateCultivationCatalogueInfo()
-    const expectedCatalogue = await getCatalogueBrp(aggregatedInfo)
+    const buildingContext = await getCultivationCatalogueBuildingContext()
+    const aggregatedInfo = await aggregateCultivationCatalogueInfo(buildingContext)
+    const expectedCatalogue = await getCatalogueBrp(buildingContext, aggregatedInfo)
     const actualCatalogue = await getCultivationCatalogue("brp")
     expect(actualCatalogue).toEqual(expectedCatalogue)
   })
@@ -80,8 +88,9 @@ describe("getCultivationCatalogue", () => {
 
 describe("getCatalogueBrp", () => {
   it("should return an array of CatalogueCultivationItem", async () => {
-    const aggregatedInfo = await aggregateCultivationCatalogueInfo()
-    const catalogue = await getCatalogueBrp(aggregatedInfo)
+    const buildingContext = await getCultivationCatalogueBuildingContext()
+    const aggregatedInfo = await aggregateCultivationCatalogueInfo(buildingContext)
+    const catalogue = await getCatalogueBrp(buildingContext, aggregatedInfo)
     expect(Array.isArray(catalogue)).toBe(true)
     for (const item of catalogue) {
       expect(typeof item).toBe("object")
@@ -106,19 +115,22 @@ describe("getCatalogueBrp", () => {
   })
 
   it("should return at least one item", async () => {
-    const aggregatedInfo = await aggregateCultivationCatalogueInfo()
-    const catalogue = await getCatalogueBrp(aggregatedInfo)
+    const buildingContext = await getCultivationCatalogueBuildingContext()
+    const aggregatedInfo = await aggregateCultivationCatalogueInfo(buildingContext)
+    const catalogue = await getCatalogueBrp(buildingContext, aggregatedInfo)
     expect(catalogue.length).toBeGreaterThan(0)
   })
 
   it("should not set any b_lu_ya to null if aggregated info is available", async () => {
-    const aggregatedInfo = await aggregateCultivationCatalogueInfo()
-    const catalogue = await getCatalogueBrp(aggregatedInfo)
+    const buildingContext = await getCultivationCatalogueBuildingContext()
+    const aggregatedInfo = await aggregateCultivationCatalogueInfo(buildingContext)
+    const catalogue = await getCatalogueBrp(buildingContext, aggregatedInfo)
     expect(catalogue.some((cultivation) => cultivation.b_lu_ya === null)).toBe(true)
   })
 
   it("should not set any b_lu_ya to null if aggregated info is missing", async () => {
-    const catalogue = await getCatalogueBrp({})
+    const buildingContext = await getCultivationCatalogueBuildingContext()
+    const catalogue = await getCatalogueBrp(buildingContext, {})
     expect(catalogue.some((cultivation) => cultivation.b_lu_ya === null)).toBe(false)
   })
 })

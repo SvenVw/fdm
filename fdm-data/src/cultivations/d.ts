@@ -1,5 +1,10 @@
 export type CatalogueCultivationName = "brp"
 
+export interface CultivationCatalogueBuildingContext {
+  firstAllowedAvailabilityYear: number
+  lastAllowedAvailabilityYear: number
+}
+
 export interface AggregatedCultivationCatalogueInfo {
   b_lu_ya_min?: number
   b_lu_ya_max?: number

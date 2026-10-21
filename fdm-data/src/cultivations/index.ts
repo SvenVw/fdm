@@ -2,9 +2,28 @@ import type {
   AggregatedCultivationCatalogueInfo,
   CatalogueCultivation,
   CatalogueCultivationName,
+  CultivationCatalogueBuildingContext,
 } from "./d"
 /* eslint-disable typescript/restrict-template-expressions -- Crop names and catalogue IDs are mapped and stringified safely in the domain lists. */
 import { aggregateCultivationCatalogueInfoBrp, getCatalogueBrp } from "./catalogues/brp"
+
+/**
+ * Collect current date and other volatile data that should be used consistently
+ * across all catalogue aggregations.
+ *
+ * @returns data to be used to process catalogue data both during aggregation and
+ * final collection.
+ */
+export async function getCultivationCatalogueBuildingContext(): Promise<CultivationCatalogueBuildingContext> {
+  // b_lu_ya years defined in the catalogue data that fall out of this range, inclusive, will be ignored. Mostly as a sanity check.
+  const firstAllowedAvailabilityYear = 2009
+  const lastAllowedAvailabilityYear = new Date().getFullYear() + 1
+
+  return {
+    firstAllowedAvailabilityYear,
+    lastAllowedAvailabilityYear,
+  }
+}
 
 /**
  * Aggregates info from all the cultivation catalogues, which is needed to build the
@@ -19,8 +38,12 @@ import { aggregateCultivationCatalogueInfoBrp, getCatalogueBrp } from "./catalog
  *
  * @returns aggregated info.
  */
-export async function aggregateCultivationCatalogueInfo(): Promise<AggregatedCultivationCatalogueInfo> {
-  const aggregates = await Promise.allSettled([aggregateCultivationCatalogueInfoBrp()])
+export async function aggregateCultivationCatalogueInfo(
+  buildingContext: CultivationCatalogueBuildingContext,
+): Promise<AggregatedCultivationCatalogueInfo> {
+  const aggregates = await Promise.allSettled([
+    aggregateCultivationCatalogueInfoBrp(buildingContext),
+  ])
   const rejected = aggregates.find((item) => item.status === "rejected")
   if (rejected) {
     throw rejected.reason
@@ -63,8 +86,9 @@ export async function getCultivationCatalogue(
 ): Promise<CatalogueCultivation> {
   // Get the specified catalogue
   if (catalogueName === "brp") {
-    const aggregatedInfo = await aggregateCultivationCatalogueInfo()
-    return await getCatalogueBrp(aggregatedInfo)
+    const buildingContext = await getCultivationCatalogueBuildingContext()
+    const aggregatedInfo = await aggregateCultivationCatalogueInfo(buildingContext)
+    return await getCatalogueBrp(buildingContext, aggregatedInfo)
   }
 
   throw new Error(`catalogue ${catalogueName} is not recognized`)
