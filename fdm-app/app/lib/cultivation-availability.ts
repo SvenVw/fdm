@@ -1,6 +1,3 @@
-// Offset used to keep the year derived from a date stable around midnight/timezone boundaries.
-const BOUNDARY_OFFSET_MS = 24 * 60 * 60 * 1000
-
 // Guards against runaway loops when the dates are clearly wrong.
 const MAX_PERIOD_YEARS = 100
 
@@ -22,7 +19,12 @@ export function isCultivationUnavailableInPeriod(
   b_lu_ya: number[] | null | undefined,
   maxCultivationAvailabilityYear: number | undefined,
 ): boolean {
-  if (!b_lu_ya || typeof maxCultivationAvailabilityYear !== "number" || !period.b_lu_start) {
+  if (
+    !b_lu_ya ||
+    b_lu_ya.length === 0 ||
+    typeof maxCultivationAvailabilityYear !== "number" ||
+    !period.b_lu_start
+  ) {
     return false
   }
 
@@ -32,18 +34,13 @@ export function isCultivationUnavailableInPeriod(
     // End before start: show a warning.
     return true
   }
-  const startYear = Math.min(
-    maxCultivationAvailabilityYear,
-    new Date(start.getTime() + BOUNDARY_OFFSET_MS).getFullYear(),
-  )
+  const startYear = Math.min(maxCultivationAvailabilityYear, start.getFullYear())
   // The boundary offsets can invert the years for very short periods around 1 January.
   const endYear = Math.max(
     startYear,
     Math.min(
       maxCultivationAvailabilityYear,
-      end
-        ? new Date(end.getTime() - BOUNDARY_OFFSET_MS).getFullYear()
-        : maxCultivationAvailabilityYear,
+      end ? end.getFullYear() : maxCultivationAvailabilityYear,
     ),
   )
 
@@ -51,7 +48,8 @@ export function isCultivationUnavailableInPeriod(
     return false
   }
   if (endYear - startYear > MAX_PERIOD_YEARS) {
-    // User is doing very wrong things so show a warning.
+    // Guard against long-running loops, there probably won't be an
+    // agricultural cultivation that has been active for 100+ years.
     return true
   }
 
