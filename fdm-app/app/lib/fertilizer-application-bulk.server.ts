@@ -205,7 +205,8 @@ export async function updateFertilizerApplications({
         principal_id,
         p_app_id,
         values.p_id ?? original.p_id,
-        values.p_app_amount_display ?? original.p_app_amount_display,
+        // Without a new amount the stored amount in kg/ha is kept, also when p_id changes
+        values.p_app_amount_display,
         (values.p_app_method ?? original.p_app_method) as ApplicationMethods,
         values.p_app_date ?? original.p_app_date,
       )
