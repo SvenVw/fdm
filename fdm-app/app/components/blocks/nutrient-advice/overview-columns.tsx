@@ -9,10 +9,11 @@ import { cn } from "~/lib/utils"
 import type { FieldNutrientRow, UnitMode } from "./overview-types"
 import type { NutrientDescription } from "./types"
 import { overviewTableFeatures } from "./overview-table-features"
-
-// A field is considered under-fertilized below this % of advice, and over-fertilized at or above it.
-const DEFICIT_THRESHOLD = 90
-const EXCESS_THRESHOLD = 105
+import {
+  ADVICE_STATUS_TEXT_CLASSES,
+  type AdviceProgressStatus,
+  computeAdviceProgress,
+} from "./progress-bar"
 
 export const GROUP_LABELS: Record<NutrientDescription["type"], string> = {
   primary: "Primair",
@@ -34,14 +35,13 @@ interface NutrientStatus {
   /** Fill percentage relative to advice. Also used as the sortable value: real over-fertilization
    * (zero advice, positive filling) is reported as Infinity so it sorts above any finite percentage. */
   percentage: number
-  hasData: boolean
-  isExcess: boolean
-  isDeficit: boolean
-  isCorrect: boolean
+  /** Applied-vs-advice class from `computeAdviceProgress`; `null` when there is no meaningful data. */
+  status: AdviceProgressStatus | null
 }
 
 /**
- * Classifies a nutrient's filling against its advice. advice === 0 with filling === 0 means no
+ * Classifies a nutrient's filling against its advice, with the same thresholds as the progress
+ * bars and the Atlas map (`computeAdviceProgress`). advice === 0 with filling === 0 means no
  * meaningful data was available; advice === 0 with filling > 0 is real over-fertilization (there
  * was no room for any filling at all), not missing data.
  */
@@ -51,26 +51,14 @@ function getNutrientStatus(
   advice: number,
 ): NutrientStatus {
   if (advice === 0 && filling === 0) {
-    return { percentage: 0, hasData: false, isExcess: false, isDeficit: false, isCorrect: false }
+    return { percentage: 0, status: null }
   }
 
-  if (advice === 0) {
-    // Positive filling with zero advice: no room was available, so this is an excess by definition.
-    return {
-      percentage: Infinity,
-      hasData: true,
-      isExcess: true,
-      isDeficit: false,
-      isCorrect: false,
-    }
-  }
-
-  const percentage = (filling / advice) * 100
   // EOC (organic carbon) is excluded from excess flagging: a surplus is agronomically beneficial, not a risk.
-  const isExcess = nutrientSymbol !== "EOC" && percentage >= EXCESS_THRESHOLD
-  const isDeficit = percentage < DEFICIT_THRESHOLD
-  const isCorrect = !isExcess && !isDeficit
-  return { percentage, hasData: true, isExcess, isDeficit, isCorrect }
+  const { status } = computeAdviceProgress(filling, advice, nutrientSymbol === "EOC")
+  // Positive filling with zero advice sorts above any finite percentage.
+  const percentage = advice === 0 ? Infinity : (filling / advice) * 100
+  return { percentage, status }
 }
 
 function NutrientColumnHeader({
@@ -144,17 +132,11 @@ function NutrientCell({
   const area = row.b_area || 0
   const filling = unitMode === "total" ? value.filling * area : value.filling
   const advice = unitMode === "total" ? value.advice * area : value.advice
-  const { isExcess, isDeficit, isCorrect } = getNutrientStatus(nutrient.symbol, filling, advice)
+  const { status } = getNutrientStatus(nutrient.symbol, filling, advice)
 
   return (
     <span className="flex items-center justify-end gap-1 whitespace-nowrap tabular-nums">
-      <span
-        className={cn(
-          isExcess && "text-amber-600 dark:text-amber-500",
-          isDeficit && "text-red-600 dark:text-red-500",
-          isCorrect && "text-green-600 dark:text-green-500",
-        )}
-      >
+      <span className={cn(status && ADVICE_STATUS_TEXT_CLASSES[status])}>
         {formatValue(filling)}
       </span>
       <span className="text-foreground">/ {formatValue(advice)}</span>
@@ -172,7 +154,7 @@ function buildNutrientColumn(
       const value = row.values[nutrient.symbol]
       if (row.errorMessage || !value) return -1
       const status = getNutrientStatus(nutrient.symbol, value.filling, value.advice)
-      return status.hasData ? status.percentage : -1
+      return status.status ? status.percentage : -1
     },
     enableHiding: true,
     header: ({ column }) => (

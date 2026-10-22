@@ -16,19 +16,23 @@ import {
 import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
 import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
-import { NutrientAdviceLegend } from "~/components/blocks/atlas/atlas-legend"
+import {
+  NUTRIENT_ADVICE_STATUS_SWATCHES,
+  NutrientAdviceLegend,
+  NutrientAdviceSwatch,
+} from "~/components/blocks/atlas/atlas-legend"
 import {
   applyNutrientAdviceShading,
   type AtlasNutrientAdviceRow,
+  countNutrientAdviceClasses,
   formatKgPerHa,
   getNutrientAdviceFillStyle,
   getNutrientAdviceOutlineStyle,
   getNutrientAdviceScale,
   isNutrientAdviceMode,
-  type NutrientAdviceMode,
   NUTRIENT_ADVICE_COPY,
   NUTRIENT_ADVICE_MODES,
-  NUTRIENT_ADVICE_STATUS_COLORS,
+  NUTRIENT_ADVICE_ZERO_COLOR,
 } from "~/components/blocks/atlas/atlas-nutrient-advice"
 import { Atlas } from "~/components/blocks/atlas/atlas-shell"
 import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
@@ -227,7 +231,7 @@ export default function FarmAtlasNutrientAdviceBlock() {
     (item) => item.symbol === nutrient,
   )
 
-  // Fields with `nav_state` / `nav_t` for the selected nutrient and mode.
+  // Fields with `nav_class` / `nav_t` for the selected nutrient and mode.
   const shadedFields = useMemo(
     () =>
       fieldsData ? applyNutrientAdviceShading(fieldsData, rowsById, nutrient, mode) : undefined,
@@ -237,14 +241,15 @@ export default function FarmAtlasNutrientAdviceBlock() {
     () => (rows ? getNutrientAdviceScale(rows, nutrient) : null),
     [rows, nutrient],
   )
-  const hasFieldsWithoutAdvice =
-    shadedFields?.features.some((feature) => feature.properties?.nav_state === "none") ?? false
+  const classCounts = useMemo(() => countNutrientAdviceClasses(shadedFields), [shadedFields])
+  // Shown in the legend when no field has advice, e.g. when the advice service is unavailable.
+  const noAdviceReason = rows?.find((row) => row.errorMessage)?.errorMessage
 
   const initialViewState = getViewState(fieldsData)
 
   const [showFields, setShowFields] = useState(true)
   const layerLayout = { visibility: showFields ? "visible" : "none" } as const
-  const fillLayer = { ...getNutrientAdviceFillStyle(mode), layout: layerLayout } as LayerProps
+  const fillLayer = { ...getNutrientAdviceFillStyle(), layout: layerLayout } as LayerProps
   // White dotted outline around every field; keep its round caps and add the visibility toggle.
   const outlineStyle = getNutrientAdviceOutlineStyle()
   const outlineLayer = {
@@ -315,7 +320,6 @@ export default function FarmAtlasNutrientAdviceBlock() {
                     row={row}
                     isLoading={rowsById === null && !loadFailed}
                     loadFailed={loadFailed}
-                    mode={mode}
                     nutrient={nutrientDescription}
                   />
                 </AtlasTooltipContent>
@@ -339,7 +343,7 @@ export default function FarmAtlasNutrientAdviceBlock() {
       </Atlas>
 
       {/* Nutrient selector + display mode (top left, like the soil parameter dropdown) */}
-      <Card className="absolute top-3 left-3 z-10 w-60 shadow-md">
+      <Card className="absolute top-3 left-3 z-10 w-72 max-w-[calc(100%-1.5rem)] shadow-md">
         <CardContent className="flex flex-col gap-2 p-2">
           <Select value={nutrient} onValueChange={setNutrient}>
             <SelectTrigger className="h-8 w-full text-xs" aria-label="Kies een nutriënt">
@@ -378,11 +382,18 @@ export default function FarmAtlasNutrientAdviceBlock() {
             aria-label="Weergave"
           >
             {NUTRIENT_ADVICE_MODES.map((item) => (
-              <ToggleGroupItem key={item} value={item} className="grow px-1 text-xs">
+              <ToggleGroupItem
+                key={item}
+                value={item}
+                className="grow px-1.5 text-xs whitespace-nowrap"
+              >
                 {NUTRIENT_ADVICE_COPY.modes[item]}
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
+          <p className="text-muted-foreground px-0.5 text-xs">
+            {NUTRIENT_ADVICE_COPY.modeHints[mode]}
+          </p>
           {b_id_farm && b_id_farm !== "undefined" && (
             <Button asChild variant="outline" size="sm" className="h-8 w-full text-xs">
               <NavLink to={`/farm/${b_id_farm}/${calendar}/nutrient_advice`}>
@@ -391,6 +402,9 @@ export default function FarmAtlasNutrientAdviceBlock() {
               </NavLink>
             </Button>
           )}
+          <p className="text-muted-foreground px-0.5 text-xs md:hidden">
+            {NUTRIENT_ADVICE_COPY.desktopHint}
+          </p>
         </CardContent>
       </Card>
 
@@ -402,10 +416,13 @@ export default function FarmAtlasNutrientAdviceBlock() {
             nutrientName={nutrientDescription.name}
             unit={nutrientDescription.unit}
             scale={scale}
-            hasFieldsWithoutAdvice={hasFieldsWithoutAdvice}
+            counts={classCounts}
+            fieldCount={fieldsData?.features.length ?? 0}
+            noAdviceReason={noAdviceReason}
             loadFailed={loadFailed}
             onRetry={() => void revalidator.revalidate()}
             isRetrying={revalidator.state === "loading"}
+            excessExempt={nutrientDescription.symbol === "EOC"}
           />
         </div>
       )}
@@ -421,23 +438,20 @@ const STATUS_LABELS = {
 } as const
 
 /**
- * Tooltip body for the hovered field: advice, already applied and remaining amount of the selected
- * nutrient in kg/ha, plus the shared progress bar. Shows the reason when there is no advice.
- *
- * In "% van advies" mode an advice of 0 (or less) is shown as "no advice", matching the grey fill
- * on the map (`getFieldShading`), instead of a progress bar and a red "over" status.
+ * Tooltip body for the hovered field: advice, already applied, percentage of the advice and the
+ * remaining amount of the selected nutrient in kg/ha, plus the shared progress bar and the status
+ * with the same swatch as on the map and in the legend. Shows the reason when there is no advice,
+ * and "no need" when the advice is 0 and nothing was applied.
  */
 function NutrientAdviceTooltipBody({
   row,
   isLoading,
   loadFailed,
-  mode,
   nutrient,
 }: {
   row: AtlasNutrientAdviceRow | undefined
   isLoading: boolean
   loadFailed: boolean
-  mode: NutrientAdviceMode
   nutrient: NutrientDescription | undefined
 }) {
   if (!nutrient) return null
@@ -458,17 +472,21 @@ function NutrientAdviceTooltipBody({
     )
   }
 
-  if (mode === "percentage" && value.advice <= 0) {
+  const heading = (
+    <p className="text-muted-foreground">
+      {nutrient.name} ({nutrient.unit})
+    </p>
+  )
+
+  // Same "no need" class as on the map: an advice of 0 with nothing applied is not "advice met".
+  if (value.advice <= 0 && value.filling <= 0) {
     return (
       <div className="min-w-52 space-y-1.5">
-        <p className="text-muted-foreground">
-          {nutrient.name} ({nutrient.unit})
+        {heading}
+        <p className="flex items-center gap-1.5 text-xs">
+          <NutrientAdviceSwatch color={NUTRIENT_ADVICE_ZERO_COLOR} className="border" />
+          {NUTRIENT_ADVICE_COPY.noNeed}
         </p>
-        <p>{NUTRIENT_ADVICE_COPY.noAdviceZero}</p>
-        <dl className="grid grid-cols-[1fr_auto] gap-x-4 whitespace-nowrap tabular-nums">
-          <dt>{NUTRIENT_ADVICE_COPY.applied}</dt>
-          <dd className="text-right">{formatKgPerHa(value.filling)}</dd>
-        </dl>
       </div>
     )
   }
@@ -478,18 +496,24 @@ function NutrientAdviceTooltipBody({
   const { status } = computeAdviceProgress(value.filling, value.advice, excessExempt)
   const remainingLabel =
     remaining >= 0 ? NUTRIENT_ADVICE_COPY.remaining : NUTRIENT_ADVICE_COPY.surplus
+  // A percentage of a zero advice is meaningless, so the row is left out then.
+  const percentage = value.advice > 0 ? Math.round((value.filling / value.advice) * 100) : null
 
   return (
     // min-w keeps labels such as "Al gegeven" on one line.
     <div className="min-w-52 space-y-1.5">
-      <p className="text-muted-foreground">
-        {nutrient.name} ({nutrient.unit})
-      </p>
+      {heading}
       <dl className="grid grid-cols-[1fr_auto] gap-x-4 gap-y-0.5 whitespace-nowrap tabular-nums">
         <dt>{NUTRIENT_ADVICE_COPY.advice}</dt>
         <dd className="text-right">{formatKgPerHa(value.advice)}</dd>
         <dt>{NUTRIENT_ADVICE_COPY.applied}</dt>
         <dd className="text-right">{formatKgPerHa(value.filling)}</dd>
+        {percentage !== null && (
+          <>
+            <dt>{NUTRIENT_ADVICE_COPY.percentageOfAdvice}</dt>
+            <dd className="text-right">{percentage.toLocaleString("nl-NL")}%</dd>
+          </>
+        )}
         <dt className="font-medium">{remainingLabel}</dt>
         <dd className="text-right font-medium">{formatKgPerHa(Math.abs(remaining))}</dd>
       </dl>
@@ -498,12 +522,9 @@ function NutrientAdviceTooltipBody({
         target={value.advice}
         excessExempt={excessExempt}
       />
-      {/* Same colour + label as the field on the map and in the legend. */}
-      <p className="text-muted-foreground flex items-center gap-1.5 text-xs">
-        <span
-          className="inline-block size-2.5 shrink-0 rounded-sm"
-          style={{ backgroundColor: NUTRIENT_ADVICE_STATUS_COLORS[status] }}
-        />
+      {/* Same swatch + label as the field on the map and in the legend. */}
+      <p className="flex items-center gap-1.5 text-xs">
+        <NutrientAdviceSwatch {...NUTRIENT_ADVICE_STATUS_SWATCHES[status]} />
         {STATUS_LABELS[status]}
       </p>
     </div>

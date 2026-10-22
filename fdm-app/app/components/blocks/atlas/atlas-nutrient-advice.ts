@@ -40,6 +40,11 @@ export const NUTRIENT_ADVICE_COPY = {
     percentage: "% van advies",
     advice: "Advies",
   } satisfies Record<NutrientAdviceMode, string>,
+  modeHints: {
+    remaining: "Hoeveel er per hectare nog gegeven kan worden tot het advies.",
+    percentage: "Hoeveel procent van het advies al gegeven is.",
+    advice: "Hoe hoog het advies per hectare is.",
+  } satisfies Record<NutrientAdviceMode, string>,
   nutrientGroups: {
     primary: "Primair",
     secondary: "Secundair",
@@ -49,18 +54,26 @@ export const NUTRIENT_ADVICE_COPY = {
   applied: "Al gegeven",
   remaining: "Nog te geven",
   surplus: "Te veel gegeven",
+  percentageOfAdvice: "Van advies",
   met: "Advies behaald",
   legendUnder: "Minder gegeven dan advies (< 90%)",
   legendMet: "Advies behaald (90–110%)",
   legendOver: "Meer gegeven dan advies (> 110%)",
+  legendAdvice: "Advies",
+  legendRemaining: "Nog te geven",
+  legendPercentage: "Percentage van advies gegeven",
   noAdvice: "Geen advies beschikbaar",
-  noAdviceZero: "Geen advies (advies is 0)",
+  noNeed: "Geen behoefte (advies is 0)",
+  noAdviceFarm: "Voor geen enkel perceel is advies beschikbaar.",
   loading: "Advies wordt berekend…",
+  loadingFields: (count: number) =>
+    `Advies wordt berekend voor ${count} ${count === 1 ? "perceel" : "percelen"}…`,
   loadFailed: "Het bemestingsadvies kon niet worden geladen.",
   retry: "Opnieuw proberen",
   openAdvice: "Bekijk bemestingsadvies",
   clickHint: "Klik op een perceel voor het volledige advies",
-  openOverview: "Naar bemestingsadvies",
+  openOverview: "Tabelweergave",
+  desktopHint: "De kaart werkt het best op een groter scherm.",
 } as const
 
 /* ================ DATA SHAPES ================ */
@@ -79,40 +92,77 @@ export type AtlasNutrientAdviceRow = {
   values: Record<string, FieldNutrientValue>
 }
 
-/** Shading state of a field, written into the GeoJSON properties as `nav_state`. */
-export type NutrientAdviceShadingState = "loading" | "none" | "ok"
+/**
+ * Shading class of a field, written into the GeoJSON properties as `nav_class`:
+ * - `loading`: the advice is still being calculated,
+ * - `none`: no advice could be calculated for this field,
+ * - `zero`: the advice is 0 and nothing was applied (no need for this nutrient),
+ * - `under` / `on-target` / `over`: applied vs. advice ("% van advies"); the colour comes from the
+ *   percentage of the advice in `nav_t`,
+ * - `remaining`: amount still to apply ("Nog te geven"; ramp position in `nav_t`),
+ * - `advice`: height of the advice ("Advies"; ramp position in `nav_t`).
+ */
+export type NutrientAdviceClass =
+  | "loading"
+  | "none"
+  | "zero"
+  | AdviceProgressStatus
+  | "remaining"
+  | "advice"
 
 /** Feature property names used by the MapLibre style expressions. */
-export const NAV_STATE = "nav_state"
-/** Applied vs. advice class (`under` / `on-target` / `over`), used by the comparison modes. */
-export const NAV_STATUS = "nav_status"
-/** Position on the colour ramp (0–1), used by the "Advies" mode only. */
+export const NAV_CLASS = "nav_class"
+/**
+ * Colour position: the percentage of the advice applied (0–{@link NUTRIENT_ADVICE_PERCENTAGE_MAX})
+ * in "% van advies", the 0–1 ramp position in "Nog te geven" and "Advies".
+ */
 export const NAV_T = "nav_t"
 
 /* ================ COLOURS ================ */
 
 /**
- * Status colours for the comparison modes ("Nog te geven", "% van advies"):
+ * Status colours for applied vs. advice:
+ * - orange: applied is less than the advice (< 90 %),
  * - green: applied is within ±10 % of the advice (90–110 %),
- * - red: applied is more than the advice (> 110 %),
- * - yellow: applied is less than the advice (< 90 %).
+ * - red: applied is more than the advice (> 110 %); never for EOC.
  *
- * Same thresholds as `computeAdviceProgress`, and the same Tailwind shades as the existing score
- * colours in `getFieldsScoreStyle`. Red/green alone is not colour-blind safe, so the legend and the
- * tooltip always add a text label (DESIGN.md).
+ * Same thresholds and colours as `computeAdviceProgress`, the progress bars and the overview table
+ * (Tailwind orange-500, green-500 and red-500). Used for the legend and tooltip swatches; the map
+ * itself uses the continuous {@link NUTRIENT_ADVICE_PERCENTAGE_STOPS}. Colour alone is not
+ * colour-blind safe, so the legend and the tooltip always add a text label (DESIGN.md).
  */
 export const NUTRIENT_ADVICE_STATUS_COLORS: Record<AdviceProgressStatus, string> = {
-  under: "#eab308",
+  under: "#f97316",
   "on-target": "#22c55e",
   over: "#ef4444",
 }
 
+/** Highest percentage of the advice on the colour scale; anything above gets the last colour. */
+export const NUTRIENT_ADVICE_PERCENTAGE_MAX = 200
+
 /**
- * Sequential ramp for the "Advies" mode (t = 0 lowest advice … 1 highest advice), ColorBrewer Blues.
- * Deliberately not yellow/red/green, so those colours always mean "applied vs. advice".
+ * Continuous palette for "% van advies", as `[percentage of advice, colour]` stops: dark
+ * orange at 0 %, through orange to green around 100 %, then through red to dark red at
+ * {@link NUTRIENT_ADVICE_PERCENTAGE_MAX} %. Small differences between fields stay visible, while
+ * 90–110 % is the same green as the "on target" status class.
+ */
+export const NUTRIENT_ADVICE_PERCENTAGE_STOPS: readonly (readonly [number, string])[] = [
+  [0, "#c2410c"],
+  [50, "#f97316"],
+  [80, "#fb923c"],
+  [90, "#22c55e"],
+  [110, "#22c55e"],
+  [125, "#f87171"],
+  [150, "#ef4444"],
+  [NUTRIENT_ADVICE_PERCENTAGE_MAX, "#991b1b"],
+]
+
+/**
+ * Sequential ramp for the "Advies" mode (t = 0 lowest advice … 1 highest advice), ColorBrewer Blues
+ * without its near-white first step, so low values stay visible on the satellite map.
+ * Deliberately not orange/green/red, so those colours always mean "applied vs. advice".
  */
 export const NUTRIENT_ADVICE_SEQUENTIAL_RAMP = [
-  "#eff3ff",
   "#c6dbef",
   "#9ecae1",
   "#6baed6",
@@ -120,25 +170,47 @@ export const NUTRIENT_ADVICE_SEQUENTIAL_RAMP = [
   "#08519c",
 ] as const
 
+/**
+ * Sequential ramp for the "Nog te geven" mode (t = 0 nothing left … 1 most still to apply on the
+ * farm), ColorBrewer Purples: light means little or nothing left, dark means a lot. Distinct from
+ * the status palette and the blue advice ramp.
+ */
+export const NUTRIENT_ADVICE_REMAINING_RAMP = [
+  "#efedf5",
+  "#dadaeb",
+  "#bcbddc",
+  "#9e9ac8",
+  "#807dba",
+  "#6a51a3",
+  "#4a1486",
+] as const
+
 /** Outline of every field: white dotted line, so field boundaries stand out on the satellite map. */
 export const NUTRIENT_ADVICE_OUTLINE_COLOR = "#ffffff"
 
-/** Fill colour of fields without advice (grey, never confused with the status colours). */
-export const NUTRIENT_ADVICE_NONE_COLOR = "#6b7280"
+/** Fill colour of fields without advice (dark grey, never confused with the status colours). */
+export const NUTRIENT_ADVICE_NONE_COLOR = "#4b5563"
+/** Fill colour of fields without a need for the nutrient (light, so they recede). */
+export const NUTRIENT_ADVICE_ZERO_COLOR = "#e7e5e4"
 /** Fill colour while the advice is still loading. */
-export const NUTRIENT_ADVICE_LOADING_COLOR = "#cbd5e1"
+export const NUTRIENT_ADVICE_LOADING_COLOR = "#f1f5f9"
 
 /* ================ SCALE & SHADING ================ */
 
 /** Farm-wide scale for the selected nutrient. */
 export type NutrientAdviceScale = {
-  /** Lowest and highest advice on the farm (kg/ha), used by the "Advies" mode. */
+  /** Lowest and highest positive advice on the farm (kg/ha), used by the "Advies" mode. */
   minAdvice: number
   maxAdvice: number
+  /** Largest amount still to apply on the farm (kg/ha), used by the "Nog te geven" mode. */
+  maxRemaining: number
 }
 
 /**
  * Computes the farm-wide scale of one nutrient over all fields that have advice.
+ *
+ * Fields with an advice of 0 are left out, so fields without a need for the nutrient (nature,
+ * woodland) do not stretch the "Advies" ramp down to 0.
  *
  * @param rows - Streamed rows of the farm.
  * @param nutrient - Selected nutrient symbol.
@@ -150,38 +222,41 @@ export function getNutrientAdviceScale(
 ): NutrientAdviceScale {
   let minAdvice = Number.POSITIVE_INFINITY
   let maxAdvice = Number.NEGATIVE_INFINITY
+  let maxRemaining = 0
   for (const row of rows) {
     const value = row.values[nutrient]
-    if (!value) continue
+    if (!value || value.advice <= 0) continue
     minAdvice = Math.min(minAdvice, value.advice)
     maxAdvice = Math.max(maxAdvice, value.advice)
+    maxRemaining = Math.max(maxRemaining, value.advice - value.filling)
   }
   if (!Number.isFinite(minAdvice)) {
     minAdvice = 0
     maxAdvice = 1
   }
-  return { minAdvice, maxAdvice }
+  return { minAdvice, maxAdvice, maxRemaining }
 }
 
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x))
 
-/** Shading of one field: state, applied-vs-advice class and ramp position. */
+/** Shading of one field: its class and its position on the colour scale. */
 export type FieldShading = {
-  state: NutrientAdviceShadingState
-  /** `under` / `on-target` / `over`; `null` unless `state` is `"ok"`. */
-  status: AdviceProgressStatus | null
-  /** 0–1 position on the "Advies" ramp; 0 unless `state` is `"ok"`. */
+  class: NutrientAdviceClass
+  /** Percentage of the advice ("% van advies") or 0–1 ramp position (other modes); 0 otherwise. */
   t: number
 }
 
 /**
  * Converts the advice and applied dose of one field into its shading.
  *
- * - Comparison modes ("Nog te geven", "% van advies"): the class comes from
- *   `computeAdviceProgress` — `on-target` when applied is 90–110 % of the advice, `over` above,
- *   `under` below — so the map, the overview table and the field cards always agree.
- *   EOC is never `over` (`excessExempt`).
- * - "Advies" mode: `t` ∈ [0, 1] between the lowest and highest advice on the farm.
+ * - An advice of 0 with nothing applied is `zero` in every mode (no need, not "advice met").
+ * - "Nog te geven": `remaining` with `t` = amount still to apply relative to the largest amount on
+ *   the farm. A surplus (more applied than advised) counts as 0: nothing left to apply.
+ * - "% van advies": the status class from `computeAdviceProgress` — `on-target` when applied is
+ *   90–110 % of the advice, `over` above, `under` below — so the map, the overview table and the
+ *   field cards always agree, and `t` is the percentage of the advice for the continuous palette.
+ *   EOC is never `over` (`excessExempt`), so its percentage is capped at 100.
+ * - "Advies": `advice` with `t` between the lowest and highest advice on the farm.
  *
  * @param value - Advice and applied dose in kg/ha, or `undefined` when the field has no advice.
  * @param mode - Display mode.
@@ -195,20 +270,31 @@ export function getFieldShading(
   scale: NutrientAdviceScale,
   excessExempt: boolean,
 ): FieldShading {
-  if (!value) return { state: "none", status: null, t: 0 }
+  if (!value) return { class: "none", t: 0 }
   const { advice, filling } = value
+  if (advice <= 0 && filling <= 0) return { class: "zero", t: 0 }
 
-  // A percentage of a zero advice is meaningless: show as "no advice" instead of ∞ or NaN.
-  if (mode === "percentage" && advice <= 0) return { state: "none", status: null, t: 0 }
+  if (mode === "advice") {
+    const range = scale.maxAdvice - scale.minAdvice
+    const t = range > 0 ? clamp((advice - scale.minAdvice) / range, 0, 1) : 0.5
+    return { class: "advice", t }
+  }
+
+  if (mode === "remaining") {
+    const remaining = Math.max(advice - filling, 0)
+    const t = scale.maxRemaining > 0 ? clamp(remaining / scale.maxRemaining, 0, 1) : 0
+    return { class: "remaining", t }
+  }
 
   const { status } = computeAdviceProgress(filling, advice, excessExempt)
-  const range = scale.maxAdvice - scale.minAdvice
-  const t = range > 0 ? clamp((advice - scale.minAdvice) / range, 0, 1) : 0.5
-  return { state: "ok", status, t }
+  // Something applied against a zero advice is too much by definition: the end of the scale.
+  const percentage = advice > 0 ? (filling / advice) * 100 : NUTRIENT_ADVICE_PERCENTAGE_MAX
+  const upper = excessExempt ? 100 : NUTRIENT_ADVICE_PERCENTAGE_MAX
+  return { class: status, t: clamp(percentage, 0, upper) }
 }
 
 /**
- * Writes `nav_state`, `nav_status` and `nav_t` for the selected nutrient and mode into a copy of the fields.
+ * Writes `nav_class` and `nav_t` for the selected nutrient and mode into a copy of the fields.
  * Doing this in JS (instead of in a MapLibre expression) keeps the style simple and testable, and
  * avoids nested objects in GeoJSON properties (MapLibre stringifies those).
  *
@@ -229,7 +315,7 @@ export function applyNutrientAdviceShading(
 
   const features = fieldsData.features.map((feature): Feature<Geometry, GeoJsonProperties> => {
     const b_id = feature.properties?.b_id as string | undefined
-    let shading: FieldShading = { state: "loading", status: null, t: 0 }
+    let shading: FieldShading = { class: "loading", t: 0 }
     if (rowsById && scale) {
       const row = b_id ? rowsById.get(b_id) : undefined
       shading = getFieldShading(row?.values[nutrient], mode, scale, excessExempt)
@@ -238,14 +324,53 @@ export function applyNutrientAdviceShading(
       ...feature,
       properties: {
         ...feature.properties,
-        [NAV_STATE]: shading.state,
-        [NAV_STATUS]: shading.status ?? "",
+        [NAV_CLASS]: shading.class,
         [NAV_T]: shading.t,
       },
     }
   })
 
   return { ...fieldsData, features }
+}
+
+/**
+ * Counts the fields per shading class, for the legend.
+ *
+ * @param shadedFields - Output of {@link applyNutrientAdviceShading}.
+ * @returns Number of fields per {@link NutrientAdviceClass}; classes without fields are 0.
+ */
+export function countNutrientAdviceClasses(
+  shadedFields: FeatureCollection<Geometry, GeoJsonProperties> | undefined,
+): Record<NutrientAdviceClass, number> {
+  const counts: Record<NutrientAdviceClass, number> = {
+    loading: 0,
+    none: 0,
+    zero: 0,
+    under: 0,
+    "on-target": 0,
+    over: 0,
+    remaining: 0,
+    advice: 0,
+  }
+  for (const feature of shadedFields?.features ?? []) {
+    const cls = feature.properties?.[NAV_CLASS] as NutrientAdviceClass | undefined
+    if (cls && cls in counts) counts[cls] += 1
+  }
+  return counts
+}
+
+/**
+ * CSS gradient of the comparison palette for the legend, from 0 % to `max` % of the advice.
+ *
+ * @param max - Highest percentage shown: 100 for EOC (never too much), otherwise
+ * {@link NUTRIENT_ADVICE_PERCENTAGE_MAX}.
+ * @returns A `linear-gradient(...)` value.
+ */
+export function getNutrientAdvicePercentageGradient(max: number): string {
+  const stops = NUTRIENT_ADVICE_PERCENTAGE_STOPS.filter(([value]) => value <= max).map(
+    ([value, color]) => `${color} ${(value / max) * 100}%`,
+  )
+  return `linear-gradient(to right, ${stops.join(", ")})`
 }
 
 /* ================ MAPLIBRE STYLES ================ */
@@ -263,56 +388,63 @@ function rampStops(ramp: readonly string[], from: number, to: number): (number |
 }
 
 /**
- * Fill style of the layer. Comparison modes use the three status colours; the "Advies" mode uses
- * the blue ramp on `nav_t`. The style does not depend on the data and only changes with the mode.
+ * Fill style of the layer, driven by `nav_class` and `nav_t`. The status classes share the
+ * continuous orange–green–red palette on the percentage of the advice (interpolated in Lab, so the
+ * transitions stay even); "Nog te geven" uses the purple ramp and "Advies" the blue ramp. The style does not depend on the data or
+ * the mode: the mode is already encoded in the classes.
  *
- * @param mode - Display mode.
  * @returns Layer `type` and `paint` props.
  */
-export function getNutrientAdviceFillStyle(mode: NutrientAdviceMode): {
+export function getNutrientAdviceFillStyle(): {
   type: "fill"
   paint: FillLayerSpecification["paint"]
 } {
-  const okColor: ExpressionSpecification =
-    mode === "advice"
-      ? ([
-          "interpolate",
-          ["linear"],
-          ["get", NAV_T],
-          ...rampStops(NUTRIENT_ADVICE_SEQUENTIAL_RAMP, 0, 1),
-        ] as ExpressionSpecification)
-      : ([
-          "match",
-          ["get", NAV_STATUS],
-          "under",
-          NUTRIENT_ADVICE_STATUS_COLORS.under,
-          "on-target",
-          NUTRIENT_ADVICE_STATUS_COLORS["on-target"],
-          "over",
-          NUTRIENT_ADVICE_STATUS_COLORS.over,
-          NUTRIENT_ADVICE_NONE_COLOR,
-        ] as ExpressionSpecification)
+  const percentageColor = [
+    "interpolate-lab",
+    ["linear"],
+    ["get", NAV_T],
+    ...NUTRIENT_ADVICE_PERCENTAGE_STOPS.flat(),
+  ] as ExpressionSpecification
+  const adviceColor = [
+    "interpolate",
+    ["linear"],
+    ["get", NAV_T],
+    ...rampStops(NUTRIENT_ADVICE_SEQUENTIAL_RAMP, 0, 1),
+  ] as ExpressionSpecification
 
   return {
     type: "fill",
     paint: {
       "fill-color": [
         "match",
-        ["get", NAV_STATE],
-        "ok",
-        okColor,
+        ["get", NAV_CLASS],
+        ["under", "on-target", "over"],
+        percentageColor,
+        "remaining",
+        [
+          "interpolate",
+          ["linear"],
+          ["get", NAV_T],
+          ...rampStops(NUTRIENT_ADVICE_REMAINING_RAMP, 0, 1),
+        ],
+        "advice",
+        adviceColor,
+        "zero",
+        NUTRIENT_ADVICE_ZERO_COLOR,
         "none",
         NUTRIENT_ADVICE_NONE_COLOR,
         NUTRIENT_ADVICE_LOADING_COLOR,
       ] as ExpressionSpecification,
       "fill-opacity": [
         "match",
-        ["get", NAV_STATE],
-        "ok",
-        0.7,
+        ["get", NAV_CLASS],
+        "loading",
+        0.55,
+        "zero",
+        0.5,
         "none",
-        0.45,
-        0.35,
+        0.55,
+        0.75,
       ] as ExpressionSpecification,
     },
   }
