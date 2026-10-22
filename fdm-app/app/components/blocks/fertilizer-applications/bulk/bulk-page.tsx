@@ -315,6 +315,7 @@ export function BulkFertilizerPage({
                   calendar={calendar}
                   onSetIncluded={handleSetIncluded}
                   disabled={isSubmitting}
+                  normKeys={state.normKeys}
                 />
               </CardContent>
             </Card>

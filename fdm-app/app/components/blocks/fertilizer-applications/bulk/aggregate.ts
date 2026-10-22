@@ -11,6 +11,7 @@ import { formatKg } from "./status"
 import {
   BULK_NUTRIENTS,
   type BulkFieldAdvice,
+  type BulkFieldNormValues,
   type BulkFieldOption,
   type BulkNormKey,
   type BulkNormValues,
@@ -21,6 +22,7 @@ import {
 /** Status of a field on the bulk page. Shown with an icon and text, never with colour alone. */
 export type FieldImpactStatus =
   | "ok"
+  | "under_advice"
   | "over_advice"
   | "over_target"
   | "missing_soil_data"
@@ -47,6 +49,14 @@ export interface FieldImpactRow {
   /** Balance after the application, when a preview is available. */
   balanceAfter?: NitrogenBalanceFieldNumeric
   statuses: FieldImpactStatus[]
+  /** The nutrients below and above the advice, after the change when a preview is available. */
+  adviceNutrients: { under: BulkNutrient[]; over: BulkNutrient[] }
+  /** The legal norms of the field, in kg per ha (indicative per field). */
+  norms?: BulkNormValues
+  /** The current norm fillings, in kg per ha. */
+  normFillings?: BulkNormValues
+  /** The norm fillings after the change, when a preview is available. */
+  normFillingsAfter?: BulkNormValues
   /** Messages that explain why (part of) the field is not calculated. */
   messages: string[]
 }
@@ -68,6 +78,8 @@ export function buildFieldImpactRows({
   balance,
   previewDoses,
   previewBalance,
+  fieldNorms,
+  previewNormFillings,
 }: {
   fields: BulkFieldOption[]
   included: Set<string>
@@ -77,6 +89,10 @@ export function buildFieldImpactRows({
   /** Dose per changed field after the change, in kg/ha. */
   previewDoses?: Record<string, BulkNutrientValues>
   previewBalance?: NitrogenBalanceFieldResultNumeric[]
+  /** The norms and current fillings per field, in kg per ha. */
+  fieldNorms?: Record<string, BulkFieldNormValues>
+  /** The norm fillings per changed field after the change, in kg per ha. */
+  previewNormFillings?: Record<string, BulkNormValues>
 }): FieldImpactRow[] {
   const adviceById = new Map(advice?.map((row) => [row.b_id, row]))
   const balanceById = new Map(balance?.map((row) => [row.b_id, row]))
@@ -91,6 +107,7 @@ export function buildFieldImpactRows({
 
     const statuses: FieldImpactStatus[] = []
     const messages: string[] = []
+    const adviceNutrients: FieldImpactRow["adviceNutrients"] = { under: [], over: [] }
 
     if (field.b_bufferstrip) {
       statuses.push("bufferstrip")
@@ -109,14 +126,16 @@ export function buildFieldImpactRows({
         if (balanceRow?.errorMessage) statuses.push("no_balance")
       }
 
+      // Too little is a risk for the yield; too much is wasteful and a risk for the environment
       const dose = doseAfter ?? adviceRow?.dose
       if (adviceRow?.advice && dose) {
-        const overAdvice = BULK_NUTRIENTS.some(
-          (nutrient) =>
-            computeAdviceProgress(dose[nutrient], adviceRow.advice?.[nutrient] ?? 0).status ===
-            "over",
-        )
-        if (overAdvice) statuses.push("over_advice")
+        for (const nutrient of BULK_NUTRIENTS) {
+          const { status } = computeAdviceProgress(dose[nutrient], adviceRow.advice[nutrient] ?? 0)
+          if (status === "under") adviceNutrients.under.push(nutrient)
+          if (status === "over") adviceNutrients.over.push(nutrient)
+        }
+        if (adviceNutrients.under.length > 0) statuses.push("under_advice")
+        if (adviceNutrients.over.length > 0) statuses.push("over_advice")
       }
       const fieldBalance = previewBalanceRow?.balance ?? balanceRow?.balance
       if (fieldBalance && fieldBalance.balance > fieldBalance.target) {
@@ -140,6 +159,10 @@ export function buildFieldImpactRows({
       balance: balanceRow?.balance,
       balanceAfter: previewBalanceRow?.balance,
       statuses,
+      adviceNutrients,
+      norms: fieldNorms?.[field.b_id]?.norms,
+      normFillings: fieldNorms?.[field.b_id]?.fillings,
+      normFillingsAfter: isIncluded ? previewNormFillings?.[field.b_id] : undefined,
       messages,
     }
   })

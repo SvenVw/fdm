@@ -1,11 +1,18 @@
-import { AlertTriangle, ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
+import { AlertTriangle, ArrowDown, ArrowUp, ArrowUpDown, ChevronDown } from "lucide-react"
 import { useMemo, useState } from "react"
 import { NavLink } from "react-router"
 import { computeAdviceProgress } from "~/components/blocks/nutrient-advice/progress-bar"
+import { Button } from "~/components/ui/button"
 import { Checkbox } from "~/components/ui/checkbox"
-import { Label } from "~/components/ui/label"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu"
 import { Skeleton } from "~/components/ui/skeleton"
-import { Switch } from "~/components/ui/switch"
 import {
   Table,
   TableBody,
@@ -17,13 +24,39 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
 import { cn } from "~/lib/utils"
 import type { FieldImpactRow } from "./aggregate"
-import type { BulkNutrient } from "./types"
+import type { BulkNormKey, BulkNutrient } from "./types"
 import { CultivationBadge } from "./cultivation-badge"
 import { ComparisonLabel, FieldStatusLabel, formatKg, isDeviation } from "./status"
 
 type SortKey = "name" | "area" | "crop" | "n" | "p" | "k" | "balance" | "status"
 
 const NUTRIENT_HEADERS: Record<BulkNutrient, string> = { n: "N", p: "P₂O₅", k: "K₂O" }
+
+/** Short column headers for the legal norms, with the full name for the tooltip. */
+const NORM_HEADERS: Record<BulkNormKey, { short: string; full: string }> = {
+  nitrogen: { short: "Norm N", full: "Gebruiksnorm stikstof, werkzaam" },
+  phosphate: { short: "Norm P₂O₅", full: "Gebruiksnorm fosfaat" },
+  manure: { short: "Norm N dierlijk", full: "Gebruiksnorm stikstof uit dierlijke mest" },
+  renure: { short: "Norm RENURE", full: "Gebruiksnorm RENURE" },
+}
+
+/** The columns that can be shown or hidden; the field name is always shown. */
+type ColumnKey = "area" | "crop" | BulkNutrient | "balance" | BulkNormKey | "status"
+
+const NORM_KEYS: BulkNormKey[] = ["nitrogen", "phosphate", "manure", "renure"]
+
+/** The columns other than the norms, in order; the norms are placed before the status. */
+const BASE_COLUMNS = ["area", "crop", "n", "p", "k", "balance", "status"] as const
+
+const COLUMN_LABELS: Record<(typeof BASE_COLUMNS)[number], string> = {
+  area: "Oppervlakte",
+  crop: "Gewas",
+  n: "N (werkzaam)",
+  p: "P₂O₅",
+  k: "K₂O",
+  balance: "N-balans",
+  status: "Status",
+}
 
 function sortValue(row: FieldImpactRow, key: SortKey): number | string {
   switch (key) {
@@ -122,12 +155,66 @@ function BalanceCell({ row }: { row: FieldImpactRow }) {
   )
 }
 
+function NormCell({ row, normKey }: { row: FieldImpactRow; normKey: BulkNormKey }) {
+  const norm = row.norms?.[normKey]
+  const filling =
+    (row.included ? row.normFillingsAfter?.[normKey] : undefined) ?? row.normFillings?.[normKey]
+  if (norm === undefined || filling === undefined) {
+    return <span className="text-muted-foreground">–</span>
+  }
+  const isOver = norm > 0 ? filling > norm : filling > 0
+  return (
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap tabular-nums">
+      <span>
+        <span className={cn(row.included && row.normFillingsAfter && "font-semibold")}>
+          {formatKg(filling)}
+        </span>
+        <span className="text-muted-foreground"> / {formatKg(norm)}</span>
+      </span>
+      <ComparisonLabel status={isOver ? "over" : "on-target"} noun="gebruiksnorm" />
+    </span>
+  )
+}
+
+const NUTRIENT_NAMES: Record<BulkNutrient, string> = { n: "N", p: "P₂O₅", k: "K₂O" }
+
+/** The status labels of a row, with the nutrients concerned and the explanation in a tooltip. */
+function StatusCell({ row }: { row: FieldImpactRow }) {
+  const extra = row.messages.join(" ") || undefined
+  return (
+    <span className="flex flex-wrap gap-x-2 gap-y-0.5">
+      {row.statuses.map((status) => (
+        <FieldStatusLabel
+          key={status}
+          status={status}
+          detail={
+            status === "under_advice"
+              ? row.adviceNutrients.under.map((n) => NUTRIENT_NAMES[n]).join(", ")
+              : status === "over_advice"
+                ? row.adviceNutrients.over.map((n) => NUTRIENT_NAMES[n]).join(", ")
+                : undefined
+          }
+          extra={
+            status === "missing_soil_data" || status === "no_advice" || status === "no_balance"
+              ? extra
+              : undefined
+          }
+        />
+      ))}
+    </span>
+  )
+}
+
 /**
  * The per-field breakdown of the bulk fertilizer application page.
  *
  * Each row can be excluded from the application. Excluded fields are also left out of the advice
  * and nitrogen balance aggregation, but stay visible so they can be included again. Values show
  * the dose and balance after the application when a preview is available.
+ *
+ * The legal norms of each field (indicative per field) can be shown as extra columns.
+ *
+ * @param props.normKeys - The norms that can be shown as columns; empty for years without norms.
  */
 export function FieldImpactTable({
   rows,
@@ -137,6 +224,7 @@ export function FieldImpactTable({
   onSetIncluded,
   disabled,
   selectable = true,
+  normKeys = [],
 }: {
   rows: FieldImpactRow[]
   loading: boolean
@@ -147,18 +235,31 @@ export function FieldImpactTable({
   disabled?: boolean
   /** Show a checkbox per field to include or exclude it. */
   selectable?: boolean
+  normKeys?: BulkNormKey[]
 }) {
   const [sort, setSort] = useState<{ key: SortKey; desc: boolean }>({ key: "name", desc: false })
-  const [deviationsOnly, setDeviationsOnly] = useState(false)
+  // The legal norms are hidden by default; every other column is shown
+  const [hidden, setHidden] = useState<Set<ColumnKey>>(() => new Set(NORM_KEYS))
+  const columns: ColumnKey[] = [
+    ...BASE_COLUMNS.slice(0, -1),
+    ...normKeys,
+    "status" as const,
+  ].filter((key) => !hidden.has(key))
+  const isShown = (key: ColumnKey) => columns.includes(key)
+  const toggleColumn = (key: ColumnKey, show: boolean) =>
+    setHidden((prev) => {
+      const next = new Set(prev)
+      if (show) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  const shownNormKeys = normKeys.filter((key) => isShown(key))
 
   const handleSort = (key: SortKey) =>
     setSort((prev) => ({ key, desc: prev.key === key ? !prev.desc : key !== "name" }))
 
   const visibleRows = useMemo(() => {
-    const filtered = deviationsOnly
-      ? rows.filter((row) => !row.hasSelectedCrop || row.statuses.some(isDeviation))
-      : rows
-    return [...filtered].sort((a, b) => {
+    return [...rows].sort((a, b) => {
       const va = sortValue(a, sort.key)
       const vb = sortValue(b, sort.key)
       const order =
@@ -167,13 +268,10 @@ export function FieldImpactTable({
           : Number(va) - Number(vb)
       return (sort.desc ? -order : order) || a.b_name.localeCompare(b.b_name, "nl-NL")
     })
-  }, [rows, sort, deviationsOnly])
+  }, [rows, sort])
 
   const allIncluded = rows.length > 0 && rows.every((row) => row.included)
   const someIncluded = rows.some((row) => row.included)
-  const deviationCount = rows.filter(
-    (row) => !row.hasSelectedCrop || row.statuses.some(isDeviation),
-  ).length
 
   return (
     <section aria-label="Percelen" className="space-y-3">
@@ -182,21 +280,57 @@ export function FieldImpactTable({
           <h3 className="text-sm font-semibold">Percelen</h3>
           <p className="text-muted-foreground text-xs">
             {selectable
-              ? "Waarden na deze gift, in kg per ha. Vink een perceel uit om het over te slaan."
+              ? "Waarden na deze gift, in kg per ha. Vink een perceel uit om het over te slaan. Wijs een status aan voor uitleg."
               : "Waarden na de wijziging, in kg per ha."}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Switch
-            id="bulk-deviations-only"
-            checked={deviationsOnly}
-            onCheckedChange={setDeviationsOnly}
-          />
-          <Label htmlFor="bulk-deviations-only" className="text-sm font-normal">
-            Alleen afwijkingen
-            {!loading && <span className="text-muted-foreground"> ({deviationCount})</span>}
-          </Label>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              Kolommen
+              <ChevronDown className="size-4" aria-hidden="true" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Kolommen tonen</DropdownMenuLabel>
+            {BASE_COLUMNS.slice(0, -1).map((key) => (
+              <DropdownMenuCheckboxItem
+                key={key}
+                checked={isShown(key)}
+                onSelect={(event) => event.preventDefault()}
+                onCheckedChange={(checked) => toggleColumn(key, checked === true)}
+              >
+                {COLUMN_LABELS[key]}
+              </DropdownMenuCheckboxItem>
+            ))}
+            {normKeys.length > 0 && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
+                  Gebruiksnormen (per perceel indicatief)
+                </DropdownMenuLabel>
+                {normKeys.map((key) => (
+                  <DropdownMenuCheckboxItem
+                    key={key}
+                    checked={isShown(key)}
+                    onSelect={(event) => event.preventDefault()}
+                    onCheckedChange={(checked) => toggleColumn(key, checked === true)}
+                  >
+                    {NORM_HEADERS[key].full}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </>
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuCheckboxItem
+              checked={isShown("status")}
+              onSelect={(event) => event.preventDefault()}
+              onCheckedChange={(checked) => toggleColumn("status", checked === true)}
+            >
+              {COLUMN_LABELS.status}
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <div className="overflow-x-auto rounded-md border">
         <Table>
@@ -218,25 +352,48 @@ export function FieldImpactTable({
                 </TableHead>
               )}
               <SortableHead label="Perceel" sortKey="name" sort={sort} onSort={handleSort} />
-              <SortableHead
-                label="Oppervlakte"
-                sortKey="area"
-                sort={sort}
-                onSort={handleSort}
-                className="text-right"
-              />
-              <SortableHead label="Gewas" sortKey="crop" sort={sort} onSort={handleSort} />
-              {(["n", "p", "k"] as const).map((nutrient) => (
+              {isShown("area") && (
                 <SortableHead
-                  key={nutrient}
-                  label={NUTRIENT_HEADERS[nutrient]}
-                  sortKey={nutrient}
+                  label="Oppervlakte"
+                  sortKey="area"
                   sort={sort}
                   onSort={handleSort}
+                  className="text-right"
                 />
+              )}
+              {isShown("crop") && (
+                <SortableHead label="Gewas" sortKey="crop" sort={sort} onSort={handleSort} />
+              )}
+              {(["n", "p", "k"] as const)
+                .filter((nutrient) => isShown(nutrient))
+                .map((nutrient) => (
+                  <SortableHead
+                    key={nutrient}
+                    label={NUTRIENT_HEADERS[nutrient]}
+                    sortKey={nutrient}
+                    sort={sort}
+                    onSort={handleSort}
+                  />
+                ))}
+              {isShown("balance") && (
+                <SortableHead label="N-balans" sortKey="balance" sort={sort} onSort={handleSort} />
+              )}
+              {shownNormKeys.map((key) => (
+                <TableHead key={key} className="whitespace-nowrap">
+                  <Tooltip>
+                    <TooltipTrigger className="cursor-help underline decoration-dotted underline-offset-4">
+                      {NORM_HEADERS[key].short}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {NORM_HEADERS[key].full}, in kg per ha. Per perceel indicatief; wettelijk telt
+                      het bedrijfstotaal.
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
               ))}
-              <SortableHead label="N-balans" sortKey="balance" sort={sort} onSort={handleSort} />
-              <SortableHead label="Status" sortKey="status" sort={sort} onSort={handleSort} />
+              {isShown("status") && (
+                <SortableHead label="Status" sortKey="status" sort={sort} onSort={handleSort} />
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -279,67 +436,62 @@ export function FieldImpactTable({
                     )}
                   </span>
                 </TableCell>
-                <TableCell className="text-right whitespace-nowrap tabular-nums">
-                  {row.b_area.toLocaleString("nl-NL")} ha
-                </TableCell>
-                <TableCell className="max-w-40">
-                  {row.mainCultivationName ? (
-                    <CultivationBadge
-                      name={row.mainCultivationName}
-                      cropRotation={row.mainCultivationCropRotation}
-                    />
-                  ) : (
-                    <span className="text-muted-foreground">–</span>
-                  )}
-                </TableCell>
-                {(["n", "p", "k"] as const).map((nutrient) => (
-                  <TableCell key={nutrient}>
+                {isShown("area") && (
+                  <TableCell className="text-right whitespace-nowrap tabular-nums">
+                    {row.b_area.toLocaleString("nl-NL")} ha
+                  </TableCell>
+                )}
+                {isShown("crop") && (
+                  <TableCell className="max-w-40">
+                    {row.mainCultivationName ? (
+                      <CultivationBadge
+                        name={row.mainCultivationName}
+                        cropRotation={row.mainCultivationCropRotation}
+                      />
+                    ) : (
+                      <span className="text-muted-foreground">–</span>
+                    )}
+                  </TableCell>
+                )}
+                {(["n", "p", "k"] as const)
+                  .filter((nutrient) => isShown(nutrient))
+                  .map((nutrient) => (
+                    <TableCell key={nutrient}>
+                      {loading ? (
+                        <Skeleton className="h-4 w-16" />
+                      ) : (
+                        <NutrientCell row={row} nutrient={nutrient} />
+                      )}
+                    </TableCell>
+                  ))}
+                {isShown("balance") && (
+                  <TableCell>
+                    {loading ? <Skeleton className="h-4 w-16" /> : <BalanceCell row={row} />}
+                  </TableCell>
+                )}
+                {shownNormKeys.map((key) => (
+                  <TableCell key={key}>
                     {loading ? (
                       <Skeleton className="h-4 w-16" />
                     ) : (
-                      <NutrientCell row={row} nutrient={nutrient} />
+                      <NormCell row={row} normKey={key} />
                     )}
                   </TableCell>
                 ))}
-                <TableCell>
-                  {loading ? <Skeleton className="h-4 w-16" /> : <BalanceCell row={row} />}
-                </TableCell>
-                <TableCell>
-                  {loading ? (
-                    <Skeleton className="h-4 w-20" />
-                  ) : (
-                    <span className="flex flex-wrap gap-x-2 gap-y-0.5">
-                      {row.statuses.map((status) =>
-                        row.messages.length > 0 &&
-                        (status === "missing_soil_data" ||
-                          status === "no_advice" ||
-                          status === "no_balance") ? (
-                          <Tooltip key={status}>
-                            <TooltipTrigger asChild>
-                              <button type="button">
-                                <FieldStatusLabel status={status} />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-xs">
-                              {row.messages.join(" ")}
-                            </TooltipContent>
-                          </Tooltip>
-                        ) : (
-                          <FieldStatusLabel key={status} status={status} />
-                        ),
-                      )}
-                    </span>
-                  )}
-                </TableCell>
+                {isShown("status") && (
+                  <TableCell>
+                    {loading ? <Skeleton className="h-4 w-20" /> : <StatusCell row={row} />}
+                  </TableCell>
+                )}
               </TableRow>
             ))}
             {visibleRows.length === 0 && (
               <TableRow>
                 <TableCell
-                  colSpan={selectable ? 9 : 8}
+                  colSpan={(selectable ? 2 : 1) + columns.length}
                   className="text-muted-foreground h-16 text-center"
                 >
-                  {deviationsOnly ? "Geen afwijkende percelen." : "Geen percelen geselecteerd."}
+                  Geen percelen geselecteerd.
                 </TableCell>
               </TableRow>
             )}

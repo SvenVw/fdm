@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import type { BulkCurrentState, BulkFieldIssue, BulkFieldOption } from "./types"
+import type { BulkCurrentState, BulkFieldIssue, BulkFieldOption, BulkNormKey } from "./types"
 import {
   buildFieldImpactRows,
   type FieldImpactRow,
@@ -86,8 +86,20 @@ export function useImpactState({
         balance: balanceResult?.status === "ok" ? balanceResult.data : undefined,
         previewDoses: impactPreview?.doses,
         previewBalance: balancePreview?.fields,
+        fieldNorms:
+          farmNormsResult?.status === "ok" ? farmNormsResult.data.selectedFields : undefined,
+        previewNormFillings: impactPreview?.norms?.fieldsAfter,
       }),
-    [fields, included, cultivationIds, adviceResult, balanceResult, impactPreview, balancePreview],
+    [
+      fields,
+      included,
+      cultivationIds,
+      adviceResult,
+      balanceResult,
+      impactPreview,
+      balancePreview,
+      farmNormsResult,
+    ],
   )
   const adviceSummary = useMemo(() => summarizeAdvice(rows), [rows])
   const balanceSummary = useMemo(() => summarizeBalance(rows), [rows])
@@ -124,6 +136,12 @@ export function useImpactState({
     normExceeded: normOutcomes.some((outcome) => outcome.remaining < 0),
     getFieldNormOutcomes,
     agronomicNotes,
+    /** The norms to show as columns in the field table; empty for years without norms. */
+    normKeys: (norms?.available
+      ? norms.showRenure
+        ? ["nitrogen", "phosphate", "manure", "renure"]
+        : ["nitrogen", "phosphate", "manure"]
+      : []) as BulkNormKey[],
     rows,
     adviceSummary,
     balanceSummary,

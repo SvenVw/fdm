@@ -351,6 +351,7 @@ export function ModifyFertilizerPage({
               b_id_farm={b_id_farm}
               calendar={calendar}
               selectable={false}
+              normKeys={state.normKeys}
             />
           </CardContent>
         </Card>
