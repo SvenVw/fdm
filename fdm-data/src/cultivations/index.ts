@@ -8,6 +8,12 @@ import type {
 import { aggregateCultivationCatalogueInfoBrp, getCatalogueBrp } from "./catalogues/brp"
 
 /**
+ * When checking for the availability of a cultivation, users of the package should
+ * check cultivation code availability in years after this year for this year instead.
+ */
+const LAST_CULTIVATION_AVAILABILITY_YEAR = 2026
+
+/**
  * Collect current date and other volatile data that should be used consistently
  * across all catalogue aggregations.
  *
@@ -92,4 +98,15 @@ export async function getCultivationCatalogue(
   }
 
   throw new Error(`catalogue ${catalogueName} is not recognized`)
+}
+
+/**
+ * Get the last cultivation availability year configured in fdm-data for the given catalogue.
+ * When checking for the availability of a cultivation, users of the package should
+ * check cultivation code availability in years after this year for this year instead.
+ *
+ * @returns the last cultivation availability year.
+ */
+export async function getLastCultivationAvailabilityYear(_catalogue: string) {
+  return LAST_CULTIVATION_AVAILABILITY_YEAR
 }

@@ -17,6 +17,7 @@ import {
   getCultivationsFromCatalogue,
   getCultivationsFromCatalogues,
   getDefaultDatesOfCultivation,
+  isCultivationUnavailableInPeriod,
   removeCultivation,
   updateCultivation,
 } from "./cultivation"
@@ -464,6 +465,45 @@ describe("Cultivation Data Model", () => {
       ).rejects.toThrow("Exception for addCultivation")
     })
 
+    it("should reject adding for an interval including years unavailable for the cultivation code", async () => {
+      const b_lu_catalogue = createId()
+      await addCultivationToCatalogue(fdm, {
+        b_lu_catalogue: b_lu_catalogue,
+        b_lu_source: b_lu_source,
+        b_lu_name: "new-name",
+        b_lu_name_en: "new-name-en",
+        b_lu_harvestable: "multiple",
+        b_lu_hcat3: "new-hcat3",
+        b_lu_hcat3_name: "new-hcat3-name",
+        b_lu_croprotation: "cereal",
+        b_lu_harvestcat: "HC050",
+        b_lu_yield: 6000,
+        b_lu_dm: 500,
+        b_lu_hi: 0.4,
+        b_lu_n_harvestable: 4,
+        b_lu_n_residue: 2,
+        b_n_fixation: 0,
+        b_lu_rest_oravib: false,
+        b_lu_variety_options: null,
+        b_lu_start_default: "03-01",
+        b_lu_eom: null,
+        b_lu_eom_residue: null,
+        b_date_harvest_default: "09-15",
+        b_lu_ya: [2023],
+      })
+
+      await expect(
+        addCultivation(
+          fdm,
+          principal_id,
+          b_lu_catalogue,
+          b_id,
+          new Date("2024-01-01"),
+          new Date("2024-12-31"),
+        ),
+      ).rejects.toThrow("Exception for addCultivation")
+    })
+
     it("should throw an error when adding a cultivation with an invalid field ID", async () => {
       const invalid_b_id = "invalid-field-id"
 
@@ -816,6 +856,54 @@ describe("Cultivation Data Model", () => {
         .from(schema.cultivationHarvesting)
         .where(eq(schema.cultivationHarvesting.b_lu, b_lu))
       expect(harvestsAfterDelete.length).toBe(1)
+    })
+
+    it("should reject updating b_lu_start and b_lu_end to an interval including years unavailable for the cultivation code", async () => {
+      const b_lu_catalogue = createId()
+      await addCultivationToCatalogue(fdm, {
+        b_lu_catalogue: b_lu_catalogue,
+        b_lu_source: b_lu_source,
+        b_lu_name: "new-name",
+        b_lu_name_en: "new-name-en",
+        b_lu_harvestable: "multiple",
+        b_lu_hcat3: "new-hcat3",
+        b_lu_hcat3_name: "new-hcat3-name",
+        b_lu_croprotation: "cereal",
+        b_lu_harvestcat: "HC050",
+        b_lu_yield: 6000,
+        b_lu_dm: 500,
+        b_lu_hi: 0.4,
+        b_lu_n_harvestable: 4,
+        b_lu_n_residue: 2,
+        b_n_fixation: 0,
+        b_lu_rest_oravib: false,
+        b_lu_variety_options: null,
+        b_lu_start_default: "03-01",
+        b_lu_eom: null,
+        b_lu_eom_residue: null,
+        b_date_harvest_default: "09-15",
+        b_lu_ya: [2023],
+      })
+
+      const b_lu = await addCultivation(
+        fdm,
+        principal_id,
+        b_lu_catalogue,
+        b_id,
+        new Date("2023-01-01"),
+        new Date("2023-12-31"),
+      )
+
+      await expect(
+        updateCultivation(
+          fdm,
+          principal_id,
+          b_lu,
+          undefined,
+          new Date("2024-01-01"),
+          new Date("2024-12-31"),
+        ),
+      ).rejects.toThrow("Exception for updateCultivation")
     })
 
     it("should update a cultivation with only the crop residue", async () => {
@@ -1292,6 +1380,114 @@ describe("Cultivation Data Model", () => {
         await expect(
           getDefaultDatesOfCultivation(fdm, principal_id, b_id_farm, nonExistentCatalogueId, year),
         ).rejects.toThrow("Exception for getDefaultDatesOfCultivation")
+      })
+    })
+
+    describe("isCultivationUnavailableInPeriod", () => {
+      it("should return null when the cultivation is available in the given time period", () => {
+        expect(
+          isCultivationUnavailableInPeriod(
+            { b_lu_start: new Date("2024-02-01"), b_lu_end: new Date("2024-09-30") },
+            [2024],
+            2026,
+          ),
+        ).toBeNull()
+      })
+
+      it("should return { unavailable_in } when the cultivation is not available after the last b_lu_ya for an open interval", () => {
+        expect(
+          isCultivationUnavailableInPeriod({ b_lu_start: new Date("2024-02-01") }, [2024], 2026),
+        ).toEqual({ unavailable_in: 2025 })
+      })
+
+      it("should return null when availability is not known for years beyond the last availability year for an open interval", () => {
+        expect(
+          isCultivationUnavailableInPeriod({ b_lu_start: new Date("2024-02-01") }, [2024], 2024),
+        ).toBeNull()
+      })
+
+      it("should return { unavailable_in } when the cultivation is not available after the last b_lu_ya", () => {
+        expect(
+          isCultivationUnavailableInPeriod(
+            { b_lu_start: new Date("2024-02-01"), b_lu_end: new Date("2025-06-10") },
+            [2024],
+            2026,
+          ),
+        ).toEqual({ unavailable_in: 2025 })
+      })
+
+      it("should return null when availability is not known for years beyond the last availability year", () => {
+        expect(
+          isCultivationUnavailableInPeriod(
+            { b_lu_start: new Date("2024-02-01"), b_lu_end: new Date("2025-06-10") },
+            [2024, 2025], // Should not happen in practice
+            2024,
+          ),
+        ).toBeNull()
+      })
+
+      it("should return { unavailable_in } when the cultivation is not available before the first b_lu_ya", () => {
+        expect(
+          isCultivationUnavailableInPeriod(
+            { b_lu_start: new Date("2024-02-01"), b_lu_end: new Date("2025-06-10") },
+            [2025],
+            2026,
+          ),
+        ).toEqual({ unavailable_in: 2024 })
+      })
+
+      it("should return { unavailable_in } when the cultivation is not available in a gap in b_lu_ya", () => {
+        expect(
+          isCultivationUnavailableInPeriod(
+            { b_lu_start: new Date("2024-02-01"), b_lu_end: new Date("2025-06-10") },
+            [2024, 2026],
+            2026,
+          ),
+        ).toEqual({ unavailable_in: 2025 })
+      })
+
+      it("should return {} when the checking range is too long", () => {
+        const b_lu_ya = []
+        for (let i = 2000; i <= 2150; i++) {
+          b_lu_ya.push(i)
+        }
+        expect(
+          isCultivationUnavailableInPeriod(
+            { b_lu_start: new Date("2001-02-01"), b_lu_end: new Date("2132-09-30") },
+            b_lu_ya,
+            2180,
+          ),
+        ).toEqual({})
+      })
+
+      it("should return null if b_lu_ya is null", () => {
+        expect(
+          isCultivationUnavailableInPeriod(
+            { b_lu_start: new Date("2024-02-01"), b_lu_end: new Date("2025-06-10") },
+            null,
+            2026,
+          ),
+        ).toBeNull()
+      })
+
+      it("should return null if last availability year is not passed", () => {
+        expect(
+          isCultivationUnavailableInPeriod(
+            { b_lu_start: new Date("2024-02-01"), b_lu_end: new Date("2025-06-10") },
+            [2024],
+            undefined,
+          ),
+        ).toBeNull()
+      })
+
+      it("should return null if last availability year is NaN", () => {
+        expect(
+          isCultivationUnavailableInPeriod(
+            { b_lu_start: new Date("2024-02-01"), b_lu_end: new Date("2025-06-10") },
+            [2024],
+            Number.NaN,
+          ),
+        ).toBeNull()
       })
     })
   })
