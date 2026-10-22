@@ -114,6 +114,91 @@ describe("buildMeasureOptions", () => {
     expect(options.every((o) => o.recommendation === null)).toBe(true)
   })
 
+  it("keeps losing variants selectable but recommends only the winning family variant", () => {
+    const ids = ["bln_BM56b", "bln_BM56c", "bln_BM239"]
+    const options = buildMeasureOptions({
+      catalogue: ids.map((id) => entry(id)),
+      enabledSources: ["bln"],
+      activeMeasures: [],
+      applicability: { applicability: ids.map(applicable) },
+      advice: {
+        indicator_advice: [
+          {
+            indicator: "C_N",
+            measures: [
+              { m_id: "bln_BM56b", measure_impact: 0.2 },
+              { m_id: "bln_BM56c", measure_impact: 0.3 },
+              { m_id: "bln_BM239", measure_impact: 0.1 },
+            ],
+          },
+        ],
+      },
+      score,
+    })
+
+    expect(options.map((o) => [o.m_id, o.recommendation?.rank ?? null])).toEqual([
+      ["bln_BM56c", 1],
+      ["bln_BM239", 2],
+      ["bln_BM56b", null],
+    ])
+    expect(options[2].selectable).toBe(true)
+    expect(options[2].predicted_impacts).toEqual([{ indicator_id: "C_N", measure_impact: 0.2 }])
+  })
+
+  it("fills all five recommendation slots with distinct families", () => {
+    const ids = ["bln_BM56b", "bln_BM56c", "bln_BM57", "bln_BM58", "bln_BM59", "bln_BM60"]
+    const options = buildMeasureOptions({
+      catalogue: ids.map((id) => entry(id)),
+      enabledSources: ["bln"],
+      activeMeasures: [],
+      applicability: { applicability: ids.map(applicable) },
+      advice: {
+        indicator_advice: [
+          {
+            indicator: "C_N",
+            measures: ids.map((m_id, i) => ({ m_id, measure_impact: 1 - i / 10 })),
+          },
+        ],
+      },
+      score,
+    })
+    expect(
+      options.filter((o) => o.recommendation).map((o) => [o.m_id, o.recommendation?.rank]),
+    ).toEqual([
+      ["bln_BM56b", 1],
+      ["bln_BM57", 2],
+      ["bln_BM58", 3],
+      ["bln_BM59", 4],
+      ["bln_BM60", 5],
+    ])
+    expect(options.find((o) => o.m_id === "bln_BM56c")?.recommendation).toBeNull()
+  })
+
+  it("does not recommend siblings of an active variant absent from the advice and catalogue", () => {
+    const options = buildMeasureOptions({
+      catalogue: [entry("bln_BM56c"), entry("bln_BM239")],
+      enabledSources: ["bln"],
+      activeMeasures: [{ b_id_measure: "active-variant", m_id: "bln_BM56b", m_conflicts: null }],
+      applicability: { applicability: [applicable("bln_BM56c"), applicable("bln_BM239")] },
+      advice: {
+        indicator_advice: [
+          {
+            indicator: "C_N",
+            measures: [
+              { m_id: "bln_BM56c", measure_impact: 0.3 },
+              { m_id: "bln_BM239", measure_impact: 0.1 },
+            ],
+          },
+        ],
+      },
+      score,
+    })
+    expect(options.map((o) => [o.m_id, o.recommendation?.rank ?? null])).toEqual([
+      ["bln_BM239", 1],
+      ["bln_BM56c", null],
+    ])
+  })
+
   it("throws for malformed advice", () => {
     expect(() =>
       buildMeasureOptions({
