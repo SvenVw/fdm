@@ -327,6 +327,11 @@ export function isCultivationUnavailableInPeriod(
 
   const start = new Date(period.b_lu_start)
   const end = period.b_lu_end ? new Date(period.b_lu_end) : null
+
+  if (Number.isNaN(start.getFullYear()) || (end && Number.isNaN(end.getFullYear()))) {
+    return null
+  }
+
   if (end && end.getTime() < start.getTime()) {
     // End before start: user will see another warning anyways so return null.
     return null
@@ -347,10 +352,6 @@ export function isCultivationUnavailableInPeriod(
       end ? end.getFullYear() : maxCultivationAvailabilityYear,
     ),
   )
-
-  if (Number.isNaN(startYear) || Number.isNaN(endYear)) {
-    return null
-  }
 
   if (endYear > b_lu_ya[b_lu_ya.length - 1]) {
     return {
@@ -1258,7 +1259,7 @@ export async function updateCultivation(
       }
 
       if (b_lu_end) {
-        // Validate if terminatinge date is after sowing date
+        // Validate if terminating date is after sowing date
         if (!b_lu_start) {
           const result = await tx
             .select({
@@ -1315,7 +1316,10 @@ export async function updateCultivation(
         if (
           result.length > 0 &&
           isCultivationUnavailableInPeriod(
-            { b_lu_start, b_lu_end },
+            {
+              b_lu_start: result[0].b_lu_start,
+              b_lu_end: b_lu_end === null ? null : result[0].b_lu_end,
+            },
             cultivation[0].b_lu_ya,
             await getLastCultivationAvailabilityYear(cultivation[0].b_lu_source),
           )

@@ -906,6 +906,51 @@ describe("Cultivation Data Model", () => {
       ).rejects.toThrow("Exception for updateCultivation")
     })
 
+    it("should update b_lu_start even if b_lu_end is not present and there are availability years", async () => {
+      const b_lu_catalogue = createId()
+      await addCultivationToCatalogue(fdm, {
+        b_lu_catalogue: b_lu_catalogue,
+        b_lu_source: b_lu_source,
+        b_lu_name: "new-name",
+        b_lu_name_en: "new-name-en",
+        b_lu_harvestable: "multiple",
+        b_lu_hcat3: "new-hcat3",
+        b_lu_hcat3_name: "new-hcat3-name",
+        b_lu_croprotation: "cereal",
+        b_lu_harvestcat: "HC050",
+        b_lu_yield: 6000,
+        b_lu_dm: 500,
+        b_lu_hi: 0.4,
+        b_lu_n_harvestable: 4,
+        b_lu_n_residue: 2,
+        b_n_fixation: 0,
+        b_lu_rest_oravib: false,
+        b_lu_variety_options: null,
+        b_lu_start_default: "03-01",
+        b_lu_eom: null,
+        b_lu_eom_residue: null,
+        b_date_harvest_default: "09-15",
+        b_lu_ya: [2023],
+      })
+
+      // b_lu_end is defined here, and it won't be cleared during the update
+      const b_lu = await addCultivation(
+        fdm,
+        principal_id,
+        b_lu_catalogue,
+        b_id,
+        new Date("2023-01-01"),
+        new Date("2023-12-31"),
+      )
+
+      // The final interval will be 2024-02-02 - 2023-12-31
+      const newSowingDate = new Date("2023-02-02")
+      await updateCultivation(fdm, principal_id, b_lu, undefined, newSowingDate)
+
+      const updatedCultivation = await getCultivation(fdm, principal_id, b_lu)
+      expect(updatedCultivation.b_lu_start).toEqual(newSowingDate)
+    })
+
     it("should update a cultivation with only the crop residue", async () => {
       await updateCultivation(fdm, principal_id, b_lu, undefined, undefined, undefined, true)
 
@@ -1506,6 +1551,32 @@ describe("Cultivation Data Model", () => {
             { b_lu_start: new Date("2024-02-01"), b_lu_end: new Date("2025-06-10") },
             [2024],
             Number.NaN,
+          ),
+        ).toBeNull()
+      })
+
+      it("should return null if b_lu_end is before b_lu_start", () => {
+        expect(
+          isCultivationUnavailableInPeriod(
+            { b_lu_start: new Date("2024-02-01"), b_lu_end: new Date("2024-01-01") },
+            [2024],
+            2026,
+          ),
+        ).toBeNull()
+      })
+
+      it("should return null if b_lu_start year is NaN", () => {
+        expect(
+          isCultivationUnavailableInPeriod({ b_lu_start: new Date("hello") }, [2024], 2026),
+        ).toBeNull()
+      })
+
+      it("should return null if b_lu_start year is NaN", () => {
+        expect(
+          isCultivationUnavailableInPeriod(
+            { b_lu_start: new Date("2024-01-01"), b_lu_end: new Date("hello") },
+            [2024],
+            2026,
           ),
         ).toBeNull()
       })
