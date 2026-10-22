@@ -2,11 +2,13 @@ import type { FeatureCollection, Geometry } from "geojson"
 import type { MapGeoJSONFeature } from "maplibre-gl"
 import { getFields } from "@nmi-agro/fdm-core"
 import { simplify } from "@turf/simplify"
+import { Table as TableIcon } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { Layer, type LayerProps } from "react-map-gl/maplibre"
 import {
   type LoaderFunctionArgs,
   type MetaFunction,
+  NavLink,
   useLoaderData,
   useNavigate,
   useRevalidator,
@@ -381,6 +383,14 @@ export default function FarmAtlasNutrientAdviceBlock() {
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
+          {b_id_farm && b_id_farm !== "undefined" && (
+            <Button asChild variant="outline" size="sm" className="h-8 w-full text-xs">
+              <NavLink to={`/farm/${b_id_farm}/${calendar}/nutrient_advice`}>
+                <TableIcon className="h-3.5 w-3.5" />
+                {NUTRIENT_ADVICE_COPY.openOverview}
+              </NavLink>
+            </Button>
+          )}
         </CardContent>
       </Card>
 

@@ -60,6 +60,7 @@ export const NUTRIENT_ADVICE_COPY = {
   retry: "Opnieuw proberen",
   openAdvice: "Bekijk bemestingsadvies",
   clickHint: "Klik op een perceel voor het volledige advies",
+  openOverview: "Naar bemestingsadvies",
 } as const
 
 /* ================ DATA SHAPES ================ */
