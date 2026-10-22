@@ -239,9 +239,45 @@ function FieldColumnHeader({
   )
 }
 
+/**
+ * Label of the farm summary row. In "per ha" mode the row is an area-weighted average, not a
+ * total, so the label says so; the tooltip explains how the numbers are calculated.
+ */
+function FarmSummaryLabel({ unitMode }: { unitMode: UnitMode }) {
+  const isTotal = unitMode === "total"
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button type="button" className="flex flex-col items-start gap-0.5 text-left">
+          <span className="font-medium">{isTotal ? "Bedrijfstotaal" : "Bedrijfsgemiddelde"}</span>
+          <span className="text-muted-foreground text-xs leading-none font-normal">
+            {isTotal ? "alle percelen samen" : "gewogen per ha"}
+          </span>
+        </button>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-xs">
+        <p className="text-xs">
+          {isTotal
+            ? "Totale hoeveelheid in kg voor alle percelen samen (advies per ha × oppervlakte)."
+            : "Gemiddelde per hectare, gewogen naar de oppervlakte van de percelen. Kies 'Totaal' voor de totale hoeveelheid in kg voor het bedrijf."}{" "}
+          Percelen zonder advies tellen niet mee.
+        </p>
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
+/**
+ * Builds the "Perceel" column, with the farm summary label in its footer.
+ *
+ * @param b_id_farm ID of the farm to be used for links.
+ * @param calendar Current calendar to be used for links.
+ * @param unitMode Whether the farm row shows the area-weighted average per ha or the farm total.
+ */
 export function buildFieldColumn(
   b_id_farm: string,
   calendar: string,
+  unitMode: UnitMode,
 ): ColumnDef<typeof overviewTableFeatures, FieldNutrientRow> {
   return {
     id: "field",
@@ -299,7 +335,7 @@ export function buildFieldColumn(
         </div>
       )
     },
-    footer: () => <span className="font-medium">Bedrijfstotaal</span>,
+    footer: () => <FarmSummaryLabel unitMode={unitMode} />,
   }
 }
 
@@ -324,7 +360,7 @@ export function buildOverviewColumns(
   calendar: string,
 ) {
   type ColGroup = ReturnType<typeof columnHelper.group>
-  const fieldColumns = columnHelper.columns([buildFieldColumn(b_id_farm, calendar)])
+  const fieldColumns = columnHelper.columns([buildFieldColumn(b_id_farm, calendar, unitMode)])
 
   const nutrientColumns = columnHelper.columns(
     typeOrder.map((type) =>
