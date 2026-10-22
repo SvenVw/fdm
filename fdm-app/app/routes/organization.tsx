@@ -7,7 +7,7 @@ import {
 } from "@nmi-agro/fdm-helpdesk"
 import posthog from "posthog-js"
 import { useEffect } from "react"
-import { Outlet, redirect, useLoaderData } from "react-router"
+import { Outlet, redirect, useLoaderData, useLocation } from "react-router"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderOrganization } from "~/components/blocks/header/organization"
 import { SidebarOrganization } from "~/components/blocks/sidebar/organization"
@@ -132,6 +132,11 @@ function OrganizationShell({
     (org) => org.slug === loaderData.selectedOrganizationSlug,
   )
 
+  // On the page of a single group, back leads to the list of groups instead of the organization
+  const location = useLocation()
+  const groupsPath = /^\/organization\/[^/]+\/[^/]+\/groups(?=\/[^/]+)/.exec(location.pathname)?.[0]
+  const isGroupPage = groupsPath !== undefined
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -159,10 +164,13 @@ function OrganizationShell({
       <SidebarInset className="min-w-0">
         <Header
           action={{
-            to: loaderData.selectedOrganizationSlug
-              ? `/organization/${loaderData.selectedOrganizationSlug}`
-              : "/organization",
-            label: "Terug naar organisatie",
+            to:
+              isGroupPage && groupsPath
+                ? groupsPath
+                : loaderData.selectedOrganizationSlug
+                  ? `/organization/${loaderData.selectedOrganizationSlug}`
+                  : "/organization",
+            label: isGroupPage ? "Terug naar groepen" : "Terug naar organisatie",
             disabled: false,
           }}
         >
@@ -207,7 +215,7 @@ export default function App() {
         name: organization.name,
       })
     }
-  }, [loaderData.selectedOrganizationSlug, organization?.name])
+  }, [organization])
 
   return (
     <OrganizationShell loaderData={loaderData}>
