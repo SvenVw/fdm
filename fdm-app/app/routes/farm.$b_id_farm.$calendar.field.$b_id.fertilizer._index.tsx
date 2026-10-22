@@ -271,9 +271,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
         p_app_date,
       )
 
-      return dataWithSuccess("Date edited successfully", {
-        message: "Bemesting is gewijzigd",
-      })
+      return dataWithSuccess(
+        { result: "Data saved successfully" },
+        { message: "Bemesting is gewijzigd" },
+      )
     }
 
     if (request.method === "DELETE") {

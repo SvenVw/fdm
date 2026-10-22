@@ -2,7 +2,13 @@ import type { Fertilizer } from "@nmi-agro/fdm-core"
 import type { ApplicationMethods } from "@nmi-agro/fdm-data"
 import { X } from "lucide-react"
 import { useMemo, useState } from "react"
-import { type Navigation, useFetcher, useLocation, useNavigation } from "react-router"
+import {
+  type Navigation,
+  useActionData,
+  useFetcher,
+  useLocation,
+  useNavigation,
+} from "react-router"
 import type { FieldFertilizerFormValues } from "~/components/blocks/fertilizer-applications/formschema"
 import type {
   FertilizerApplication,
@@ -81,15 +87,20 @@ export function FieldFertilizerPage({
   })
   const editing = fertilizerApplications.find((app) => app.p_app_id === editingId)
 
-  // After a save, return to an empty form for the next application
+  // After a save, return to an empty form for the next application. A failed save keeps the
+  // entered values, so only reset when the action confirms the save.
+  const actionData = useActionData()
+  const saved = typeof actionData === "object" && actionData !== null && "result" in actionData
   const isSubmitting = navigation.state !== "idle" && Boolean(navigation.formData)
   const [formKey, setFormKey] = useState(0)
   const [wasSubmitting, setWasSubmitting] = useState(false)
   if (isSubmitting && !wasSubmitting) setWasSubmitting(true)
   if (!isSubmitting && wasSubmitting && navigation.state === "idle") {
     setWasSubmitting(false)
-    setEditingId(undefined)
-    setFormKey((key) => key + 1)
+    if (saved) {
+      setEditingId(undefined)
+      setFormKey((key) => key + 1)
+    }
   }
 
   // The norms block and the verdict near the save button use the same scope

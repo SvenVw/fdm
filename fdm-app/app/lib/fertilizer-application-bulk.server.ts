@@ -105,21 +105,20 @@ export async function addFertilizerApplicationToFields({
   values: BulkFertilizerApplicationValues
 }): Promise<string[]> {
   const uniqueFieldIds = [...new Set(fieldIds.filter(Boolean))]
-  await fdm.transaction((tx) =>
-    Promise.all(
-      uniqueFieldIds.map((b_id) =>
-        addFertilizerApplication(
-          tx,
-          principal_id,
-          b_id,
-          values.p_id,
-          values.p_app_amount_display,
-          values.p_app_method as ApplicationMethods,
-          values.p_app_date,
-        ),
-      ),
-    ),
-  )
+  // Queries in a transaction share one connection, so run them one after the other
+  await fdm.transaction(async (tx) => {
+    for (const b_id of uniqueFieldIds) {
+      await addFertilizerApplication(
+        tx,
+        principal_id,
+        b_id,
+        values.p_id,
+        values.p_app_amount_display,
+        values.p_app_method as ApplicationMethods,
+        values.p_app_date,
+      )
+    }
+  })
   return uniqueFieldIds
 }
 
@@ -194,24 +193,23 @@ export async function updateFertilizerApplications({
   values: PartialFertilizerApplicationValues
 }): Promise<number> {
   const ids = [...new Set(p_app_ids.filter(Boolean))]
-  await fdm.transaction((tx) =>
-    Promise.all(
-      ids.map(async (p_app_id) => {
-        const original = await getFertilizerApplication(tx, principal_id, p_app_id)
-        if (!original) {
-          throw new Error(`Application ${p_app_id} not found.`)
-        }
-        return updateFertilizerApplication(
-          tx,
-          principal_id,
-          p_app_id,
-          values.p_id ?? original.p_id,
-          values.p_app_amount_display ?? original.p_app_amount_display,
-          (values.p_app_method ?? original.p_app_method) as ApplicationMethods,
-          values.p_app_date ?? original.p_app_date,
-        )
-      }),
-    ),
-  )
+  // Queries in a transaction share one connection, so run them one after the other
+  await fdm.transaction(async (tx) => {
+    for (const p_app_id of ids) {
+      const original = await getFertilizerApplication(tx, principal_id, p_app_id)
+      if (!original) {
+        throw new Error(`Application ${p_app_id} not found.`)
+      }
+      await updateFertilizerApplication(
+        tx,
+        principal_id,
+        p_app_id,
+        values.p_id ?? original.p_id,
+        values.p_app_amount_display ?? original.p_app_amount_display,
+        (values.p_app_method ?? original.p_app_method) as ApplicationMethods,
+        values.p_app_date ?? original.p_app_date,
+      )
+    }
+  })
   return ids.length
 }

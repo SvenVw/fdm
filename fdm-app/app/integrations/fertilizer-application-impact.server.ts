@@ -188,8 +188,9 @@ export function loadBulkCurrentState({
           selectedFields,
           fertilizers: await fertilizersPromise,
           applicationsByField: await applicationsPromise,
-          norms: await normsPromise,
-          balanceInput: await balanceInputPromise,
+          // Norms and balance report their own failure; the rest of the preview still loads
+          norms: await normsPromise.catch(() => undefined),
+          balanceInput: await balanceInputPromise.catch(() => undefined),
         }),
       ),
   )
