@@ -28,6 +28,7 @@ export function NewFieldsForm({
   b_area,
   b_lu_catalogue,
   b_bufferstrip,
+  cultivationAvailabilityYear,
   cultivationOptions,
 }: NewFieldsFormProps) {
   const form = useRemixForm({
@@ -109,8 +110,8 @@ export function NewFieldsForm({
                         <Alert className="border-amber-200 bg-amber-50 text-amber-700">
                           <AlertTriangle className="size-4 stroke-amber-700" />
                           <p>
-                            Deze gewascode kan volgens de RVO niet worden gebruikt voor het
-                            geselecteerde jaar.
+                            Deze gewascode is niet beschikbaar voor{" "}
+                            {cultivationAvailabilityYear ?? "het huidig geselecteerde jaar"}.
                           </p>
                         </Alert>
                       )}
@@ -167,6 +168,7 @@ type NewFieldsFormProps = {
   b_area: number
   b_lu_catalogue: string
   b_bufferstrip: boolean
+  cultivationAvailabilityYear: number | undefined
   cultivationOptions: {
     value: string
     label: string

@@ -43,14 +43,14 @@ export function getCultivationAvailabilityMessage(
   }
 
   if (typeof result.last_unavailable_in !== "number") {
-    return `Volgens de RVO kan deze gewascode niet worden gebruikt na ${result.first_unavailable_in - 1}.`
+    return `Deze gewascode is niet beschikbaar na ${result.first_unavailable_in - 1}.`
   }
 
   if (result.first_unavailable_in === result.last_unavailable_in) {
-    return `Volgens de RVO kan deze gewascode niet worden gebruikt in ${result.first_unavailable_in}.`
+    return `Deze gewascode is niet beschikbaar in ${result.first_unavailable_in}.`
   }
 
-  return `Volgens de RVO kan deze gewascode niet worden gebruikt tussen ${result.first_unavailable_in}-${result.last_unavailable_in}.`
+  return `Deze gewascode is niet beschikbaar tussen ${result.first_unavailable_in}-${result.last_unavailable_in}.`
 }
 
 function resolveResult(props: CultivationAvailabilityProps): CultivationAvailabilityResult {

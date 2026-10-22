@@ -1,6 +1,5 @@
 import type { FeatureCollection } from "geojson"
 import {
-  CultivationCatalogue,
   getCultivations,
   getCultivationsFromCatalogue,
   getCurrentSoilData,
@@ -104,15 +103,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the cultivations on the field
     const cultivations = await getCultivations(fdm, session.principal_id, b_id, timeframe)
 
-    // Get the cultivations from catalogue
-    const cultivationsCatalogue = await getCultivationsFromCatalogue(
-      fdm,
-      session.principal_id,
-      b_id_farm,
-    )
+    const b_lu_name = cultivations[0]?.b_lu_name
+    const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
 
-    // Map catalogue cultivations to options for the combobox
-    // Include those that already exist on the farm, or available in this year
+    // Find the year to check cultivation availability for
     const availabilityYearRaw = Number.parseInt(calendar)
     const availabilityYear = Number.isNaN(availabilityYearRaw)
       ? undefined
@@ -120,25 +114,43 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
           availabilityYearRaw,
         )
-    const b_lu_catalogue_set = new Set(cultivations.map((c) => c.b_lu_catalogue))
-    const isAvailableThisYear = (cultivation: CultivationCatalogue) =>
-      typeof availabilityYear === "undefined" ||
-      cultivation.b_lu_ya === null ||
-      cultivation.b_lu_ya.includes(availabilityYear)
-    const cultivationOptions = cultivationsCatalogue
-      .filter(
-        (cultivation) =>
-          cultivation?.b_lu_catalogue &&
-          cultivation?.b_lu_name &&
-          (b_lu_catalogue_set.has(cultivation.b_lu_catalogue) || isAvailableThisYear(cultivation)),
-      )
-      .map((cultivation) => ({
-        value: cultivation.b_lu_catalogue,
-        label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
-        availableThisYear: isAvailableThisYear(cultivation),
-      }))
 
-    const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
+    // Get the cultivations from catalogue
+    const cultivationsCatalogue = await getCultivationsFromCatalogue(
+      fdm,
+      session.principal_id,
+      b_id_farm,
+      availabilityYear,
+    )
+
+    const cultivationOptions = cultivationsCatalogue.map((c) => ({
+      value: c.b_lu_catalogue,
+      label: c.b_lu_name,
+      availableThisYear: true,
+    }))
+
+    // Add the current cultivation to the cultivation options if it is missing
+    if (b_lu_catalogue) {
+      let insertionIndex = 0
+      let found = false
+      for (let i = 0; i < cultivationOptions.length; i++) {
+        const c = cultivationOptions[i]
+        if (c.value === b_lu_catalogue) {
+          found = true
+          break
+        }
+        if (c.label < b_lu_name) {
+          insertionIndex = i + 1
+        }
+      }
+      if (!found) {
+        cultivationOptions.splice(insertionIndex, 0, {
+          value: b_lu_catalogue,
+          label: b_lu_name,
+          availableThisYear: false,
+        })
+      }
+    }
 
     // Get Map Style
     const mapStyle = getMapStyle("satellite")
@@ -149,6 +161,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       b_name: field.b_name,
       b_lu_catalogue: b_lu_catalogue,
       b_lu_start: cultivations[0]?.b_lu_start,
+      cultivationAvailabilityYear: availabilityYear,
       currentSoilData: currentSoilData,
       isEstimated: isEstimated,
       soilParameterDescription: soilParameterDescription,
@@ -178,6 +191,7 @@ export default function Index() {
       b_lu_catalogue={loaderData.b_lu_catalogue}
       b_area={loaderData.b_area}
       b_bufferstrip={loaderData.b_bufferstrip}
+      cultivationAvailabilityYear={loaderData.cultivationAvailabilityYear}
       cultivationOptions={loaderData.cultivationOptions}
       featureCollection={loaderData.featureCollection}
       mapStyle={loaderData.mapStyle}
@@ -202,7 +216,7 @@ export default function Index() {
  * @returns A payload with a success message upon successful update.
  * @throws {Error} If either the field ID or farm ID is missing.
  */
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params, url }: ActionFunctionArgs) {
   try {
     const b_id = params.b_id
     if (!b_id) {
@@ -218,8 +232,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     const timeframe = getTimeframe(params)
     const calendar = getCalendar(params)
-
-    const url = new URL(request.url)
 
     if (request.method === "POST") {
       const formValues = await extractFormValuesFromRequest(request, FormSchema)
