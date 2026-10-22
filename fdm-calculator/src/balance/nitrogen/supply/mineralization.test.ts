@@ -143,6 +143,22 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
     ).toThrow("No a_c_of value found")
   })
 
+  it("should not require MINIP soil parameters when the timeframe is empty", () => {
+    const emptyTimeFrame: NitrogenBalanceInput["timeFrame"] = {
+      start: new Date("2023-06-01"),
+      end: new Date("2023-06-01"),
+    }
+    const result = calculateNitrogenSupplyBySoilMineralization(
+      [],
+      mockSoilAnalysis, // No a_c_of, a_cn_fr or a_density_sa
+      mockCultivationDetails,
+      emptyTimeFrame,
+      true,
+    )
+    expect(result.total.toNumber()).toBe(0)
+    expect(result.years).toEqual([])
+  })
+
   it("should calculate mineralization for grassland on veen soil", () => {
     const cultivations: FieldInput["cultivations"] = [
       {

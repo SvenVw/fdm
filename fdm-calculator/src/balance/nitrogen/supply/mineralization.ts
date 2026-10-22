@@ -33,14 +33,10 @@ export function calculateNitrogenSupplyBySoilMineralization(
   let totalMineralization = new Decimal(0)
   const minerlizationPerYear = []
 
-  // MINIP gives the yearly mineralization (kg N / ha / year) from the soil analysis
-  const yearlyMineralizationMinip = useMinip
-    ? calculateNitrogenSupplyBySoilMineralizationUsingMinip(
-        soilAnalysis.a_c_of,
-        soilAnalysis.a_cn_fr,
-        soilAnalysis.a_density_sa,
-      )
-    : undefined
+  // MINIP gives the yearly mineralization (kg N / ha / year) from the soil analysis. It is only
+  // calculated for a year that overlaps with the timeframe, so that its soil parameters are not
+  // required when the timeframe is empty.
+  let yearlyMineralizationMinip: Decimal | undefined
 
   const startYear = timeFrame.start.getFullYear()
   const endYear = timeFrame.end.getFullYear()
@@ -68,13 +64,6 @@ export function calculateNitrogenSupplyBySoilMineralization(
       )
     })
 
-    const yearlyMineralization =
-      yearlyMineralizationMinip ??
-      calculateNitrogenSupplyBySoilMineralizationUsingDefaults(
-        soilAnalysis.b_soiltype_agr,
-        isGrassland,
-      )
-
     const yearStartTime = new Date(year, 0, 1).getTime()
     const yearEndTime = new Date(year + 1, 0, 1).getTime()
     const timeframeStartTime = timeFrame.start.getTime()
@@ -84,6 +73,19 @@ export function calculateNitrogenSupplyBySoilMineralization(
     const overlapEnd = Math.min(yearEndTime, timeframeEndTime)
 
     if (overlapStart < overlapEnd) {
+      if (useMinip && yearlyMineralizationMinip === undefined) {
+        yearlyMineralizationMinip = calculateNitrogenSupplyBySoilMineralizationUsingMinip(
+          soilAnalysis.a_c_of,
+          soilAnalysis.a_cn_fr,
+          soilAnalysis.a_density_sa,
+        )
+      }
+      const yearlyMineralization =
+        yearlyMineralizationMinip ??
+        calculateNitrogenSupplyBySoilMineralizationUsingDefaults(
+          soilAnalysis.b_soiltype_agr,
+          isGrassland,
+        )
       const daysInYear = new Date(year, 1, 29).getMonth() === 1 ? 366 : 365
       const overlapDays = differenceInCalendarDays(new Date(overlapEnd), new Date(overlapStart))
       const adjustedMineralization = yearlyMineralization.times(overlapDays).dividedBy(daysInYear)
