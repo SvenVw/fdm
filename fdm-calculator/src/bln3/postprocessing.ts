@@ -16,6 +16,8 @@ export type {
 export {
   buildMeasureOptions,
   buildPredictedImpacts,
+  getBestVariantIds,
+  getMeasureFamilyId,
   getTopOpportunitiesForField,
   MAX_RECOMMENDED_MEASURES,
 } from "./recommendations"

@@ -62,7 +62,9 @@ import { getFieldAvailability } from "~/lib/field-availability"
 import { getMainCultivation } from "~/lib/hoofdteelt.server"
 import {
   type Ecosysteemdienst,
+  getBestVariantIds,
   getBln3ExclusionMessage,
+  getMeasureFamilyId,
   INDICATORS,
   scoreToDisplay,
 } from "~/lib/indicators"
@@ -429,7 +431,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // `advice` is null when the NMI fetch failed — signal unavailability with
     // null so cards hide the section instead of showing a false empty state.
     const measureNameById = new Map(measureCatalogue.map((m) => [m.m_id, m.m_name]))
-    const activeMeasureIds = new Set(fieldMeasures.map((m) => m.m_id))
+    const activeFamilyIds = new Set(fieldMeasures.map((m) => getMeasureFamilyId(m.m_id)))
     const adviceUnavailable = applicabilityMap === null || advice === null
     const indicatorAdvice: Record<
       string,
@@ -437,12 +439,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     > | null = adviceUnavailable ? null : {}
     if (applicabilityMap !== null && advice !== null && indicatorAdvice !== null) {
       for (const entry of advice?.indicator_advice ?? []) {
-        const recommendations = entry.measures
-          .filter(
-            (measure) =>
-              applicabilityMap[measure.m_id]?.applicability === "applicable" &&
-              !activeMeasureIds.has(measure.m_id),
-          )
+        // At most one variant per measure family, and none when a variant of
+        // that family is already active on the field.
+        const candidates = entry.measures.filter(
+          (measure) =>
+            applicabilityMap[measure.m_id]?.applicability === "applicable" &&
+            !activeFamilyIds.has(getMeasureFamilyId(measure.m_id)),
+        )
+        const bestVariantIds = getBestVariantIds(
+          new Map(candidates.map((measure) => [measure.m_id, measure.measure_impact])),
+        )
+        const recommendations = candidates
+          .filter((measure) => bestVariantIds.has(measure.m_id))
           .sort((a, b) => b.measure_impact - a.measure_impact)
           .slice(0, 3)
           .map((measure) => ({
