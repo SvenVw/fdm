@@ -1,3 +1,4 @@
+import type { Dose } from "@nmi-agro/fdm-calculator/browser"
 import type { Fertilizer } from "@nmi-agro/fdm-core"
 import type { ApplicationMethods } from "@nmi-agro/fdm-data"
 import { calculateDose } from "@nmi-agro/fdm-calculator/browser"
@@ -30,16 +31,84 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table"
-import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
 import { cn } from "~/lib/utils"
+import { InfoTip } from "./info-tip"
 import { formatKg } from "./status"
 
+/** Change and remove buttons for one application, with a confirmation before removing. */
+function ApplicationActions({
+  application,
+  date,
+  dose,
+  isEditing,
+  isBusy,
+  onEdit,
+  onDelete,
+}: {
+  application: FertilizerApplication
+  date: string
+  dose?: Dose
+  isEditing: boolean
+  isBusy: boolean
+  onEdit: (application: FertilizerApplication) => void
+  onDelete: (p_app_id: string) => void
+}) {
+  return (
+    <span className="flex justify-end gap-1">
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label={`Gift van ${date} wijzigen`}
+        disabled={isBusy || isEditing}
+        onClick={() => onEdit(application)}
+      >
+        <Pencil className="size-4" />
+      </Button>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label={`Gift van ${date} verwijderen`}
+            disabled={isBusy}
+          >
+            <Trash2 className="size-4" />
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Gift verwijderen?</AlertDialogTitle>
+            <AlertDialogDescription>
+              De gift van {application.p_name_nl} op {date} wordt verwijderd.
+              {dose &&
+                ` De aanvoer op dit perceel daalt daarmee met ${formatKg(dose.p_dose_nw)} kg werkzame N, ${formatKg(dose.p_dose_p)} kg P₂O₅ en ${formatKg(dose.p_dose_k)} kg K₂O per ha.`}{" "}
+              Dit kan niet ongedaan worden gemaakt.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => onDelete(application.p_app_id)}
+              className={buttonVariants({ variant: "destructive" })}
+            >
+              Verwijderen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </span>
+  )
+}
+
 /**
- * The saved fertilizer applications of a field in a table, with the nutrients each application
- * supplies (workable N, P₂O₅ and K₂O in kg/ha).
+ * The saved fertilizer applications of a field, with the nutrients each application supplies
+ * (workable N, P₂O₅ and K₂O in kg/ha). A table in a wide column, a card per application in a
+ * narrow one (phones).
  *
- * Applications can be changed or removed from the table. The application that is being changed
- * in the form is highlighted.
+ * Applications can be changed or removed. The application that is being changed in the form is
+ * highlighted.
  */
 export function FieldApplicationsTable({
   calendar,
@@ -77,6 +146,23 @@ export function FieldApplicationsTable({
   }, [applications, fertilizers])
   const doseById = new Map(doses?.applications.map((dose) => [dose.p_app_id, dose]))
 
+  const items = sorted.map((application) => ({
+    application,
+    fertilizer: fertilizers.find((f) => f.p_id === application.p_id),
+    dose: doseById.get(application.p_app_id),
+    editable: canModify[application.p_app_id] ?? true,
+    isEditing: application.p_app_id === editingId,
+    date: format(application.p_app_date, "PP", { locale: nl }),
+    amount:
+      application.p_app_amount_display !== null
+        ? `${application.p_app_amount_display.toLocaleString("nl-NL", { maximumFractionDigits: 2 })} ${getApplicationAmountUnitLabel(application.p_app_amount_unit)}`
+        : "–",
+    method:
+      applicationMethodOptions.find((x) => x.value === application.p_app_method)?.label ??
+      "Onbekend",
+  }))
+  const actionProps = { isBusy, onEdit, onDelete }
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-3">
@@ -90,134 +176,142 @@ export function FieldApplicationsTable({
           </CardDescription>
         </div>
       </CardHeader>
-      <CardContent>
-        {sorted.length === 0 ? (
+      <CardContent className="@container/apps">
+        {items.length === 0 ? (
           <p className="text-muted-foreground text-sm">
             Nog geen bemestingen op dit perceel. Een opgeslagen gift verschijnt hier.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Datum</TableHead>
-                  <TableHead>Meststof</TableHead>
-                  <TableHead className="text-right">Hoeveelheid</TableHead>
-                  <TableHead>Methode</TableHead>
-                  <TableHead className="text-right">
-                    <Tooltip>
-                      <TooltipTrigger className="cursor-help underline decoration-dotted underline-offset-4">
-                        N
-                      </TooltipTrigger>
-                      <TooltipContent>Werkzame stikstof, kg N/ha</TooltipContent>
-                    </Tooltip>
-                  </TableHead>
-                  <TableHead className="text-right">P₂O₅</TableHead>
-                  <TableHead className="text-right">K₂O</TableHead>
-                  <TableHead className="w-24">
-                    <span className="sr-only">Acties</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {sorted.map((application) => {
-                  const fertilizer = fertilizers.find((f) => f.p_id === application.p_id)
-                  const dose = doseById.get(application.p_app_id)
-                  const editable = canModify[application.p_app_id] ?? true
-                  const isEditing = application.p_app_id === editingId
-                  const date = format(application.p_app_date, "PP", { locale: nl })
-                  return (
+          <>
+            {/* Narrow containers (phones) get a card per application instead of a wide table */}
+            <ul className="divide-y rounded-md border @xl/apps:hidden">
+              {items.map((item) => (
+                <li
+                  key={item.application.p_app_id}
+                  className={cn("space-y-2 p-3", item.isEditing && "bg-muted")}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 space-y-0.5">
+                      <p className="flex items-center gap-2 font-medium">
+                        {item.fertilizer && (
+                          <FertilizerIcon
+                            p_type={item.fertilizer.p_type}
+                            p_type_rvo={item.fertilizer.p_type_rvo}
+                          />
+                        )}
+                        <span className="min-w-0">{item.application.p_name_nl}</span>
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {item.date} · {item.amount} · {item.method}
+                      </p>
+                      {item.isEditing && <Badge variant="outline">Wordt gewijzigd</Badge>}
+                    </div>
+                    {item.editable && (
+                      <ApplicationActions
+                        application={item.application}
+                        date={item.date}
+                        dose={item.dose}
+                        isEditing={item.isEditing}
+                        {...actionProps}
+                      />
+                    )}
+                  </div>
+                  {item.dose && (
+                    <dl className="text-muted-foreground grid grid-cols-3 gap-2 text-xs tabular-nums">
+                      {(
+                        [
+                          ["N werkzaam", item.dose.p_dose_nw],
+                          ["P₂O₅", item.dose.p_dose_p],
+                          ["K₂O", item.dose.p_dose_k],
+                        ] as const
+                      ).map(([label, value]) => (
+                        <div key={label}>
+                          <dt>{label}</dt>
+                          <dd className="text-foreground text-sm">{formatKg(value)} kg/ha</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <div className="hidden overflow-x-auto rounded-md border @xl/apps:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Datum</TableHead>
+                    <TableHead>Meststof</TableHead>
+                    <TableHead className="text-right">Hoeveelheid</TableHead>
+                    <TableHead>Methode</TableHead>
+                    <TableHead className="text-right">
+                      <InfoTip content="Werkzame stikstof, kg N/ha">
+                        <button
+                          type="button"
+                          className="cursor-help underline decoration-dotted underline-offset-4"
+                        >
+                          N
+                        </button>
+                      </InfoTip>
+                    </TableHead>
+                    <TableHead className="text-right">P₂O₅</TableHead>
+                    <TableHead className="text-right">K₂O</TableHead>
+                    <TableHead className="w-24">
+                      <span className="sr-only">Acties</span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {items.map((item) => (
                     <TableRow
-                      key={application.p_app_id}
-                      data-state={isEditing ? "selected" : undefined}
-                      className={cn(isEditing && "bg-muted")}
+                      key={item.application.p_app_id}
+                      data-state={item.isEditing ? "selected" : undefined}
+                      className={cn(item.isEditing && "bg-muted")}
                     >
-                      <TableCell className="whitespace-nowrap">{date}</TableCell>
+                      <TableCell className="whitespace-nowrap">{item.date}</TableCell>
                       <TableCell className="max-w-56">
                         <span className="flex items-center gap-2">
-                          {fertilizer && (
+                          {item.fertilizer && (
                             <FertilizerIcon
-                              p_type={fertilizer.p_type}
-                              p_type_rvo={fertilizer.p_type_rvo}
+                              p_type={item.fertilizer.p_type}
+                              p_type_rvo={item.fertilizer.p_type_rvo}
                             />
                           )}
-                          <span className="truncate font-medium">{application.p_name_nl}</span>
-                          {isEditing && <Badge variant="outline">Wordt gewijzigd</Badge>}
+                          <span className="truncate font-medium">{item.application.p_name_nl}</span>
+                          {item.isEditing && <Badge variant="outline">Wordt gewijzigd</Badge>}
                         </span>
                       </TableCell>
                       <TableCell className="text-right whitespace-nowrap tabular-nums">
-                        {application.p_app_amount_display !== null
-                          ? `${application.p_app_amount_display.toLocaleString("nl-NL", { maximumFractionDigits: 2 })} ${getApplicationAmountUnitLabel(application.p_app_amount_unit)}`
-                          : "–"}
+                        {item.amount}
                       </TableCell>
                       <TableCell className="text-muted-foreground max-w-40 truncate">
-                        {applicationMethodOptions.find((x) => x.value === application.p_app_method)
-                          ?.label ?? "Onbekend"}
+                        {item.method}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {dose ? formatKg(dose.p_dose_nw) : "–"}
+                        {item.dose ? formatKg(item.dose.p_dose_nw) : "–"}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {dose ? formatKg(dose.p_dose_p) : "–"}
+                        {item.dose ? formatKg(item.dose.p_dose_p) : "–"}
                       </TableCell>
                       <TableCell className="text-right tabular-nums">
-                        {dose ? formatKg(dose.p_dose_k) : "–"}
+                        {item.dose ? formatKg(item.dose.p_dose_k) : "–"}
                       </TableCell>
                       <TableCell>
-                        {editable && (
-                          <span className="flex justify-end gap-1">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              aria-label={`Gift van ${date} wijzigen`}
-                              disabled={isBusy || isEditing}
-                              onClick={() => onEdit(application)}
-                            >
-                              <Pencil className="size-4" />
-                            </Button>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  aria-label={`Gift van ${date} verwijderen`}
-                                  disabled={isBusy}
-                                >
-                                  <Trash2 className="size-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Gift verwijderen?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    De gift van {application.p_name_nl} op {date} wordt verwijderd.
-                                    {dose &&
-                                      ` De aanvoer op dit perceel daalt daarmee met ${formatKg(dose.p_dose_nw)} kg werkzame N, ${formatKg(dose.p_dose_p)} kg P₂O₅ en ${formatKg(dose.p_dose_k)} kg K₂O per ha.`}{" "}
-                                    Dit kan niet ongedaan worden gemaakt.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Annuleren</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => onDelete(application.p_app_id)}
-                                    className={buttonVariants({ variant: "destructive" })}
-                                  >
-                                    Verwijderen
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </span>
+                        {item.editable && (
+                          <ApplicationActions
+                            application={item.application}
+                            date={item.date}
+                            dose={item.dose}
+                            isEditing={item.isEditing}
+                            {...actionProps}
+                          />
                         )}
                       </TableCell>
                     </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          </div>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </CardContent>
     </Card>

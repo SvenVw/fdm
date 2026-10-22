@@ -12,6 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select"
 import { Skeleton } from "~/components/ui/skeleton"
 import {
   Table,
@@ -21,11 +28,11 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table"
-import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
 import { cn } from "~/lib/utils"
 import type { FieldImpactRow } from "./aggregate"
 import type { BulkNormKey, BulkNutrient } from "./types"
 import { CultivationBadge } from "./cultivation-badge"
+import { InfoTip } from "./info-tip"
 import { ComparisonLabel, FieldStatusLabel, formatKg, isDeviation } from "./status"
 
 type SortKey = "name" | "area" | "crop" | "n" | "p" | "k" | "balance" | "status"
@@ -39,6 +46,15 @@ const NORM_HEADERS: Record<BulkNormKey, { short: string; full: string }> = {
   manure: { short: "Norm N dierlijk", full: "Gebruiksnorm stikstof uit dierlijke mest" },
   renure: { short: "Norm RENURE", full: "Gebruiksnorm RENURE" },
 }
+
+/** Sort options for the card view, which has no column headers. */
+const SORT_OPTIONS: { value: string; label: string }[] = [
+  { value: "name:asc", label: "Naam" },
+  { value: "status:desc", label: "Aandachtspunten eerst" },
+  { value: "balance:desc", label: "Hoogste N-balans" },
+  { value: "n:desc", label: "Meeste N t.o.v. advies" },
+  { value: "area:desc", label: "Grootste oppervlakte" },
+]
 
 /** The columns that can be shown or hidden; the field name is always shown. */
 type ColumnKey = "area" | "crop" | BulkNutrient | "balance" | BulkNormKey | "status"
@@ -178,6 +194,18 @@ function NormCell({ row, normKey }: { row: FieldImpactRow; normKey: BulkNormKey 
 
 const NUTRIENT_NAMES: Record<BulkNutrient, string> = { n: "N", p: "P₂O₅", k: "K₂O" }
 
+/** Warning for a field that does not have the crop selected in the rotation table. */
+function CropWarning() {
+  const text = "Dit perceel heeft het geselecteerde gewas niet"
+  return (
+    <InfoTip content={text}>
+      <button type="button" aria-label={text} className="-m-1 shrink-0 rounded-sm p-1">
+        <AlertTriangle className="size-4 text-amber-600" aria-hidden="true" />
+      </button>
+    </InfoTip>
+  )
+}
+
 /** The status labels of a row, with the nutrients concerned and the explanation in a tooltip. */
 function StatusCell({ row }: { row: FieldImpactRow }) {
   const extra = row.messages.join(" ") || undefined
@@ -274,7 +302,7 @@ export function FieldImpactTable({
   const someIncluded = rows.some((row) => row.included)
 
   return (
-    <section aria-label="Percelen" className="space-y-3">
+    <section aria-label="Percelen" className="@container/fields space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h3 className="text-sm font-semibold">Percelen</h3>
@@ -284,55 +312,159 @@ export function FieldImpactTable({
               : "Waarden na de wijziging, in kg per ha."}
           </p>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              Kolommen
-              <ChevronDown className="size-4" aria-hidden="true" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Kolommen tonen</DropdownMenuLabel>
-            {BASE_COLUMNS.slice(0, -1).map((key) => (
+        <div className="flex items-center gap-2">
+          {/* The cards have no column headers, so sorting gets its own control there */}
+          <Select
+            value={`${sort.key}:${sort.desc ? "desc" : "asc"}`}
+            onValueChange={(value) => {
+              const [key, direction] = value.split(":") as [SortKey, string]
+              setSort({ key, desc: direction === "desc" })
+            }}
+          >
+            <SelectTrigger className="h-8 w-auto @xl/fields:hidden" aria-label="Sorteren">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {SORT_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                Kolommen
+                <ChevronDown className="size-4" aria-hidden="true" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Kolommen tonen</DropdownMenuLabel>
+              {BASE_COLUMNS.slice(0, -1).map((key) => (
+                <DropdownMenuCheckboxItem
+                  key={key}
+                  checked={isShown(key)}
+                  onSelect={(event) => event.preventDefault()}
+                  onCheckedChange={(checked) => toggleColumn(key, checked === true)}
+                >
+                  {COLUMN_LABELS[key]}
+                </DropdownMenuCheckboxItem>
+              ))}
+              {normKeys.length > 0 && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
+                    Gebruiksnormen (per perceel indicatief)
+                  </DropdownMenuLabel>
+                  {normKeys.map((key) => (
+                    <DropdownMenuCheckboxItem
+                      key={key}
+                      checked={isShown(key)}
+                      onSelect={(event) => event.preventDefault()}
+                      onCheckedChange={(checked) => toggleColumn(key, checked === true)}
+                    >
+                      {NORM_HEADERS[key].full}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </>
+              )}
+              <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
-                key={key}
-                checked={isShown(key)}
+                checked={isShown("status")}
                 onSelect={(event) => event.preventDefault()}
-                onCheckedChange={(checked) => toggleColumn(key, checked === true)}
+                onCheckedChange={(checked) => toggleColumn("status", checked === true)}
               >
-                {COLUMN_LABELS[key]}
+                {COLUMN_LABELS.status}
               </DropdownMenuCheckboxItem>
-            ))}
-            {normKeys.length > 0 && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">
-                  Gebruiksnormen (per perceel indicatief)
-                </DropdownMenuLabel>
-                {normKeys.map((key) => (
-                  <DropdownMenuCheckboxItem
-                    key={key}
-                    checked={isShown(key)}
-                    onSelect={(event) => event.preventDefault()}
-                    onCheckedChange={(checked) => toggleColumn(key, checked === true)}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+      {/* Narrow containers (phones) get a card per field instead of a wide table */}
+      <ul className="divide-y rounded-md border @xl/fields:hidden">
+        {visibleRows.map((row) => (
+          <li
+            key={row.b_id}
+            className={cn("space-y-3 p-3", !row.included && "text-muted-foreground")}
+          >
+            <div className="flex items-start gap-3">
+              {selectable && (
+                <Checkbox
+                  aria-label={`${row.b_name} meenemen`}
+                  className="mt-0.5 size-5"
+                  checked={row.included}
+                  disabled={disabled}
+                  onCheckedChange={(checked) => onSetIncluded?.([row.b_id], checked === true)}
+                />
+              )}
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <NavLink
+                    to={`/farm/${b_id_farm}/${calendar}/field/${row.b_id}/fertilizer`}
+                    className="font-medium underline-offset-4 hover:underline"
                   >
-                    {NORM_HEADERS[key].full}
-                  </DropdownMenuCheckboxItem>
-                ))}
+                    {row.b_name}
+                  </NavLink>
+                  {!row.hasSelectedCrop && <CropWarning />}
+                  {isShown("area") && (
+                    <span className="text-muted-foreground text-xs tabular-nums">
+                      {row.b_area.toLocaleString("nl-NL")} ha
+                    </span>
+                  )}
+                </div>
+                {isShown("crop") && row.mainCultivationName && (
+                  <CultivationBadge
+                    name={row.mainCultivationName}
+                    cropRotation={row.mainCultivationCropRotation}
+                  />
+                )}
+              </div>
+            </div>
+            {loading ? (
+              <Skeleton className="h-10 w-full" />
+            ) : (
+              <>
+                <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                  {(["n", "p", "k"] as const)
+                    .filter((nutrient) => isShown(nutrient))
+                    .map((nutrient) => (
+                      <div key={nutrient}>
+                        <dt className="text-muted-foreground">{COLUMN_LABELS[nutrient]}</dt>
+                        <dd className="text-sm">
+                          <NutrientCell row={row} nutrient={nutrient} />
+                        </dd>
+                      </div>
+                    ))}
+                  {isShown("balance") && (
+                    <div>
+                      <dt className="text-muted-foreground">{COLUMN_LABELS.balance}</dt>
+                      <dd className="text-sm">
+                        <BalanceCell row={row} />
+                      </dd>
+                    </div>
+                  )}
+                  {shownNormKeys.map((key) => (
+                    <div key={key}>
+                      <dt className="text-muted-foreground">{NORM_HEADERS[key].short}</dt>
+                      <dd className="text-sm">
+                        <NormCell row={row} normKey={key} />
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                {isShown("status") && <StatusCell row={row} />}
               </>
             )}
-            <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem
-              checked={isShown("status")}
-              onSelect={(event) => event.preventDefault()}
-              onCheckedChange={(checked) => toggleColumn("status", checked === true)}
-            >
-              {COLUMN_LABELS.status}
-            </DropdownMenuCheckboxItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="overflow-x-auto rounded-md border">
+          </li>
+        ))}
+        {visibleRows.length === 0 && (
+          <li className="text-muted-foreground p-4 text-center text-sm">
+            Geen percelen geselecteerd.
+          </li>
+        )}
+      </ul>
+      <div className="hidden overflow-x-auto rounded-md border @xl/fields:block">
         <Table>
           <TableHeader>
             <TableRow>
@@ -380,15 +512,16 @@ export function FieldImpactTable({
               )}
               {shownNormKeys.map((key) => (
                 <TableHead key={key} className="whitespace-nowrap">
-                  <Tooltip>
-                    <TooltipTrigger className="cursor-help underline decoration-dotted underline-offset-4">
+                  <InfoTip
+                    content={`${NORM_HEADERS[key].full}, in kg per ha. Per perceel indicatief; wettelijk telt het bedrijfstotaal.`}
+                  >
+                    <button
+                      type="button"
+                      className="cursor-help underline decoration-dotted underline-offset-4"
+                    >
                       {NORM_HEADERS[key].short}
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      {NORM_HEADERS[key].full}, in kg per ha. Per perceel indicatief; wettelijk telt
-                      het bedrijfstotaal.
-                    </TooltipContent>
-                  </Tooltip>
+                    </button>
+                  </InfoTip>
                 </TableHead>
               ))}
               {isShown("status") && (
@@ -421,19 +554,7 @@ export function FieldImpactTable({
                     >
                       {row.b_name}
                     </NavLink>
-                    {!row.hasSelectedCrop && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <AlertTriangle
-                            className="size-4 shrink-0 text-amber-600"
-                            aria-label="Dit perceel heeft het geselecteerde gewas niet"
-                          />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          Dit perceel heeft het geselecteerde gewas niet
-                        </TooltipContent>
-                      </Tooltip>
-                    )}
+                    {!row.hasSelectedCrop && <CropWarning />}
                   </span>
                 </TableCell>
                 {isShown("area") && (

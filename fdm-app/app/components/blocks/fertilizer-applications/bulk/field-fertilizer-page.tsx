@@ -214,7 +214,7 @@ export function FieldFertilizerPage({
                 b_id_farm={b_id_farm}
                 b_id_or_b_lu_catalogue={field.b_id}
                 fertilizerApplication={formApplication}
-                fieldsClassName="md:grid-cols-1"
+                fieldsClassName="xl:grid-cols-1"
                 submitLabel={editing ? "Wijziging opslaan" : "Gift toevoegen"}
                 onValuesChange={setFormValues}
                 footerSlot={

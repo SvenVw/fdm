@@ -23,6 +23,7 @@ import { Button, buttonVariants } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Checkbox } from "~/components/ui/checkbox"
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "~/components/ui/empty"
+import { Spinner } from "~/components/ui/spinner"
 import {
   Table,
   TableBody,
@@ -32,6 +33,7 @@ import {
   TableRow,
 } from "~/components/ui/table"
 import { getCommonApplicationValues } from "~/lib/fertilizer-application-helpers"
+import { cn } from "~/lib/utils"
 import type { BulkCurrentState, BulkFieldOption } from "./types"
 import { FieldImpactTable } from "./field-impact-table"
 import { useImpactState } from "./impact-state"
@@ -53,8 +55,16 @@ export interface ModifiableApplication extends FertilizerApplication {
   p_app_method_name?: string
 }
 
+const FORM_ID = "modify-fertilizer-application-form"
+
 function applicationsLabel(count: number) {
   return `${count} ${count === 1 ? "gift" : "giften"}`
+}
+
+function formatAmount(app: ModifiableApplication) {
+  return app.p_app_amount_display !== null
+    ? `${app.p_app_amount_display.toLocaleString("nl-NL", { maximumFractionDigits: 2 })} ${getApplicationAmountUnitLabel(app.p_app_amount_unit)}`
+    : "–"
 }
 
 /**
@@ -169,6 +179,9 @@ export function ModifyFertilizerPage({
       return next
     })
 
+  const setAll = (checked: boolean) =>
+    setSelectedIds(() => (checked ? new Set(allModifiable.map((app) => app.p_app_id)) : new Set()))
+
   const handleRemove = () => {
     void removeFetcher.submit(
       {
@@ -180,6 +193,8 @@ export function ModifyFertilizerPage({
   }
 
   const base = `/farm/${b_id_farm}/${calendar}`
+  const submitLabel = `${applicationsLabel(selected.length)} wijzigen`
+  const submitDisabledReason = selected.length === 0 ? "Selecteer minimaal één gift." : undefined
   const fieldCount = new Set(selected.map((app) => app.b_id)).size
 
   if (applications.length === 0) {
@@ -196,166 +211,223 @@ export function ModifyFertilizerPage({
   }
 
   return (
-    <div className="grid items-start gap-6 pb-10 xl:grid-cols-[minmax(20rem,24rem)_minmax(0,1fr)]">
-      <Card className="xl:sticky xl:top-4">
-        <CardHeader>
-          <CardTitle>Geselecteerde giften wijzigen</CardTitle>
-          <CardDescription>
-            {selected.length === 0
-              ? "Selecteer rechts de giften die u wilt wijzigen of verwijderen."
-              : `${applicationsLabel(selected.length)} op ${fieldCount} ${fieldCount === 1 ? "perceel" : "percelen"}. Lege velden houden de waarde van elke gift.`}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <FertilizerApplicationForm
-            key={selectedKey}
-            options={fertilizerOptions}
-            action={`${location.pathname}${location.search}`}
-            navigation={navigation as unknown as Navigation}
-            b_id_farm={b_id_farm}
-            b_id_or_b_lu_catalogue={`modify-${fields.map((f) => f.b_id).join(",")}`}
-            fertilizerApplication={formApplication}
-            exampleFertilizerApplication={example}
-            schema={FormSchemaPartialModify}
-            fieldsClassName="md:grid-cols-1"
-            submitLabel={`${applicationsLabel(selected.length)} wijzigen`}
-            submitDisabledReason={
-              selected.length === 0 ? "Selecteer minimaal één gift." : undefined
-            }
-            onValuesChange={setFormValues}
-            footerSlot={
-              <div className="space-y-2">
-                {state.previewMessage && (
-                  <p className="text-muted-foreground text-sm">{state.previewMessage}</p>
-                )}
-                <SaveVerdict outcomes={state.normOutcomes} notes={state.agronomicNotes} />
-              </div>
-            }
-          />
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                disabled={selected.length === 0 || removeFetcher.state !== "idle" || isSubmitting}
-              >
-                <Trash2 className="size-4" />
-                {applicationsLabel(selected.length)} verwijderen
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  {applicationsLabel(selected.length)} verwijderen?
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  De geselecteerde giften van {fertilizerName} worden verwijderd van{" "}
-                  {fieldCount === 1 ? "1 perceel" : `${fieldCount} percelen`}. De gebruiksruimte,
-                  het advies en de stikstofbalans worden daarna opnieuw berekend. Dit kan niet
-                  ongedaan worden gemaakt.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Annuleren</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleRemove}
-                  className={buttonVariants({ variant: "destructive" })}
-                >
-                  Verwijderen
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </CardContent>
-      </Card>
-
-      <div className="min-w-0 space-y-6">
-        <ImpactSummaryCard state={state} base={base} />
-
-        <Card>
+    <div className="xl:pb-10">
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(20rem,24rem)_minmax(0,1fr)]">
+        <Card className="xl:sticky xl:top-4">
           <CardHeader>
-            <CardTitle>Giften van {fertilizerName}</CardTitle>
+            <CardTitle>Geselecteerde giften wijzigen</CardTitle>
             <CardDescription>
-              Vink de giften aan die u samen wilt wijzigen of verwijderen.
+              {selected.length === 0
+                ? "Selecteer rechts de giften die u wilt wijzigen of verwijderen."
+                : `${applicationsLabel(selected.length)} op ${fieldCount} ${fieldCount === 1 ? "perceel" : "percelen"}. Lege velden houden de waarde van elke gift.`}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-10">
-                      <Checkbox
-                        aria-label="Alle giften selecteren"
-                        checked={allSelected ? true : selected.length > 0 ? "indeterminate" : false}
-                        onCheckedChange={(checked) =>
-                          setSelectedIds(() =>
-                            checked === true
-                              ? new Set(allModifiable.map((app) => app.p_app_id))
-                              : new Set(),
-                          )
-                        }
-                      />
-                    </TableHead>
-                    <TableHead>Perceel</TableHead>
-                    <TableHead>Datum</TableHead>
-                    <TableHead className="text-right">Hoeveelheid</TableHead>
-                    <TableHead>Methode</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {applications.map((app) => (
-                    <TableRow
-                      key={app.p_app_id}
-                      data-state={selectedIds.has(app.p_app_id) ? "selected" : undefined}
-                    >
-                      <TableCell>
-                        <Checkbox
-                          aria-label={`Gift op ${app.b_name} van ${format(app.p_app_date, "PP", { locale: nl })} selecteren`}
-                          checked={selectedIds.has(app.p_app_id)}
-                          disabled={!app.canModify}
-                          onCheckedChange={(checked) => toggle(app.p_app_id, checked === true)}
-                        />
-                      </TableCell>
-                      <TableCell className="max-w-48">
-                        <NavLink
-                          to={`${base}/field/${app.b_id}/fertilizer`}
-                          className="truncate font-medium underline-offset-4 hover:underline"
-                        >
-                          {app.b_name}
-                        </NavLink>
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        {format(app.p_app_date, "PP", { locale: nl })}
-                      </TableCell>
-                      <TableCell className="text-right whitespace-nowrap tabular-nums">
-                        {app.p_app_amount_display !== null
-                          ? `${app.p_app_amount_display.toLocaleString("nl-NL", { maximumFractionDigits: 2 })} ${getApplicationAmountUnitLabel(app.p_app_amount_unit)}`
-                          : "–"}
-                      </TableCell>
-                      <TableCell>{app.p_app_method_name ?? "–"}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+          <CardContent className="space-y-4">
+            <FertilizerApplicationForm
+              key={selectedKey}
+              id={FORM_ID}
+              options={fertilizerOptions}
+              action={`${location.pathname}${location.search}`}
+              navigation={navigation as unknown as Navigation}
+              b_id_farm={b_id_farm}
+              b_id_or_b_lu_catalogue={`modify-${fields.map((f) => f.b_id).join(",")}`}
+              fertilizerApplication={formApplication}
+              exampleFertilizerApplication={example}
+              schema={FormSchemaPartialModify}
+              fieldsClassName="xl:grid-cols-1"
+              submitLabel={submitLabel}
+              submitDisabledReason={submitDisabledReason}
+              submitAreaClassName="max-xl:hidden"
+              onValuesChange={setFormValues}
+              footerSlot={
+                <div className="space-y-2">
+                  {state.previewMessage && (
+                    <p className="text-muted-foreground text-sm">{state.previewMessage}</p>
+                  )}
+                  <SaveVerdict outcomes={state.normOutcomes} notes={state.agronomicNotes} />
+                </div>
+              }
+            />
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  disabled={selected.length === 0 || removeFetcher.state !== "idle" || isSubmitting}
+                >
+                  <Trash2 className="size-4" />
+                  {applicationsLabel(selected.length)} verwijderen
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {applicationsLabel(selected.length)} verwijderen?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    De geselecteerde giften van {fertilizerName} worden verwijderd van{" "}
+                    {fieldCount === 1 ? "1 perceel" : `${fieldCount} percelen`}. De gebruiksruimte,
+                    het advies en de stikstofbalans worden daarna opnieuw berekend. Dit kan niet
+                    ongedaan worden gemaakt.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleRemove}
+                    className={buttonVariants({ variant: "destructive" })}
+                  >
+                    Verwijderen
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="pt-6">
-            <FieldImpactTable
-              rows={state.rows}
-              loading={!state.adviceResult || !state.balanceResult}
-              b_id_farm={b_id_farm}
-              calendar={calendar}
-              selectable={false}
-              normKeys={state.normKeys}
-            />
-          </CardContent>
-        </Card>
+        <div className="min-w-0 space-y-6">
+          <ImpactSummaryCard state={state} base={base} />
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Giften van {fertilizerName}</CardTitle>
+              <CardDescription>
+                Vink de giften aan die u samen wilt wijzigen of verwijderen.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="@container/apps space-y-3">
+              {/* Narrow containers (phones) get a card per application instead of a wide table */}
+              <label className="flex items-center gap-3 text-sm @xl/apps:hidden">
+                <Checkbox
+                  className="size-5"
+                  checked={allSelected ? true : selected.length > 0 ? "indeterminate" : false}
+                  onCheckedChange={(checked) => setAll(checked === true)}
+                />
+                Alle giften selecteren
+              </label>
+              <ul className="divide-y rounded-md border @xl/apps:hidden">
+                {applications.map((app) => (
+                  <li
+                    key={app.p_app_id}
+                    className={cn(
+                      "flex items-start gap-3 p-3",
+                      selectedIds.has(app.p_app_id) && "bg-muted/50",
+                    )}
+                  >
+                    <Checkbox
+                      aria-label={`Gift op ${app.b_name} van ${format(app.p_app_date, "PP", { locale: nl })} selecteren`}
+                      className="mt-0.5 size-5"
+                      checked={selectedIds.has(app.p_app_id)}
+                      disabled={!app.canModify}
+                      onCheckedChange={(checked) => toggle(app.p_app_id, checked === true)}
+                    />
+                    <div className="min-w-0 space-y-0.5">
+                      <NavLink
+                        to={`${base}/field/${app.b_id}/fertilizer`}
+                        className="font-medium underline-offset-4 hover:underline"
+                      >
+                        {app.b_name}
+                      </NavLink>
+                      <p className="text-muted-foreground text-xs">
+                        {format(app.p_app_date, "PP", { locale: nl })} · {formatAmount(app)} ·{" "}
+                        {app.p_app_method_name ?? "–"}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <div className="hidden overflow-x-auto rounded-md border @xl/apps:block">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-10">
+                        <Checkbox
+                          aria-label="Alle giften selecteren"
+                          checked={
+                            allSelected ? true : selected.length > 0 ? "indeterminate" : false
+                          }
+                          onCheckedChange={(checked) => setAll(checked === true)}
+                        />
+                      </TableHead>
+                      <TableHead>Perceel</TableHead>
+                      <TableHead>Datum</TableHead>
+                      <TableHead className="text-right">Hoeveelheid</TableHead>
+                      <TableHead>Methode</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {applications.map((app) => (
+                      <TableRow
+                        key={app.p_app_id}
+                        data-state={selectedIds.has(app.p_app_id) ? "selected" : undefined}
+                      >
+                        <TableCell>
+                          <Checkbox
+                            aria-label={`Gift op ${app.b_name} van ${format(app.p_app_date, "PP", { locale: nl })} selecteren`}
+                            checked={selectedIds.has(app.p_app_id)}
+                            disabled={!app.canModify}
+                            onCheckedChange={(checked) => toggle(app.p_app_id, checked === true)}
+                          />
+                        </TableCell>
+                        <TableCell className="max-w-48">
+                          <NavLink
+                            to={`${base}/field/${app.b_id}/fertilizer`}
+                            className="truncate font-medium underline-offset-4 hover:underline"
+                          >
+                            {app.b_name}
+                          </NavLink>
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          {format(app.p_app_date, "PP", { locale: nl })}
+                        </TableCell>
+                        <TableCell className="text-right whitespace-nowrap tabular-nums">
+                          {formatAmount(app)}
+                        </TableCell>
+                        <TableCell>{app.p_app_method_name ?? "–"}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <FieldImpactTable
+                rows={state.rows}
+                loading={!state.adviceResult || !state.balanceResult}
+                b_id_farm={b_id_farm}
+                calendar={calendar}
+                selectable={false}
+                normKeys={state.normKeys}
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
+
+      {selected.length > 0 && (
+        <div className="bg-background sticky bottom-0 z-10 -mx-2 mt-6 border-t px-4 py-3 md:-mx-4 xl:hidden">
+          <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3">
+            <p
+              className={cn(
+                "text-sm",
+                state.normExceeded ? "text-red-700" : "text-muted-foreground",
+              )}
+            >
+              {state.normExceeded
+                ? "Gebruiksruimte wordt overschreden"
+                : `${applicationsLabel(selected.length)} op ${fieldCount} ${fieldCount === 1 ? "perceel" : "percelen"}`}
+            </p>
+            <Button type="submit" form={FORM_ID} disabled={isSubmitting}>
+              {isSubmitting ? <Spinner /> : null}
+              {submitLabel}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

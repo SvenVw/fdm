@@ -269,7 +269,7 @@ export function BulkFertilizerPage({
                 b_id_farm={b_id_farm}
                 b_id_or_b_lu_catalogue={formStoreKey}
                 fertilizerApplication={undefined}
-                fieldsClassName="md:grid-cols-1"
+                fieldsClassName="xl:grid-cols-1"
                 submitLabel={submitLabel}
                 submitDisabledReason={submitDisabledReason}
                 submitAreaClassName="max-xl:hidden"

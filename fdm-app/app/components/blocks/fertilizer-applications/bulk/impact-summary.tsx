@@ -10,12 +10,12 @@ import { Label } from "~/components/ui/label"
 import { Skeleton } from "~/components/ui/skeleton"
 import { Spinner } from "~/components/ui/spinner"
 import { Switch } from "~/components/ui/switch"
-import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
 import { cn } from "~/lib/utils"
 import type { AdviceSummary, BalanceSummary, NormOutcome } from "./aggregate"
 import type { ImpactState } from "./impact-state"
 import type { BulkFieldIssue, BulkNormKey, BulkNormValues, BulkNutrient } from "./types"
 import { ImpactBar, type ImpactBarTone } from "./impact-bar"
+import { InfoTip } from "./info-tip"
 import { ComparisonLabel, formatKg } from "./status"
 
 /** Labels, units and explanations of the farm norms, as on the norms page. */
@@ -148,14 +148,15 @@ function MetricRow({
         <span className="flex items-center gap-1 font-medium">
           {label}
           {tooltip && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button type="button" className="text-muted-foreground" aria-label={tooltip}>
-                  <Info className="size-3.5" aria-hidden="true" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent>{tooltip}</TooltipContent>
-            </Tooltip>
+            <InfoTip content={tooltip}>
+              <button
+                type="button"
+                className="text-muted-foreground -m-1 rounded-sm p-1"
+                aria-label={tooltip}
+              >
+                <Info className="size-3.5" aria-hidden="true" />
+              </button>
+            </InfoTip>
           )}
         </span>
         <span className="flex items-baseline gap-2 whitespace-nowrap tabular-nums">

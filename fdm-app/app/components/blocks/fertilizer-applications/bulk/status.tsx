@@ -8,9 +8,9 @@ import {
   Sprout,
   TriangleAlert,
 } from "lucide-react"
-import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
 import { cn } from "~/lib/utils"
 import type { FieldImpactStatus } from "./aggregate"
+import { InfoTip } from "./info-tip"
 
 /** Dutch labels for the field statuses. */
 export const FIELD_STATUS_LABELS: Record<FieldImpactStatus, string> = {
@@ -30,8 +30,7 @@ export const FIELD_STATUS_DESCRIPTIONS: Record<FieldImpactStatus, string> = {
   ok: "De gift past bij het advies en de stikstofbalans blijft binnen de streefwaarde.",
   under_advice:
     "Minder dan het gewas nodig heeft. Dat geeft risico op een lagere opbrengst of kwaliteit.",
-  over_advice:
-    "Meer dan het gewas nodig heeft. Dat is verspilling van meststof en vergroot de verliezen naar het milieu.",
+  over_advice: "Meer dan het gewas nodig heeft. Dit vergroot de verliezen naar het milieu.",
   over_target:
     "Het stikstofoverschot ligt boven de streefwaarde. Dat vergroot het risico op uitspoeling naar grond- en oppervlaktewater.",
   missing_soil_data: "Zonder bodemanalyse kunnen het advies en de balans niet worden berekend.",
@@ -78,25 +77,27 @@ export function FieldStatusLabel({
 }) {
   const { icon: Icon, className } = FIELD_STATUS_STYLE[status]
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          className={cn(
-            "inline-flex cursor-help items-center gap-1 rounded-sm text-xs font-medium whitespace-nowrap",
-            className,
-          )}
-        >
-          <Icon className="size-3.5 shrink-0" aria-hidden="true" />
-          {FIELD_STATUS_LABELS[status]}
-          {detail && <span className="font-normal">({detail})</span>}
-        </button>
-      </TooltipTrigger>
-      <TooltipContent className="max-w-xs">
-        <p>{FIELD_STATUS_DESCRIPTIONS[status]}</p>
-        {extra && <p className="mt-1">{extra}</p>}
-      </TooltipContent>
-    </Tooltip>
+    <InfoTip
+      className="max-w-xs"
+      content={
+        <>
+          <p>{FIELD_STATUS_DESCRIPTIONS[status]}</p>
+          {extra && <p className="mt-1">{extra}</p>}
+        </>
+      }
+    >
+      <button
+        type="button"
+        className={cn(
+          "inline-flex cursor-help items-center gap-1 rounded-sm py-1 text-xs font-medium whitespace-nowrap",
+          className,
+        )}
+      >
+        <Icon className="size-3.5 shrink-0" aria-hidden="true" />
+        {FIELD_STATUS_LABELS[status]}
+        {detail && <span className="font-normal">({detail})</span>}
+      </button>
+    </InfoTip>
   )
 }
 
@@ -124,19 +125,15 @@ export function ComparisonLabel({ status, noun }: { status: ComparisonStatus; no
   const text = `${label} ${noun}`
   if (!Icon) return <span className="sr-only">{text}</span>
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span
-          role="img"
-          aria-label={text}
-          tabIndex={0}
-          className={cn("inline-flex shrink-0 rounded-sm outline-offset-2", className)}
-        >
-          <Icon className="size-3.5" aria-hidden="true" />
-        </span>
-      </TooltipTrigger>
-      <TooltipContent>{text}</TooltipContent>
-    </Tooltip>
+    <InfoTip content={text}>
+      <button
+        type="button"
+        aria-label={text}
+        className={cn("-m-1 inline-flex shrink-0 rounded-sm p-1", className)}
+      >
+        <Icon className="size-3.5" aria-hidden="true" />
+      </button>
+    </InfoTip>
   )
 }
 

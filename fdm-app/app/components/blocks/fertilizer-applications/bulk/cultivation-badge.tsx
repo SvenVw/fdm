@@ -1,6 +1,6 @@
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
 import { Badge } from "~/components/ui/badge"
-import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
+import { InfoTip } from "./info-tip"
 
 /** A cultivation as a badge in its crop rotation colour, as in the rotation table. */
 export function CultivationBadge({
@@ -35,17 +35,14 @@ export function CultivationDot({
   cropRotation: string | null | undefined
 }) {
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
+    <InfoTip content={label}>
+      {/* The padding gives the small dot a touch target of its own */}
+      <button type="button" aria-label={label} className="-m-1.5 inline-flex rounded-full p-1.5">
         <span
-          role="img"
-          aria-label={label}
-          tabIndex={0}
-          className="inline-block size-3 shrink-0 rounded-full outline-offset-2"
+          className="inline-block size-3 shrink-0 rounded-full"
           style={{ backgroundColor: getCultivationColor(cropRotation ?? undefined) }}
         />
-      </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
-    </Tooltip>
+      </button>
+    </InfoTip>
   )
 }
