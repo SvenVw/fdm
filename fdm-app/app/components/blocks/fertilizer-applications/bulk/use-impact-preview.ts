@@ -40,6 +40,11 @@ export interface PreviewApplicationValues {
   p_app_amount_display: number
   p_app_method: string
   p_app_date: Date
+  /**
+   * The amount in kg/ha. When given, it is used instead of converting `p_app_amount_display`,
+   * for example to keep the stored amount of an application whose amount is not changed.
+   */
+  p_app_amount?: number
 }
 
 /** The change on a single field: existing applications that are removed, and new applications. */
@@ -141,13 +146,15 @@ function pickNutrients(dose: { p_dose_nw: number; p_dose_p: number; p_dose_k: nu
 function validateApplication(
   input: BulkPreviewInput,
   values: PreviewApplicationValues,
-): { message: string } | { fertilizer: Fertilizer; kgPerDisplayUnit: number } {
+): { message: string } | { fertilizer: Fertilizer; p_app_amount: number } {
   const fertilizer = input.fertilizers.find((f) => f.p_id === values.p_id)
   if (!fertilizer) return { message: "Meststof niet gevonden." }
   const { start, end } = input.timeframe
   if ((start && values.p_app_date < start) || (end && values.p_app_date > end)) {
     return { message: "De datum valt buiten het jaar. Het effect kan niet worden berekend." }
   }
+  // A known amount in kg/ha needs no conversion
+  if (values.p_app_amount !== undefined) return { fertilizer, p_app_amount: values.p_app_amount }
   const kgPerDisplayUnit = input.kgPerDisplayUnit[fertilizer.p_id]
   if (kgPerDisplayUnit === null || kgPerDisplayUnit === undefined) {
     return {
@@ -155,7 +162,7 @@ function validateApplication(
         "De dichtheid van deze meststof ontbreekt, waardoor de hoeveelheid niet kan worden omgerekend.",
     }
   }
-  return { fertilizer, kgPerDisplayUnit }
+  return { fertilizer, p_app_amount: values.p_app_amount_display * kgPerDisplayUnit }
 }
 
 /**
@@ -203,7 +210,7 @@ export function calculateLocalPreview({
         p_id: valid.fertilizer.p_id,
         p_id_catalogue: valid.fertilizer.p_id_catalogue,
         p_name_nl: valid.fertilizer.p_name_nl,
-        p_app_amount: values.p_app_amount_display * valid.kgPerDisplayUnit,
+        p_app_amount: valid.p_app_amount,
         p_app_method: values.p_app_method as BaseFertilizerApplication["p_app_method"],
         p_app_date: values.p_app_date,
       })

@@ -152,7 +152,12 @@ export function ModifyFertilizerPage({
       if (!values) return null
       const change = result[app.b_id] ?? { removeAppIds: [], add: [] }
       change.removeAppIds.push(app.p_app_id)
-      change.add.push(values)
+      // Without a new amount the stored amount in kg/ha is kept, also when p_id changes, as on save
+      const keepsAmount =
+        debounced.values.p_app_amount_display === undefined && app.p_app_amount !== null
+      change.add.push(
+        keepsAmount ? { ...values, p_app_amount: app.p_app_amount ?? undefined } : values,
+      )
       result[app.b_id] = change
     }
     return result
