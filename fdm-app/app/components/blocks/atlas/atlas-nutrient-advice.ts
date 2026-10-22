@@ -60,6 +60,8 @@ export const NUTRIENT_ADVICE_COPY = {
   legendMet: "Advies behaald (90–110%)",
   legendOver: "Meer gegeven dan advies (> 110%)",
   legendAdvice: "Advies",
+  showLegend: "Legenda tonen",
+  hideLegend: "Legenda verbergen",
   legendRemaining: "Nog te geven",
   legendPercentage: "Percentage van advies gegeven",
   noAdvice: "Geen advies beschikbaar",

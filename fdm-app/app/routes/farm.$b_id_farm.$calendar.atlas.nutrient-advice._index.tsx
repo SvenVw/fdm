@@ -342,11 +342,16 @@ export default function FarmAtlasNutrientAdviceBlock() {
         />
       </Atlas>
 
-      {/* Nutrient selector + display mode (top left, like the soil parameter dropdown) */}
-      <Card className="absolute top-3 left-3 z-10 w-72 max-w-[calc(100%-1.5rem)] shadow-md">
+      {/* Nutrient selector + display mode (top left, like the soil parameter dropdown). On a phone it
+          spans the width, leaving room for the map controls on the right; on touch screens the
+          controls grow to a 40 px target. */}
+      <Card className="absolute top-3 right-14 left-3 z-10 shadow-md md:right-auto md:w-72">
         <CardContent className="flex flex-col gap-2 p-2">
           <Select value={nutrient} onValueChange={setNutrient}>
-            <SelectTrigger className="h-8 w-full text-xs" aria-label="Kies een nutriënt">
+            <SelectTrigger
+              className="h-8 w-full text-xs pointer-coarse:h-10"
+              aria-label="Kies een nutriënt"
+            >
               {nutrientDescription
                 ? `${nutrientDescription.name} (${nutrientDescription.symbol})`
                 : null}
@@ -385,17 +390,23 @@ export default function FarmAtlasNutrientAdviceBlock() {
               <ToggleGroupItem
                 key={item}
                 value={item}
-                className="grow px-1.5 text-xs whitespace-nowrap"
+                className="grow px-1.5 text-xs whitespace-nowrap pointer-coarse:h-10"
               >
                 {NUTRIENT_ADVICE_COPY.modes[item]}
               </ToggleGroupItem>
             ))}
           </ToggleGroup>
-          <p className="text-muted-foreground px-0.5 text-xs">
+          {/* The legend title repeats the mode, so the hint gives way on a phone. */}
+          <p className="text-muted-foreground hidden px-0.5 text-xs md:block">
             {NUTRIENT_ADVICE_COPY.modeHints[mode]}
           </p>
           {b_id_farm && b_id_farm !== "undefined" && (
-            <Button asChild variant="outline" size="sm" className="h-8 w-full text-xs">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="h-8 w-full text-xs pointer-coarse:h-10"
+            >
               <NavLink to={`/farm/${b_id_farm}/${calendar}/nutrient_advice`}>
                 <TableIcon className="h-3.5 w-3.5" />
                 {NUTRIENT_ADVICE_COPY.openOverview}

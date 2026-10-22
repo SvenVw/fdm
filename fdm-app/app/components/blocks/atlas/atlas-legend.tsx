@@ -1,7 +1,7 @@
 import type { SoilParameterDescription } from "@nmi-agro/fdm-core"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
-import { TriangleAlert } from "lucide-react"
-import { type ReactNode, useId, useMemo } from "react"
+import { ChevronUp, TriangleAlert } from "lucide-react"
+import { type ReactNode, useId, useMemo, useState } from "react"
 import { Bar, BarChart, type BarShapeProps, Rectangle, XAxis, YAxis } from "recharts"
 import type { AdviceProgressStatus } from "~/components/blocks/nutrient-advice/progress-bar"
 import { cn } from "@/app/lib/utils"
@@ -9,6 +9,7 @@ import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { ChartContainer } from "~/components/ui/chart"
 import { Spinner } from "~/components/ui/spinner"
+import { useIsMobile } from "~/hooks/use-mobile"
 import {
   formatKgPerHa,
   NUTRIENT_ADVICE_COPY,
@@ -499,17 +500,49 @@ export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
     excessExempt = false,
   } = props
 
+  // On a phone the key starts collapsed to its title, so it does not cover half of the map.
+  const isMobile = useIsMobile()
+  const [expanded, setExpanded] = useState(false)
+  const collapsed = isMobile && !expanded
+
+  const title = (
+    <>
+      <span className="block text-sm leading-tight font-medium">{nutrientName}</span>
+      <span className="text-muted-foreground block text-xs">
+        {unit} · {NUTRIENT_ADVICE_COPY.modes[mode]}
+      </span>
+    </>
+  )
   // Announced to screen readers when the nutrient or mode changes.
   const header = (
     <CardHeader className="space-y-0.5 p-0" aria-live="polite">
-      <CardTitle className="text-sm leading-tight font-medium">{nutrientName}</CardTitle>
-      <p className="text-muted-foreground text-xs">
-        {unit} · {NUTRIENT_ADVICE_COPY.modes[mode]}
-      </p>
+      {isMobile ? (
+        <button
+          type="button"
+          // The legend wrapper ignores pointer events so it never blocks the map.
+          className="pointer-events-auto -m-1 flex min-h-11 items-center justify-between gap-2 rounded-sm p-1 text-left"
+          aria-expanded={!collapsed}
+          onClick={() => setExpanded(!expanded)}
+        >
+          <span className="space-y-0.5">{title}</span>
+          <span className="sr-only">
+            {collapsed ? NUTRIENT_ADVICE_COPY.showLegend : NUTRIENT_ADVICE_COPY.hideLegend}
+          </span>
+          <ChevronUp
+            aria-hidden="true"
+            className={cn(
+              "text-muted-foreground size-4 shrink-0 transition-transform motion-reduce:transition-none",
+              collapsed && "rotate-180",
+            )}
+          />
+        </button>
+      ) : (
+        title
+      )}
     </CardHeader>
   )
   const cardClassName =
-    "min-h-0 w-72 max-w-[calc(100vw-2rem)] flex-initial space-y-3 overflow-y-auto p-4 shadow-xs"
+    "min-h-0 w-72 max-w-[calc(100vw-2rem)] flex-initial space-y-3 overflow-y-auto p-3 shadow-xs md:p-4"
 
   // A failed load gets its own message and retry button instead of a legend that would suggest
   // the fields have no advice.
@@ -575,6 +608,10 @@ export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
   const swatch = (status: AdviceProgressStatus) => (
     <NutrientAdviceSwatch {...NUTRIENT_ADVICE_STATUS_SWATCHES[status]} />
   )
+  if (collapsed) {
+    return <Card className={cardClassName}>{header}</Card>
+  }
+
   const percentageMax = excessExempt ? 100 : NUTRIENT_ADVICE_PERCENTAGE_MAX
   const overRow = excessExempt ? null : (
     <NutrientAdviceLegendRow
