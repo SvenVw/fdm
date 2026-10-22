@@ -168,6 +168,12 @@ export function BulkFertilizerPage({
   const includedBufferStripIds = selectedFields
     .filter((field) => field.b_bufferstrip && included.has(field.b_id))
     .map((field) => field.b_id)
+  // Excluded buffer strips are left out of the field table; they can be included again
+  const excludedBufferStripIds = selectedFields
+    .filter((field) => field.b_bufferstrip && !included.has(field.b_id))
+    .map((field) => field.b_id)
+  const excludedBufferStrips = new Set(excludedBufferStripIds)
+  const tableRows = rows.filter((row) => !excludedBufferStrips.has(row.b_id))
 
   const base = `/farm/${b_id_farm}/${calendar}`
 
@@ -285,8 +291,25 @@ export function BulkFertilizerPage({
 
             <Card>
               <CardContent className="pt-6">
+                {excludedBufferStripIds.length > 0 && (
+                  <p className="text-muted-foreground mb-3 flex flex-wrap items-center gap-x-2 text-sm">
+                    {excludedBufferStripIds.length === 1
+                      ? "1 bufferstrook is uitgesloten en staat niet in de tabel."
+                      : `${excludedBufferStripIds.length} bufferstroken zijn uitgesloten en staan niet in de tabel.`}
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="sm"
+                      className="h-auto p-0"
+                      disabled={isSubmitting}
+                      onClick={() => handleSetIncluded(excludedBufferStripIds, true)}
+                    >
+                      Weer meenemen
+                    </Button>
+                  </p>
+                )}
                 <FieldImpactTable
-                  rows={rows}
+                  rows={tableRows}
                   loading={!state.adviceResult || !state.balanceResult}
                   b_id_farm={b_id_farm}
                   calendar={calendar}
