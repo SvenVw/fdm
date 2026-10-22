@@ -1416,6 +1416,16 @@ describe("Cultivation Data Model", () => {
         ).toEqual({ unavailable_in: 2025 })
       })
 
+      it("should return { unavailable_in } when the whole interval is after the last b_lu_ya", () => {
+        expect(
+          isCultivationUnavailableInPeriod(
+            { b_lu_start: new Date("2025-02-01"), b_lu_end: new Date("2025-06-10") },
+            [2023],
+            2026,
+          ),
+        ).toEqual({ unavailable_in: 2025 })
+      })
+
       it("should return null when availability is not known for years beyond the last availability year", () => {
         expect(
           isCultivationUnavailableInPeriod(
@@ -1434,6 +1444,16 @@ describe("Cultivation Data Model", () => {
             2026,
           ),
         ).toEqual({ unavailable_in: 2024 })
+      })
+
+      it("should return { unavailable_in } when the whole interval is before the first b_lu_ya", () => {
+        expect(
+          isCultivationUnavailableInPeriod(
+            { b_lu_start: new Date("2023-02-01"), b_lu_end: new Date("2023-06-10") },
+            [2025],
+            2026,
+          ),
+        ).toEqual({ unavailable_in: 2023 })
       })
 
       it("should return { unavailable_in } when the cultivation is not available in a gap in b_lu_ya", () => {

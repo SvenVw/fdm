@@ -9,6 +9,8 @@ import {
   aggregateCultivationCatalogueInfo,
   getCultivationCatalogue,
   getCultivationCatalogueBuildingContext,
+  getLastCultivationAvailabilityYear,
+  LAST_CULTIVATION_AVAILABILITY_YEAR,
 } from "./index"
 
 vi.mock("./catalogues/brp", async (importOriginal: () => Promise<typeof brpModule>) => {
@@ -132,5 +134,13 @@ describe("getCatalogueBrp", () => {
     const buildingContext = await getCultivationCatalogueBuildingContext()
     const catalogue = await getCatalogueBrp(buildingContext, {})
     expect(catalogue.some((cultivation) => cultivation.b_lu_ya === null)).toBe(false)
+  })
+})
+
+describe("getLastCultivationAvailabilityYear", () => {
+  it("should return LAST_CULTIVATION_AVAILABILITY_YEAR", async () => {
+    await expect(getLastCultivationAvailabilityYear("brp")).resolves.toBe(
+      LAST_CULTIVATION_AVAILABILITY_YEAR,
+    )
   })
 })

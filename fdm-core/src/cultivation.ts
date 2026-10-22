@@ -347,11 +347,11 @@ export function isCultivationUnavailableInPeriod(
   }
 
   if (endYear > b_lu_ya[b_lu_ya.length - 1]) {
-    return { unavailable_in: b_lu_ya[b_lu_ya.length - 1] + 1 }
+    return { unavailable_in: Math.max(startYear, b_lu_ya[b_lu_ya.length - 1] + 1) }
   }
 
   if (startYear < b_lu_ya[0]) {
-    return { unavailable_in: b_lu_ya[0] - 1 }
+    return { unavailable_in: Math.min(endYear, b_lu_ya[0] - 1) }
   }
 
   if (endYear - startYear > MAX_PERIOD_YEARS_FOR_AVAILABILITY) {
@@ -437,16 +437,6 @@ export async function addCultivation(
         )
       ) {
         throw new Error("Cultivation code is not available for this time period")
-      }
-
-      // Validate if field exists
-      const field = await tx
-        .select()
-        .from(schema.fields)
-        .where(eq(schema.fields.b_id, b_id))
-        .limit(1)
-      if (field.length === 0) {
-        throw new Error("Field does not exist")
       }
 
       // Validate if cultivation is not an duplicate of already existing cultivation

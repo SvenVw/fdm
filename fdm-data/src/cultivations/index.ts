@@ -11,7 +11,7 @@ import { aggregateCultivationCatalogueInfoBrp, getCatalogueBrp } from "./catalog
  * When checking for the availability of a cultivation, users of the package should
  * check cultivation code availability in years after this year for this year instead.
  */
-const LAST_CULTIVATION_AVAILABILITY_YEAR = 2026
+export const LAST_CULTIVATION_AVAILABILITY_YEAR = 2026
 
 /**
  * Collect current date and other volatile data that should be used consistently
