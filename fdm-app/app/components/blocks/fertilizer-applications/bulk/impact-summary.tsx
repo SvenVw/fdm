@@ -144,8 +144,9 @@ function MetricRow({
 }) {
   return (
     <div className="space-y-1.5">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-sm">
-        <span className="flex items-center gap-1 font-medium">
+      {/* The label wraps, the value keeps its own right-aligned column, so every row lines up */}
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 text-sm">
+        <span className="flex min-w-0 items-center gap-1 font-medium">
           {label}
           {tooltip && (
             <InfoTip content={tooltip}>
@@ -162,7 +163,7 @@ function MetricRow({
         <span className="flex items-baseline gap-2 whitespace-nowrap tabular-nums">
           <span>
             {formatKg(current)}
-            {after !== undefined && (
+            {after !== undefined && formatKg(after) !== formatKg(current) && (
               <span data-after className="font-semibold">
                 {" "}
                 → {formatKg(after)}
@@ -542,7 +543,7 @@ export function BalanceImpact({
                     <dt>{label}</dt>
                     <dd className="text-foreground">
                       {formatKg(value)}
-                      {valueAfter !== undefined && (
+                      {valueAfter !== undefined && formatKg(valueAfter) !== formatKg(value) && (
                         <span data-after className="font-semibold">
                           {" "}
                           → {formatKg(valueAfter)}

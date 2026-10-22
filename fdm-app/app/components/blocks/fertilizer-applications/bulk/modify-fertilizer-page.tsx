@@ -298,7 +298,7 @@ export function ModifyFertilizerPage({
             </CardHeader>
             <CardContent className="@container/apps space-y-3">
               {/* Narrow containers (phones) get a card per application instead of a wide table */}
-              <label className="flex items-center gap-3 text-sm @xl/apps:hidden">
+              <label className="flex items-center gap-3 text-sm @3xl/apps:hidden">
                 <Checkbox
                   className="size-5"
                   checked={allSelected ? true : selected.length > 0 ? "indeterminate" : false}
@@ -306,7 +306,7 @@ export function ModifyFertilizerPage({
                 />
                 Alle giften selecteren
               </label>
-              <ul className="divide-y rounded-md border @xl/apps:hidden">
+              <ul className="divide-y rounded-md border @3xl/apps:hidden">
                 {applications.map((app) => (
                   <li
                     key={app.p_app_id}
@@ -329,15 +329,19 @@ export function ModifyFertilizerPage({
                       >
                         {app.b_name}
                       </NavLink>
+                      {/* Each separator stays with the value after it, so no line ends in "·" */}
                       <p className="text-muted-foreground text-xs">
-                        {format(app.p_app_date, "PP", { locale: nl })} · {formatAmount(app)} ·{" "}
-                        {app.p_app_method_name ?? "–"}
+                        <span className="whitespace-nowrap">
+                          {format(app.p_app_date, "PP", { locale: nl })}
+                        </span>{" "}
+                        <span className="whitespace-nowrap">· {formatAmount(app)}</span>{" "}
+                        <span>·&nbsp;{app.p_app_method_name ?? "–"}</span>
                       </p>
                     </div>
                   </li>
                 ))}
               </ul>
-              <div className="hidden overflow-x-auto rounded-md border @xl/apps:block">
+              <div className="hidden overflow-x-auto rounded-md border @3xl/apps:block">
                 <Table>
                   <TableHeader>
                     <TableRow>

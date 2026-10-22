@@ -317,8 +317,8 @@ const NUTRIENT_NAMES: Record<BulkNutrient, string> = { n: "N", p: "P₂O₅", k:
 
 /**
  * Short, neutral notes about the agronomic effect of a change: whether the nitrogen balance ends
- * above its target and which fields or nutrients end above the advice. Shown near the save
- * button next to the legal norms; they never block saving.
+ * above its target and which fields end above the advice for a nutrient the change adds. Shown
+ * near the save button next to the legal norms; they never block saving.
  *
  * @param rows - The field rows, with the preview applied.
  * @param balance - The aggregated nitrogen balance of the included fields.
@@ -339,24 +339,23 @@ export function getAgronomicNotes(rows: FieldImpactRow[], balance: BalanceSummar
     )
   }
 
-  const overAdvice = changed.filter(
-    (row) =>
-      row.advice &&
-      row.doseAfter &&
-      BULK_NUTRIENTS.some(
-        (n) =>
-          computeAdviceProgress(row.doseAfter?.[n] ?? 0, row.advice?.[n] ?? 0).status === "over",
-      ),
-  )
-  if (overAdvice.length === 1 && changed.length === 1) {
-    const row = overAdvice[0]
-    const nutrients = BULK_NUTRIENTS.filter(
-      (n) => computeAdviceProgress(row.doseAfter?.[n] ?? 0, row.advice?.[n] ?? 0).status === "over",
+  // Only blame the application for nutrients it adds and that end up above the advice
+  const overNutrients = (row: FieldImpactRow) =>
+    BULK_NUTRIENTS.filter((n) => {
+      const after = row.doseAfter?.[n]
+      const advice = row.advice?.[n]
+      if (after === undefined || advice === undefined) return false
+      return after > (row.dose?.[n] ?? 0) && computeAdviceProgress(after, advice).status === "over"
+    })
+  const overAdvice = changed.filter((row) => overNutrients(row).length > 0)
+  if (overAdvice.length > 0) {
+    const nutrients = BULK_NUTRIENTS.filter((n) =>
+      overAdvice.some((row) => overNutrients(row).includes(n)),
     ).map((n) => NUTRIENT_NAMES[n])
-    notes.push(`De gift komt boven het advies voor ${nutrients.join(", ")}.`)
-  } else if (overAdvice.length > 0) {
     notes.push(
-      `${overAdvice.length} van ${changed.length} percelen ${overAdvice.length === 1 ? "komt" : "komen"} boven het advies.`,
+      changed.length === 1
+        ? `De gift komt boven het advies voor ${nutrients.join(", ")}.`
+        : `${overAdvice.length} van ${changed.length} percelen ${overAdvice.length === 1 ? "komt" : "komen"} boven het advies voor ${nutrients.join(", ")}.`,
     )
   }
   return notes

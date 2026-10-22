@@ -184,7 +184,7 @@ export function FieldApplicationsTable({
         ) : (
           <>
             {/* Narrow containers (phones) get a card per application instead of a wide table */}
-            <ul className="divide-y rounded-md border @xl/apps:hidden">
+            <ul className="divide-y rounded-md border @3xl/apps:hidden">
               {items.map((item) => (
                 <li
                   key={item.application.p_app_id}
@@ -201,8 +201,11 @@ export function FieldApplicationsTable({
                         )}
                         <span className="min-w-0">{item.application.p_name_nl}</span>
                       </p>
+                      {/* Each separator stays with the value after it, so no line ends in "·" */}
                       <p className="text-muted-foreground text-xs">
-                        {item.date} · {item.amount} · {item.method}
+                        <span className="whitespace-nowrap">{item.date}</span>{" "}
+                        <span className="whitespace-nowrap">· {item.amount}</span>{" "}
+                        <span>·&nbsp;{item.method}</span>
                       </p>
                       {item.isEditing && <Badge variant="outline">Wordt gewijzigd</Badge>}
                     </div>
@@ -220,7 +223,7 @@ export function FieldApplicationsTable({
                     <dl className="text-muted-foreground grid grid-cols-3 gap-2 text-xs tabular-nums">
                       {(
                         [
-                          ["N werkzaam", item.dose.p_dose_nw],
+                          ["N (werkzaam)", item.dose.p_dose_nw],
                           ["P₂O₅", item.dose.p_dose_p],
                           ["K₂O", item.dose.p_dose_k],
                         ] as const
@@ -235,7 +238,7 @@ export function FieldApplicationsTable({
                 </li>
               ))}
             </ul>
-            <div className="hidden overflow-x-auto rounded-md border @xl/apps:block">
+            <div className="hidden overflow-x-auto rounded-md border @3xl/apps:block">
               <Table>
                 <TableHeader>
                   <TableRow>

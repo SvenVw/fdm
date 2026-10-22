@@ -87,14 +87,8 @@ export async function loader({ request, params, url }: LoaderFunctionArgs) {
         ? returnUrlParam
         : `/farm/${b_id_farm}/${params.calendar}/field`
 
-    // Get fieldIds from search params
+    // Get fieldIds from search params; without any, the page asks to select fields
     const fieldIds = url.searchParams.get("fieldIds")?.split(",").filter(Boolean) ?? []
-    if (!url.searchParams.has("fieldIds")) {
-      throw data("missing: fieldIds", {
-        status: 400,
-        statusText: "missing: fieldIds",
-      })
-    }
 
     // Get timeframe from calendar store
     const timeframe = getTimeframe(params)

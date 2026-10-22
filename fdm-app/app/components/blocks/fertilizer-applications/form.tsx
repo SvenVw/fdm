@@ -330,7 +330,7 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
                     placeholder={
                       Number.isFinite(exampleFertilizerApplication?.p_app_amount_display) &&
                       fertilizerApplication?.p_id === p_id
-                        ? `Er zijn verschillende waarden ingevuld, bv: ${exampleFertilizerApplication?.p_app_amount_display} ${currentApplicationUnitLabel}`
+                        ? `Verschillend, bv. ${exampleFertilizerApplication?.p_app_amount_display} ${currentApplicationUnitLabel}`
                         : `Bv. ${({ "kg/ha": "3700", "ton/ha": "3,7", "l/ha": "3700", "m3/ha": "3,7" } as const)[currentApplicationUnit]} ${currentApplicationUnitLabel}`
                     }
                     aria-required="true"
@@ -369,7 +369,7 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
                   }
                   placeholder={
                     exampleFertilizerApplication?.p_app_date
-                      ? `Er zijn verschillende waarden ingevuld, bv: ${formatDate(exampleFertilizerApplication.p_app_date, "PP", { locale: nl })}`
+                      ? `Verschillend, bv. ${formatDate(exampleFertilizerApplication.p_app_date, "PP", { locale: nl })}`
                       : undefined
                   }
                   defaultValue={fertilizerApplication?.p_app_date}
