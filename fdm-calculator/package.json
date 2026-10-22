@@ -30,6 +30,12 @@
         "types": "./dist/indicators.d.ts",
         "default": "./dist/indicators.js"
       }
+    },
+    "./browser": {
+      "import": {
+        "types": "./dist/browser.d.ts",
+        "default": "./dist/browser.js"
+      }
     }
   },
   "publishConfig": {

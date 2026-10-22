@@ -20,6 +20,8 @@ export default defineConfig({
     index: "src/index.ts",
     // Browser-safe subpath without fdm-core or network dependencies, for client-side code.
     indicators: "src/bln3/postprocessing.ts",
+    // Browser-safe pure aggregation functions, for client-side impact previews.
+    browser: "src/browser.ts",
   },
   format: "esm",
   outDir: "dist",
