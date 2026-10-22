@@ -4,6 +4,7 @@ import { TriangleAlert } from "lucide-react"
 import { useId, useMemo } from "react"
 import { Bar, BarChart, type BarShapeProps, Rectangle, XAxis, YAxis } from "recharts"
 import { cn } from "@/app/lib/utils"
+import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { ChartContainer } from "~/components/ui/chart"
 import { Spinner } from "~/components/ui/spinner"
@@ -375,6 +376,12 @@ interface NutrientAdviceLegendProps {
   scale: NutrientAdviceScale | null
   /** Whether at least one field has no advice, to show the "Geen advies" swatch. */
   hasFieldsWithoutAdvice: boolean
+  /** `true` when loading the advice failed (network/transport error), not "no advice". */
+  loadFailed?: boolean
+  /** Called by the retry button shown when `loadFailed` is `true`. */
+  onRetry?: () => void
+  /** Disables the retry button while a retry is running. */
+  isRetrying?: boolean
 }
 
 /**
@@ -387,7 +394,51 @@ interface NutrientAdviceLegendProps {
  * Every colour has a text label next to it (DESIGN.md: colour is never the only signal).
  */
 export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
-  const { mode, nutrientName, unit, scale, hasFieldsWithoutAdvice } = props
+  const {
+    mode,
+    nutrientName,
+    unit,
+    scale,
+    hasFieldsWithoutAdvice,
+    loadFailed,
+    onRetry,
+    isRetrying,
+  } = props
+
+  // A failed load gets its own message and retry button instead of a legend that would suggest
+  // the fields have no advice.
+  if (loadFailed) {
+    return (
+      <Card className="min-h-0 w-60 flex-initial space-y-2 p-4 shadow-xs">
+        <CardHeader className="p-0">
+          <CardTitle className="text-muted-foreground text-center text-xs">
+            {nutrientName} ({unit}) · {NUTRIENT_ADVICE_COPY.modes[mode]}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 p-0">
+          <p className="flex items-start gap-2 text-xs" role="alert">
+            <TriangleAlert className="mt-0.5 size-3.5 shrink-0 text-orange-500" />
+            {NUTRIENT_ADVICE_COPY.loadFailed}
+          </p>
+          {onRetry && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              // The legend wrapper ignores pointer events so it never blocks the map.
+              className="pointer-events-auto w-full"
+              onClick={onRetry}
+              disabled={isRetrying}
+            >
+              {isRetrying && <Spinner className="size-3" />}
+              {NUTRIENT_ADVICE_COPY.retry}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    )
+  }
+
   const isLoading = scale === null
 
   const statusItems = [

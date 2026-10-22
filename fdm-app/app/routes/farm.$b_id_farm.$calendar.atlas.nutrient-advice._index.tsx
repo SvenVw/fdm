@@ -9,6 +9,7 @@ import {
   type MetaFunction,
   useLoaderData,
   useNavigate,
+  useRevalidator,
 } from "react-router"
 import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
 import { MapTilerAttribution } from "~/components/blocks/atlas/atlas-attribution"
@@ -22,6 +23,7 @@ import {
   getNutrientAdviceOutlineStyle,
   getNutrientAdviceScale,
   isNutrientAdviceMode,
+  type NutrientAdviceMode,
   NUTRIENT_ADVICE_COPY,
   NUTRIENT_ADVICE_MODES,
   NUTRIENT_ADVICE_STATUS_COLORS,
@@ -145,19 +147,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * the same rows. Returns `null` while loading and again whenever a new promise arrives
  * (farm or year switch).
  *
- * The resolved rows are stored together with the promise they came from. "Loading" is then
- * derived during render (stored promise ≠ current promise) instead of resetting state inside the
- * effect, which `react/set-state-in-effect` forbids. State is only set from the async callbacks.
+ * The result is stored together with the promise it came from. "Loading" is then derived during
+ * render (stored promise ≠ current promise) instead of resetting state inside the effect, which
+ * `react/set-state-in-effect` forbids. State is only set from the async callbacks.
+ *
+ * A rejected promise (network/transport error) is kept apart from a successful result: it must not
+ * look like "no advice for any field".
  *
  * @param asyncData - Deferred loader data, or `null` without a farm.
- * @returns The rows, or `null` while loading.
+ * @returns `rows` (`null` while loading or after a failure) and `failed` (`true` when the current
+ * promise rejected).
  */
-function useStreamedRows(
-  asyncData: Promise<{ rows: AtlasNutrientAdviceRow[] }> | null,
-): AtlasNutrientAdviceRow[] | null {
+function useStreamedRows(asyncData: Promise<{ rows: AtlasNutrientAdviceRow[] }> | null): {
+  rows: AtlasNutrientAdviceRow[] | null
+  failed: boolean
+} {
   const [resolved, setResolved] = useState<{
     source: Promise<{ rows: AtlasNutrientAdviceRow[] }>
-    rows: AtlasNutrientAdviceRow[]
+    rows: AtlasNutrientAdviceRow[] | null
+    failed: boolean
   } | null>(null)
 
   useEffect(() => {
@@ -165,20 +173,21 @@ function useStreamedRows(
     let cancelled = false
     asyncData
       .then((data) => {
-        if (!cancelled) setResolved({ source: asyncData, rows: data.rows })
+        if (!cancelled) setResolved({ source: asyncData, rows: data.rows, failed: false })
       })
       .catch((error: unknown) => {
         // The helper never rejects for data problems; this only covers transport errors.
         console.error("Failed to load nutrient advice for the atlas:", error)
-        if (!cancelled) setResolved({ source: asyncData, rows: [] })
+        if (!cancelled) setResolved({ source: asyncData, rows: null, failed: true })
       })
     return () => {
       cancelled = true
     }
   }, [asyncData])
 
-  // Rows from a previous farm/year promise are stale and read as "loading".
-  return resolved && resolved.source === asyncData ? resolved.rows : null
+  // A result from a previous farm/year promise is stale and reads as "loading".
+  if (!resolved || resolved.source !== asyncData) return { rows: null, failed: false }
+  return { rows: resolved.rows, failed: resolved.failed }
 }
 
 /**
@@ -204,7 +213,9 @@ export default function FarmAtlasNutrientAdviceBlock() {
     capture("atlas_viewed", { b_id_farm, calendar, layer: "nutrient_advice", nutrient, mode })
   }, [b_id_farm, calendar, nutrient, mode, capture])
 
-  const rows = useStreamedRows(asyncData)
+  const { rows, failed: loadFailed } = useStreamedRows(asyncData)
+  // Re-runs the loader, which returns a new `asyncData` promise (shown as "loading" again).
+  const revalidator = useRevalidator()
   const rowsById = useMemo(
     () => (rows ? new Map(rows.map((row) => [row.b_id, row])) : null),
     [rows],
@@ -300,7 +311,9 @@ export default function FarmAtlasNutrientAdviceBlock() {
                 <AtlasTooltipContent className="block">
                   <NutrientAdviceTooltipBody
                     row={row}
-                    isLoading={rowsById === null}
+                    isLoading={rowsById === null && !loadFailed}
+                    loadFailed={loadFailed}
+                    mode={mode}
                     nutrient={nutrientDescription}
                   />
                 </AtlasTooltipContent>
@@ -380,6 +393,9 @@ export default function FarmAtlasNutrientAdviceBlock() {
             unit={nutrientDescription.unit}
             scale={scale}
             hasFieldsWithoutAdvice={hasFieldsWithoutAdvice}
+            loadFailed={loadFailed}
+            onRetry={() => void revalidator.revalidate()}
+            isRetrying={revalidator.state === "loading"}
           />
         </div>
       )}
@@ -397,17 +413,27 @@ const STATUS_LABELS = {
 /**
  * Tooltip body for the hovered field: advice, already applied and remaining amount of the selected
  * nutrient in kg/ha, plus the shared progress bar. Shows the reason when there is no advice.
+ *
+ * In "% van advies" mode an advice of 0 (or less) is shown as "no advice", matching the grey fill
+ * on the map (`getFieldShading`), instead of a progress bar and a red "over" status.
  */
 function NutrientAdviceTooltipBody({
   row,
   isLoading,
+  loadFailed,
+  mode,
   nutrient,
 }: {
   row: AtlasNutrientAdviceRow | undefined
   isLoading: boolean
+  loadFailed: boolean
+  mode: NutrientAdviceMode
   nutrient: NutrientDescription | undefined
 }) {
   if (!nutrient) return null
+  if (loadFailed) {
+    return <p className="text-muted-foreground">{NUTRIENT_ADVICE_COPY.loadFailed}</p>
+  }
   if (isLoading) {
     return <p className="text-muted-foreground">{NUTRIENT_ADVICE_COPY.loading}</p>
   }
@@ -419,6 +445,21 @@ function NutrientAdviceTooltipBody({
         <p className="text-muted-foreground">{nutrient.name}</p>
         <p>{row?.errorMessage ?? NUTRIENT_ADVICE_COPY.noAdvice}</p>
       </>
+    )
+  }
+
+  if (mode === "percentage" && value.advice <= 0) {
+    return (
+      <div className="min-w-52 space-y-1.5">
+        <p className="text-muted-foreground">
+          {nutrient.name} ({nutrient.unit})
+        </p>
+        <p>{NUTRIENT_ADVICE_COPY.noAdviceZero}</p>
+        <dl className="grid grid-cols-[1fr_auto] gap-x-4 whitespace-nowrap tabular-nums">
+          <dt>{NUTRIENT_ADVICE_COPY.applied}</dt>
+          <dd className="text-right">{formatKgPerHa(value.filling)}</dd>
+        </dl>
+      </div>
     )
   }
 

@@ -56,6 +56,8 @@ export const NUTRIENT_ADVICE_COPY = {
   noAdvice: "Geen advies beschikbaar",
   noAdviceZero: "Geen advies (advies is 0)",
   loading: "Advies wordt berekend…",
+  loadFailed: "Het bemestingsadvies kon niet worden geladen.",
+  retry: "Opnieuw proberen",
   openAdvice: "Bekijk bemestingsadvies",
   clickHint: "Klik op een perceel voor het volledige advies",
 } as const
