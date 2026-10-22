@@ -527,7 +527,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             activeCatalogueItem?.b_lu_ya,
             serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
           )
-        : false
+        : null
     })()
 
     const cultivationHistoryPromise = (async (): Promise<

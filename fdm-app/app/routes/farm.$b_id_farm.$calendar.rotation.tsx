@@ -28,6 +28,8 @@ import { useAnalytics } from "~/hooks/use-analytics"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
+import { serverConfig } from "~/lib/config.server"
+import { isCultivationUnavailableInPeriod } from "~/lib/cultivation-availability"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
@@ -185,6 +187,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       }
     })
 
+    const maxCultivationAvailabilityYear =
+      serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear
+
     const rotationExtended = cultivationsInRotation.map((b_lu_catalogue) => {
       const catalogueItem = cultivationCatalogue.find(
         (cat) => cat.b_lu_catalogue === b_lu_catalogue,
@@ -213,8 +218,21 @@ export async function loader({ request, params }: Route.LoaderArgs) {
           (cultivation) => harvestsForFarm.get(cultivation.b_lu) ?? [],
         )
 
+        // First period in which the RVO crop code is unavailable, if any.
+        const availabilityWarning =
+          cultivationsForCatalogue
+            .map((cultivation) =>
+              isCultivationUnavailableInPeriod(
+                cultivation,
+                catalogueItem.b_lu_ya,
+                maxCultivationAvailabilityYear,
+              ),
+            )
+            .find((result) => result !== null) ?? null
+
         return {
           type: "field",
+          availabilityWarning: availabilityWarning,
           canModify: farmWritePermission,
           b_id: field.b_id,
           b_name: field.b_name,
@@ -270,6 +288,9 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
       return {
         type: "crop",
+        availabilityWarning:
+          fieldRows.find((fieldRow) => fieldRow.availabilityWarning !== null)
+            ?.availabilityWarning ?? null,
         canModify: farmWritePermission,
         b_lu_catalogue: b_lu_catalogue,
         b_lu_name: b_lu_name ?? "",

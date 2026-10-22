@@ -314,6 +314,7 @@ export function AddEventSheet({
                 b_lu_start: request.context.date ?? today,
                 b_lu_end: undefined,
               }}
+              maxCultivationAvailabilityYear={maxCultivationAvailabilityYear}
               options={cultivationOptions.filter(
                 (c) =>
                   c.value === request.context.b_lu ||
@@ -341,6 +342,7 @@ export function AddEventSheet({
                     ? request.context.date
                     : (cultivation?.b_lu_end ?? undefined),
               }}
+              maxCultivationAvailabilityYear={maxCultivationAvailabilityYear}
               options={cultivationOptions}
             />
           ) : null}

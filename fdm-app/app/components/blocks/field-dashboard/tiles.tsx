@@ -1,7 +1,6 @@
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import {
-  AlertTriangle,
   Calculator,
   CheckCircle2,
   ClipboardCheck,
@@ -14,6 +13,7 @@ import {
 } from "lucide-react"
 import { lazy, type ReactNode, Suspense } from "react"
 import { Await, Link } from "react-router"
+import { CultivationAvailabilityWarning } from "~/components/blocks/cultivation/availability-warning"
 import { CultivationSuggestionStatusBanner } from "~/components/blocks/cultivation/suggestion"
 import { ScoreBadge } from "~/components/blocks/indicators/score-badge"
 import { NormProgressBar } from "~/components/blocks/norms/progress-bar"
@@ -22,7 +22,6 @@ import { BCS_COLOR_CLASSES, BCS_SCORE_DOT } from "~/components/blocks/soil-visua
 import { BcsScoreCard } from "~/components/blocks/soil-visual/bcs-score-card"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
 import { PdfViewerDialogContent, ViewPdfButton } from "~/components/custom/pdf-viewer"
-import { Alert } from "~/components/ui/alert"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
@@ -259,14 +258,7 @@ export function FieldDashboardCurrentCultivationTile({ dashboard, tile }: FieldD
         </div>
         <Suspense fallback={null}>
           <Await resolve={dashboard.asyncInsights.showAvailabilityYearWarning} errorElement={<></>}>
-            {(showAvailabilityYearWarning) =>
-              showAvailabilityYearWarning && (
-                <Alert className="border-amber-200 bg-amber-50 text-amber-700">
-                  <AlertTriangle className="size-4 stroke-amber-700" />
-                  <p>Volgens de RVO kan deze gewascode in deze periode niet worden gebruikt.</p>
-                </Alert>
-              )
-            }
+            {(availabilityResult) => <CultivationAvailabilityWarning result={availabilityResult} />}
           </Await>
         </Suspense>
         <div className="grid gap-3 sm:grid-cols-2">

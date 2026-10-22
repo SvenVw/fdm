@@ -136,6 +136,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         return {
           value: cultivation.b_lu_catalogue,
           label: cultivation.b_lu_name,
+          b_lu_ya: cultivation.b_lu_ya,
         }
       })
 
@@ -155,6 +156,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return {
       field: field,
       cultivationsCatalogueOptions: cultivationsCatalogueOptions,
+      maxCultivationAvailabilityYear:
+        serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
       cultivations: cultivations,
       harvests: harvests,
       fieldWritePermission: fieldWritePermission,
@@ -224,6 +227,7 @@ export default function FarmFieldsOverviewBlock() {
       <div className="grid gap-4 2xl:grid-cols-2">
         <CultivationListCard
           cultivationsCatalogueOptions={loaderData.cultivationsCatalogueOptions}
+          maxCultivationAvailabilityYear={loaderData.maxCultivationAvailabilityYear}
           cultivations={loaderData.cultivations}
           harvests={loaderData.harvests}
           editable={loaderData.fieldWritePermission}
