@@ -1,11 +1,11 @@
-import type { MouseEvent } from "react"
+import type { MouseEvent, ReactNode } from "react"
 import type { Navigation } from "react-router"
 /* eslint-disable typescript/unbound-method -- react-hook-form registration and control references are unbound by design in standard React Hook Form usage. */
 import { zodResolver } from "@hookform/resolvers/zod"
 import { formatDate } from "date-fns"
 import { nl } from "date-fns/locale"
 import { Plus } from "lucide-react"
-import { useEffect, useId } from "react"
+import { useEffect, useId, useRef } from "react"
 import { Controller, useWatch } from "react-hook-form"
 import { Form, useNavigate, useSearchParams } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
@@ -45,6 +45,12 @@ import {
  * It accepts two partial FieldFertilizerFormValues objects to pre-fill the form and set the placeholders.
  * - The fields are pre-filled according to the fertilizerApplication prop value. If it is missing, all form fields are left empty. fertilizerApplication cannot be used to drive the form state.
  * - The placeholders will be set according to the exampleFertilizerApplication prop value. If it is missing, the default placeholders are used for all form fields.
+ *
+ * Optional props for embedding the form in a larger page:
+ * - `submitLabel` replaces the text of the submit button.
+ * - `onValuesChange` is called with the current form values whenever a value changes, for example to preview the effect of the application.
+ * - `footerSlot` is rendered directly above the submit button, for example for warnings.
+ * - `submitDisabledReason` disables the submit button and shows the reason next to it.
  */
 export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
   intent,
@@ -58,6 +64,12 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
   exampleFertilizerApplication,
   schema,
   fieldsClassName,
+  submitLabel,
+  onValuesChange,
+  footerSlot,
+  submitDisabledReason,
+  id,
+  submitAreaClassName,
 }: {
   intent?: string
   b_id?: string
@@ -70,10 +82,18 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
   exampleFertilizerApplication?: Partial<FieldFertilizerFormValues> | null | undefined
   schema?: T
   fieldsClassName?: string
+  submitLabel?: string
+  onValuesChange?: (values: Partial<FieldFertilizerFormValues>) => void
+  footerSlot?: ReactNode
+  submitDisabledReason?: string
+  /** Id of the form element, so a button elsewhere on the page can submit it. */
+  id?: string
+  submitAreaClassName?: string
 }) {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const formId = useId()
+  const generatedFormId = useId()
+  const formId = id ?? generatedFormId
   const { calendar } = useCalendarStore()
   const form = useRemixForm<FieldFertilizerFormValues>({
     mode: "onTouched",
@@ -99,6 +119,22 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
       method: fertilizerApplication ? "PUT" : "POST",
     },
   })
+
+  // Report value changes to the parent, for example to preview the effect of the application
+  const onValuesChangeRef = useRef(onValuesChange)
+  useEffect(() => {
+    onValuesChangeRef.current = onValuesChange
+  }, [onValuesChange])
+  const hasValuesListener = Boolean(onValuesChange)
+  const { watch, getValues } = form
+  useEffect(() => {
+    if (!hasValuesListener) return
+    onValuesChangeRef.current?.(getValues())
+    const subscription = watch((values) =>
+      onValuesChangeRef.current?.(values as Partial<FieldFertilizerFormValues>),
+    )
+    return () => subscription.unsubscribe()
+  }, [hasValuesListener, watch, getValues])
 
   const p_id = useWatch({ control: form.control, name: "p_id" })
   const selectedFertilizer = options.find((option) => option.value === p_id)
@@ -319,18 +355,28 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
                 />
               )}
             />
-            <div className="invisible" />
-            <div className="ml-auto">
-              <Button type="submit">
+            {footerSlot ? (
+              <div className="col-span-full">{footerSlot}</div>
+            ) : (
+              <div className="invisible" />
+            )}
+            <div
+              className={cn(
+                "col-span-full ml-auto flex flex-wrap items-center justify-end gap-x-3 gap-y-1 md:col-span-1",
+                submitAreaClassName,
+              )}
+            >
+              {submitDisabledReason && (
+                <p className="text-muted-foreground text-sm">{submitDisabledReason}</p>
+              )}
+              <Button type="submit" disabled={Boolean(submitDisabledReason)}>
                 {isSubmitting ? (
                   <div className="flex items-center space-x-2">
                     <Spinner />
                     <span>Opslaan...</span>
                   </div>
-                ) : fertilizerApplication ? (
-                  "Opslaan"
                 ) : (
-                  "Voeg toe"
+                  (submitLabel ?? (fertilizerApplication ? "Opslaan" : "Voeg toe"))
                 )}
               </Button>
             </div>

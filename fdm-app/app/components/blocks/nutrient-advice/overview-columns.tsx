@@ -1,3 +1,4 @@
+import { aggregateNutrientAdviceToFarmLevel } from "@nmi-agro/fdm-calculator/browser"
 import { createColumnHelper, type Column, type ColumnDef } from "@tanstack/react-table"
 import { ArrowDown, ArrowUp } from "lucide-react"
 import { NavLink } from "react-router"
@@ -180,27 +181,29 @@ function buildNutrientColumn(
     ),
     cell: ({ row }) => <NutrientCell row={row.original} nutrient={nutrient} unitMode={unitMode} />,
     footer: ({ table }) => {
-      const rows = table
+      const fields = table
         .getFilteredRowModel()
         .rows.map((r) => r.original)
-        .filter((r) => !r.errorMessage && r.values[nutrient.symbol])
+        .filter((r) => !r.errorMessage)
+        .map((r) => {
+          const value = r.values[nutrient.symbol]
+          return {
+            b_area: r.b_area || 0,
+            values: value
+              ? { [nutrient.symbol]: { dose: value.filling, advice: value.advice } }
+              : {},
+          }
+        })
 
-      const totalArea = rows.reduce((sum, r) => sum + (r.b_area || 0), 0)
-      let fillingSum = 0
-      let adviceSum = 0
-      for (const r of rows) {
-        const value = r.values[nutrient.symbol]
-        if (!value) continue
-        fillingSum += value.filling * (r.b_area || 0)
-        adviceSum += value.advice * (r.b_area || 0)
-      }
-
-      const filling = unitMode === "total" ? fillingSum : totalArea > 0 ? fillingSum / totalArea : 0
-      const advice = unitMode === "total" ? adviceSum : totalArea > 0 ? adviceSum / totalArea : 0
+      const { dose, advice } = aggregateNutrientAdviceToFarmLevel(
+        fields,
+        [nutrient.symbol],
+        unitMode,
+      )[nutrient.symbol]
 
       return (
         <span className="flex justify-end whitespace-nowrap tabular-nums">
-          {formatValue(filling)} / {formatValue(advice)}
+          {formatValue(dose)} / {formatValue(advice)}
         </span>
       )
     },
