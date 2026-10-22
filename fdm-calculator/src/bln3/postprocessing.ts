@@ -17,6 +17,7 @@ export {
   buildMeasureOptions,
   buildPredictedImpacts,
   getBestVariantIds,
+  getFieldOpportunityCandidates,
   getMeasureFamilyId,
   getTopOpportunitiesForField,
   MAX_RECOMMENDED_MEASURES,

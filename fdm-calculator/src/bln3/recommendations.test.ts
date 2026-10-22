@@ -4,6 +4,7 @@ import { IndicatorsUnavailableError } from "./errors"
 import {
   buildMeasureOptions,
   getBestVariantIds,
+  getFieldOpportunityCandidates,
   getMeasureFamilyId,
   getTopOpportunitiesForField,
   type MeasureCatalogueEntry,
@@ -251,6 +252,16 @@ describe("getTopOpportunitiesForField", () => {
     })
     // bln_BM56b sums to 0.35 and beats bln_BM56c (0.3)
     expect(result.map((o) => o.m_id)).toEqual(["bln_BM56b", "bln_BM239"])
+  })
+
+  it("keeps every eligible variant as a candidate for farm-wide selection", () => {
+    const result = getFieldOpportunityCandidates({
+      advice,
+      score,
+      applicability,
+      activeMeasureIds: new Set(),
+    })
+    expect(result.map((o) => o.m_id)).toEqual(["bln_BM56c", "bln_BM56b", "bln_BM239"])
   })
 
   it("does not recommend a variant when another variant of the family is active", () => {

@@ -146,24 +146,23 @@ export function getBestVariantIds(impactByMeasureId: Map<string, number>): Set<s
 }
 
 /**
- * Derives a ranked list of recommended measures for a field from raw measure advice,
- * cross-referenced with the current score and a fresh applicability check.
+ * Collects all eligible measure candidates for a field from raw measure advice, before
+ * reducing them to one variant per measure family.
  *
  * Only non-green indicators are used. Measures that are not `applicable` according to
  * `applicability` (an absent entry counts as not applicable) or that belong to the same
  * measure family as an active measure (see {@link getMeasureFamilyId}) are dropped.
- * Remaining entries are grouped per measure, reduced to the best variant per family (see
- * {@link getBestVariantIds}) and sorted by descending `aggregateImpact`. This is a pure
- * function; it performs no NMI request.
+ * Remaining entries are grouped per measure. Use this when variants must be compared over
+ * several fields; use {@link getTopOpportunitiesForField} for a single field.
  *
  * @param params - Inputs.
  * @param params.advice - Measure advice for the field.
  * @param params.score - Current indicator score of the field.
  * @param params.applicability - Applicability per measure ID.
  * @param params.activeMeasureIds - Catalogue IDs of measures already adopted.
- * @returns Opportunities sorted by descending aggregate impact.
+ * @returns Candidates sorted by descending aggregate impact, possibly several per family.
  */
-export function getTopOpportunitiesForField({
+export function getFieldOpportunityCandidates({
   advice,
   score,
   applicability,
@@ -206,12 +205,35 @@ export function getTopOpportunitiesForField({
       }
     }
   }
+  return [...byMeasure.values()].sort((a, b) => b.aggregateImpact - a.aggregateImpact)
+}
+
+/**
+ * Derives a ranked list of recommended measures for a field from raw measure advice,
+ * cross-referenced with the current score and a fresh applicability check.
+ *
+ * Takes the candidates of {@link getFieldOpportunityCandidates}, reduces them to the best
+ * variant per measure family (see {@link getBestVariantIds}) and sorts them by descending
+ * `aggregateImpact`. This is a pure function; it performs no NMI request.
+ *
+ * @param params - Inputs.
+ * @param params.advice - Measure advice for the field.
+ * @param params.score - Current indicator score of the field.
+ * @param params.applicability - Applicability per measure ID.
+ * @param params.activeMeasureIds - Catalogue IDs of measures already adopted.
+ * @returns Opportunities sorted by descending aggregate impact.
+ */
+export function getTopOpportunitiesForField(params: {
+  advice: Bln3MeasureAdviceResult
+  score: Bln3Score | null
+  applicability: Record<string, MeasureApplicabilityInfo>
+  activeMeasureIds: Set<string>
+}): FieldTopOpportunity[] {
+  const candidates = getFieldOpportunityCandidates(params)
   const bestVariantIds = getBestVariantIds(
-    new Map([...byMeasure.values()].map((o) => [o.m_id, o.aggregateImpact])),
+    new Map(candidates.map((o) => [o.m_id, o.aggregateImpact])),
   )
-  return [...byMeasure.values()]
-    .filter((o) => bestVariantIds.has(o.m_id))
-    .sort((a, b) => b.aggregateImpact - a.aggregateImpact)
+  return candidates.filter((o) => bestVariantIds.has(o.m_id))
 }
 
 /**
