@@ -480,8 +480,8 @@ This schema holds the primary data related to farm operations.
 | **a_date**         | `timestamp with time zone` |             | Timestamp indicating when the analysis was performed or reported. |
 | **a_source**       | `soilAnalysisSourceEnum`   |             | Laboratory that performed the analysis.                           |
 | **a_al_ox**        | `numeric` (custom)         |             | Aluminum extracted with oxalate (mmol Al/kg).                     |
-| **a_c_of**         | `numeric` (custom)         |             | Organic carbon content (g C/g).                                   |
-| **a_ca_co**        | `numeric` (custom)         |             | Calcium, total soil reserve (mmol+/kg).                           |
+| **a_c_of**         | `numeric` (custom)         |             | Organic carbon content (g C/kg).                                  |
+| **a_ca_co**        | `numeric` (custom)         |             | Calcium, exchangeable, extracted with cohex (mmol+/kg).           |
 | **a_ca_co_po**     | `numeric` (custom)         |             | Calcium saturation degree (%).                                    |
 | **a_caco3_if**     | `numeric` (custom)         |             | Carbonate lime (%).                                               |
 | **a_cec_co**       | `numeric` (custom)         |             | Cation Exchange Capacity (mmol+/kg).                              |
@@ -492,13 +492,13 @@ This schema holds the primary data related to farm operations.
 | **a_density_sa**   | `numeric` (custom)         |             | Bulk density (g/cm³).                                             |
 | **a_fe_ox**        | `numeric` (custom)         |             | Iron extracted with oxalate (mmol Fe/kg).                         |
 | **a_k_cc**         | `numeric` (custom)         |             | Potassium, plant available (mg K/kg).                             |
-| **a_k_co**         | `numeric` (custom)         |             | Potassium, total soil reserve (mmol+/kg).                         |
+| **a_k_co**         | `numeric` (custom)         |             | Potassium, exchangeable, extracted with cohex (mmol+/kg).         |
 | **a_k_co_po**      | `numeric` (custom)         |             | Potassium saturation degree (%).                                  |
 | **a_mg_cc**        | `numeric` (custom)         |             | Magnesium, plant available (mg Mg/kg).                            |
-| **a_mg_co**        | `numeric` (custom)         |             | Magnesium, total soil reserve (mmol+ Mg/kg).                      |
+| **a_mg_co**        | `numeric` (custom)         |             | Magnesium, exchangeable, extracted with cohex (mmol+/kg).         |
 | **a_mg_co_po**     | `numeric` (custom)         |             | Magnesium saturation degree (%).                                  |
 | **a_n_pmn**        | `numeric` (custom)         |             | Potentially mineralizable Nitrogen (mg N/kg).                     |
-| **a_n_rt**         | `numeric` (custom)         |             | Nitrogen, total soil reserve (mg N/g).                            |
+| **a_n_rt**         | `numeric` (custom)         |             | Nitrogen, total soil reserve (mg N/kg).                           |
 | **a_nh4_cc**       | `numeric` (custom)         |             | Ammonium (NH4-N) (mg N/l).                                        |
 | **a_nmin_cc**      | `numeric` (custom)         |             | Available nitrogen reserve (kg N/ha).                             |
 | **a_no3_cc**       | `numeric` (custom)         |             | Nitrate (NO3-N) (mg N/l).                                         |
