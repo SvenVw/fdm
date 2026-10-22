@@ -22,7 +22,8 @@ import { calculateNitrogenSupplyBySoilMineralization } from "./mineralization"
  * @param fertilizerDetailsMap - A map containing details for each fertilizer, including its type and nitrogen content.
  * @param depositionSupply - The pre-calculated nitrogen supply from atmospheric deposition.
  * @param timeFrame - The time frame for which to calculate the nitrogen supply.
- * @param useEffectiveNitrogen - When `true`, the supply by fertilizers is calculated with effective nitrogen. Defaults to `false`.
+ * @param useEffectiveNitrogen - When `true`, the supply by fertilizers is calculated with effective nitrogen and the
+ *   soil mineralization with the MINIP model. Defaults to `false`.
  *
  * @returns An object containing the total nitrogen supply for the field,
  *  as well as a breakdown by source (fertilizers, fixation, deposition, and mineralization).
@@ -59,6 +60,7 @@ export function calculateNitrogenSupply(
       soilAnalysis,
       cultivationDetailsMap,
       timeFrame,
+      useEffectiveNitrogen, // Effective nitrogen balance: mineralization with MINIP
     )
     // Calculate the total amount of Nitrogen supplied
     const totalSupply = fertilizersSupply.total

@@ -540,7 +540,9 @@ export type NitrogenBalanceInput = {
   }
   /**
    * When `true`, the nitrogen supply by fertilizers is calculated with effective nitrogen
-   * (`p_n_rt * p_n_wc`) instead of total nitrogen (`p_n_rt`). Defaults to `false`.
+   * (`p_n_rt * p_n_wc`) instead of total nitrogen (`p_n_rt`), and the soil mineralization with the
+   * MINIP model. Nitrate leaching is still based on the surplus of the balance with total nitrogen.
+   * Defaults to `false`.
    */
   useEffectiveNitrogen?: boolean
 }
@@ -558,7 +560,9 @@ export type NitrogenBalanceFieldInput = {
   }
   /**
    * When `true`, the nitrogen supply by fertilizers is calculated with effective nitrogen
-   * (`p_n_rt * p_n_wc`) instead of total nitrogen (`p_n_rt`). Defaults to `false`.
+   * (`p_n_rt * p_n_wc`) instead of total nitrogen (`p_n_rt`), and the soil mineralization with the
+   * MINIP model. Nitrate leaching is still based on the surplus of the balance with total nitrogen.
+   * Defaults to `false`.
    */
   useEffectiveNitrogen?: boolean
 }

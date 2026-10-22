@@ -344,14 +344,21 @@ function NitrogenBalance({
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overschot / Doel (Perceel)</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {/* The target applies to the balance with total nitrogen only */}
+              {useEffectiveNitrogen ? "Overschot (Perceel)" : "Overschot / Doel (Perceel)"}
+            </CardTitle>
             <ArrowRightLeft className="text-muted-foreground text-xs" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               <div className="flex items-center gap-4">
-                <p>{`${result.balance} / ${result.target}`}</p>
-                {result.balance <= result.target ? (
+                <p>
+                  {useEffectiveNitrogen
+                    ? `${result.balance}`
+                    : `${result.balance} / ${result.target}`}
+                </p>
+                {useEffectiveNitrogen ? null : result.balance <= result.target ? (
                   <CircleCheck className="rounded-full bg-green-100 p-0 text-green-500 " />
                 ) : (
                   <CircleAlert className="rounded-full bg-red-100 text-red-500 " />

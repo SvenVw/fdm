@@ -3,6 +3,7 @@ import Decimal from "decimal.js"
 import { describe, expect, it } from "vitest"
 import type { NitrogenBalanceFieldResultNumeric, NitrogenBalanceInput } from "./types"
 import { calculateNitrogenBalance, calculateNitrogenBalancesFieldToFarm } from "."
+import { calculateNitrogenSupplyBySoilMineralizationUsingMinip } from "./supply/mineralization"
 
 // Mock FdmType
 const mockFdm = {
@@ -276,9 +277,24 @@ describe("calculateNitrogenBalance", () => {
     // 1000 kg/ha * 10 g N/kg = 10 kg N/ha total; with p_n_wc 0.5 -> 5 kg N/ha effective
     expect(totalResult.supply.fertilizers.total).toBe(10)
     expect(effectiveResult.supply.fertilizers.total).toBe(5)
-    // Ammonia emission is unchanged, so the balance decreases by the same amount as the supply
+
+    // Mineralization: default value for dekzand (0) vs MINIP from the soil analysis
+    const minip = calculateNitrogenSupplyBySoilMineralizationUsingMinip(20, 10, 1.2)
+      .times(364)
+      .dividedBy(365) // 2023-01-01 to 2023-12-31
+    expect(totalResult.supply.mineralisation).toBe(0)
+    expect(effectiveResult.supply.mineralisation).toBe(minip.round().toNumber())
+    expect(effectiveResult.supply.mineralisation).toBeGreaterThan(0)
+
+    // Ammonia emission and nitrate leaching are the same in both balances
     expect(effectiveResult.emission.ammonia.total).toBe(totalResult.emission.ammonia.total)
-    expect(totalResult.balance - effectiveResult.balance).toBe(5)
+    expect(effectiveResult.emission.nitrate).toBe(totalResult.emission.nitrate)
+
+    // Balance: -5 kg N/ha from fertilizers, + MINIP mineralization (rounding of 1 allowed)
+    const expectedDifference = minip.minus(5).toNumber()
+    expect(
+      Math.abs(effectiveResult.balance - totalResult.balance - expectedDifference),
+    ).toBeLessThanOrEqual(1)
   })
 
   it("should handle errors from sub-calculations", async () => {

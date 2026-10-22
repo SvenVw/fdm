@@ -243,14 +243,19 @@ function FarmBalanceNitrogenOverview({
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overschot / Doel (Bedrijf)</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {/* The target applies to the balance with total nitrogen only */}
+              {useEffectiveNitrogen ? "Overschot (Bedrijf)" : "Overschot / Doel (Bedrijf)"}
+            </CardTitle>
             <ArrowRightLeft className="text-muted-foreground text-xs" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               <div className="flex items-center gap-4">
                 <p>
-                  {`${resolvedNitrogenBalanceResult.balance} / ${resolvedNitrogenBalanceResult.target}`}
+                  {useEffectiveNitrogen
+                    ? `${resolvedNitrogenBalanceResult.balance}`
+                    : `${resolvedNitrogenBalanceResult.balance} / ${resolvedNitrogenBalanceResult.target}`}
                 </p>
                 {hasErrors ? (
                   <Tooltip>
@@ -259,7 +264,7 @@ function FarmBalanceNitrogenOverview({
                     </TooltipTrigger>
                     <TooltipContent>Niet alle percelen konden worden berekend</TooltipContent>
                   </Tooltip>
-                ) : resolvedNitrogenBalanceResult.balance <=
+                ) : useEffectiveNitrogen ? null : resolvedNitrogenBalanceResult.balance <=
                   resolvedNitrogenBalanceResult.target ? (
                   <CircleCheck className="rounded-full bg-green-100 p-0 text-green-500 " />
                 ) : (
@@ -350,7 +355,9 @@ function FarmBalanceNitrogenOverview({
                 return (
                   <div className="flex items-center" key={fieldResult.b_id}>
                     {fieldResult.balance ? (
-                      fieldResult.balance.balance <= fieldResult.balance.target ? (
+                      useEffectiveNitrogen ? (
+                        <div className="h-6 w-6" />
+                      ) : fieldResult.balance.balance <= fieldResult.balance.target ? (
                         <CircleCheck className="h-6 w-6 rounded-full bg-green-100 p-0 text-green-500" />
                       ) : (
                         <CircleX className="h-6 w-6 rounded-full bg-red-100 p-0 text-red-500" />
@@ -377,7 +384,11 @@ function FarmBalanceNitrogenOverview({
                     </div>
                     <div className="ml-auto font-medium">
                       {fieldResult.balance ? (
-                        `${fieldResult.balance.balance} / ${fieldResult.balance.target}`
+                        useEffectiveNitrogen ? (
+                          `${fieldResult.balance.balance}`
+                        ) : (
+                          `${fieldResult.balance.balance} / ${fieldResult.balance.target}`
+                        )
                       ) : (
                         <NavLink to={`./${fieldResult.b_id}${search}`}>
                           <p className="text-end text-sm text-orange-500 hover:underline">

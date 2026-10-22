@@ -10,21 +10,37 @@ import type {
 } from "../types"
 
 /**
- * Calculates the amount of nitrogen supplied through soil mineralization using Minip.
+ * Calculates the amount of nitrogen supplied through soil mineralization.
  *
- * This function determines the mineralization based on the soil analyses conducted.
+ * By default, a default value per soil type and land use is used. With `useMinip`, the yearly
+ * mineralization is calculated with the MINIP model from the soil analysis (organic carbon,
+ * C/N ratio and bulk density). In both cases the yearly value is pro-rated for the timeframe.
+ * @param cultivations - The cultivations on the field.
  * @param soilAnalysis - Combined soil analysis data for the field.
+ * @param cultivationDetails - A map with the details of each cultivation.
  * @param timeFrame - The timeframe for which to calculate the nitrogen mineralization.
+ * @param useMinip - When `true`, the MINIP model is used instead of the default values. Defaults to `false`.
  * @returns The NitrogenSupplyMineralization object containing the total amount of Nitrogen mineralized.
+ * @throws Throws an error when `useMinip` is `true` and `a_c_of`, `a_cn_fr` or `a_density_sa` is missing.
  */
 export function calculateNitrogenSupplyBySoilMineralization(
   cultivations: FieldInput["cultivations"],
   soilAnalysis: SoilAnalysisPicked,
   cultivationDetails: Map<string, CultivationDetail>,
   timeFrame: NitrogenBalanceInput["timeFrame"],
+  useMinip = false,
 ): NitrogenSupplyMineralization {
   let totalMineralization = new Decimal(0)
   const minerlizationPerYear = []
+
+  // MINIP gives the yearly mineralization (kg N / ha / year) from the soil analysis
+  const yearlyMineralizationMinip = useMinip
+    ? calculateNitrogenSupplyBySoilMineralizationUsingMinip(
+        soilAnalysis.a_c_of,
+        soilAnalysis.a_cn_fr,
+        soilAnalysis.a_density_sa,
+      )
+    : undefined
 
   const startYear = timeFrame.start.getFullYear()
   const endYear = timeFrame.end.getFullYear()
@@ -52,10 +68,12 @@ export function calculateNitrogenSupplyBySoilMineralization(
       )
     })
 
-    const yearlyMineralization = calculateNitrogenSupplyBySoilMineralizationUsingDefaults(
-      soilAnalysis.b_soiltype_agr,
-      isGrassland,
-    )
+    const yearlyMineralization =
+      yearlyMineralizationMinip ??
+      calculateNitrogenSupplyBySoilMineralizationUsingDefaults(
+        soilAnalysis.b_soiltype_agr,
+        isGrassland,
+      )
 
     const yearStartTime = new Date(year, 0, 1).getTime()
     const yearEndTime = new Date(year + 1, 0, 1).getTime()
@@ -122,7 +140,7 @@ function calculateNitrogenSupplyBySoilMineralizationUsingDefaults(
  * @param a_c_of - The organic carbon content of the soil (g C / kg soil).
  * @param a_cn_fr - The C/N ratio of the soil organic matter.
  * @param a_density_sa - The soil bulk density (g / cm³).
- * @returns The amount of nitrogen mineralized in kg N / ha.
+ * @returns The amount of nitrogen mineralized in kg N / ha / year.
  * @throws Throws an error if required soil analysis data is missing or average yearly temperature is too high.
  */
 export function calculateNitrogenSupplyBySoilMineralizationUsingMinip(
