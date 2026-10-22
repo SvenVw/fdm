@@ -524,12 +524,17 @@ export function BalanceImpact({
               />
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <dl className="text-muted-foreground mt-2 grid grid-cols-3 gap-2 text-xs tabular-nums">
+              <dl className="text-muted-foreground mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-xs tabular-nums">
                 {(
                   [
                     ["Aanvoer", current.supply.total, after?.supply.total],
                     ["Afvoer", current.removal.total, after?.removal.total],
-                    ["Emissie", current.emission.total, after?.emission.total],
+                    [
+                      "Emissie ammoniak",
+                      current.emission.ammonia.total,
+                      after?.emission.ammonia.total,
+                    ],
+                    ["Emissie nitraat", current.emission.nitrate, after?.emission.nitrate],
                   ] as const
                 ).map(([label, value, valueAfter]) => (
                   <div key={label}>
