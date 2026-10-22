@@ -17,6 +17,7 @@ import type {
   BulkNutrientValues,
   BulkPreviewInput,
 } from "./types"
+import { toFriendlyCalculationError } from "./errors"
 
 /**
  * Wait this long after the last change before recalculating. The calculation itself is fast,
@@ -260,7 +261,9 @@ export function calculateLocalPreview({
         fieldIssues.push({
           b_id,
           b_name: fieldNames.get(b_id) ?? b_id,
-          message: error instanceof Error ? error.message : String(error),
+          message: toFriendlyCalculationError(
+            error instanceof Error ? error.message : String(error),
+          ),
         })
       }
     }
@@ -319,7 +322,9 @@ export function calculateLocalPreview({
       } catch (error) {
         balanceFields.push({
           ...base,
-          errorMessage: error instanceof Error ? error.message : String(error),
+          errorMessage: toFriendlyCalculationError(
+            error instanceof Error ? error.message : String(error),
+          ),
         })
       }
     }

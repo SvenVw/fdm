@@ -10,3 +10,12 @@ The fertilizer page of a single field now shows the form directly on the page in
 
 The applications of a fertilizer, opened from the fields table or the rotation table, are now shown on their own page instead of in a dialog. Several applications can be selected and changed or removed together, with the effect on the farm norms, advice and nitrogen balance shown while the form is filled in. Old links to change applications from the bulk page are redirected to this page.
 
+Near the save button, the page now gives one verdict on the same level as the norms block: per norm the room that is left or by how much it is exceeded, on a field page also the verdict for the whole farm (which is what counts legally), and neutral notes when the nitrogen balance ends above its target or a field ends above the advice. Saving is never blocked. Other improvements on these pages:
+
+- The advice on the field page is always based on the main cultivation, shown as a coloured dot; the field table shows cultivations as badges, as in the rotation table.
+- Statuses are named precisely ("Geen advies", "Geen balans") and calculation errors are shown in Dutch, with the option to try again.
+- The field selection has a search field and buttons to select all fields with the crop or none.
+- An application method is filled in when a fertilizer has only one, and all required fields are marked.
+- Removing applications asks for confirmation with the effect on the nutrient supply.
+- In the farm creation wizard, the bulk page keeps the wizard header, and the breadcrumb shows the rotation step.
+

@@ -139,15 +139,26 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
   const p_id = useWatch({ control: form.control, name: "p_id" })
   const selectedFertilizer = options.find((option) => option.value === p_id)
   const isSubmitting = navigation.state !== "idle"
+  // With a custom (partial) schema, empty fields keep their value, so they are not required
+  const requiredMarker = schema ? null : (
+    <span className="text-red-500" aria-hidden="true">
+      *
+    </span>
+  )
 
-  // If the user switched the fertilizer, clear the application method and amount
+  // If the user switched the fertilizer, clear the amount and the application method. When the
+  // fertilizer has a single application method, choose it right away.
   const formSetValue = form.setValue
+  const singleMethod =
+    selectedFertilizer?.applicationMethodOptions.length === 1
+      ? selectedFertilizer.applicationMethodOptions[0].value
+      : undefined
   useEffect(() => {
     if (p_id && (!fertilizerApplication || fertilizerApplication.p_id !== p_id)) {
-      formSetValue("p_app_method", "")
+      formSetValue("p_app_method", singleMethod ?? "")
       formSetValue("p_app_amount_display", undefined as unknown as number)
     }
-  }, [formSetValue, p_id, fertilizerApplication])
+  }, [formSetValue, p_id, fertilizerApplication, singleMethod])
 
   const formGetFieldState = form.getFieldState
   const form_p_app_date = useWatch({ control: form.control, name: "p_app_date" })
@@ -249,7 +260,7 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
                   label={
                     <span>
                       Meststof
-                      <span className="text-red-500">*</span>
+                      {requiredMarker}
                     </span>
                   }
                   defaultValue={fertilizerApplication?.p_id}
@@ -264,6 +275,7 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
                       variant="secondary"
                       className="ml-2"
                       onClick={handleManageFertilizers}
+                      aria-label="Voeg een nieuwe meststof toe"
                     >
                       <Plus className="size-4" />
                     </Button>
@@ -278,7 +290,12 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
               name="p_app_method"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid} className="gap-1">
-                  <FieldLabel>Toedieningsmethode</FieldLabel>
+                  <FieldLabel>
+                    <span>
+                      Toedieningsmethode
+                      {requiredMarker}
+                    </span>
+                  </FieldLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value ?? ""}
@@ -303,14 +320,18 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
               name="p_app_amount_display"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid} className="gap-1">
-                  <FieldLabel>Hoeveelheid ({currentApplicationUnitLabel})</FieldLabel>
+                  <FieldLabel>
+                    <span>
+                      Hoeveelheid ({currentApplicationUnitLabel}){requiredMarker}
+                    </span>
+                  </FieldLabel>
                   <Input
                     {...field}
                     placeholder={
                       Number.isFinite(exampleFertilizerApplication?.p_app_amount_display) &&
                       fertilizerApplication?.p_id === p_id
                         ? `Er zijn verschillende waarden ingevuld, bv: ${exampleFertilizerApplication?.p_app_amount_display} ${currentApplicationUnitLabel}`
-                        : `Bv. ${({ "kg/ha": "3700", "ton/ha": "3.7", "l/ha": "3700", "m3/ha": "3.7" } as const)[currentApplicationUnit]} ${currentApplicationUnitLabel}`
+                        : `Bv. ${({ "kg/ha": "3700", "ton/ha": "3,7", "l/ha": "3700", "m3/ha": "3,7" } as const)[currentApplicationUnit]} ${currentApplicationUnitLabel}`
                     }
                     aria-required="true"
                     aria-invalid={fieldState.invalid}
@@ -340,7 +361,12 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
               control={form.control}
               render={({ field, fieldState }) => (
                 <DatePicker
-                  label="Datum"
+                  label={
+                    <span>
+                      Datum
+                      {requiredMarker}
+                    </span>
+                  }
                   placeholder={
                     exampleFertilizerApplication?.p_app_date
                       ? `Er zijn verschillende waarden ingevuld, bv: ${formatDate(exampleFertilizerApplication.p_app_date, "PP", { locale: nl })}`

@@ -3,6 +3,7 @@ import type { BulkCurrentState, BulkFieldIssue, BulkFieldOption } from "./types"
 import {
   buildFieldImpactRows,
   type FieldImpactRow,
+  getAgronomicNotes,
   getNormOutcomes,
   summarizeAdvice,
   summarizeBalance,
@@ -16,7 +17,7 @@ function toIssue(row: FieldImpactRow): BulkFieldIssue {
   return {
     b_id: row.b_id,
     b_name: row.b_name,
-    message: row.messages[0] ?? (status ? FIELD_STATUS_LABELS[status] : "Nog niet berekend"),
+    message: row.messages[0] ?? (status ? FIELD_STATUS_LABELS[status] : "Wordt nog berekend"),
   }
 }
 
@@ -103,6 +104,16 @@ export function useImpactState({
       ? getNormOutcomes(norms.farmNorms, normsAfter.current, normsAfter.after, norms.showRenure)
       : []
 
+  /** The outcomes of a single field, in kg per ha, for pages that show the norms of one field. */
+  const getFieldNormOutcomes = (b_id: string) => {
+    const field = norms?.selectedFields?.[b_id]
+    const after = normsAfter?.fieldsAfter[b_id]
+    return field && after
+      ? getNormOutcomes(field.norms, field.fillings, after, norms?.showRenure ?? false)
+      : []
+  }
+  const agronomicNotes = preview.isActive ? getAgronomicNotes(rows, balanceSummary) : []
+
   return {
     farmNormsResult,
     adviceResult,
@@ -111,6 +122,8 @@ export function useImpactState({
     normsAfter,
     normOutcomes,
     normExceeded: normOutcomes.some((outcome) => outcome.remaining < 0),
+    getFieldNormOutcomes,
+    agronomicNotes,
     rows,
     adviceSummary,
     balanceSummary,

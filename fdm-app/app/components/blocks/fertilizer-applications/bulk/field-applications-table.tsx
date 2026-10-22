@@ -20,9 +20,8 @@ import {
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog"
 import { Badge } from "~/components/ui/badge"
-import { Button } from "~/components/ui/button"
+import { Button, buttonVariants } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "~/components/ui/empty"
 import {
   Table,
   TableBody,
@@ -93,14 +92,9 @@ export function FieldApplicationsTable({
       </CardHeader>
       <CardContent>
         {sorted.length === 0 ? (
-          <Empty>
-            <EmptyHeader>
-              <EmptyTitle>Nog geen bemestingen</EmptyTitle>
-              <EmptyDescription>
-                Vul links een gift in. Na opslaan verschijnt die hier.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <p className="text-muted-foreground text-sm">
+            Nog geen bemestingen op dit perceel. Een opgeslagen gift verschijnt hier.
+          </p>
         ) : (
           <div className="overflow-x-auto rounded-md border">
             <Table>
@@ -199,12 +193,17 @@ export function FieldApplicationsTable({
                                   <AlertDialogTitle>Gift verwijderen?</AlertDialogTitle>
                                   <AlertDialogDescription>
                                     De gift van {application.p_name_nl} op {date} wordt verwijderd.
+                                    {dose &&
+                                      ` De aanvoer op dit perceel daalt daarmee met ${formatKg(dose.p_dose_nw)} kg werkzame N, ${formatKg(dose.p_dose_p)} kg P₂O₅ en ${formatKg(dose.p_dose_k)} kg K₂O per ha.`}{" "}
                                     Dit kan niet ongedaan worden gemaakt.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                   <AlertDialogCancel>Annuleren</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => onDelete(application.p_app_id)}>
+                                  <AlertDialogAction
+                                    onClick={() => onDelete(application.p_app_id)}
+                                    className={buttonVariants({ variant: "destructive" })}
+                                  >
                                     Verwijderen
                                   </AlertDialogAction>
                                 </AlertDialogFooter>

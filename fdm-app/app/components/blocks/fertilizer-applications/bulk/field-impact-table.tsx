@@ -18,6 +18,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip
 import { cn } from "~/lib/utils"
 import type { FieldImpactRow } from "./aggregate"
 import type { BulkNutrient } from "./types"
+import { CultivationBadge } from "./cultivation-badge"
 import { ComparisonLabel, FieldStatusLabel, formatKg, isDeviation } from "./status"
 
 type SortKey = "name" | "area" | "crop" | "n" | "p" | "k" | "balance" | "status"
@@ -99,7 +100,7 @@ function NutrientCell({ row, nutrient }: { row: FieldImpactRow; nutrient: BulkNu
         </span>
         <span className="text-muted-foreground"> / {formatKg(advice)}</span>
       </span>
-      <ComparisonLabel status={status} noun="advies" compact />
+      <ComparisonLabel status={status} noun="advies" />
     </span>
   )
 }
@@ -116,7 +117,7 @@ function BalanceCell({ row }: { row: FieldImpactRow }) {
         </span>
         <span className="text-muted-foreground"> / {formatKg(balance.target)}</span>
       </span>
-      <ComparisonLabel status={isOver ? "over" : "on-target"} noun="streefwaarde" compact />
+      <ComparisonLabel status={isOver ? "over" : "on-target"} noun="streefwaarde" />
     </span>
   )
 }
@@ -141,7 +142,6 @@ export function FieldImpactTable({
   loading: boolean
   b_id_farm: string
   calendar: string
-  /** Includes or excludes the given fields. */
   /** Includes or excludes the given fields. Not used when `selectable` is `false`. */
   onSetIncluded?: (b_ids: string[], included: boolean) => void
   disabled?: boolean
@@ -243,7 +243,7 @@ export function FieldImpactTable({
             {visibleRows.map((row) => (
               <TableRow
                 key={row.b_id}
-                data-state={row.included ? "selected" : undefined}
+                // Excluded fields are dimmed; included fields keep the normal background for contrast
                 className={cn(!row.included && "text-muted-foreground")}
               >
                 {selectable && (
@@ -282,8 +282,15 @@ export function FieldImpactTable({
                 <TableCell className="text-right whitespace-nowrap tabular-nums">
                   {row.b_area.toLocaleString("nl-NL")} ha
                 </TableCell>
-                <TableCell className="max-w-40 truncate">
-                  {row.mainCultivationName ?? <span className="text-muted-foreground">–</span>}
+                <TableCell className="max-w-40">
+                  {row.mainCultivationName ? (
+                    <CultivationBadge
+                      name={row.mainCultivationName}
+                      cropRotation={row.mainCultivationCropRotation}
+                    />
+                  ) : (
+                    <span className="text-muted-foreground">–</span>
+                  )}
                 </TableCell>
                 {(["n", "p", "k"] as const).map((nutrient) => (
                   <TableCell key={nutrient}>
@@ -304,7 +311,9 @@ export function FieldImpactTable({
                     <span className="flex flex-wrap gap-x-2 gap-y-0.5">
                       {row.statuses.map((status) =>
                         row.messages.length > 0 &&
-                        (status === "missing_soil_data" || status === "not_calculated") ? (
+                        (status === "missing_soil_data" ||
+                          status === "no_advice" ||
+                          status === "no_balance") ? (
                           <Tooltip key={status}>
                             <TooltipTrigger asChild>
                               <button type="button">

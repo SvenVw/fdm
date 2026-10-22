@@ -1,18 +1,19 @@
 import {
   aggregateNutrientAdviceToFarmLevel,
   calculateNitrogenBalancesFieldToFarm,
-  type AggregatedNormFillingsToFarmLevel,
-  type AggregatedNormsToFarmLevel,
   type NitrogenBalanceFieldNumeric,
   type NitrogenBalanceFieldResultNumeric,
   type NitrogenBalanceNumeric,
 } from "@nmi-agro/fdm-calculator/browser"
 import { computeAdviceProgress } from "~/components/blocks/nutrient-advice/progress-bar"
+import { toFriendlyCalculationError } from "./errors"
+import { formatKg } from "./status"
 import {
   BULK_NUTRIENTS,
   type BulkFieldAdvice,
   type BulkFieldOption,
   type BulkNormKey,
+  type BulkNormValues,
   type BulkNutrient,
   type BulkNutrientValues,
 } from "./types"
@@ -25,7 +26,8 @@ export type FieldImpactStatus =
   | "missing_soil_data"
   | "bufferstrip"
   | "no_crop"
-  | "not_calculated"
+  | "no_advice"
+  | "no_balance"
 
 /** One row of the field table. All values are in kg/ha. */
 export interface FieldImpactRow {
@@ -33,6 +35,7 @@ export interface FieldImpactRow {
   b_name: string
   b_area: number
   mainCultivationName: string | null
+  mainCultivationCropRotation: string | null
   included: boolean
   /** `false` in the rotation flow when the field does not have the selected crop. */
   hasSelectedCrop: boolean
@@ -97,11 +100,13 @@ export function buildFieldImpactRows({
       const errors = [adviceRow?.errorMessage, balanceRow?.errorMessage].filter(
         (message): message is string => Boolean(message),
       )
-      messages.push(...new Set(errors))
+      messages.push(...new Set(errors.map(toFriendlyCalculationError)))
       if (errors.some((message) => SOIL_DATA_PATTERN.test(message))) {
         statuses.push("missing_soil_data")
-      } else if (errors.length > 0) {
-        statuses.push("not_calculated")
+      } else {
+        // Name what could not be calculated, so it does not look like the whole row failed
+        if (adviceRow?.errorMessage) statuses.push("no_advice")
+        if (balanceRow?.errorMessage) statuses.push("no_balance")
       }
 
       const dose = doseAfter ?? adviceRow?.dose
@@ -125,6 +130,7 @@ export function buildFieldImpactRows({
       b_name: field.b_name,
       b_area: field.b_area,
       mainCultivationName: field.mainCultivationName,
+      mainCultivationCropRotation: field.mainCultivationCropRotation,
       included: isIncluded,
       hasSelectedCrop:
         cultivationIds.length === 0 || field.cultivations.some((c) => cultivationIds.includes(c)),
@@ -268,9 +274,9 @@ export interface NormOutcome {
  * much the norm is exceeded after the application.
  */
 export function getNormOutcomes(
-  norms: AggregatedNormsToFarmLevel,
-  current: AggregatedNormFillingsToFarmLevel,
-  after: AggregatedNormFillingsToFarmLevel,
+  norms: BulkNormValues,
+  current: BulkNormValues,
+  after: BulkNormValues,
   showRenure: boolean,
 ): NormOutcome[] {
   const keys: BulkNormKey[] = showRenure
@@ -282,4 +288,53 @@ export function getNormOutcomes(
     if (added <= 0) return []
     return [{ key, remaining: norm - (after[key] ?? 0) }]
   })
+}
+
+const NUTRIENT_NAMES: Record<BulkNutrient, string> = { n: "N", p: "P₂O₅", k: "K₂O" }
+
+/**
+ * Short, neutral notes about the agronomic effect of a change: whether the nitrogen balance ends
+ * above its target and which fields or nutrients end above the advice. Shown near the save
+ * button next to the legal norms; they never block saving.
+ *
+ * @param rows - The field rows, with the preview applied.
+ * @param balance - The aggregated nitrogen balance of the included fields.
+ * @returns The notes, empty when there is no preview or nothing to mention.
+ */
+export function getAgronomicNotes(rows: FieldImpactRow[], balance: BalanceSummary): string[] {
+  const changed = rows.filter((row) => row.included && (row.doseAfter || row.balanceAfter))
+  if (changed.length === 0) return []
+  const notes: string[] = []
+
+  const after = balance.after
+  if (after && after.balance > after.target) {
+    const above = formatKg(after.balance - after.target)
+    notes.push(
+      balance.includedFields === 1
+        ? `Stikstofbalans komt ${above} kg N/ha boven de streefwaarde.`
+        : `Stikstofbalans komt gemiddeld ${above} kg N/ha boven de streefwaarde.`,
+    )
+  }
+
+  const overAdvice = changed.filter(
+    (row) =>
+      row.advice &&
+      row.doseAfter &&
+      BULK_NUTRIENTS.some(
+        (n) =>
+          computeAdviceProgress(row.doseAfter?.[n] ?? 0, row.advice?.[n] ?? 0).status === "over",
+      ),
+  )
+  if (overAdvice.length === 1 && changed.length === 1) {
+    const row = overAdvice[0]
+    const nutrients = BULK_NUTRIENTS.filter(
+      (n) => computeAdviceProgress(row.doseAfter?.[n] ?? 0, row.advice?.[n] ?? 0).status === "over",
+    ).map((n) => NUTRIENT_NAMES[n])
+    notes.push(`De gift komt boven het advies voor ${nutrients.join(", ")}.`)
+  } else if (overAdvice.length > 0) {
+    notes.push(
+      `${overAdvice.length} van ${changed.length} percelen ${overAdvice.length === 1 ? "komt" : "komen"} boven het advies.`,
+    )
+  }
+  return notes
 }

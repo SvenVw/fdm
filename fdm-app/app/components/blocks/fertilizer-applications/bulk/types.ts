@@ -38,6 +38,8 @@ export interface BulkFieldOption {
   cultivations: string[]
   /** Name of the main cultivation in the calendar year, if any. */
   mainCultivationName: string | null
+  /** Crop rotation group of the main cultivation, for its colour. */
+  mainCultivationCropRotation: string | null
 }
 
 /** The current advice and dose of a field. */

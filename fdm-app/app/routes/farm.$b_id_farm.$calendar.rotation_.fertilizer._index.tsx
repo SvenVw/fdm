@@ -20,6 +20,7 @@ import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { BulkFertilizerPage } from "~/components/blocks/fertilizer-applications/bulk/bulk-page"
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import { Header } from "~/components/blocks/header/base"
+import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { SidebarInset } from "~/components/ui/sidebar"
@@ -155,41 +156,57 @@ export default function FarmRotationFertilizerAddIndex() {
     ? `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`
     : `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/rotation`
 
+  const farmName =
+    loaderData.farmOptions.find((farm) => farm.b_id_farm === loaderData.b_id_farm)?.b_name_farm ??
+    ""
+  const back = { to: rotationUrl, label: "Terug naar bouwplan", disabled: false }
+
+  const content = (
+    <main>
+      <FarmTitle
+        title={`Bemesting toevoegen aan ${loaderData.cultivationName || "bouwplan"}`}
+        description="Voeg één bemesting toe aan meerdere percelen en zie direct het effect op gebruiksruimte, advies en stikstofbalans."
+      />
+      <FarmContent>
+        <BulkFertilizerPage
+          b_id_farm={loaderData.b_id_farm}
+          calendar={loaderData.calendar}
+          fertilizerOptions={loaderData.fertilizerOptions}
+          fieldOptions={loaderData.fieldOptions}
+          selectedFieldIds={loaderData.selectedFieldIds}
+          cultivationIds={loaderData.cultivationIds}
+          cultivationName={loaderData.cultivationName}
+          current={loaderData.current}
+          formAction={`${location.pathname}${location.search}`}
+          formStoreKey={loaderData.cultivationIds.join(",") || "cultivationIds"}
+          overviewUrl={rotationUrl}
+        />
+      </FarmContent>
+    </main>
+  )
+
+  // In the farm creation wizard, keep the wizard header so the user stays in the flow
+  if (loaderData.create) {
+    return (
+      <>
+        <Header action={back}>
+          <HeaderFarmCreate b_name_farm={farmName} />
+        </Header>
+        {content}
+      </>
+    )
+  }
+
   return (
     <SidebarInset>
-      <Header
-        action={{
-          to: rotationUrl,
-          label: "Terug naar bouwplan",
-          disabled: false,
-        }}
-      >
+      <Header action={back}>
         <HeaderFarm b_id_farm={loaderData.b_id_farm} farmOptions={loaderData.farmOptions} />
         <BreadcrumbSeparator />
         <BreadcrumbItem className="hidden md:block">Bouwplan</BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem className="hidden md:block">Bemesting toevoegen</BreadcrumbItem>
       </Header>
-      <main>
-        <FarmTitle
-          title={`Bemesting toevoegen aan ${loaderData.cultivationName || "bouwplan"}`}
-          description="Voeg één bemesting toe aan meerdere percelen en zie direct het effect op gebruiksruimte, advies en stikstofbalans."
-        />
-        <FarmContent>
-          <BulkFertilizerPage
-            b_id_farm={loaderData.b_id_farm}
-            calendar={loaderData.calendar}
-            fertilizerOptions={loaderData.fertilizerOptions}
-            fieldOptions={loaderData.fieldOptions}
-            selectedFieldIds={loaderData.selectedFieldIds}
-            cultivationIds={loaderData.cultivationIds}
-            cultivationName={loaderData.cultivationName}
-            current={loaderData.current}
-            formAction={`${location.pathname}${location.search}`}
-            formStoreKey={loaderData.cultivationIds.join(",") || "cultivationIds"}
-          />
-        </FarmContent>
-      </main>
+      {content}
     </SidebarInset>
   )
 }

@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog"
+import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import type { BulkFieldOption } from "./types"
 
@@ -69,9 +70,13 @@ export function FieldSelectionDialog({
 }) {
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState(() => new Set(selectedFieldIds))
+  const [query, setQuery] = useState("")
 
   const handleOpenChange = (next: boolean) => {
-    if (next) setSelected(new Set(selectedFieldIds))
+    if (next) {
+      setSelected(new Set(selectedFieldIds))
+      setQuery("")
+    }
     setOpen(next)
   }
 
@@ -83,13 +88,33 @@ export function FieldSelectionDialog({
       return next
     })
 
+  // Search on field name and main cultivation
+  const needle = query.trim().toLocaleLowerCase("nl-NL")
+  const visible = needle
+    ? fieldOptions.filter((field) =>
+        `${field.b_name} ${field.mainCultivationName ?? ""}`
+          .toLocaleLowerCase("nl-NL")
+          .includes(needle),
+      )
+    : fieldOptions
+
   const isRotation = cultivationIds.length > 0
   const withCrop = isRotation
-    ? fieldOptions.filter((field) => field.cultivations.some((c) => cultivationIds.includes(c)))
-    : fieldOptions
+    ? visible.filter((field) => field.cultivations.some((c) => cultivationIds.includes(c)))
+    : visible
   const withoutCrop = isRotation
-    ? fieldOptions.filter((field) => !field.cultivations.some((c) => cultivationIds.includes(c)))
+    ? visible.filter((field) => !field.cultivations.some((c) => cultivationIds.includes(c)))
     : []
+
+  const setMany = (fields: BulkFieldOption[], include: boolean) =>
+    setSelected((prev) => {
+      const next = new Set(prev)
+      for (const field of fields) {
+        if (include) next.add(field.b_id)
+        else next.delete(field.b_id)
+      }
+      return next
+    })
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -104,7 +129,40 @@ export function FieldSelectionDialog({
           <DialogDescription>Selecteer de percelen voor de bemesting.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <FieldCheckboxList fields={withCrop} selected={selected} onToggle={toggle} />
+          <div className="space-y-2">
+            <Input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Zoek op perceel of gewas"
+              aria-label="Zoek op perceel of gewas"
+            />
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setMany(isRotation ? withCrop : visible, true)}
+              >
+                {isRotation
+                  ? `Alle percelen met ${cultivationName || "dit gewas"}`
+                  : "Alles selecteren"}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setMany(visible, false)}
+              >
+                Niets selecteren
+              </Button>
+            </div>
+          </div>
+          {withCrop.length === 0 && withoutCrop.length === 0 ? (
+            <p className="text-muted-foreground text-sm">Geen percelen gevonden.</p>
+          ) : (
+            <FieldCheckboxList fields={withCrop} selected={selected} onToggle={toggle} />
+          )}
           {withoutCrop.length > 0 && (
             <Accordion type="single" collapsible>
               <AccordionItem value="without-crop">

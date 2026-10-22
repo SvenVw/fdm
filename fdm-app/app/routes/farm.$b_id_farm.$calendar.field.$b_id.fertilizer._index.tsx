@@ -33,7 +33,6 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getFertilizerOptions, toBulkFieldOptions } from "~/lib/fertilizer-application-bulk.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { getMainCultivation } from "~/lib/hoofdteelt.server"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -51,8 +50,7 @@ export const meta: MetaFunction = () => {
  * streamed impact of the field (farm norms, advice and nitrogen balance) including the input to
  * preview the effect of a new or changed application in the browser.
  *
- * The optional `?cultivation=` search parameter selects the cultivation the advice is based on;
- * otherwise the main cultivation of the year is used.
+ * The advice is based on the main cultivation of the year.
  *
  * @throws {Error} If the farm or field ID is missing, or if the specified field does not exist.
  */
@@ -114,6 +112,7 @@ export async function loader({ request, params, url }: LoaderFunctionArgs) {
       b_bufferstrip: field.b_bufferstrip ?? false,
       cultivations: [],
       mainCultivationName: null,
+      mainCultivationCropRotation: null,
     }
 
     const applicationMethods = getFertilizerParametersDescription().find(
@@ -126,13 +125,6 @@ export async function loader({ request, params, url }: LoaderFunctionArgs) {
       )
       .map((option) => ({ value: option.value, label: option.label }))
 
-    // The cultivation the advice is based on
-    const cultivations = cultivationsByField.get(b_id) ?? []
-    const cultivationId = url.searchParams.get("cultivation")
-    const activeCultivation =
-      (cultivationId ? cultivations.find((c) => c.b_lu === cultivationId) : undefined) ??
-      getMainCultivation(cultivations, calendar)
-
     // Start calculating the impact of the field; streamed to the page
     const current = loadBulkCurrentState({
       fdm,
@@ -142,7 +134,6 @@ export async function loader({ request, params, url }: LoaderFunctionArgs) {
       timeframe,
       farmFields: farmFields.some((f) => f.b_id === b_id) ? farmFields : [...farmFields, field],
       selectedFieldIds: [b_id],
-      adviceCultivations: activeCultivation ? { [b_id]: activeCultivation.b_lu } : undefined,
     })
 
     const pathname = url.pathname
@@ -176,8 +167,6 @@ export async function loader({ request, params, url }: LoaderFunctionArgs) {
       fertilizers,
       fertilizerApplications,
       applicationMethodOptions,
-      cultivations,
-      activeCultivationId: activeCultivation?.b_lu,
       current,
       fieldWritePermission,
       fertilizerApplicationWritePermissions: Object.fromEntries(permissionEntries),
@@ -210,8 +199,6 @@ export default function FarmFieldsOverviewBlock() {
       fertilizerApplications={loaderData.fertilizerApplications}
       applicationMethodOptions={loaderData.applicationMethodOptions}
       current={loaderData.current}
-      cultivations={loaderData.cultivations}
-      activeCultivationId={loaderData.activeCultivationId}
       canCreate={loaderData.fieldWritePermission}
       canModify={loaderData.fertilizerApplicationWritePermissions}
     />

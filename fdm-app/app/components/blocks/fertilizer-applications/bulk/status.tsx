@@ -8,6 +8,7 @@ import {
   Sprout,
   TriangleAlert,
 } from "lucide-react"
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
 import { cn } from "~/lib/utils"
 import type { FieldImpactStatus } from "./aggregate"
 
@@ -19,17 +20,20 @@ export const FIELD_STATUS_LABELS: Record<FieldImpactStatus, string> = {
   missing_soil_data: "Bodemdata ontbreekt",
   bufferstrip: "Bufferstrook",
   no_crop: "Geen gewas",
-  not_calculated: "Niet berekend",
+  no_advice: "Geen advies",
+  no_balance: "Geen balans",
 }
 
 const FIELD_STATUS_STYLE: Record<FieldImpactStatus, { icon: LucideIcon; className: string }> = {
-  ok: { icon: CircleCheck, className: "text-green-700 dark:text-green-400" },
+  // OK is the normal case and stays neutral, so colour is left for deviations
+  ok: { icon: CircleCheck, className: "text-muted-foreground" },
   over_advice: { icon: ArrowUp, className: "text-red-700 dark:text-red-400" },
   over_target: { icon: TriangleAlert, className: "text-red-700 dark:text-red-400" },
   missing_soil_data: { icon: AlertTriangle, className: "text-amber-700 dark:text-amber-400" },
   bufferstrip: { icon: CircleSlash, className: "text-muted-foreground" },
   no_crop: { icon: Sprout, className: "text-muted-foreground" },
-  not_calculated: { icon: AlertTriangle, className: "text-amber-700 dark:text-amber-400" },
+  no_advice: { icon: AlertTriangle, className: "text-amber-700 dark:text-amber-400" },
+  no_balance: { icon: AlertTriangle, className: "text-amber-700 dark:text-amber-400" },
 }
 
 /** Returns whether a status means the field deviates and deserves attention. */
@@ -57,44 +61,39 @@ export type ComparisonStatus = "under" | "on-target" | "over"
 
 const COMPARISON_STYLE: Record<
   ComparisonStatus,
-  { icon: LucideIcon; label: string; className: string }
+  { icon?: LucideIcon; label: string; className: string }
 > = {
   under: { icon: ArrowDown, label: "Onder", className: "text-orange-700 dark:text-orange-400" },
-  "on-target": {
-    icon: CircleCheck,
-    label: "Binnen",
-    className: "text-green-700 dark:text-green-400",
-  },
+  // Within the reference is the normal case: no icon and no colour, so deviations stand out
+  "on-target": { label: "Binnen", className: "text-muted-foreground" },
   over: { icon: ArrowUp, label: "Boven", className: "text-red-700 dark:text-red-400" },
 }
 
 /**
- * The status of a value compared with its reference, as an icon with an optional short label.
+ * The status of a value compared with its reference, as a small icon with the full text in a
+ * tooltip; the colour of the bar already shows the status. Within the reference nothing is shown,
+ * only the text for screen readers.
  *
- * @param noun - The reference, for example "advies" or "norm". Shown after the label.
- * @param compact - Show only the icon, with the label for screen readers.
+ * @param noun - The reference, for example "advies" or "norm".
  */
-export function ComparisonLabel({
-  status,
-  noun,
-  compact = false,
-}: {
-  status: ComparisonStatus
-  noun: string
-  compact?: boolean
-}) {
+export function ComparisonLabel({ status, noun }: { status: ComparisonStatus; noun: string }) {
   const { icon: Icon, label, className } = COMPARISON_STYLE[status]
   const text = `${label} ${noun}`
+  if (!Icon) return <span className="sr-only">{text}</span>
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 text-xs font-medium whitespace-nowrap",
-        className,
-      )}
-    >
-      <Icon className="size-3.5 shrink-0" aria-hidden="true" />
-      {compact ? <span className="sr-only">{text}</span> : text}
-    </span>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span
+          role="img"
+          aria-label={text}
+          tabIndex={0}
+          className={cn("inline-flex shrink-0 rounded-sm outline-offset-2", className)}
+        >
+          <Icon className="size-3.5" aria-hidden="true" />
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>{text}</TooltipContent>
+    </Tooltip>
   )
 }
 

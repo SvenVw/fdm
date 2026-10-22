@@ -109,18 +109,14 @@ const REGION_CONCURRENCY = 8
  *
  * @param params.farmFields - All fields of the farm in the calendar year.
  * @param params.selectedFieldIds - The fields selected on the page.
- * @param params.adviceCultivations - Optionally, the cultivation (`b_lu`) to base the advice on per
- *   field. Fields without an entry use their main cultivation.
  */
 export function loadBulkCurrentState({
   farmFields,
   selectedFieldIds,
-  adviceCultivations,
   ...context
 }: ImpactContext & {
   farmFields: FarmField[]
   selectedFieldIds: string[]
-  adviceCultivations?: Record<string, string>
 }) {
   const { fdm, principal_id, b_id_farm, calendar, timeframe } = context
   const selected = new Set(selectedFieldIds)
@@ -170,7 +166,6 @@ export function loadBulkCurrentState({
       loadSelectionAdvice(context, selectedFields, {
         fertilizersPromise,
         applicationsPromise,
-        adviceCultivations,
       }),
     ),
   )
@@ -252,7 +247,6 @@ async function loadSelectionAdvice(
   shared: {
     fertilizersPromise: Promise<Fertilizer[]>
     applicationsPromise: ReturnType<typeof getFertilizerApplicationsForFarm>
-    adviceCultivations?: Record<string, string>
   },
 ): Promise<BulkFieldAdvice[]> {
   if (fields.length === 0) return []
@@ -285,10 +279,7 @@ async function loadSelectionAdvice(
           if (cultivations.length === 0) {
             return { ...base, dose, errorMessage: "Geen gewas geregistreerd voor dit perceel." }
           }
-          const chosen = shared.adviceCultivations?.[field.b_id]
-          const mainCultivation =
-            (chosen ? cultivations.find((c) => c.b_lu === chosen) : undefined) ??
-            getMainCultivation(cultivations, calendar)
+          const mainCultivation = getMainCultivation(cultivations, calendar)
           if (!mainCultivation) {
             return { ...base, dose, errorMessage: "Geen hoofdteelt bepaald voor dit jaar." }
           }

@@ -65,13 +65,15 @@ export function toBulkFieldOptions(
 ): BulkFieldOption[] {
   return fields.map((field) => {
     const cultivations = cultivationsByField.get(field.b_id) ?? []
+    const main = getMainCultivation(cultivations, calendar)
     return {
       b_id: field.b_id,
       b_name: field.b_name,
       b_area: Math.round((field.b_area ?? 0) * 10) / 10,
       b_bufferstrip: field.b_bufferstrip ?? false,
       cultivations: cultivations.map((c) => c.b_lu_catalogue),
-      mainCultivationName: getMainCultivation(cultivations, calendar)?.b_lu_name ?? null,
+      mainCultivationName: main?.b_lu_name ?? null,
+      mainCultivationCropRotation: main?.b_lu_croprotation ?? null,
     }
   })
 }

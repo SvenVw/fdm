@@ -1,4 +1,4 @@
-import type { Cultivation, Fertilizer } from "@nmi-agro/fdm-core"
+import type { Fertilizer } from "@nmi-agro/fdm-core"
 import type { ApplicationMethods } from "@nmi-agro/fdm-data"
 import { X } from "lucide-react"
 import { useMemo, useState } from "react"
@@ -9,15 +9,15 @@ import type {
   FertilizerOption,
 } from "~/components/blocks/fertilizer-applications/types.d"
 import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applications/form"
-import { CultivationSelector } from "~/components/custom/cultivation-selector"
 import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { useCalendarStore } from "~/store/calendar"
 import { useFieldFertilizerFormStore } from "~/store/field-fertilizer-form"
 import type { BulkCurrentState, BulkFieldOption } from "./types"
+import { CultivationDot } from "./cultivation-badge"
 import { FieldApplicationsTable } from "./field-applications-table"
 import { useImpactState } from "./impact-state"
-import { ImpactSummaryCard, NormOutcomeList } from "./impact-summary"
+import { ImpactSummaryCard, type NormsScope, SaveVerdict } from "./impact-summary"
 import {
   type PreviewChanges,
   type PreviewFormValues,
@@ -39,8 +39,6 @@ const FORM_ID = "field-fertilizer-application-form"
  * @param props.field - The field.
  * @param props.fieldNames - Names of all fields of the farm, for messages about other fields.
  * @param props.current - The streamed current state, from `loadBulkCurrentState` for this field.
- * @param props.cultivations - The cultivations of the field, to choose the one the advice is for.
- * @param props.activeCultivationId - The cultivation the advice is for.
  */
 export function FieldFertilizerPage({
   b_id_farm,
@@ -52,8 +50,6 @@ export function FieldFertilizerPage({
   fertilizerApplications,
   applicationMethodOptions,
   current,
-  cultivations,
-  activeCultivationId,
   canCreate,
   canModify,
 }: {
@@ -66,8 +62,6 @@ export function FieldFertilizerPage({
   fertilizerApplications: FertilizerApplication[]
   applicationMethodOptions: { value: ApplicationMethods; label: string }[]
   current: BulkCurrentState
-  cultivations: Cultivation[]
-  activeCultivationId?: string
   canCreate: boolean
   canModify: Record<string, boolean>
 }) {
@@ -98,6 +92,8 @@ export function FieldFertilizerPage({
     setFormKey((key) => key + 1)
   }
 
+  // The norms block and the verdict near the save button use the same scope
+  const [normsScope, setNormsScope] = useState<NormsScope>("field")
   const [formValues, setFormValues] = useState<PreviewFormValues>({})
   const debounced = useDebouncedPreviewValues(formValues)
   const changes = useMemo((): PreviewChanges | null => {
@@ -145,19 +141,57 @@ export function FieldFertilizerPage({
 
   const base = `/farm/${b_id_farm}/${calendar}`
 
+  const applicationsTable = (
+    <FieldApplicationsTable
+      calendar={calendar}
+      applications={fertilizerApplications}
+      fertilizers={fertilizers}
+      applicationMethodOptions={applicationMethodOptions}
+      canModify={canModify}
+      editingId={editingId}
+      onEdit={startEditing}
+      onDelete={handleDelete}
+      isBusy={fetcher.state !== "idle" || isSubmitting}
+    />
+  )
+  const impactCard = (
+    <ImpactSummaryCard
+      state={state}
+      base={base}
+      normsField={field.b_id}
+      normsScope={normsScope}
+      onNormsScopeChange={setNormsScope}
+      advice={{
+        title: "Advies perceel",
+        basis: "Dit perceel, per ha",
+        detailHref: `${base}/nutrient_advice/${field.b_id}`,
+        single: true,
+        // The advice is for the main cultivation of the year
+        titleAddon: field.mainCultivationName ? (
+          <CultivationDot
+            label={`Advies voor de hoofdteelt: ${field.mainCultivationName}`}
+            cropRotation={field.mainCultivationCropRotation}
+          />
+        ) : undefined,
+      }}
+      balance={{
+        title: "Stikstofbalans perceel",
+        basis: field.b_bufferstrip
+          ? "Geen stikstofbalans voor een bufferstrook"
+          : "Dit perceel, in kg N/ha",
+        detailHref: `${base}/balance/nitrogen/${field.b_id}`,
+        single: true,
+      }}
+    />
+  )
+
   return (
     <div className="grid items-start gap-6 xl:grid-cols-[minmax(20rem,24rem)_minmax(0,1fr)]">
       <div className="xl:sticky xl:top-4">
         {(canCreate || editing) && (
           <Card>
             <CardHeader className="flex flex-row items-start justify-between gap-2">
-              <div className="space-y-1.5">
-                <CardTitle>{editing ? "Gift wijzigen" : "Gift toevoegen"}</CardTitle>
-                <CardDescription>
-                  Het effect op gebruiksruimte, advies en stikstofbalans ziet u direct, nog voordat
-                  u opslaat.
-                </CardDescription>
-              </div>
+              <CardTitle>{editing ? "Gift wijzigen" : "Nieuwe gift"}</CardTitle>
               {editing && (
                 <Button
                   type="button"
@@ -188,7 +222,16 @@ export function FieldFertilizerPage({
                     {state.previewMessage && (
                       <p className="text-muted-foreground text-sm">{state.previewMessage}</p>
                     )}
-                    <NormOutcomeList outcomes={state.normOutcomes} />
+                    <SaveVerdict
+                      outcomes={
+                        normsScope === "field"
+                          ? state.getFieldNormOutcomes(field.b_id)
+                          : state.normOutcomes
+                      }
+                      perHectare={normsScope === "field"}
+                      farmOutcomes={normsScope === "field" ? state.normOutcomes : undefined}
+                      notes={state.agronomicNotes}
+                    />
                   </div>
                 }
               />
@@ -197,42 +240,18 @@ export function FieldFertilizerPage({
         )}
       </div>
       <div className="min-w-0 space-y-6">
-        <FieldApplicationsTable
-          calendar={calendar}
-          applications={fertilizerApplications}
-          fertilizers={fertilizers}
-          applicationMethodOptions={applicationMethodOptions}
-          canModify={canModify}
-          editingId={editingId}
-          onEdit={startEditing}
-          onDelete={handleDelete}
-          isBusy={fetcher.state !== "idle" || isSubmitting}
-        />
-        <ImpactSummaryCard
-          state={state}
-          base={base}
-          normsField={field.b_id}
-          advice={{
-            title: "Advies perceel",
-            basis: "Dit perceel, per ha",
-            detailHref: `${base}/nutrient_advice/${field.b_id}`,
-            headerAction:
-              cultivations.length > 0 && activeCultivationId ? (
-                <CultivationSelector
-                  cultivations={cultivations}
-                  selectedCultivationId={activeCultivationId}
-                  variant="icon"
-                />
-              ) : undefined,
-          }}
-          balance={{
-            title: "Stikstofbalans perceel",
-            basis: field.b_bufferstrip
-              ? "Geen stikstofbalans voor een bufferstrook"
-              : "Dit perceel, in kg N/ha",
-            detailHref: `${base}/balance/nitrogen/${field.b_id}`,
-          }}
-        />
+        {/* Without applications yet, the impact comes first and the empty table stays compact */}
+        {fertilizerApplications.length === 0 ? (
+          <>
+            {impactCard}
+            {applicationsTable}
+          </>
+        ) : (
+          <>
+            {applicationsTable}
+            {impactCard}
+          </>
+        )}
       </div>
     </div>
   )

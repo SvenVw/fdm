@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "~/components/ui/alert-dialog"
-import { Button } from "~/components/ui/button"
+import { Button, buttonVariants } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Checkbox } from "~/components/ui/checkbox"
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "~/components/ui/empty"
@@ -35,7 +35,7 @@ import { getCommonApplicationValues } from "~/lib/fertilizer-application-helpers
 import type { BulkCurrentState, BulkFieldOption } from "./types"
 import { FieldImpactTable } from "./field-impact-table"
 import { useImpactState } from "./impact-state"
-import { ImpactSummaryCard, NormOutcomeList } from "./impact-summary"
+import { ImpactSummaryCard, SaveVerdict } from "./impact-summary"
 import {
   type PreviewChanges,
   type PreviewFormValues,
@@ -228,7 +228,7 @@ export function ModifyFertilizerPage({
                 {state.previewMessage && (
                   <p className="text-muted-foreground text-sm">{state.previewMessage}</p>
                 )}
-                <NormOutcomeList outcomes={state.normOutcomes} />
+                <SaveVerdict outcomes={state.normOutcomes} notes={state.agronomicNotes} />
               </div>
             }
           />
@@ -250,13 +250,20 @@ export function ModifyFertilizerPage({
                   {applicationsLabel(selected.length)} verwijderen?
                 </AlertDialogTitle>
                 <AlertDialogDescription>
-                  De geselecteerde giften van {fertilizerName} worden verwijderd. Dit kan niet
+                  De geselecteerde giften van {fertilizerName} worden verwijderd van{" "}
+                  {fieldCount === 1 ? "1 perceel" : `${fieldCount} percelen`}. De gebruiksruimte,
+                  het advies en de stikstofbalans worden daarna opnieuw berekend. Dit kan niet
                   ongedaan worden gemaakt.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Annuleren</AlertDialogCancel>
-                <AlertDialogAction onClick={handleRemove}>Verwijderen</AlertDialogAction>
+                <AlertDialogAction
+                  onClick={handleRemove}
+                  className={buttonVariants({ variant: "destructive" })}
+                >
+                  Verwijderen
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -264,6 +271,8 @@ export function ModifyFertilizerPage({
       </Card>
 
       <div className="min-w-0 space-y-6">
+        <ImpactSummaryCard state={state} base={base} />
+
         <Card>
           <CardHeader>
             <CardTitle>Giften van {fertilizerName}</CardTitle>
@@ -333,8 +342,6 @@ export function ModifyFertilizerPage({
             </div>
           </CardContent>
         </Card>
-
-        <ImpactSummaryCard state={state} base={base} />
 
         <Card>
           <CardContent className="pt-6">

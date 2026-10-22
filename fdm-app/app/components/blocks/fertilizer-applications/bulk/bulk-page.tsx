@@ -3,7 +3,7 @@ import { useMemo, useState } from "react"
 import { type Navigation, NavLink, useNavigation, useSearchParams } from "react-router"
 import type { FertilizerOption } from "~/components/blocks/fertilizer-applications/types.d"
 import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applications/form"
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
+import { Alert, AlertDescription } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent } from "~/components/ui/card"
 import { Spinner } from "~/components/ui/spinner"
@@ -12,7 +12,7 @@ import { cn } from "~/lib/utils"
 import { FieldImpactTable } from "./field-impact-table"
 import { FieldSelectionDialog } from "./field-selection-dialog"
 import { useImpactState } from "./impact-state"
-import { ImpactSummaryCard, NormOutcomeList } from "./impact-summary"
+import { ImpactSummaryCard, SaveVerdict } from "./impact-summary"
 import {
   BULK_ANALYTICS_PARAMS as ANALYTICS_PARAMS,
   type BulkCurrentState,
@@ -61,6 +61,7 @@ export function BulkFertilizerPage({
   current,
   formAction,
   formStoreKey,
+  overviewUrl,
 }: {
   b_id_farm: string
   calendar: string
@@ -72,6 +73,8 @@ export function BulkFertilizerPage({
   current: BulkCurrentState
   formAction: string
   formStoreKey: string
+  /** Where to go to change the selection, for example the rotation in the creation wizard. */
+  overviewUrl?: string
 }) {
   const navigation = useNavigation()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -203,11 +206,12 @@ export function BulkFertilizerPage({
             className="size-4 text-amber-700! dark:text-amber-400!"
             aria-hidden="true"
           />
-          <AlertTitle>
+          {/* A real h3, so the heading levels follow the page structure */}
+          <h3 className="mb-1 leading-none font-medium tracking-tight">
             {includedBufferStripIds.length === 1
               ? "Er is een bufferstrook geselecteerd"
               : `Er zijn ${includedBufferStripIds.length} bufferstroken geselecteerd`}
-          </AlertTitle>
+          </h3>
           <AlertDescription className="text-amber-900 dark:text-amber-100">
             <p>
               Op bufferstroken mag niet worden bemest. Ze tellen niet mee in het advies en de
@@ -237,7 +241,11 @@ export function BulkFertilizerPage({
               Pas uw selectie aan, of ga naar het overzicht voor meer filtermogelijkheden.
             </p>
             <Button asChild variant="link">
-              <NavLink to={cultivationIds.length > 0 ? `${base}/rotation` : `${base}/field`}>
+              <NavLink
+                to={
+                  overviewUrl ?? (cultivationIds.length > 0 ? `${base}/rotation` : `${base}/field`)
+                }
+              >
                 {cultivationIds.length > 0 ? "Naar bouwplan" : "Naar percelenoverzicht"}
               </NavLink>
             </Button>
@@ -247,7 +255,6 @@ export function BulkFertilizerPage({
         <div className="grid items-start gap-6 xl:grid-cols-[minmax(20rem,24rem)_minmax(0,1fr)]">
           <Card className="xl:sticky xl:top-4">
             <CardContent className="space-y-4 pt-6">
-              <h2 className="text-base font-semibold">Gift</h2>
               <FertilizerApplicationForm
                 id={FORM_ID}
                 options={fertilizerOptions}
@@ -266,7 +273,7 @@ export function BulkFertilizerPage({
                     {previewMessage && (
                       <p className="text-muted-foreground text-sm">{previewMessage}</p>
                     )}
-                    <NormOutcomeList outcomes={normOutcomes} />
+                    <SaveVerdict outcomes={normOutcomes} notes={state.agronomicNotes} />
                   </div>
                 }
               />
