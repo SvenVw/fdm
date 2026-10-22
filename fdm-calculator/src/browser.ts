@@ -8,10 +8,14 @@
  * import { aggregateNutrientAdviceToFarmLevel } from "@nmi-agro/fdm-calculator/browser"
  * ```
  *
+ * Besides the norms, nitrogen balance, dose and nutrient advice functions, it contains the pure
+ * indicator helpers: scores, area-weighted aggregation and measure options.
+ *
  * Everything exported here is also exported from the main entry point.
  *
  * @module browser
  */
+export * from "./bln3/postprocessing"
 export {
   calculateNitrogenBalanceField,
   calculateNitrogenBalancesFieldToFarm,
