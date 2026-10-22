@@ -1394,10 +1394,10 @@ describe("Cultivation Data Model", () => {
         ).toBeNull()
       })
 
-      it("should return { unavailable_in } when the cultivation is not available after the last b_lu_ya for an open interval", () => {
+      it("should return an open unavailability interval when the cultivation is not available after the last b_lu_ya for an open interval", () => {
         expect(
           isCultivationUnavailableInPeriod({ b_lu_start: new Date("2024-02-01") }, [2024], 2026),
-        ).toEqual({ unavailable_in: 2025 })
+        ).toEqual({ first_unavailable_in: 2025 })
       })
 
       it("should return null when availability is not known for years beyond the last availability year for an open interval", () => {
@@ -1406,24 +1406,24 @@ describe("Cultivation Data Model", () => {
         ).toBeNull()
       })
 
-      it("should return { unavailable_in } when the cultivation is not available after the last b_lu_ya", () => {
+      it("should return an object when the cultivation is not available after the last b_lu_ya", () => {
         expect(
           isCultivationUnavailableInPeriod(
             { b_lu_start: new Date("2024-02-01"), b_lu_end: new Date("2025-06-10") },
             [2024],
             2026,
           ),
-        ).toEqual({ unavailable_in: 2025 })
+        ).toEqual({ first_unavailable_in: 2025, last_unavailable_in: 2025 })
       })
 
-      it("should return { unavailable_in } when the whole interval is after the last b_lu_ya", () => {
+      it("should return an object when the whole interval is after the last b_lu_ya", () => {
         expect(
           isCultivationUnavailableInPeriod(
             { b_lu_start: new Date("2025-02-01"), b_lu_end: new Date("2025-06-10") },
             [2023],
             2026,
           ),
-        ).toEqual({ unavailable_in: 2025 })
+        ).toEqual({ first_unavailable_in: 2025, last_unavailable_in: 2025 })
       })
 
       it("should return null when availability is not known for years beyond the last availability year", () => {
@@ -1436,24 +1436,24 @@ describe("Cultivation Data Model", () => {
         ).toBeNull()
       })
 
-      it("should return { unavailable_in } when the cultivation is not available before the first b_lu_ya", () => {
+      it("should return an object when the cultivation is not available before the first b_lu_ya", () => {
         expect(
           isCultivationUnavailableInPeriod(
             { b_lu_start: new Date("2024-02-01"), b_lu_end: new Date("2025-06-10") },
             [2025],
             2026,
           ),
-        ).toEqual({ unavailable_in: 2024 })
+        ).toEqual({ first_unavailable_in: 2024, last_unavailable_in: 2024 })
       })
 
-      it("should return { unavailable_in } when the whole interval is before the first b_lu_ya", () => {
+      it("should return an object when the whole interval is before the first b_lu_ya", () => {
         expect(
           isCultivationUnavailableInPeriod(
             { b_lu_start: new Date("2023-02-01"), b_lu_end: new Date("2023-06-10") },
             [2025],
             2026,
           ),
-        ).toEqual({ unavailable_in: 2023 })
+        ).toEqual({ first_unavailable_in: 2023, last_unavailable_in: 2023 })
       })
 
       it("should return { unavailable_in } when the cultivation is not available in a gap in b_lu_ya", () => {
@@ -1463,7 +1463,7 @@ describe("Cultivation Data Model", () => {
             [2024, 2026],
             2026,
           ),
-        ).toEqual({ unavailable_in: 2025 })
+        ).toEqual({ first_unavailable_in: 2025, last_unavailable_in: 2025 })
       })
 
       it("should return {} when the checking range is too long", () => {

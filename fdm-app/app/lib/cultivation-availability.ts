@@ -23,7 +23,7 @@ export function isCultivationUnavailableInPeriod(
   period: { b_lu_start?: Date | string | null; b_lu_end?: Date | string | null },
   b_lu_ya: number[] | null | undefined,
   maxCultivationAvailabilityYear: number | undefined,
-): { unavailable_in?: number } | null {
+): { first_unavailable_in?: number; last_unavailable_in?: number } | null {
   if (
     !b_lu_ya ||
     b_lu_ya.length === 0 ||
@@ -43,6 +43,11 @@ export function isCultivationUnavailableInPeriod(
 
   const startYear = Math.min(maxCultivationAvailabilityYear, start.getFullYear())
 
+  // Can return an open unavailability range when end is null.
+  if (end === null && maxCultivationAvailabilityYear > b_lu_ya[b_lu_ya.length - 1]) {
+    return { first_unavailable_in: b_lu_ya[b_lu_ya.length - 1] + 1 }
+  }
+
   // The boundary offsets can invert the years for very short periods around 1 January.
   const endYear = Math.max(
     startYear,
@@ -57,11 +62,17 @@ export function isCultivationUnavailableInPeriod(
   }
 
   if (endYear > b_lu_ya[b_lu_ya.length - 1]) {
-    return { unavailable_in: Math.max(startYear, b_lu_ya[b_lu_ya.length - 1] + 1) }
+    return {
+      first_unavailable_in: Math.max(startYear, b_lu_ya[b_lu_ya.length - 1] + 1),
+      last_unavailable_in: endYear,
+    }
   }
 
   if (startYear < b_lu_ya[0]) {
-    return { unavailable_in: Math.min(endYear, b_lu_ya[0] - 1) }
+    return {
+      first_unavailable_in: startYear,
+      last_unavailable_in: Math.min(endYear, b_lu_ya[0] - 1),
+    }
   }
 
   if (endYear - startYear > MAX_PERIOD_YEARS_FOR_AVAILABILITY) {
@@ -72,7 +83,7 @@ export function isCultivationUnavailableInPeriod(
 
   for (let y = startYear; y <= endYear; y++) {
     if (!b_lu_ya.includes(y)) {
-      return { unavailable_in: y }
+      return { first_unavailable_in: y, last_unavailable_in: y }
     }
   }
   return null

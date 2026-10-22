@@ -304,16 +304,17 @@ const MAX_PERIOD_YEARS_FOR_AVAILABILITY = 100
  * @param b_lu_ya - Sorted array of years in which the crop code is available, or `null` when no
  * availability information exists for the crop code.
  * @param maxCultivationAvailabilityYear - Last year that is checked for cultivations without an end date.
- * @returns A truthy object, maybe with a not_available in field, when a warning should be shown.
- * This is also the case when the period is invalid (end before start, or longer than 100 years), where no
- * availability info is supplied. `false` when the crop code is available in every year or when availability
- * cannot be determined.
+ * @returns An object with the first_unavailable_in field and last_unavailable_in fields if there is
+ * a specific range of years that is determined to be unavailable yet requested for the cultivation.
+ * An empty object is returned when the cultivation is assumed to be unavailable but the years aren't
+ * determined for mitigation reasons. null if the crop code is available in every year or when
+ * b_lu_end < b_lu_start.
  */
 export function isCultivationUnavailableInPeriod(
   period: { b_lu_start?: Date | string | null; b_lu_end?: Date | string | null },
   b_lu_ya: number[] | null | undefined,
   maxCultivationAvailabilityYear: number | undefined,
-): { unavailable_in?: number } | null {
+): { first_unavailable_in?: number; last_unavailable_in?: number } | null {
   if (
     !b_lu_ya ||
     b_lu_ya.length === 0 ||
@@ -333,6 +334,11 @@ export function isCultivationUnavailableInPeriod(
 
   const startYear = Math.min(maxCultivationAvailabilityYear, start.getFullYear())
 
+  // Can return an open unavailability range when end is null.
+  if (end === null && maxCultivationAvailabilityYear > b_lu_ya[b_lu_ya.length - 1]) {
+    return { first_unavailable_in: b_lu_ya[b_lu_ya.length - 1] + 1 }
+  }
+
   // The boundary offsets can invert the years for very short periods around 1 January.
   const endYear = Math.max(
     startYear,
@@ -347,11 +353,17 @@ export function isCultivationUnavailableInPeriod(
   }
 
   if (endYear > b_lu_ya[b_lu_ya.length - 1]) {
-    return { unavailable_in: Math.max(startYear, b_lu_ya[b_lu_ya.length - 1] + 1) }
+    return {
+      first_unavailable_in: Math.max(startYear, b_lu_ya[b_lu_ya.length - 1] + 1),
+      last_unavailable_in: endYear,
+    }
   }
 
   if (startYear < b_lu_ya[0]) {
-    return { unavailable_in: Math.min(endYear, b_lu_ya[0] - 1) }
+    return {
+      first_unavailable_in: startYear,
+      last_unavailable_in: Math.min(endYear, b_lu_ya[0] - 1),
+    }
   }
 
   if (endYear - startYear > MAX_PERIOD_YEARS_FOR_AVAILABILITY) {
@@ -362,7 +374,7 @@ export function isCultivationUnavailableInPeriod(
 
   for (let y = startYear; y <= endYear; y++) {
     if (!b_lu_ya.includes(y)) {
-      return { unavailable_in: y }
+      return { first_unavailable_in: y, last_unavailable_in: y }
     }
   }
   return null

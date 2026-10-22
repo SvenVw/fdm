@@ -38,9 +38,19 @@ export type CultivationAvailabilityProps = {
 export function getCultivationAvailabilityMessage(
   result: NonNullable<CultivationAvailabilityResult>,
 ): string {
-  return typeof result.unavailable_in === "number"
-    ? `Volgens de RVO kan deze gewascode niet worden gebruikt in ${result.unavailable_in}.`
-    : "Deze gewascode is niet beschikbaar voor het huidig geselecteerde jaar."
+  if (typeof result.first_unavailable_in !== "number") {
+    return "Deze gewascode is niet beschikbaar voor het huidig geselecteerde jaar."
+  }
+
+  if (typeof result.last_unavailable_in !== "number") {
+    return `Volgens de RVO kan deze gewascode niet worden gebruikt na ${result.first_unavailable_in - 1}.`
+  }
+
+  if (result.first_unavailable_in === result.last_unavailable_in) {
+    return `Volgens de RVO kan deze gewascode niet worden gebruikt in ${result.first_unavailable_in}.`
+  }
+
+  return `Volgens de RVO kan deze gewascode niet worden gebruikt tussen ${result.first_unavailable_in}-${result.last_unavailable_in}.`
 }
 
 function resolveResult(props: CultivationAvailabilityProps): CultivationAvailabilityResult {
