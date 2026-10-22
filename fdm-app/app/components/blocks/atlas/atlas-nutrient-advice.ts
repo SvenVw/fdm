@@ -34,7 +34,6 @@ export function isNutrientAdviceMode(value: unknown): value is NutrientAdviceMod
  * (fdm-app has no i18n library yet).
  */
 export const NUTRIENT_ADVICE_COPY = {
-  layerName: "Bemestingsadvies",
   modes: {
     remaining: "Nog te geven",
     percentage: "% van advies",
@@ -55,7 +54,6 @@ export const NUTRIENT_ADVICE_COPY = {
   remaining: "Nog te geven",
   surplus: "Te veel gegeven",
   percentageOfAdvice: "Van advies",
-  met: "Advies behaald",
   legendUnder: "Minder gegeven dan advies (< 90%)",
   legendMet: "Advies behaald (90–110%)",
   legendOver: "Meer gegeven dan advies (> 110%)",
