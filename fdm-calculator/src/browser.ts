@@ -12,8 +12,10 @@
  *
  * @module browser
  */
-export { calculateNitrogenBalancesFieldToFarm } from "./balance/nitrogen/aggregate"
-export { calculateNitrogenBalanceField } from "./balance/nitrogen/field"
+export {
+  calculateNitrogenBalanceField,
+  calculateNitrogenBalancesFieldToFarm,
+} from "./balance/nitrogen/field"
 export type {
   FieldInput,
   NitrogenBalanceFieldInput,
@@ -27,9 +29,8 @@ export type {
   AggregatedNormFillingsToFarmLevel,
   AggregatedNormsToFarmLevel,
   InputAggregateNormFillingsToFarmLevel,
-  InputAggregateNormsToFarmLevel,
 } from "./norms/farm"
-export { aggregateNormFillingsToFarmLevel, aggregateNormsToFarmLevel } from "./norms/farm"
+export { aggregateNormFillingsToFarmLevel } from "./norms/farm"
 export type {
   FertilizerApplicationFillingInputByYear,
   FertilizerApplicationFillings,

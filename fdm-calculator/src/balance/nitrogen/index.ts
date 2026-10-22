@@ -6,8 +6,7 @@ import type {
   NitrogenBalanceNumeric,
 } from "./types"
 import pkg from "../../package"
-import { calculateNitrogenBalancesFieldToFarm } from "./aggregate"
-import { calculateNitrogenBalanceField } from "./field"
+import { calculateNitrogenBalanceField, calculateNitrogenBalancesFieldToFarm } from "./field"
 
 /**
  * Calculates the nitrogen balance for an entire farm.
@@ -135,5 +134,4 @@ export const getNitrogenBalanceField = withCalculationCache(
   pkg.calculatorVersion,
 )
 
-export { calculateNitrogenBalancesFieldToFarm } from "./aggregate"
-export { calculateNitrogenBalanceField } from "./field"
+export { calculateNitrogenBalanceField, calculateNitrogenBalancesFieldToFarm } from "./field"
