@@ -24,7 +24,10 @@ import { length } from "@turf/length"
 import fs from "node:fs/promises"
 import { data } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
-import { ImportReviewChoicesSchema } from "~/components/blocks/rvo/schema"
+import {
+  getImportValidationMessage,
+  ImportReviewChoicesSchema,
+} from "~/components/blocks/rvo/schema"
 import { getNmiApiKey, getSoilParameterEstimatesForGeometry } from "~/integrations/nmi.server"
 import { captureEvent } from "~/lib/analytics.server"
 import { getSession } from "~/lib/auth.server"
@@ -260,7 +263,7 @@ export async function genericAction(
         ) {
           return {
             success: false,
-            message: "Geen data gevonden om te verwerken. Start de RVO import opnieuw.",
+            message: "Geen data gevonden om te verwerken. Upload het shapefile opnieuw.",
           }
         }
 
@@ -287,6 +290,12 @@ export async function genericAction(
               field.b_bufferstrip,
             )
 
+            // Soil estimates depend on the location only, so every added field gets them.
+            addedFields.push({
+              b_id: b_id,
+              geometry: field.b_geometry as unknown as FieldGeometry,
+            })
+
             if (typeof field.b_lu_catalogue === "string") {
               const defaultDates = await getDefaultDatesOfCultivation(
                 tx,
@@ -304,11 +313,6 @@ export async function genericAction(
                 defaultDates.b_lu_start,
                 defaultDates.b_lu_end,
               )
-
-              addedFields.push({
-                b_id: b_id,
-                geometry: field.b_geometry as unknown as FieldGeometry,
-              })
             }
           }
 
@@ -409,7 +413,9 @@ export async function genericAction(
         console.error("Error at saving RVO fields: ", e)
         return {
           success: false,
-          message: `Error at saving RVO fields: ${await extractErrorMessage(e)}`,
+          message:
+            getImportValidationMessage(e) ??
+            `Het opslaan van de percelen is mislukt. Uw keuzes zijn bewaard, probeer het opnieuw. (${await extractErrorMessage(e)})`,
         }
       }
     }

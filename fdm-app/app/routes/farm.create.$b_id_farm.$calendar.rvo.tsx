@@ -36,13 +36,17 @@ import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { parseRvoRequestMode, RvoConnectCard } from "~/components/blocks/rvo/connect-card"
 import { RvoErrorAlert } from "~/components/blocks/rvo/error-alert"
+import { ImportIssuesAlert } from "~/components/blocks/rvo/import-review-summary"
 import {
   CustomValueButtonsToggle,
   RvoImportReviewTable,
   useRvoImportForm,
 } from "~/components/blocks/rvo/import-review-table"
 import { RvoNoFieldsAlert } from "~/components/blocks/rvo/no-fields-alert"
-import { ImportReviewChoicesSchema } from "~/components/blocks/rvo/schema"
+import {
+  getImportValidationMessage,
+  ImportReviewChoicesSchema,
+} from "~/components/blocks/rvo/schema"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
@@ -298,7 +302,9 @@ export default function RvoImportCreatePage() {
     navigation.state === "submitting" && navigation.formData?.get("intent") === "save_fields"
 
   const [canUnloadSafely, setCanUnloadSafely] = useState(false)
-  const { formValues } = useRvoImportForm(rvoImportReviewData, { calendar })
+  const { formValues, issues } = useRvoImportForm(rvoImportReviewData, { calendar })
+  const hasIssues = issues.length > 0
+  const hasFieldsToAdd = formValues.fieldsToAdd.length > 0
 
   // A failed save re-arms the guard even if the user had just disarmed it to submit.
   const effectiveCanUnloadSafely = canUnloadSafely && actionData?.success !== false
@@ -426,7 +432,7 @@ export default function RvoImportCreatePage() {
 
             <FarmContent>
               <div className="flex flex-col space-y-4 pb-10">
-                <div className="flex justify-end">
+                <div className="bg-background sticky top-0 z-20 flex items-center justify-end gap-4 border-b py-3">
                   <CustomValueButtonsToggle />
                   <Form method="post" action={`/farm/create/${b_id_farm}/${calendar}/rvo`}>
                     <input type="hidden" name="intent" value="save_fields" />
@@ -447,7 +453,7 @@ export default function RvoImportCreatePage() {
                     />
                     <Button
                       type="submit"
-                      disabled={isSaving}
+                      disabled={isSaving || hasIssues}
                       onClick={() => setCanUnloadSafely(true)}
                     >
                       {isSaving ? (
@@ -455,12 +461,15 @@ export default function RvoImportCreatePage() {
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Opslaan...
                         </>
-                      ) : (
+                      ) : hasFieldsToAdd ? (
                         "Opslaan en verder"
+                      ) : (
+                        "Doorgaan zonder percelen"
                       )}
                     </Button>
                   </Form>
                 </div>
+                <ImportIssuesAlert issues={issues} />
                 <div className="w-full">
                   <RvoImportReviewTable
                     calendar={calendar}
@@ -566,6 +575,12 @@ export async function action({ request, params, url }: ActionFunctionArgs) {
             field.b_bufferstrip,
           )
 
+          // Soil estimates depend on the location only, so every added field gets them.
+          addedFields.push({
+            b_id: b_id,
+            geometry: field.b_geometry as unknown as FieldGeometry,
+          })
+
           if (typeof field.b_lu_catalogue === "string") {
             const defaultDates = await getDefaultDatesOfCultivation(
               tx,
@@ -583,11 +598,6 @@ export async function action({ request, params, url }: ActionFunctionArgs) {
               defaultDates.b_lu_start,
               defaultDates.b_lu_end,
             )
-
-            addedFields.push({
-              b_id: b_id,
-              geometry: field.b_geometry as unknown as FieldGeometry,
-            })
           }
         }
 
@@ -688,7 +698,9 @@ export async function action({ request, params, url }: ActionFunctionArgs) {
       console.error("Error at saving RVO fields: ", e)
       return {
         success: false,
-        message: `Error at saving RVO fields: ${await extractErrorMessage(e)}`,
+        message:
+          getImportValidationMessage(e) ??
+          `Het opslaan van de percelen is mislukt. Uw keuzes zijn bewaard, probeer het opnieuw. (${await extractErrorMessage(e)})`,
       }
     }
   }

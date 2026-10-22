@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { MijnPercelenUploadForm } from "~/components/blocks/mijnpercelen/form-upload"
+import { ImportIssuesAlert } from "~/components/blocks/rvo/import-review-summary"
 import {
   CustomValueButtonsToggle,
   RvoImportReviewTable,
@@ -61,10 +62,12 @@ export function UploadMijnPercelenPage({
     navigation.state === "submitting" && navigation.formData?.get("intent") === "save_fields"
 
   const [canUnloadSafely, setCanUnloadSafely] = useState(true)
-  const { formValues } = useRvoImportForm(rvoImportReviewData ?? emptyReviewData, {
+  const { formValues, issues } = useRvoImportForm(rvoImportReviewData ?? emptyReviewData, {
     calendar,
     flags: mijnPercelenReviewFlags,
   })
+  const hasIssues = issues.length > 0
+  const hasFieldsToAdd = formValues.fieldsToAdd.length > 0
 
   useEffect(() => {
     if (typeof window === "undefined") return
@@ -136,8 +139,8 @@ export function UploadMijnPercelenPage({
           />
           <FarmContent>
             <div className="flex flex-col space-y-4 pb-10">
-              <Form method="post">
-                <div className="flex justify-end gap-2">
+              <Form method="post" className="bg-background sticky top-0 z-20 border-b py-3">
+                <div className="flex items-center justify-end gap-2">
                   <input type="hidden" name="intent" value="save_fields" />
                   <input
                     type="hidden"
@@ -171,7 +174,7 @@ export function UploadMijnPercelenPage({
 
                   <Button
                     type="submit"
-                    disabled={isSaving}
+                    disabled={isSaving || hasIssues}
                     onClick={() => setCanUnloadSafely(true)}
                   >
                     {isSaving ? (
@@ -179,12 +182,15 @@ export function UploadMijnPercelenPage({
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Opslaan...
                       </>
-                    ) : (
+                    ) : hasFieldsToAdd ? (
                       "Opslaan en verder"
+                    ) : (
+                      "Doorgaan zonder percelen"
                     )}
                   </Button>
                 </div>
               </Form>
+              <ImportIssuesAlert issues={issues} />
               <div className="w-full">
                 <RvoImportReviewTable
                   data={rvoImportReviewData}

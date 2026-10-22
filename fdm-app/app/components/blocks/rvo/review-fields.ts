@@ -3,8 +3,9 @@ import type { FieldDiff, RvoImportReviewItem } from "@nmi-agro/fdm-rvo/types"
 import { getItemId } from "@nmi-agro/fdm-rvo/utils"
 import { area } from "@turf/area"
 import { format as formatDateFns, parseISO } from "date-fns"
-import { adjustEndDateAtYearStart } from "@/app/lib/calendar"
+import { adjustEndDateAtYearStart } from "~/lib/calendar"
 import { acquiringMethodOptions } from "~/lib/constants"
+import { isValidFieldPeriod } from "./schema"
 
 export type ReviewItem = RvoImportReviewItem<Field>
 export type ReviewOption = { value: string; label: string }
@@ -186,7 +187,7 @@ const definitions = [
     type: "string",
     columnId: "perceel",
     label: "Perceel",
-    description: "De naam en het RVO ID van het perceel.",
+    description: "De naam van het perceel.",
     allowCustomValue: true,
     getLocal: (item) => item.localField?.b_name,
     getRemote: (item) =>
@@ -200,7 +201,8 @@ const definitions = [
     type: "geometry",
     columnId: "oppervlakte",
     label: "Oppervlakte",
-    description: "De oppervlakte van het perceel in hectaren.",
+    description:
+      "De oppervlakte van het perceel in hectaren. Met de oppervlakte kiest u ook de perceelsgrens die wordt opgeslagen.",
     allowCustomValue: false,
     getLocal: (item) => item.localField?.b_geometry,
     getRemote: (item) => item.rvoField?.geometry,
@@ -214,7 +216,8 @@ const definitions = [
     type: "enum",
     columnId: "gewas",
     label: "Gewas",
-    description: "Het gewas dat op 15 mei wordt geteeld.",
+    description:
+      "Het gewas dat op 15 mei op het perceel staat. De zaai- en einddatum van de teelt worden bij het opslaan afgeleid van het gewas.",
     allowCustomValue: true,
     getLocal: (item) => item.localCultivation?.b_lu_catalogue,
     // Without a crop code there is nothing to import; keep the local cultivation untouched.
@@ -230,7 +233,7 @@ const definitions = [
     type: "date",
     columnId: "ingangsdatum",
     label: "Ingangsdatum",
-    description: "De datum vanaf wanneer het perceel actief is.",
+    description: "De datum vanaf wanneer het perceel in gebruik is.",
     allowCustomValue: true,
     getLocal: (item) => item.localField?.b_start,
     getRemote: (item) => item.rvoField?.properties.BeginDate,
@@ -240,7 +243,8 @@ const definitions = [
     type: "date",
     columnId: "einddatum",
     label: "Einddatum",
-    description: "De datum waarop het perceel niet meer actief is.",
+    description:
+      "De datum waarop het perceel niet meer in gebruik is. Zonder einddatum blijft het perceel in gebruik.",
     allowCustomValue: true,
     getLocal: (item) => item.localField?.b_end,
     getRemote: (item, ctx) =>
@@ -249,10 +253,12 @@ const definitions = [
         : item.rvoField
           ? (item.rvoField.properties.EndDate ?? null)
           : undefined,
+    // Without an RVO end date the generic formatting applies, which shows the proposed close date
+    // of a field that RVO no longer reports.
     formatRemote: (item) =>
       item.rvoField?.properties.EndDate
         ? formatDate(adjustEndDateAtYearStart(parseISO(item.rvoField.properties.EndDate)))
-        : "-",
+        : undefined,
   },
   {
     key: "b_acquiring_method",
@@ -285,7 +291,7 @@ const definitions = [
     fallback: false,
     isRemoteAvailable: (ctx) => ctx.bufferstripInfoAvailable,
     unavailableDescription:
-      "Shapefile bevat geen informatie over bufferstroken. De getoonde waarden zijn schattingen of de huidige ingevulde status voor het perceel.",
+      "Een shapefile bevat geen informatie over bufferstroken. De waarden zijn geschat op basis van de vorm en de naam van het perceel, of overgenomen uit de huidige gegevens. Controleer ze voordat u opslaat.",
   },
 ] as const satisfies readonly ReviewFieldDefinition[]
 
@@ -318,6 +324,18 @@ export function getDiffKeys(item: ReviewItem): ReadonlySet<FieldDiff> {
   const keys = new Set<FieldDiff>(item.diffs)
   if (item.status === "EXPIRED_LOCAL") keys.add("b_end")
   return keys
+}
+
+/**
+ * The name by which a review item is announced to assistive technology: the name in FDM, or else
+ * the name RVO reports.
+ */
+export function getItemName(item: ReviewItem): string {
+  return (
+    item.localField?.b_name ||
+    item.rvoField?.properties.CropFieldDesignator ||
+    (item.rvoField ? `RVO Perceel ${item.rvoField.properties.CropFieldID}` : "Perceel")
+  )
 }
 
 /** The value shown when the user has made no choice. */
@@ -508,4 +526,103 @@ export function buildImportFormValues(
     fieldsToRemove: formFieldsToRemove,
     fieldsToUpdate: formFieldsToUpdate,
   }
+}
+
+export type ImportFormValues = ReturnType<typeof buildImportFormValues>
+
+/** The names of the fields that each kind of change applies to. */
+export interface ImportChangeSummary {
+  add: string[]
+  update: string[]
+  close: string[]
+  remove: string[]
+}
+
+/**
+ * Groups the submitted changes by kind and names the fields they apply to, so the user can check
+ * them before confirming. An update of a field that RVO no longer reports, which sets its end
+ * date, counts as closing the field.
+ */
+export function summarizeImportChanges(
+  data: ReviewItem[],
+  formValues: ImportFormValues,
+): ImportChangeSummary {
+  const itemsByLocalId = new Map<string, ReviewItem>()
+  for (const item of data) {
+    if (item.localField) itemsByLocalId.set(item.localField.b_id, item)
+  }
+
+  const summary: ImportChangeSummary = {
+    add: formValues.fieldsToAdd.map((field) => field.b_name),
+    update: [],
+    close: [],
+    remove: formValues.fieldsToRemove.map(
+      (b_id) => itemsByLocalId.get(b_id)?.localField?.b_name ?? b_id,
+    ),
+  }
+  for (const update of formValues.fieldsToUpdate) {
+    const item = itemsByLocalId.get(update.b_id)
+    const name = update.b_name ?? item?.localField?.b_name ?? update.b_id
+    if (item?.status === "EXPIRED_LOCAL" && !isNullish(update.b_end)) {
+      summary.close.push(name)
+    } else {
+      summary.update.push(name)
+    }
+  }
+  return summary
+}
+
+/** A problem with the values chosen for one field, which blocks submitting the review. */
+export interface ImportIssue {
+  itemId: string
+  b_name: string
+  message: string
+}
+
+/**
+ * Checks the values that will be stored for every field that is added or changed, with the same
+ * rules as the field forms: a name and a start date are required, and the end date lies after
+ * the start date. Fields that are left as they are, or removed, are not checked.
+ */
+export function getImportIssues(
+  data: ReviewItem[],
+  userChoices: ReadonlyMap<string, ReviewChoices>,
+  fieldsToAdd: ReadonlySet<string>,
+  fieldsToRemove: ReadonlySet<string>,
+  ctx: ReviewFieldContext,
+): ImportIssue[] {
+  const issues: ImportIssue[] = []
+  const fields = new Map(REVIEW_FIELDS.map((field) => [field.key, field]))
+  const valueOf = (key: ReviewItemFieldKey, item: ReviewItem, choices?: ReviewChoices) =>
+    getEffectiveValue(fields.get(key)!, item, ctx, choices)
+
+  for (const item of data) {
+    const id = getItemId(item)
+    const choices = userChoices.get(id)
+    const isChecked =
+      item.status === "NEW_REMOTE" ? fieldsToAdd.has(id) : !!choices && !fieldsToRemove.has(id)
+    if (!isChecked) continue
+
+    const b_name = valueOf("b_name", item, choices)
+    const b_start = valueOf("b_start", item, choices)
+    const b_end = valueOf("b_end", item, choices)
+    const name =
+      typeof b_name === "string" && b_name.trim() !== ""
+        ? b_name
+        : (item.localField?.b_name ?? "Perceel zonder naam")
+
+    if (typeof b_name !== "string" || b_name.trim() === "") {
+      issues.push({ itemId: id, b_name: name, message: "Vul een naam in." })
+    }
+    if (isNullish(b_start)) {
+      issues.push({ itemId: id, b_name: name, message: "Vul een ingangsdatum in." })
+    } else if (!isValidFieldPeriod(b_start, b_end)) {
+      issues.push({
+        itemId: id,
+        b_name: name,
+        message: "De einddatum moet na de ingangsdatum liggen.",
+      })
+    }
+  }
+  return issues
 }
