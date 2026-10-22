@@ -61,6 +61,7 @@ Accurate N balance calculation relies on comprehensive input data that captures 
     - Ammonium content (`p_nh4_rt`, g N/ kg)
     - Sulfur content (`p_s_rt`, g SO3 / kg)
     - Type flag: `p_type` ("manure", "mineral", "compost" or `null`).
+    - Nitrogen working coefficient (`p_n_wc`, fraction 0-1). Only used with `useEffectiveNitrogen`.
   - `CultivationCatalogue` (`CultivationDetail`):
     - Default yield (`b_lu_yield`, kg / ha).
     - Default N content of harvestable product (`b_lu_n_harvestable`, g N / kg).
@@ -87,6 +88,10 @@ Fertilizers are a primary and often controlled source of nitrogen input in agric
   - **Manure:** Organic fertilizers derived from animal feces, providing both readily available and slowly mineralizing nitrogen.
   - **Compost:** Stabilized organic matter, releasing nitrogen slowly over time as it decomposes.
   - **Other Fertilizers:** Any other types of fertilizers not classified as mineral, manure, or compost.
+
+- **Effective nitrogen (optional):** With `useEffectiveNitrogen: true` in the input, the supply by fertilizers is calculated with effective nitrogen, using the nitrogen working coefficient of the fertilizer (`p_n_wc`, fraction 0-1). If `p_n_wc` is missing, it is treated as 1.
+  `N_supplied (kg N / ha) = Amount_applied (kg / ha) * Total_N_content (g N / kg) * p_n_wc / 1000`
+  All other components (fixation, deposition, mineralization, removal and emissions) are calculated in the same way. Note that the working coefficient already accounts for part of the ammonia loss after application, while ammonia emission is still subtracted, and that the target value is meant for a balance with total nitrogen. In the app, this option is available with the switch "Totale stikstof / Werkzame stikstof" on the nitrogen balance pages.
 
 #### 3.1.2. Biological Fixation
 

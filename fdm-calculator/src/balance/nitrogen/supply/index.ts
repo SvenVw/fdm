@@ -22,6 +22,7 @@ import { calculateNitrogenSupplyBySoilMineralization } from "./mineralization"
  * @param fertilizerDetailsMap - A map containing details for each fertilizer, including its type and nitrogen content.
  * @param depositionSupply - The pre-calculated nitrogen supply from atmospheric deposition.
  * @param timeFrame - The time frame for which to calculate the nitrogen supply.
+ * @param useEffectiveNitrogen - When `true`, the supply by fertilizers is calculated with effective nitrogen. Defaults to `false`.
  *
  * @returns An object containing the total nitrogen supply for the field,
  *  as well as a breakdown by source (fertilizers, fixation, deposition, and mineralization).
@@ -34,6 +35,7 @@ export function calculateNitrogenSupply(
   fertilizerDetailsMap: Map<string, FertilizerDetail>,
   depositionSupply: NitrogenSupply["deposition"] | undefined,
   timeFrame: NitrogenBalanceInput["timeFrame"],
+  useEffectiveNitrogen = false,
 ): NitrogenSupply {
   try {
     // Guard: deposition data must be present; silently defaulting to zero would mask missing data
@@ -45,6 +47,7 @@ export function calculateNitrogenSupply(
     const fertilizersSupply = calculateNitrogenSupplyByFertilizers(
       fertilizerApplications,
       fertilizerDetailsMap,
+      useEffectiveNitrogen,
     )
 
     // Calculate the amount of Nitrogen fixated by the cultivations

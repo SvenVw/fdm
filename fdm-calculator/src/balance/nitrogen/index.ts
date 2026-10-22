@@ -27,6 +27,7 @@ import { calculateTargetForNitrogenBalance } from "./target"
  *
  * @param fdm - The FDM instance for database access (caching).
  * @param nitrogenBalanceInput - The input data for the nitrogen balance calculation, including all fields.
+ *   Set `useEffectiveNitrogen: true` to calculate the supply by fertilizers with effective nitrogen.
  * @returns A promise that resolves with the aggregated nitrogen balance for the farm.
  */
 export async function calculateNitrogenBalance(
@@ -70,6 +71,7 @@ export async function calculateNitrogenBalanceForFarms(
         fertilizerDetails: input.fertilizerDetails,
         cultivationDetails: input.cultivationDetails,
         timeFrame: input.timeFrame,
+        useEffectiveNitrogen: input.useEffectiveNitrogen,
       })),
   )
   return calculateNitrogenBalanceBatched(fdm, fieldInputs)
@@ -148,7 +150,8 @@ async function calculateNitrogenBalanceBatched(
 export function calculateNitrogenBalanceField(
   nitrogenBalanceInput: NitrogenBalanceFieldInput,
 ): NitrogenBalanceFieldNumeric {
-  const { fieldInput, fertilizerDetails, cultivationDetails, timeFrame } = nitrogenBalanceInput
+  const { fieldInput, fertilizerDetails, cultivationDetails, timeFrame, useEffectiveNitrogen } =
+    nitrogenBalanceInput
 
   // Get the details of the field
   const { field, harvests, cultivations, soilAnalyses, fertilizerApplications, depositionSupply } =
@@ -240,6 +243,7 @@ export function calculateNitrogenBalanceField(
     fertilizerDetailsMap,
     depositionSupply,
     timeFrameField,
+    useEffectiveNitrogen,
   )
 
   // Calculate the amount of Nitrogen removed

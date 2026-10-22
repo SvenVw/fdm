@@ -18,9 +18,11 @@ import {
   type MetaFunction,
   NavLink,
   useLoaderData,
+  useLocation,
   useParams,
 } from "react-router"
 import { BufferStripInfo } from "~/components/blocks/balance/buffer-strip-info"
+import { isEffectiveNitrogenRequested } from "~/components/blocks/balance/effective-nitrogen-toggle"
 import { FieldCultivationsBadge } from "~/components/blocks/balance/field-cultivations-badge"
 import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons"
@@ -65,6 +67,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get timeframe from calendar store
     const timeframe = getTimeframe(params)
 
+    // Calculate with effective nitrogen when selected with the toggle
+    const useEffectiveNitrogen = isEffectiveNitrogenRequested(request)
+
     // Get details of farm
     const farm = await getFarm(fdm, session.principal_id, b_id_farm)
     if (!farm) {
@@ -89,6 +94,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         principal_id: session.principal_id,
         b_id_farm,
         timeframe,
+        useEffectiveNitrogen,
       })
 
       if (nitrogenBalanceResult.hasErrors) {
@@ -124,6 +130,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       cultivationsEntries: [...cultivationsMap.entries()] as [string, Cultivation[]][],
       harvestsEntries: [...harvestsMap.entries()] as [string, Harvest[]][],
       mainCultivationEntries: mainCultivationEntries as [string, Cultivation | undefined][],
+      useEffectiveNitrogen: useEffectiveNitrogen,
       asyncData: asyncData,
     }
   } catch (error) {
@@ -146,7 +153,10 @@ export default function FarmBalanceNitrogenOverviewBlock() {
 
   return (
     <div className="space-y-4">
-      <Suspense key={loaderData.farm.b_id_farm} fallback={<NitrogenBalanceFallback />}>
+      <Suspense
+        key={`${loaderData.farm.b_id_farm}#${loaderData.useEffectiveNitrogen}`}
+        fallback={<NitrogenBalanceFallback />}
+      >
         <FarmBalanceNitrogenOverview {...loaderData} />
       </Suspense>
     </div>
@@ -168,9 +178,12 @@ function FarmBalanceNitrogenOverview({
   cultivationsEntries,
   harvestsEntries,
   mainCultivationEntries,
+  useEffectiveNitrogen,
   asyncData,
 }: Awaited<ReturnType<typeof loader>>) {
   const { nitrogenBalanceResult } = use(asyncData)
+  // Keep the selected nitrogen option when navigating to a field
+  const { search } = useLocation()
   // Computed once, not on every render: only shown in the error branch's debug dump below.
   const [errorTimestamp] = useState(() => new Date())
 
@@ -259,7 +272,9 @@ function FarmBalanceNitrogenOverview({
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Aanvoer</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {useEffectiveNitrogen ? "Aanvoer (werkzaam)" : "Aanvoer"}
+            </CardTitle>
             <ArrowDown className="text-muted-foreground text-xs" />
           </CardHeader>
           <CardContent>
@@ -346,7 +361,7 @@ function FarmBalanceNitrogenOverview({
 
                     <div className="ml-4 space-y-1">
                       <div className="flex items-baseline gap-2">
-                        <NavLink to={`./${fieldResult.b_id}`}>
+                        <NavLink to={`./${fieldResult.b_id}${search}`}>
                           <p className="text-sm leading-none font-medium hover:underline">
                             {fieldData?.b_name}
                           </p>
@@ -364,7 +379,7 @@ function FarmBalanceNitrogenOverview({
                       {fieldResult.balance ? (
                         `${fieldResult.balance.balance} / ${fieldResult.balance.target}`
                       ) : (
-                        <NavLink to={`./${fieldResult.b_id}`}>
+                        <NavLink to={`./${fieldResult.b_id}${search}`}>
                           <p className="text-end text-sm text-orange-500 hover:underline">
                             {"Bekijk foutmelding"}
                           </p>
