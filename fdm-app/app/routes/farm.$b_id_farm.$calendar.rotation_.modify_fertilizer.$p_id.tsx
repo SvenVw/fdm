@@ -231,8 +231,11 @@ function getBackUrl(url: URL) {
 
 const RemoveSchema = z.object({
   intent: z.literal("remove_application"),
-  /** Set when every listed application is removed, so the page would be empty. */
-  removeAll: z.literal("true").optional(),
+  /**
+   * Set when every listed application is removed, so the page would be empty. The client sends
+   * "true", which `extractFormValuesFromRequest` turns into a boolean.
+   */
+  removeAll: z.boolean().optional(),
   appIds: z
     .string()
     .transform(parseAppIds)
