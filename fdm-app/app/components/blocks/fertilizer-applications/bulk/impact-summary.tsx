@@ -525,44 +525,32 @@ export function BalanceImpact({
             tone={isOver ? "over" : "ok"}
             status={<ComparisonLabel status={isOver ? "over" : "on-target"} noun="streefwaarde" />}
           />
-          <Collapsible>
-            <CollapsibleTrigger className="text-muted-foreground hover:text-foreground group flex items-center gap-1 text-xs">
-              Aanvoer, afvoer en emissie
-              <ChevronDown
-                className="size-3 transition-transform group-data-[state=open]:rotate-180"
-                aria-hidden="true"
-              />
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <dl className="text-muted-foreground mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-xs tabular-nums">
-                {(
-                  [
-                    ["Aanvoer", current.supply.total, after?.supply.total],
-                    ["Afvoer", current.removal.total, after?.removal.total],
-                    [
-                      "Emissie ammoniak",
-                      current.emission.ammonia.total,
-                      after?.emission.ammonia.total,
-                    ],
-                    ["Emissie nitraat", current.emission.nitrate, after?.emission.nitrate],
-                  ] as const
-                ).map(([label, value, valueAfter]) => (
-                  <div key={label}>
-                    <dt>{label}</dt>
-                    <dd className="text-foreground">
-                      {formatKg(value)}
-                      {valueAfter !== undefined && formatKg(valueAfter) !== formatKg(value) && (
-                        <span data-after className="font-semibold">
-                          {" "}
-                          → {formatKg(valueAfter)}
-                        </span>
-                      )}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </CollapsibleContent>
-          </Collapsible>
+          <dl
+            aria-label="Aanvoer, afvoer en emissie"
+            className="text-muted-foreground grid grid-cols-2 gap-x-4 gap-y-2 text-xs tabular-nums"
+          >
+            {(
+              [
+                ["Aanvoer", current.supply.total, after?.supply.total],
+                ["Afvoer", current.removal.total, after?.removal.total],
+                ["Emissie ammoniak", current.emission.ammonia.total, after?.emission.ammonia.total],
+                ["Emissie nitraat", current.emission.nitrate, after?.emission.nitrate],
+              ] as const
+            ).map(([label, value, valueAfter]) => (
+              <div key={label}>
+                <dt>{label}</dt>
+                <dd className="text-foreground">
+                  {formatKg(value)}
+                  {valueAfter !== undefined && formatKg(valueAfter) !== formatKg(value) && (
+                    <span data-after className="font-semibold">
+                      {" "}
+                      → {formatKg(valueAfter)}
+                    </span>
+                  )}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </>
       )}
     </ImpactBlock>
