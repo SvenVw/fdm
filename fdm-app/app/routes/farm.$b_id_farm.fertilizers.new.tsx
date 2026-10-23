@@ -29,7 +29,7 @@ export const meta: MetaFunction = () => {
   ]
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params, url }: LoaderFunctionArgs) {
   try {
     // Get the farm id
     const b_id_farm = params.b_id_farm
@@ -40,10 +40,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       })
     }
 
-    const requestUrl = new URL(request.url)
-    const returnUrl = requestUrl.searchParams.get("returnUrl") ?? `/farm/${b_id_farm}/fertilizers`
+    const returnUrl = url.searchParams.get("returnUrl") ?? `/farm/${b_id_farm}/fertilizers`
 
-    if (!isOfOrigin(returnUrl, requestUrl.origin)) {
+    if (!isOfOrigin(returnUrl, url.origin)) {
       return redirectWithError(
         `/farm/${b_id_farm}/fertilizers`,
         `Return URL ${returnUrl} is niet ondersteund.`,

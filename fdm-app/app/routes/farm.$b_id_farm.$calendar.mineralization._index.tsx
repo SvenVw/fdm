@@ -35,7 +35,7 @@ export const meta: MetaFunction = () => {
   ]
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request, params, url }: LoaderFunctionArgs) {
   try {
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
@@ -60,7 +60,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const fields = allFields.filter((f) => !f.b_bufferstrip)
 
     // Read method from search params (default: minip)
-    const url = new URL(request.url)
     const methodParam = url.searchParams.get("method")
     const method: NSupplyMethod =
       methodParam === "minip" || methodParam === "pmn" || methodParam === "century"

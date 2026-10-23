@@ -111,7 +111,7 @@ export default function FarmFertilizerPage() {
   )
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
+export async function action({ request, params, url }: ActionFunctionArgs) {
   try {
     const b_id_farm = params.b_id_farm
 
@@ -119,8 +119,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
       throw new Error("missing: b_id_farm")
     }
 
-    const requestUrl = new URL(request.url)
-    const returnUrl = requestUrl.searchParams.get("returnUrl") ?? `/farm/${b_id_farm}/fertilizers`
+    const returnUrl = url.searchParams.get("returnUrl") ?? `/farm/${b_id_farm}/fertilizers`
 
     const session = await getSession(request)
     const formValues = await extractFormValuesFromRequest(request, FormSchema)
@@ -147,7 +146,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     )
 
     return redirectWithSuccess(
-      isOfOrigin(returnUrl, requestUrl.origin)
+      isOfOrigin(returnUrl, url.origin)
         ? modifySearchParams(returnUrl, (searchParams) => searchParams.set("p_id", p_new_id))
         : `/farm/${b_id_farm}/fertilizers`,
       {
