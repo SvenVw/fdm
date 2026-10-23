@@ -9,12 +9,12 @@ const TONE_CLASSES: Record<ImpactBarTone, string> = {
 }
 
 /**
- * A horizontal bar that shows a current value, the part added by a new application, and the
+ * A horizontal bar that shows a current value, the change by an unsaved application, and the
  * remaining room up to a reference (norm or advice).
  *
- * The added part uses the same hue as the current part with a hatched fill, so the two can be
- * told apart without relying on colour. The bar is decorative: the values must also be shown as
- * text next to it.
+ * An increase is drawn after the current value with a hatched fill; a decrease, for example when
+ * an application is changed to a smaller amount, is drawn as the part that drops away, in the
+ * same hue but faded. The bar is decorative: the values must also be shown as text next to it.
  *
  * @param current - The current value.
  * @param after - The value after the application. Omit when there is no preview.
@@ -37,8 +37,11 @@ export function ImpactBar({
   const scale = Math.max(reference, current, after ?? 0)
   const toPercent = (value: number) => (scale > 0 ? Math.min((value / scale) * 100, 100) : 0)
   const currentPercent = toPercent(Math.max(current, 0))
-  const addedPercent =
-    after !== undefined ? Math.max(toPercent(Math.max(after, 0)) - currentPercent, 0) : 0
+  const afterPercent = after !== undefined ? toPercent(Math.max(after, 0)) : currentPercent
+  // The solid part is what remains; the change is either added (hatched) or removed (faded)
+  const solidPercent = Math.min(currentPercent, afterPercent)
+  const addedPercent = Math.max(afterPercent - currentPercent, 0)
+  const removedPercent = Math.max(currentPercent - afterPercent, 0)
   const referencePercent = toPercent(reference)
 
   return (
@@ -52,7 +55,7 @@ export function ImpactBar({
             "h-full transition-[width] duration-300 ease-out motion-reduce:transition-none",
             TONE_CLASSES[tone],
           )}
-          style={{ width: `${currentPercent}%` }}
+          style={{ width: `${solidPercent}%` }}
         />
         {addedPercent > 0 && (
           <div
@@ -61,6 +64,15 @@ export function ImpactBar({
               TONE_CLASSES[tone],
             )}
             style={{ width: `${addedPercent}%` }}
+          />
+        )}
+        {removedPercent > 0 && (
+          <div
+            className={cn(
+              "h-full opacity-30 transition-[width] duration-300 ease-out motion-reduce:transition-none",
+              TONE_CLASSES[tone],
+            )}
+            style={{ width: `${removedPercent}%` }}
           />
         )}
       </div>

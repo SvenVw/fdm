@@ -164,10 +164,18 @@ function MetricRow({
           <span>
             {formatKg(current)}
             {after !== undefined && formatKg(after) !== formatKg(current) && (
-              <span data-after className="font-semibold">
-                {" "}
-                → {formatKg(after)}
-              </span>
+              <>
+                <span data-after className="font-semibold">
+                  {" "}
+                  → {formatKg(after)}
+                </span>
+                <span className="text-muted-foreground">
+                  {" "}
+                  ({after > current ? "+" : "−"}
+                  {formatKg(Math.abs(after - current))})
+                  <span className="sr-only">{after > current ? " toename" : " afname"}</span>
+                </span>
+              </>
             )}
             <span className="text-muted-foreground">
               {" "}
