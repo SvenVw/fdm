@@ -35,10 +35,12 @@ export function UploadMijnPercelenPage({
   b_id_farm,
   calendar,
   backUrl,
+  isFarmCreateWizard,
 }: {
   b_id_farm: string
   calendar: string
   backUrl: string
+  isFarmCreateWizard: boolean
 }) {
   const { cultivationOptions } = useLoaderData<typeof loader>()
   type ActionData = Exclude<Awaited<ReturnType<typeof genericAction>>, Response>
@@ -182,7 +184,7 @@ export function UploadMijnPercelenPage({
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Opslaan...
                       </>
-                    ) : hasFieldsToAdd ? (
+                    ) : !isFarmCreateWizard || hasFieldsToAdd ? (
                       "Opslaan en verder"
                     ) : (
                       "Doorgaan zonder percelen"
