@@ -24,6 +24,7 @@ import {
   parsePreviewValues,
   useDebouncedPreviewValues,
 } from "./use-impact-preview"
+import { useUnsavedChangesGuard } from "./use-unsaved-changes-guard"
 
 const FORM_ID = "bulk-fertilizer-application-form"
 
@@ -79,6 +80,9 @@ export function BulkFertilizerPage({
   const navigation = useNavigation()
   const [searchParams, setSearchParams] = useSearchParams()
   const isSubmitting = navigation.state !== "idle" && Boolean(navigation.formData)
+  // Warn before leaving with unsaved input, but never block the redirect after saving
+  const [dirty, setDirty] = useState(false)
+  const unsavedDialog = useUnsavedChangesGuard(dirty && !isSubmitting)
 
   // Fields excluded on this page. They belong to a selection, so a new selection starts empty.
   const selectionKey = selectedFieldIds.join(",")
@@ -180,6 +184,7 @@ export function BulkFertilizerPage({
 
   return (
     <div className="relative pb-10">
+      {unsavedDialog}
       {isSubmitting && (
         <div className="bg-background/80 absolute inset-0 z-20 flex items-start justify-center pt-24">
           <div className="text-muted-foreground flex items-center text-sm" role="status">
@@ -275,6 +280,7 @@ export function BulkFertilizerPage({
                 submitDisabledReason={submitDisabledReason}
                 submitAreaClassName="max-xl:hidden"
                 onValuesChange={setFormValues}
+                onDirtyChange={setDirty}
                 footerSlot={
                   <div className="space-y-2">
                     {previewMessage && (

@@ -30,6 +30,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip
 import { getContextualDate } from "~/lib/calendar"
 import { useCalendarStore } from "~/store/calendar"
 import type { FertilizerOption } from "./types.d"
+import { DRAFT_SAVED_STATE } from "./bulk/use-unsaved-changes-guard"
 import {
   type FieldFertilizerFormValues,
   FormSchema,
@@ -52,6 +53,8 @@ import {
  * - `footerSlot` is rendered directly above the submit button, for example for warnings.
  * - `submitDisabledReason` disables the submit button and shows the reason next to it.
  * - `onCancel` adds an Annuleren button next to the submit button, for example to stop editing.
+ * - `onDirtyChange` is called when the user starts or stops having unsaved input, for example to
+ *   warn before leaving the page.
  */
 export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
   intent,
@@ -72,6 +75,7 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
   id,
   submitAreaClassName,
   onCancel,
+  onDirtyChange,
 }: {
   intent?: string
   b_id?: string
@@ -92,6 +96,7 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
   id?: string
   submitAreaClassName?: string
   onCancel?: () => void
+  onDirtyChange?: (dirty: boolean) => void
 }) {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -122,6 +127,16 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
       method: fertilizerApplication ? "PUT" : "POST",
     },
   })
+
+  // Report whether the user has unsaved input, for example to warn before leaving the page
+  const isDirty = form.formState.isDirty
+  const onDirtyChangeRef = useRef(onDirtyChange)
+  useEffect(() => {
+    onDirtyChangeRef.current = onDirtyChange
+  })
+  useEffect(() => {
+    onDirtyChangeRef.current?.(isDirty)
+  }, [isDirty])
 
   // Report value changes to the parent, for example to preview the effect of the application
   const onValuesChangeRef = useRef(onValuesChange)
@@ -235,8 +250,10 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
     if (b_id_farm && b_id_or_b_lu_catalogue) {
       saveFertilizerForm(b_id_farm, b_id_or_b_lu_catalogue, form.getValues(), calendar)
     }
+    // The input is kept as a draft, so a warning about unsaved input is not needed
     void navigate(
       `/farm/${b_id_farm}/fertilizers/new?returnUrl=${encodeURIComponent(`${location.pathname}${location.search}`)}`,
+      { state: DRAFT_SAVED_STATE },
     )
   }
 

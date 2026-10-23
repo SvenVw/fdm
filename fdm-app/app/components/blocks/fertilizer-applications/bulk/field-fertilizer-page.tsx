@@ -30,6 +30,7 @@ import {
   parsePreviewValues,
   useDebouncedPreviewValues,
 } from "./use-impact-preview"
+import { useUnsavedChangesGuard } from "./use-unsaved-changes-guard"
 
 const FORM_ID = "field-fertilizer-application-form"
 
@@ -92,6 +93,9 @@ export function FieldFertilizerPage({
   const actionData = useActionData()
   const saved = typeof actionData === "object" && actionData !== null && "result" in actionData
   const isSubmitting = navigation.state !== "idle" && Boolean(navigation.formData)
+  // Warn before leaving with unsaved input, but never block the redirect after saving
+  const [dirty, setDirty] = useState(false)
+  const unsavedDialog = useUnsavedChangesGuard(dirty && !isSubmitting)
   const [formKey, setFormKey] = useState(0)
   const [wasSubmitting, setWasSubmitting] = useState(false)
   if (isSubmitting && !wasSubmitting) setWasSubmitting(true)
@@ -198,6 +202,7 @@ export function FieldFertilizerPage({
 
   return (
     <div className="grid items-start gap-6 xl:grid-cols-[minmax(20rem,24rem)_minmax(0,1fr)]">
+      {unsavedDialog}
       <div className="xl:sticky xl:top-4">
         {(canCreate || editing) && (
           <Card>
@@ -229,6 +234,7 @@ export function FieldFertilizerPage({
                 submitLabel={editing ? "Wijziging opslaan" : "Gift toevoegen"}
                 onCancel={editing ? stopEditing : undefined}
                 onValuesChange={setFormValues}
+                onDirtyChange={setDirty}
                 footerSlot={
                   <div className="space-y-2">
                     {state.previewMessage && (

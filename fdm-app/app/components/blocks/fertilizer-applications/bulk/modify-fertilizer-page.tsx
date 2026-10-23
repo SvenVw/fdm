@@ -43,6 +43,7 @@ import {
   parsePreviewValues,
   useDebouncedPreviewValues,
 } from "./use-impact-preview"
+import { useUnsavedChangesGuard } from "./use-unsaved-changes-guard"
 
 /** An existing application of the fertilizer on one of the fields. */
 export interface ModifiableApplication extends FertilizerApplication {
@@ -103,6 +104,11 @@ export function ModifyFertilizerPage({
   const navigation = useNavigation()
   const removeFetcher = useFetcher()
   const isSubmitting = navigation.state !== "idle" && Boolean(navigation.formData)
+  // Warn before leaving with unsaved input, but never block the redirect after saving
+  const [dirty, setDirty] = useState(false)
+  const unsavedDialog = useUnsavedChangesGuard(
+    dirty && !(isSubmitting || removeFetcher.state !== "idle"),
+  )
 
   // The selected applications; by default all that may be changed. A new set of applications,
   // for example after a removal, starts with the default again.
@@ -205,6 +211,7 @@ export function ModifyFertilizerPage({
 
   return (
     <div className="xl:pb-10">
+      {unsavedDialog}
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(20rem,24rem)_minmax(0,1fr)]">
         <Card className="xl:sticky xl:top-4">
           <CardHeader>
@@ -232,6 +239,7 @@ export function ModifyFertilizerPage({
               submitDisabledReason={submitDisabledReason}
               submitAreaClassName="max-xl:hidden"
               onValuesChange={setFormValues}
+              onDirtyChange={setDirty}
               footerSlot={
                 <div className="space-y-2">
                   {state.previewMessage && (
