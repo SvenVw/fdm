@@ -129,7 +129,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const availabilityYearRaw = Number.parseInt(calendar)
     const availabilityYear = Number.isNaN(availabilityYearRaw)
       ? undefined
-      : Math.min(await getLastCultivationAvailabilityYear("brp"), availabilityYearRaw)
+      : Math.min(await getLastCultivationAvailabilityYear(), availabilityYearRaw)
 
     // Get the cultivations from catalogue
     const cultivationsCatalogue = await getCultivationsFromCatalogue(

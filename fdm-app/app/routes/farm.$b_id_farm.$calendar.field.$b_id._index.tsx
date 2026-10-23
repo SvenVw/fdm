@@ -524,7 +524,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         ? isCultivationUnavailableInPeriod(
             activeCultivation,
             activeCatalogueItem?.b_lu_ya,
-            await getLastCultivationAvailabilityYear(activeCultivation.b_lu_source),
+            await getLastCultivationAvailabilityYear(),
           )
         : null
     })()

@@ -187,17 +187,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       }
     })
 
-    // Collect the needed last cultivation availability years
-    const neededCatalogues = new Set<string>()
-    for (const c of cultivationCatalogue) {
-      neededCatalogues.add(c.b_lu_source)
-    }
-    const neededCataloguesArr = [...neededCatalogues]
-    const lastCultivationAvailabilityYear = new Map<(typeof neededCataloguesArr)[number], number>()
-    for (const cat of neededCatalogues) {
-      lastCultivationAvailabilityYear.set(cat, await getLastCultivationAvailabilityYear(cat))
-    }
-    const lastCultivationAvailabilityYearBrp = lastCultivationAvailabilityYear.get("brp") as number
+    const lastCultivationAvailabilityYear = await getLastCultivationAvailabilityYear()
 
     const rotationExtended = cultivationsInRotation.map((b_lu_catalogue) => {
       const catalogueItem = cultivationCatalogue.find(
@@ -234,8 +224,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
               isCultivationUnavailableInPeriod(
                 cultivation,
                 catalogueItem.b_lu_ya,
-                lastCultivationAvailabilityYear.get(cultivation.b_lu_source) ??
-                  lastCultivationAvailabilityYearBrp,
+                lastCultivationAvailabilityYear,
               ),
             )
             .find((result) => result !== null) ?? null

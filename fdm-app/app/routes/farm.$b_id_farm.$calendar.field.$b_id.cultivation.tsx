@@ -110,7 +110,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get available cultivations for the farm
-    const lastCultivationAvailabilityYear = await getLastCultivationAvailabilityYear("brp")
+    const lastCultivationAvailabilityYear = await getLastCultivationAvailabilityYear()
     const availabilityYearRaw = Number.parseInt(calendar)
     const availabilityYear = Number.isNaN(availabilityYearRaw)
       ? undefined

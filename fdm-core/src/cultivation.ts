@@ -446,7 +446,7 @@ export async function addCultivation(
         isCultivationUnavailableInPeriod(
           { b_lu_start, b_lu_end },
           cultivation[0].b_lu_ya,
-          await getLastCultivationAvailabilityYear(cultivation[0].b_lu_source),
+          await getLastCultivationAvailabilityYear(),
         )
       ) {
         throw new Error("Cultivation code is not available for this time period")
@@ -1344,7 +1344,7 @@ export async function updateCultivation(
               b_lu_end: b_lu_end === null ? null : result[0].b_lu_end,
             },
             cultivation[0].b_lu_ya,
-            await getLastCultivationAvailabilityYear(cultivation[0].b_lu_source),
+            await getLastCultivationAvailabilityYear(),
           )
         ) {
           throw new Error("Cultivation code is not available for this time period")

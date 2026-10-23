@@ -160,9 +160,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const harvestParameters = getParametersForHarvestCat(cultivation.b_lu_harvestcat)
 
-    const lastCultivationAvailabilityYear = await getLastCultivationAvailabilityYear(
-      cultivation.b_lu_source,
-    )
+    const lastCultivationAvailabilityYear = await getLastCultivationAvailabilityYear()
 
     // Return user information from loader
     return {

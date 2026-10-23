@@ -101,12 +101,12 @@ export async function getCultivationCatalogue(
 }
 
 /**
- * Get the last cultivation availability year configured in fdm-data for the given catalogue.
+ * Get the last cultivation availability year configured in fdm-data, which applies to all catalogues.
  * When checking for the availability of a cultivation, users of the package should
  * check cultivation code availability in years after this year for this year instead.
  *
  * @returns the last cultivation availability year.
  */
-export async function getLastCultivationAvailabilityYear(_catalogue: string) {
+export async function getLastCultivationAvailabilityYear() {
   return LAST_CULTIVATION_AVAILABILITY_YEAR
 }

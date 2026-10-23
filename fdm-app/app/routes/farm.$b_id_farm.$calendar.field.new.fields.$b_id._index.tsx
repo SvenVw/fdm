@@ -107,7 +107,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
 
     // Find the year to check cultivation availability for
-    const lastCultivationAvailabilityYear = await getLastCultivationAvailabilityYear("brp")
+    const lastCultivationAvailabilityYear = await getLastCultivationAvailabilityYear()
     const availabilityYearRaw = Number.parseInt(calendar)
     const availabilityYear = Number.isNaN(availabilityYearRaw)
       ? undefined

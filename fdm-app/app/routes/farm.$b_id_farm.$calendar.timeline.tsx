@@ -193,7 +193,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     return {
       b_id_farm,
       calendar,
-      lastCultivationAvailabilityYear: await getLastCultivationAvailabilityYear("brp"),
+      lastCultivationAvailabilityYear: await getLastCultivationAvailabilityYear(),
       farmWritePermission,
       farmOptions,
       fields: timelineFields,

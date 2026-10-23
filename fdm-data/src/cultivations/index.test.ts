@@ -139,7 +139,7 @@ describe("getCatalogueBrp", () => {
 
 describe("getLastCultivationAvailabilityYear", () => {
   it("should return LAST_CULTIVATION_AVAILABILITY_YEAR", async () => {
-    await expect(getLastCultivationAvailabilityYear("brp")).resolves.toBe(
+    await expect(getLastCultivationAvailabilityYear()).resolves.toBe(
       LAST_CULTIVATION_AVAILABILITY_YEAR,
     )
   })
