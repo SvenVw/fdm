@@ -204,18 +204,9 @@ export function AddEventSheet({
     submittedDeleteInteractionRef.current = null
   })
 
-  // Allow some wiggle room for the cultivations. Between 1 october and 1 january options for the next year will also be shown.
-  const cultivationAvailabilityYearForPrev = request?.context.date
-    ? Math.min(
-        lastCultivationAvailabilityYear,
-        new Date(request.context.date.getTime() + 93 * 24 * 60 * 60 * 1000).getFullYear(),
-      )
-    : undefined
-  const cultivationAvailabilityYearForNext = request?.context.date
-    ? Math.min(
-        lastCultivationAvailabilityYear,
-        new Date(request.context.date.getTime() - 1 * 24 * 60 * 60 * 1000).getFullYear(),
-      )
+  // Only offer cultivation codes that are available in the year of the selected date.
+  const cultivationAvailabilityYear = request?.context.date
+    ? Math.min(lastCultivationAvailabilityYear, request.context.date.getFullYear())
     : undefined
 
   return (
@@ -319,11 +310,9 @@ export function AddEventSheet({
                 (c) =>
                   c.value === request.context.b_lu ||
                   (request.context.date &&
-                    (typeof cultivationAvailabilityYearForPrev !== "number" ||
-                      typeof cultivationAvailabilityYearForNext !== "number" ||
+                    (typeof cultivationAvailabilityYear !== "number" ||
                       c.b_lu_ya === null ||
-                      c.b_lu_ya.includes(cultivationAvailabilityYearForPrev) ||
-                      c.b_lu_ya.includes(cultivationAvailabilityYearForNext))),
+                      c.b_lu_ya.includes(cultivationAvailabilityYear))),
               )}
             />
           ) : null}

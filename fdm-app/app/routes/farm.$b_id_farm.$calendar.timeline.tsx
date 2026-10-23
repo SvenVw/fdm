@@ -179,11 +179,16 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     }))
 
     // Map catalogue cultivations to options for the add-cultivation combobox
-    const cultivationOptions = cultivationsCatalogue.map((cultivation) => ({
-      value: cultivation.b_lu_catalogue,
-      label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
-      b_lu_ya: cultivation.b_lu_ya,
-    }))
+    const cultivationOptions = cultivationsCatalogue.map((cultivation) => {
+      const catalogueCode = cultivation.b_lu_catalogue.split("_")[1]
+      return {
+        value: cultivation.b_lu_catalogue,
+        label: catalogueCode
+          ? `${cultivation.b_lu_name} (${catalogueCode})`
+          : cultivation.b_lu_name,
+        b_lu_ya: cultivation.b_lu_ya,
+      }
+    })
 
     return {
       b_id_farm,

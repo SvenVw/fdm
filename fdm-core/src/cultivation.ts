@@ -1172,6 +1172,20 @@ export async function updateCultivation(
         throw new Error("Cultivation does not exist")
       }
 
+      // Load the stored period before applying any updates, to detect what actually changes
+      const previousPeriod = await tx
+        .select({
+          b_lu_start: schema.cultivationStarting.b_lu_start,
+          b_lu_end: schema.cultivationEnding.b_lu_end,
+        })
+        .from(schema.cultivationStarting)
+        .leftJoin(
+          schema.cultivationEnding,
+          eq(schema.cultivationStarting.b_lu, schema.cultivationEnding.b_lu),
+        )
+        .where(eq(schema.cultivationStarting.b_lu, b_lu))
+        .limit(1)
+
       //Validate if the cultivation exists in catalogue
       const cultivation = await tx
         .select()
@@ -1294,7 +1308,16 @@ export async function updateCultivation(
           .where(eq(schema.cultivationEnding.b_lu, b_lu))
       }
 
-      if (b_lu_start || b_lu_end) {
+      // Only check availability when the start, end or catalogue code differs from the stored value
+      const storedStart = previousPeriod[0]?.b_lu_start ?? null
+      const storedEnd = previousPeriod[0]?.b_lu_end ?? null
+      const startChanged = !!b_lu_start && b_lu_start.getTime() !== storedStart?.getTime()
+      const endChanged =
+        b_lu_end !== undefined && (b_lu_end?.getTime() ?? null) !== (storedEnd?.getTime() ?? null)
+      const catalogueChanged =
+        !!b_lu_catalogue && b_lu_catalogue !== existingCultivation[0].b_lu_catalogue
+
+      if (startChanged || endChanged || catalogueChanged) {
         const result = await tx
           .select({
             b_lu_start: schema.cultivationStarting.b_lu_start,

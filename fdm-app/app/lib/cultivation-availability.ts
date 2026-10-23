@@ -36,6 +36,11 @@ export function isCultivationUnavailableInPeriod(
 
   const start = new Date(period.b_lu_start)
   const end = period.b_lu_end ? new Date(period.b_lu_end) : null
+
+  if (Number.isNaN(start.getFullYear()) || (end && Number.isNaN(end.getFullYear()))) {
+    return null
+  }
+
   if (end && end.getTime() < start.getTime()) {
     // End before start: user will see another warning anyways so return null.
     return null
@@ -56,10 +61,6 @@ export function isCultivationUnavailableInPeriod(
       end ? end.getFullYear() : lastCultivationAvailabilityYear,
     ),
   )
-
-  if (Number.isNaN(startYear) || Number.isNaN(endYear)) {
-    return null
-  }
 
   if (endYear > b_lu_ya[b_lu_ya.length - 1]) {
     return {

@@ -137,7 +137,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
           found = true
           break
         }
-        if (c.label < b_lu_name) {
+        if (c.label.localeCompare(b_lu_name, "nl") < 0) {
           insertionIndex = i + 1
         }
       }
