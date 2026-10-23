@@ -22,7 +22,6 @@ import {
 import { Button, buttonVariants } from "~/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Checkbox } from "~/components/ui/checkbox"
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "~/components/ui/empty"
 import { Spinner } from "~/components/ui/spinner"
 import {
   Table,
@@ -203,19 +202,6 @@ export function ModifyFertilizerPage({
   const submitLabel = `${applicationsLabel(selected.length)} wijzigen`
   const submitDisabledReason = selected.length === 0 ? "Selecteer minimaal één gift." : undefined
   const fieldCount = new Set(selected.map((app) => app.b_id)).size
-
-  if (applications.length === 0) {
-    return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyTitle>Geen giften gevonden</EmptyTitle>
-          <EmptyDescription>
-            {fertilizerName} wordt in {calendar} niet op deze percelen toegepast.
-          </EmptyDescription>
-        </EmptyHeader>
-      </Empty>
-    )
-  }
 
   return (
     <div className="xl:pb-10">

@@ -9,7 +9,7 @@ import {
   removeFertilizerApplication,
 } from "@nmi-agro/fdm-core"
 import { useMemo } from "react"
-import { data, type MetaFunction, useLoaderData } from "react-router"
+import { data, type MetaFunction, redirect, useLoaderData } from "react-router"
 import { dataWithSuccess, redirectWithSuccess } from "remix-toast"
 import z from "zod"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
@@ -122,6 +122,11 @@ export async function loader({ params, request, url }: Route.LoaderArgs) {
           methodOptions.find((option) => option.value === app.p_app_method)?.label ?? undefined,
       })),
     )
+
+    // Nothing left to change, for example after the last application was removed elsewhere
+    if (applications.length === 0) {
+      return redirect(getBackUrl(url))
+    }
 
     // Only the fields with an application of this fertilizer are affected
     const affectedFieldIds = [...new Set(applications.map((app) => app.b_id))]
