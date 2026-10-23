@@ -91,9 +91,10 @@ export function CultivationDetailsCard({
     b_lu_ya,
     lastCultivationAvailabilityYear,
   )
-  const formCultivationAvailabilityWarning = isCultivationUnavailable
-    ? getCultivationAvailabilityMessage(isCultivationUnavailable)
-    : null
+  const formCultivationAvailabilityWarning =
+    isCultivationUnavailable && form.formState.isDirty
+      ? getCultivationAvailabilityMessage(isCultivationUnavailable)
+      : null
 
   return (
     <Card>
