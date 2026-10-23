@@ -227,6 +227,7 @@ export function FieldFertilizerPage({
                 fertilizerApplication={formApplication}
                 fieldsClassName="xl:grid-cols-1"
                 submitLabel={editing ? "Wijziging opslaan" : "Gift toevoegen"}
+                onCancel={editing ? stopEditing : undefined}
                 onValuesChange={setFormValues}
                 footerSlot={
                   <div className="space-y-2">

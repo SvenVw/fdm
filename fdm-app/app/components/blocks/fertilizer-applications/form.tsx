@@ -51,6 +51,7 @@ import {
  * - `onValuesChange` is called with the current form values whenever a value changes, for example to preview the effect of the application.
  * - `footerSlot` is rendered directly above the submit button, for example for warnings.
  * - `submitDisabledReason` disables the submit button and shows the reason next to it.
+ * - `onCancel` adds an Annuleren button next to the submit button, for example to stop editing.
  */
 export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
   intent,
@@ -70,6 +71,7 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
   submitDisabledReason,
   id,
   submitAreaClassName,
+  onCancel,
 }: {
   intent?: string
   b_id?: string
@@ -89,6 +91,7 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
   /** Id of the form element, so a button elsewhere on the page can submit it. */
   id?: string
   submitAreaClassName?: string
+  onCancel?: () => void
 }) {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -394,6 +397,11 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
             >
               {submitDisabledReason && (
                 <p className="text-muted-foreground text-sm">{submitDisabledReason}</p>
+              )}
+              {onCancel && (
+                <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+                  Annuleren
+                </Button>
               )}
               <Button type="submit" disabled={Boolean(submitDisabledReason)}>
                 {isSubmitting ? (
