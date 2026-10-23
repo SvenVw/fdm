@@ -378,9 +378,9 @@ export function getConflictRowAction(
 ): "UPDATE_FROM_REMOTE" | "KEEP_LOCAL" | "CUSTOM" {
   const fields = getRowFields(ctx)
   const matches = (pick: (field: ReviewField) => unknown) =>
-    fields.every((field) =>
-      valuesEqual(field.type, getEffectiveValue(field, item, ctx, choices), pick(field)),
-    )
+    fields.every((field) => {
+      return valuesEqual(field.type, getEffectiveValue(field, item, ctx, choices), pick(field))
+    })
 
   if (matches((field) => getRemoteTarget(field, item, ctx))) return "UPDATE_FROM_REMOTE"
   if (matches((field) => field.getLocal(item))) return "KEEP_LOCAL"
@@ -606,26 +606,21 @@ export function summarizeChangesAgainstRvo(
         // RVO does not report the field, but it stays in FDM.
         if (item.localField && !removedIds.has(item.localField.b_id)) summary.keep++
         break
-      case "EXPIRED_LOCAL":
+      case "EXPIRED_LOCAL": {
         // RVO no longer reports the field, but it is not closed.
         const update = item.localField && updatesById.get(item.localField.b_id)
         if (item.localField && isNullish(update?.b_end)) summary.doNotClose++
         break
+      }
       case "MATCH":
       case "CONFLICT": {
         if (!item.localField) break
-        // Counted when any differing field is not submitted as an update, or is submitted with a
-        // value that still differs from RVO.
         const update = updatesById.get(item.localField.b_id)
-        const differsFromRvo = [...getDiffKeys(item)].some((key) => {
-          const field = REVIEW_FIELDS.find((f) => f.key === key)
-          if (!field || !isRemoteAvailable(field, ctx)) return false
-          const remote = field.getRemote(item, ctx)
-          if (remote === undefined) return false
-          const value = update && key in update ? update[key] : field.getLocal(item)
-          return !valuesEqual(field.type, value, remote)
-        })
-        if (differsFromRvo) summary.update++
+        const rowAction = getConflictRowAction(item, ctx, update)
+        const differsFromRvo = rowAction !== "UPDATE_FROM_REMOTE"
+        if (differsFromRvo) {
+          summary.update++
+        }
         break
       }
     }
