@@ -73,7 +73,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError, reportError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getMainCultivation } from "~/lib/hoofdteelt.server"
-import { isExcludedFromBln3 } from "~/lib/indicators"
+import { getBestVariantIds, isExcludedFromBln3 } from "~/lib/indicators"
 import { INDICATORS } from "~/lib/indicators"
 
 const MeasuresMap = lazy(() => import("@/app/components/blocks/measures/measures-atlas"))
@@ -123,7 +123,7 @@ async function getFarmNextSteps({
   const activeMeasureIdsByField = new Map(
     b_ids.map((b_id) => [b_id, new Set((measuresMap.get(b_id) ?? []).map((m) => m.m_id))]),
   )
-  const { opportunities } = await getFarmMeasureOpportunities({
+  const { opportunities: fieldOpportunities, candidates } = await getFarmMeasureOpportunities({
     principal_id,
     b_ids,
     b_year,
@@ -132,6 +132,20 @@ async function getFarmNextSteps({
     activeMeasureIdsByField,
     measureNameById: new Map(catalogue.map((m) => [m.m_id, m.m_name])),
   })
+
+  // Show one variant per measure family farm-wide: the variant with the highest
+  // impact summed over all eligible candidates of all fields (not only each
+  // field's winner). Fields where another variant of that family scored best
+  // are not listed for it.
+  const farmImpactByMId = new Map<string, number>()
+  for (const candidate of candidates) {
+    farmImpactByMId.set(
+      candidate.m_id,
+      (farmImpactByMId.get(candidate.m_id) ?? 0) + candidate.aggregateImpact,
+    )
+  }
+  const bestVariantIds = getBestVariantIds(farmImpactByMId)
+  const opportunities = fieldOpportunities.filter((opp) => bestVariantIds.has(opp.m_id))
 
   const opportunitiesByField: Record<string, FieldTopOpportunity[]> = {}
   const farmOpportunitiesByMId = new Map<string, FieldTopOpportunity>()

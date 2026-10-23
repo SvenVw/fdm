@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest"
 import type { Bln3Score } from "./types"
 import { IndicatorsUnavailableError } from "./errors"
-import { buildMeasureOptions, type MeasureCatalogueEntry } from "./recommendations"
+import {
+  buildMeasureOptions,
+  getBestVariantIds,
+  getFieldOpportunityCandidates,
+  getMeasureFamilyId,
+  getTopOpportunitiesForField,
+  type MeasureCatalogueEntry,
+} from "./recommendations"
 import { aggregateFarmScores } from "./scoring"
 
 const entry = (id: string, extra: Partial<MeasureCatalogueEntry> = {}): MeasureCatalogueEntry => ({
@@ -107,6 +114,91 @@ describe("buildMeasureOptions", () => {
     expect(options.every((o) => o.recommendation === null)).toBe(true)
   })
 
+  it("keeps losing variants selectable but recommends only the winning family variant", () => {
+    const ids = ["bln_BM56b", "bln_BM56c", "bln_BM239"]
+    const options = buildMeasureOptions({
+      catalogue: ids.map((id) => entry(id)),
+      enabledSources: ["bln"],
+      activeMeasures: [],
+      applicability: { applicability: ids.map(applicable) },
+      advice: {
+        indicator_advice: [
+          {
+            indicator: "C_N",
+            measures: [
+              { m_id: "bln_BM56b", measure_impact: 0.2 },
+              { m_id: "bln_BM56c", measure_impact: 0.3 },
+              { m_id: "bln_BM239", measure_impact: 0.1 },
+            ],
+          },
+        ],
+      },
+      score,
+    })
+
+    expect(options.map((o) => [o.m_id, o.recommendation?.rank ?? null])).toEqual([
+      ["bln_BM56c", 1],
+      ["bln_BM239", 2],
+      ["bln_BM56b", null],
+    ])
+    expect(options[2].selectable).toBe(true)
+    expect(options[2].predicted_impacts).toEqual([{ indicator_id: "C_N", measure_impact: 0.2 }])
+  })
+
+  it("fills all five recommendation slots with distinct families", () => {
+    const ids = ["bln_BM56b", "bln_BM56c", "bln_BM57", "bln_BM58", "bln_BM59", "bln_BM60"]
+    const options = buildMeasureOptions({
+      catalogue: ids.map((id) => entry(id)),
+      enabledSources: ["bln"],
+      activeMeasures: [],
+      applicability: { applicability: ids.map(applicable) },
+      advice: {
+        indicator_advice: [
+          {
+            indicator: "C_N",
+            measures: ids.map((m_id, i) => ({ m_id, measure_impact: 1 - i / 10 })),
+          },
+        ],
+      },
+      score,
+    })
+    expect(
+      options.filter((o) => o.recommendation).map((o) => [o.m_id, o.recommendation?.rank]),
+    ).toEqual([
+      ["bln_BM56b", 1],
+      ["bln_BM57", 2],
+      ["bln_BM58", 3],
+      ["bln_BM59", 4],
+      ["bln_BM60", 5],
+    ])
+    expect(options.find((o) => o.m_id === "bln_BM56c")?.recommendation).toBeNull()
+  })
+
+  it("does not recommend siblings of an active variant absent from the advice and catalogue", () => {
+    const options = buildMeasureOptions({
+      catalogue: [entry("bln_BM56c"), entry("bln_BM239")],
+      enabledSources: ["bln"],
+      activeMeasures: [{ b_id_measure: "active-variant", m_id: "bln_BM56b", m_conflicts: null }],
+      applicability: { applicability: [applicable("bln_BM56c"), applicable("bln_BM239")] },
+      advice: {
+        indicator_advice: [
+          {
+            indicator: "C_N",
+            measures: [
+              { m_id: "bln_BM56c", measure_impact: 0.3 },
+              { m_id: "bln_BM239", measure_impact: 0.1 },
+            ],
+          },
+        ],
+      },
+      score,
+    })
+    expect(options.map((o) => [o.m_id, o.recommendation?.rank ?? null])).toEqual([
+      ["bln_BM239", 1],
+      ["bln_BM56c", null],
+    ])
+  })
+
   it("throws for malformed advice", () => {
     expect(() =>
       buildMeasureOptions({
@@ -161,5 +253,109 @@ describe("aggregateFarmScores", () => {
     ])
     expect(res.indicators[0].score).toBeCloseTo(0.2)
     expect(res.aggregations[0].score).toBeCloseTo(0.5)
+  })
+})
+
+describe("getMeasureFamilyId", () => {
+  it("strips one trailing lowercase letter from a BLN3 measure ID", () => {
+    expect(getMeasureFamilyId("bln_BM56b")).toBe("bln_BM56")
+    expect(getMeasureFamilyId("bln_BM56c")).toBe("bln_BM56")
+  })
+
+  it("leaves IDs without a variant suffix unchanged", () => {
+    expect(getMeasureFamilyId("bln_BM239")).toBe("bln_BM239")
+    expect(getMeasureFamilyId("bln_BM56bc")).toBe("bln_BM56bc")
+    expect(getMeasureFamilyId("other_BM56b")).toBe("other_BM56b")
+  })
+})
+
+describe("getBestVariantIds", () => {
+  it("keeps the variant with the highest impact per family", () => {
+    const ids = getBestVariantIds(
+      new Map([
+        ["bln_BM56b", 0.1],
+        ["bln_BM56c", 0.3],
+        ["bln_BM239", 0.05],
+      ]),
+    )
+    expect([...ids].sort()).toEqual(["bln_BM239", "bln_BM56c"])
+  })
+
+  it("prefers the earliest suffix letter on a tie", () => {
+    const ids = getBestVariantIds(
+      new Map([
+        ["bln_BM56c", 0.2],
+        ["bln_BM56b", 0.2],
+      ]),
+    )
+    expect([...ids]).toEqual(["bln_BM56b"])
+  })
+})
+
+describe("getTopOpportunitiesForField", () => {
+  const advice = {
+    indicator_advice: [
+      {
+        indicator: "C_N",
+        measures: [
+          { m_id: "bln_BM56b", measure_impact: 0.2 },
+          { m_id: "bln_BM56c", measure_impact: 0.3 },
+          { m_id: "bln_BM239", measure_impact: 0.1 },
+        ],
+      },
+      { indicator: "C_P", measures: [{ m_id: "bln_BM56b", measure_impact: 0.05 }] },
+    ],
+  }
+  const applicability = Object.fromEntries(
+    ["bln_BM56b", "bln_BM56c", "bln_BM239"].map((id) => [
+      id,
+      { applicability: "applicable" as const, message: "" },
+    ]),
+  )
+
+  it("keeps only the best variant per measure family", () => {
+    const result = getTopOpportunitiesForField({
+      advice,
+      score,
+      applicability,
+      activeMeasureIds: new Set(),
+    })
+    expect(result.map((o) => o.m_id)).toEqual(["bln_BM56c", "bln_BM239"])
+  })
+
+  it("compares variants on their impact summed over weak indicators", () => {
+    const result = getTopOpportunitiesForField({
+      advice: {
+        indicator_advice: [
+          ...advice.indicator_advice,
+          { indicator: "C_P", measures: [{ m_id: "bln_BM56b", measure_impact: 0.1 }] },
+        ],
+      },
+      score,
+      applicability,
+      activeMeasureIds: new Set(),
+    })
+    // bln_BM56b sums to 0.35 and beats bln_BM56c (0.3)
+    expect(result.map((o) => o.m_id)).toEqual(["bln_BM56b", "bln_BM239"])
+  })
+
+  it("keeps every eligible variant as a candidate for farm-wide selection", () => {
+    const result = getFieldOpportunityCandidates({
+      advice,
+      score,
+      applicability,
+      activeMeasureIds: new Set(),
+    })
+    expect(result.map((o) => o.m_id)).toEqual(["bln_BM56c", "bln_BM56b", "bln_BM239"])
+  })
+
+  it("does not recommend a variant when another variant of the family is active", () => {
+    const result = getTopOpportunitiesForField({
+      advice,
+      score,
+      applicability,
+      activeMeasureIds: new Set(["bln_BM56b"]),
+    })
+    expect(result.map((o) => o.m_id)).toEqual(["bln_BM239"])
   })
 })

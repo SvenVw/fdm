@@ -20,6 +20,7 @@ import {
   LEAF_AGGREGATION_IDS,
 } from "~/lib/aggregations"
 import {
+  getBestVariantIds,
   getScoreBadgeClass,
   getScoreDotClass,
   getScoreTextClass,
@@ -531,7 +532,13 @@ function WhereToStartPanel({
       grouped.set(rec.m_id, existing)
     }
 
+    // One variant per measure family: the one with the highest area-weighted impact.
+    const bestVariantIds = getBestVariantIds(
+      new Map([...grouped.entries()].map(([m_id, g]) => [m_id, g.weightedImpact])),
+    )
+
     return [...grouped.entries()]
+      .filter(([m_id]) => bestVariantIds.has(m_id))
       .map(([m_id, g]) => {
         const fieldIds = [...g.fieldImpacts.entries()]
           .sort((a, b) => b[1] - a[1])
