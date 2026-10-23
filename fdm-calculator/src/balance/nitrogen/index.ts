@@ -1,6 +1,7 @@
 import { type FdmType, withCalculationCache } from "@nmi-agro/fdm-core"
 import type {
   NitrogenBalanceFieldInput,
+  NitrogenBalanceFieldNumeric,
   NitrogenBalanceFieldResultNumeric,
   NitrogenBalanceInput,
   NitrogenBalanceNumeric,
@@ -120,6 +121,12 @@ async function calculateNitrogenBalanceBatched(
   )
 }
 
+const getNitrogenBalanceFieldCached = withCalculationCache(
+  calculateNitrogenBalanceField,
+  "calculateNitrogenBalanceField",
+  pkg.calculatorVersion,
+)
+
 /**
  * A cached version of the `calculateNitrogenBalanceField` function.
  *
@@ -128,12 +135,24 @@ async function calculateNitrogenBalanceBatched(
  * same input. The cache is managed by `withCalculationCache` and uses the
  * `pkg.calculatorVersion` as part of its cache key.
  *
+ * `useEffectiveNitrogen: false` and an omitted `useEffectiveNitrogen` give the same result and
+ * therefore share the same cache entry.
+ *
+ * @param fdm - The FDM instance for database access (caching).
+ * @param nitrogenBalanceInput - The input data for the nitrogen balance calculation for a single field.
  * @returns A promise that resolves with the calculated nitrogen balance, with numeric values as numbers.
  */
-export const getNitrogenBalanceField = withCalculationCache(
-  calculateNitrogenBalanceField,
-  "calculateNitrogenBalanceField",
-  pkg.calculatorVersion,
-)
+export function getNitrogenBalanceField(
+  fdm: FdmType,
+  nitrogenBalanceInput: NitrogenBalanceFieldInput,
+): Promise<NitrogenBalanceFieldNumeric> {
+  // Only include the option when it is enabled, so that the cache key for the balance with total
+  // nitrogen does not depend on whether the caller passed `false` or left it out
+  const { useEffectiveNitrogen, ...input } = nitrogenBalanceInput
+  return getNitrogenBalanceFieldCached(
+    fdm,
+    useEffectiveNitrogen ? { ...input, useEffectiveNitrogen: true } : input,
+  )
+}
 
 export { calculateNitrogenBalanceField, calculateNitrogenBalancesFieldToFarm } from "./field"

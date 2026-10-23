@@ -1,8 +1,16 @@
 import type { FdmType } from "@nmi-agro/fdm-core"
 import Decimal from "decimal.js"
 import { describe, expect, it } from "vitest"
-import type { NitrogenBalanceFieldResultNumeric, NitrogenBalanceInput } from "./types"
-import { calculateNitrogenBalance, calculateNitrogenBalancesFieldToFarm } from "."
+import type {
+  NitrogenBalanceFieldInput,
+  NitrogenBalanceFieldResultNumeric,
+  NitrogenBalanceInput,
+} from "./types"
+import {
+  calculateNitrogenBalance,
+  calculateNitrogenBalancesFieldToFarm,
+  getNitrogenBalanceField,
+} from "."
 import { calculateNitrogenSupplyBySoilMineralizationUsingMinip } from "./supply/mineralization"
 
 // Mock FdmType
@@ -461,5 +469,55 @@ describe("calculateNitrogenBalance", () => {
     // Should match field1 values exactly
     expect(farmBalance.balance).toBe(100)
     expect(farmBalance.supply.total).toBe(100)
+  })
+})
+
+describe("getNitrogenBalanceField", () => {
+  it("should use the same cache entry for useEffectiveNitrogen false and omitted", async () => {
+    // Record the hash of every cache write (always a cache miss)
+    const cachedHashes: string[] = []
+    const recordingFdm = {
+      select: () => recordingFdm,
+      from: () => recordingFdm,
+      where: () => recordingFdm,
+      limit: async () => [],
+      insert: () => recordingFdm,
+      values: (row: { calculation_hash: string }) => {
+        cachedHashes.push(row.calculation_hash)
+        return { onConflictDoNothing: async () => undefined }
+      },
+    } as unknown as FdmType
+
+    const input: NitrogenBalanceFieldInput = {
+      fieldInput: {
+        field: {
+          b_id: "field1",
+          b_centroid: [5.0, 52.0],
+          b_area: 1,
+          b_start: new Date("2023-01-01"),
+          b_end: null,
+          b_bufferstrip: true,
+        },
+        cultivations: [],
+        harvests: [],
+        soilAnalyses: [],
+        fertilizerApplications: [],
+        depositionSupply: { total: new Decimal(0) },
+      },
+      fertilizerDetails: [],
+      cultivationDetails: [],
+      timeFrame: {
+        start: new Date("2023-01-01"),
+        end: new Date("2023-12-31"),
+      },
+    }
+
+    await getNitrogenBalanceField(recordingFdm, input)
+    await getNitrogenBalanceField(recordingFdm, { ...input, useEffectiveNitrogen: false })
+    await getNitrogenBalanceField(recordingFdm, { ...input, useEffectiveNitrogen: true })
+
+    expect(cachedHashes).toHaveLength(3)
+    expect(cachedHashes[1]).toBe(cachedHashes[0])
+    expect(cachedHashes[2]).not.toBe(cachedHashes[0])
   })
 })
