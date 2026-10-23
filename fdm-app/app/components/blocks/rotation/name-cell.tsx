@@ -21,10 +21,10 @@ export function NameCell({
       className={"gap-1 text-white"}
       variant="default"
     >
+      {original.b_lu_name}
       {original.availabilityWarning ? (
         <CultivationAvailabilityWarningIcon result={original.availabilityWarning} />
       ) : null}
-      {original.b_lu_name}
     </Badge>
   ) : (
     <NavLink

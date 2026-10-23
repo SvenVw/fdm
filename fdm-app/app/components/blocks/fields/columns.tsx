@@ -130,10 +130,10 @@ export function buildColumns(
                 className="gap-1 text-white"
                 variant="default"
               >
+                {cultivation.b_lu_name}
                 {cultivation.availabilityWarning ? (
                   <CultivationAvailabilityWarningIcon result={cultivation.availabilityWarning} />
                 ) : null}
-                {cultivation.b_lu_name}
               </Badge>
             ))}
             {field.cultivationSuggestion && (
