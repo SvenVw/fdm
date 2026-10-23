@@ -146,6 +146,23 @@ describe("getCatalogueBrp with phosphate contents from the NMI API", () => {
     )
   })
 
+  it("should throw a clear error when the NMI API request times out", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new DOMException("The operation timed out.", "TimeoutError")),
+    )
+
+    await expect(getCatalogueBrp({ nmiApiKey: "test-key" })).rejects.toThrowError(
+      /Fetching NMI cultivations lookup timed out after 30000ms/,
+    )
+  })
+
+  it("should rethrow other network errors from the NMI API request", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("fetch failed")))
+
+    await expect(getCatalogueBrp({ nmiApiKey: "test-key" })).rejects.toThrowError("fetch failed")
+  })
+
   it("should throw when the NMI API response has an unexpected shape", async () => {
     vi.stubGlobal(
       "fetch",
