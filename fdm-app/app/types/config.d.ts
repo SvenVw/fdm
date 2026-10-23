@@ -41,9 +41,6 @@ export interface ServerConfig {
       provider: "maptiler" | "osm"
       maptilerKey?: string
     }
-    "fdm-data": {
-      lastCultivationAvailabilityYear: number
-    }
     nmi?: {
       api_key: string
     }

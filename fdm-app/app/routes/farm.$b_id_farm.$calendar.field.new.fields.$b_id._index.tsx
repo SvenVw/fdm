@@ -9,6 +9,7 @@ import {
   updateCultivation,
   updateField,
 } from "@nmi-agro/fdm-core"
+import { getLastCultivationAvailabilityYear } from "@nmi-agro/fdm-data"
 import { type ActionFunctionArgs, data, type LoaderFunctionArgs, useLoaderData } from "react-router"
 import { dataWithSuccess, redirectWithSuccess } from "remix-toast"
 import { NewFieldsBlock } from "~/components/blocks/fields-new/block"
@@ -107,13 +108,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
 
     // Find the year to check cultivation availability for
+    const lastCultivationAvailabilityYear = await getLastCultivationAvailabilityYear("brp")
     const availabilityYearRaw = Number.parseInt(calendar)
     const availabilityYear = Number.isNaN(availabilityYearRaw)
       ? undefined
-      : Math.min(
-          serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear,
-          availabilityYearRaw,
-        )
+      : Math.min(lastCultivationAvailabilityYear, availabilityYearRaw)
 
     // Get the cultivations from catalogue
     const cultivationsCatalogue = await getCultivationsFromCatalogue(

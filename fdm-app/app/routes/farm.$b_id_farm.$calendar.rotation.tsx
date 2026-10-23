@@ -10,6 +10,7 @@ import {
   getHarvestsForFarm,
   updateCultivation,
 } from "@nmi-agro/fdm-core"
+import { getLastCultivationAvailabilityYear } from "@nmi-agro/fdm-data"
 import { useEffect } from "react"
 import { type MetaFunction, NavLink, Outlet, redirect, useLoaderData } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
@@ -28,7 +29,6 @@ import { useAnalytics } from "~/hooks/use-analytics"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
-import { serverConfig } from "~/lib/config.server"
 import { isCultivationUnavailableInPeriod } from "~/lib/cultivation-availability"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -187,8 +187,17 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       }
     })
 
-    const lastCultivationAvailabilityYear =
-      serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear
+    // Collect the needed last cultivation availability years
+    const neededCatalogues = new Set<string>()
+    for (const c of cultivationCatalogue) {
+      neededCatalogues.add(c.b_lu_source)
+    }
+    const neededCataloguesArr = [...neededCatalogues]
+    const lastCultivationAvailabilityYear = new Map<(typeof neededCataloguesArr)[number], number>()
+    for (const cat of neededCatalogues) {
+      lastCultivationAvailabilityYear.set(cat, await getLastCultivationAvailabilityYear(cat))
+    }
+    const lastCultivationAvailabilityYearBrp = lastCultivationAvailabilityYear.get("brp") as number
 
     const rotationExtended = cultivationsInRotation.map((b_lu_catalogue) => {
       const catalogueItem = cultivationCatalogue.find(
@@ -225,7 +234,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
               isCultivationUnavailableInPeriod(
                 cultivation,
                 catalogueItem.b_lu_ya,
-                lastCultivationAvailabilityYear,
+                lastCultivationAvailabilityYear.get(cultivation.b_lu_source) ??
+                  lastCultivationAvailabilityYearBrp,
               ),
             )
             .find((result) => result !== null) ?? null

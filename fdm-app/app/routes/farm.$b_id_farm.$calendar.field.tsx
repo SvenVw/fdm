@@ -11,6 +11,7 @@ import {
   getSoilAnalysesForFarm,
   updateField,
 } from "@nmi-agro/fdm-core"
+import { getLastCultivationAvailabilityYear } from "@nmi-agro/fdm-data"
 import { useMemo } from "react"
 import {
   type ActionFunctionArgs,
@@ -180,8 +181,18 @@ export async function loader({ request, params, url }: LoaderFunctionArgs) {
         item.b_lu_ya,
       ]),
     )
-    const lastCultivationAvailabilityYear =
-      serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear
+    // Collect the needed last cultivation availability years
+    const neededCatalogues = new Set<string>(["brp"])
+    for (const cultivationsOnField of cultivationsForFarm.values()) {
+      for (const cultivation of cultivationsOnField) {
+        neededCatalogues.add(cultivation.b_lu_source)
+      }
+    }
+    const lastCultivationAvailabilityYear = new Map<string, number>()
+    for (const cat of neededCatalogues) {
+      lastCultivationAvailabilityYear.set(cat, await getLastCultivationAvailabilityYear(cat))
+    }
+    const lastCultivationAvailabilityYearBrp = lastCultivationAvailabilityYear.get("brp") as number
     const fertilizerApplicationsForFarm = await getFertilizerApplicationsForFarm(
       fdm,
       session.principal_id,
@@ -205,7 +216,8 @@ export async function loader({ request, params, url }: LoaderFunctionArgs) {
           availabilityWarning: isCultivationUnavailableInPeriod(
             cultivation,
             availabilityYearsByCatalogue.get(cultivation.b_lu_catalogue),
-            lastCultivationAvailabilityYear,
+            lastCultivationAvailabilityYear.get(cultivation.b_lu_source) ??
+              lastCultivationAvailabilityYearBrp,
           ),
         }))
 

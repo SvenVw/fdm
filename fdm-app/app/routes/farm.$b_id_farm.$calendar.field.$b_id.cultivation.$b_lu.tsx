@@ -9,6 +9,7 @@ import {
   removeCultivation,
   updateCultivation,
 } from "@nmi-agro/fdm-core"
+import { getLastCultivationAvailabilityYear } from "@nmi-agro/fdm-data"
 import {
   type ActionFunctionArgs,
   data,
@@ -160,6 +161,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const harvestParameters = getParametersForHarvestCat(cultivation.b_lu_harvestcat)
 
+    const lastCultivationAvailabilityYear = await getLastCultivationAvailabilityYear(
+      cultivation.b_lu_source,
+    )
+
     // Return user information from loader
     return {
       field: field,
@@ -171,8 +176,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       b_lu_variety_options: b_lu_variety_options,
       b_id_farm: b_id_farm,
       calendar: calendar,
-      lastCultivationAvailabilityYear:
-        serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear,
+      lastCultivationAvailabilityYear: lastCultivationAvailabilityYear,
       cultivationWritePermission: await cultivationWritePermission,
     }
   } catch (error) {

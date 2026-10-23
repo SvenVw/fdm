@@ -7,6 +7,7 @@ import {
   getHarvests,
   removeCultivation,
 } from "@nmi-agro/fdm-core"
+import { getLastCultivationAvailabilityYear } from "@nmi-agro/fdm-data"
 import {
   type ActionFunctionArgs,
   data,
@@ -110,13 +111,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get available cultivations for the farm
+    const lastCultivationAvailabilityYear = await getLastCultivationAvailabilityYear("brp")
     const availabilityYearRaw = Number.parseInt(calendar)
     const availabilityYear = Number.isNaN(availabilityYearRaw)
       ? undefined
-      : Math.min(
-          serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear,
-          availabilityYearRaw,
-        )
+      : Math.min(lastCultivationAvailabilityYear, availabilityYearRaw)
     const cultivationsCatalogue = await getCultivationsFromCatalogue(
       fdm,
       session.principal_id,
@@ -156,8 +155,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return {
       field: field,
       cultivationsCatalogueOptions: cultivationsCatalogueOptions,
-      lastCultivationAvailabilityYear:
-        serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear,
+      lastCultivationAvailabilityYear: lastCultivationAvailabilityYear,
       cultivations: cultivations,
       harvests: harvests,
       fieldWritePermission: fieldWritePermission,

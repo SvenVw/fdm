@@ -94,13 +94,6 @@ export const serverConfig: ServerConfig = {
         process.env.PUBLIC_MAPTILER_API_KEY ?? process.env.MAPTILER_API_KEY ?? "",
       ),
     },
-    "fdm-data": {
-      lastCultivationAvailabilityYear: !Number.isNaN(
-        Number.parseInt(process.env.LAST_CULTIVATION_AVAILABILITY_YEAR ?? ""),
-      )
-        ? Number.parseInt(process.env.LAST_CULTIVATION_AVAILABILITY_YEAR ?? "")
-        : 2026,
-    },
     ...(process.env.NMI_API_KEY?.trim()
       ? {
           nmi: {

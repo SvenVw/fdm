@@ -24,7 +24,7 @@ import {
   updateHarvest,
   updateSoilAnalysis,
 } from "@nmi-agro/fdm-core"
-import { ApplicationMethods } from "@nmi-agro/fdm-data"
+import { ApplicationMethods, getLastCultivationAvailabilityYear } from "@nmi-agro/fdm-data"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react"
@@ -63,7 +63,6 @@ import { getSession } from "~/lib/auth.server"
 import { isBcsAnalysis } from "~/lib/bcs"
 import { endMonth, getTimeframeForYears, startMonth } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
-import { serverConfig } from "~/lib/config.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
@@ -189,8 +188,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     return {
       b_id_farm,
       calendar,
-      lastCultivationAvailabilityYear:
-        serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear,
+      lastCultivationAvailabilityYear: await getLastCultivationAvailabilityYear("brp"),
       farmWritePermission,
       farmOptions,
       fields: timelineFields,

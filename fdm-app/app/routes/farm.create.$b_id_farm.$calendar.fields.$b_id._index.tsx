@@ -9,6 +9,7 @@ import {
   updateCultivation,
   updateField,
 } from "@nmi-agro/fdm-core"
+import { getLastCultivationAvailabilityYear } from "@nmi-agro/fdm-data"
 import {
   type ActionFunctionArgs,
   data,
@@ -129,10 +130,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const availabilityYearRaw = Number.parseInt(calendar)
     const availabilityYear = Number.isNaN(availabilityYearRaw)
       ? undefined
-      : Math.min(
-          serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear,
-          availabilityYearRaw,
-        )
+      : Math.min(await getLastCultivationAvailabilityYear("brp"), availabilityYearRaw)
 
     // Get the cultivations from catalogue
     const cultivationsCatalogue = await getCultivationsFromCatalogue(

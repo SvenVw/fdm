@@ -27,7 +27,7 @@ import {
   getSoilParametersDescription,
   listAvailableAcquiringMethods,
 } from "@nmi-agro/fdm-core"
-import { getCultivationCatalogue } from "@nmi-agro/fdm-data"
+import { getCultivationCatalogue, getLastCultivationAvailabilityYear } from "@nmi-agro/fdm-data"
 import { simplify } from "@turf/simplify"
 import { useEffect } from "react"
 import { data, type LoaderFunctionArgs, type MetaFunction, useLoaderData } from "react-router"
@@ -71,7 +71,6 @@ import { deriveBcsScores } from "~/lib/bcs-derived.server"
 import { computeBcs } from "~/lib/bcs.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
-import { serverConfig } from "~/lib/config.server"
 import { isCultivationUnavailableInPeriod } from "~/lib/cultivation-availability"
 import { getCultivationSuggestionResult } from "~/lib/cultivation-suggestion.server"
 import { handleLoaderError, reportError } from "~/lib/error"
@@ -525,7 +524,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         ? isCultivationUnavailableInPeriod(
             activeCultivation,
             activeCatalogueItem?.b_lu_ya,
-            serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear,
+            await getLastCultivationAvailabilityYear(activeCultivation.b_lu_source),
           )
         : null
     })()
