@@ -66,6 +66,8 @@ export const NUTRIENT_ADVICE_COPY = {
   noNeed: "Geen behoefte (advies is 0)",
   noAdviceFarm: "Voor geen enkel perceel is advies beschikbaar.",
   loading: "Advies wordt berekend…",
+  loadingProgress: (done: number, total: number) =>
+    `Advies berekend voor ${done} van ${total} ${total === 1 ? "perceel" : "percelen"}…`,
   loadingFields: (count: number) =>
     `Advies wordt berekend voor ${count} ${count === 1 ? "perceel" : "percelen"}…`,
   loadFailed: "Het bemestingsadvies kon niet worden geladen.",
@@ -298,28 +300,34 @@ export function getFieldShading(
  * Doing this in JS (instead of in a MapLibre expression) keeps the style simple and testable, and
  * avoids nested objects in GeoJSON properties (MapLibre stringifies those).
  *
+ * The advice arrives per field. A field without a row is `loading` until every row has arrived
+ * (`complete`), and `none` (no advice) after that. The scale is taken from the rows received so
+ * far, so colours can still shift slightly while the last fields arrive.
+ *
  * @param fieldsData - Field geometries with at least `b_id` in the properties.
- * @param rowsById - Streamed advice per field, or `null` while still loading.
+ * @param rowsById - Advice rows received so far, by field ID.
+ * @param complete - `true` once the advice of every field has arrived.
  * @param nutrient - Selected nutrient symbol.
  * @param mode - Display mode.
  * @returns A new FeatureCollection; the input is not mutated.
  */
 export function applyNutrientAdviceShading(
   fieldsData: FeatureCollection<Geometry, GeoJsonProperties>,
-  rowsById: Map<string, AtlasNutrientAdviceRow> | null,
+  rowsById: Map<string, AtlasNutrientAdviceRow>,
+  complete: boolean,
   nutrient: string,
   mode: NutrientAdviceMode,
 ): FeatureCollection<Geometry, GeoJsonProperties> {
-  const scale = rowsById ? getNutrientAdviceScale([...rowsById.values()], nutrient) : null
+  const scale = getNutrientAdviceScale([...rowsById.values()], nutrient)
   const excessExempt = nutrient === "EOC"
 
   const features = fieldsData.features.map((feature): Feature<Geometry, GeoJsonProperties> => {
     const b_id = feature.properties?.b_id as string | undefined
-    let shading: FieldShading = { class: "loading", t: 0 }
-    if (rowsById && scale) {
-      const row = b_id ? rowsById.get(b_id) : undefined
-      shading = getFieldShading(row?.values[nutrient], mode, scale, excessExempt)
-    }
+    const row = b_id ? rowsById.get(b_id) : undefined
+    const shading: FieldShading =
+      row || complete
+        ? getFieldShading(row?.values[nutrient], mode, scale, excessExempt)
+        : { class: "loading", t: 0 }
     return {
       ...feature,
       properties: {

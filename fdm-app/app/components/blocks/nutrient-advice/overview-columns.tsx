@@ -4,6 +4,7 @@ import { NavLink } from "react-router"
 import { CultivationSuggestionBadge } from "~/components/blocks/cultivation/suggestion"
 import { getCultivationColor } from "~/components/custom/cultivation-colors"
 import { Badge } from "~/components/ui/badge"
+import { Skeleton } from "~/components/ui/skeleton"
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
 import { cn } from "~/lib/utils"
 import type { FieldNutrientRow, UnitMode } from "./overview-types"
@@ -113,6 +114,14 @@ function NutrientCell({
 }) {
   const value = row.values[nutrient.symbol]
 
+  if (row.pending) {
+    return (
+      <span className="flex justify-end">
+        <Skeleton className="h-4 w-14" />
+      </span>
+    )
+  }
+
   if (row.errorMessage || !value) {
     return (
       <Tooltip>
@@ -147,6 +156,7 @@ function NutrientCell({
 function buildNutrientColumn(
   nutrient: NutrientDescription,
   unitMode: UnitMode,
+  complete: boolean,
 ): ColumnDef<typeof overviewTableFeatures, FieldNutrientRow> {
   return {
     id: nutrient.symbol,
@@ -162,6 +172,15 @@ function buildNutrientColumn(
     ),
     cell: ({ row }) => <NutrientCell row={row.original} nutrient={nutrient} unitMode={unitMode} />,
     footer: ({ table }) => {
+      // The farm average or total is only meaningful once every field's advice has arrived.
+      if (!complete) {
+        return (
+          <span className="flex justify-end">
+            <Skeleton className="h-4 w-14" />
+          </span>
+        )
+      }
+
       const rows = table
         .getFilteredRowModel()
         .rows.map((r) => r.original)
@@ -334,12 +353,15 @@ const typeOrder = ["primary", "secondary", "trace"] as const
  * @param unitMode Whether to display per-ha or total nutrient advice on the table.
  * @param b_id_farm ID of the farm to be used for links.
  * @param calendar Current calendar to be used for links.
+ * @param complete Whether every field's advice has arrived; until then the farm row shows a
+ * placeholder.
  */
 export function buildOverviewColumns(
   nutrients: NutrientDescription[],
   unitMode: UnitMode,
   b_id_farm: string,
   calendar: string,
+  complete: boolean,
 ) {
   type ColGroup = ReturnType<typeof columnHelper.group>
   const fieldColumns = columnHelper.columns([buildFieldColumn(b_id_farm, calendar, unitMode)])
@@ -358,7 +380,7 @@ export function buildOverviewColumns(
     if (typeof group === "undefined") {
       continue
     }
-    ;(group.columns as any[]).push(buildNutrientColumn(nutrient, unitMode))
+    ;(group.columns as any[]).push(buildNutrientColumn(nutrient, unitMode, complete))
   }
 
   return [...fieldColumns, ...nutrientColumns]

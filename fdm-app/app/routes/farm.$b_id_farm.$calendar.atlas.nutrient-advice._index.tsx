@@ -60,12 +60,13 @@ import {
 } from "~/components/ui/select"
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group"
 import { useAnalytics } from "~/hooks/use-analytics"
+import { useStreamedRows } from "~/hooks/use-streamed-rows"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { getFarmNutrientAdviceRows } from "~/lib/nutrient-advice.server"
+import { startFarmNutrientAdviceRows } from "~/lib/nutrient-advice.server"
 import { useSelectedAtlasNutrientAdviceStore } from "~/store/selected-nutrient-advice"
 
 export const meta: MetaFunction = () => {
@@ -82,12 +83,12 @@ export const meta: MetaFunction = () => {
 /**
  * Loads the field geometries of the farm immediately and defers the per-field nutrient advice.
  *
- * The advice needs one NMI API call per field, so it is returned as a promise (`asyncData`) that
- * React Router streams to the client. The map renders the field outlines straight away and colours
- * them as soon as the advice arrives.
+ * The advice needs one NMI API call per field, so it is returned as one promise per field
+ * (`rowPromises`) that React Router streams to the client. The map renders the field outlines
+ * straight away and colours each field as soon as its advice arrives.
  *
- * @returns `fieldsData` (simplified GeoJSON, `undefined` without a farm) and `asyncData` (slim
- * advice rows in kg/ha, `null` without a farm).
+ * @returns `fieldsData` (simplified GeoJSON, `undefined` without a farm) and `rowPromises` (slim
+ * advice rows in kg/ha, one promise per field, `null` without a farm).
  * @throws {Response} When loading the fields fails.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -98,7 +99,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const timeframe = getTimeframe(params)
 
     let fieldsData: FeatureCollection | undefined
-    let asyncData: Promise<{ rows: AtlasNutrientAdviceRow[] }> | null = null
+    let rowPromises: Promise<AtlasNutrientAdviceRow>[] | null = null
 
     if (b_id_farm && b_id_farm !== "undefined") {
       const fields = await getFields(fdm, session.principal_id, b_id_farm, timeframe)
@@ -120,24 +121,24 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       }
 
       // Same calculation as the Bemestingsadvies overview, then slimmed down to what the map needs.
-      asyncData = getFarmNutrientAdviceRows(
+      rowPromises = startFarmNutrientAdviceRows(
         { principal_id: session.principal_id, b_id_farm, calendar, timeframe },
         fields,
-      ).then((rows) => ({
-        rows: rows.map((row): AtlasNutrientAdviceRow => ({
+      ).map((promise) =>
+        promise.then((row): AtlasNutrientAdviceRow => ({
           b_id: row.b_id,
           b_lu_name: row.mainCultivation?.b_lu_name ?? null,
           errorMessage: row.errorMessage,
           values: row.values,
         })),
-      }))
+      )
     }
 
     return {
       calendar,
       b_id_farm,
       fieldsData,
-      asyncData,
+      rowPromises,
       nutrientsDescription: getNutrientsDescription(),
     }
   } catch (error) {
@@ -146,63 +147,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Resolves the streamed advice into state.
- *
- * Deliberately not `Suspense` + `use()`: the map source must stay mounted while the advice loads
- * (otherwise MapLibre removes and re-adds the source and layers), and the tooltip and legend need
- * the same rows. Returns `null` while loading and again whenever a new promise arrives
- * (farm or year switch).
- *
- * The result is stored together with the promise it came from. "Loading" is then derived during
- * render (stored promise ≠ current promise) instead of resetting state inside the effect, which
- * `react/set-state-in-effect` forbids. State is only set from the async callbacks.
- *
- * A rejected promise (network/transport error) is kept apart from a successful result: it must not
- * look like "no advice for any field".
- *
- * @param asyncData - Deferred loader data, or `null` without a farm.
- * @returns `rows` (`null` while loading or after a failure) and `failed` (`true` when the current
- * promise rejected).
- */
-function useStreamedRows(asyncData: Promise<{ rows: AtlasNutrientAdviceRow[] }> | null): {
-  rows: AtlasNutrientAdviceRow[] | null
-  failed: boolean
-} {
-  const [resolved, setResolved] = useState<{
-    source: Promise<{ rows: AtlasNutrientAdviceRow[] }>
-    rows: AtlasNutrientAdviceRow[] | null
-    failed: boolean
-  } | null>(null)
-
-  useEffect(() => {
-    if (!asyncData) return
-    let cancelled = false
-    asyncData
-      .then((data) => {
-        if (!cancelled) setResolved({ source: asyncData, rows: data.rows, failed: false })
-      })
-      .catch((error: unknown) => {
-        // The helper never rejects for data problems; this only covers transport errors.
-        console.error("Failed to load nutrient advice for the atlas:", error)
-        if (!cancelled) setResolved({ source: asyncData, rows: null, failed: true })
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [asyncData])
-
-  // A result from a previous farm/year promise is stale and reads as "loading".
-  if (!resolved || resolved.source !== asyncData) return { rows: null, failed: false }
-  return { rows: resolved.rows, failed: resolved.failed }
-}
-
-/**
  * Atlas layer "Bemestingsadvies": colours every field of the farm by its nutrient advice for the
  * selected nutrient (all in kg/ha). Hovering a field shows advice / applied / remaining for that
  * nutrient; clicking a field opens the full fertilization advice page of that field.
  */
 export default function FarmAtlasNutrientAdviceBlock() {
-  const { calendar, b_id_farm, fieldsData, asyncData, nutrientsDescription } =
+  const { calendar, b_id_farm, fieldsData, rowPromises, nutrientsDescription } =
     useLoaderData<typeof loader>()
   const navigate = useNavigate()
   const { capture } = useAnalytics()
@@ -219,13 +169,17 @@ export default function FarmAtlasNutrientAdviceBlock() {
     capture("atlas_viewed", { b_id_farm, calendar, layer: "nutrient_advice", nutrient, mode })
   }, [b_id_farm, calendar, nutrient, mode, capture])
 
-  const { rows, failed: loadFailed } = useStreamedRows(asyncData)
-  // Re-runs the loader, which returns a new `asyncData` promise (shown as "loading" again).
+  // The map source stays mounted while the advice streams in (Suspense would remove and re-add the
+  // MapLibre source), and each field is coloured as soon as its advice arrives.
+  const streamed = useStreamedRows(rowPromises)
+  const loadFailed = streamed.failed
+  // Re-runs the loader, which returns new `rowPromises` (shown as "loading" again).
   const revalidator = useRevalidator()
-  const rowsById = useMemo(
-    () => (rows ? new Map(rows.map((row) => [row.b_id, row])) : null),
-    [rows],
+  const rows = useMemo(
+    () => streamed.rows.filter((row): row is AtlasNutrientAdviceRow => row !== undefined),
+    [streamed.rows],
   )
+  const rowsById = useMemo(() => new Map(rows.map((row) => [row.b_id, row])), [rows])
 
   const nutrientDescription: NutrientDescription | undefined = nutrientsDescription.find(
     (item) => item.symbol === nutrient,
@@ -234,16 +188,19 @@ export default function FarmAtlasNutrientAdviceBlock() {
   // Fields with `nav_class` / `nav_t` for the selected nutrient and mode.
   const shadedFields = useMemo(
     () =>
-      fieldsData ? applyNutrientAdviceShading(fieldsData, rowsById, nutrient, mode) : undefined,
-    [fieldsData, rowsById, nutrient, mode],
+      fieldsData
+        ? applyNutrientAdviceShading(fieldsData, rowsById, streamed.complete, nutrient, mode)
+        : undefined,
+    [fieldsData, rowsById, streamed.complete, nutrient, mode],
   )
+  // `null` until the first field has arrived, so the legend shows its loading state.
   const scale = useMemo(
-    () => (rows ? getNutrientAdviceScale(rows, nutrient) : null),
+    () => (rows.length > 0 ? getNutrientAdviceScale(rows, nutrient) : null),
     [rows, nutrient],
   )
   const classCounts = useMemo(() => countNutrientAdviceClasses(shadedFields), [shadedFields])
   // Shown in the legend when no field has advice, e.g. when the advice service is unavailable.
-  const noAdviceReason = rows?.find((row) => row.errorMessage)?.errorMessage
+  const noAdviceReason = rows.find((row) => row.errorMessage)?.errorMessage
 
   const initialViewState = getViewState(fieldsData)
 
@@ -318,8 +275,10 @@ export default function FarmAtlasNutrientAdviceBlock() {
                 <AtlasTooltipContent className="block">
                   <NutrientAdviceTooltipBody
                     row={row}
-                    isLoading={rowsById === null && !loadFailed}
-                    loadFailed={loadFailed}
+                    // Per field: a field whose advice already arrived shows it, even while others
+                    // are still loading or after a transport error.
+                    isLoading={!row && !streamed.complete}
+                    loadFailed={!row && loadFailed}
                     nutrient={nutrientDescription}
                   />
                 </AtlasTooltipContent>
@@ -420,7 +379,7 @@ export default function FarmAtlasNutrientAdviceBlock() {
       </Card>
 
       {/* Legend (bottom left) */}
-      {nutrientDescription && asyncData && (
+      {nutrientDescription && rowPromises && (
         <div className="pointer-events-none absolute bottom-9 left-4">
           <NutrientAdviceLegend
             mode={mode}
@@ -429,6 +388,7 @@ export default function FarmAtlasNutrientAdviceBlock() {
             scale={scale}
             counts={classCounts}
             fieldCount={fieldsData?.features.length ?? 0}
+            progress={{ settled: streamed.settled, total: streamed.total }}
             noAdviceReason={noAdviceReason}
             loadFailed={loadFailed}
             onRetry={() => void revalidator.revalidate()}

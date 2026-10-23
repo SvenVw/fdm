@@ -36,18 +36,37 @@ export type FarmNutrientAdviceArgs = {
 }
 
 /**
- * Splits an array into consecutive chunks of at most `size` items each.
+ * Creates a limiter that runs at most `limit` tasks at the same time. A new task starts as soon as
+ * any running task settles, so one slow task does not hold back a whole batch.
  *
- * @param items - Items to split.
- * @param size - Maximum chunk size; must be at least 1.
- * @returns The chunks, in the original order.
+ * @param limit - Maximum number of tasks running at once; must be at least 1.
+ * @returns A function that schedules a task and resolves or rejects with its result.
  */
-function chunk<T>(items: T[], size: number): T[][] {
-  const chunks: T[][] = []
-  for (let i = 0; i < items.length; i += size) {
-    chunks.push(items.slice(i, i + size))
+function createLimiter(limit: number) {
+  let active = 0
+  const queue: (() => void)[] = []
+
+  const next = () => {
+    if (active >= limit) return
+    const start = queue.shift()
+    if (!start) return
+    active += 1
+    start()
   }
-  return chunks
+
+  return function run<T>(task: () => Promise<T>): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+      queue.push(() => {
+        task()
+          .then(resolve, reject)
+          .finally(() => {
+            active -= 1
+            next()
+          })
+      })
+      next()
+    })
+  }
 }
 
 /**
@@ -69,26 +88,30 @@ function errorRow(field: FarmField, errorMessage: string): FieldNutrientRow {
 }
 
 /**
- * Calculates the nutrient advice and the already applied dose for every field of a farm.
+ * Starts calculating the nutrient advice and the already applied dose for every field of a farm,
+ * and returns one promise per field, so callers can show each field as soon as it is ready.
  *
- * Farm-wide data (cultivations, fertilizer applications, soil data and fertilizers) is fetched in a
- * single batch. The NMI advice API is then called per field, with at most
- * {@link NUTRIENT_ADVICE_CONCURRENCY} requests in parallel.
+ * Farm-wide data (cultivations, fertilizer applications, soil data and fertilizers) is fetched once
+ * in a single batch. The NMI advice API is then called per field, with at most
+ * {@link NUTRIENT_ADVICE_CONCURRENCY} requests running at the same time; the next field starts as
+ * soon as any running request finishes.
  *
- * This function never throws for data problems: every failure is turned into a row with
+ * The promises never reject for data problems: every failure is turned into a row with
  * `errorMessage` set, so one failing field does not break the overview table or the atlas layer.
+ * React Router can stream the returned promises to the client one by one.
  *
  * Shared by the Bemestingsadvies overview (`nutrient_advice._index`) and the Atlas layer
  * (`atlas.nutrient-advice._index`).
  *
  * @param args - Session principal, farm, calendar year and timeframe.
  * @param fields - Fields of the farm, as returned by `getFields`.
- * @returns One {@link FieldNutrientRow} per field, in the same order as `fields`. Values are in kg/ha.
+ * @returns One promise of a {@link FieldNutrientRow} per field, in the same order as `fields`.
+ * Values are in kg/ha.
  */
-export async function getFarmNutrientAdviceRows(
+export function startFarmNutrientAdviceRows(
   args: FarmNutrientAdviceArgs,
   fields: FarmField[],
-): Promise<FieldNutrientRow[]> {
+): Promise<FieldNutrientRow>[] {
   const { principal_id, b_id_farm, calendar, timeframe } = args
 
   if (fields.length === 0) {
@@ -96,31 +119,32 @@ export async function getFarmNutrientAdviceRows(
   }
 
   const nutrientsDescription = getNutrientsDescription()
-
-  // Fetch farm-wide data in a handful of batched queries instead of N queries per field. If this
-  // batch fails, fall back to per-field error rows instead of throwing to the route error boundary.
-  let cultivationsByField: Awaited<ReturnType<typeof getCultivationsForFarm>>
-  let fertilizerApplicationsByField: Awaited<ReturnType<typeof getFertilizerApplicationsForFarm>>
-  let soilDataByField: Awaited<ReturnType<typeof getCurrentSoilDataForFarm>>
-  let fertilizers: Awaited<ReturnType<typeof getFertilizers>>
-  try {
-    ;[cultivationsByField, fertilizerApplicationsByField, soilDataByField, fertilizers] =
-      await Promise.all([
-        getCultivationsForFarm(fdm, principal_id, b_id_farm, timeframe),
-        getFertilizerApplicationsForFarm(fdm, principal_id, b_id_farm, timeframe),
-        getCurrentSoilDataForFarm(fdm, principal_id, b_id_farm, timeframe),
-        getFertilizers(fdm, principal_id, b_id_farm),
-      ])
-  } catch (error) {
-    const errorMessage = toFriendlyAdviceError(error)
-    return fields.map((field) => errorRow(field, errorMessage))
-  }
-
   const nmiApiKey = getNmiApiKey()
 
+  // Fetch farm-wide data in a handful of batched queries instead of N queries per field. If this
+  // batch fails, every field gets an error row instead of the route error boundary.
+  const farmData = Promise.all([
+    getCultivationsForFarm(fdm, principal_id, b_id_farm, timeframe),
+    getFertilizerApplicationsForFarm(fdm, principal_id, b_id_farm, timeframe),
+    getCurrentSoilDataForFarm(fdm, principal_id, b_id_farm, timeframe),
+    getFertilizers(fdm, principal_id, b_id_farm),
+  ]).then(
+    ([cultivationsByField, fertilizerApplicationsByField, soilDataByField, fertilizers]) => ({
+      ok: true as const,
+      cultivationsByField,
+      fertilizerApplicationsByField,
+      soilDataByField,
+      fertilizers,
+    }),
+    (error: unknown) => ({ ok: false as const, errorMessage: toFriendlyAdviceError(error) }),
+  )
+
   /** Calculates the row of a single field. May throw; the caller maps rejections to error rows. */
-  async function getRow(field: FarmField): Promise<FieldNutrientRow> {
-    const cultivations = cultivationsByField.get(field.b_id) ?? []
+  async function getRow(
+    field: FarmField,
+    data: Extract<Awaited<typeof farmData>, { ok: true }>,
+  ): Promise<FieldNutrientRow> {
+    const cultivations = data.cultivationsByField.get(field.b_id) ?? []
     const b_area = field.b_area ?? 0
 
     if (cultivations.length === 0) {
@@ -128,8 +152,8 @@ export async function getFarmNutrientAdviceRows(
     }
 
     const activeCultivation = getMainCultivation(cultivations, calendar)
-    const fertilizerApplications = fertilizerApplicationsByField.get(field.b_id) ?? []
-    const currentSoilData = soilDataByField.get(field.b_id) ?? []
+    const fertilizerApplications = data.fertilizerApplicationsByField.get(field.b_id) ?? []
+    const currentSoilData = data.soilDataByField.get(field.b_id) ?? []
 
     // Only ask the NMI API for a crop suggestion when no main cultivation is registered.
     const cultivationSuggestion = activeCultivation
@@ -162,7 +186,10 @@ export async function getFarmNutrientAdviceRows(
     }
 
     try {
-      const doses = calculateDose({ applications: fertilizerApplications, fertilizers })
+      const doses = calculateDose({
+        applications: fertilizerApplications,
+        fertilizers: data.fertilizers,
+      })
       const nutrientAdvice = await getNutrientAdvice(fdm, {
         b_lu_catalogue: activeCultivation.b_lu_catalogue,
         b_centroid: field.b_centroid,
@@ -204,15 +231,29 @@ export async function getFarmNutrientAdviceRows(
     }
   }
 
-  const results: PromiseSettledResult<FieldNutrientRow>[] = []
-  for (const fieldsChunk of chunk(fields, NUTRIENT_ADVICE_CONCURRENCY)) {
-    results.push(...(await Promise.allSettled(fieldsChunk.map(getRow))))
-  }
+  const limit = createLimiter(NUTRIENT_ADVICE_CONCURRENCY)
+  return fields.map(async (field) => {
+    const data = await farmData
+    if (!data.ok) return errorRow(field, data.errorMessage)
+    try {
+      return await limit(() => getRow(field, data))
+    } catch (error) {
+      return errorRow(field, toFriendlyAdviceError(error))
+    }
+  })
+}
 
-  // `results` has the same order as `fields`, because chunks are processed sequentially.
-  return results.map((result, index) =>
-    result.status === "fulfilled"
-      ? result.value
-      : errorRow(fields[index], toFriendlyAdviceError(result.reason)),
-  )
+/**
+ * Calculates the nutrient advice and the already applied dose for every field of a farm and waits
+ * for all of them. Use {@link startFarmNutrientAdviceRows} instead to show fields as they arrive.
+ *
+ * @param args - Session principal, farm, calendar year and timeframe.
+ * @param fields - Fields of the farm, as returned by `getFields`.
+ * @returns One {@link FieldNutrientRow} per field, in the same order as `fields`. Values are in kg/ha.
+ */
+export function getFarmNutrientAdviceRows(
+  args: FarmNutrientAdviceArgs,
+  fields: FarmField[],
+): Promise<FieldNutrientRow[]> {
+  return Promise.all(startFarmNutrientAdviceRows(args, fields))
 }

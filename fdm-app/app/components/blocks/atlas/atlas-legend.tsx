@@ -403,6 +403,8 @@ interface NutrientAdviceLegendProps {
   counts: Record<NutrientAdviceClass, number>
   /** Number of fields on the map. */
   fieldCount: number
+  /** How many fields' advice has arrived (`settled`) out of `total`; shown while streaming. */
+  progress: { settled: number; total: number }
   /** Reason shown when no field has advice (e.g. the first error message), if known. */
   noAdviceReason?: string
   /** `true` when loading the advice failed (network/transport error), not "no advice". */
@@ -493,6 +495,7 @@ export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
     scale,
     counts,
     fieldCount,
+    progress,
     noAdviceReason,
     loadFailed,
     onRetry,
@@ -596,7 +599,16 @@ export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
     )
   }
 
-  if (fieldCount > 0 && counts.none === fieldCount) {
+  const complete = progress.settled >= progress.total
+  // Progress while the advice streams in field by field; also shown when collapsed on a phone.
+  const progressLine = complete ? null : (
+    <p className="text-muted-foreground flex items-center gap-2 text-xs" role="status">
+      <Spinner className="size-3" />
+      {NUTRIENT_ADVICE_COPY.loadingProgress(progress.settled, progress.total)}
+    </p>
+  )
+
+  if (complete && fieldCount > 0 && counts.none === fieldCount) {
     return (
       <Card className={cardClassName}>
         {staticHeader}
@@ -612,7 +624,12 @@ export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
   }
 
   if (collapsed) {
-    return <Card className={cardClassName}>{header}</Card>
+    return (
+      <Card className={cardClassName}>
+        {header}
+        {progressLine}
+      </Card>
+    )
   }
 
   const swatch = (status: AdviceProgressStatus) => (
@@ -688,6 +705,7 @@ export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
             />
           )}
         </ul>
+        {progressLine}
       </CardContent>
     </Card>
   )

@@ -1,10 +1,15 @@
 import { checkPermission, getFields } from "@nmi-agro/fdm-core"
 import { BookOpenText } from "lucide-react"
-import { Suspense, use, useEffect } from "react"
-import { type LoaderFunctionArgs, type MetaFunction, NavLink, useLoaderData } from "react-router"
+import { useEffect, useMemo } from "react"
+import {
+  type LoaderFunctionArgs,
+  type MetaFunction,
+  NavLink,
+  useLoaderData,
+  useRevalidator,
+} from "react-router"
 import type { FieldNutrientRow } from "~/components/blocks/nutrient-advice/overview-types"
 import { getNutrientsDescription } from "~/components/blocks/nutrient-advice/nutrients"
-import { NutrientAdviceOverviewSkeleton } from "~/components/blocks/nutrient-advice/overview-skeleton"
 import { NutrientAdviceOverviewTable } from "~/components/blocks/nutrient-advice/overview-table"
 import { Button } from "~/components/ui/button"
 import {
@@ -16,12 +21,13 @@ import {
   EmptyTitle,
 } from "~/components/ui/empty"
 import { useAnalytics } from "~/hooks/use-analytics"
+import { useStreamedRows } from "~/hooks/use-streamed-rows"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { getFarmNutrientAdviceRows } from "~/lib/nutrient-advice.server"
+import { startFarmNutrientAdviceRows } from "~/lib/nutrient-advice.server"
 import { cn } from "~/lib/utils"
 
 // Meta
@@ -39,8 +45,9 @@ export const meta: MetaFunction = () => {
 
 /**
  * Loads the fields of a farm and their write permission, so the overview can render immediately.
- * The (slower) per-field nutrient advice calculation is deferred into `asyncData` and streamed in,
- * since it requires an external NMI API call per field.
+ * The (slower) per-field nutrient advice calculation is returned as one promise per field
+ * (`rowPromises`) and streamed in, since it requires an external NMI API call per field.
+ * `pendingFields` lets the table show every field's name while its advice is still loading.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
   try {
@@ -72,10 +79,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const nutrientsDescription = getNutrientsDescription()
 
     // Per-field advice is shared with the Atlas "Bemestingsadvies" layer (FDM-361).
-    const asyncData: Promise<{ rows: FieldNutrientRow[] }> = getFarmNutrientAdviceRows(
+    const rowPromises: Promise<FieldNutrientRow>[] = startFarmNutrientAdviceRows(
       { principal_id: session.principal_id, b_id_farm, calendar, timeframe },
       fields,
-    ).then((rows) => ({ rows }))
+    )
 
     return {
       hasFields: fields.length > 0,
@@ -83,7 +90,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       calendar: calendar,
       farmWritePermission,
       nutrientsDescription,
-      asyncData,
+      pendingFields: fields.map((field) => ({
+        b_id: field.b_id,
+        b_name: field.b_name,
+        b_area: field.b_area ?? 0,
+      })),
+      rowPromises,
     }
   } catch (error) {
     throw handleLoaderError(error)
@@ -134,29 +146,42 @@ export default function FieldNutrientAdviceIndex() {
 
   return (
     <div className="min-w-0 px-10 pb-10">
-      <Suspense key={`${b_id_farm}#${calendar}`} fallback={<NutrientAdviceOverviewSkeleton />}>
-        <NutrientAdviceOverview loaderData={loaderData} />
-      </Suspense>
+      {/* Keyed per farm and year, so search and sorting start fresh on a switch. */}
+      <NutrientAdviceOverview key={`${b_id_farm}#${calendar}`} loaderData={loaderData} />
     </div>
   )
 }
 
 /**
- * Renders the table once the per-field nutrient advice has resolved.
- *
- * This has to be extracted into a separate component because of the `use(...)` hook.
- * React will not render the component until `asyncData` resolves, but React Router
- * handles it nicely via the `Suspense` component and server-to-client data streaming.
+ * Renders the table straight away and fills it field by field as the streamed advice arrives.
+ * Fields whose advice has not arrived yet are shown as `pending` placeholder rows, so their names
+ * are visible immediately.
  */
 function NutrientAdviceOverview({
   loaderData,
 }: {
-  loaderData: Awaited<ReturnType<typeof loader>>
+  loaderData: ReturnType<typeof useLoaderData<typeof loader>>
 }) {
-  const { rows } = use(loaderData.asyncData)
+  const streamed = useStreamedRows(loaderData.rowPromises)
+  // Re-runs the loader, which returns new `rowPromises` (shown as loading again).
+  const revalidator = useRevalidator()
+
+  const data = useMemo(
+    () =>
+      loaderData.pendingFields.map(
+        (field, index): FieldNutrientRow =>
+          streamed.rows[index] ?? { ...field, mainCultivation: null, values: {}, pending: true },
+      ),
+    [loaderData.pendingFields, streamed.rows],
+  )
+
   return (
     <NutrientAdviceOverviewTable
-      data={rows}
+      data={data}
+      progress={{ settled: streamed.settled, total: streamed.total }}
+      loadFailed={streamed.failed}
+      onRetry={() => void revalidator.revalidate()}
+      isRetrying={revalidator.state === "loading"}
       nutrients={loaderData.nutrientsDescription}
       b_id_farm={loaderData.b_id_farm}
       calendar={loaderData.calendar}
