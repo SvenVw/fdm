@@ -22,7 +22,7 @@ import {
   isExcludedFromBln3,
   type ScoreTier,
   scoreToDisplay,
-} from "@nmi-agro/fdm-calculator/indicators"
+} from "@nmi-agro/fdm-calculator/browser"
 
 // Score and exclusion rules are shared with the REST API through fdm-calculator.
 export { EXCLUDED_BLN3_BRP_CODES, getScoreTier, isExcludedFromBln3, scoreToDisplay }
