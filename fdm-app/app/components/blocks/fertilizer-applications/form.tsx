@@ -156,7 +156,9 @@ export function FertilizerApplicationForm<T extends typeof FormSchemaPartial>({
 
   const p_id = useWatch({ control: form.control, name: "p_id" })
   const selectedFertilizer = options.find((option) => option.value === p_id)
-  const isSubmitting = navigation.state !== "idle"
+  // Only a form submission counts; leaving the page without saving is a navigation without form
+  // data and must not look like saving
+  const isSubmitting = navigation.state !== "idle" && Boolean(navigation.formData)
   // With a custom (partial) schema, empty fields keep their value, so they are not required
   const requiredMarker = schema ? null : (
     <span className="text-red-500" aria-hidden="true">
