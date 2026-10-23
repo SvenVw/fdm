@@ -10,7 +10,7 @@ import {
 } from "@nmi-agro/fdm-core"
 import { useMemo } from "react"
 import { data, type MetaFunction, useLoaderData } from "react-router"
-import { dataWithSuccess } from "remix-toast"
+import { dataWithSuccess, redirectWithSuccess } from "remix-toast"
 import z from "zod"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
@@ -147,7 +147,7 @@ export async function loader({ params, request, url }: Route.LoaderArgs) {
         : isField
           ? ("field" as const)
           : ("rotation" as const),
-      backUrl: url.pathname.replace(/\/modify_fertilizer\/[^/]+\/?$/, ""),
+      backUrl: getBackUrl(url),
       farmName,
       farmOptions: farms.map((farm) => ({
         b_id_farm: farm.b_id_farm,
@@ -224,8 +224,15 @@ export default function ModifyFertilizerRoute() {
   )
 }
 
+/** The table the modify page was opened from: the field table or the rotation table. */
+function getBackUrl(url: URL) {
+  return url.pathname.replace(/\/modify_fertilizer\/[^/]+\/?$/, "")
+}
+
 const RemoveSchema = z.object({
   intent: z.literal("remove_application"),
+  /** Set when every listed application is removed, so the page would be empty. */
+  removeAll: z.literal("true").optional(),
   appIds: z
     .string()
     .transform(parseAppIds)
@@ -236,7 +243,7 @@ const RemoveSchema = z.object({
  * Changes the selected applications (`PUT`, with the partial form values) or removes them (`POST`
  * with intent `remove_application`).
  */
-export async function action({ request }: Route.ActionArgs) {
+export async function action({ request, url }: Route.ActionArgs) {
   try {
     const session = await getSession(request)
 
@@ -254,17 +261,19 @@ export async function action({ request }: Route.ActionArgs) {
     }
 
     const formData = await extractFormValuesFromRequest(request, RemoveSchema)
-    await fdm.transaction((tx) =>
-      Promise.all(
-        formData.appIds.map(({ p_app_id }) =>
-          removeFertilizerApplication(tx, session.principal_id, p_app_id),
-        ),
-      ),
-    )
-    return dataWithSuccess(null, {
-      message:
-        formData.appIds.length === 1 ? "Bemesting is verwijderd" : "Bemestingen zijn verwijderd",
+    // Queries in a transaction share one connection, so run them one after the other
+    await fdm.transaction(async (tx) => {
+      for (const { p_app_id } of formData.appIds) {
+        await removeFertilizerApplication(tx, session.principal_id, p_app_id)
+      }
     })
+    const message =
+      formData.appIds.length === 1 ? "Bemesting is verwijderd" : "Bemestingen zijn verwijderd"
+    // Without applications left the page would be empty, so return to the table
+    if (formData.removeAll) {
+      return redirectWithSuccess(getBackUrl(url), { message })
+    }
+    return dataWithSuccess(null, { message })
   } catch (error) {
     return handleActionError(error)
   }

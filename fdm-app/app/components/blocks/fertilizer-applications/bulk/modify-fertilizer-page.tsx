@@ -192,6 +192,8 @@ export function ModifyFertilizerPage({
       {
         intent: "remove_application",
         appIds: selected.map((app) => `${app.b_id}:${app.p_app_id}`).join(","),
+        // The page would be empty afterwards, so the action returns to the table
+        ...(selected.length === applications.length ? { removeAll: "true" } : {}),
       },
       { method: "POST" },
     )
