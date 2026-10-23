@@ -302,7 +302,9 @@ export default function RvoImportCreatePage() {
     navigation.state === "submitting" && navigation.formData?.get("intent") === "save_fields"
 
   const [canUnloadSafely, setCanUnloadSafely] = useState(false)
-  const { formValues, issues } = useRvoImportForm(rvoImportReviewData, { calendar })
+  const { formValues, issues, changeSummaryAgainstRvo } = useRvoImportForm(rvoImportReviewData, {
+    calendar,
+  })
   const hasIssues = issues.length > 0
   const hasFieldsToAdd = formValues.fieldsToAdd.length > 0
 
@@ -475,6 +477,7 @@ export default function RvoImportCreatePage() {
                     calendar={calendar}
                     data={rvoImportReviewData}
                     cultivationOptions={cultivationOptions}
+                    changeSummaryAgainstRvo={changeSummaryAgainstRvo}
                   />
                 </div>
               </div>

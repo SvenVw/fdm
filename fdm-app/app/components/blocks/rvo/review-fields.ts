@@ -538,6 +538,13 @@ export interface ImportChangeSummary {
   remove: string[]
 }
 
+export interface ChangeSummaryAgainstRvo {
+  ignore: number
+  update: number
+  keep: number
+  doNotClose: number
+}
+
 /**
  * Groups the submitted changes by kind and names the fields they apply to, so the user can check
  * them before confirming. An update of a field that RVO no longer reports, which sets its end
@@ -567,6 +574,60 @@ export function summarizeImportChanges(
       summary.close.push(name)
     } else {
       summary.update.push(name)
+    }
+  }
+  return summary
+}
+
+/**
+ * Changes to be displayed to the user. RVO has the authoritative information so the users would
+ * be more interested in seeing what is different from RVO, unlike what `summarizeImportChanges`
+ * computes.
+ */
+export function summarizeChangesAgainstRvo(
+  data: ReviewItem[],
+  formValues: ImportFormValues,
+  ctx: ReviewFieldContext,
+): ChangeSummaryAgainstRvo {
+  const addedSourceIds = new Set(formValues.fieldsToAdd.map((field) => field.b_id_source))
+  const removedIds = new Set(formValues.fieldsToRemove)
+  const updatesById = new Map(formValues.fieldsToUpdate.map((update) => [update.b_id, update]))
+
+  const summary: ChangeSummaryAgainstRvo = { ignore: 0, update: 0, keep: 0, doNotClose: 0 }
+  for (const item of data) {
+    switch (item.status) {
+      case "NEW_REMOTE":
+        // RVO reports a field that is not imported.
+        if (item.rvoField && !addedSourceIds.has(item.rvoField.properties.CropFieldID)) {
+          summary.ignore++
+        }
+        break
+      case "NEW_LOCAL":
+        // RVO does not report the field, but it stays in FDM.
+        if (item.localField && !removedIds.has(item.localField.b_id)) summary.keep++
+        break
+      case "EXPIRED_LOCAL":
+        // RVO no longer reports the field, but it is not closed.
+        const update = item.localField && updatesById.get(item.localField.b_id)
+        if (item.localField && isNullish(update?.b_end)) summary.doNotClose++
+        break
+      case "MATCH":
+      case "CONFLICT": {
+        if (!item.localField) break
+        // Counted when any differing field is not submitted as an update, or is submitted with a
+        // value that still differs from RVO.
+        const update = updatesById.get(item.localField.b_id)
+        const differsFromRvo = [...getDiffKeys(item)].some((key) => {
+          const field = REVIEW_FIELDS.find((f) => f.key === key)
+          if (!field || !isRemoteAvailable(field, ctx)) return false
+          const remote = field.getRemote(item, ctx)
+          if (remote === undefined) return false
+          const value = update && key in update ? update[key] : field.getLocal(item)
+          return !valuesEqual(field.type, value, remote)
+        })
+        if (differsFromRvo) summary.update++
+        break
+      }
     }
   }
   return summary

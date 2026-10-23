@@ -329,7 +329,10 @@ export default function RvoImportReviewPage() {
     navigation.state === "submitting" && navigation.formData?.get("intent") === "apply_changes"
 
   const [canUnloadSafely, setCanUnloadSafely] = useState(false)
-  const { formValues, summary, issues } = useRvoImportForm(rvoImportReviewData, { calendar })
+  const { formValues, summary, issues, changeSummaryAgainstRvo } = useRvoImportForm(
+    rvoImportReviewData,
+    { calendar },
+  )
 
   // A failed save re-arms the guard even if the user had just disarmed it to submit.
   const effectiveCanUnloadSafely = canUnloadSafely && actionData?.success !== false
@@ -542,6 +545,7 @@ export default function RvoImportReviewPage() {
                     calendar={calendar}
                     data={rvoImportReviewData}
                     cultivationOptions={cultivationOptions}
+                    changeSummaryAgainstRvo={changeSummaryAgainstRvo}
                   />
                 </div>
               </div>

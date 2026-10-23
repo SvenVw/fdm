@@ -64,10 +64,13 @@ export function UploadMijnPercelenPage({
     navigation.state === "submitting" && navigation.formData?.get("intent") === "save_fields"
 
   const [canUnloadSafely, setCanUnloadSafely] = useState(true)
-  const { formValues, issues } = useRvoImportForm(rvoImportReviewData ?? emptyReviewData, {
-    calendar,
-    flags: mijnPercelenReviewFlags,
-  })
+  const { formValues, issues, changeSummaryAgainstRvo } = useRvoImportForm(
+    rvoImportReviewData ?? emptyReviewData,
+    {
+      calendar,
+      flags: mijnPercelenReviewFlags,
+    },
+  )
   const hasIssues = issues.length > 0
   const hasFieldsToAdd = formValues.fieldsToAdd.length > 0
 
@@ -199,6 +202,7 @@ export function UploadMijnPercelenPage({
                   calendar={calendar}
                   cultivationOptions={cultivationOptions}
                   flags={mijnPercelenReviewFlags}
+                  changeSummaryAgainstRvo={changeSummaryAgainstRvo}
                 />
               </div>
             </div>

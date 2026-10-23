@@ -85,7 +85,10 @@ import {
   REVIEW_FIELDS,
   summarizeImportChanges,
   valuesEqual,
+  summarizeChangesAgainstRvo,
+  ChangeSummaryAgainstRvo,
 } from "./review-fields"
+import { UserChoicesSummary } from "./user-choices-summary"
 
 export type { ImportReviewFlags }
 
@@ -103,6 +106,7 @@ interface RvoImportReviewTableProps {
   calendar: string
   flags?: ImportReviewFlags
   cultivationOptions: ReviewOption[]
+  changeSummaryAgainstRvo: ChangeSummaryAgainstRvo
 }
 
 function ActionItem({
@@ -822,6 +826,7 @@ export function useRvoImportForm(
     return {
       formValues,
       summary: summarizeImportChanges(data, formValues),
+      changeSummaryAgainstRvo: summarizeChangesAgainstRvo(data, formValues, ctx),
       issues: getImportIssues(data, userChoices, fieldsToAdd, fieldsToRemove, ctx),
     }
   }, [data, userChoices, fieldsToAdd, fieldsToRemove, calendar, bufferstripInfoAvailable])
@@ -895,6 +900,7 @@ function RvoImportReviewTableComponent({
   calendar,
   flags,
   cultivationOptions,
+  changeSummaryAgainstRvo,
 }: RvoImportReviewTableProps) {
   const clearActiveForm = useActiveTableFormStore((store) => store.clearActiveForm)
 
@@ -993,11 +999,14 @@ function RvoImportReviewTableComponent({
   return (
     <TooltipProvider>
       <div className="space-y-4">
-        <ImportDifferenceSummary
-          statusCounts={differences.statusCounts}
-          columnCounts={differences.columnCounts}
-          matches={{ expanded: showMatches, onToggle: toggleMatches }}
-        />
+        <div className="flex justify-between">
+          <ImportDifferenceSummary
+            statusCounts={differences.statusCounts}
+            columnCounts={differences.columnCounts}
+            matches={{ expanded: showMatches, onToggle: toggleMatches }}
+          />
+          <UserChoicesSummary changeSummaryAgainstRvo={changeSummaryAgainstRvo} />
+        </div>
         <div className="bg-card rounded-md border">
           <Table>
             <TableHeader>
