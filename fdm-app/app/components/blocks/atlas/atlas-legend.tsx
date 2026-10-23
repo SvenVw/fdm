@@ -513,10 +513,11 @@ export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
       </span>
     </>
   )
-  // Announced to screen readers when the nutrient or mode changes.
-  const header = (
+  // Announced to screen readers when the nutrient or mode changes. Only collapsible states get the
+  // toggle, so `aria-expanded` always matches what is shown.
+  const renderHeader = (collapsible: boolean) => (
     <CardHeader className="space-y-0.5 p-0" aria-live="polite">
-      {isMobile ? (
+      {collapsible ? (
         <button
           type="button"
           // The legend wrapper ignores pointer events so it never blocks the map.
@@ -541,6 +542,10 @@ export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
       )}
     </CardHeader>
   )
+  const header = renderHeader(isMobile)
+  // Failure and "no advice" messages stay visible (the retry button must stay reachable), so
+  // their header has no toggle.
+  const staticHeader = renderHeader(false)
   const cardClassName =
     "min-h-0 w-72 max-w-[calc(100vw-2rem)] flex-initial space-y-3 overflow-y-auto p-3 shadow-xs md:p-4"
 
@@ -549,7 +554,7 @@ export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
   if (loadFailed) {
     return (
       <Card className={cardClassName}>
-        {header}
+        {staticHeader}
         <CardContent className="space-y-2 p-0">
           <p className="flex items-start gap-2 text-xs" role="alert">
             <TriangleAlert className="mt-0.5 size-3.5 shrink-0 text-orange-500" />
@@ -575,6 +580,7 @@ export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
   }
 
   if (scale === null) {
+    if (collapsed) return <Card className={cardClassName}>{header}</Card>
     return (
       <Card className={cardClassName}>
         {header}
@@ -593,7 +599,7 @@ export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
   if (fieldCount > 0 && counts.none === fieldCount) {
     return (
       <Card className={cardClassName}>
-        {header}
+        {staticHeader}
         <CardContent className="space-y-1 p-0" role="alert">
           <p className="flex items-start gap-2 text-xs">
             <TriangleAlert className="mt-0.5 size-3.5 shrink-0 text-orange-500" />
@@ -605,12 +611,13 @@ export function NutrientAdviceLegend(props: NutrientAdviceLegendProps) {
     )
   }
 
-  const swatch = (status: AdviceProgressStatus) => (
-    <NutrientAdviceSwatch {...NUTRIENT_ADVICE_STATUS_SWATCHES[status]} />
-  )
   if (collapsed) {
     return <Card className={cardClassName}>{header}</Card>
   }
+
+  const swatch = (status: AdviceProgressStatus) => (
+    <NutrientAdviceSwatch {...NUTRIENT_ADVICE_STATUS_SWATCHES[status]} />
+  )
 
   const percentageMax = excessExempt ? 100 : NUTRIENT_ADVICE_PERCENTAGE_MAX
   const overRow = excessExempt ? null : (
