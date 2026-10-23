@@ -345,3 +345,17 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
     expect(result.total.toNumber()).toBeCloseTo(320, 0)
   })
 })
+
+describe("calculateNitrogenSupplyBySoilMineralizationUsingMinip", () => {
+  it("should return the yearly MINIP mineralization for known soil parameters", () => {
+    expect(
+      calculateNitrogenSupplyBySoilMineralizationUsingMinip(20, 10, 1.2).toNumber(),
+    ).toBeCloseTo(97.239835025751, 8)
+    expect(
+      calculateNitrogenSupplyBySoilMineralizationUsingMinip(35, 12, 1.1).toNumber(),
+    ).toBeCloseTo(116.991676515357, 8)
+    expect(
+      calculateNitrogenSupplyBySoilMineralizationUsingMinip(8, 9, 1.45).toNumber(),
+    ).toBeCloseTo(54.83246252841, 8)
+  })
+})
