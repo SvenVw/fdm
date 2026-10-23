@@ -39,7 +39,12 @@ async function toNmiApiError(response: Response): Promise<NmiApiError> {
   const status = response.status
   if (status === 400) {
     const message = await readErrorMessage(response)
-    return new NmiApiError(400, `Dyna kon niet rekenen met deze gegevens: ${message}`.trim())
+    return new NmiApiError(
+      400,
+      message
+        ? `Dyna kon niet rekenen met deze gegevens: ${message}`
+        : "Dyna kon niet rekenen met deze gegevens.",
+    )
   }
   if (status === 401 || status === 403) {
     return new NmiApiError(status, "Geen toegang tot de NMI API.")

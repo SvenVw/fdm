@@ -141,7 +141,7 @@ describe("requestDynaV2", () => {
 
     expect(error).toBeInstanceOf(NmiApiError)
     expect((error as NmiApiError).status).toBe(400)
-    expect((error as NmiApiError).message).toBe("Dyna kon niet rekenen met deze gegevens:")
+    expect((error as NmiApiError).message).toBe("Dyna kon niet rekenen met deze gegevens.")
   })
 
   it.each([401, 403])("throws NmiApiError %i when access is denied", async (status) => {

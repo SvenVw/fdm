@@ -245,6 +245,8 @@ export function shouldRevalidateMineralization({
   defaultShouldRevalidate,
 }: ShouldRevalidateFunctionArgs): boolean {
   if (formMethod || currentUrl.pathname !== nextUrl.pathname) return defaultShouldRevalidate
+  // Same URL means an explicit revalidation, e.g. a retry button
+  if (currentUrl.search === nextUrl.search) return defaultShouldRevalidate
   const current = new URLSearchParams(currentUrl.search)
   const next = new URLSearchParams(nextUrl.search)
   current.delete("phase")

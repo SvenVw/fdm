@@ -67,7 +67,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { isOfOrigin, modifySearchParams } from "~/lib/url-utils"
+import { modifySearchParams } from "~/lib/url-utils"
 
 export const meta: MetaFunction<typeof loader> = ({ loaderData }) => {
   const term = getHarvestTerm(
@@ -87,11 +87,22 @@ export const meta: MetaFunction<typeof loader> = ({ loaderData }) => {
 
 /**
  * Page to return to after saving or cancelling, when another page (such as Mineralisatie) opened
- * this form; only paths within the app are accepted.
+ * this form. The value is resolved against the app's origin and only its normalized path, search
+ * and hash are returned, so backslashes or control characters cannot lead to another site.
  */
 function getReturnUrl(url: URL): string | null {
   const returnUrl = url.searchParams.get("returnUrl")
-  return returnUrl?.startsWith("/") && isOfOrigin(returnUrl, url.origin) ? returnUrl : null
+  if (!returnUrl?.startsWith("/")) return null
+  let resolved: URL
+  try {
+    resolved = new URL(returnUrl, url.origin)
+  } catch {
+    return null
+  }
+  if (resolved.origin !== url.origin) return null
+  const relative = `${resolved.pathname}${resolved.search}${resolved.hash}`
+  // A normalized path such as "/.//example.com" becomes "//example.com", which is protocol-relative
+  return relative.startsWith("//") ? null : relative
 }
 
 export async function loader({ request, params, url }: LoaderFunctionArgs) {
