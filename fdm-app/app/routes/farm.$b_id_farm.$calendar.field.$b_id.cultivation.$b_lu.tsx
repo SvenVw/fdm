@@ -171,8 +171,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
       b_lu_variety_options: b_lu_variety_options,
       b_id_farm: b_id_farm,
       calendar: calendar,
-      maxCultivationAvailabilityYear:
-        serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
+      lastCultivationAvailabilityYear:
+        serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear,
       cultivationWritePermission: await cultivationWritePermission,
     }
   } catch (error) {
@@ -195,7 +195,7 @@ export default function FarmFieldsOverviewBlock() {
         b_lu_ya={loaderData.b_lu_ya}
         b_lu_variety_options={loaderData.b_lu_variety_options}
         editable={loaderData.cultivationWritePermission}
-        maxCultivationAvailabilityYear={loaderData.maxCultivationAvailabilityYear}
+        lastCultivationAvailabilityYear={loaderData.lastCultivationAvailabilityYear}
       />
       <CultivationHarvestsCard
         harvests={loaderData.harvests}

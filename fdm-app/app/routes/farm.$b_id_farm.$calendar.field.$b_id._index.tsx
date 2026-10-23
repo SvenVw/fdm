@@ -525,7 +525,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         ? isCultivationUnavailableInPeriod(
             activeCultivation,
             activeCatalogueItem?.b_lu_ya,
-            serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
+            serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear,
           )
         : null
     })()

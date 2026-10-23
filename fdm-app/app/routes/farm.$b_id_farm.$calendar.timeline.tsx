@@ -189,8 +189,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     return {
       b_id_farm,
       calendar,
-      maxCultivationAvailabilityYear:
-        serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
+      lastCultivationAvailabilityYear:
+        serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear,
       farmWritePermission,
       farmOptions,
       fields: timelineFields,
@@ -868,7 +868,7 @@ export default function TimelinePage() {
       <AddEventSheet
         b_id_farm={loaderData.b_id_farm}
         calendar={loaderData.calendar}
-        maxCultivationAvailabilityYear={loaderData.maxCultivationAvailabilityYear}
+        lastCultivationAvailabilityYear={loaderData.lastCultivationAvailabilityYear}
         canModify={loaderData.farmWritePermission}
         fertilizerOptions={loaderData.fertilizerOptions}
         cultivationOptions={loaderData.cultivationOptions}

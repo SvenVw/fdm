@@ -187,8 +187,8 @@ export async function loader({ request, params }: Route.LoaderArgs) {
       }
     })
 
-    const maxCultivationAvailabilityYear =
-      serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear
+    const lastCultivationAvailabilityYear =
+      serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear
 
     const rotationExtended = cultivationsInRotation.map((b_lu_catalogue) => {
       const catalogueItem = cultivationCatalogue.find(
@@ -225,7 +225,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
               isCultivationUnavailableInPeriod(
                 cultivation,
                 catalogueItem.b_lu_ya,
-                maxCultivationAvailabilityYear,
+                lastCultivationAvailabilityYear,
               ),
             )
             .find((result) => result !== null) ?? null

@@ -16,7 +16,7 @@ export type CultivationAvailabilityProps = {
       result: CultivationAvailabilityResult
       period?: never
       b_lu_ya?: never
-      maxCultivationAvailabilityYear?: never
+      lastCultivationAvailabilityYear?: never
     }
   | {
       result?: undefined
@@ -25,7 +25,7 @@ export type CultivationAvailabilityProps = {
       /** Years in which the RVO crop code is available, `null` when unknown. */
       b_lu_ya: number[] | null | undefined
       /** Last year that is checked for cultivations without an end date. */
-      maxCultivationAvailabilityYear: number | undefined
+      lastCultivationAvailabilityYear: number | undefined
     }
 )
 
@@ -60,7 +60,7 @@ function resolveResult(props: CultivationAvailabilityProps): CultivationAvailabi
   return isCultivationUnavailableInPeriod(
     props.period,
     props.b_lu_ya,
-    props.maxCultivationAvailabilityYear,
+    props.lastCultivationAvailabilityYear,
   )
 }
 

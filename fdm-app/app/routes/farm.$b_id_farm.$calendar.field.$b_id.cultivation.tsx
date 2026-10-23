@@ -114,7 +114,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const availabilityYear = Number.isNaN(availabilityYearRaw)
       ? undefined
       : Math.min(
-          serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
+          serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear,
           availabilityYearRaw,
         )
     const cultivationsCatalogue = await getCultivationsFromCatalogue(
@@ -156,8 +156,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return {
       field: field,
       cultivationsCatalogueOptions: cultivationsCatalogueOptions,
-      maxCultivationAvailabilityYear:
-        serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
+      lastCultivationAvailabilityYear:
+        serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear,
       cultivations: cultivations,
       harvests: harvests,
       fieldWritePermission: fieldWritePermission,
@@ -227,7 +227,7 @@ export default function FarmFieldsOverviewBlock() {
       <div className="grid gap-4 2xl:grid-cols-2">
         <CultivationListCard
           cultivationsCatalogueOptions={loaderData.cultivationsCatalogueOptions}
-          maxCultivationAvailabilityYear={loaderData.maxCultivationAvailabilityYear}
+          lastCultivationAvailabilityYear={loaderData.lastCultivationAvailabilityYear}
           cultivations={loaderData.cultivations}
           harvests={loaderData.harvests}
           editable={loaderData.fieldWritePermission}

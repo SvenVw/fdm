@@ -27,7 +27,7 @@ export interface CultivationsFormProps {
   b_lu?: string
   options: CultivationOption[]
   /** Last year that is checked for the RVO availability of cultivations without an end date. */
-  maxCultivationAvailabilityYear?: number
+  lastCultivationAvailabilityYear?: number
   /** When set, pre-fills the form and auto-opens the dialog (used for accepted suggestions). */
   defaultValues?: CultivationDefaultValues
 }

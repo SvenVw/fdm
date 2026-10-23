@@ -57,7 +57,7 @@ export function AddEventSheet({
   onOpenChange,
   b_id_farm,
   calendar,
-  maxCultivationAvailabilityYear,
+  lastCultivationAvailabilityYear,
   canModify,
   fields,
   fertilizerOptions,
@@ -67,7 +67,7 @@ export function AddEventSheet({
   onOpenChange: (open: boolean) => void
   b_id_farm: string
   calendar: string
-  maxCultivationAvailabilityYear: number
+  lastCultivationAvailabilityYear: number
   canModify: boolean
   fields: TimelineField[]
   fertilizerOptions: {
@@ -207,13 +207,13 @@ export function AddEventSheet({
   // Allow some wiggle room for the cultivations. Between 1 october and 1 january options for the next year will also be shown.
   const cultivationAvailabilityYearForPrev = request?.context.date
     ? Math.min(
-        maxCultivationAvailabilityYear,
+        lastCultivationAvailabilityYear,
         new Date(request.context.date.getTime() + 93 * 24 * 60 * 60 * 1000).getFullYear(),
       )
     : undefined
   const cultivationAvailabilityYearForNext = request?.context.date
     ? Math.min(
-        maxCultivationAvailabilityYear,
+        lastCultivationAvailabilityYear,
         new Date(request.context.date.getTime() - 1 * 24 * 60 * 60 * 1000).getFullYear(),
       )
     : undefined
@@ -314,7 +314,7 @@ export function AddEventSheet({
                 b_lu_start: request.context.date ?? today,
                 b_lu_end: undefined,
               }}
-              maxCultivationAvailabilityYear={maxCultivationAvailabilityYear}
+              lastCultivationAvailabilityYear={lastCultivationAvailabilityYear}
               options={cultivationOptions.filter(
                 (c) =>
                   c.value === request.context.b_lu ||
@@ -342,7 +342,7 @@ export function AddEventSheet({
                     ? request.context.date
                     : (cultivation?.b_lu_end ?? undefined),
               }}
-              maxCultivationAvailabilityYear={maxCultivationAvailabilityYear}
+              lastCultivationAvailabilityYear={lastCultivationAvailabilityYear}
               options={cultivationOptions}
             />
           ) : null}

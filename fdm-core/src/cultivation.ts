@@ -300,10 +300,10 @@ const MAX_PERIOD_YEARS_FOR_AVAILABILITY = 100
  * years in which the cultivation is active.
  *
  * @param period - Start and end date of the cultivation. A missing end date means the cultivation
- * is still active and runs up to `maxCultivationAvailabilityYear`.
+ * is still active and runs up to `lastCultivationAvailabilityYear`.
  * @param b_lu_ya - Sorted array of years in which the crop code is available, or `null` when no
  * availability information exists for the crop code.
- * @param maxCultivationAvailabilityYear - Last year that is checked for cultivations without an end date.
+ * @param lastCultivationAvailabilityYear - Last year that is checked for cultivations without an end date.
  * @returns An object with the first_unavailable_in field and last_unavailable_in fields if there is
  * a specific range of years that is determined to be unavailable yet requested for the cultivation.
  * An empty object is returned when the cultivation is assumed to be unavailable but the years aren't
@@ -313,13 +313,13 @@ const MAX_PERIOD_YEARS_FOR_AVAILABILITY = 100
 export function isCultivationUnavailableInPeriod(
   period: { b_lu_start?: Date | string | null; b_lu_end?: Date | string | null },
   b_lu_ya: number[] | null | undefined,
-  maxCultivationAvailabilityYear: number | undefined,
+  lastCultivationAvailabilityYear: number | undefined,
 ): { first_unavailable_in?: number; last_unavailable_in?: number } | null {
   if (
     !b_lu_ya ||
     b_lu_ya.length === 0 ||
-    typeof maxCultivationAvailabilityYear !== "number" ||
-    Number.isNaN(maxCultivationAvailabilityYear) ||
+    typeof lastCultivationAvailabilityYear !== "number" ||
+    Number.isNaN(lastCultivationAvailabilityYear) ||
     !period.b_lu_start
   ) {
     return null
@@ -337,10 +337,10 @@ export function isCultivationUnavailableInPeriod(
     return null
   }
 
-  const startYear = Math.min(maxCultivationAvailabilityYear, start.getFullYear())
+  const startYear = Math.min(lastCultivationAvailabilityYear, start.getFullYear())
 
   // Can return an open unavailability range when end is null.
-  if (end === null && maxCultivationAvailabilityYear > b_lu_ya[b_lu_ya.length - 1]) {
+  if (end === null && lastCultivationAvailabilityYear > b_lu_ya[b_lu_ya.length - 1]) {
     return { first_unavailable_in: b_lu_ya[b_lu_ya.length - 1] + 1 }
   }
 
@@ -348,8 +348,8 @@ export function isCultivationUnavailableInPeriod(
   const endYear = Math.max(
     startYear,
     Math.min(
-      maxCultivationAvailabilityYear,
-      end ? end.getFullYear() : maxCultivationAvailabilityYear,
+      lastCultivationAvailabilityYear,
+      end ? end.getFullYear() : lastCultivationAvailabilityYear,
     ),
   )
 

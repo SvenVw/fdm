@@ -36,13 +36,13 @@ export function CultivationDetailsCard({
   cultivation,
   b_lu_variety_options,
   b_lu_ya,
-  maxCultivationAvailabilityYear,
+  lastCultivationAvailabilityYear,
   editable = true,
 }: {
   cultivation: Cultivation
   b_lu_variety_options: { value: string; label: string }[]
   b_lu_ya: number[] | null
-  maxCultivationAvailabilityYear?: number
+  lastCultivationAvailabilityYear?: number
   editable?: boolean
 }) {
   const fetcher = useFetcher()
@@ -89,7 +89,7 @@ export function CultivationDetailsCard({
   const isCultivationUnavailable = isCultivationUnavailableInPeriod(
     { b_lu_start: current_b_lu_start, b_lu_end: current_b_lu_end },
     b_lu_ya,
-    maxCultivationAvailabilityYear,
+    lastCultivationAvailabilityYear,
   )
   const formCultivationAvailabilityWarning = isCultivationUnavailable
     ? getCultivationAvailabilityMessage(isCultivationUnavailable)
@@ -123,7 +123,7 @@ export function CultivationDetailsCard({
         <CultivationAvailabilityWarning
           period={{ b_lu_start: cultivation.b_lu_start, b_lu_end: cultivation.b_lu_end }}
           b_lu_ya={b_lu_ya}
-          maxCultivationAvailabilityYear={maxCultivationAvailabilityYear}
+          lastCultivationAvailabilityYear={lastCultivationAvailabilityYear}
         />
         <RemixFormProvider {...form}>
           <Form onSubmit={form.handleSubmit} method="post">

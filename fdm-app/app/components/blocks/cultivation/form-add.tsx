@@ -21,7 +21,7 @@ import { CultivationAddFormSchema } from "./schema"
 
 export function CultivationAddFormDialog({
   options,
-  maxCultivationAvailabilityYear,
+  lastCultivationAvailabilityYear,
   defaultValues,
   onClose,
 }: CultivationsFormProps & { onClose?: () => void }) {
@@ -48,7 +48,7 @@ export function CultivationAddFormDialog({
         </DialogHeader>
         <CultivationAddForm
           options={options}
-          maxCultivationAvailabilityYear={maxCultivationAvailabilityYear}
+          lastCultivationAvailabilityYear={lastCultivationAvailabilityYear}
           defaultValues={defaultValues}
           onSuccess={() => handleOpenChange(false)}
         />
@@ -59,7 +59,7 @@ export function CultivationAddFormDialog({
 
 export function CultivationAddForm({
   options,
-  maxCultivationAvailabilityYear,
+  lastCultivationAvailabilityYear,
   defaultValues,
   onSuccess,
   editable = true,
@@ -140,7 +140,7 @@ export function CultivationAddForm({
             <CultivationAvailabilityWarning
               period={{ b_lu_start: current_b_lu_start, b_lu_end: current_b_lu_end }}
               b_lu_ya={current_b_lu_ya}
-              maxCultivationAvailabilityYear={maxCultivationAvailabilityYear}
+              lastCultivationAvailabilityYear={lastCultivationAvailabilityYear}
             />
             <div className="">
               <Button type="submit" className="w-full">

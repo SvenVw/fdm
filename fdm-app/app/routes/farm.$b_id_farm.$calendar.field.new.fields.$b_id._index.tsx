@@ -111,7 +111,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const availabilityYear = Number.isNaN(availabilityYearRaw)
       ? undefined
       : Math.min(
-          serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear,
+          serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear,
           availabilityYearRaw,
         )
 

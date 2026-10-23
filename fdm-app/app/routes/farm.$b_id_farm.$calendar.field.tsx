@@ -180,8 +180,8 @@ export async function loader({ request, params, url }: LoaderFunctionArgs) {
         item.b_lu_ya,
       ]),
     )
-    const maxCultivationAvailabilityYear =
-      serverConfig.integrations["fdm-data"].maxCultivationAvailabilityYear
+    const lastCultivationAvailabilityYear =
+      serverConfig.integrations["fdm-data"].lastCultivationAvailabilityYear
     const fertilizerApplicationsForFarm = await getFertilizerApplicationsForFarm(
       fdm,
       session.principal_id,
@@ -205,7 +205,7 @@ export async function loader({ request, params, url }: LoaderFunctionArgs) {
           availabilityWarning: isCultivationUnavailableInPeriod(
             cultivation,
             availabilityYearsByCatalogue.get(cultivation.b_lu_catalogue),
-            maxCultivationAvailabilityYear,
+            lastCultivationAvailabilityYear,
           ),
         }))
 

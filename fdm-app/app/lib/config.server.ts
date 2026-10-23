@@ -95,10 +95,10 @@ export const serverConfig: ServerConfig = {
       ),
     },
     "fdm-data": {
-      maxCultivationAvailabilityYear: !Number.isNaN(
-        Number.parseInt(process.env.MAX_CULTIVATION_AVAILABILITY_YEAR ?? ""),
+      lastCultivationAvailabilityYear: !Number.isNaN(
+        Number.parseInt(process.env.LAST_CULTIVATION_AVAILABILITY_YEAR ?? ""),
       )
-        ? Number.parseInt(process.env.MAX_CULTIVATION_AVAILABILITY_YEAR ?? "")
+        ? Number.parseInt(process.env.LAST_CULTIVATION_AVAILABILITY_YEAR ?? "")
         : 2026,
     },
     ...(process.env.NMI_API_KEY?.trim()

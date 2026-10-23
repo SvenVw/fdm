@@ -42,7 +42,7 @@ export interface ServerConfig {
       maptilerKey?: string
     }
     "fdm-data": {
-      maxCultivationAvailabilityYear: number
+      lastCultivationAvailabilityYear: number
     }
     nmi?: {
       api_key: string
