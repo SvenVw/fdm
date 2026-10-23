@@ -8,6 +8,7 @@ import {
   type Field,
   getFertilizerParametersDescription,
   getFertilizers,
+  getFields,
   type PrincipalId,
 } from "@nmi-agro/fdm-core"
 import type { FertilizerOption } from "~/components/blocks/fertilizer-applications/types.d"
@@ -89,24 +90,35 @@ export interface BulkFertilizerApplicationValues {
 /**
  * Adds the same fertilizer application to several fields in one transaction.
  *
- * Duplicate field ids are ignored. When one of the fields fails, no application is added.
+ * Duplicate field ids are ignored. Fields that do not belong to the farm are rejected. When one
+ * of the fields fails, no application is added.
  *
  * @returns The ids of the fields the application was added to.
  */
 export async function addFertilizerApplicationToFields({
   fdm,
   principal_id,
+  b_id_farm,
   fieldIds,
   values,
 }: {
   fdm: FdmType
   principal_id: PrincipalId
+  b_id_farm: string
   fieldIds: string[]
   values: BulkFertilizerApplicationValues
 }): Promise<string[]> {
   const uniqueFieldIds = [...new Set(fieldIds.filter(Boolean))]
   // Queries in a transaction share one connection, so run them one after the other
   await fdm.transaction(async (tx) => {
+    // The field ids come from the URL, so only accept fields of the farm of the page
+    const farmFieldIds = new Set(
+      (await getFields(tx, principal_id, b_id_farm)).map((field) => field.b_id),
+    )
+    const outside = uniqueFieldIds.filter((b_id) => !farmFieldIds.has(b_id))
+    if (outside.length > 0) {
+      throw new Error(`Fields do not belong to farm ${b_id_farm}: ${outside.join(", ")}`)
+    }
     for (const b_id of uniqueFieldIds) {
       await addFertilizerApplication(
         tx,

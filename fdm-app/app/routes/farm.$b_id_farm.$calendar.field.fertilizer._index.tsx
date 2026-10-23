@@ -223,6 +223,7 @@ export async function action({ request, params, url }: ActionFunctionArgs) {
     const fieldIds = await addFertilizerApplicationToFields({
       fdm,
       principal_id: session.principal_id,
+      b_id_farm,
       fieldIds: requestedFieldIds,
       values: validatedData,
     })

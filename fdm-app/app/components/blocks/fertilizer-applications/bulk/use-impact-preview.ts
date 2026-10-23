@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from "react"
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import type {
   BulkBalancePreview,
+  BulkBlockResult,
   BulkFarmNorms,
   BulkFieldIssue,
   BulkImpactPreview,
@@ -78,11 +79,17 @@ export function parsePreviewValues(values: PreviewFormValues): PreviewApplicatio
 }
 
 /**
- * Resolves a streamed loader promise into state, so that values from several blocks can be
+ * Resolves a streamed block promise into state, so that values from several blocks can be
  * combined. Returns `undefined` until the promise settles, and again when a new promise is passed.
+ * A rejected promise, for example when the stream is interrupted, gives an error result, so the
+ * block shows its error instead of loading forever.
  */
-export function useSettled<T>(promise: Promise<T>): T | undefined {
-  const [state, setState] = useState<{ promise: Promise<T>; value: T } | undefined>(undefined)
+export function useSettled<T>(
+  promise: Promise<BulkBlockResult<T>>,
+): BulkBlockResult<T> | undefined {
+  const [state, setState] = useState<
+    { promise: Promise<BulkBlockResult<T>>; value: BulkBlockResult<T> } | undefined
+  >(undefined)
   useEffect(() => {
     let active = true
     promise.then(
@@ -90,7 +97,15 @@ export function useSettled<T>(promise: Promise<T>): T | undefined {
         if (active) setState({ promise, value })
       },
       () => {
-        // Block promises resolve with an error result; a rejection is handled by the error boundary
+        if (active) {
+          setState({
+            promise,
+            value: {
+              status: "error",
+              message: "Berekening is mislukt. Probeer het later opnieuw.",
+            },
+          })
+        }
       },
     )
     return () => {
