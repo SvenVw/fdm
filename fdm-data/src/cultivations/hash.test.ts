@@ -21,6 +21,8 @@ describe("hashCultivation", () => {
       b_lu_eom_residue: 0,
       b_lu_n_harvestable: 11.3,
       b_lu_n_residue: 19.3,
+      b_lu_p_harvestable: null,
+      b_lu_p_residue: null,
       b_n_fixation: 0,
       b_lu_rest_oravib: false,
       b_lu_variety_options: null,
@@ -54,6 +56,8 @@ describe("hashCultivation", () => {
       b_lu_eom_residue: 0,
       b_lu_n_harvestable: 11.3,
       b_lu_n_residue: 19.3,
+      b_lu_p_harvestable: null,
+      b_lu_p_residue: null,
       b_n_fixation: 0,
       b_lu_rest_oravib: false,
       b_lu_variety_options: null,
@@ -79,6 +83,8 @@ describe("hashCultivation", () => {
       b_lu_eom_residue: 0,
       b_lu_n_harvestable: 11.3,
       b_lu_n_residue: 19.3,
+      b_lu_p_harvestable: null,
+      b_lu_p_residue: null,
       b_n_fixation: 0,
       b_lu_rest_oravib: false,
       b_lu_variety_options: null,
@@ -111,6 +117,8 @@ describe("hashCultivation", () => {
       b_lu_eom_residue: 0,
       b_lu_n_harvestable: 11.3,
       b_lu_n_residue: 19.3,
+      b_lu_p_harvestable: null,
+      b_lu_p_residue: null,
       b_n_fixation: 0,
       b_lu_rest_oravib: false,
       b_lu_variety_options: null,
@@ -147,6 +155,8 @@ describe("hashCultivation", () => {
       b_lu_eom_residue: 0,
       b_lu_n_harvestable: 11.3,
       b_lu_n_residue: 19.3,
+      b_lu_p_harvestable: null,
+      b_lu_p_residue: null,
       b_n_fixation: 0,
       b_lu_rest_oravib: false,
       b_lu_variety_options: null,
@@ -183,6 +193,8 @@ describe("hashCultivation", () => {
       b_lu_eom_residue: 0,
       b_lu_n_harvestable: 11.3,
       b_lu_n_residue: 19.3,
+      b_lu_p_harvestable: null,
+      b_lu_p_residue: null,
       b_n_fixation: 0,
       b_lu_rest_oravib: false,
       b_lu_variety_options: null,
@@ -220,6 +232,8 @@ describe("hashCultivation", () => {
       b_lu_eom_residue: 0,
       b_lu_n_harvestable: 11.3,
       b_lu_n_residue: 19.3,
+      b_lu_p_harvestable: null,
+      b_lu_p_residue: null,
       b_n_fixation: 0,
       b_lu_rest_oravib: false,
       b_lu_variety_options: null,
@@ -257,6 +271,8 @@ describe("hashCultivation", () => {
       b_lu_eom_residue: 0,
       b_lu_n_harvestable: 11.3,
       b_lu_n_residue: 19.3,
+      b_lu_p_harvestable: null,
+      b_lu_p_residue: null,
       b_n_fixation: 0,
       b_lu_rest_oravib: false,
       b_lu_variety_options: ["Agria"],
@@ -294,6 +310,8 @@ describe("hashCultivation", () => {
       b_lu_eom_residue: 0,
       b_lu_n_harvestable: 11.3,
       b_lu_n_residue: 19.3,
+      b_lu_p_harvestable: null,
+      b_lu_p_residue: null,
       b_n_fixation: 0,
       b_lu_rest_oravib: false,
       b_lu_variety_options: null,
@@ -338,6 +356,8 @@ describe("hashCultivation", () => {
       b_lu_eom_residue: 0,
       b_lu_n_harvestable: 11.3,
       b_lu_n_residue: 19.3,
+      b_lu_p_harvestable: null,
+      b_lu_p_residue: null,
       b_n_fixation: 0,
       b_lu_rest_oravib: false,
       b_lu_variety_options: null,
@@ -349,6 +369,45 @@ describe("hashCultivation", () => {
     const cultivation2: CatalogueCultivationItem = {
       ...cultivation1,
       b_lu_rest_oravib: true,
+    }
+
+    const hash1 = await hashCultivation(cultivation1)
+    const hash2 = await hashCultivation(cultivation2)
+
+    expect(hash1).not.toBe(hash2)
+  })
+  it("should generate different hashes when a phosphate content is set", async () => {
+    const cultivation1: CatalogueCultivationItem = {
+      b_lu_source: "brp",
+      b_lu_catalogue: "test-id-1",
+      b_lu_name: "Test Cultivation 1",
+      b_lu_name_en: "Test Cultivation (EN)",
+      b_lu_harvestable: "once",
+      b_lu_hcat3: "hcat3",
+      b_lu_hcat3_name: "hcat3 name",
+      b_lu_croprotation: "other",
+      b_lu_harvestcat: "HC010",
+      b_lu_yield: 51298,
+      b_lu_dm: 500,
+      b_lu_hi: 0.85,
+      b_lu_eom: 850,
+      b_lu_eom_residue: 0,
+      b_lu_n_harvestable: 11.3,
+      b_lu_n_residue: 19.3,
+      b_lu_p_harvestable: null,
+      b_lu_p_residue: null,
+      b_n_fixation: 0,
+      b_lu_rest_oravib: false,
+      b_lu_variety_options: null,
+      b_lu_start_default: "03-15",
+      b_date_harvest_default: "09-15",
+      hash: null,
+    }
+
+    const cultivation2: CatalogueCultivationItem = {
+      ...cultivation1,
+      b_lu_p_harvestable: 4.5,
+      b_lu_p_residue: 2.1,
     }
 
     const hash1 = await hashCultivation(cultivation1)
